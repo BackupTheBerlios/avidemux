@@ -411,7 +411,7 @@ char *start;
                                                 ADM_assert(0);
                                         }
                                         str--;
-#ifdef CYG_MANGLING                                        
+#ifdef ADM_WIN32                                        
                                         sscanf(str,"%c:%I64x,%I64x,%x",&imgtype,&imgabs,&imgrel,&imgsize);
 #else                                      
                                         sscanf(str,"%c:%llx,%llx,%x",&imgtype,&imgabs,&imgrel,&imgsize);

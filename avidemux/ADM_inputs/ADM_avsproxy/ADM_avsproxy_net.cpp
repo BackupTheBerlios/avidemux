@@ -1,5 +1,5 @@
 #include "config.h"
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 #include "windows.h"
 #include "winbase.h"
 #include "io.h"
@@ -32,7 +32,7 @@
 
 uint8_t avsHeader::bindMe(uint32_t port)
 {
- #ifndef CYG_MANGLING
+ #ifndef ADM_WIN32
  mySocket = socket(PF_INET, SOCK_STREAM, 0);
  #else
  mySocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -64,7 +64,7 @@ uint8_t avsHeader::close(void)
     if(mySocket)
     {
         int er;
-#ifndef CYG_MANGLING        
+#ifndef ADM_WIN32        
         er=shutdown(mySocket,SHUT_RDWR);
 #else
         er=shutdown(mySocket,SD_BOTH);

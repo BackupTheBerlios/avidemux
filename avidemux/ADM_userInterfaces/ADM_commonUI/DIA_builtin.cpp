@@ -74,7 +74,7 @@ uint8_t DIA_builtin(void)
 #ifdef USE_VORBIS
         vorbis=1;
 #endif
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
         win32=1;
 #endif
 #ifdef USE_FAAC

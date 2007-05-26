@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-#ifndef CYG_MANGLING 
+#ifndef ADM_WIN32 
 #ifdef USE_ARTS
 #include <artsc.h>
 

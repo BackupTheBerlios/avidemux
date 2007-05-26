@@ -248,7 +248,7 @@ uint32_t rd;
 		// now read up each parts...
 		//____________________________
 		
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
                 
 #define DUMP_TRACK(i) aprintf(" at %I64u (%I64x) size : %I64u (%I64x)\n", \
                                 _Tracks[i].strh.offset,\

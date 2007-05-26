@@ -48,7 +48,7 @@ static uint8_t sdl_running=0;
 static SDL_Overlay *sdl_overlay=NULL;
 static SDL_Surface *sdl_display=NULL;
 static SDL_Rect disp;
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 HWND sdlWin32;
 #endif
 static ColBase *color=NULL;
@@ -104,7 +104,7 @@ int flags;
             decoded=new uint8_t[w*h*2];
     }
         /* Hack to get SDL to use GTK window, ugly but works */
-#if !defined(CONFIG_DARWIN) && !defined(CYG_MANGLING)
+#if !defined(CONFIG_DARWIN) && !defined(ADM_WIN32)
         { char SDL_windowhack[32];
           int winid=(int)window->window;
                 sprintf(SDL_windowhack,"SDL_WINDOWID=%ld",winid);
@@ -128,7 +128,7 @@ int flags;
         
         }
         SDL_LockSurface(sdl_display);
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 	struct SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
        if(-1 != SDL_GetWMInfo(&wmInfo))

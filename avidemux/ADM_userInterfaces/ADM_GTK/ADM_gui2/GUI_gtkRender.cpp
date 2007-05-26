@@ -22,7 +22,7 @@
 #include <unistd.h>
 
 #include <gtk/gtk.h>
-#ifndef CYG_MANGLING
+#ifndef ADM_WIN32
 #include <gdk/gdkx.h>
 #else
 #include <gdk/gdkwin32.h>
@@ -111,7 +111,7 @@ void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo)
         GtkWidget *widget=(GtkWidget *)draw;
           
         win = gtk_widget_get_parent_window(widget);
-#ifndef CYG_MANGLING
+#ifndef ADM_WIN32
         xinfo->window=	GDK_WINDOW_XWINDOW(widget->window);
         xinfo->display= GDK_WINDOW_XDISPLAY(win);
 #else

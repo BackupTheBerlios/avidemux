@@ -19,7 +19,7 @@ void *StartThreadSpidermonkey(void *pData);
 #else
 #define JSVAR(a,b,c) extern a b
 #endif
-#if defined( CYG_MANGLING) && defined(JSDECLARE)
+#if defined( ADM_WIN32) && defined(JSDECLARE)
  pthread_t g_pThreadSpidermonkey ;
 #else
 JSVAR( pthread_t, g_pThreadSpidermonkey , 0);

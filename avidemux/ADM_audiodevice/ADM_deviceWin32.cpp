@@ -23,7 +23,7 @@
 //
 
 #include "config.h"
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 
 #include <stdio.h>
 #include <stdlib.h>

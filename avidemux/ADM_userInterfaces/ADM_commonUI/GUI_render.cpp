@@ -194,7 +194,7 @@ uint8_t r=0;
 	// in that case we do not even try to use accel
 	
 	// Win32 does not have display
-#ifndef CYG_MANGLING	
+#ifndef ADM_WIN32	
 	displ=getenv("DISPLAY");
 	if(!displ)
 	{

@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
-#ifndef CYG_MANGLING
+#ifndef ADM_WIN32
 #include <unistd.h>
 #endif
 #include <gtk/gtk.h>

@@ -17,7 +17,7 @@
  ***************************************************************************/
 #include "config.h"
 
-#if defined( USE_ESD ) && !defined(CYG_MANGLING)
+#if defined( USE_ESD ) && !defined(ADM_WIN32)
 
 #include <stdio.h>
 #include <stdlib.h>

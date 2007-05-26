@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifndef CYG_MANGLING
+#ifndef ADM_WIN32
 #include <sys/wait.h>
 #include <sys/param.h>
 #endif
@@ -311,7 +311,7 @@ char *n;
         *rval=STRING_TO_JSVAL(JS_NewStringCopyZ(cx,n));
         return JS_TRUE;
 }
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 
 JSBool systemExecute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
@@ -414,7 +414,7 @@ JSBool systemExecute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 	return JS_TRUE;
 }// end systemExecute
 #endif
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 
 JSBool systemInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {

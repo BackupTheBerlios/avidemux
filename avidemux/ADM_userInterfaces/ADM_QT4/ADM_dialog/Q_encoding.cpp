@@ -43,7 +43,7 @@ class encodingWindow : public QDialog
 
 	void priorityChanged(int priorityLevel)
 	{
-	#ifndef CYG_MANGLING
+	#ifndef ADM_WIN32
 		if (getuid() != 0)
 		{
 			ui.comboBoxPriority->disconnect(SIGNAL(currentIndexChanged(int)));
@@ -61,7 +61,7 @@ class encodingWindow : public QDialog
 
 	void shutdownChanged(int state)
 	{
-	#ifndef CYG_MANGLING
+	#ifndef ADM_WIN32
 		if (getuid() != 0)
 		{
 			ui.checkBoxShutdown->disconnect(SIGNAL(stateChanged(int)));
@@ -83,7 +83,7 @@ encodingWindow::encodingWindow()     : QDialog()
  {
 	ui.setupUi(this);
 
-#ifndef CYG_MANGLING
+#ifndef ADM_WIN32
 	//check for root privileges
 	if (getuid() == 0)
 	{
@@ -101,7 +101,7 @@ encodingWindow::encodingWindow()     : QDialog()
 
 	prefs->get(PRIORITY_ENCODING,&priority);	
 
-#ifndef CYG_MANGLING
+#ifndef ADM_WIN32
 	// check for root privileges
 	if (getuid() == 0)
 	{

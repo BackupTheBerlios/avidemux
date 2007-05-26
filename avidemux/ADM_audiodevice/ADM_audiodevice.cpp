@@ -44,7 +44,7 @@
 #include "ADM_audiodevice/ADM_deviceSDL.h"
 #endif
 
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 #include "ADM_audiodevice/ADM_deviceWin32.h"
 #endif
 
@@ -161,7 +161,7 @@ AUDIO_DEVICE id;
 			AVDM_switch(DEVICE_OSS);			
 			printf("\n Using OSS\n");
 		#else
-			#ifdef CYG_MANGLING
+			#ifdef ADM_WIN32
 			AVDM_switch(DEVICE_WIN32);
 			#else
                 #ifdef USE_ESD
@@ -194,13 +194,13 @@ void AVDM_switch(AUDIO_DEVICE action)
 								break;
 
 #endif
-#if defined(OSS_SUPPORT) && !defined(CYG_MANGLING)
+#if defined(OSS_SUPPORT) && !defined(ADM_WIN32)
 		  case  DEVICE_OSS :
 								device=new 	 ossAudioDevice;
 								currentDevice=DEVICE_OSS;;
 								break;
 #endif
-#if defined(USE_ESD) && !defined(CYG_MANGLING)
+#if defined(USE_ESD) && !defined(ADM_WIN32)
 		  case  DEVICE_ESD :
 								device=new 	 esdAudioDevice;
 								currentDevice=DEVICE_ESD;;
@@ -227,7 +227,7 @@ void AVDM_switch(AUDIO_DEVICE action)
 								break;
 #endif
 
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 		case DEVICE_WIN32:
 								device=new win32AudioDevice;
 								currentDevice=DEVICE_WIN32;

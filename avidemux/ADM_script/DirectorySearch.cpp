@@ -14,7 +14,7 @@ at amistry@am-productions.biz
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#ifndef CYG_MANGLING  // def __unix__
+#ifndef ADM_WIN32  // def __unix__
 int CDirectorySearch::_findnext(unsigned long int hDir,_finddata_t *pfdData)
 {// begin _findnext
 	if(!hDir || hDir == 0xFFFFFFFF)
@@ -25,7 +25,7 @@ int CDirectorySearch::_findnext(unsigned long int hDir,_finddata_t *pfdData)
 	if(!pEntry)
 		return -1;
 	std::string sFilePath = "";
-#if defined( __linux__) || defined(__macosx__) || defined(CYG_MANGLING)
+#if defined( __linux__) || defined(__macosx__) || defined(ADM_WIN32)
 	strncpy(pfdData->name,pEntry->d_name,pEntry->d_reclen);
 	// append NULL terminator
 	pfdData->name[pEntry->d_reclen] = '\0';
@@ -50,7 +50,7 @@ int CDirectorySearch::_findnext(unsigned long int hDir,_finddata_t *pfdData)
 		pfdData->attrib |= _A_SUBDIR;
 	if(S_ISCHR(stInfo.st_mode) ||
 	S_ISBLK(stInfo.st_mode) ||
-#if !defined(CYG_MANGLING)	
+#if !defined(ADM_WIN32)	
 	S_ISLNK(stInfo.st_mode) ||
 	S_ISSOCK(stInfo.st_mode) ||
 #endif
@@ -100,7 +100,7 @@ char *s;
 	const char *old=sDirectory.c_str();
 	s=new char[strlen(old)+10];
 	strcpy(s,old);
-#ifdef CYG_MANGLING	
+#ifdef ADM_WIN32	
 	strcat(s,"\\*");
 #endif
 	
@@ -112,7 +112,7 @@ char *s;
 		printf("Find first failed\n");
 		return false;
 	}
-#ifdef CYG_MANGLING   //ndef __unix__
+#ifdef ADM_WIN32   //ndef __unix__
 	m_sDirectory = GetFileDirectory(sDirectory);
 #else
 	m_sDirectory = sDirectory;
@@ -149,7 +149,7 @@ std::string CDirectorySearch::GetFileDirectory(std::string sFilePath) const
 	for(int i = sFilePath.length()-1;i >= 0;i--)
 		if(sFilePath[i] == DIRECTORY_DELIMITOR)
 		{// begin copy directory name into buffer
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 			if(sFilePath[0] == DIRECTORY_DELIMITOR)
 			{
 				sFilePath.erase(0,1);

@@ -23,7 +23,7 @@ at amistry@am-productions.biz
 
 using namespace std;
 
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 	const char DIRECTORY_DELIMITOR = '\\';
 #else
 	const char DIRECTORY_DELIMITOR = '/';

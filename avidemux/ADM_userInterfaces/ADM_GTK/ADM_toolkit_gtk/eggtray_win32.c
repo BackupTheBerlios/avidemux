@@ -22,7 +22,7 @@
 
 /* Stub code to interface with Shell_NotifyIcon */
 #include <config.h>
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 #include <windows.h>
 #include <wingdi.h>
 

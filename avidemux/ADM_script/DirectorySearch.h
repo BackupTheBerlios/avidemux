@@ -14,7 +14,7 @@ at amistry@am-productions.biz
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
-#if defined( CYG_MANGLING) 
+#if defined( ADM_WIN32) 
 #include <io.h>
 #include <sys/stat.h>
 #else
@@ -27,7 +27,7 @@ at amistry@am-productions.biz
 // create a non file bit for unix
 #define _A_NONFILE	0x03
 
-#if defined( __unix__) && !defined(__macosx__) && !defined(CYG_MANGLING)
+#if defined( __unix__) && !defined(__macosx__) && !defined(ADM_WIN32)
 
 // wrap the file mode bits
 #define _A_NORMAL	0x00
@@ -104,7 +104,7 @@ protected:
 	_finddata_t m_fdData;
 	std::string m_sDirectory;
 private:
-#ifndef CYG_MANGLING //def __unix__
+#ifndef ADM_WIN32 //def __unix__
 	// prototypes
 	int _findfirst(const char *path,_finddata_t *pfdData);
 	int _findnext(unsigned long int hDir,_finddata_t *pfdData);

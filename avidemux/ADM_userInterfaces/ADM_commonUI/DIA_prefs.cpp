@@ -242,10 +242,10 @@ uint32_t hzd,vzd,dring;
 #ifdef CONFIG_DARWIN
 	MKADID(COREAUDIO),
 #endif
-#if	defined(USE_SDL) && !defined(CYG_MANGLING)	
+#if	defined(USE_SDL) && !defined(ADM_WIN32)	
 	MKADID(SDL),
 #endif	
-#ifdef CYG_MANGLING	
+#ifdef ADM_WIN32	
 	MKADID(WIN32),
 #endif	
 #ifdef USE_ESD	
@@ -279,7 +279,7 @@ uint32_t hzd,vzd,dring;
      
         // Filter path
         if( prefs->get(FILTERS_AUTOLOAD_PATH, &filterPath) != RC_OK )
-#ifndef CYG_MANGLING
+#ifndef ADM_WIN32
                filterPath = ADM_strdup("/tmp");
 #else
                filterPath = ADM_strdup("c:\\");
