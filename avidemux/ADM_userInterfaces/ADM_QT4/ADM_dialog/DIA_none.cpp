@@ -91,7 +91,7 @@ uint8_t DIA_audioCodec( AUDIOENCODER *codec ) {return 0;}
 uint8_t DIA_srt(ADMImage *source, SUBCONF *param) {return 0;}			
 uint8_t DIA_quota(char *) {return 0;}
 uint8_t  DIA_job_select(char **jobname, char **filename) {return 0;}
-const char * GUI_getCustomScript(uint32_t nb) {return 0;}
+//const char * GUI_getCustomScript(uint32_t nb) {return 0;}
 uint8_t DIA_RecentFiles( char **name ){return 0;}
 uint8_t DIA_about( void ){return 0;}
 void    DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate ){return ;}

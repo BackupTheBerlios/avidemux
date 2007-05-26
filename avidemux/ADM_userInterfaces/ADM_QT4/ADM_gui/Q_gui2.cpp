@@ -40,6 +40,7 @@
 #include "ADM_codecs/ADM_codec.h"
 #include "gui_action.hxx"
 #include "ADM_editor/ADM_outputfmt.h"
+#include "ADM_toolkit/filesel.h"
 #include "prefs.h"
 
 extern int automation(void );
@@ -50,7 +51,7 @@ extern uint32_t audioFilterGetNbEncoder(void);
 extern const char* audioFilterGetIndexedName(uint32_t i);
 extern void checkCrashFile(void);
 static void setupMenus(void);
-
+static void GUI_initCustom(void);
 #ifdef CUSTOM_SLIDER
 static ADM_QSlider *slider=NULL;
 #else
@@ -58,7 +59,9 @@ static QSlider *slider=NULL;
 #endif
 static int _upd_in_progres=0;
 /* Ugly game with macro so that buttons emit their name ...*/
-
+static char     *customNames[ADM_MAC_CUSTOM_SCRIPT];
+static QAction  *customActions[ADM_MAC_CUSTOM_SCRIPT];
+static uint32_t ADM_nbCustom=0;
 
 
 #include "ui_gui2.h"
@@ -100,6 +103,7 @@ static Action searchTranslationTable(const char *name);
      Ui_MainWindow ui;
  public slots:
      void buttonPressed(void);
+     void custom(void);
      void toolButtonPressed(bool z);
      void comboChanged(int z)
      {
@@ -209,7 +213,48 @@ MainWindow::MainWindow()     : QMainWindow()
           ui.pushButtonVideoFilter->setEnabled(b);
           ui.pushButtonAudioConf->setEnabled(b);
           ui.pushButtonAudioFilter->setEnabled(b);
+          
+          /* Build the custom menu */
+          GUI_initCustom();
+          for(int i=0;i<ADM_nbCustom;i++)
+          {
+            customActions[i]=new QAction(customNames[i],NULL);
+            ui.menuCustom->addAction(customActions[i]);
+            connect(customActions[i], SIGNAL(triggered()), this, SLOT(custom()));
+          }
+          printf("Menu built\n");
  }
+ /**
+    \fn     custom
+    \brief  Invoked when one of the custom script has been called
+ */
+void MainWindow::custom(void)
+{
+    printf("[CUSTOM] Invoked\n");
+    QObject *ptr=sender();
+    if(!ptr) return;
+    for(int i=0;i<ADM_nbCustom;i++)
+    {
+      if(customActions[i]==ptr)
+      {
+        printf("[Custom] %u/%u scrips\n",i,ADM_nbCustom);
+        HandleAction( (Action)(ACT_CUSTOM_BASE+i));
+        return; 
+      }
+    }
+    printf("[Custom] Not found\n");
+}
+/**
+    Get the custom entry 
+
+*/
+const char * GUI_getCustomScript(uint32_t nb)
+{
+    ADM_assert(nb<ADM_nbCustom);
+    return customNames[nb];
+
+}
+ 
  /*
       We receive a button press event
  */
@@ -591,6 +636,30 @@ uint8_t UI_sliderResize(uint32_t w)
   printf("sliderResize %u\n",w);
   slider->resize(w,w);
   return 1; 
+}
+/**
+      \fn GUI_initCustom
+      \brief Initialize custom menu
+*/
+void GUI_initCustom(void )
+{
+  char *customdir=ADM_getCustomDir();
+  if(!customdir) 
+  {
+      printf("No custom dir...\n");
+      return;
+  }
+  /* Collect the name */
+   if(! buildDirectoryContent(&ADM_nbCustom,customdir, customNames,ADM_MAC_CUSTOM_SCRIPT,".js"))
+    {
+      printf("Failed to build custom dir content");
+      return;
+    }
+  if(!ADM_nbCustom)
+  {
+      printf("No custom script\n");
+  }
+  printf("Found %u custom scripts, adding them\n",ADM_nbCustom);
 }
 //********************************************
 //EOF
