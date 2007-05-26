@@ -40,7 +40,7 @@ extern const char *shortkey(const char *);
 diaElemReadOnlyText::diaElemReadOnlyText(char *readyOnly,const char *toggleTitle,const char *tip)
   : diaElem(ELEM_TOGGLE)
 {
-  param=(void *)readyOnly;
+  param=(void *)ADM_strdup(readyOnly);
   paramTitle=shortkey(toggleTitle);
   this->tip=tip;
  }
@@ -49,6 +49,7 @@ diaElemReadOnlyText::~diaElemReadOnlyText()
 {
   if(paramTitle)
     delete paramTitle;
+  ADM_dealloc(readOnly);
 }
 void diaElemReadOnlyText::setMe(void *dialog, void *opaque,uint32_t line)
 {

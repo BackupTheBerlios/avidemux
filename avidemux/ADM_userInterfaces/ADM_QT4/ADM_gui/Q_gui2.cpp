@@ -198,6 +198,8 @@ MainWindow::MainWindow()     : QMainWindow()
             ADD(actionNext_blak_frame);
             ADD(actionFirst_Frame);
             ADD(actionLast_Frame);
+            ADD(actionGo_to_Marker_A);
+            ADD(actionGo_to_Marker_B);
             //** Add shortcuts **//
             QKeySequence seqFilter("CTRL+Alt+F");
             ui.actionFilters->setShortcut(seqFilter);

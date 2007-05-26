@@ -9,6 +9,8 @@
         <file>pics/filesave.png</file>
         <file>pics/filesaveas.png</file>
         <file>pics/forward.png</file>
+        <file>pics/gotoA.png</file>
+        <file>pics/gotoB.png</file>
         <file>pics/info.png</file>
         <file>pics/markA.png</file>
         <file>pics/markB.png</file>
@@ -24,5 +26,6 @@
         <file>pics/previous.png</file>
         <file>pics/project_open.png</file>
         <file>pics/thumbnail.png</file>
+        <file>pics/volume.png</file>
     </qresource>
 </RCC>

@@ -71,8 +71,6 @@ PROCESS(actionPSP_H264,ACT_AUTO_PSP_H264)
 
 
 #define LIST_OF_BUTTONS     \
-PROCESS(setMarkerA , ACT_GotoMarkA  ) \
-PROCESS(setMarkerB ,ACT_GotoMarkB )  \
 PROCESS(pushButtonVideoConf ,ACT_VideoCodec)  \
 PROCESS(pushButtonVideoFilter , ACT_VideoParameter  ) \
 PROCESS(pushButtonAudioConf ,ACT_AudioCodec ) \

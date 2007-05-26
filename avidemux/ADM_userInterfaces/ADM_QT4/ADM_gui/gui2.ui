@@ -628,23 +628,9 @@
          <number>6</number>
         </property>
         <item>
-         <widget class="QPushButton" name="setMarkerA" >
-          <property name="sizePolicy" >
-           <sizepolicy>
-            <hsizetype>1</hsizetype>
-            <vsizetype>0</vsizetype>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize" >
-           <size>
-            <width>32</width>
-            <height>0</height>
-           </size>
-          </property>
+         <widget class="QLabel" name="label_12" >
           <property name="text" >
-           <string>A:</string>
+           <string> A:</string>
           </property>
          </widget>
         </item>
@@ -664,23 +650,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="setMarkerB" >
-          <property name="sizePolicy" >
-           <sizepolicy>
-            <hsizetype>4</hsizetype>
-            <vsizetype>0</vsizetype>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize" >
-           <size>
-            <width>32</width>
-            <height>0</height>
-           </size>
-          </property>
+         <widget class="QLabel" name="label_11" >
           <property name="text" >
-           <string>B:</string>
+           <string> B:</string>
           </property>
          </widget>
         </item>
@@ -696,6 +668,19 @@
           </property>
           <property name="text" >
            <string>0000000</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>...</string>
+          </property>
+          <property name="icon" >
+           <iconset resource="avidemux.qrc" >:/new/prefix1/pics/arts.png</iconset>
           </property>
          </widget>
         </item>
@@ -966,6 +951,16 @@
     <addaction name="actionPSP" />
     <addaction name="actionPSP_H264" />
    </widget>
+   <widget class="QMenu" name="menuAudio" >
+    <property name="title" >
+     <string>Audio</string>
+    </property>
+    <addaction name="actionMain_Track" />
+    <addaction name="actionSecondary_Track" />
+    <addaction name="actionBuild_VBR_time_map" />
+    <addaction name="actionSave_2" />
+    <addaction name="actionFilters_2" />
+   </widget>
    <widget class="QMenu" name="menuVideo" >
     <property name="title" >
      <string>Video</string>
@@ -976,16 +971,6 @@
     <addaction name="separator" />
     <addaction name="actionFilters" />
     <addaction name="actionFrame_rate" />
-   </widget>
-   <widget class="QMenu" name="menuAudio" >
-    <property name="title" >
-     <string>Audio</string>
-    </property>
-    <addaction name="actionMain_Track" />
-    <addaction name="actionSecondary_Track" />
-    <addaction name="actionBuild_VBR_time_map" />
-    <addaction name="actionSave_2" />
-    <addaction name="actionFilters_2" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -1016,8 +1001,6 @@
    <addaction name="separator" />
    <addaction name="actionCalculator" />
    <addaction name="separator" />
-   <addaction name="actionPreview" />
-   <addaction name="actionDisplay_output" />
   </widget>
   <action name="actionOpen" >
    <property name="icon" >
@@ -1340,11 +1323,17 @@
    </property>
   </action>
   <action name="actionGo_to_Marker_A" >
+   <property name="icon" >
+    <iconset resource="avidemux.qrc" >:/new/prefix1/pics/gotoA.png</iconset>
+   </property>
    <property name="text" >
     <string>Go to Marker A</string>
    </property>
   </action>
   <action name="actionGo_to_Marker_B" >
+   <property name="icon" >
+    <iconset resource="avidemux.qrc" >:/new/prefix1/pics/gotoB.png</iconset>
+   </property>
    <property name="text" >
     <string>Go to Marker B</string>
    </property>
