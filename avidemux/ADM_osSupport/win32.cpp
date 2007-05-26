@@ -6,7 +6,7 @@
 #include "ADM_misc.h"
 
 
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 #include "windows.h"
 #include "winbase.h"
 #include "io.h"

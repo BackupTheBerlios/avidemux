@@ -976,7 +976,7 @@ int A_openAvi2 (char *name, uint8_t mode)
             setCurrentMixerFromString("NONE");
         }
 	for(i=strlen(longname);i>=0;i--)
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 		if( longname[i] == '\\' ){
 #else
 		if( longname[i] == '/' ){

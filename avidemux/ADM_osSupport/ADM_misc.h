@@ -73,7 +73,7 @@ uint8_t         ADM_fileExist(char *name);
 	#endif
 #endif
 
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 	#define PRIO_MIN -20
 	#define PRIO_MAX 20
 	#define PRIO_PROCESS 0

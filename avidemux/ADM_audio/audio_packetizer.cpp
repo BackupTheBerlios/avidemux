@@ -24,7 +24,7 @@ Split a stream into packet(s)
 #include <string.h>
 #include <ADM_assert.h>
 #include <math.h>
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 #include <io.h>
 #endif
 

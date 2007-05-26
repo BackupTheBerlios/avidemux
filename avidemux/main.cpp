@@ -28,7 +28,7 @@
 #endif
 #include "default.h"
 
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 #define WIN32_CLASH
 #include "windows.h"
 #include "wingdi.h"
@@ -141,7 +141,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 #endif
 #ifdef HAVE_GETTEXT
   char *local=setlocale (LC_ALL, "");
-#ifndef CYG_MANGLING
+#ifndef ADM_WIN32
   bindtextdomain ("avidemux", ADMLOCALE);
 #else
   bindtextdomain ("avidemux", "./share/locale");
@@ -157,7 +157,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
   local=textdomain(NULL);
   if(local)
     printf("[Locale] Textdomain is now  %s \n",local);
-#ifndef CYG_MANGLING  
+#ifndef ADM_WIN32  
   printf("[Locale] Files for %s appear to be in %s\n","avidemux", ADMLOCALE);
 #endif
   printf("[Locale] Test: %s \n",dgettext("avidemux","_File"));
@@ -185,7 +185,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 
 
     
-#ifdef CYG_MANGLING    
+#ifdef ADM_WIN32    
     win32_netInit();
 #endif
     UI_Init(argc,argv);

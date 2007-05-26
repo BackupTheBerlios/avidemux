@@ -450,7 +450,7 @@ uint32_t done=0;
 	// Get the amound of utf16...
 	done=(ADM_RAW-sout)>>1;
 // For win32 we swap le and be
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
        ADM_GLYPH_T glyph;
        for(uint32_t w=0;w<done;w++)
        {

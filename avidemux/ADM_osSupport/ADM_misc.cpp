@@ -23,7 +23,7 @@
 #include <time.h>
 #include <math.h>
 #include <string.h>
-#ifndef CYG_MANGLING
+#ifndef ADM_WIN32
 #include <unistd.h>
 #endif
 //#include <gtk/gtk.h>
@@ -324,7 +324,7 @@ void TLK_getDate(ADM_date *date)
 
 bool shutdown(void)
 {
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 	return (shutdown_win32() == 0);
 #else
 	return (system("shutdown -P 0") == 0);

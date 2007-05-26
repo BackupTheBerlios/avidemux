@@ -50,7 +50,7 @@ size_t ADM_fwrite (void *ptr, size_t size, size_t n, FILE *sstream)
 FILE  *ADM_fopen (const char *file, const char *mode)
 {
   FILE *f;
-#ifndef CYG_MANGLING
+#ifndef ADM_WIN32
   return fopen(file,mode); 
 #else
   
@@ -73,7 +73,7 @@ static char customdir[1024]={0};
 int baseDirDone=0;
 int jobDirDone=0;
 int customDirDone=0;
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 const char *ADM_DIR_NAME="\\avidemux";
 #else
 const char *ADM_DIR_NAME="/.avidemux";
@@ -92,7 +92,7 @@ char *ADM_getCustomDir(void)
   char *rootDir;
   rootDir=ADM_getBaseDir();
   strncpy(customdir,rootDir,1023);
-#if defined(CYG_MANGLING)
+#if defined(ADM_WIN32)
   strcat(customdir,"\\custom"); 
 #else
   strcat(customdir,"/custom");
@@ -116,7 +116,7 @@ char *ADM_getJobDir(void)
   char *rootDir;
   rootDir=ADM_getBaseDir();
   strncpy(jobdir,rootDir,1023);
-#if defined(CYG_MANGLING)
+#if defined(ADM_WIN32)
   strcat(jobdir,"\\jobs"); 
 #else
   strcat(jobdir,"/jobs");
@@ -140,7 +140,7 @@ char *home;
 //
         if(baseDirDone) return basedir;
 // Get the base directory
-#if defined(CYG_MANGLING)
+#if defined(ADM_WIN32)
         if( ! (home=getenv("USERPROFILE")) )
         {
           GUI_Error_HIG(_("Oops"),_("can't determine $USERPROFILE."));
@@ -189,7 +189,7 @@ DIR *dir=NULL;
                   closedir(dir);
                   return 1;
               }
-#if defined(CYG_MANGLING)
+#if defined(ADM_WIN32)
                 if(mkdir(dirname))
                 {
                     printf("Oops: mkdir failed on %s\n",dirname);   
@@ -294,14 +294,14 @@ char *PathCanonize(const char *tmpname)
 	{
 		out=new char [strlen(path)+2];
 		strcpy(out,path);
-#ifndef CYG_MANGLING		
+#ifndef ADM_WIN32		
 		strcat(out,"/");
 #else
 		strcat(out,"\\");
 #endif	
 		printf("\n Canonizing null string ??? (%s)\n",out);
 	}else if(tmpname[0]=='/'
-#if defined(CYG_MANGLING)
+#if defined(ADM_WIN32)
 		|| tmpname[1]==':'
 #endif	
 	
@@ -313,7 +313,7 @@ char *PathCanonize(const char *tmpname)
 	}else{
 		out=new char[strlen(path)+strlen(tmpname)+6];
 		strcpy(out,path);
-#ifndef CYG_MANGLING		
+#ifndef ADM_WIN32		
 		strcat(out,"/");
 #else
 		strcat(out,"\\");
@@ -332,7 +332,7 @@ void		PathStripName(char *str)
 		int len=strlen(str);
 		if(len<=1) return;
 		len--;
-#ifndef CYG_MANGLING		
+#ifndef ADM_WIN32		
 		while( *(str+len)!='/' && len)
 #else
 	while( *(str+len)!='\\' && len)
@@ -351,7 +351,7 @@ const char *GetFileName(const char *str)
 {
 	char *filename;
         char *filename2;
-#ifndef CYG_MANGLING		
+#ifndef ADM_WIN32		
 	filename = strrchr(str, '/');
         
 #else
