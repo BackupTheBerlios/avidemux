@@ -407,6 +407,7 @@ AM_CONDITIONAL(HAVE_CYGWIN, test "x$use_cygwin" = "xyes")
 if test "x$use_cygwin" = "xyes"; then
 	AC_DEFINE(MEMALIGN_HACK,1,"SSE on Cywin")
 	AC_DEFINE(CYG_MANGLING,1,"Name mangling")
+	AC_DEFINE(ADM_WIN32,1,"Build for windows 32bits")
 	AC_DEFINE(rindex,ADM_rindex,"rindex does not exist on Cygwin")
 	AC_DEFINE(index,ADM_index,"rindex does not exist on Cygwin")
 	AC_DEFINE(fseeko,fseeko_adm,"")
