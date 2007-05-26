@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-04-24 13:16+0100\n"
-"PO-Revision-Date: 2007-05-17 20:37+0100\n"
+"PO-Revision-Date: 2007-05-26 12:38+0100\n"
 "Last-Translator: \n"
 "Language-Team: Mean <fr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1747,7 +1747,7 @@ msgstr "© 2001-2006 Mean"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_about.cpp:71
 msgid "Multiplatform video editor"
-msgstr "Editeur Vidéo Multi-plateforme francisé par OliverDivX"
+msgstr "Editeur Vidéo Multi-plateforme"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_about.cpp:72
 msgid ""
