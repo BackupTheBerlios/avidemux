@@ -179,7 +179,7 @@ ADMBitstream bitstream(MAXIMUM_SIZE * MAXIMUM_SIZE * 3);
 		return 0;
         _videoFlag=bitstream.flags;
 	// 3-write it
-        encoding_gui->setFrame(frame,bitstream.len,bitstream.out_quantizer,frametogo);
+        encoding_gui->setFrame(frame-frameStart,bitstream.len,bitstream.out_quantizer,frametogo);
 	return writter->saveVideoFrame (bitstream.len, _videoFlag, vbuffer);
 }
 //_________________________________________________________
@@ -249,7 +249,7 @@ uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
     				return 0;
                         _videoFlag=img.flags;
 			_nextip=nextip;
-                        encoding_gui->setFrame(frame,img.dataLength,0,frametogo);
+                        encoding_gui->setFrame(frame-frameStart,img.dataLength,0,frametogo);
 			return writter->saveVideoFrame (img.dataLength, img.flags, img.data);
 		}
 		else
@@ -258,7 +258,7 @@ uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
 			if (!video_body->getFrameNoAlloc (frame-1, &img, &seq))
     				return 0;
                          _videoFlag=img.flags;
-                        encoding_gui->setFrame(frame,img.dataLength,0,frametogo);
+                        encoding_gui->setFrame(frame-frameStart,img.dataLength,0,frametogo);
 			return writter->saveVideoFrame (img.dataLength, img.flags, img.data);
 		}
 	}
@@ -271,7 +271,7 @@ uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
 		if (! video_body->getFrameNoAlloc(frame-1, &img, &seq))// (frame-1, vbuffer, &len,    &_videoFlag, &seq))
     			return 0;
                  _videoFlag=img.flags;
-                encoding_gui->setFrame(frame,img.dataLength,0,frametogo);
+                encoding_gui->setFrame(frame-frameStart,img.dataLength,0,frametogo);
 		return writter->saveVideoFrame  (img.dataLength, img.flags, img.data);;
 	
 	}
@@ -283,7 +283,7 @@ uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
 			aprintf("Seq broken..\n");
 			compEngaged = 1;
 			initEncoder (_cqReenc);
-                        encoding_gui->setFrame(frame,img.dataLength,0,frametogo);
+                        encoding_gui->setFrame(frame-frameStart,img.dataLength,0,frametogo);
 			return writeVideoChunk_recode(frame);
 		}
 	_nextip=frame;
@@ -291,7 +291,7 @@ uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
 	if(! video_body->getFrameNoAlloc (frame, &img, &seq)) return 0;
         _videoFlag=img.flags;
 	
-	encoding_gui->setFrame(frame,img.dataLength,0,frametogo);
+	encoding_gui->setFrame(frame-frameStart,img.dataLength,0,frametogo);
 	return writter->saveVideoFrame (img.dataLength, img.flags, img.data);;
 }
 //_________________________________________________________
