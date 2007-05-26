@@ -21,7 +21,7 @@
 #ifndef __AVIFMT2__
 #define __AVIFMT2__
 
-#if !defined( WIN32_CLASH) || !defined(CYG_MANGLING)
+#if !defined( WIN32_CLASH) || !defined(ADM_WIN32)
 typedef struct
 {
     uint32_t 		biSize;
@@ -50,14 +50,14 @@ void printBih(BITMAPINFOHEADER *bi);
 
 
 typedef struct _avistdindex_chunk {
-/*	uint32_t 		fcc;					// ’ix##’
+/*	uint32_t 		fcc;					// ï¿½ix##ï¿½
 	DWORD 			cb;
 */
 	uint16_t 	wLongsPerEntry;		// must be sizeof(aIndex[0])/sizeof(DWORD)
 	uint8_t 	bIndexSubType;			// must be 0
 	uint8_t 	bIndexType;			// must be AVI_INDEX_OF_CHUNKS
 	uint32_t 	nEntriesInUse;		//
-	uint32_t 	dwChunkId;			// ’##dc’ or ’##db’ or ’##wb’ etc..
+	uint32_t 	dwChunkId;			// ï¿½##dcï¿½ or ï¿½##dbï¿½ or ï¿½##wbï¿½ etc..
 /*	QUADWORD 	qwBaseOffset;		// all dwOffsets in aIndex array are
 														// relative to this
 */

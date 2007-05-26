@@ -13,7 +13,7 @@
 #ifndef NOAVIFMT
 
 #ifndef __WINE_WINDEF_H
-#if !defined( WIN32_CLASH) || !defined(CYG_MANGLING)
+#if !defined( WIN32_CLASH) || !defined(ADM_WIN32)
 #define LOBYTE(w)              ((uint8_t)(uint16_t)(w))
 #define HIBYTE(w)              ((uint8_t)((uint16_t)(w) >> 8))
 

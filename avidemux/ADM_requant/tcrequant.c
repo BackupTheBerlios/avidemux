@@ -85,7 +85,7 @@ static int verbose = 2;
 
 // user defined types
 //typedef unsigned int		uint;
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 	#define uint unsigned int
 #endif
 #ifdef ADM_BSD_FAMILY

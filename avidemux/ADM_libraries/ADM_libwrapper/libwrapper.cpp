@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "default.h"
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 #include <windows.h>
 #else
 #include <dlfcn.h>
@@ -23,7 +23,7 @@ ADM_LibWrapper::~ADM_LibWrapper()
 	{
 		printf("Unloading library 0x%08x\n", hinstLib);
 
-	#ifdef CYG_MANGLING
+	#ifdef ADM_WIN32
 		FreeLibrary((HINSTANCE) hinstLib);
 	#else
 		dlclose(hinstLib);
@@ -36,7 +36,7 @@ bool ADM_LibWrapper::isAvailable()
 	return initialised;
 }
 
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 char* ADM_LibWrapper::formatMessage(uint32_t msgCode)
 {
 	char* lpMsgBuf;
@@ -49,7 +49,7 @@ char* ADM_LibWrapper::formatMessage(uint32_t msgCode)
 
 bool ADM_LibWrapper::loadLibrary(const char* path)
 {
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 	hinstLib = LoadLibrary(path);
 
 	if (hinstLib == NULL)
@@ -87,7 +87,7 @@ bool ADM_LibWrapper::loadLibrary(const char* path)
 
 void* ADM_LibWrapper::getSymbol(const char* name)
 {
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 	void* procAddr = (void*)GetProcAddress((HINSTANCE) hinstLib, name);
 
 	if (procAddr == NULL)
@@ -113,7 +113,7 @@ void* ADM_LibWrapper::getSymbol(const char* name)
 
 bool ADM_LibWrapper::getSymbols(int symCount, ...)
 {
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
     va_list va;
     va_start(va, symCount);
 

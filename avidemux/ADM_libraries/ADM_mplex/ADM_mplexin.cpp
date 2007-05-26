@@ -17,7 +17,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <errno.h>
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 #include <io.h>
 #endif
 #include "interact.hpp"
@@ -63,7 +63,7 @@ int FileOutputStream::Open()
   char msg[512];
    while( !(strm = fopen( cur_filename, "wb" )) ){
       if( errno == ENOSPC
-#ifndef CYG_MANGLING
+#ifndef ADM_WIN32
                           || errno == EDQUOT
 #endif
                                              ){
@@ -129,7 +129,7 @@ FileOutputStream::Write( uint8_t *buf, unsigned int len )
          continue;
       }
       if( rc == -1 && (errno == ENOSPC
-#ifndef CYG_MANGLING
+#ifndef ADM_WIN32
                                        || errno == EDQUOT
 #endif
                                                           ) ){

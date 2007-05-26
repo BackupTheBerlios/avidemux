@@ -420,7 +420,7 @@ int preferences::save_xml_to_file(){
         strcat(rcfile,CONFIG);
 
 
-#if defined(CYG_MANGLING)
+#if defined(ADM_WIN32)
 	xmlSetDocCompressMode(xdoc,9);
 	if( xmlSaveFormatFile(rcfile,xdoc,1) == -1 ){
            fprintf(stderr,"\ncan't save xml tree to file. Filesystem full?\n\n");

@@ -26,7 +26,7 @@
 #include <pthread.h>
 #define WIN32_CLASH
 //#include <unistd.h>
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 #include "sys/stat.h"
 #endif
 #ifdef ADM_BSD_FAMILY
@@ -352,7 +352,7 @@ thisIsMpeg:
                     printf("Filesystem is writable\n");
 		}else if( errno == EROFS ){
 		  char *tmpdir = getenv("TMPDIR");
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
                         printf("Filesystem is not writable, looking for somewhere else\n");
 			if( !tmpdir )
 				tmpdir = "c:";

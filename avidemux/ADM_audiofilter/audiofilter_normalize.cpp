@@ -41,7 +41,7 @@
 extern AVDMGenericAudioStream *currentaudiostream;
 
 
-#ifndef CYG_MANGLING
+#ifndef ADM_WIN32
 #ifdef ADM_BSD_FAMILY
                 #define POW10(x) powf(10.0,x)
 #else

@@ -22,7 +22,7 @@
 #include <stdlib.h>
 //#include <glib.h>
 #include <signal.h>
-#ifndef CYG_MANGLING
+#ifndef ADM_WIN32
 #include <unistd.h>
 #endif
 #include <math.h>

@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define WIN32_CLASH
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 #include <windows.h> 
 #ifdef USE_EDLL
 #include "edll/edll.h"
@@ -50,7 +50,7 @@
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_osSupport/ADM_quota.h"
 
-#ifdef CYG_MANGLING
+#ifdef ADM_WIN32
 #ifdef USE_EDLL
 #define TYPEOFHANDLE     edll_module *
 #define OPENLIB(x)       edll_open(x)
