@@ -376,7 +376,8 @@ ADMVideoSubtitle::~ADMVideoSubtitle()
 	}
 }
 
-uint8_t DIA_srt(ADMImage *source, SUBCONF *param);
+uint8_t DIA_srt(AVDMGenericVideoStream *source, SUBCONF *param);
+    
 uint8_t ADMVideoSubtitle::configure(AVDMGenericVideoStream *instream)
 {
   
@@ -386,13 +387,8 @@ uint8_t ret=0;
 int charset=0;
 uint32_t l,f;
 
-          ADMImage *sourceImage=new ADMImage(_info.width,_info.height);
-          ADM_assert(instream->getFrameNumberNoAlloc(curframe,
-                                        &l,
-                                        sourceImage,
-                                        &f));
                         
-          if(DIA_srt(	sourceImage,_conf))
+          if(DIA_srt(	instream,_conf))
           {
             printf("\n Font : %s", _conf->_fontname);
             printf("\n Sub  : %s", _conf->_subname);
@@ -420,7 +416,6 @@ uint32_t l,f;
                         _conf->_useBackgroundColor);
             ret=1;
         }
-        delete  sourceImage;
         return ret;
 
 }
