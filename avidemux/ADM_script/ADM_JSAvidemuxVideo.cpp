@@ -243,8 +243,10 @@ JSBool ADM_JSAvidemuxVideo::Codec(JSContext *cx, JSObject *obj, uintN argc,
         if(JSVAL_IS_STRING(argv[0]) == false || JSVAL_IS_STRING(argv[1]) == false  || JSVAL_IS_STRING(argv[2]) == false)
                 return JS_FALSE;
         
-
-                printf("Valid codec conf %s found.\n",JS_GetStringBytes(JSVAL_TO_STRING(argv[2])));
+                printf("[codec]%s\n",JS_GetStringBytes(JSVAL_TO_STRING(argv[0])));
+                printf("[conf ]%s\n",JS_GetStringBytes(JSVAL_TO_STRING(argv[1])));
+                printf("[xtra ]%s\n",JS_GetStringBytes(JSVAL_TO_STRING(argv[2])));
+                
                 char *codec,*conf,*codecConfString;
                 codec = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
                 conf = JS_GetStringBytes(JSVAL_TO_STRING(argv[1]));

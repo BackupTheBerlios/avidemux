@@ -144,6 +144,8 @@ bool parseECMAScript(const char *name)
 		JS_DestroyScript(g_pCx,pJSScript);
 		printf("Done.\n");
 	}// end execute external file
+        // Run garbage collector now, it is safe
+        JS_GC(g_pCx);
 	A_Resync();
 	return g_bJSSuccess;
 }// end parseECMAScript
