@@ -20,6 +20,7 @@ FAC_readOnlyText.cpp \
 FAC_notch.cpp \
 FAC_frame.cpp \
 FAC_hex.cpp \
-FAC_button.cpp
+FAC_button.cpp \
+DIA_color.cpp
 
 

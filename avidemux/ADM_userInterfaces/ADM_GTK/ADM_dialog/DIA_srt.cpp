@@ -55,377 +55,151 @@
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
 
-#include "prototype.h"
-#include "prefs.h"
 #include <ADM_assert.h>
+#include "DIA_flyDialog.h"
+#include "DIA_flySrtPos.h"
 
 
-    
-typedef struct unicd
-{
-	char *display,*name;
-}unicd;
-#define CHECKSPIN(x,y) y= gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(x)) ;
-//
-//	If you want to add languages just add them here, nothing else to do
-//	First is the displayed name, second is the iconv --list name use internally
-//
-static unicd  names[]=
-{
-	{(char *)"Ascii"	,(char *)"ISO-8859-1"},
-	{(char *)"Cyrillic"	,(char *)"WINDOWS-1251"}, // ru
-	{(char *)"Czech"	,(char *)"ISO-8859-2"},	// cz
-	{(char *)"German"	,(char *)"ISO-8859-9"}		// german ?
-	,{(char *)"Slovene"	,(char *)"CP1250"}		// UTF8
-	,{(char *)"UTF8"	,(char *)"UTF8"}		// UTF8
-	,{(char *)"Chinese Traditionnal(Big5)"	,(char *)"CP950"}		// UTF8
-	,{(char *)"Chinese Simplified (GB2312)"	,(char *)"CP936"}		// UTF8
-};
-
-
-
-static void on_callback_sub(GtkButton * button, gpointer user_data);
-static void on_callback_font(GtkButton * button, gpointer user_data);
-static void on_callback_color(GtkButton * button, gpointer user_data);
-
-static gboolean on_slider( void );
-
-static void indexSUB(char *name);
-static void update(uint32_t value);
-static void read(void);
-
-static GtkWidget* create_dialog1 (void);
-static GtkWidget *dialog=NULL;
-static GtkWidget *drawing=NULL;
-static GtkAdjustment *sliderAdjustment;
-
-static uint32_t glob_font=0;
-static uint32_t glob_base=0;
-
-
-static int  GUI_subtitleParam(char *font,char *sub,int  *charset,int *size,uint32_t *baseline,
-                              int32_t *coly,int32_t *colu,int32_t *colv,uint32_t *autocut,int32_t *delay
-			      ,uint32_t *bg);
-
+static void read( void );
+static void upload ( void );
+static gboolean slider_update( void );
+static gboolean gui_update( void);
 static gboolean gui_draw( void );
-static void draw( void);
+static GtkWidget *create_dialog1 (void);
 
-#define MAX_STRING 300
-static char subString[MAX_STRING];
-static char fontString[MAX_STRING];
-
-static ADMImage  *sourceImage=NULL;
-static uint8_t *targetImage=NULL;
-static uint8_t *targetImageRGB=NULL;
-
-static uint32_t _w,_h;
-static int32_t myY,myU,myV;
-
-extern int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b);
-ColYuvRgb *rgbConv=NULL;
-
-
-uint8_t DIA_srt(ADMImage *source, SUBCONF *param)
+static GtkWidget *dialog=NULL;
+static flySrtPos *myCrop=NULL;
+static int lock=0;
+/**
+      \fn DIA_srtPos
+      \brief Dialog that handles subtitle size and position
+*/
+int DIA_srtPos(AVDMGenericVideoStream *in,uint32_t *size,uint32_t *position)
 {
-
-//char c;
-uint8_t ret=0;
-int charset=0;
-uint32_t l,f;
-
-          // look up old one
-          if(param->_charset)
-          {
-                  for(uint32_t j=0;j<sizeof(names)/sizeof(unicd);j++)
-                    if(!strcmp(param->_charset,names[j].name)) charset=j;
-          }
-          _w=source->_width;
-          _h=source->_height;
-
-          sourceImage     =source;
-          targetImage     =new uint8_t[_w*_h*2];
-          targetImageRGB  =new uint8_t[_w*_h*4];
-
-          rgbConv=new ColYuvRgb(_w,_h);
-          rgbConv->reset(_w,_h);
-          //*****************************
-          ret= GUI_subtitleParam( (char *)param->_fontname,
-                        (char *)param->_subname,
-                        &charset,
-                        (int *)&param->_fontsize,
-                        &(param->_baseLine),
-                        &(param->_Y_percent),
-                        &(param->_U_percent),
-                        &(param->_V_percent),
-                        &(param->_selfAdjustable),
-                        &(param->_delay),
-                        &(param->_useBackgroundColor));
-
-          //*****************************
-          delete [] targetImage;
-          delete [] targetImageRGB;
-
-          targetImage=targetImageRGB=NULL;
-          delete rgbConv;
-          rgbConv=NULL;
-
-          if(ret==1)
-          {
-            if(charset<(int)(sizeof(names)/sizeof(unicd)))
-            {
-                strcpy(param->_charset,names[charset].name    );
-                printf("\n Charset : %s\n",   names[charset].name    );
-            } 
-          }
-    
-}
-
-int  GUI_subtitleParam(char *font,char *sub,int  *charset,int *size,uint32_t *baseline,
-                       int32_t *coly,int32_t *colu,int32_t *colv,uint32_t *autocut,int32_t *delay,
-		       uint32_t *bgcolor)
-{
-
+  uint8_t ret=0;
   
+        uint32_t width,height;
 
-int ret=0;
-gint answer;
-#define WID(x) lookup_widget(dialog,#x)
-#define CHECK_GET(x,y) {y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
-#define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),y);}		
+        // Allocate space for green-ised video
+        width=in->getInfo()->width;
+        height=in->getInfo()->height;
 
-	printf("In:Y:%d U:%d V:%d\n",*coly,*colu,*colv);
-
-       	dialog = create_dialog1();
-	    gtk_register_dialog(dialog);
+        dialog=create_dialog1();
+        gtk_register_dialog(dialog);
+        
+        gtk_widget_set_usize(WID(drawingarea1), width,height);
+        gtk_window_set_title (GTK_WINDOW (dialog), _("Subtitle Size and Position"));
+        gtk_widget_show(dialog);
 	
-	if(sub)    	strcpy( subString, sub);
-	if(font) 	 strcpy( fontString, font);
+        myCrop=new flySrtPos( width, height,in,WID(drawingarea1),WID(hscale1));
+        myCrop->param.fontSize=*size;
+        myCrop->param.position=*position;
+        
+           gtk_range_set_range(GTK_RANGE(WID(vscale1)),0,height-1);
+        
+        
+        myCrop->upload();
+        myCrop->sliderChanged();
+        
+        gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
+            GTK_SIGNAL_FUNC(gui_draw),
+            NULL);
+        
+        gtk_signal_connect (GTK_OBJECT(WID( spinbutton1)), "value_changed",
+                    GTK_SIGNAL_FUNC (gui_update),
+                    NULL);
+        
+         gtk_signal_connect (GTK_OBJECT(WID( hscale1)), "value_changed",
+                    GTK_SIGNAL_FUNC (slider_update),
+                    NULL);
 
-	myY=*coly;
-	myU=*colu;
-	myV=*colv;
+          gtk_signal_connect (GTK_OBJECT(WID( vscale1)), "value_changed",
+                    GTK_SIGNAL_FUNC (gui_update),
+                    NULL);
+       
+        ret=0;
+        int response;
+        response=gtk_dialog_run(GTK_DIALOG(dialog));
 
-
-
-        gtk_label_set_text(GTK_LABEL(WID(label_sub)),sub);
-        gtk_label_set_text(GTK_LABEL(WID(label_font)),font);
-        gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbutton_fontsize)),(gfloat)*size) ;
-	CHECK_SET(checkbutton_autosplit,*autocut);
-	CHECK_SET(checkbuttonbg,*bgcolor);
-	
-	gtk_write_entry(WID(entry_delay), *delay);
-	
-	int nb=sizeof(names)/sizeof(unicd);
-
-	GtkWidget *w;
-	for(uint32_t j=1;j<(uint32_t)nb;j++)
-	{
-
- 		w = gtk_menu_item_new_with_mnemonic ( names[j].display  );
-  		gtk_widget_show (w);
-  		gtk_container_add (GTK_CONTAINER (WID(menu1)),w);
-	}
-
-	 gtk_option_menu_set_history (GTK_OPTION_MENU (WID(optionmenu1)), *charset);
-
-  	 gtk_signal_connect(GTK_OBJECT(WID(button_sub)), "clicked",
-		       GTK_SIGNAL_FUNC(on_callback_sub), (void *) 1);
-     	gtk_signal_connect(GTK_OBJECT(WID(button_font)), "clicked",
-		       GTK_SIGNAL_FUNC(on_callback_font), (void *) 1);
-
- 	gtk_signal_connect(GTK_OBJECT(WID(button_color)), "clicked",
-		       GTK_SIGNAL_FUNC(on_callback_color), (void *) 1);
-
-	// Draw a green square to show where it's gonna be
-	CHECKSPIN( WID(spinbutton_fontsize),glob_font);
-
-
-	drawing=WID(drawingarea1);
-
-	gtk_widget_set_usize(drawing, _w,_h);
-
-	gtk_widget_show(dialog);
-
-	glob_font=*size;
-	glob_base=*baseline;
-
-	sliderAdjustment=gtk_range_get_adjustment (GTK_RANGE(WID(vscale1)));
-  	gtk_adjustment_set_value( GTK_ADJUSTMENT(sliderAdjustment),(  gdouble  ) glob_base );
-/*-------*/
-
-	gtk_signal_connect(GTK_OBJECT(sliderAdjustment),"value_changed", \
-		       GTK_SIGNAL_FUNC(on_slider), NULL);
-
-
-/*-------*/
-
-
-	update(*baseline);
-	draw();
-
-	 gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
-		       GTK_SIGNAL_FUNC(gui_draw),
-		       NULL);
-
-	ret=0;
-	gtk_register_dialog(dialog);
-	while( (answer=gtk_dialog_run(GTK_DIALOG(dialog)))==GTK_RESPONSE_APPLY)
-	{
-		read();
-		update(glob_base);
-		draw();
-	}
-	gtk_unregister_dialog(dialog);
-	if(answer==GTK_RESPONSE_OK)
-	{
-				strcpy(sub,subString);
-				strcpy(font,fontString);
-				*charset= getRangeInMenu(WID(optionmenu1));;
-
-          			read();
-				*size=glob_font;
-				*baseline=glob_base;
-
-				*coly=myY;
-				*colu=myU;
-				*colv=myV;
-				printf("Y:%d U:%d V:%d\n",*coly,*colu,*colv);
-				CHECK_GET(checkbutton_autosplit,*autocut);
-				CHECK_GET(checkbuttonbg,*bgcolor);
-				*delay= (int32_t)gtk_read_entry(WID(entry_delay));
-				ret=1;
-	}
-	gtk_unregister_dialog(dialog);
-	gtk_widget_destroy(dialog);
-	dialog=NULL;
-	return ret;
-
+        if(response==GTK_RESPONSE_OK)
+        {
+            myCrop->download();
+            *size=myCrop->param.fontSize;
+            *position=myCrop->param.position;
+            ret=1;
+        }
+        gtk_unregister_dialog(dialog);
+        gtk_widget_destroy(dialog);
+        delete myCrop;
+        return ret;
 }
-void on_callback_color(GtkButton * button, gpointer user_data)
+/**********************************/
+void read( void )
 {
-	uint8_t r,g,b;
-	uint8_t y;
-	int8_t u,v;
-
-		y=(myY);
-		u=(myU);
-		v=(myV);
-
-
-	aprintf("YUV: %d %d %d \n",y,u,v);
-	COL_YuvToRgb(   y,  u,  v, &b,&g,&r);
-	aprintf("RGB %d %d %d -->\n\n",r,g,b);
-
-
-	if(DIA_colorSel(&r,&g,&b))
-	{
-		aprintf("RGB %d %d %d -->\n",r,g,b);
-		COL_RgbToYuv(b,  g,  r, &y, &u,&v);
-		aprintf("YUV:%d %d %d \n",y,u,v);
-		myY=y;
-		myU=(u);
-		myV=(v);
-
-		if(abs(myU)<2) myU=0;
-		if(abs(myV)<2) myV=0;
-
-	}
-
+	myCrop->download();
 }
-
-gboolean on_slider( void )
+gboolean slider_update( void )
 {
-		read();
-		update(glob_base);
-		draw();
-	return TRUE;
+        myCrop->sliderChanged();
+        return true;
 }
-void on_callback_sub(GtkButton * button, gpointer user_data)
+gboolean gui_update( void)
 {
-	      UNUSED_ARG(button);
-	UNUSED_ARG(user_data);
-        //GUI_FileSelRead("TTF font to use", fontCB);
-        FileSel_SelectRead(_("Subtitle to load"), subString,
-		MAX_STRING,subString);
-	gtk_label_set_text(GTK_LABEL(WID(label_sub)),subString);
+  if(lock) return true;
+      myCrop->update();
+  return true;
 }
-
-void on_callback_font(GtkButton * button, gpointer user_data)
-{
-        UNUSED_ARG(button);
-	UNUSED_ARG(user_data);
-        //GUI_FileSelRead("TTF font to use", fontCB);
-        FileSel_SelectRead(_("TTF font to use"), fontString,
-		MAX_STRING,fontString);
-	gtk_label_set_text(GTK_LABEL(WID(label_font)),fontString);
-	
-}
-/*--------------------------------------*/
 gboolean gui_draw( void )
 {
-	draw();
+	myCrop->display();
 	return true;
 }
-void draw (void  )
+
+/******************************/
+#define SPIN_GET(x,y) {y= gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(dialog,#x))) ;\
+				printf(#x":%d\n", y);}
+
+#define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(lookup_widget(dialog,#x)),(gfloat)y) ; printf(#x":%d\n", y);}
+
+
+uint8_t    flySrtPos::upload(void)
 {
-	GUI_RGBDisplay(targetImageRGB, _w,_h, (void *)drawing);
+        SPIN_SET(spinbutton1,param.fontSize);
+        
+        int32_t max=_h;
+        max-=(SRT_MAX_LINE)*param.fontSize;
+        if(max<0) max=0;
+        if(param.position>=max)
+        {
+          param.position=max;
+        }
+        
+        GtkAdjustment *adj=gtk_range_get_adjustment (GTK_RANGE(WID(vscale1)));
+        GTK_ADJUSTMENT(adj)->value=param.position;
+        return 1;
 }
-
-void read ( void )
+uint8_t    flySrtPos::download(void)
 {
-
-	// Draw a green square to show where it's gonna be
-	CHECKSPIN( WID(spinbutton_fontsize),glob_font);
-
-	glob_base=(uint32_t)GTK_ADJUSTMENT(sliderAdjustment)->value;
-
-	if(glob_base<1) glob_base=1;
-	if(glob_base>(_h - glob_font*SRT_MAX_LINE)) glob_base=_h - glob_font*SRT_MAX_LINE;
-
-
+        SPIN_GET(spinbutton1,param.fontSize);
+        GtkAdjustment *adj=gtk_range_get_adjustment (GTK_RANGE(WID(vscale1)));
+        param.position=(uint32_t)GTK_ADJUSTMENT(adj)->value;
+        
+        int32_t max=_h;
+        max-=(SRT_MAX_LINE)*param.fontSize;
+        if(max<0) max=0;
+        if(param.position>=max)
+        {
+          param.position=max;
+          upload(); 
+        }
+        
+        return 1;
 }
-
-/*
-	Add our stuff and display the result
-*/
-void update(uint32_t value)
-{
-uint32_t h;
-uint32_t page=_w*_h;
-	//printf("\n Updating with %lu base line\n",value);
-	// grab it
-	
-	memcpy(targetImage,YPLANE(sourceImage),(_w*_h));
-	memcpy(targetImage+page,UPLANE(sourceImage),(_w*_h)>>2);
-	memcpy(targetImage+((page*5)>>2),VPLANE(sourceImage),(_w*_h)>>2);
-	
-	h=glob_font;
-	if(h>8) h-=4;
-
-	for(uint32_t line=0;line<SRT_MAX_LINE;line++)
-	{
-		uint8_t *src=targetImage+(glob_base+line*glob_font)*_w;
-
-		for(uint32_t y=0;y<h;y+=2)
-		{
-			memset(src,255,_w);
-			src+=2*_w;
-		}
-	}
-	// convert to rgb
-	//ADM_assert(COL_yv12rgb(_w,_h,targetImage,targetImageRGB));
-	rgbConv->scale(targetImage,targetImageRGB);
-
-}
-
 
 /*
 	Almost straigh out of glade2
 
 */
-
-//-------------------------------
-
 
 GtkWidget*
 create_dialog1 (void)
@@ -433,46 +207,21 @@ create_dialog1 (void)
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
   GtkWidget *vbox1;
-  GtkWidget *table1;
-  GtkWidget *label1;
-  GtkWidget *label2;
-  GtkWidget *label3;
-  GtkWidget *label4;
   GtkWidget *hbox1;
-  GtkWidget *label_sub;
-  GtkWidget *button_sub;
-  GtkWidget *image1;
+  GtkWidget *label1;
+  GtkObject *spinbutton1_adj;
+  GtkWidget *spinbutton1;
+  GtkWidget *hscale1;
   GtkWidget *hbox2;
-  GtkWidget *label_font;
-  GtkWidget *button_font;
-  GtkWidget *image2;
-  GtkWidget *optionmenu1;
-  GtkWidget *menu1;
-  GtkWidget *enc_ascii;
-  /*
-  GtkWidget *enc_8859;
-  GtkWidget *ebc_cyrillic;
-  GtkWidget *enc_german;
-  */
-  GtkObject *spinbutton_fontsize_adj;
-  GtkWidget *spinbutton_fontsize;
-  GtkWidget *label5;
-  GtkWidget *hbox4;
-  GtkWidget *button_color;
-  GtkWidget *checkbutton_autosplit;
-  GtkWidget *label6;
-  GtkWidget *entry_delay;
-  GtkWidget *checkbuttonbg;
-  GtkWidget *hbox3;
   GtkWidget *drawingarea1;
   GtkWidget *vscale1;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
-  GtkWidget *applybutton1;
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Subtitle selector"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), _("Subtitle Size and Position"));
+  gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -481,164 +230,36 @@ create_dialog1 (void)
   gtk_widget_show (vbox1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
 
-  table1 = gtk_table_new (7, 2, FALSE);
-  gtk_widget_show (table1);
-  gtk_box_pack_start (GTK_BOX (vbox1), table1, TRUE, TRUE, 0);
-
-  label1 = gtk_label_new (_("Subtitle file "));
-  gtk_widget_show (label1);
-  gtk_table_attach (GTK_TABLE (table1), label1, 0, 1, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label1), 0, 0.5);
-
-  label2 = gtk_label_new (_("Font (TTF)"));
-  gtk_widget_show (label2);
-  gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
-
-  label3 = gtk_label_new (_("Encoding "));
-  gtk_widget_show (label3);
-  gtk_table_attach (GTK_TABLE (table1), label3, 0, 1, 2, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
-
-  label4 = gtk_label_new (_("Font Size"));
-  gtk_widget_show (label4);
-  gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 3, 4,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
-
   hbox1 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox1);
-  gtk_table_attach (GTK_TABLE (table1), hbox1, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+  gtk_box_pack_start (GTK_BOX (vbox1), hbox1, FALSE, FALSE, 0);
 
-  label_sub = gtk_label_new (_("sub"));
-  gtk_widget_show (label_sub);
-  gtk_box_pack_start (GTK_BOX (hbox1), label_sub, TRUE, FALSE, 0);
+  label1 = gtk_label_new (_("Font Size:"));
+  gtk_widget_show (label1);
+  gtk_box_pack_start (GTK_BOX (hbox1), label1, FALSE, FALSE, 0);
 
-  button_sub = gtk_button_new ();
-  gtk_widget_show (button_sub);
-  gtk_box_pack_start (GTK_BOX (hbox1), button_sub, FALSE, FALSE, 0);
+  spinbutton1_adj = gtk_adjustment_new (1, 6, 99, 1, 10, 10);
+  spinbutton1 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton1_adj), 1, 2);
+  gtk_widget_show (spinbutton1);
+  gtk_box_pack_start (GTK_BOX (hbox1), spinbutton1, FALSE, FALSE, 0);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton1), TRUE);
 
-  image1 = gtk_image_new_from_stock ("gtk-open", GTK_ICON_SIZE_BUTTON);
-  gtk_widget_show (image1);
-  gtk_container_add (GTK_CONTAINER (button_sub), image1);
+  hscale1 = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 99, 1, 1, 1)));
+  gtk_widget_show (hscale1);
+  gtk_box_pack_start (GTK_BOX (vbox1), hscale1, FALSE, FALSE, 0);
 
   hbox2 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox2);
-  gtk_table_attach (GTK_TABLE (table1), hbox2, 1, 2, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
-
-  label_font = gtk_label_new (_("font"));
-  gtk_widget_show (label_font);
-  gtk_box_pack_start (GTK_BOX (hbox2), label_font, TRUE, FALSE, 0);
-
-  button_font = gtk_button_new ();
-  gtk_widget_show (button_font);
-  gtk_box_pack_start (GTK_BOX (hbox2), button_font, FALSE, FALSE, 0);
-
-  image2 = gtk_image_new_from_stock ("gtk-open", GTK_ICON_SIZE_BUTTON);
-  gtk_widget_show (image2);
-  gtk_container_add (GTK_CONTAINER (button_font), image2);
-
-  optionmenu1 = gtk_option_menu_new ();
-  gtk_widget_show (optionmenu1);
-  gtk_table_attach (GTK_TABLE (table1), optionmenu1, 1, 2, 2, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-
-  menu1 = gtk_menu_new ();
-
-  enc_ascii = gtk_menu_item_new_with_mnemonic (_("Ascii"));
-  gtk_widget_show (enc_ascii);
-  gtk_container_add (GTK_CONTAINER (menu1), enc_ascii);
-/*
-  enc_8859 = gtk_menu_item_new_with_mnemonic (_("Iso 8859-1 (Czech...)"));
-  gtk_widget_show (enc_8859);
-  gtk_container_add (GTK_CONTAINER (menu1), enc_8859);
-
-  ebc_cyrillic = gtk_menu_item_new_with_mnemonic (_("Cyrillic"));
-  gtk_widget_show (ebc_cyrillic);
-  gtk_container_add (GTK_CONTAINER (menu1), ebc_cyrillic);
-
-  enc_german = gtk_menu_item_new_with_mnemonic (_("German"));
-  gtk_widget_show (enc_german);
-  gtk_container_add (GTK_CONTAINER (menu1), enc_german);
-*/
-  gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu1), menu1);
-
-  spinbutton_fontsize_adj = gtk_adjustment_new (26, 8, 100, 1, 10, 10);
-  spinbutton_fontsize = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_fontsize_adj), 1, 0);
-  gtk_widget_show (spinbutton_fontsize);
-  gtk_table_attach (GTK_TABLE (table1), spinbutton_fontsize, 1, 2, 3, 4,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton_fontsize), TRUE);
-
-  label5 = gtk_label_new (_("Select color"));
-  gtk_widget_show (label5);
-  gtk_table_attach (GTK_TABLE (table1), label5, 0, 1, 4, 5,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
-
-  hbox4 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox4);
-  gtk_table_attach (GTK_TABLE (table1), hbox4, 1, 2, 4, 5,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
-
-  button_color = gtk_button_new_with_mnemonic (_("Select"));
-  gtk_widget_show (button_color);
-  gtk_box_pack_start (GTK_BOX (hbox4), button_color, FALSE, FALSE, 0);
-
-  checkbutton_autosplit = gtk_check_button_new_with_mnemonic (_("Auto split"));
-  gtk_widget_show (checkbutton_autosplit);
-  gtk_table_attach (GTK_TABLE (table1), checkbutton_autosplit, 0, 1, 5, 6,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-
-  label6 = gtk_label_new (_("Delay in ms"));
-  gtk_widget_show (label6);
-  gtk_table_attach (GTK_TABLE (table1), label6, 0, 1, 6, 7,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
-
-  entry_delay = gtk_entry_new ();
-  gtk_widget_show (entry_delay);
-  gtk_table_attach (GTK_TABLE (table1), entry_delay, 1, 2, 6, 7,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_widget_set_size_request (entry_delay, 90, -1);
-  gtk_entry_set_text (GTK_ENTRY (entry_delay), _("0"));
-
-  checkbuttonbg = gtk_check_button_new_with_mnemonic (_("Force background"));
-  gtk_widget_show (checkbuttonbg);
-  gtk_table_attach (GTK_TABLE (table1), checkbuttonbg, 1, 2, 5, 6,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-
-  hbox3 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox3);
-  gtk_box_pack_start (GTK_BOX (vbox1), hbox3, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox1), hbox2, TRUE, TRUE, 0);
 
   drawingarea1 = gtk_drawing_area_new ();
   gtk_widget_show (drawingarea1);
-  gtk_box_pack_start (GTK_BOX (hbox3), drawingarea1, TRUE, TRUE, 0);
-  gtk_widget_set_size_request (drawingarea1, 352, 288);
+  gtk_box_pack_start (GTK_BOX (hbox2), drawingarea1, TRUE, TRUE, 0);
 
-  vscale1 = gtk_vscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 1, 576, 1, 1, 1)));
+  vscale1 = gtk_vscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 100, 1, 1, 1, 1)));
   gtk_widget_show (vscale1);
-  gtk_box_pack_start (GTK_BOX (hbox3), vscale1, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox2), vscale1, FALSE, FALSE, 0);
+  gtk_scale_set_digits (GTK_SCALE (vscale1), 0);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
@@ -649,11 +270,6 @@ create_dialog1 (void)
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), cancelbutton1, GTK_RESPONSE_CANCEL);
   GTK_WIDGET_SET_FLAGS (cancelbutton1, GTK_CAN_DEFAULT);
 
-  applybutton1 = gtk_button_new_from_stock ("gtk-apply");
-  gtk_widget_show (applybutton1);
-  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), applybutton1, GTK_RESPONSE_APPLY);
-  GTK_WIDGET_SET_FLAGS (applybutton1, GTK_CAN_DEFAULT);
-
   okbutton1 = gtk_button_new_from_stock ("gtk-ok");
   gtk_widget_show (okbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), okbutton1, GTK_RESPONSE_OK);
@@ -663,44 +279,19 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
   GLADE_HOOKUP_OBJECT (dialog1, vbox1, "vbox1");
-  GLADE_HOOKUP_OBJECT (dialog1, table1, "table1");
-  GLADE_HOOKUP_OBJECT (dialog1, label1, "label1");
-  GLADE_HOOKUP_OBJECT (dialog1, label2, "label2");
-  GLADE_HOOKUP_OBJECT (dialog1, label3, "label3");
-  GLADE_HOOKUP_OBJECT (dialog1, label4, "label4");
   GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
-  GLADE_HOOKUP_OBJECT (dialog1, label_sub, "label_sub");
-  GLADE_HOOKUP_OBJECT (dialog1, button_sub, "button_sub");
-  GLADE_HOOKUP_OBJECT (dialog1, image1, "image1");
+  GLADE_HOOKUP_OBJECT (dialog1, label1, "label1");
+  GLADE_HOOKUP_OBJECT (dialog1, spinbutton1, "spinbutton1");
+  GLADE_HOOKUP_OBJECT (dialog1, hscale1, "hscale1");
   GLADE_HOOKUP_OBJECT (dialog1, hbox2, "hbox2");
-  GLADE_HOOKUP_OBJECT (dialog1, label_font, "label_font");
-  GLADE_HOOKUP_OBJECT (dialog1, button_font, "button_font");
-  GLADE_HOOKUP_OBJECT (dialog1, image2, "image2");
-  GLADE_HOOKUP_OBJECT (dialog1, optionmenu1, "optionmenu1");
-  GLADE_HOOKUP_OBJECT (dialog1, menu1, "menu1");
-  GLADE_HOOKUP_OBJECT (dialog1, enc_ascii, "enc_ascii");
-  /*
-  GLADE_HOOKUP_OBJECT (dialog1, enc_8859, "enc_8859");
-  GLADE_HOOKUP_OBJECT (dialog1, ebc_cyrillic, "ebc_cyrillic");
-  GLADE_HOOKUP_OBJECT (dialog1, enc_german, "enc_german");
-  */
-  GLADE_HOOKUP_OBJECT (dialog1, spinbutton_fontsize, "spinbutton_fontsize");
-  GLADE_HOOKUP_OBJECT (dialog1, label5, "label5");
-  GLADE_HOOKUP_OBJECT (dialog1, hbox4, "hbox4");
-  GLADE_HOOKUP_OBJECT (dialog1, button_color, "button_color");
-  GLADE_HOOKUP_OBJECT (dialog1, checkbutton_autosplit, "checkbutton_autosplit");
-  GLADE_HOOKUP_OBJECT (dialog1, label6, "label6");
-  GLADE_HOOKUP_OBJECT (dialog1, entry_delay, "entry_delay");
-  GLADE_HOOKUP_OBJECT (dialog1, checkbuttonbg, "checkbuttonbg");
-  GLADE_HOOKUP_OBJECT (dialog1, hbox3, "hbox3");
   GLADE_HOOKUP_OBJECT (dialog1, drawingarea1, "drawingarea1");
   GLADE_HOOKUP_OBJECT (dialog1, vscale1, "vscale1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog1, cancelbutton1, "cancelbutton1");
-  GLADE_HOOKUP_OBJECT (dialog1, applybutton1, "applybutton1");
   GLADE_HOOKUP_OBJECT (dialog1, okbutton1, "okbutton1");
 
   return dialog1;
 }
 
+//-------------------------------
 #endif //FREETYPE

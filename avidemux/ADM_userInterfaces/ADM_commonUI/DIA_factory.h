@@ -79,10 +79,9 @@ typedef struct dialElemLink
 class diaElemButton : public diaElem
 {
   protected:
-    
+  public:
     void            *_cookie;
     ADM_FAC_CALLBACK *_callBack;
-public:
             diaElemButton(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void *cookie,const char *tip=NULL);
   virtual   ~diaElemButton() ;
   void      setMe(void *dialog, void *opaque,uint32_t line);

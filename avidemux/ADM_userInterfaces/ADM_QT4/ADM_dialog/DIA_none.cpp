@@ -88,7 +88,7 @@ uint8_t DIA_vobsub(vobSubParam *param){return 0;}
 uint8_t DIA_job(uint32_t nb,char **name){return 0;}
 uint8_t DIA_videoCodec (SelectCodecType * codec){return 0;}
 uint8_t DIA_audioCodec( AUDIOENCODER *codec ) {return 0;}
-uint8_t DIA_srt(ADMImage *source, SUBCONF *param) {return 0;}			
+//uint8_t DIA_srt(ADMImage *source, SUBCONF *param) {return 0;}			
 uint8_t DIA_quota(char *) {return 0;}
 uint8_t  DIA_job_select(char **jobname, char **filename) {return 0;}
 //const char * GUI_getCustomScript(uint32_t nb) {return 0;}
@@ -97,5 +97,9 @@ uint8_t DIA_about( void ){return 0;}
 void    DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate ){return ;}
 uint8_t initFileSelector(void){return 0;}
 uint8_t initGUI( void ){return 1;}
+int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b) {return 0;}
+
+
+
 //EOF
 

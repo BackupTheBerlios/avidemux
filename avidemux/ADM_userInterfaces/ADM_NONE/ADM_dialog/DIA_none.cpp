@@ -130,8 +130,12 @@ uint8_t DIA_audioCodec( AUDIOENCODER *codec ) {return 0;}
 uint8_t DIA_dnr(uint32_t *llock,uint32_t *lthresh, uint32_t *clock,
 			uint32_t *cthresh, uint32_t *scene) {return 0;}
 			
-uint8_t DIA_srt(ADMImage *source, SUBCONF *param) {return 0;}			
-			
+int DIA_srtPos(AVDMGenericVideoStream *source,uint32_t *size,uint32_t *position)
+{
+  return 0; 
+}
+
+int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b) {return 0;}			
 			
 extern int global_argc;
 extern char **global_argv;
