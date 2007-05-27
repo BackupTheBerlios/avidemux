@@ -99,10 +99,10 @@ gtk_markscale_expose (GtkWidget      *widget,
 		GdkGC *gc = gdk_gc_new(widget->window);
 	
 		int width = widget->allocation.width;
-		int start = widget->allocation.x + (int)floor(markA*(width/(float)nbFrames));
-		int end =  widget->allocation.x + (int)floor(markB*(width/(float)nbFrames));
+		int start = widget->allocation.x + (int)floor((width-1)*((float)markA/(nbFrames-1)));
+		int end =  widget->allocation.x + (int)floor((width-1)*((float)markB/(nbFrames-1)));
 		int top = widget->allocation.y + 1;
-		int bottom = widget->allocation.y + widget->allocation.height - 1;
+		int bottom = widget->allocation.y + widget->allocation.height - 2;
 		
 	//mark A:
 		gdk_draw_line (widget->window,
