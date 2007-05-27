@@ -1,0 +1,5 @@
+add_subdirectory(ADM_dialog)
+add_subdirectory(ADM_dialogFactory)
+add_subdirectory(ADM_filters)
+add_subdirectory(ADM_gui2)
+include_directories(../ADM_commonUI)

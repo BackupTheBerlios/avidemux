@@ -1,0 +1,4 @@
+
+SET(ADM_toolkit_SRCS 
+ADM_audioQueue.cpp  ADM_intfloat.cpp  ADM_packetQueue.cpp  automation.cpp  filesel.cpp)
+ADD_LIBRARY(ADM_toolkit STATIC ${ADM_toolkit_SRCS})
