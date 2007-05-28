@@ -9,7 +9,7 @@ INCLUDE(Po)
 MESSAGE("GTK:"${GTK_CFLAGS}"GLIB:"${GLIB_CFLAGS})
 
 SET(adm_EXE_SRCS ADM_preview.cpp  gtk_gui.cpp  gui_autodrive.cpp  GUI_jobs.cpp  gui_navigate.cpp  guiplay.cpp  gui_savenew.cpp  main.cpp )
-COMPILE_PO_FILES(${CMAKE_SOURCE_DIR}/po adm_EXE_SRCS)
+#COMPILE_PO_FILES(${CMAKE_SOURCE_DIR}/po adm_EXE_SRCS)
 include_directories(ADM_userInterfaces/ADM_commonUI ADM_outputs)
 
 # Small macro...
@@ -213,6 +213,20 @@ LINK_DIRECTORIES(avidemux2_gtk ${GLIB_LIB}  )
 TARGET_LINK_LIBRARIES(avidemux2_gtk ${GTK_LDFLAGS} )
 TARGET_LINK_LIBRARIES(avidemux2_gtk ${GTHREAD_LDFLAGS} ) # FIXME
 endif(GTK_FOUND)
+
+IF(WIN32)
+#-mms-bitfield -mno-cygwin \
+#-mwinmm \
+add_libs_all_targets(ADM_osSupport)
+add_libs_all_targets(pthreadGC2 )
+add_libs_all_targets(winmm )
+add_libs_all_targets(wsock32 )
+
+SET_TARGET_PROPERTIES(avidemux2_cli
+	PROPERTIES LINK_FLAGS "-mms-bitfield -mno-cygwin -mwinmm"
+)
+
+ENDIF(WIN32)
 
 
 # /EOF
