@@ -1,0 +1,7 @@
+subdirs(PREORDER ADM_dialog)
+subdirs(PREORDER ADM_dialogFactory)
+subdirs(PREORDER ADM_filters)
+subdirs(PREORDER ADM_gui2)
+subdirs(PREORDER ADM_toolkit_gtk)
+subdirs(PREORDER ADM_ocr)
+include_directories(../ADM_commonUI)
