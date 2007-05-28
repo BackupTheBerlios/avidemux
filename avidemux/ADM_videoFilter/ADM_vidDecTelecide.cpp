@@ -456,7 +456,7 @@ void Telecide::Show(ADMImage *dst, int frame)
 	else if (chosen == C) use = 'c';
 	else use = 'n';
 
-	sprintf(buf, "Telecide %s", VERSION);
+	sprintf(buf, "Telecide %s", 0); // VERSION
 	DrawString(dst, 0, 0, buf);
 
 	sprintf(buf, "Copyright 2003 Donald A. Graft");

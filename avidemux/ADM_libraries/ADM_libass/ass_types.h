@@ -81,11 +81,12 @@ typedef struct parser_priv_s parser_priv_t;
 
 typedef struct ass_library_s ass_library_t;
 /* MEANX */
-typedef enum TRACK_TYPE
+typedef enum 
 {
     TRACK_TYPE_UNKNOWN = 0, 
     TRACK_TYPE_ASS, 
-    TRACK_TYPE_SSA};
+    TRACK_TYPE_SSA
+    }TRACK_TYPE;
     /* MEANX */
 /// ass track represent either an external script or a matroska subtitle stream (no real difference between them)
 /// it can be used in rendering after the headers are parsed (i.e. events format line read)

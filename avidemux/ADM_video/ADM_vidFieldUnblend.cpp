@@ -37,7 +37,7 @@
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_video/ADM_cache.h"
 #include "ADM_filter/video_filters.h"
-#include "DIA_enter.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_enter.h"
 
 #define MUL 1
 // Set it to 2 for post separate field
@@ -399,7 +399,7 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
 	ADMImage *srcP,*srcN,*srcNN,*src,*final,*display;
         float distMerged, distN,distP,distM,distR;
         char txt[255];
-        if(frame>= _info.nb_frames) return 0;
+        if(inframe>= _info.nb_frames) return 0;
         if(inframe<1 || inframe>inframe>_info.nb_frames-2 )
         {
                 data->duplicate(vidCache->getImage(inframe));

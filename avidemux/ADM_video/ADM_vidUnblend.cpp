@@ -139,7 +139,7 @@ void vidUnblend::DrawShow(ADMImage *src, int useframe, int blend, int inframe, i
 
 	if (_param->show == true)
 	{
-		sprintf(buf, "unblend %s", VERSION);
+		sprintf(buf, "unblend %s", 0);
 		DrawString(src, 0, 0, buf);
 		sprintf(buf, "Copyright 2003 Bach, based on source by D.Graft and Ernst Pech");
 		DrawString(src, 0, 1, buf);

@@ -55,6 +55,7 @@ create_aboutdialog1 (void)
   GdkPixbuf *aboutdialog1_logo_pixbuf;
   // MEANX : PATCH SVN VERSION
   char subversion[1024];
+  #define VERSION "CMAKE0"
   	if(!ADM_SUBVERSION)
 		{
 			strcpy(subversion,VERSION);

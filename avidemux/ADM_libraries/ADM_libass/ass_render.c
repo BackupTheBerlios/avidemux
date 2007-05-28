@@ -122,18 +122,18 @@ typedef struct text_info_s {
 
 // Renderer state.
 // Values like current font face, color, screen position, clipping and so on are stored here.
-typedef enum EVENT_X
+typedef enum 
 {	EVENT_NORMAL, // "normal" top-, sub- or mid- title
 		EVENT_POSITIONED, // happens after pos(,), margins are ignored
 		EVENT_HSCROLL, // "Banner" transition effect, text_width is unlimited
 		EVENT_VSCROLL // "Scroll up", "Scroll down" transition effects
-		};
-typedef enum SCROLL_TYPE
+		}EVENT_X;
+typedef enum 
 { SCROLL_LR, // left-to-right
 	       SCROLL_RL,
 	       SCROLL_TB, // top-to-bottom
 	       SCROLL_BT
-	       };                    
+	       }SCROLL_TYPE;                    
 typedef struct render_context_s {
 	ass_event_t* event;
 	ass_style_t* style;

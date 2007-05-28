@@ -27,7 +27,6 @@
 #include <errno.h>
 
 #include <glib.h>
-#include <gtk/gtk.h>
 
 #include "config.h"
 #include "prefs.h"
@@ -41,7 +40,6 @@
 #include "ADM_audiodevice/audio_out.h"
 
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 
@@ -59,7 +57,7 @@
 static void resetTime(void);
 static void ComputePreload(void);
 static void FillAudio(void);
-
+extern void UI_purge(void);
 #define EVEN(x) (x&0xffffffe)
 
  

@@ -46,7 +46,7 @@
 #include "ADM_toolkit/filesel.h"
 #include "ADM_mpegdemuxer/dmx_demuxer.h"
 #include "ADM_mpegdemuxer/dmx_demuxerPS.h"
-#include "DIA_working.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 #define ADM_VOBSUB_NO_PADDING
 static int vobsub_parse_ifo(const char *const name, 
                      uint32_t *palette, 

@@ -666,7 +666,7 @@ static int encode_frame(twolame_options *glopts, bit_stream *bs)
     if (frameBits % 8) {	/* a program failure */
 		fprintf (stderr, "Sent %ld bits = %ld slots plus %ld\n", frameBits, frameBits/8, frameBits%8);
 		fprintf (stderr, "If you are reading this, the program is broken\n");
-		fprintf (stderr, "email %s with the command line arguments and other info\n", PACKAGE_BUGREPORT);
+		fprintf (stderr, "email %s with the command line arguments and other info\n", "noone@none.org");
 		return -1;
     }
 

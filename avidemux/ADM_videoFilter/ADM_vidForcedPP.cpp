@@ -38,7 +38,7 @@
 
 
 #include "ADM_vidForcedPP.h"
-#include "DIA_enter.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_enter.h"
 #include "ADM_filter/video_filters.h"
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"

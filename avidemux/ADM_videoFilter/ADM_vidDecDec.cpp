@@ -293,7 +293,7 @@ Decimate::Decimate(AVDMGenericVideoStream *in,CONFcouple *couples)
 		if (debug)
 		{
 			char b[80];
-			sprintf(b, "Decimate %s by Donald Graft, Copyright 2003\n", VERSION);
+			sprintf(b, "Decimate %s by Donald Graft, Copyright 2003\n", 0); // VERSION
 			OutputDebugString(b);
 		}
 	}
@@ -333,7 +333,7 @@ void Decimate::DrawShow(ADMImage  *src, int useframe, bool forced, int dropframe
 
 	if (show == true)
 	{
-		sprintf(buf, "Decimate %s", VERSION);
+		sprintf(buf, "Decimate %s", 0); // VERSION
 		DrawString(src, 0, 0, buf);
 		sprintf(buf, "Copyright 2003 Donald Graft");
 		DrawString(src, 0, 1, buf);
@@ -429,7 +429,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		GETFRAME(useframe, src);
 		if (show == true)
 		{
-			sprintf(buf, "Decimate %s", VERSION);
+			sprintf(buf, "Decimate %s", 0);
 			DrawString(src, 0, 0, buf);
 			sprintf(buf, "Copyright 2003 Donald Graft");
 			DrawString(src, 0, 1, buf);
@@ -500,7 +500,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			if (show == true)
 			{
 
-				sprintf(buf, "Decimate %s", VERSION);
+				sprintf(buf, "Decimate %s", 0);
 				DrawString(src, 0, 0, buf);
 				sprintf(buf, "Copyright 2003 Donald Graft");
 				DrawString(src, 0, 1, buf);
@@ -658,7 +658,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		if (show == true)
 		{
 
-			sprintf(buf, "Decimate %s", VERSION);
+			sprintf(buf, "Decimate %s", 0);
 			DrawString(dst, 0, 0, buf);
 			sprintf(buf, "Copyright 2003 Donald Graft");
 			DrawString(dst, 0, 1, buf);
@@ -701,7 +701,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			int start = (useframe / _param->cycle) * _param->cycle;
 
 
-			sprintf(buf, "Decimate %s", VERSION);
+			sprintf(buf, "Decimate %s", 0);
 			DrawString(src, 0, 0, buf);
 			sprintf(buf, "Copyright 2003 Donald Graft");
 			DrawString(src, 0, 1, buf);

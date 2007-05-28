@@ -1,6 +1,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <libintl.h>
 #include <string.h>
 #include <pthread.h>
 #include "default.h"

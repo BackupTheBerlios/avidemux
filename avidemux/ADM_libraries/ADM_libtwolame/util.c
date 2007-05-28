@@ -37,7 +37,7 @@
 // of this library
 const char* get_twolame_version( void )
 {
-	const char* str = PACKAGE_VERSION;
+	const char* str = "FOO BAR";
 	
 	return str;
 }

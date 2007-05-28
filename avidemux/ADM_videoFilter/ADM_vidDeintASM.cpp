@@ -40,7 +40,7 @@
 #if defined( ARCH_X86)  || defined(ARCH_X86_64)
 //	#define DEBUG_DEINT 1
 //	#define MMX_TRACE 1
-	#include "mmx_macros.h"
+	#include "ADM_video/mmx_macros.h"
 #include "admmangle.h"
 
  void myDeintASM(void);
