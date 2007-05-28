@@ -11,8 +11,11 @@
 #define _ADM_ASS_H
 
 #ifdef USE_FREETYPE
-#include "ADM_libass/ass.h"
 
+extern "C"
+{
+#include "ADM_libass/ass.h"
+}
 #include "ADM_vidAss_Params.h" 
 class ADMVideoSubASS : public AVDMGenericVideoStream 
 {

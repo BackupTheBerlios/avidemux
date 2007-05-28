@@ -11,6 +11,17 @@ MESSAGE("GTK:"${GTK_CFLAGS}"GLIB:"${GLIB_CFLAGS})
 SET(adm_EXE_SRCS ADM_preview.cpp  gtk_gui.cpp  gui_autodrive.cpp  GUI_jobs.cpp  gui_navigate.cpp  guiplay.cpp  gui_savenew.cpp  main.cpp )
 COMPILE_PO_FILES(${CMAKE_SOURCE_DIR}/po adm_EXE_SRCS)
 include_directories(ADM_userInterfaces/ADM_commonUI ADM_outputs)
+
+# Small macro...
+MACRO (add_libs_all_targets _libName)
+  TARGET_LINK_LIBRARIES(avidemux2_cli ${_libName})
+  if(GTK_FOUND)
+  TARGET_LINK_LIBRARIES(avidemux2_gtk ${_libName})
+  endif(GTK_FOUND)
+ENDMACRO (add_libs_all_targets _libName)
+#/ Small macro...
+
+
 #
 # Normal subdirs, compile and link what is inside....
 #
@@ -53,11 +64,7 @@ add_definitions(${GLIB_CFLAGS})
 ###########################################
 FOREACH(_current ${ADM_SUBDIR})
 subdirs (PREORDER ${_current})
-TARGET_LINK_LIBRARIES(avidemux2_cli ${_current})
-if(GTK_FOUND)
-TARGET_LINK_LIBRARIES(avidemux2_gtk ${_current})
-endif(GTK_FOUND)
-
+add_libs_all_targets(${_current})
 ENDFOREACH(_current ${ADM_SUBDIR})
 
 ###########################################
@@ -89,11 +96,7 @@ SET(ADM_LIBRARIES ${ADM_LIBRARIES}  ADM_libass)
 ENDIF(FT_FOUND)
 
 FOREACH(_current ${ADM_LIBRARIES})
-TARGET_LINK_LIBRARIES(avidemux2_cli ${_current})
-if(GTK_FOUND)
-TARGET_LINK_LIBRARIES(avidemux2_gtk ${_current})
-endif(GTK_FOUND)
-
+add_libs_all_targets(${_current})
 ENDFOREACH(_current ${ADM_SUBDIR})
 
 ###########################################
@@ -128,11 +131,70 @@ endif(GTK_FOUND)
 ###########################################
 TARGET_LINK_LIBRARIES(avidemux2_cli ${GLIB_LDFLAGS} )
 LINK_DIRECTORIES(avidemux2_cli ${GLIB_LIB}  )
-TARGET_LINK_LIBRARIES(avidemux2_cli xml2 )
+
+#fontconfig
+if(USE_FONTCONFIG)
+add_libs_all_targets(fontconfig)
+endif(USE_FONTCONFIG)
+
+# Xv
+if(USE_XV)
+add_libs_all_targets( Xext)
+add_libs_all_targets( X11 )
+add_libs_all_targets( Xv )
+add_libs_all_targets( m)
+endif(USE_XV)
+
+# Lame
+if(HAVE_LIBMP3LAME)
+add_libs_all_targets(mp3lame )
+endif(HAVE_LIBMP3LAME)
+
+# SDL
+if(USE_SDL)
+add_libs_all_targets(${SDL_LIBRARY} )
+endif(USE_SDL)
+
+
+# x264
+if(USE_X264)
+add_libs_all_targets(x264 )
+endif(USE_X264)
+
+# png
+if(USE_PNG)
+add_libs_all_targets(png )
+endif(USE_PNG)
+
+# Vorbis
+if(USE_VORBIS)
+add_libs_all_targets(vorbis )
+add_libs_all_targets(vorbisenc )
+endif(USE_VORBIS)
+
+#faac
+if(USE_FAAC)
+add_libs_all_targets(faac)
+endif(USE_FAAC)
+
+#faad
+if(USE_FAAD)
+add_libs_all_targets(faad)
+endif(USE_FAAD)
+
+#freetype
+if(USE_FREETYPE)
+add_libs_all_targets(${FT_LDFLAGS})
+endif(USE_FREETYPE)
+
+# Xml2
+add_libs_all_targets(xml2 )
+###########################################
+# Specific
+###########################################
 if(GTK_FOUND)
 TARGET_LINK_LIBRARIES(avidemux2_gtk ${GLIB_LDFLAGS} )
 LINK_DIRECTORIES(avidemux2_gtk ${GLIB_LIB}  )
-TARGET_LINK_LIBRARIES(avidemux2_gtk xml2 )
 TARGET_LINK_LIBRARIES(avidemux2_gtk ${GTK_LDFLAGS} )
 TARGET_LINK_LIBRARIES(avidemux2_gtk ${GTHREAD_LDFLAGS} ) # FIXME
 endif(GTK_FOUND)

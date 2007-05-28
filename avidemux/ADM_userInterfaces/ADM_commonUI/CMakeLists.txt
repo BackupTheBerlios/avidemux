@@ -15,3 +15,7 @@ ADD_ADM_LIB(${ADM_LIB} ADM_userInterfaces)
 
 ####################################"
 include_directories(./..)
+if(FT_FOUND)
+add_definitions(${FT_CFLAGS})
+endif(FT_FOUND)
+

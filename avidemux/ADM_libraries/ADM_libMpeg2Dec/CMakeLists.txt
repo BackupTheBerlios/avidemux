@@ -3,7 +3,7 @@ SET(ADM_libMpeg2dec_SRCS
 alloc.c      cpu_state.c  header.c      idct_altivec.c  idct_mlib.c  motion_comp_alpha.c    motion_comp.c       motion_comp_mmx.c
 cpu_accel.c  decode.c     idct_alpha.c  idct.c          idct_mmx.c   motion_comp_altivec.c  motion_comp_mlib.c  slice.c
 )
-ADD_LIBRARY(ADM_libMpeg2dec STATIC ${ADM_libMpeg2dec_SRCS})
+ADD_LIBRARY(ADM_libMpeg2Dec STATIC ${ADM_libMpeg2dec_SRCS})
 ################################
 #
 ################################

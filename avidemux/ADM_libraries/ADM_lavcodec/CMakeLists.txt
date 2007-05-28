@@ -21,6 +21,8 @@ ac3enc.c
 		vc1.c vc1dsp.c vp56.c vp56data.c vp6.c vp5.c indeo2.c smacker.c  opt.c
 )
 # ADD x86 ones
+
+IF(ARCH_X86)
 SET(${ADM_LIB}_SRCS  ${${ADM_LIB}_SRCS}
                         i386/cputest.c     
 			i386/mpegvideo_mmx.c     i386/vp3dsp_mmx.c 
@@ -30,7 +32,7 @@ SET(${ADM_LIB}_SRCS  ${${ADM_LIB}_SRCS}
 			i386/idct_mmx_xvid.c i386/fft_3dn2.c 
 			i386/snowdsp_mmx.c i386/fft_3dn.c 
 )
-
+ENDIF(ARCH_X86)
 ADD_LIBRARY(${ADM_LIB} STATIC ${${ADM_LIB}_SRCS})
 ADD_ADM_LIB(${ADM_LIB} ADM_libraries)
 

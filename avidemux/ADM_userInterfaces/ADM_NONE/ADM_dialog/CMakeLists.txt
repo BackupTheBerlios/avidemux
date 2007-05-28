@@ -13,3 +13,6 @@ ADD_ADM_LIB(${ADM_LIB} ADM_libraries)
 
 ################################
 include_directories(../../../ADM_inputs)
+if(FT_FOUND)
+add_definitions(${FT_CFLAGS})
+endif(FT_FOUND)

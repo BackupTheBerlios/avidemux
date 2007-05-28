@@ -8,4 +8,7 @@ ADM_mpdetc.cpp           ADM_vidChromaShift.cpp  ADM_vidEq2.cpp        ADM_vidMP
 ADM_vidClean.cpp        ADM_vidEqualizer.cpp  ADM_vidNull.cpp          ADM_vidSRTRender.cpp
 )
 ADD_LIBRARY(ADM_video STATIC ${ADM_video_SRCS})
+if(FT_FOUND)
+add_definitions(${FT_CFLAGS})
+endif(FT_FOUND)
 include_directories(../ADM_inputs)
