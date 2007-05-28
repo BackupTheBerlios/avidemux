@@ -3,7 +3,7 @@
 /* MPEG2DEC */
 #cmakedefine ACCEL_DETECT
 
-#if ${WIN32}
+#if ${WIN32_DEF}
 #define rindex ADM_rindex
 #define index ADM_index
 #define ftello ftello_adm

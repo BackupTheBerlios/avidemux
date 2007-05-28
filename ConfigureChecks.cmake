@@ -44,6 +44,14 @@ SET(USE_LIBXML2    1)
 SET(HAVE_LRINTF    1)
 SET(EMULATE_FAST_INT    1)
 SET(RUNTIME_CPUDETECT    1)
+########################################
+# WIN32
+########################################
+if(WIN32)
+SET(WIN32_DEF 1)
+else(WIN32)
+SET(WIN32_DEF 0)
+endif(WIN32)
 
 ########################################
 # ALSA
