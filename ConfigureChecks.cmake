@@ -7,6 +7,7 @@ INCLUDE(CheckSymbolExists)
 INCLUDE(CheckFunctionExists)
 INCLUDE(CheckLibraryExists)
 include(lavcodec)
+include(CMakeDetermineSystem)
 #INCLUDE(CheckStructMember)
 check_function_exists(gettimeofday    HAVE_GETTIMEOFDAY)
 # Header
@@ -40,22 +41,37 @@ SET(USE_LIBXML2    1)
 SET(HAVE_LRINTF    1)
 SET(EMULATE_FAST_INT    1)
 SET(RUNTIME_CPUDETECT    1)
-# to be better latter
-SET(ARCH_X86    1)
-SET(HAVE_MMX    1)
+########################################
+# CPU and Host
+########################################
 SET(HAVE_AUDIO    1)
-SET(ARCH_X86_32    1)
-SET(ARCH_X86_64    1)
-SET(FPM_DEFAULT    1)
-SET(ARCH_64_BITS    1)
-SET(ADM_DEBUG    1)
-
-# We have Encoders
-
-#if win 32 ?
-if(WIN32)
-SET(ADM_WIN32 1)
-SET(CYG_MANGLING 1)
-endif(WIN32)
-
+MESSAGE("Checking CPU and OS")
+MESSAGE("<CPU:${CMAKE_SYSTEM_PROCESSOR}>")
+# windows is always X86 for now on...
+ if(WIN32)
+   MESSAGE(STATUS WIN32)
+   SET(ADM_WIN32 1)
+   SET(CYG_MANGLING 1)
+   SET(ARCH_X86    1)
+   SET(HAVE_MMX    1)
+   SET(ARCH_X86_32    1)
+   SET(FPM_INTEL    1)
+ else(WIN32)
+      if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i586" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i686")
+          MESSAGE(STATUS "x86 CPU")
+          SET(ARCH_X86    1)
+          SET(HAVE_MMX    1)
+          SET(ARCH_X86_32    1)
+          SET(FPM_INTEL    1)
+     endif(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i586" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i686")
+     if( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "amd64")
+         MESSAGE(STATUS "AMD64 CPU")
+         SET(ARCH_X86_64    1)
+         SET(FPM_DEFAULT    1)
+         SET(ARCH_64_BITS    1)
+     endif( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "amd64")
+ endif(WIN32)
+MESSAGE("End of CPU and OS Check")
+#
+SET(ADM_DEBUG 1)
 # EOF

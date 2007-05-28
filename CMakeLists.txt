@@ -16,6 +16,12 @@ include(Po)
 include(CheckCXXCompilerFlag)
 include(FindLibXml2)
 #**************************************************
+# MESSAGE
+#**************************************************
+MESSAGE("#####################################")
+MESSAGE("Configure Started")
+MESSAGE("#####################################")
+#**************************************************
 # libxml2
 #**************************************************
 if(NOT LIBXML2_FOUND)
@@ -26,21 +32,26 @@ SET(LIBXML2_INCLUDE_DIR,${LIBXML2_INCLUDE_DIR})
 #**************************************************
 # PKG Config
 #**************************************************
+MESSAGE("Checking for PKG-CONFIG")
 if(NOT PKGCONFIG_EXECUTABLE)
              MESSAGE(FATAL_ERROR "Could not find pkg-config")
 endif(NOT PKGCONFIG_EXECUTABLE)
+MESSAGE(STATUS OK)
 #**************************************************
 # Search for FREETYPE
 #**************************************************
+MESSAGE("Checking for FreeType through PKG-CONFIG")
 PKGCONFIG(freetype2 FT_INCLUDE FT_LIB FT_LDFLAGS FT_CFLAGS)
 
 IF(NOT FT_INCLUDE)
-    MESSAGE("Could not find Freetype ")
+    MESSAGE(STATUS "Could not find Freetype ")
 ELSE(NOT FT_INCLUDE)
     SET(FT_FOUND TRUE)
     SET(FT_CFLAGS ${FT_CFLAGS})
     SET(FT_INCLUDE ${FT_INCLUDE})
+    MESSAGE(STATUS OK)
     MESSAGE("FreeType Found ("${FT_CFLAGS} ${FT_INCLUDE}")")
+    
 ENDIF(NOT FT_INCLUDE)
 #**************************************************
 # Search for  X11 (not on windows)
@@ -51,6 +62,7 @@ if(NOT WIN32)
         if(NOT X11_FOUND)
              MESSAGE(FATAL_ERROR "Could not find X11")
         endif(NOT X11_FOUND)
+        MESSAGE(STATUS OK)
 endif(NOT WIN32)
 #**************************************************
 # Search for GLIB through PKG-Config
@@ -59,13 +71,15 @@ MESSAGE("Checking for GLIB")
 PKGCONFIG(glib-2.0 GLIB_INCLUDE GLIB_LIB GLIB_LDFLAGS GLIB_CFLAGS)
 
 IF(NOT GLIB_INCLUDE)
-    MESSAGE("Could not find GLIB - cannot compile avidemux2_gtk here")
+    MESSAGE(STATUS "Could not find GLIB - cannot compile avidemux2_gtk here")
 ELSE(NOT GLIB_INCLUDE)
     SET(GLIB_FOUND,TRUE)
     SET(GLIB_CFLAGS,${GLIB_CFLAGS})
     SET(GLIB_LDFLAGS,${GLIB_LDFLAGS})
     SET(GLIB_LIB,${GLIB_LIB})
+    MESSAGE(STATUS OK)
     MESSAGE("GLIB Found ("${GLIB_CFLAGS}")")
+    
 ENDIF(NOT GLIB_INCLUDE)
 #**************************************************
 # Search for GTK through PKG-Config
@@ -74,26 +88,26 @@ MESSAGE("Checking for GTK")
 PKGCONFIG(gtk+-2.0 GTK_INCLUDE GTK_LIB GTK_LDFLAGS GTK_CFLAGS)
 
 IF(NOT GTK_CFLAGS)
-    MESSAGE("Could not find GTK - cannot compile avidemux2_gtk here")
+    MESSAGE(STATUS "Could not find GTK - cannot compile avidemux2_gtk here")
 ELSE(NOT GTK_CFLAGS)
     SET(GTK_FOUND TRUE)
     SET(GTK_CFLAGS,${GTK_CFLAGS})
     SET(GTK_LDFLAGS,${GTK_LDFLAGS})
     SET(GTK_LIB,${GTK_LIB})
-    MESSAGE("GTK Found")
+    MESSAGE(STATUS OK)
 ENDIF(NOT GTK_CFLAGS)
 #**************************************************
 # Search for Gthread through PKG-Config
 #**************************************************
-MESSAGE("Checking for GTK")
+MESSAGE("Checking for Gthread")
 PKGCONFIG(gthread-2.0 GTHREAD_INCLUDE GTHREAD_LIB GTHREAD_LDFLAGS GTHREAD_CFLAGS)
 
 IF(NOT GTHREAD_CFLAGS)
-    MESSAGE("Could not find GTHREAD")
+    MESSAGE(STATUS "Could not find GTHREAD")
     SET(GTK_FOUND FALSE)
 ELSE(NOT GTHREAD_CFLAGS)
     SET(GTHREAD_LDFLAGS,${GTHREAD_LDFLAGS})
-    MESSAGE("GTHREAD Found")
+    MESSAGE(STATUS OK)
 ENDIF(NOT GTHREAD_CFLAGS)
 #**************************************************
 # Search for QT4 
