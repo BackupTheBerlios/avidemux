@@ -3,6 +3,12 @@
 /* MPEG2DEC */
 #cmakedefine ACCEL_DETECT
 
+#if ${WIN32}
+#define rindex ADM_rindex
+#define index ADM_index
+#define ftello ftello_adm
+#define fseeko fseeko_adm
+#endif
 /* Big endian CPU - SPARC or PowerPC */
 #cmakedefine ADM_BIG_ENDIAN
 

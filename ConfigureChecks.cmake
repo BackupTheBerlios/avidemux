@@ -141,7 +141,10 @@ if(NOT USE_FAAD)
  ADM_CHECK_HL(NeAAC neaacdec.h faad NeAACDecInit USE_FAAD)
 endif(NOT USE_FAAD)
 # FIXME
+# FIXME
+# FIXME
 SET(OLD_FAAD_PROTO 1)
+#SET(ICONV_NEED_CONST 1)
 ########################################
 # FreeType
 ########################################
@@ -166,9 +169,6 @@ MESSAGE("<CPU:${CMAKE_SYSTEM_PROCESSOR}>")
    SET(ARCH_X86_32    1)
    SET(FPM_INTEL    1)
    SET(MEMALIGN_HACK    1)
-   SET(rindex    ADM_rindex)
-   SET(fseeko    ADM_fseeko)
-   SET(ftello    ADM_ftello)
    add_definitions(-mms-bitfields -mno-cygwin)
  else(WIN32)
       if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i586" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i686")
