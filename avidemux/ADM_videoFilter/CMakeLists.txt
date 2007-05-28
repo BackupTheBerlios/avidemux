@@ -8,5 +8,6 @@ ADM_vidBlendRemoval.cpp  ADM_vidDGbob.cpp            ADM_vidHardIvtcRemoval.cpp 
 ADM_vidBSmear.cpp        ADM_vidDropOut.cpp          ADM_vidKernelDeint.cpp      ADM_vidMsmooth.cpp    ADM_vidSoften.cpp
 ADM_vidChroma.cpp        ADM_vidFade.cpp             ADM_vidLargeMedian.cpp      ADM_vidPalShift.cpp   ADM_vidStabilize.cpp
 ADM_vidDecDec.cpp        ADM_vidFastConvolution.cpp  ADM_vidLuma.cpp             ADM_vidPalSmart.cpp   ADM_vidSwapFields.cpp
+ADM_vidYadif_asm.c
 )
 ADD_LIBRARY(ADM_videoFilter STATIC ${ADM_videoFilter_SRCS})

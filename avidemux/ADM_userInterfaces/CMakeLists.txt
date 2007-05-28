@@ -1,8 +1,8 @@
-#if(QT4_FOUND)
-#add_subdirectory(ADM_QT4)
-#endifif(QT4_FOUND)
+subdirs(PREORDER ADM_NONE)
+subdirs(PREORDER ADM_commonUI)
 
-add_subdirectory(ADM_NONE)
-add_subdirectory(ADM_commonUI)
+if(GTK_FOUND)
+subdirs(PREORDER ADM_GTK)
+endif(GTK_FOUND)
 
 include_directories(ADM_commonUI)

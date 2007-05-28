@@ -14,7 +14,6 @@ include(MacroEnsureOutOfSourceBuild)
 
 include(Po)
 include(CheckCXXCompilerFlag)
-include(lavcodec)
 include(FindLibXml2)
 #**************************************************
 # libxml2
@@ -30,6 +29,19 @@ SET(LIBXML2_INCLUDE_DIR,${LIBXML2_INCLUDE_DIR})
 if(NOT PKGCONFIG_EXECUTABLE)
              MESSAGE(FATAL_ERROR "Could not find pkg-config")
 endif(NOT PKGCONFIG_EXECUTABLE)
+#**************************************************
+# Search for FREETYPE
+#**************************************************
+PKGCONFIG(freetype2 FT_INCLUDE FT_LIB FT_LDFLAGS FT_CFLAGS)
+
+IF(NOT FT_INCLUDE)
+    MESSAGE("Could not find Freetype ")
+ELSE(NOT FT_INCLUDE)
+    SET(FT_FOUND TRUE)
+    SET(FT_CFLAGS ${FT_CFLAGS})
+    SET(FT_INCLUDE ${FT_INCLUDE})
+    MESSAGE("FreeType Found ("${FT_CFLAGS} ${FT_INCLUDE}")")
+ENDIF(NOT FT_INCLUDE)
 #**************************************************
 # Search for  X11 (not on windows)
 #**************************************************
@@ -51,6 +63,8 @@ IF(NOT GLIB_INCLUDE)
 ELSE(NOT GLIB_INCLUDE)
     SET(GLIB_FOUND,TRUE)
     SET(GLIB_CFLAGS,${GLIB_CFLAGS})
+    SET(GLIB_LDFLAGS,${GLIB_LDFLAGS})
+    SET(GLIB_LIB,${GLIB_LIB})
     MESSAGE("GLIB Found ("${GLIB_CFLAGS}")")
 ENDIF(NOT GLIB_INCLUDE)
 #**************************************************
@@ -62,9 +76,25 @@ PKGCONFIG(gtk+-2.0 GTK_INCLUDE GTK_LIB GTK_LDFLAGS GTK_CFLAGS)
 IF(NOT GTK_CFLAGS)
     MESSAGE("Could not find GTK - cannot compile avidemux2_gtk here")
 ELSE(NOT GTK_CFLAGS)
-    SET(GTK_FOUND,TRUE)
+    SET(GTK_FOUND TRUE)
+    SET(GTK_CFLAGS,${GTK_CFLAGS})
+    SET(GTK_LDFLAGS,${GTK_LDFLAGS})
+    SET(GTK_LIB,${GTK_LIB})
     MESSAGE("GTK Found")
 ENDIF(NOT GTK_CFLAGS)
+#**************************************************
+# Search for Gthread through PKG-Config
+#**************************************************
+MESSAGE("Checking for GTK")
+PKGCONFIG(gthread-2.0 GTHREAD_INCLUDE GTHREAD_LIB GTHREAD_LDFLAGS GTHREAD_CFLAGS)
+
+IF(NOT GTHREAD_CFLAGS)
+    MESSAGE("Could not find GTHREAD")
+    SET(GTK_FOUND FALSE)
+ELSE(NOT GTHREAD_CFLAGS)
+    SET(GTHREAD_LDFLAGS,${GTHREAD_LDFLAGS})
+    MESSAGE("GTHREAD Found")
+ENDIF(NOT GTHREAD_CFLAGS)
 #**************************************************
 # Search for QT4 
 #**************************************************
@@ -80,7 +110,6 @@ CONFIGURE_FILE(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 include_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/avidemux ${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries/ADM_utilities/ ${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries/ADM_lavutil)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries/ADM_lavcodec  )
-SET_LAVCODEC_FLAGS()
 #**********************************************
 # Some CFLAGS
 #**********************************************
