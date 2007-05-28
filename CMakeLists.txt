@@ -36,7 +36,7 @@ MESSAGE("Checking for PKG-CONFIG")
 if(NOT PKGCONFIG_EXECUTABLE)
              MESSAGE(FATAL_ERROR "Could not find pkg-config")
 endif(NOT PKGCONFIG_EXECUTABLE)
-MESSAGE(STATUS OK)
+MESSAGE(STATUS "OK ${PKGCONFIG_EXECUTABLE}")
 #**************************************************
 # Search for FREETYPE
 #**************************************************
@@ -107,7 +107,7 @@ IF(NOT GTHREAD_CFLAGS)
     SET(GTK_FOUND FALSE)
 ELSE(NOT GTHREAD_CFLAGS)
     SET(GTHREAD_LDFLAGS,${GTHREAD_LDFLAGS})
-    MESSAGE(STATUS OK)
+    MESSAGE(STATUS "OK ${GTHREAD_LDFLAGS}")
 ENDIF(NOT GTHREAD_CFLAGS)
 #**************************************************
 # Search for QT4 
