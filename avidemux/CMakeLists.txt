@@ -132,6 +132,15 @@ endif(GTK_FOUND)
 TARGET_LINK_LIBRARIES(avidemux2_cli ${GLIB_LDFLAGS} )
 LINK_DIRECTORIES(avidemux2_cli ${GLIB_LIB}  )
 
+# xvid
+if(USE_XVID_4)
+add_libs_all_targets(xvidcore)
+endif(USE_XVID_4)
+
+#alsa
+if(ALSA_FOUND)
+add_libs_all_targets( ${ASOUND_LIBRARY} )
+endif(ALSA_FOUND)
 #fontconfig
 if(USE_FONTCONFIG)
 add_libs_all_targets(fontconfig)
@@ -153,7 +162,13 @@ endif(HAVE_LIBMP3LAME)
 # SDL
 if(USE_SDL)
 add_libs_all_targets(${SDL_LIBRARY} )
+add_libs_all_targets(SDL )
 endif(USE_SDL)
+
+# ESD
+if(USE_ESD)
+add_libs_all_targets(esd )
+endif(USE_ESD)
 
 
 # x264

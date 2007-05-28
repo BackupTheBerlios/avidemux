@@ -44,9 +44,11 @@
 uint8_t DIA_builtin(void)
 {
   uint32_t altivec=0,mad=0,a52dec=0,xvid4=0,X264=0,freetype=0,esd=0,arts=0,vorbis=0,win32=0;
-  uint32_t faac=0,faad=0,libdca=0,aften=0,libamrnb=0,lame=0,sdl=0,oss=0,xvideo=0,x86=0,x86_64=0;
-  uint32_t powerpc=0,gettext=0;
-  
+  uint32_t faac=0,faad=0,libdca=0,aften=0,libamrnb=0,lame=0,sdl=0,oss=0,xvideo=0,x86=0,x86_64=0,alsa=0;
+  uint32_t powerpc=0,gettext=0,fontconfig=0;
+#ifdef USE_FONTCONFIG
+  fontconfig=1;
+#endif
 #ifdef USE_ALTIVEC
         altivec=1;
 #endif
@@ -103,6 +105,10 @@ uint8_t DIA_builtin(void)
 #ifdef OSS_SUPPORT
 	oss=1;
 #endif
+#ifdef ALSA_SUPPORT
+	alsa=1;
+#endif
+
 #ifdef USE_XV
 	xvideo=1;
 #endif
@@ -150,8 +156,10 @@ uint8_t DIA_builtin(void)
 	diaElemFrame miscFrame(_("Miscellaneous libraries:"));
 	diaElemNotch tArts(arts, _("aRts"));
 	diaElemNotch tEsd(esd, _("ESD"));
+        diaElemNotch tFontConfig(fontconfig, _("FontConfig"));
 	diaElemNotch tFreetype(freetype, _("FreeType 2"));
 	diaElemNotch tGettext(gettext, _("gettext"));
+        diaElemNotch tAlsa(alsa, _("Alsa"));
 	diaElemNotch tOss(oss, _("OSS"));
 	diaElemNotch tSdl(sdl, _("SDL"));
 	diaElemNotch tXvideo(xvideo, _("XVideo"));
@@ -159,8 +167,10 @@ uint8_t DIA_builtin(void)
 	miscFrame.swallow(&tArts);
 	miscFrame.swallow(&tEsd);
 	miscFrame.swallow(&tFreetype);
+        miscFrame.swallow(&tFontConfig);
 	miscFrame.swallow(&tGettext);
 	miscFrame.swallow(&tOss);
+        miscFrame.swallow(&tAlsa);
 	miscFrame.swallow(&tSdl);
 	miscFrame.swallow(&tXvideo);
     

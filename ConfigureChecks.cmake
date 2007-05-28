@@ -44,10 +44,25 @@ SET(USE_LIBXML2    1)
 SET(HAVE_LRINTF    1)
 SET(EMULATE_FAST_INT    1)
 SET(RUNTIME_CPUDETECT    1)
+
+########################################
+# ALSA
+########################################
+if(NOT WIN32)
+  MESSAGE(STATUS "<Checking for ALSA>")
+  include(FindAlsa)
+  if(ALSA_FOUND)
+    ALSA_VERSION_STRING(alsaVersion)
+    MESSAGE("Found alsa version :${alsaVersion}") 
+    MESSAGE("Found alsa lib     :${ASOUND_LIBRARY}")
+    SET(ALSA_SUPPORT 1)
+    SET(ALSA_1_0_SUPPORT 1)
+  endif(ALSA_FOUND)
+endif(NOT WIN32)
 ########################################
 # SDL
 ########################################
-MESSAGE(STATUS "Checking for SDL")
+MESSAGE(STATUS "<Checking for SDL>")
 include(FindSDL)
 if(SDL_FOUND)
  SET(USE_SDL 1)
@@ -69,9 +84,35 @@ if(NOT WIN32)
 ADM_CHECK_HL(Xvideo X11/extensions/Xvlib.h Xv XvShmPutImage USE_XV)
 endif(NOT WIN32)
 ########################################
+# OSS
+########################################
+
+if(NOT WIN32)
+MESSAGE(STATUS "<Checking for OSS>")
+CHECK_INCLUDE_FILES(sys/soundcard.h      OSS_SUPPORT)
+if(OSS_SUPPORT)
+MESSAGE(STATUS "Found")
+else(OSS_SUPPORT)
+MESSAGE(STATUS "Not found")
+endif(OSS_SUPPORT)
+
+endif(NOT WIN32)
+########################################
+# ESD
+########################################
+if(NOT WIN32)
+ADM_CHECK_HL(Esd esd.h  esd esd_close USE_ESD)
+endif(NOT WIN32)
+
+########################################
 # LAME
 ########################################
 ADM_CHECK_HL(Lame lame/lame.h mp3lame lame_init HAVE_LIBMP3LAME)
+########################################
+# Xvid
+########################################
+ADM_CHECK_HL(Xvid xvid.h xvidcore xvid_plugin_single USE_XVID_4)
+
 ########################################
 # X264
 ########################################
