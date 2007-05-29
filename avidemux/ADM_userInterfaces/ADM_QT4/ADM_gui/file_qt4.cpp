@@ -12,6 +12,7 @@
 #include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <libintl.h>
 #include <dirent.h>
 #include "default.h"
 #include <QtCore/QVariant>

@@ -18,6 +18,10 @@ MACRO (add_libs_all_targets _libName)
   if(GTK_FOUND)
   TARGET_LINK_LIBRARIES(avidemux2_gtk ${_libName})
   endif(GTK_FOUND)
+  if(QT4_FOUND)
+  TARGET_LINK_LIBRARIES(avidemux2_qt4 ${_libName})
+  endif(QT4_FOUND)
+
 ENDMACRO (add_libs_all_targets _libName)
 #/ Small macro...
 
@@ -57,6 +61,10 @@ ADD_EXECUTABLE(avidemux2_cli ${adm_EXE_SRCS} )
 if(GTK_FOUND)
 ADD_EXECUTABLE(avidemux2_gtk ${adm_EXE_SRCS} )
 endif(GTK_FOUND)
+if(QT4_FOUND)
+ADD_EXECUTABLE(avidemux2_qt4 ${adm_EXE_SRCS} )
+endif(QT4_FOUND)
+
 
 add_definitions(${GLIB_CFLAGS})
 ###########################################
@@ -125,6 +133,17 @@ TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_gui2Gtk )
 TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_toolkitGtk )
 TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_commonUI )
 endif(GTK_FOUND)
+
+if(QT4_FOUND)
+TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_ocr )
+TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_commonUI )
+TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_dialogQt4 )
+
+TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_dialogFactoryQt4 )
+TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_guiQt4 )
+TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_filtersQt4 )
+TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_commonUI )
+endif(QT4_FOUND)
 
 ###########################################
 # Add external libs
@@ -218,6 +237,15 @@ LINK_DIRECTORIES(avidemux2_gtk ${GLIB_LIB}  )
 TARGET_LINK_LIBRARIES(avidemux2_gtk ${GTK_LDFLAGS} )
 TARGET_LINK_LIBRARIES(avidemux2_gtk ${GTHREAD_LDFLAGS} ) # FIXME
 endif(GTK_FOUND)
+
+if(QT4_FOUND)
+TARGET_LINK_LIBRARIES(avidemux2_qt4 ${GLIB_LDFLAGS} )
+LINK_DIRECTORIES(avidemux2_qt4 ${GLIB_LIB}  )
+TARGET_LINK_LIBRARIES(avidemux2_qt4 ${GTK_LDFLAGS} )
+TARGET_LINK_LIBRARIES(avidemux2_qt4 ${QT_QTGUI_LIBRARY} ) # FIXME
+TARGET_LINK_LIBRARIES(avidemux2_qt4 ${QT_QTCORE_LIBRARY} ) # FIXME
+endif(QT4_FOUND)
+
 
 IF(WIN32)
 #-mms-bitfield -mno-cygwin \
