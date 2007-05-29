@@ -9,21 +9,28 @@ SET(CMAKE_COLOR_MAKEFILE ON)
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-include(UsePkgConfig)
-include(MacroEnsureOutOfSourceBuild)
-
-include(Po)
-include(CheckCXXCompilerFlag)
-include(FindLibXml2)
 #**************************************************
 # MESSAGE
 #**************************************************
 MESSAGE("#####################################")
 MESSAGE("Configure Started")
 MESSAGE("#####################################")
+SET(CMAKE_INCLUDE_PATH $ENV{CMAKE_INCLUDE_PATH})
+SET(CMAKE_LIBRARY_PATH $ENV{CMAKE_LIBRARY_PATH})
+MESSAGE("<<EXTRA INC:${CMAKE_INCLUDE_PATH}>>")
+MESSAGE("<<EXTRA LIB:${CMAKE_LIBRARY_PATH}>>")
+include_directories(${CMAKE_INCLUDE_PATH})
+LINK_DIRECTORIES(${CMAKE_LIBRARY_PATH})
+#*************************************************
+include(UsePkgConfig)
+include(MacroEnsureOutOfSourceBuild)
+
+include(Po)
+include(CheckCXXCompilerFlag)
 #**************************************************
 # libxml2
 #**************************************************
+include(FindLibXml2)
 if(NOT LIBXML2_FOUND)
   MESSAGE(FATAL_ERROR "Could not find Libxml2")
 endif(NOT LIBXML2_FOUND)
@@ -115,7 +122,7 @@ ENDIF(NOT GTHREAD_CFLAGS)
 #**************************************************
 # Search for QT4 
 #**************************************************
-MESSAGE("Checking for QT4")
+MESSAGE(STATUS "<Checking for QT4>")
 include(FindQt4)
 
 # do config checks
@@ -123,10 +130,10 @@ include(ConfigureChecks.cmake)
 
 # create config.h
 CONFIGURE_FILE(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-#
-include_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/avidemux ${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries/ADM_utilities/ ${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries/ADM_lavutil)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries/ADM_lavcodec  )
+# #
+ include_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/avidemux ${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries)
+ include_directories(${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries/ADM_utilities/ ${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries/ADM_lavutil)
+ include_directories(${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries/ADM_lavcodec  )
 #**********************************************
 # Some CFLAGS
 #**********************************************

@@ -217,4 +217,6 @@ MESSAGE("<CPU:${CMAKE_SYSTEM_PROCESSOR}>")
 MESSAGE("End of CPU and OS Check")
 #
 SET(ADM_DEBUG 1)
+
+include(adm_log)
 # EOF
