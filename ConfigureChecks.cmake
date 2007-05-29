@@ -45,6 +45,17 @@ SET(USE_LIBXML2    1)
 SET(HAVE_LRINTF    1)
 SET(EMULATE_FAST_INT    1)
 SET(RUNTIME_CPUDETECT    1)
+
+
+########################################
+# taist : Should fail!
+########################################
+ADM_CHECK_HL(teist larreme.h mzfdgp3lame lagggme_icnit HAVE_LzertgIBMP3LAME)
+if(HAVE_LzertgIBMP3LAME)
+  MESSAGE(FATAL "THAT TEST SHOULD HAVE FAILED EXPECT PROBLEM")
+endif(HAVE_LzertgIBMP3LAME)
+
+
 ########################################
 # WIN32
 ########################################
@@ -93,9 +104,18 @@ endif(USE_FONTCONFIG)
 ########################################
 if(NOT WIN32)
 
-SET(CMAKE_REQUIRED_FLAGS ${X11_INCLUDE_DIR})
-ADM_CHECK_HL(Xvideo "X11/extensions/Xvlib.h" Xv XvShmPutImage USE_XV)
-MESSAGE(STATUS "(i used ${CMAKE_REQUIRED_FLAGS}/${X11_INCLUDE_DIR})")
+SET(CMAKE_REQUIRED_FLAGS "-include X11/Xlib.h")
+SET(CMAKE_REQUIRED_LIBRARIES "${X11_LIBRARIES}")
+SET(CMAKE_REQUIRED_INCLUDE "${X11_INCLUDE_DIR}")
+
+ADM_CHECK_HL(Xvideo X11/extensions/Xvlib.h Xv XvShmPutImage USE_XV)
+MESSAGE(STATUS "(i used ${CMAKE_REQUIRED_FLAGS}**${X11_INCLUDE_DIR})")
+MESSAGE(STATUS "(and ${CMAKE_REQUIRED_LIBRARIES}**${X11_LIBRARIES})")
+
+SET(CMAKE_REQUIRED_FLAGS )
+SET(CMAKE_REQUIRED_LIBRARIES )
+SET(CMAKE_REQUIRED_INCLUDE )
+
 
 endif(NOT WIN32)
 ########################################
@@ -155,13 +175,11 @@ else(ICONV_WITH)
     MESSAGE(STATUS "No")
 endif(ICONV_WITH)
 ########################################
-# taist
-########################################
-ADM_CHECK_HL(teist lxzame/larreme.h mzfdgp3lame lagggme_icnit HAVE_LzertgIBMP3LAME)
-########################################
 # LAME
 ########################################
+SET(CMAKE_REQUIRED_LIBRARIES "-lm")
 ADM_CHECK_HL(Lame lame/lame.h mp3lame lame_init HAVE_LIBMP3LAME)
+SET(CMAKE_REQUIRED_LIBRARIES )
 ########################################
 # Xvid
 ########################################
@@ -170,32 +188,27 @@ ADM_CHECK_HL(Xvid xvid.h xvidcore xvid_plugin_single USE_XVID_4)
 ########################################
 # X264
 ########################################
+SET(CMAKE_REQUIRED_FLAGS "-include stdint.h")
 ADM_CHECK_HL(x264 x264.h x264 x264_encoder_open USE_X264)
+SET(CMAKE_REQUIRED_FLAGS)
 ########################################
 # PNG
 ########################################
 ADM_CHECK_HL(libPNG png.h png png_malloc USE_PNG)
-########################################
-# FAAC
-########################################
-ADM_CHECK_HL(FAAC faac.h faac faacEncClose USE_FAAC)
-########################################
-# Vorbis
-########################################
-ADM_CHECK_HL(Vorbis vorbisenc.h vorbis vorbis_info_init USE_VORBIS1)
-ADM_CHECK_HL(Vorbis vorbisenc.h vorbisenc vorbis_encode_init USE_VORBIS2)
-if(USE_VORBIS1 AND USE_VORBIS2)
-  SET(USE_VORBIS 1)
-endif(USE_VORBIS1 AND USE_VORBIS2)
+
+
 ########################################
 # FAAD
 ########################################
 
-ADM_CHECK_HL(FAAD faad.h faad faacDecInit USE_FAAD)
-if(NOT USE_FAAD)
- ADM_CHECK_HL(NeAAC neaacdec.h faad NeAACDecInit USE_FAAD)
-endif(NOT USE_FAAD)
-
+ADM_CHECK_HL(FAAD faad.h faad faacDecInit USE_FAAD_P)
+if(NOT USE_FAAD_P)
+ MESSAGE(STATUS "Trying neaac variant")
+ ADM_CHECK_HL(NeAAC faad.h faad NeAACDecInit USE_FAAD_A)
+endif(NOT USE_FAAD_P)
+if(USE_FAAD_P OR USE_FAAD_A)
+  SET(USE_FAAD  1)
+endif(USE_FAAD_P OR USE_FAAD_A)
 # See if we need old FAAD or NEW
 if(USE_FAAD)
 MESSAGE(STATUS "<Checking if faad needs old proto>")
@@ -208,16 +221,43 @@ else(FAAD_WITH)
 endif(FAAD_WITH)
 endif(USE_FAAD)
 ########################################
+# FAAC
+########################################
+ADM_CHECK_HL(FAAC faac.h faac faacEncClose USE_FAAC)
+########################################
 # FreeType
 ########################################
 if(FT_FOUND)
 SET(USE_FREETYPE 1)
 endif(FT_FOUND)
 ########################################
+# Vorbis
+########################################
+
+ ADM_CHECK_HL(Vorbis vorbis/vorbisenc.h vorbis vorbis_info_init USE_VORBIS1)
+ ADM_CHECK_HL(Vorbis vorbis/vorbisenc.h vorbisenc vorbis_encode_init USE_VORBIS2)
+ if(USE_VORBIS1 AND USE_VORBIS2)
+   SET(USE_VORBIS 1)
+ endif(USE_VORBIS1 AND USE_VORBIS2)
+
+########################################
+# End test
+########################################
+
+ ADM_CHECK_HL(Invalid dummy_header.h dummy_libxyz dummy_func_tyu DUMMY_TEST)
+ ADM_CHECK_HL(Invalid stdio.h dummy_libxyz dummy_func_tyu DUMMY_TEST2)
+ if(DUMMY_TEST OR DUMMY_TEST2)
+   MESSAGE(FATAL "This test should have failed!!!")
+   MESSAGE(FATAL "This test should have failed!!!")
+   MESSAGE(FATAL "This test should have failed!!!")
+ endif(DUMMY_TEST OR DUMMY_TEST2)
+
+########################################
 # CPU and Host
 ########################################
 SET(HAVE_AUDIO    1)
-MESSAGE("Checking CPU and OS")
+MESSAGE(STATUS "<Checking CPU and OS>")
+MESSAGE(STATUS "<*******************>")
 MESSAGE("<CPU:${CMAKE_SYSTEM_PROCESSOR}>")
 # windows is always X86 for now on...
  if(WIN32)
