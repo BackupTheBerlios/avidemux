@@ -123,9 +123,9 @@ if(NOT HAVE_ICONV_H)
 endif(NOT HAVE_ICONV_H)
 
 # need libiconv ?
-CHECK_LIBRARY_EXISTS("iconv" "" iconv LINK_WITH_ICONV)
+CHECK_LIBRARY_EXISTS(iconv libiconv "" LINK_WITH_ICONV)
 if(LINK_WITH_ICONV)
-  SET(NEEED_LIBICONV 1)
+  SET(NEED_LIBICONV 1)
   MESSAGE(STATUS "libiconv found, probably needed")
 else(LINK_WITH_ICONV)
   MESSAGE(STATUS "libiconv not found, probably not needed")
@@ -133,7 +133,13 @@ endif(LINK_WITH_ICONV)
 
 #
 MESSAGE(STATUS "<Checking if iconv needs const>")
+
+if(NEED_LIBICONV)
+ADM_COMPILE_WITH_WITHOUT(iconv_check.cpp "-DICONV_NEED_CONST" "-liconv" ICONV_WITH)
+else(NEED_LIBICONV)
 ADM_COMPILE_WITH_WITHOUT(iconv_check.cpp "-DICONV_NEED_CONST" "-lm" ICONV_WITH)
+endif(NEED_LIBICONV)
+
 if(ICONV_WITH)
   MESSAGE(STATUS "Yes")
   SET(ICONV_NEED_CONST 1)
