@@ -1,61 +1,10 @@
-SET(ADM_inputs_SRCS 
-ADM_openDML/ADM_openDML.cpp
-ADM_openDML/ADM_opendml_reorder.cpp
-ADM_openDML/ADM_odml_odml.cpp
-ADM_openDML/ADM_openDMLDepack.cpp
-ADM_openDML/ADM_riff.cpp
-ADM_openDML/ADM_odml_audio.cpp
-ADM_openDML/ADM_odml_regular.cpp
-ADM_openDML/ADM_opendml_reindex.cpp
-ADM_mp4/ADM_mp4Indexer.cpp
-ADM_mp4/ADM_atom.cpp
-ADM_mp4/ADM_mp4.cpp
-ADM_mp4/ADM_mp4audio.cpp
-ADM_mp4/ADM_mp4Analyzer.cpp
-ADM_mp4/ADM_infoextractor.cpp
-ADM_mp4/ADM_mp4Leaf.cpp
-ADM_matroska/ADM_mkv.cpp
-ADM_matroska/ADM_mkv_audio.cpp
-ADM_matroska/ebml.cpp
-ADM_matroska/ADM_mkvTrackType.cpp
-ADM_matroska/ADM_mkvEntries.cpp
-ADM_matroska/mkv_tags.cpp
-ADM_matroska/ADM_mkvIndexer.cpp
-ADM_h263/ADM_mp4.cpp
-ADM_h263/ADM_h263.cpp
-ADM_h263/bitsRead.cpp
-ADM_mpegdemuxer/dmx_indexer_mpeg2.cpp
-ADM_mpegdemuxer/dmx_indexer.cpp
-ADM_mpegdemuxer/dmx_demuxerES.cpp
-ADM_mpegdemuxer/dmx_audio.cpp
-ADM_mpegdemuxer/dmx_indexer_h264.cpp
-ADM_mpegdemuxer/dmx_video.cpp
-ADM_mpegdemuxer/dmx_io.cpp
-ADM_mpegdemuxer/dmx_probe.cpp
-ADM_mpegdemuxer/dmx_demuxer.cpp
-ADM_mpegdemuxer/dmx_identify.cpp
-ADM_mpegdemuxer/dmx_demuxerPS.cpp
-ADM_mpegdemuxer/dmx_probeTS.cpp
-ADM_mpegdemuxer/dmx_demuxerTS.cpp
-ADM_mpegdemuxer/dmx_demuxerMSDVR.cpp
-ADM_ogm/ADM_ogm.cpp
-ADM_ogm/ADM_ogmpages.cpp
-ADM_ogm/ADM_ogmAudio.cpp
-ADM_ogm/ADM_ogmreorder.cpp
-ADM_inpics/ADM_pics.cpp
-ADM_nuv/minilzo.c
-ADM_nuv/RTjpeg.c
-ADM_nuv/RTjpegN.cpp
-ADM_nuv/ADM_nuvAudio.cpp
-ADM_nuv/ADM_nuv.cpp
-ADM_nuv/RToldformat.cpp
-ADM_asf/ADM_asfPacket.cpp
-ADM_asf/ADM_asfChunk.cpp
-ADM_asf/ADM_asf.cpp
-ADM_asf/ADM_asf_audio.cpp
-ADM_avsproxy/ADM_avsproxy_net.cpp
-ADM_avsproxy/ADM_avsproxy.cpp
-)
-ADD_LIBRARY(ADM_inputs STATIC ${ADM_inputs_SRCS})
-include_directories(./ )
-
+subdirs (PREORDER ADM_asf)
+subdirs (PREORDER ADM_avsproxy)
+subdirs (PREORDER ADM_h263)
+subdirs (PREORDER ADM_inpics)
+subdirs (PREORDER ADM_matroska)
+subdirs (PREORDER ADM_mp4)
+subdirs (PREORDER ADM_mpegdemuxer)
+subdirs (PREORDER ADM_nuv)
+subdirs (PREORDER ADM_ogm)
+subdirs (PREORDER ADM_openDML)

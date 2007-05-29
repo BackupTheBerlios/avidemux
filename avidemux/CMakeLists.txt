@@ -43,14 +43,6 @@ ADM_video
 ADM_colorspace 
 ADM_audiodevice
 ADM_ocr  
-
-ADM_outputs
-ADM_inputs
-ADM_encoder
-ADM_codecs
-ADM_requant 
-ADM_toolkit  
-ADM_osSupport  
 )
 
 
@@ -74,6 +66,62 @@ FOREACH(_current ${ADM_SUBDIR})
 subdirs (PREORDER ${_current})
 add_libs_all_targets(${_current})
 ENDFOREACH(_current ${ADM_SUBDIR})
+# build trail
+subdirs (PREORDER ADM_osSupport)
+subdirs (PREORDER ADM_encoder)
+subdirs (PREORDER ADM_toolkit)
+subdirs (PREORDER ADM_codecs)
+subdirs (PREORDER ADM_requant)
+subdirs (PREORDER ADM_infoExtractor)
+###########################################
+# Construct ADM_outputs
+###########################################
+subdirs (PREORDER ADM_outputs)
+LINK_DIRECTORIES(ADM_outputs)
+SET(ADM_outputs
+oplug_avi
+oplug_mp4
+oplug_mpeg
+oplug_mpegFF
+oplug_ogm
+)
+
+FOREACH(_current ${ADM_outputs})
+add_libs_all_targets(${_current})
+ENDFOREACH(_current ${ADM_outputs})
+###########################################
+# Construct ADM_inputs
+###########################################
+subdirs (PREORDER ADM_inputs)
+LINK_DIRECTORIES(ADM_inputs)
+SET(ADM_inputs
+ADM_asf
+ADM_avsproxy
+ADM_h263
+ADM_inpics
+ADM_matroska
+ADM_mp4
+ADM_mpegdemuxer
+ADM_nuv
+ADM_ogm
+ADM_openDML
+)
+
+FOREACH(_current ${ADM_inputs})
+add_libs_all_targets(${_current})
+ENDFOREACH(_current ${ADM_inputs})
+
+#########################################
+# Trails
+#########################################
+
+
+add_libs_all_targets(ADM_toolkit)
+add_libs_all_targets(ADM_osSupport)
+add_libs_all_targets(ADM_encoder)
+add_libs_all_targets(ADM_codecs)
+add_libs_all_targets(ADM_requant)
+add_libs_all_targets(ADM_infoExtractor)
 
 ###########################################
 # Construct ADM_libraries
