@@ -2,6 +2,9 @@
 # main cmake file for avidemux
 # Derived from the one available in sim-im & kde4
 ##########################################################
+MESSAGE("#####################################")
+MESSAGE("Configure Started")
+MESSAGE("#####################################")
 PROJECT(Avidemux2)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4.4)
 SET(CMAKE_COLOR_MAKEFILE ON)
@@ -12,15 +15,11 @@ SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 #**************************************************
 # MESSAGE
 #**************************************************
-MESSAGE("#####################################")
-MESSAGE("Configure Started")
-MESSAGE("#####################################")
-SET(CMAKE_INCLUDE_PATH $ENV{CMAKE_INCLUDE_PATH})
-SET(CMAKE_LIBRARY_PATH $ENV{CMAKE_LIBRARY_PATH})
-MESSAGE("<<EXTRA INC:${CMAKE_INCLUDE_PATH}>>")
-MESSAGE("<<EXTRA LIB:${CMAKE_LIBRARY_PATH}>>")
-include_directories(${CMAKE_INCLUDE_PATH})
-LINK_DIRECTORIES(${CMAKE_LIBRARY_PATH})
+SET(CMAKE_C_FLAGS $ENV{CFLAGS})
+SET(CMAKE_CXX_FLAGS $ENV{CXXFLAGS})
+
+MESSAGE("EXTRA Cflags:${CMAKE_C_FLAGS}")
+MESSAGE("EXTRA CXXflags:${CMAKE_CXX_FLAGS}")
 #*************************************************
 include(UsePkgConfig)
 include(MacroEnsureOutOfSourceBuild)
