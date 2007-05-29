@@ -59,6 +59,7 @@ endif(WIN32)
 ########################################
 if(NOT WIN32)
   MESSAGE(STATUS "<Checking for ALSA>")
+  MESSAGE(STATUS "<*****************>")
   include(FindAlsa)
   if(ALSA_FOUND)
     ALSA_VERSION_STRING(alsaVersion)
@@ -72,6 +73,7 @@ endif(NOT WIN32)
 # SDL
 ########################################
 MESSAGE(STATUS "<Checking for SDL>")
+MESSAGE(STATUS "<*****************>")
 include(FindSDL)
 if(SDL_FOUND)
  SET(USE_SDL 1)
@@ -90,7 +92,11 @@ endif(USE_FONTCONFIG)
 # Xvideo
 ########################################
 if(NOT WIN32)
-ADM_CHECK_HL(Xvideo X11/extensions/Xvlib.h Xv XvShmPutImage USE_XV)
+
+SET(CMAKE_REQUIRED_FLAGS ${X11_INCLUDE_DIR})
+ADM_CHECK_HL(Xvideo "X11/extensions/Xvlib.h" Xv XvShmPutImage USE_XV)
+MESSAGE(STATUS "(i used ${CMAKE_REQUIRED_FLAGS}/${X11_INCLUDE_DIR})")
+
 endif(NOT WIN32)
 ########################################
 # OSS
@@ -98,6 +104,7 @@ endif(NOT WIN32)
 
 if(NOT WIN32)
 MESSAGE(STATUS "<Checking for OSS>")
+MESSAGE(STATUS "<*****************>")
 CHECK_INCLUDE_FILES(sys/soundcard.h      OSS_SUPPORT)
 if(OSS_SUPPORT)
 MESSAGE(STATUS "Found")
@@ -117,6 +124,7 @@ endif(NOT WIN32)
 ########################################
 # search ICON.h
 MESSAGE(STATUS "<Checking for iconv.h>")
+MESSAGE(STATUS "<******************************>")
 CHECK_INCLUDE_FILES(iconv.h HAVE_ICONV_H)
 if(NOT HAVE_ICONV_H)
   MESSAGE(FATAL "iconv.h not found")
@@ -146,6 +154,10 @@ if(ICONV_WITH)
 else(ICONV_WITH)
     MESSAGE(STATUS "No")
 endif(ICONV_WITH)
+########################################
+# taist
+########################################
+ADM_CHECK_HL(teist lxzame/larreme.h mzfdgp3lame lagggme_icnit HAVE_LzertgIBMP3LAME)
 ########################################
 # LAME
 ########################################
@@ -237,7 +249,8 @@ MESSAGE("<CPU:${CMAKE_SYSTEM_PROCESSOR}>")
          SET(HAVE_MMX    1)
      endif( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "amd64")
  endif(WIN32)
-MESSAGE("End of CPU and OS Check")
+MESSAGE(STATUS "<End of CPU and OS Check>")
+MESSAGE(STATUS "<******************************>")
 #
 SET(ADM_DEBUG 1)
 

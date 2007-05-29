@@ -29,16 +29,20 @@ include(CheckCXXCompilerFlag)
 #**************************************************
 # libxml2
 #**************************************************
+MESSAGE(STATUS "<Checking for LibXML2>")
+MESSAGE(STATUS "<*********************>")
 include(FindLibXml2)
 if(NOT LIBXML2_FOUND)
   MESSAGE(FATAL_ERROR "Could not find Libxml2")
 endif(NOT LIBXML2_FOUND)
+MESSAGE(STATUS "LibXML2 OK")
 SET(LIBXML2_DEFINITIONS,${LIBXML2_DEFINITIONS})
 SET(LIBXML2_INCLUDE_DIR,${LIBXML2_INCLUDE_DIR})
 #**************************************************
 # PKG Config
 #**************************************************
-MESSAGE("Checking for PKG-CONFIG")
+MESSAGE(STATUS "<Checking for PKG-CONFIG>")
+MESSAGE(STATUS "<***********************>")
 if(NOT PKGCONFIG_EXECUTABLE)
              MESSAGE(FATAL_ERROR "Could not find pkg-config")
 endif(NOT PKGCONFIG_EXECUTABLE)
@@ -46,7 +50,8 @@ MESSAGE(STATUS "OK ${PKGCONFIG_EXECUTABLE}")
 #**************************************************
 # Search for FREETYPE
 #**************************************************
-MESSAGE("Checking for FreeType through PKG-CONFIG")
+MESSAGE(STATUS "<Checking for FreeType through PKG-CONFIG>")
+MESSAGE(STATUS "<****************************************>")
 PKGCONFIG(freetype2 FT_INCLUDE FT_LIB FT_LDFLAGS FT_CFLAGS)
 
 IF(NOT FT_INCLUDE)
@@ -56,17 +61,18 @@ ELSE(NOT FT_INCLUDE)
     SET(FT_CFLAGS ${FT_CFLAGS})
     SET(FT_LDFLAGS ${FT_LDFLAGS})
     SET(FT_INCLUDE ${FT_INCLUDE})
-    MESSAGE("LDFLAGS <${FT_LDFLAGS}>")
-    MESSAGE("LIBS <${FT_LIB}>")
+    MESSAGE(STATUS "LDFLAGS <${FT_LDFLAGS}>")
+    MESSAGE(STATUS "LIBS <${FT_LIB}>")
     MESSAGE(STATUS OK)
-    MESSAGE("FreeType Found ("${FT_CFLAGS} ${FT_INCLUDE}")")
+    MESSAGE(STATUS "FreeType Found ("${FT_CFLAGS} ${FT_INCLUDE}")")
     
 ENDIF(NOT FT_INCLUDE)
 #**************************************************
 # Search for  X11 (not on windows)
 #**************************************************
 if(NOT WIN32)
-        MESSAGE("Checking for X11")
+        MESSAGE(STATUS "<Checking for X11>")
+        MESSAGE(STATUS "<******************************>")
         include(FindX11)
         if(NOT X11_FOUND)
              MESSAGE(FATAL_ERROR "Could not find X11")
@@ -76,7 +82,8 @@ endif(NOT WIN32)
 #**************************************************
 # Search for GLIB through PKG-Config
 #**************************************************
-MESSAGE("Checking for GLIB")
+MESSAGE(STATUS "<Checking for GLIB>")
+MESSAGE(STATUS "<******************************>")
 PKGCONFIG(glib-2.0 GLIB_INCLUDE GLIB_LIB GLIB_LDFLAGS GLIB_CFLAGS)
 
 IF(NOT GLIB_INCLUDE)
@@ -93,7 +100,8 @@ ENDIF(NOT GLIB_INCLUDE)
 #**************************************************
 # Search for GTK through PKG-Config
 #**************************************************
-MESSAGE("Checking for GTK")
+MESSAGE(STATUS "<Checking for GTK>")
+MESSAGE(STATUS "<******************************>")
 PKGCONFIG(gtk+-2.0 GTK_INCLUDE GTK_LIB GTK_LDFLAGS GTK_CFLAGS)
 
 IF(NOT GTK_CFLAGS)
@@ -108,7 +116,8 @@ ENDIF(NOT GTK_CFLAGS)
 #**************************************************
 # Search for Gthread through PKG-Config
 #**************************************************
-MESSAGE("Checking for Gthread")
+MESSAGE(STATUS "<Checking for Gthread>")
+MESSAGE(STATUS "<******************************>")
 PKGCONFIG(gthread-2.0 GTHREAD_INCLUDE GTHREAD_LIB GTHREAD_LDFLAGS GTHREAD_CFLAGS)
 
 IF(NOT GTHREAD_CFLAGS)
@@ -122,6 +131,7 @@ ENDIF(NOT GTHREAD_CFLAGS)
 # Search for QT4 
 #**************************************************
 MESSAGE(STATUS "<Checking for QT4>")
+MESSAGE(STATUS "<******************************>")
 include(FindQt4)
 
 # do config checks
@@ -141,3 +151,7 @@ add_definitions( -DHAVE_CONFIG_H )
 
 ADD_SUBDIRECTORY(avidemux)
 
+###############################
+# Summary
+###############################
+include(conf_summary)
