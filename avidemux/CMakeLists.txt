@@ -202,6 +202,11 @@ if(USE_FREETYPE)
 add_libs_all_targets(${FT_LDFLAGS})
 endif(USE_FREETYPE)
 
+#iconv
+if(NEEED_LIBICONV)
+add_libs_all_targets(iconv)
+endif(NEEED_LIBICONV)
+
 # Xml2
 add_libs_all_targets(xml2 )
 ###########################################

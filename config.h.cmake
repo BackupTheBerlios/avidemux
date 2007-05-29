@@ -12,6 +12,9 @@
 /* Big endian CPU - SPARC or PowerPC */
 #cmakedefine ADM_BIG_ENDIAN
 
+/* If we need to explictely link to iconv */
+#cmakedefine NEEED_LIBICONV
+
 /* BSD OS specific ifdef */
 #cmakedefine ADM_BSD_FAMILY
 

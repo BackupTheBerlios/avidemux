@@ -115,6 +115,23 @@ endif(NOT WIN32)
 ########################################
 # ICONV
 ########################################
+# search ICON.h
+MESSAGE(STATUS "<Checking for iconv.h>")
+CHECK_INCLUDE_FILES(iconv.h HAVE_ICONV_H)
+if(NOT HAVE_ICONV_H)
+  MESSAGE(FATAL "iconv.h not found")
+endif(NOT HAVE_ICONV_H)
+
+# need libiconv ?
+CHECK_LIBRARY_EXISTS("iconv" "" iconv LINK_WITH_ICONV)
+if(LINK_WITH_ICONV)
+  SET(NEEED_LIBICONV 1)
+  MESSAGE(STATUS "libiconv found, probably needed")
+else(LINK_WITH_ICONV)
+  MESSAGE(STATUS "libiconv not found, probably not needed")
+endif(LINK_WITH_ICONV)
+
+#
 MESSAGE(STATUS "<Checking if iconv needs const>")
 ADM_COMPILE_WITH_WITHOUT(iconv_check.cpp "-DICONV_NEED_CONST" "-lm" ICONV_WITH)
 if(ICONV_WITH)
@@ -219,4 +236,5 @@ MESSAGE("End of CPU and OS Check")
 SET(ADM_DEBUG 1)
 
 include(adm_log)
+MESSAGE("LINK_FLAGS ${CMAKE_LD_FLAGS}")
 # EOF
