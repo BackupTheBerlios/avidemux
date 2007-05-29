@@ -4,13 +4,21 @@
 include(AdmLib)
 SET(ADM_LIB ADM_dialogFactoryQt4)
 #
-SET(${ADM_LIB}_SRCS
-AT_bitrate.cpp  AT_dialogFactory.cpp  FAC_bar.cpp    FAC_frame.cpp  FAC_integer.cpp  FAC_notch.cpp         FAC_toggle.cpp
-AT_button.cpp   AT_filesel.cpp        FAC_float.cpp  FAC_hex.cpp    FAC_menu.cpp     FAC_readOnlyText.cpp
+SET(${ADM_LIB}_T
+bitrate  
+dialogFactory  
+button
+filesel        
 )
-ADD_LIBRARY(${ADM_LIB} STATIC ${${ADM_LIB}_SRCS})
-ADD_ADM_LIB(${ADM_LIB} ADM_libraries)
 
+SET(${ADM_LIB}_SRCS
+FAC_bar.cpp    FAC_frame.cpp  FAC_integer.cpp  FAC_notch.cpp         FAC_toggle.cpp
+FAC_float.cpp  FAC_hex.cpp    FAC_menu.cpp     FAC_readOnlyText.cpp
+)
+
+################################
+include(adm_qt4)
+################################
 
 ################################
 ADD_definitions(-DADM_SUBVERSION=0 )
