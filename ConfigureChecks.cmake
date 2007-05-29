@@ -9,6 +9,7 @@ INCLUDE(CheckLibraryExists)
 include(lavcodec)
 include(CMakeDetermineSystem)
 include(adm_checkHeaderLib)
+include(adm_compile)
 #INCLUDE(CheckStructMember)
 check_function_exists(gettimeofday    HAVE_GETTIMEOFDAY)
 # Header
@@ -111,7 +112,17 @@ endif(NOT WIN32)
 if(NOT WIN32)
 ADM_CHECK_HL(Esd esd.h  esd esd_close USE_ESD)
 endif(NOT WIN32)
-
+########################################
+# ICONV
+########################################
+MESSAGE(STATUS "<Checking if iconv needs const>")
+ADM_COMPILE_WITH_WITHOUT(iconv_check.cpp "-DICONV_NEED_CONST" "-lm" ICONV_WITH)
+if(ICONV_WITH)
+  MESSAGE(STATUS "Yes")
+  SET(ICONV_NEED_CONST 1)
+else(ICONV_WITH)
+    MESSAGE(STATUS "No")
+endif(ICONV_WITH)
 ########################################
 # LAME
 ########################################
@@ -144,15 +155,23 @@ endif(USE_VORBIS1 AND USE_VORBIS2)
 ########################################
 # FAAD
 ########################################
+
 ADM_CHECK_HL(FAAD faad.h faad faacDecInit USE_FAAD)
 if(NOT USE_FAAD)
  ADM_CHECK_HL(NeAAC neaacdec.h faad NeAACDecInit USE_FAAD)
 endif(NOT USE_FAAD)
-# FIXME
-# FIXME
-# FIXME
-SET(OLD_FAAD_PROTO 1)
-#SET(ICONV_NEED_CONST 1)
+
+# See if we need old FAAD or NEW
+if(USE_FAAD)
+MESSAGE(STATUS "<Checking if faad needs old proto>")
+ADM_COMPILE_WITH_WITHOUT(faad_check.cpp "-DOLD_FAAD_PROTO" "-lfaad" FAAD_WITH)
+if(FAAD_WITH)
+  MESSAGE(STATUS "Yes")
+  SET(OLD_FAAD_PROTO 1)
+else(FAAD_WITH)
+    MESSAGE(STATUS "No")
+endif(FAAD_WITH)
+endif(USE_FAAD)
 ########################################
 # FreeType
 ########################################

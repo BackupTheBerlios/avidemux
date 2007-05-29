@@ -499,7 +499,7 @@
 #cmakedefine USE_XX_XVID
 
 /* Version number of package */
-#cmakedefine VERSION
+#define  VERSION "${VERSION}"
 
 /* Big endian CPU - SPARC or PowerPC */
 #cmakedefine WORDS_BIGENDIAN
