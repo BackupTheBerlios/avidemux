@@ -14,6 +14,8 @@ mainfilter
 ################################
 include(adm_qt4)
 ################################
+Q_RCC(filter)
+
 ADD_definitions(-DADM_SUBVERSION=0 )
 include_directories(.. ../../../ADM_osSupport ../../../ADM_inputs)
 include_directories(${QT_INCLUDES})

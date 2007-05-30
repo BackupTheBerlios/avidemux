@@ -16,6 +16,18 @@ MACRO(Q_UIMOCIFY _source)
    #FILE(APPEND ${CMAKE_CURRENT_SOURCE_DIR}/AQ_${_source}.cpp "#include \"Q_${_source}.moc\" \n" )
 ENDMACRO(Q_UIMOCIFY _source)  
 ##############################################################"
+# FOR 
+# foo.qrc->foo_rsc.cpp
+##############################################################"
+# $(RCC)  $< -o $@   -name filter
+MACRO(Q_RCC _source)                     
+  ADD_CUSTOM_COMMAND(OUTPUT   ${_source}_rsc.cpp
+                     COMMAND  ${QT_RCC_EXECUTABLE} ${_source}.qrc -o ${_source}_rsc.cpp -name ${_source}
+                     DEPENDS  ${_source}.qrc
+                     VERBATIM
+                )
+ENDMACRO(Q_RCC _source)        
+##############################################################"
 # FOR AT
 # T_foo.cpp i => AT_foo.cpp and T_foo.moc
 ##############################################################"
