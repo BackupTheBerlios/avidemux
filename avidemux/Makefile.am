@@ -74,7 +74,8 @@ SUBDIRS = ADM_libraries ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
 	ADM_script ADM_ocr \
 	ADM_osSupport \
 	ADM_inputs ADM_outputs \
-	ADM_userInterfaces
+	ADM_userInterfaces \
+	ADM_infoExtractor
 	
 
 
@@ -120,6 +121,7 @@ ADM_filter/filter_saveload.o 				\
 ./ADM_inputs/ADM_openDML/libADM_openDML.a		\
 ./ADM_inputs/ADM_avsproxy/libADM_avsproxy.a		\
 ./ADM_inputs/ADM_matroska/libADM_matroska.a		\
+./ADM_infoExtractor/libADM_infoExtractor.a 		\
 ./ADM_libraries/ADM_lavcodec/libpostproc/libpostproc.a	\
 ./ADM_libraries/ADM_mplex/libADM_mplex.a		\
 ./ADM_libraries/ADM_lvemux/libADM_lvemux.a		\
