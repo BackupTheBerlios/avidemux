@@ -73,9 +73,9 @@ _VIDEOS *currentVideo;
 			return r;		
 		}
 		// could not get the cound, rewind and retry
-		printf("EditorPacket:Read failed; retrying (were at seg %lu"   ,_audioseg);
-                printf("sample %llu\n",_audioSample); // FIXME use proper stuff
-                printf("/ %lld)\n",_segments[_audioseg]._audio_duration);
+		printf("EditorPacket:Read failed; retrying (were at seg %u"   ,_audioseg);
+                printf("sample %u\n",_audioSample); // FIXME use proper stuff
+                printf("/ %d)\n",_segments[_audioseg]._audio_duration);
 		if(_audioseg == (_nb_segment - 1))
 		{		
 			printf("EditorPacket : End of *last* stream\n");
@@ -113,8 +113,8 @@ _VIDEOS *currentVideo;
 	{
 		
 		printf("EditorPacket : End of stream Segment :%u/%u \n",_audioseg,_nb_segment);
-                printf("This sample : %s ",ms2timedisplay(1000*_audioSample/currentVideo->_audiostream->getInfo()->frequency));
-                printf("total :%s\n" ,ms2timedisplay(1000*_segments[_audioseg]._audio_duration/currentVideo->_audiostream->getInfo()->frequency));
+                printf("This sample : %u (%s) ",_audioSample,ms2timedisplay(1000*_audioSample/currentVideo->_audiostream->getInfo()->frequency));
+                printf("total :%u (%s)\n" ,_segments[_audioseg]._audio_duration,ms2timedisplay(1000*_segments[_audioseg]._audio_duration/currentVideo->_audiostream->getInfo()->frequency));
 		return 0;
 	}
 	// switch segment

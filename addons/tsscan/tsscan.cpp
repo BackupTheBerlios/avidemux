@@ -124,7 +124,7 @@ int parse(FILE *fd,FILE *fo, int cpid)
 int loop=0;
 int pid,adapt,start,len;
 
-	while(loop<50000)
+	while(loop<350000)
 	{
 		loop++;		
 		if(1!=fread(buffer,TS_PACKET,1,fd))

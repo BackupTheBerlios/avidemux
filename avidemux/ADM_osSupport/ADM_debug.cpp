@@ -33,7 +33,7 @@
 
 // put here the module you want to be verbose (MODULE_xxx + MODULE_yyyy+  ....)
 #ifndef masked
-#define masked  (MODULE_3GP*1+ 1*MODULE_MPEG) //+MODULE_3GP) //(MODULE_AUDIO_EDITOR) MODULE_OGM_AUDIO MODULE_REQUANT MODULE_CODEC
+#define masked  (MODULE_3GP*0+ 0*MODULE_MPEG) //+MODULE_3GP) //(MODULE_AUDIO_EDITOR) MODULE_OGM_AUDIO MODULE_REQUANT MODULE_CODEC
 #endif
 
 #ifndef thresholdLevel

@@ -133,6 +133,13 @@ ENDIF(NOT GTHREAD_CFLAGS)
 MESSAGE(STATUS "<Checking for QT4>")
 MESSAGE(STATUS "<******************************>")
 include(FindQt4)
+if(QT4_FOUND AND MINGW)
+	MESSAGE(STATUS "** MINGW ** OVERRIDING PATH FOR QT4 You may have to edit CMakeLists.txt!!!")
+	SET(QT_QMAKE_EXECUTABLE qmake)
+	SET(QT_UIC_EXECUTABLE uic)
+	SET(QT_MOC_EXECUTABLE moc)
+	SET(QT_RCC_EXECUTABLE rcc)
+endif(QT4_FOUND AND MINGW)
 
 # do config checks
 include(ConfigureChecks.cmake)
