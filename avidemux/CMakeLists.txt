@@ -21,9 +21,21 @@ MACRO (add_libs_all_targets _libName)
   if(QT4_FOUND)
   TARGET_LINK_LIBRARIES(avidemux2_qt4 ${_libName})
   endif(QT4_FOUND)
-
 ENDMACRO (add_libs_all_targets _libName)
-#/ Small macro...
+
+MACRO (change_ldflags_all_targets _libName)
+        SET_TARGET_PROPERTIES(avidemux2_cli
+	PROPERTIES LINK_FLAGS ${_libName})
+  if(GTK_FOUND)
+        SET_TARGET_PROPERTIES(avidemux2_gtk
+	PROPERTIES LINK_FLAGS ${_libName})
+  endif(GTK_FOUND)
+  if(QT4_FOUND)
+        SET_TARGET_PROPERTIES(avidemux2_qt4
+	PROPERTIES LINK_FLAGS ${_libName})
+  endif(QT4_FOUND)
+ENDMACRO (change_ldflags_all_targets _libName)
+##/ Small macro...
 
 
 #
@@ -228,8 +240,7 @@ endif(HAVE_LIBMP3LAME)
 
 # SDL
 if(USE_SDL)
-add_libs_all_targets(${SDL_LIBRARY} )
-add_libs_all_targets(SDL )
+add_libs_all_targets(${SDL_LDFLAGS} )
 endif(USE_SDL)
 
 # ESD
@@ -296,18 +307,16 @@ endif(QT4_FOUND)
 
 
 IF(WIN32)
-#-mms-bitfield -mno-cygwin \
-#-mwinmm \
 add_libs_all_targets(ADM_osSupport)
 add_libs_all_targets(pthreadGC2 )
 add_libs_all_targets(winmm )
 add_libs_all_targets(wsock32 )
 
-SET_TARGET_PROPERTIES(avidemux2_cli
-	PROPERTIES LINK_FLAGS "-mms-bitfield -mno-cygwin -mwinmm"
-)
-
+change_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows")
 ENDIF(WIN32)
+
+SDLify(main.cpp )
+
 
 
 # /EOF

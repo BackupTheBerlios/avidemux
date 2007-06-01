@@ -26,3 +26,10 @@ else(SDL_EXECUTABLE)
   MESSAGE(STATUS "sdl-config not found ")
 endif(SDL_EXECUTABLE)
 ENDMACRO(ADM_FIND_SDL)
+
+MACRO(SDLify _source)
+if(SDL_FOUND)
+        SET_SOURCE_FILES_PROPERTIES(${_source}
+                                     PROPERTIES COMPILE_FLAGS ${SDL_CFLAGS}) 
+endif(SDL_FOUND)
+ENDMACRO(SDLify _source)

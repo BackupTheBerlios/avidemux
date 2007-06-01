@@ -18,4 +18,4 @@ include_directories(./..)
 if(FT_FOUND)
 add_definitions(${FT_CFLAGS})
 endif(FT_FOUND)
-
+SDLify(GUI_sdlRender.cpp)
