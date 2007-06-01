@@ -312,7 +312,7 @@ add_libs_all_targets(pthreadGC2 )
 add_libs_all_targets(winmm )
 add_libs_all_targets(wsock32 )
 
-change_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows")
+change_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows xpm/adm.o")
 ENDIF(WIN32)
 
 SDLify(main.cpp )
