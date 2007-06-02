@@ -270,6 +270,12 @@ if(USE_FAAC)
 add_libs_all_targets(faac)
 endif(USE_FAAC)
 
+#aften
+if(USE_AFTEN)
+add_libs_all_targets(aften)
+endif(USE_AFTEN)
+
+
 #faad
 if(USE_FAAD)
 add_libs_all_targets(faad)
@@ -307,6 +313,7 @@ endif(QT4_FOUND)
 
 
 IF(WIN32)
+add_libs_all_targets(z)
 add_libs_all_targets(ADM_osSupport)
 add_libs_all_targets(pthreadGC2 )
 add_libs_all_targets(winmm )
