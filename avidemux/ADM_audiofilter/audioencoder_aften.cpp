@@ -33,7 +33,7 @@
 //
 extern "C"
 {
-#ifdef USE_AFTEN_06
+#if !defined(USE_AFTEN_05)
 	#include "aften.h"
 #else
 	#include "aften/aften.h"
@@ -51,7 +51,9 @@ AUDMEncoder_Aften::AUDMEncoder_Aften(AUDMAudioFilter * instream)  :AUDMEncoder  
   memset(_handle,0,sizeof(AftenContext));
   aften_set_defaults(_HANDLE);
   _wavheader->encoding=WAV_AC3;
-  
+#ifdef USE_AFTEN_07
+  _HANDLE->params.n_threads=1; // MThread collides with avidemux multithreading
+#endif
 };
 
 

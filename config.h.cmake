@@ -437,6 +437,8 @@
 
 /* Use Aften 0.06 */
 #cmakedefine USE_AFTEN_06
+/*               */
+#cmakedefine USE_AFTEN_07
 
 /* AltiVec for mpeg2enc */
 #cmakedefine USE_ALTIVEC

@@ -3,8 +3,11 @@
 MACRO (ADM_CHECK_HL _banner _includeName _libName _libFunc _varToSet)
 MESSAGE(STATUS "<Checking for ${_banner}>")
 MESSAGE(STATUS "<******************************>")
-#set(${_varToSet} FALSE)
-CHECK_INCLUDE_FILES("${_includeName}" ${_varToSet}_H)
+ SET(_oldCRF ${CMAKE_REQUIRED_FLAGS})
+ SET(CMAKE_REQUIRED_FLAGS "$ENV{CFLAGS} ${_oldCRF}")
+#MESSAGE(STATUS "CMAKE_REQUIRED_FLAGS:${CMAKE_REQUIRED_FLAGS}")
+#MESSAGE(STATUS "ENV:"$ENV{CFLAGS})
+CHECK_INCLUDE_FILES("${_includeName}" "${_varToSet}_H")
 #MESSAGE("OUT ${HAVE_IT_H}")
 if(${_varToSet}_H)
   MESSAGE(STATUS "Header ${_includeName} Found")
@@ -25,7 +28,7 @@ if(${_varToSet})
 else(${_varToSet})
      MESSAGE(STATUS "${_banner} support off")
 endif(${_varToSet})
-
+SET(CMAKE_REQUIRED_FLAGS "${_oldCRF}")
 ENDMACRO (ADM_CHECK_HL _includeName _libName _libFunc _varToSet)
 
 
