@@ -38,12 +38,12 @@ typedef union
 
 }ArgI;
 
-typedef struct Arg
+typedef struct 
 {
 	APM_TYPE type;
 	ArgI	 arg;
 
-};
+}Arg;
 #define MAXPARAM 40
 #endif
 //END
