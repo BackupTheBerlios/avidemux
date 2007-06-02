@@ -159,9 +159,9 @@ ADM_utilities
 ADM_xvidratectl
 ADM_libpostproc
 )
-if(FT_FOUND)
+if(USE_FREETYPE)
 SET(ADM_LIBRARIES ${ADM_LIBRARIES}  ADM_libass)
-ENDIF(FT_FOUND)
+ENDIF(USE_FREETYPE)
 
 FOREACH(_current ${ADM_LIBRARIES})
 add_libs_all_targets(${_current})

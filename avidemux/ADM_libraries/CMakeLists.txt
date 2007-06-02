@@ -15,6 +15,6 @@ subdirs (PREORDER ADM_utilities)
 subdirs (PREORDER ADM_xvidratectl)
 subdirs (PREORDER ADM_libpostproc)
 
-if(FT_FOUND)
+if(USE_FREETYPE)
 subdirs (PREORDER ADM_libass)
-endif(FT_FOUND)
+endif(USE_FREETYPE)
