@@ -41,7 +41,8 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 
-#include "ADM_video/ADM_vidFont.h"
+//#include "ADM_video/ADM_vidFont.h"
+class ADMfont;
 #include "ADM_video/ADM_vidSRT.h"
 
 #include "ADM_toolkit_gtk/ADM_gladeSupport.h"
