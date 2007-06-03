@@ -405,7 +405,10 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                 uint32_t n,i,j,k,v;
                   printf("ctts:%lu\n",son.read32()); // version & flags
                   n=son.read32();
-            
+                  if(n==1) // all the same , ignore
+                  {
+                    break;
+                  }
                 info.Ctts=new uint32_t[n*4]; // keep a safe margin
             
                 for(i=0;i<n;i++)
@@ -427,6 +430,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                     info.Ctts=NULL;
                     printf("Destroying Ctts, seems invalid\n");
                 }
+                ADM_assert(info.nbCtts<n*4);
                 printf("Found %u elements\n",info.nbCtts);
             }
             break;  
