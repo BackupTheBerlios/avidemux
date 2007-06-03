@@ -24,7 +24,8 @@
 #include "ADM_image.h"
 
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidFont.h"
+class ADMfont;
+//#include "ADM_video/ADM_vidFont.h"
 #include "ADM_video/ADM_vidSRT.h"
 
 #include "DIA_flyDialog.h"

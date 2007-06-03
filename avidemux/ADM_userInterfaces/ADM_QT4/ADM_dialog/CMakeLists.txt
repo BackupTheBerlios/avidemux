@@ -34,7 +34,6 @@ OCR_none.cpp
 )
 
 IF(USE_FREETYPE)
-add_definitions(${FT_CFLAGS})
 SET(${ADM_LIB}_SRCS ${${ADM_LIB}_SRCS} DIA_srt.cpp)
 SET(${ADM_LIB}_Q ${${ADM_LIB}_Q} srt)
 ENDIF(USE_FREETYPE)

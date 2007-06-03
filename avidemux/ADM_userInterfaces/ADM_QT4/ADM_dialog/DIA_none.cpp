@@ -51,7 +51,8 @@
 #include "ADM_video/ADM_vidMPdelogo.h"
 #include "ADM_video/ADM_vidEq2.h"
 #include "ADM_video/ADM_vidContrast.h"
-#include "ADM_video/ADM_vidFont.h"
+//#include "ADM_video/ADM_vidFont.h"
+class ADMfont;
 #include "ADM_video/ADM_vidSRT.h"
 #include "ADM_audiofilter/audioencoder_vorbis_param.h"    
     

@@ -34,7 +34,8 @@
 #include "DIA_flyDialog.h"
 #include "DIA_flyDialogQt4.h"
 
-#include "ADM_video/ADM_vidFont.h"
+//#include "ADM_video/ADM_vidFont.h"
+class ADMfont;
 #include "ADM_video/ADM_vidSRT.h"
 
 #include "DIA_flySrtPos.h"

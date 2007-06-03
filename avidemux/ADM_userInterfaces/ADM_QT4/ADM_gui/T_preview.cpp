@@ -43,12 +43,6 @@
 #include "ADM_colorspace/ADM_rgb.h"
 #include "GUI_render.h"
 #include "GUI_accelRender.h"
-#if defined(USE_XV)
-#include "GUI_xvRender.h"
-#endif
-#if defined (USE_SDL)
-#include "GUI_sdlRender.h"
-#endif
 #include "prefs.h"
 #include <ADM_assert.h>
     

@@ -40,12 +40,6 @@
 #include "ADM_commonUI/GUI_render.h"
 
 #include "ADM_commonUI/GUI_accelRender.h"
-#ifdef USE_XV
-#include "ADM_commonUI/GUI_xvRender.h"
-#endif
-#ifdef USE_SDL
-#include "ADM_commonUI/GUI_sdlRender.h"
-#endif
 
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
 

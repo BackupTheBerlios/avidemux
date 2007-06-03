@@ -27,7 +27,8 @@
 #include "ADM_video/ADM_genvideo.hxx"
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
-#include "ADM_video/ADM_vidFont.h"
+//#include "ADM_video/ADM_vidFont.h"
+class ADMfont;
 #include "ADM_video/ADM_vidSRT.h"
 /**
       \fn DIA_x264
