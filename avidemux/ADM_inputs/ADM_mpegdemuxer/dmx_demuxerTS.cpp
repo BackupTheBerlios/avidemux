@@ -173,6 +173,7 @@ uint8_t dmx_demuxerTS::setPos( uint64_t abs,uint64_t  rel)
         }
         // There is a risk we don't get the PES start for that
         //
+        packMode=0;
         if(!parser->setpos(abs))
         {
                 printf("DMX_TS: setPos failed\n");
@@ -362,8 +363,15 @@ _againBranch:
 #endif
                                          _pesBufferLen=packLen;
                                 }
+#if 0
+                                printf("at %llx, packLen=%lu minus %lu\n",_pesBufferStart,packLen,_pesBufferLen);
+#endif
                                 packLen-=_pesBufferLen;
-                                if(!packLen) packMode=0;
+                                
+                                if(!packLen) 
+                                {
+                                  packMode=0;
+                                }
                         }
                         return 1;
                 }
