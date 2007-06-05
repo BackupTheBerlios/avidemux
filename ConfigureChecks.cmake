@@ -22,6 +22,7 @@ CHECK_INCLUDE_FILES(sys/stat.h      HAVE_SYS_STAT_H)                    # gpg/gp
 CHECK_INCLUDE_FILES(sys/types.h     HAVE_SYS_TYPES_H)                   # simapi.h
 CHECK_INCLUDE_FILES(unistd.h        HAVE_UNISTD_H)                      # simapi.h
 CHECK_INCLUDE_FILES(malloc.h        HAVE_MALLOC_H)                      # simapi.h
+CHECK_INCLUDE_FILES(libintl.h       HAVE_LIBINTL_H)                      # simapi.h
 # Set lavcodec/util/format configuration
 SET_LAVCODEC_FLAGS()
 
@@ -55,7 +56,32 @@ if(HAVE_LzertgIBMP3LAME)
   MESSAGE(FATAL "THAT TEST SHOULD HAVE FAILED EXPECT PROBLEM")
 endif(HAVE_LzertgIBMP3LAME)
 
-
+########################################
+# Gettext
+########################################
+if(HAVE_LIBINTL_H)
+  MESSAGE(STATUS "<Checking gettext >")
+  MESSAGE(STATUS "<**************** >")
+# Try linking without -lintl
+  ADM_COMPILE( gettext.cpp "" "" WITHOUT_LIBINTL outputWithoutLibintl)
+  if(WITHOUT_LIBINTL)
+      SET(HAVE_GETTEXT 1)
+      MESSAGE(STATUS "Ok, No lib needed (${ADM_GETTEXT_LIB})")
+  else(WITHOUT_LIBINTL)
+      ADM_COMPILE( gettext.cpp "" "-lintl" WITH_LIBINTL outputWithLibintl)
+      if(WITH_LIBINTL)
+        SET(ADM_GETTEXT_LIB "-lintl")
+        SET(HAVE_GETTEXT 1)
+        MESSAGE(STATUS "Ok, libintl needed")
+      else(WITH_LIBINTL)
+        MESSAGE(STATUS "Does not work, without ${outputWithoutLibintl}")
+        MESSAGE(STATUS "Does not work, with    ${outputWithLibintl}")
+      endif(WITH_LIBINTL)
+  endif(WITHOUT_LIBINTL)
+endif(HAVE_LIBINTL_H)
+if(HAVE_GETTEXT)
+  add_definitions(-DADMLOCALE="\\"/usr\\"")
+endif(HAVE_GETTEXT)
 ########################################
 # WIN32
 ########################################
@@ -241,6 +267,8 @@ endif(USE_FAAD)
 # FAAC
 ########################################
 ADM_CHECK_HL(FAAC faac.h faac faacEncClose USE_FAAC)
+
+
 ########################################
 # FreeType
 ########################################
@@ -309,8 +337,18 @@ MESSAGE("<CPU:${CMAKE_SYSTEM_PROCESSOR}>")
 MESSAGE(STATUS "<End of CPU and OS Check>")
 MESSAGE(STATUS "<******************************>")
 #
-SET(ADM_DEBUG 1)
-
 include(adm_log)
+#
+if(NOT CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE "Release")
+endif(NOT CMAKE_BUILD_TYPE)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+MESSAGE(STATUS "** DEBUG BUILD (${CMAKE_BUILD_TYPR})**")
+add_definitions(-DADM_DEBUG)
+else (CMAKE_BUILD_TYPE STREQUAL "Debug")
+MESSAGE(STATUS "** RELEASE BUILD (${CMAKE_BUILD_TYPR})**")
+endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+
 MESSAGE("LINK_FLAGS ${CMAKE_LD_FLAGS}")
 # EOF

@@ -18,8 +18,6 @@
 /* BSD OS specific ifdef */
 #cmakedefine ADM_BSD_FAMILY
 
-/* be verbose */
-#cmakedefine ADM_DEBUG
 
 #cmakedefine HAVE_AUDIO
 

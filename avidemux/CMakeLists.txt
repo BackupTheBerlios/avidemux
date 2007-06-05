@@ -286,6 +286,11 @@ if(USE_FREETYPE)
 add_libs_all_targets(${FT_LDFLAGS})
 endif(USE_FREETYPE)
 
+#gettext
+if(ADM_GETTEXT_LIB)
+add_libs_all_targets(${ADM_GETTEXT_LIB})
+endif(ADM_GETTEXT_LIB)
+
 #iconv
 if(NEEED_LIBICONV)
 add_libs_all_targets(iconv)
