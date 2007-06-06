@@ -124,50 +124,44 @@ void ADMVideoFields::hasMotion_MMX(uint8_t *p,uint8_t *c,
 #if !defined(DEBUG_DEINT)
 void myDeintASM(void)
 {
+                    __asm__ __volatile__ (
+                            "push "REG_bx"\n\t" // Dont clobber ebx for macOsX
+                            "mov "Mangle(_l_c)",	"REG_ax"\n\t"
+                            "mov "Mangle(_l_p)",	"REG_bx"\n\t"
+                            "mov "Mangle(_l_n)",	"REG_cx"\n\t"
+                            "mov "Mangle(_l_all)",	"REG_si"\n\t"
+                            "7:"
+                            "movd ("REG_ax"),	%%mm0\n\t"
+                            "movd ("REG_bx"),	%%mm1\n\t"
+                            "movd ("REG_cx"),	%%mm2\n\t"
+                            :
+                            :
+                            : "eax","ecx","edx","esi" 
+                            );
 
-	//printf("\n using  MMX \n");
+                            COMPUTE_MMX; // Doint it like that should be safe as there should be no extra code inserted (...)
 
+                            /* store result in e, e2 */
 
-        	{
+                    __asm__ __volatile__(
+                            "mov 	"Mangle(_l_e)",	"REG_dx"\n\t"
+                            "movd	%%mm3,("REG_dx")\n\t"
 
-			__asm__ __volatile__ (
-				"mov "Mangle(_l_c)",	"REG_ax"\n\t"
-				"mov "Mangle(_l_p)",	"REG_bx"\n\t"
-				"mov "Mangle(_l_n)",	"REG_cx"\n\t"
-				"mov "Mangle(_l_all)",	"REG_si"\n\t"
-				"7:"
-				"movd ("REG_ax"),	%%mm0\n\t"
-				"movd ("REG_bx"),	%%mm1\n\t"
-				"movd ("REG_cx"),	%%mm2\n\t"
-				:
-				:
-				: "eax","ebx","ecx","edx","esi" 
-				);
+                            "mov 	"Mangle(_l_e2)",	"REG_dx"\n\t"
+                            "movd	%%mm0,("REG_dx")\n\t"
 
-				COMPUTE_MMX;
-
-				/* store result in e, e2 */
-
-			__asm__ __volatile__(
-				"mov 	"Mangle(_l_e)",	"REG_dx"\n\t"
-				"movd	%%mm3,("REG_dx")\n\t"
-
-				"mov 	"Mangle(_l_e2)",	"REG_dx"\n\t"
-				"movd	%%mm0,("REG_dx")\n\t"
-
-				"add 	$4,	"REG_ax"\n\t"
-				"add 	$4,	"REG_bx"\n\t"
-				"add 	$4,	"REG_cx"\n\t"
-				"add 	$4,	"Mangle(_l_e)"\n\t"
-				"add 	$4,	"Mangle(_l_e2)"\n\t"
-				"sub 	$1,	"REG_si"\n\t"
-				"jnz 7b\n\t"
-
-				:
-				:
-				: "eax", "ebx","ecx","edx","esi"
-				);
-	           	}
+                            "add 	$4,	"REG_ax"\n\t"
+                            "add 	$4,	"REG_bx"\n\t"
+                            "add 	$4,	"REG_cx"\n\t"
+                            "add 	$4,	"Mangle(_l_e)"\n\t"
+                            "add 	$4,	"Mangle(_l_e2)"\n\t"
+                            "sub 	$1,	"REG_si"\n\t"
+                            "jnz 7b\n\t"
+                            "pop "REG_bx"\n\t" // Dont clobber ebx for macOsX
+                            :
+                            :
+                            : "eax", "ecx","edx","esi"
+                            );
 	   emms();
 
 }
