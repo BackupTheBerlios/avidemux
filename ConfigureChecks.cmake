@@ -79,9 +79,6 @@ if(HAVE_LIBINTL_H)
       endif(WITH_LIBINTL)
   endif(WITHOUT_LIBINTL)
 endif(HAVE_LIBINTL_H)
-if(HAVE_GETTEXT)
-  add_definitions(-DADMLOCALE="\\"/usr\\"")
-endif(HAVE_GETTEXT)
 ########################################
 # WIN32
 ########################################
