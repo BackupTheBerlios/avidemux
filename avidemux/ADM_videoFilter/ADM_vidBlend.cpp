@@ -39,8 +39,11 @@
 
 #include "admmangle.h"
 
-
+#ifdef ARCH_X86_64
+static int64_t _l_w,_l_h;
+#else
  static int32_t _l_w,_l_h;
+#endif
  static uint8_t *_l_p,*_l_c,*_l_n;
  static uint8_t *_l_e,*_l_e2;
 #define EXPAND(x) (x)+((x)<<16)+((x)<<32) +((x)<<48)
@@ -97,6 +100,8 @@ void myBlendASM(void)
 {
 	__asm__ (
 //"StartASM4: \n\t"
+"myBlendASM%=:\n\t"
+"push 				"REG_bx"\n\t" // MACOSX
 "push 				"REG_di"\n\t"
 "push 				"REG_si"\n\t"
 "push 				"REG_ax"\n\t"
@@ -179,9 +184,10 @@ void myBlendASM(void)
 "pop 				"REG_ax"\n\t"
 "pop 				"REG_si"\n\t"
 "pop 				"REG_di"\n\t"
+"pop 				"REG_bx"\n\t" // MACOSX
 " emms       \n\t"
  : /* no output */
  :  "r"(&_mmTHRESH1)
- :   "ebx", "ecx", "edx");
+ :   "ecx", "edx");
 }
 #endif
