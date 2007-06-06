@@ -618,6 +618,12 @@ decoderFFCinepak::decoderFFCinepak (uint32_t w, uint32_t h, uint32_t l, uint8_t 
 {
   WRAP_Open (CODEC_ID_CINEPAK);
 }
+//*************
+decoderFFCRAM::decoderFFCRAM (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,	   h)
+{
+  WRAP_Open (CODEC_ID_MSVIDEO1);
+}
+
 
 
 #endif
