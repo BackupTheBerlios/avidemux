@@ -6,10 +6,12 @@
 ##########################################################
 
 INCLUDE(Po)
-MESSAGE("GTK:"${GTK_CFLAGS}"GLIB:"${GLIB_CFLAGS})
 
 SET(adm_EXE_SRCS ADM_preview.cpp  gtk_gui.cpp  gui_autodrive.cpp  GUI_jobs.cpp  gui_navigate.cpp  guiplay.cpp  gui_savenew.cpp  main.cpp )
-#COMPILE_PO_FILES(${CMAKE_SOURCE_DIR}/po adm_EXE_SRCS)
+if(NOT win32)
+COMPILE_PO_FILES(${CMAKE_SOURCE_DIR}/po adm_EXE_SRCS)
+endif(NOT win32)
+
 include_directories(ADM_userInterfaces/ADM_commonUI ADM_outputs)
 
 # Small macro...
@@ -124,7 +126,7 @@ add_libs_all_targets(${_current})
 ENDFOREACH(_current ${ADM_inputs})
 
 #########################################
-# Trails
+# Tails
 #########################################
 
 
@@ -328,8 +330,11 @@ change_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows xpm/adm
 ENDIF(WIN32)
 
 SDLify(main.cpp )
-
-
+#FIXME : Set correct prefix for linguas
+if(HAVE_GETTEXT)
+    SET_SOURCE_FILES_PROPERTIES(main.cpp
+                                     PROPERTIES COMPILE_FLAGS -DADMLOCALE="\\"/usr\\"") 
+endif(HAVE_GETTEXT)
 
 # /EOF
 
