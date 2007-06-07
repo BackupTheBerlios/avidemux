@@ -308,7 +308,7 @@ __asm__ __volatile__(
 __asm__ __volatile__(
 "prefetchnta ("REG_source","REG_counter",8) \n\t"
 "prefetchnta ("REG_prev","REG_counter",8) \n\t"
-ADM_ALIGN16 // ??".p2align 4\n\t"
+".p2align 4\n\t"
 "pxor %%mm7,%%mm7\n\t"
 "HLine%=:  \n\t"
 
@@ -410,7 +410,7 @@ __asm__ __volatile__ (
 "prefetchnta ("REG_source","REG_counter",8) \n\t"
 "prefetchnta ("REG_prev","REG_counter",8) \n\t"
 "prefetchnta ("REG_mask","REG_counter",8) \n\t"
-ADM_ALIGN16 //??".p2align 4\n\t"
+".p2align 4\n\t"
 "pxor %%mm7,%%mm7\n\t"
 "Lfoo%=:  \n\t"
 "prefetchnta 8("REG_source","REG_counter",8) \n\t"
