@@ -26,7 +26,7 @@
 
 /* Feel free to add more to the list, eg. a.out IMO */
 /* Use rip-relative addressing if compiling PIC code on x86-64. */
-#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(__OS2__) || \
+#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(__APPLE__)|| defined(__OS2__) || \
    (defined(__OpenBSD__) && !defined(__ELF__))
 #if defined(ARCH_X86_64) && defined(PIC)
 #define MANGLE(a) "_" #a"(%%rip)"
