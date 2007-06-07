@@ -59,7 +59,7 @@
 #include "ADM_vidMSharpen_param.h"
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
-
+#include "admmangle.h"
 class Msharpen : public AVDMGenericVideoStream
 {
 private:
@@ -309,12 +309,12 @@ int wh ,ww,hh;
   int off;
 #ifdef GCC_2_95_X
         __asm__(
-                        ".align 16\n"
+                        ADM_ALIGN16
                         "pxor  %mm7,%mm7\n"
                 : : );
 #else
         __asm__(
-                        ".align 16\n"
+                        ADM_ALIGN16
                         "pxor  %%mm7,%%mm7\n"
                 : : );
 #endif
@@ -325,7 +325,7 @@ int wh ,ww,hh;
                 {
                         off=x<<3;                        
                         __asm__(
-                        ".align 16\n"                      
+                        ADM_ALIGN16
                         "movq  (%0),%%mm0\n"
                         "movq  %%mm0,%%mm6\n"
                         "punpckhbw %%mm7,%%mm0\n" // High part extended to 16 bits

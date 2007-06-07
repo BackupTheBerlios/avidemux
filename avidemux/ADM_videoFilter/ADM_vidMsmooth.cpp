@@ -70,7 +70,7 @@
 }
 
 #include "ADM_vidMSmooth_param.h"
-
+#include "admmangle.h"
 
 extern uint8_t 	PutHintingData(unsigned char *video, unsigned int hint);
 extern uint8_t 	GetHintingData(unsigned char *video, unsigned int *hint);
@@ -505,7 +505,7 @@ uint32_t off;
 			off=x<<3;
 			
 			__asm__(
-			".align 16\n"
+			ADM_ALIGN16
 			"pxor  %%mm7,%%mm7\n"
 			"movq  (%0),%%mm0\n"
 			"movq  %%mm0,%%mm6\n"
