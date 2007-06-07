@@ -9,11 +9,8 @@
 	#define Mangle(x) #x
 	#define MANGLE(x) #x
 #endif
-#ifdef __APPLE__
-  #define ADM_ALIGN16 ".align 4\n"
-#else
-  #define ADM_ALIGN16 ".align 16\n"
-#endif
+
+#define ADM_ALIGN16 ".p2align 4\n"
 /* Regiter renaming */
 #ifdef ARCH_X86_64
 #define REG_a  "rax" 
