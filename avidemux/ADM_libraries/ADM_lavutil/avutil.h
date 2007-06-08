@@ -32,7 +32,7 @@ extern "C" {
 #endif
 /* MEANX
  */
-	#define ASMALIGN(ZEROBITS) ".align 1<<" #ZEROBITS "\n\t" 
+	#define ASMALIGN(ZEROBITS) ".p2align " #ZEROBITS "\n\t" 
 /* /MEANX
  */
 
