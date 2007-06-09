@@ -11,6 +11,11 @@ SET(CMAKE_COLOR_MAKEFILE ON)
 
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+# XMingw ?
+OPTION(XMINGW FALSE)
+if(XMINGW)
+SET(WIN32 1)
+endif(XMINGW)
 
 #**************************************************
 # MESSAGE
@@ -134,11 +139,24 @@ MESSAGE(STATUS "<Checking for QT4>")
 MESSAGE(STATUS "<******************************>")
 include(FindQt4)
 if(QT4_FOUND AND MINGW)
+if(XMINGW) # Cross compile ?
+        SET(QTXM /rot2/qt_4.3)
+        #
+	SET(QT_QMAKE_EXECUTABLE qmake)
+	SET(QT_UIC_EXECUTABLE uic-qt4)
+	SET(QT_MOC_EXECUTABLE moc-qt4)
+	SET(QT_RCC_EXECUTABLE rcc)
+        SET(CMAKE_CXX_FLAGS "-I${QTXM}/include ${CMAKE_CXX_FLAGS}")
+        LINK_DIRECTORIES(${QTXM}/bin)
+        LINK_DIRECTORIES(${QTXM}/lib)
+
+else(XMINGW)
 	MESSAGE(STATUS "** MINGW ** OVERRIDING PATH FOR QT4 You may have to edit CMakeLists.txt!!!")
 	SET(QT_QMAKE_EXECUTABLE qmake)
 	SET(QT_UIC_EXECUTABLE uic)
 	SET(QT_MOC_EXECUTABLE moc)
 	SET(QT_RCC_EXECUTABLE rcc)
+endif(XMINGW)
 endif(QT4_FOUND AND MINGW)
 
 # do config checks
