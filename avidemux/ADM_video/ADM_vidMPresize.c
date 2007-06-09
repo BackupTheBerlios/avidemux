@@ -147,7 +147,7 @@ AVDMVideoStreamMPResize::AVDMVideoStreamMPResize(
 uint8_t	AVDMVideoStreamMPResize::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(3);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
@@ -179,7 +179,7 @@ uint8_t AVDMVideoStreamMPResize::getFrameNumberNoAlloc(uint32_t frame,
 {
 static Image in,out;
 			if(frame>= _info.nb_frames) return 0;
-			assert(_param);	
+			ADM_assert(_param);	
 	
    			
 
@@ -206,7 +206,7 @@ static Image in,out;
                 	if(_param->algo>2)
                  		{
                       	printf("\n Wrong algorithm selection");
-                        assert(0);
+                        ADM_assert(0);
                      }
                	 precompute(&out,&in, _param->algo );
               }
