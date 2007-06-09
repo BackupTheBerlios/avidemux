@@ -156,7 +156,7 @@ pxor_r2r(mm7,mm7);
 				"movd ("REG_cx"),	%%mm2\n\t"
 				:
 				:
-				: "eax", "ebx", "ecx", "edx"
+				: "eax",  "ecx", "edx"
 				);
 				COMPUTE
 
