@@ -27,7 +27,7 @@ at amistry@am-productions.biz
 // create a non file bit for unix
 #define _A_NONFILE	0x03
 
-#if defined( __unix__) && !defined(__macosx__) && !defined(ADM_WIN32)
+#if (defined( __unix__)||defined(__APPLE__)) && !defined(ADM_WIN32)
 
 // wrap the file mode bits
 #define _A_NORMAL	0x00
