@@ -176,13 +176,13 @@ _erLoad:
        							incoming->finalsize=value;
 				      			
            					}
-						gtk_label_set_text(GTK_LABEL(WID(label11)),"Size (MBytes):");
+						gtk_label_set_text(GTK_LABEL(WID(label11)),_("Size (MBytes):"));
             					break;
 				case 3:
 		     				incoming->mode = COMPRESS_2PASS_BITRATE;	
 						value = (uint32_t) gtk_read_entry(WID(entryEntry));
 						incoming->avg_bitrate=value;
-						gtk_label_set_text(GTK_LABEL(WID(label11)),"Average bitrate (kb/s):");
+						gtk_label_set_text(GTK_LABEL(WID(label11)),_("Average bitrate (kb/s):"));
             					break;
 
 				case 4:
@@ -351,7 +351,7 @@ uint32_t b;
 			VAL_SET(b);
 			gtk_widget_set_sensitive(WID(spinbuttonQuant),0);
 			gtk_widget_set_sensitive(WID(entryEntry),1);
-			gtk_label_set_text(GTK_LABEL(WID(label11)),"Target bitrate (kb/s):");
+			gtk_label_set_text(GTK_LABEL(WID(label11)),_("Target bitrate (kb/s):"));
 			break;
 
 		case COMPRESS_2PASS:
@@ -359,14 +359,14 @@ uint32_t b;
 			VAL_SET(mS);
 			gtk_widget_set_sensitive(WID(spinbuttonQuant),0);
 			gtk_widget_set_sensitive(WID(entryEntry),1);
-			gtk_label_set_text(GTK_LABEL(WID(label11)),"Target size (MBytes):");
+			gtk_label_set_text(GTK_LABEL(WID(label11)),_("Target size (MBytes):"));
 			break;
                 case COMPRESS_2PASS_BITRATE:
 			HIST_SET(3);
 			VAL_SET(mA);
 			gtk_widget_set_sensitive(WID(spinbuttonQuant),0);
 			gtk_widget_set_sensitive(WID(entryEntry),1);
-			gtk_label_set_text(GTK_LABEL(WID(label11)),"Average bitrate (kb/s):");
+			gtk_label_set_text(GTK_LABEL(WID(label11)),_("Average bitrate (kb/s):"));
 			break;
 
 	    	case COMPRESS_CQ:

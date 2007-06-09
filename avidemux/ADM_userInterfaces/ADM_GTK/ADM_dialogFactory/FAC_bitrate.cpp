@@ -70,7 +70,7 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
                     (GtkAttachOptions) (0), 0, 0);
   
   /* Add text -> encoding mode */
-  label1 = gtk_label_new_with_mnemonic ("_Encoding mode:");
+  label1 = gtk_label_new_with_mnemonic (_("_Encoding mode:"));
   gtk_misc_set_alignment (GTK_MISC (label1), 0.0, 0.5);
   gtk_widget_show(label1);
   

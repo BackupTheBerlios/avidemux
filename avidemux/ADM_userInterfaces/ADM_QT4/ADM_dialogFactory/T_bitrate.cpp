@@ -56,7 +56,7 @@ class  ADM_Qbitrate : public QWidget
            compress=p;
            combo=new QComboBox(z);
            maxQ=mq;
-#define add(x) combo->addItem(#x)
+#define add(x) combo->addItem(_(#x))
   
   add(Constant Bitrate);
   add(Constant Quality);

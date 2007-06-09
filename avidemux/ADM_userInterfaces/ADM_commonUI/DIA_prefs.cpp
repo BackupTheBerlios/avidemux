@@ -255,7 +255,7 @@ uint32_t hzd,vzd,dring;
 };
         diaElemMenu menuAudio(&newdevice,_("_Audio output:"), sizeof(audioEntries)/sizeof(diaMenuEntry),audioEntries,"");
         
-        diaElemText entryAlsaDevice(&alsaDevice,"ALSA _device:",NULL);
+        diaElemText entryAlsaDevice(&alsaDevice,_("ALSA _device:"),NULL);
 #ifdef ALSA_SUPPORT
           int z,m;
           m=sizeof(audioEntries)/sizeof(diaMenuEntry);
@@ -318,7 +318,7 @@ uint32_t hzd,vzd,dring;
         
         /* seventh Tab : Xfilter */
         diaElem *diaXFilter[]={&loadEx,&entryFilterPath};
-        diaElemTabs tabXfilter("External Filters",2,(diaElem **)diaXFilter);
+        diaElemTabs tabXfilter(_("External Filters"),2,(diaElem **)diaXFilter);
                                     
 // SET
         diaElemTabs *tabs[]={&tabUser,&tabAuto,&tabInput,&tabOutput,&tabAudio,&tabVideo,&tabCpu,&tabXfilter};
