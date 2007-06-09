@@ -87,11 +87,18 @@ SET(WIN32_DEF 1)
 else(WIN32)
 SET(WIN32_DEF 0)
 endif(WIN32)
+########################################
+# MacIntel
+########################################
+if(CMAKE_OSX_SYSROOT)
+  SET(ADM_BSD_FAMILY 1)
+#  SET(CYG_MANGLING 1)
+endif(CMAKE_OSX_SYSROOT)
 
 ########################################
 # ALSA
 ########################################
-if(NOT WIN32)
+if(NOT WIN32 AND NOT CMAKE_OSX_SYSROOT)
   MESSAGE(STATUS "<Checking for ALSA>")
   MESSAGE(STATUS "<*****************>")
   include(FindAlsa)
@@ -102,7 +109,7 @@ if(NOT WIN32)
     SET(ALSA_SUPPORT 1)
     SET(ALSA_1_0_SUPPORT 1)
   endif(ALSA_FOUND)
-endif(NOT WIN32)
+endif(NOT WIN32 AND NOT CMAKE_OSX_SYSROOT)
 ########################################
 # SDL
 ########################################
@@ -315,6 +322,15 @@ MESSAGE("<CPU:${CMAKE_SYSTEM_PROCESSOR}>")
    SET(MEMALIGN_HACK    1)
    add_definitions(-mms-bitfields -mno-cygwin)
  else(WIN32)
+      if(CMAKE_OSX_SYSROOT AND  ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i386")
+        SET(CYG_MANGLING 1)
+        MESSAGE(STATUS "x86 CPU, MACINTEL")
+        SET(ARCH_X86    1)
+        SET(HAVE_MMX    1)
+        SET(ARCH_X86_32    1)
+        SET(FPM_INTEL    1)
+      endif(CMAKE_OSX_SYSROOT AND  ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i386")
+
       if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i586" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i686")
           MESSAGE(STATUS "x86 CPU")
           SET(ARCH_X86    1)
