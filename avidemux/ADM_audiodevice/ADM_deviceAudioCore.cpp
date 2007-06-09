@@ -23,7 +23,7 @@
 #include "fourcc.h" 
  
 #ifdef __APPLE__
-#include "ADM_library/default.h"
+#include "default.h"
 #include <pthread.h>
 
 #include "ADM_toolkit/toolkit.hxx"
