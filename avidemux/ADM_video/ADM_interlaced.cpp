@@ -145,6 +145,7 @@ pxor_r2r(mm7,mm7);
 	for(y=h>>SKIP_FACTOR;  y >2 ; y--)
 		{
 			__asm__ __volatile__(
+                                "push "REG_bx"\n\t"
 				"mov "Mangle(_l_c)",	"REG_ax"\n\t"
 				"mov "Mangle(_l_p)",	"REG_bx"\n\t"
 				"mov "Mangle(_l_n)",	"REG_cx"\n\t"
@@ -165,9 +166,10 @@ pxor_r2r(mm7,mm7);
 				"add $4,		"REG_cx"\n\t"
 				"sub $1,		"REG_dx"\n\t"
 				"jnz 		8b\n\t"
+                                "pop "REG_bx"\n\t"
 				:
 				:
-				: "eax", "ebx", "ecx", "edx"
+				: "eax", "ecx", "edx"
 				);
 
 

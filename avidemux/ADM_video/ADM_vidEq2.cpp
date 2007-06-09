@@ -303,7 +303,7 @@ void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
     asm volatile (
       "pxor %%mm0, %%mm0 \n\t"
       "movl %4, %%eax\n\t"
-      ".balign 16 \n\t"
+      ".p2align 4 \n\t"
       "lop%=: \n\t"
       "movq (%0), %%mm1 \n\t"
       "movq (%0), %%mm2 \n\t"
