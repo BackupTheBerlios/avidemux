@@ -34,7 +34,7 @@
 #include <QPainter>
 #include <QImage>
 /* Probably on unix/X11 ..*/
-#ifndef ADM_WIN32
+#if !defined(ADM_WIN32) && !defined(__APPLE__)
 #include <QX11Info>
 #endif
 #include "fourcc.h"
@@ -201,7 +201,7 @@ void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
 */
 void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo)
 {
-#ifndef ADM_WIN32
+#if !defined(ADM_WIN32) && !defined(__APPLE__)
         const QX11Info &info=videoWindow->x11Info();
         xinfo->display=info.display();
         xinfo->window=videoWindow->winId();
