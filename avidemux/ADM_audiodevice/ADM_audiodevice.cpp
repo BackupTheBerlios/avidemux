@@ -52,7 +52,7 @@
 #include "ADM_deviceEsd.h"
 #endif
 
-#ifdef CONFIG_DARWIN
+#ifdef __APPLE__
 #include "ADM_audiodevice/ADM_deviceAudioCore.h"
 #endif
 
@@ -186,7 +186,7 @@ void AVDM_switch(AUDIO_DEVICE action)
 	 currentDevice=DEVICE_DUMMY;
 	switch(action)
 	{
-#ifdef CONFIG_DARWIN
+#ifdef __APPLE__
 		  case  DEVICE_COREAUDIO :
 								device=new 	 coreAudioDevice;
 								currentDevice=DEVICE_COREAUDIO;;

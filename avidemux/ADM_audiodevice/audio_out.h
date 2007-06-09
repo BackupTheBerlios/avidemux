@@ -49,7 +49,7 @@ static const DEVICELIST audioDeviceList[]=
 #ifdef ALSA_SUPPORT
 	MKADID(ALSA),
 #endif	
-#ifdef CONFIG_DARWIN
+#ifdef __APPLE__
 	MKADID(COREAUDIO),
 #endif
 #if	defined(USE_SDL) && !defined(ADM_WIN32)	
