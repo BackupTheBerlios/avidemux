@@ -14,6 +14,7 @@ SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 # XMingw ?
 OPTION(XMINGW FALSE)
 if(XMINGW)
+MESSAGE(STATUS "Xmingw set, forcing win32 target")
 SET(WIN32 1)
 endif(XMINGW)
 
@@ -146,6 +147,9 @@ if(XMINGW) # Cross compile ?
 	SET(QT_UIC_EXECUTABLE uic-qt4)
 	SET(QT_MOC_EXECUTABLE moc-qt4)
 	SET(QT_RCC_EXECUTABLE rcc)
+	SET(QT_QTGUI_LIBRARY QtGui4 ) # FIXME
+        SET(QT_QTCORE_LIBRARY QtCore4 ) # FIXME
+
         SET(CMAKE_CXX_FLAGS "-I${QTXM}/include ${CMAKE_CXX_FLAGS}")
         LINK_DIRECTORIES(${QTXM}/bin)
         LINK_DIRECTORIES(${QTXM}/lib)
