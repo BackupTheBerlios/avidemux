@@ -9,7 +9,7 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#ifdef CONFIG_DARWIN
+#ifdef __APPLE__
 
 	        class coreAudioDevice : public audioDevice
 	 {

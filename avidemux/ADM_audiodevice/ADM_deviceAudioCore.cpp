@@ -22,7 +22,7 @@
   
 #include "fourcc.h" 
  
-#ifdef CONFIG_DARWIN
+#ifdef __APPLE__
 #include "ADM_library/default.h"
 #include <pthread.h>
 
