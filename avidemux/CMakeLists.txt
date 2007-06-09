@@ -328,7 +328,16 @@ add_libs_all_targets(wsock32 )
 
 change_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows xpm/adm.o")
 ENDIF(WIN32)
+# MacOsX
 
+if(CMAKE_OSX_SYSROOT)
+add_libs_all_targets(z)
+if(GTK_FOUND)
+LINK_DIRECTORIES(avidemux2_gtk /usr/X11R6/lib )
+endif(GTK_FOUND)
+
+endif(CMAKE_OSX_SYSROOT)
+# all
 SDLify(main.cpp )
 #FIXME : Set correct prefix for linguas
 if(HAVE_GETTEXT)
