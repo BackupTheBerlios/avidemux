@@ -37,7 +37,7 @@ extern ADM_Composer *video_body;
 static void saveCrashProject(void);
 extern char *ADM_getBaseDir(void);
 extern void A_parseECMAScript(const char *name);
-#ifdef ADM_WIN32
+#if defined(ADM_WIN32) || defined(__APPLE__)
 void installSigHandler()
 {
 
