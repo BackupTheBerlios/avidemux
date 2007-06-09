@@ -226,13 +226,26 @@ endif(ALSA_FOUND)
 if(USE_FONTCONFIG)
 add_libs_all_targets(fontconfig)
 endif(USE_FONTCONFIG)
-
-# Xv
+##########################
+# XVideo 
+##########################
 if(USE_XV)
-add_libs_all_targets( Xext)
-add_libs_all_targets( X11 )
-add_libs_all_targets( Xv )
-add_libs_all_targets( m)
+       TARGET_LINK_LIBRARIES(avidemux2_cli Xext)
+       TARGET_LINK_LIBRARIES(avidemux2_cli X11)
+       TARGET_LINK_LIBRARIES(avidemux2_cli Xv)
+       TARGET_LINK_LIBRARIES(avidemux2_cli m)
+       if(GTK_FOUND)
+               TARGET_LINK_LIBRARIES(avidemux2_gtk Xext)
+               TARGET_LINK_LIBRARIES(avidemux2_gtk X11)
+               TARGET_LINK_LIBRARIES(avidemux2_gtk Xv)
+               TARGET_LINK_LIBRARIES(avidemux2_gtk m)
+       endif(GTK_FOUND)
+       if(QT4_FOUND AND NOT CMAKE_OSX_SYSROOT)
+               TARGET_LINK_LIBRARIES(avidemux2_qt4 Xext)
+               TARGET_LINK_LIBRARIES(avidemux2_qt4 X11 )
+               TARGET_LINK_LIBRARIES(avidemux2_qt4 Xv )
+               TARGET_LINK_LIBRARIES(avidemux2_qt4 m)
+       endif(QT4_FOUND AND NOT CMAKE_OSX_SYSROOT)
 endif(USE_XV)
 
 # Lame
@@ -313,12 +326,14 @@ endif(GTK_FOUND)
 if(QT4_FOUND)
 TARGET_LINK_LIBRARIES(avidemux2_qt4 ${GLIB_LDFLAGS} )
 LINK_DIRECTORIES(avidemux2_qt4 ${GLIB_LIB}  )
-TARGET_LINK_LIBRARIES(avidemux2_qt4 ${GTK_LDFLAGS} )
 TARGET_LINK_LIBRARIES(avidemux2_qt4 ${QT_QTGUI_LIBRARY} ) # FIXME
 TARGET_LINK_LIBRARIES(avidemux2_qt4 ${QT_QTCORE_LIBRARY} ) # FIXME
 endif(QT4_FOUND)
 
 
+########################
+# Win32
+########################
 IF(WIN32)
 add_libs_all_targets(z)
 add_libs_all_targets(ADM_osSupport)
@@ -328,16 +343,20 @@ add_libs_all_targets(wsock32 )
 
 change_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows xpm/adm.o")
 ENDIF(WIN32)
+########################
 # MacOsX
-
+########################
 if(CMAKE_OSX_SYSROOT)
 add_libs_all_targets(z)
+add_libs_all_targets( "-framework CoreServices  -framework CoreAudio   -framework AudioUnit")
 if(GTK_FOUND)
 LINK_DIRECTORIES(avidemux2_gtk /usr/X11R6/lib )
 endif(GTK_FOUND)
 
 endif(CMAKE_OSX_SYSROOT)
+########################
 # all
+########################
 SDLify(main.cpp )
 #FIXME : Set correct prefix for linguas
 if(HAVE_GETTEXT)
