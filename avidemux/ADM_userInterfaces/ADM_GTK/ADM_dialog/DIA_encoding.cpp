@@ -72,7 +72,10 @@ uint32_t useTray=0;
 		{
 			// set priority to normal, regardless of preferences
 			gtk_combo_box_set_active(GTK_COMBO_BOX(WID(combobox_priority)), 2);
-		}
+		}else
+                {
+                  	gtk_widget_set_sensitive(WID(combobox_priority), 0);
+                }
 
         gtk_signal_connect(GTK_OBJECT(WID(checkbutton_shutdown)), "toggled",
                       GTK_SIGNAL_FUNC(shutdown_toggled), NULL);
@@ -96,7 +99,8 @@ uint32_t useTray=0;
 		if (getuid() == 0)
 		{
 			gtk_combo_box_set_active(GTK_COMBO_BOX(WID(combobox_priority)),priority);
-		}
+		}else
+                  gtk_widget_set_sensitive(WID(combobox_priority), 0);
 	#else
 		gtk_combo_box_set_active(GTK_COMBO_BOX(WID(combobox_priority)),priority);
 	#endif
