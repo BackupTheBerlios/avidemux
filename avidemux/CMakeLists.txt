@@ -213,6 +213,10 @@ endif(QT4_FOUND)
 TARGET_LINK_LIBRARIES(avidemux2_cli ${GLIB_LDFLAGS} )
 LINK_DIRECTORIES(avidemux2_cli ${GLIB_LIB}  )
 
+#libdts
+if(USE_LIBDCA)
+add_libs_all_targets(dts)
+endif(USE_LIBDCA)
 # xvid
 if(USE_XVID_4)
 add_libs_all_targets(xvidcore)

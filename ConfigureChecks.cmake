@@ -231,7 +231,14 @@ SET(CMAKE_REQUIRED_LIBRARIES )
 # Xvid
 ########################################
 ADM_CHECK_HL(Xvid xvid.h xvidcore xvid_plugin_single USE_XVID_4)
-
+########################################
+# Libdca
+########################################
+SET(CMAKE_REQUIRED_FLAGS "-include stdint.h")
+SET(CMAKE_REQUIRED_LIBRARIES "-lm")
+ADM_CHECK_HL(libdca dts.h dts dts_init USE_LIBDCA)
+SET(CMAKE_REQUIRED_LIBRARIES)
+SET(CMAKE_REQUIRED_FLAGS)
 ########################################
 # X264
 ########################################
