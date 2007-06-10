@@ -348,6 +348,11 @@ if (fourCC::check (fcc, (uint8_t *) "FFV1"))
       return (decoders *) (new decoderYUY2 (w, h));
     }
 
+  if (fourCC::check (fcc, (uint8_t *) "VP6F"))
+    {
+      printf ("\n using VP6F codec\n");
+      return (decoders *) (new decoderFFVP6F (w, h,extraLen,extraData));
+    }
 
 
   if ((fcc == 0) || fourCC::check (fcc, (uint8_t *) "RGB "))

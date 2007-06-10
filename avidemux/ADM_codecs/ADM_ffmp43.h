@@ -290,5 +290,11 @@ public:
   decoderFFCRAM (uint32_t w, uint32_t h, uint32_t l, uint8_t * d);
 
 };
+class decoderFFVP6F:public decoderFF
+{
+protected:
+public:
+  decoderFFVP6F (uint32_t w, uint32_t h, uint32_t l, uint8_t * d);
+};
 
 #endif
