@@ -304,6 +304,8 @@ endif(FT_FOUND)
 ########################################
 # CPU and Host
 ########################################
+# ASSUME GCC >=2
+SET(HAVE_BUILTIN_VECTOR 1)
 SET(HAVE_AUDIO    1)
 MESSAGE(STATUS "<Checking CPU and OS>")
 MESSAGE(STATUS "<*******************>")

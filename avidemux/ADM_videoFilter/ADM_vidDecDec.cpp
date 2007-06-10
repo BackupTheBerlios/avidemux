@@ -63,7 +63,7 @@
 
 #include "ADM_osSupport/ADM_cpuCap.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
-
+#include "admmangle.h"
 
 #define PROGRESSIVE  0x00000001
 #define MAGIC_NUMBER (0xdeadbeef)
