@@ -212,7 +212,10 @@ endif(QT4_FOUND)
 ###########################################
 TARGET_LINK_LIBRARIES(avidemux2_cli ${GLIB_LDFLAGS} )
 LINK_DIRECTORIES(avidemux2_cli ${GLIB_LIB}  )
-
+# libAMRNB
+if(USE_AMR_NB)
+add_libs_all_targets(amrnb)
+endif(USE_AMR_NB)
 #libdts
 if(USE_LIBDCA)
 add_libs_all_targets(dts)

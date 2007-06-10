@@ -232,6 +232,13 @@ SET(CMAKE_REQUIRED_LIBRARIES )
 ########################################
 ADM_CHECK_HL(Xvid xvid.h xvidcore xvid_plugin_single USE_XVID_4)
 ########################################
+# AMR_NB
+########################################
+ADM_CHECK_HL(AMRNB amrnb/interf_dec.h amrnb GP3Decoder_Interface_Decode USE_AMR_NB)
+if(USE_AMR_NB)
+SET(CONFIG_AMR_NB 1)
+endif(USE_AMR_NB)
+########################################
 # Libdca
 ########################################
 SET(CMAKE_REQUIRED_FLAGS "-include stdint.h")
