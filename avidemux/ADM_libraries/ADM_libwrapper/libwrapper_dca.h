@@ -7,7 +7,7 @@
 extern "C"
 {
 #include "dts.h"
-#include "dts_internal.h"
+//#include "dts_internal.h"
 }
 
 class ADM_LibWrapperDca : public ADM_LibWrapper
