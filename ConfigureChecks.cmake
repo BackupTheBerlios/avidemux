@@ -166,6 +166,13 @@ endif(OSS_SUPPORT)
 
 endif(NOT WIN32)
 ########################################
+# ARTS
+########################################
+if(NOT WIN32)
+ADM_CHECK_HL(Arts artsc/artsc.h  artsc arts_init USE_ARTS)
+endif(NOT WIN32)
+
+########################################
 # ESD
 ########################################
 if(NOT WIN32)

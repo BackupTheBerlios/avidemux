@@ -30,6 +30,8 @@ ADM_DISPLAY("libAMRNB  " USE_AMR_NB)
 MESSAGE("*** Audio Device ***")
 ADM_DISPLAY("ESD       " USE_ESD)
 ADM_DISPLAY("OSS       " OSS_SUPPORT)
+ADM_DISPLAY("ARTS      " USE_ARTS)
+
 MESSAGE("*** Misc       ***")
 ADM_DISPLAY("SDL       " USE_SDL)
 ADM_DISPLAY("FreeType  " USE_FREETYPE)
