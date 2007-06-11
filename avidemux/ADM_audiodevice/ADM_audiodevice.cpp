@@ -16,7 +16,7 @@
  ***************************************************************************/
 #include "config.h"
 #ifdef USE_ARTS
-#include <artsc.h>
+#include <artsc/artsc.h>
 #endif
 
 #include <stdio.h>
