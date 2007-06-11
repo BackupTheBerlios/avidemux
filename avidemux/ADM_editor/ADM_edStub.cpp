@@ -338,6 +338,7 @@ uint8_t ADM_Composer::updateVideoInfo (aviInfo * info)
       AVIStreamHeader *ily =	_videos[0]._aviheader->	getVideoStreamHeader ();
       ily->dwRate = r;
       ily->dwScale = s;
+      rebuildDuration();
     }
   return 1;
 }
