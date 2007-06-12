@@ -372,9 +372,22 @@ SDLify(main.cpp )
 #FIXME : Set correct prefix for linguas
 if(HAVE_GETTEXT)
     SET_SOURCE_FILES_PROPERTIES(main.cpp
-                                     PROPERTIES COMPILE_FLAGS -DADMLOCALE="\\"/usr\\"") 
+                                     PROPERTIES COMPILE_FLAGS -DADMLOCALE="\\"${CMAKE_INSTALL_PREFIX}/share/locale\\"") 
 endif(HAVE_GETTEXT)
+###############
+# INSTALL
+###############
+SET(ADM_EXES avidemux2_cli)
+if(GTK_FOUND)
+  SET(ADM_EXES ${ADM_EXES} avidemux2_gtk)
+endif(GTK_FOUND)
+if(QT4_FOUND)
+  SET(ADM_EXES ${ADM_EXES} avidemux2_qt4)
+endif(QT4_FOUND)
 
+INSTALL(TARGETS ${ADM_EXES}
+            RUNTIME DESTINATION bin
+            LIBRARY DESTINATION lib)
 # /EOF
 
 

@@ -28,7 +28,7 @@ ENDMACRO(FIND_MSGFMT)
 
 MACRO(COMPILE_PO_FILES po_subdir _sources)
     FIND_MSGFMT()
-
+    SET(_basename avidemux2)
     IF(MSGFMT_EXECUTABLE)
         FILE(GLOB po_files ${po_subdir}/*.po)
 
@@ -87,7 +87,7 @@ MACRO(COMPILE_PO_FILES po_subdir _sources)
             SET(mo_files ${mo_files} ${_out})
 
             IF(NOT WIN32)
-               INSTALL(FILES ${_out} DESTINATION ${SIM_I18N_DIR}/${_basename}/LC_MESSAGES RENAME sim.mo)
+               INSTALL(FILES ${_out} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/locale/${_basename}/LC_MESSAGES RENAME avidemux.mo)
             ENDIF(NOT WIN32)
         ENDFOREACH(po_input ${po_files})
 

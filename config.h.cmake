@@ -12,7 +12,7 @@
 /* Big endian CPU - SPARC or PowerPC */
 #cmakedefine ADM_BIG_ENDIAN
 
-#define PACKAGE "avidemux2"
+#define PACKAGE "avidemux"
 
 /* If we need to explictely link to iconv */
 #cmakedefine NEEED_LIBICONV
