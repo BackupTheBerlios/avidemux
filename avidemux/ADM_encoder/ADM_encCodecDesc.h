@@ -425,7 +425,7 @@ extern uint8_t DIA_SVCDParam (COMPRES_PARAMS * toto);
 
 
 Mpeg2encParam SVCDExtra = {
-  (2500 * 1000) >> 3,		// Max BR
+  2500 ,		// Max BR
   12,				// Gop size
   0,				//int   wideScreen;
   0,				//int   matrix;
@@ -471,7 +471,7 @@ COMPRES_PARAMS RequantCodec = {
 #endif
 //********************************************
 Mpeg2encParam DVDExtra = {
-  (9000 * 1000) >> 3,		// Max BR
+  9000            ,		// Max BR
   12,				// Gop size
   0,				//int   wideScreen;
   0,				//int   matrix;
