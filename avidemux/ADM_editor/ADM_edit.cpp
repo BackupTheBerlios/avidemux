@@ -55,6 +55,7 @@
 #include "ADM_mpegdemuxer/dmx_identify.h"
 #include "ADM_mpegdemuxer/dmx_probe.h"
 #include "ADM_matroska/ADM_mkv.h"
+#include "ADM_flv/ADM_flv.h"
 #include "ADM_asf/ADM_asf.h"
 #include "ADM_assert.h"
 #include "prefs.h"
@@ -327,6 +328,7 @@ UNUSED_ARG(mode);
 	}
       OPEN_AS (BMP_FileType, picHeader);
       OPEN_AS (Matroska_FileType, mkvHeader);
+      OPEN_AS (FLV_FileType, flvHeader);
       OPEN_AS (AvsProxy_FileType, avsHeader);
       OPEN_AS (_3GPP_FileType, MP4Header);
        OPEN_AS (Ogg_FileType, oggHeader);

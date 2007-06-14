@@ -119,6 +119,7 @@ ADM_mpegdemuxer
 ADM_nuv
 ADM_ogm
 ADM_openDML
+ADM_flv
 )
 
 FOREACH(_current ${ADM_inputs})

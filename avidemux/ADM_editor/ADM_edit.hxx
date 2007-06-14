@@ -57,6 +57,7 @@ typedef enum
                 AvsProxy_FileType=15,
                 Matroska_FileType=16,
                 ASF_FileType=17,
+                FLV_FileType=18,
 		DUMMY_FILETYPE=99
 }fileType;
 

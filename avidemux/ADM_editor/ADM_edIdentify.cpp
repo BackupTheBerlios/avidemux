@@ -89,7 +89,15 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
 	*type = VCodec_FileType;
 	return 1;	
     }
-    
+  // FLV
+    if (fourCC::check (id, (uint8_t *) "FLV\1"))
+    {
+	  printf (" \n FLV file detected...\n");
+	  *type =     FLV_FileType;
+	  return 1;
+    }
+
+
   // now try to identifies the filetype by its magic
   if (fourCC::check (id, (uint8_t *) "RIFF"))
     {
