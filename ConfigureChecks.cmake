@@ -187,7 +187,7 @@ else(WIN32)
 SET(CMAKE_REQUIRED_FLAGS "-lm -lpthread")
 endif(WIN32)
 
-ADM_CHECK_HL(Aften aften.h  aften aften_encode_init USE_AFTEN)
+ADM_CHECK_HL(Aften aften/aften.h  aften aften_encode_init USE_AFTEN)
 if(USE_AFTEN)
 # TODO! Check aften version 5/6/7!
 SET(USE_AFTEN_07 1)
