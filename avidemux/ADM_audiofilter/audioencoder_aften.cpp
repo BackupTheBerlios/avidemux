@@ -33,9 +33,9 @@
 //
 extern "C"
 {
-#if !defined(USE_AFTEN_05)
+#if defined(USE_AFTEN_06)
 	#include "aften.h"
-#else
+#else	// Aften 0.05 & 0.07
 	#include "aften/aften.h"
 #endif
 };
