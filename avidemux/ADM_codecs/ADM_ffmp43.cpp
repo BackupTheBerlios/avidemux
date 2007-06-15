@@ -628,6 +628,11 @@ decoderFFVP6F::decoderFFVP6F (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):d
 {
   WRAP_Open (CODEC_ID_VP6F);
 }
+//************
+decoderFFFLV1::decoderFFFLV1 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,	   h)
+{
+  WRAP_Open (CODEC_ID_FLV1);
+}
 
 
 

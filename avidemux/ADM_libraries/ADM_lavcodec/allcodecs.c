@@ -75,7 +75,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER(EIGHTBPS, eightbps);
     REGISTER_DECODER(FLASHSV, flashsv);
     REGISTER_DECODER(FLIC, flic);
-    REGISTER_ENCDEC (FLV, flv);
+    
     REGISTER_DECODER(FOURXM, fourxm);
     REGISTER_ENCDEC (GIF, gif);
     REGISTER_DECODER(LOCO, loco);
@@ -116,6 +116,7 @@ void avcodec_register_all(void)
 #endif
 
 #endif
+    REGISTER_ENCDEC (FLV, flv);
     REGISTER_DECODER(CINEPAK, cinepak);
     REGISTER_ENCDEC (DVVIDEO, dvvideo);
     

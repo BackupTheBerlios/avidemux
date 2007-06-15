@@ -227,6 +227,12 @@ getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
       return (decoders *) (new decoderFFMP42 (w, h));
     }
 #endif
+    if (fourCC::check (fcc, (uint8_t *) "FLV1"))
+    {
+      return (decoders *) (new decoderFFFLV1 (w, h,extraLen, extraData));
+    }
+  
+    
 #ifdef USE_FFMPEG
   if (fourCC::check (fcc, (uint8_t *) "H263"))
     {
