@@ -353,7 +353,7 @@ add_libs_all_targets(pthreadGC2 )
 add_libs_all_targets(winmm )
 add_libs_all_targets(wsock32 )
 
-change_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows xpm/adm.o")
+change_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows xpm/adm.o -Wl,--export-all-symbols")
 ENDIF(WIN32)
 ########################
 # MacOsX
