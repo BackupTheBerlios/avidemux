@@ -97,8 +97,6 @@ protected:
 public:
 
 virtual   void 			Dump(void) ;
-virtual   uint32_t 		getNbStream(void) ;
-virtual   uint8_t 		needDecompress(void) ;
 
 					oggHeader( void ) ;
 		   virtual  		~oggHeader(  ) ;

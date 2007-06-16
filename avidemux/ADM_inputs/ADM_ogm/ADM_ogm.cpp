@@ -127,15 +127,6 @@ uint8_t  oggHeader::getAudioStream(AVDMGenericAudioStream **audio)
 	*audio=_audio;
 	return 1;
 }
-uint32_t  oggHeader::getNbStream(void)
-{
-	return 1;
-
-}
-uint8_t  oggHeader::needDecompress( void )
-{
-	return 1;
-}
 
 uint8_t  oggHeader:: getFrameSize(uint32_t frame,uint32_t *size)
 {

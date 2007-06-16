@@ -96,7 +96,7 @@ uint8_t             flvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
     float f=delta;
     f=f*_wavheader->frequency;
     f/=1000;
-    *samples=floor(f+0.49);
+    *samples=(uint32_t)floor(f+0.49);
     _curBlock++;
     //
     return 1;

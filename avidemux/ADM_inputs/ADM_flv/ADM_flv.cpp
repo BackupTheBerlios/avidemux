@@ -364,14 +364,6 @@ void flvHeader::Dump(void)
     __________________________________________________________
 */
 
-uint32_t flvHeader::getNbStream(void) 
-{
-  return 0; 
-}
-/*
-    __________________________________________________________
-*/
-
 uint8_t flvHeader::close(void)
 {
   if(_filename) ADM_dealloc(_filename);
@@ -385,14 +377,6 @@ uint8_t flvHeader::close(void)
   videoTrack=NULL;
   audioTrack=NULL;
   _audioStream=NULL;
-}
-/*
-    __________________________________________________________
-*/
-
-uint8_t flvHeader::needDecompress(void)
-{
-  return 1; 
 }
 /*
     __________________________________________________________

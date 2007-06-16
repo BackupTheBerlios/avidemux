@@ -40,8 +40,6 @@ public:
         virtual  void           Dump (void );
 
 
-        virtual   uint32_t                      getNbStream(void);
-        virtual   uint8_t                       needDecompress(void);
 
 // AVI io
         virtual         uint8_t                 open(char *name);

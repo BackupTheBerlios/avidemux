@@ -162,8 +162,6 @@ class asfHeader         :public vidHeader
 
 
     virtual   void          Dump(void);
-    virtual   uint32_t      getNbStream(void) ;
-    virtual   uint8_t       needDecompress(void);
     virtual   uint8_t       getExtraHeaderData(uint32_t *len, uint8_t **data);
              asfHeader( void );
     virtual  ~asfHeader(  ) ;

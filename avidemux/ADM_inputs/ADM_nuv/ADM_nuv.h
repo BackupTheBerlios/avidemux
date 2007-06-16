@@ -103,8 +103,6 @@ protected:
 public:
 
 virtual   void 			Dump(void) ;
-virtual   uint32_t 		getNbStream(void) ;
-virtual   uint8_t 		needDecompress(void) ;
 
 					nuvHeader( void ) ;
 		   virtual  		~nuvHeader(  ) ;

@@ -185,10 +185,6 @@ WAVHeader 	*OpenDMLHeader::getAudioInfo(void )
 		return NULL;
 	
 } ;
-uint32_t OpenDMLHeader::getNbStream(void)
-{ 
-                return 1+_nbAudioTracks;
-};
 //______________________________________
 //
 // Open and get the headears/index built

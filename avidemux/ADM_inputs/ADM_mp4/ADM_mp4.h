@@ -153,8 +153,6 @@ public:
           uint8_t               hasPtsDts(void) {return 1;} // Return 1 if the container gives PTS & DTS info
           uint32_t              ptsDtsDelta(uint32_t framenum);
 virtual   void 	                Dump(void) {};
-virtual   uint32_t              getNbStream(void) ;
-virtual   uint8_t               needDecompress(void) { return 1;};
 
                                 MP4Header( void ) ;
 virtual	                        ~MP4Header(  ) ;

@@ -99,11 +99,6 @@ typedef struct ChaineD
 }ChaineD;
 
 
-uint32_t 	nuvHeader::getNbStream(void)
-{
-
-	return 1;
-}
 
 /*
   	Return size of the given compressed frame
@@ -420,14 +415,6 @@ uint32_t nuvHeader::getFlags(uint32_t frame,uint32_t *flags)
 	*flags=0;
 	return 1;
 };
-uint8_t nuvHeader::needDecompress(void)
-{
-	if(!_isXvid)
-		return 0;
-	else
-		return 1;
-
-} 
 
 /*
 

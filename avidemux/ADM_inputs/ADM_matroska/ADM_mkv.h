@@ -131,8 +131,6 @@ class mkvHeader         :public vidHeader
       uint32_t              ptsDtsDelta(uint32_t framenum);
 
     virtual   void          Dump(void);
-    virtual   uint32_t      getNbStream(void) ;
-    virtual   uint8_t       needDecompress(void);
 
             mkvHeader( void );
    virtual  ~mkvHeader(  ) ;

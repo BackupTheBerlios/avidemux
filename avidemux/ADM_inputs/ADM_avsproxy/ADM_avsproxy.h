@@ -26,8 +26,6 @@ class avsHeader         :public vidHeader
 
 
         virtual   void 				Dump(void) {};
-        virtual   uint32_t 			getNbStream(void) { return 1;};
-        virtual   uint8_t 			needDecompress(void) { return 0;};
 
         avsHeader( void );
         ~avsHeader(  );

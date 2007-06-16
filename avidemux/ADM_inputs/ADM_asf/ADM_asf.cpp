@@ -66,14 +66,6 @@ void asfHeader::Dump(void)
     __________________________________________________________
 */
 
-uint32_t asfHeader::getNbStream(void) 
-{
-  return _nbAudioTrack; 
-}
-/*
-    __________________________________________________________
-*/
-
 uint8_t asfHeader::close(void)
 {
   if(_videoExtraData)
@@ -111,14 +103,6 @@ uint8_t       asfHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
 {
   *len=_extraDataLen;
   *data=_extraData;
-  return 1; 
-}
-/*
-    __________________________________________________________
-*/
-
-uint8_t asfHeader::needDecompress(void)
-{
   return 1; 
 }
 /*

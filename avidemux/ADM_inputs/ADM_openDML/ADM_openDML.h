@@ -119,8 +119,6 @@ protected:
 public:
 	  uint8_t			unpackPacked( void );
 virtual   void 				Dump(void) ;
-virtual   uint32_t 			getNbStream(void) ;
-virtual   uint8_t 			needDecompress(void) { return 1;};
 
 					OpenDMLHeader( void ) ;
        		    			~OpenDMLHeader(  ) ;

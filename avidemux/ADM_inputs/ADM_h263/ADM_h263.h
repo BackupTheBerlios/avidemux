@@ -45,8 +45,6 @@ public:
 //  static int checkFourCC(uint8_t *in, uint8_t *fourcc);
 
 virtual   void 				Dump(void) {};
-virtual   uint32_t 			getNbStream(void) { return 1;};
-virtual   uint8_t 			needDecompress(void) { return 1;};
 
 			h263Header( void ) {_fd=NULL;};
        		    	~h263Header(  ) { };

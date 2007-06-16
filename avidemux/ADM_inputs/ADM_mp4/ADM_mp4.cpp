@@ -177,10 +177,6 @@ WAVHeader 	*MP4Header::getAudioInfo(void )
        
         return _audioTracks[_currentAudioTrack]->getInfo();
 } ;
-uint32_t MP4Header::getNbStream(void)
-{ 
-    return 1+nbAudioTrack;
-};
 uint8_t   MP4Header::getExtraHeaderData(uint32_t *len, uint8_t **data)
 {
 uint32_t old;

@@ -115,14 +115,6 @@ uint32_t  dmxHeader::getFlags(uint32_t frame,uint32_t *flags)
         return 1; // not usefull for these
 }
 
-uint32_t dmxHeader::getNbStream(void)
-{
-        return 1;
-}
-uint8_t                 dmxHeader::needDecompress(void)
-{
-                return 1;
-}                 
 
 //------------------------
 uint8_t                 dmxHeader::close(void)

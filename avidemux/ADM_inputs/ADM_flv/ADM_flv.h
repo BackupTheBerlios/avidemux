@@ -106,8 +106,6 @@ class flvHeader         :public vidHeader
 
 
     virtual   void          Dump(void);
-    virtual   uint32_t      getNbStream(void) ;
-    virtual   uint8_t       needDecompress(void);
 
             flvHeader( void );
    virtual  ~flvHeader(  ) ;
