@@ -121,8 +121,28 @@ uint8_t             flvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
   // 
   for(int i=0;i<_track->_nbIndex;i++)
     _length+=_track->_index[i].size;
-  
   printf("[FLVAUDIO] found %lu bytes\n",_length);
+  // Guess bitrate
+  uint32_t duration=_track->_index[_track->_nbIndex-1].timeCode;
+  printf("[FLVAUDIO] Duration %u ms\n",duration);
+  
+  if(duration)
+  {
+    float f=_length;
+    f/=duration;
+    uint32_t bitrate,byterate;
+    
+
+    
+    bitrate=(uint32_t)f*8; // kbits/s
+    byterate=(uint32_t)(f*1000);         // byte/s
+    
+    printf("[FLVAUDIO] Byterate %u / %u kbps\n",byterate,bitrate); 
+    _wavheader->byterate=byterate;
+  }
+  
+  //
+  
   goToBlock(0);
 }
 /**
