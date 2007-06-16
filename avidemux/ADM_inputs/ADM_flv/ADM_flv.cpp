@@ -146,10 +146,11 @@ uint8_t flvHeader::open(char *name)
   pos=ftello(_fd);;
   printf("pos:%u/%u\n",pos,fileSize); 
   // Create our video index
-  videoTrack=new flvTrak;
-  memset(videoTrack,0,sizeof(flvTrak));
-  videoTrack->_index=new flvIndex[50];
-  videoTrack->_indexMax=50;
+  videoTrack=new flvTrak(50);
+  if(_isaudiopresent) 
+    audioTrack=new flvTrak(50);
+  else
+    videoTrack=NULL;
   // Loop
   while(pos<fileSize-14)
   {
@@ -167,11 +168,17 @@ uint8_t flvHeader::open(char *name)
           {
             if(!_isaudiopresent) break;
             uint8_t flags=read8();
+            int of=1+4+3+3+1+4;
             remaining--;
             int format=flags>>4;
             int fq=(flags>>2)&3;
             int bps=(flags>>1) & 1;
             int channel=(flags) & 1;
+            if(!audioTrack->_nbIndex) // first frame..
+            {
+               setAudioHeader(format,fq,bps,channel);
+            }
+            insertAudio(pos+of,remaining,pts);
           }
           break;
       case FLV_TAG_TYPE_VIDEO:
@@ -232,9 +239,56 @@ uint8_t flvHeader::open(char *name)
    
         
     videoTrack->_index[0].flags=AVI_KEY_FRAME;
+    
+    // audio track
+    _audioStream=new flvAudio(name,audioTrack,&wavHeader);
   printf("[FLV]FLV successfully read\n");
   
   return 1;
+}
+/**
+      \fn setAudioHeader
+      \brief Build WavHeader from info
+
+*/
+uint8_t   flvHeader::setAudioHeader(uint32_t format,uint32_t fq,uint32_t bps,uint32_t channels)
+{
+  switch(fq)
+  {
+    case 3: wavHeader.frequency=44100;break;  
+    case 2: wavHeader.frequency=22050;break;
+    case 1: wavHeader.frequency=11025;break;
+    case 0: 
+          if(format==5) wavHeader.frequency=8000;
+          else wavHeader.frequency=5512;
+          break;
+    default: printf("[FLV]Unknown frequency:%u\n",fq);
+  }
+  switch(format)
+  {
+    case 2: wavHeader.encoding=WAV_MP3;break;
+    case 3: wavHeader.encoding=WAV_PCM;break; 
+    case 0: wavHeader.encoding=WAV_LPCM;break;
+    case 1: wavHeader.encoding=WAV_MSADPCM;break;
+    default:
+          printf("[FLV]Unsupported audio codec:%u\n",format);    
+  }
+  switch(channels)
+  {
+    case 1: wavHeader.channels=2;break; 
+    case 0: wavHeader.channels=1;break;
+        default:
+          printf("[FLV]Unsupported channel mode :%u\n",channels);    
+  }
+  switch(bps)
+  {
+    case 1: wavHeader.bitspersample=16;break; 
+    case 0: wavHeader.bitspersample=8;break;
+        default:
+          printf("[FLV]Unsupported bps mode :%u\n",bps);    
+  }
+  wavHeader.byterate=(64000)/8; // 64 kbits default
+  return 1; 
 }
 /**
       \fn insertVideo
@@ -242,15 +296,7 @@ uint8_t flvHeader::open(char *name)
 */
 uint8_t flvHeader::insertVideo(uint32_t pos,uint32_t size,uint32_t frameType,uint32_t pts)
 {
-    if(videoTrack->_indexMax==videoTrack->_nbIndex)
-    {
-      // Grow
-      flvIndex *ix=new flvIndex[ videoTrack->_indexMax*2];
-      memcpy(ix,videoTrack->_index,sizeof(flvIndex)*videoTrack->_nbIndex);
-      delete [] videoTrack->_index;
-      videoTrack->_index=ix;
-      videoTrack->_indexMax*=2;
-    }
+    videoTrack->grow();
     flvIndex *x=&(videoTrack->_index[videoTrack->_nbIndex]);
     x->size=size;
     x->pos=pos;
@@ -266,12 +312,31 @@ uint8_t flvHeader::insertVideo(uint32_t pos,uint32_t size,uint32_t frameType,uin
     videoTrack->_nbIndex++;
     return 1;
 }    
+/**
+      \fn insertVideo
+      \brief add a frame to the index, grow the index if needed
+*/
+uint8_t flvHeader::insertAudio(uint32_t pos,uint32_t size,uint32_t pts)
+{
+    audioTrack->grow();
+    flvIndex *x=&(audioTrack->_index[audioTrack->_nbIndex]);
+    x->size=size;
+    x->pos=pos;
+    x->timeCode=pts;
+    x->flags=0;
+    audioTrack->_nbIndex++;
+    return 1;
+}    
+
 /*
   __________________________________________________________
 */
 WAVHeader *flvHeader::getAudioInfo(void )
 {
-  return NULL;
+  if(_isaudiopresent)
+    return &wavHeader;
+  else
+      return NULL;
 }
 /*
     __________________________________________________________
@@ -279,6 +344,11 @@ WAVHeader *flvHeader::getAudioInfo(void )
 
 uint8_t flvHeader::getAudioStream(AVDMGenericAudioStream **audio)
 {
+  if(_isaudiopresent)
+  {
+    *audio=_audioStream;
+    return 1;
+  }
   *audio=NULL;
   return 0; 
 }
@@ -308,11 +378,13 @@ uint8_t flvHeader::close(void)
   if(videoTrack) delete videoTrack;
   if(audioTrack) delete audioTrack;
   if(_fd) fclose(_fd);
-    _fd=NULL;
-    _filename=NULL;
-    videoTrack=NULL;
-    audioTrack=NULL;
+  if(_audioStream) delete _audioStream;
   
+  _fd=NULL;
+  _filename=NULL;
+  videoTrack=NULL;
+  audioTrack=NULL;
+  _audioStream=NULL;
 }
 /*
     __________________________________________________________
@@ -332,6 +404,8 @@ uint8_t flvHeader::needDecompress(void)
     _filename=NULL;
     videoTrack=NULL;
     audioTrack=NULL;
+    _audioStream=NULL;
+    memset(&wavHeader,0,sizeof(wavHeader));
     
 }
 /*
@@ -437,12 +511,20 @@ uint32_t  flvHeader::getCurrentAudioStreamNumber(void)
 */
 uint8_t  flvHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
 {
-    
+    if(!_isaudiopresent)
     {
         *nbStreams=0;
         *infos=NULL;
         return 1;
     }
-    
+    *nbStreams=1;
+    audioInfo *nfo=new audioInfo;
+    nfo->encoding=wavHeader.encoding;
+    nfo->bitrate=(wavHeader.byterate*8)/1000;;
+    nfo->channels=(wavHeader.channels);
+    nfo->frequency=(wavHeader.frequency);
+    nfo->av_sync=0;
+    *infos=nfo;
+    return 1;
 }
 //EOF

@@ -32,9 +32,13 @@ typedef struct
     uint32_t timeCode;  // Time code in ms from start
 }flvIndex;
 //**********************************************
-typedef struct 
+class flvTrak 
 {
-  /* Index in mkv */
+public:
+          flvTrak(int nb);
+          ~flvTrak();
+  uint8_t grow(void);
+  //
   uint32_t  streamIndex;
   uint32_t  length;
   uint8_t    *extraData;
@@ -44,9 +48,32 @@ typedef struct
   uint32_t  _indexMax; // Max size of the index
   uint32_t  _sizeInBytes; // Approximate size in bytes of that stream
   uint32_t  _defaultFrameDuration; // in us!
-}flvTrak;
+};
 
+class flvAudio : public AVDMGenericAudioStream
+{
+  protected:
+    FILE                        *_fd;
+    flvTrak                     *_track;
+    uint32_t                    _curTimeCode;
+    uint8_t                      goToBlock(uint32_t x);
+    uint32_t                    _curBlock;
+    uint8_t                     getPacket(uint8_t *dest, uint32_t *packlen, uint32_t *samples,uint32_t *timecode);
+  public:
+                                flvAudio(const char *name,flvTrak *track,WAVHeader *hdr);
+                                
+                                
+    virtual                     ~flvAudio();
+    virtual uint32_t            read(uint32_t len,uint8_t *buffer);
+    virtual uint8_t             goTo(uint32_t newoffset);
+            uint8_t	        goToTime(uint32_t mstime);
+    virtual uint8_t             getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
+    
+    virtual uint8_t             extraData(uint32_t *l,uint8_t **d);
+            
+};
 
+//*****************************************************
 class flvHeader         :public vidHeader
 {
   protected:
@@ -55,11 +82,11 @@ class flvHeader         :public vidHeader
     char                    *_filename;
     flvTrak                 *videoTrack;
     flvTrak                 *audioTrack;
-    
+    WAVHeader               wavHeader;
     uint8_t                 changeAudioStream(uint32_t newstream);
     uint32_t                getCurrentAudioStreamNumber(void);
     uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos);
-    
+    flvAudio                *_audioStream;
     /* */
     
     uint8_t     read(uint32_t len, uint8_t *where);
@@ -69,6 +96,11 @@ class flvHeader         :public vidHeader
     uint32_t    read32(void);
     uint8_t     Skip(uint32_t len);
     uint8_t     insertVideo(uint32_t pos,uint32_t size,uint32_t frameType,uint32_t pts);
+    uint8_t     insertAudio(uint32_t pos,uint32_t size,uint32_t pts);
+    uint8_t     setAudioHeader(uint32_t format,uint32_t fq,uint32_t bps,uint32_t channels);
+    
+    
+    
     uint8_t     getFrameSize (uint32_t frame, uint32_t * size);
   public:
 
