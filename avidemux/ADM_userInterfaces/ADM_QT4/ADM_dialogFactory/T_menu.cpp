@@ -34,7 +34,35 @@
 
 
 extern const char *shortkey(const char *);
+/**/
 
+  class ADM_QComboBox : public QComboBox
+{
+      Q_OBJECT
+    
+  signals:
+        
+        
+   public slots:
+        void changed(int i)
+        {
+          _menu->updateMe();
+        }
+  protected:
+        diaElemMenuDynamic *_menu;
+  public:
+  ADM_QComboBox(QWidget *root,diaElemMenuDynamic *menu) : QComboBox(root)
+  {
+    _menu=menu;
+  }
+  void connectMe(void)
+  {
+    QObject::connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(changed(int )));
+  }
+  
+};
+
+/**/
 
 diaElemMenu::diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
                const diaMenuEntry *menu,const char *tip)
@@ -94,6 +122,8 @@ void   diaElemMenu::finalize(void)
   dyna->finalize();
 }
 //*********************************
+//* DYNAMIC                       *
+//*********************************
 
 diaElemMenuDynamic::diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
                 diaMenuEntryDynamic **menu,const char *tip)
@@ -114,7 +144,7 @@ diaElemMenuDynamic::~diaElemMenuDynamic()
 }
 void diaElemMenuDynamic::setMe(void *dialog, void *opaque,uint32_t line)
 {
-  QComboBox *combo=new QComboBox( (QWidget *)dialog);
+  ADM_QComboBox *combo=new ADM_QComboBox( (QWidget *)dialog,this);
   QGridLayout *layout=(QGridLayout*) opaque;
      myWidget=(void *)combo; 
 
@@ -132,11 +162,13 @@ void diaElemMenuDynamic::setMe(void *dialog, void *opaque,uint32_t line)
    text->setBuddy(combo);
    layout->addWidget(text,line,0);
    layout->addWidget(combo,line,1);
+   
+   combo->connectMe();
 }
 
 void diaElemMenuDynamic::getMe(void)
 {
-  QComboBox *combo=(QComboBox *)myWidget;
+  ADM_QComboBox *combo=(ADM_QComboBox *)myWidget;
   int r;
   r=combo->currentIndex();
   if(!nbMenu) return;
@@ -146,7 +178,7 @@ void diaElemMenuDynamic::getMe(void)
 }
 void diaElemMenuDynamic::finalize(void)
 { 
-   QComboBox *combo=(QComboBox *)myWidget;
+   ADM_QComboBox *combo=(ADM_QComboBox *)myWidget;
   uint32_t val;
   uint32_t rank;
   if(!nbMenu) return;
@@ -187,7 +219,7 @@ void diaElemMenuDynamic::finalize(void)
 }
 void diaElemMenuDynamic::enable(uint32_t onoff)
 { 
-   QComboBox *combo=(QComboBox *)myWidget;
+   ADM_QComboBox *combo=(ADM_QComboBox *)myWidget;
   ADM_assert(combo);
   if(onoff)
     combo->setEnabled(true);

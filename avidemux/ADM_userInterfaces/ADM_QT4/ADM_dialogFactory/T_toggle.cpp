@@ -32,6 +32,51 @@
 #include "ADM_assert.h"
 
 extern const char *shortkey(const char *);
+typedef enum
+{
+    TT_TOGGLE,TT_TOGGLE_UINT,TT_TOGGLE_INT
+  
+}TOG_TYPE;
+class ADM_QCheckBox : public QCheckBox
+{
+      Q_OBJECT
+    
+  signals:
+  protected:
+        void     *_toggle;
+        TOG_TYPE _type;
+        
+   public slots:
+        void changed(int i)
+        {
+          switch(_type)
+          {
+            case TT_TOGGLE:
+                              ((diaElemToggle *)_toggle)->updateMe();break;
+            case TT_TOGGLE_UINT:
+                              ((diaElemToggleUint *)_toggle)->updateMe();break;
+            case TT_TOGGLE_INT:
+                              ((diaElemToggleInt *)_toggle)->updateMe();break;
+            default:
+                  ADM_assert(0);
+          }
+        }
+  public:
+  ADM_QCheckBox(const QString & str,QWidget *root,void *toggle,TOG_TYPE type) : QCheckBox(str,root)
+  {
+    _toggle=toggle;
+    _type=type;
+  }
+  void connectMe(void)
+  {
+    QObject::connect(this, SIGNAL(stateChanged(int)), this, SLOT(changed(int )));
+  }
+  
+};
+
+/**/
+
+
 
 diaElemToggle::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip)
   : diaElem(ELEM_TOGGLE)
@@ -45,7 +90,7 @@ diaElemToggle::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, cons
 
 diaElemToggle::~diaElemToggle()
 {
-  QCheckBox *box=(QCheckBox *)myWidget;
+  ADM_QCheckBox *box=(ADM_QCheckBox *)myWidget;
  // if(box) delete box;
   myWidget=NULL;
   if(paramTitle)
@@ -53,7 +98,7 @@ diaElemToggle::~diaElemToggle()
 }
 void diaElemToggle::setMe(void *dialog, void *opaque,uint32_t l)
 {
- QCheckBox *box=new QCheckBox(paramTitle,(QWidget *)dialog);
+ ADM_QCheckBox *box=new ADM_QCheckBox(paramTitle,(QWidget *)dialog,this,TT_TOGGLE);
  QGridLayout *layout=(QGridLayout*) opaque;
  myWidget=(void *)box; 
  if( *(uint32_t *)param)
@@ -62,10 +107,11 @@ void diaElemToggle::setMe(void *dialog, void *opaque,uint32_t l)
  }
  box->show();
  layout->addWidget(box,l,0);
+ box->connectMe();
 }
 void diaElemToggle::getMe(void)
 {
-  QCheckBox *box=(QCheckBox *)myWidget;
+  ADM_QCheckBox *box=(ADM_QCheckBox *)myWidget;
   uint32_t *val=(uint32_t *)param;
   if(Qt::Checked==box->checkState())
   {
@@ -75,7 +121,7 @@ void diaElemToggle::getMe(void)
 }
 void diaElemToggle::enable(uint32_t onoff) 
 {
-  QCheckBox *box=(QCheckBox *)myWidget;
+  ADM_QCheckBox *box=(ADM_QCheckBox *)myWidget;
   ADM_assert(box);
   if(onoff)
     box->setEnabled(TRUE);
@@ -95,7 +141,7 @@ void   diaElemToggle::updateMe(void)
   if(!nbLink) return;
   ADM_assert(myWidget);
   
-  QCheckBox *box=(QCheckBox *)myWidget;
+  ADM_QCheckBox *box=(ADM_QCheckBox *)myWidget;
   
   if(Qt::Checked==box->checkState())
   {
@@ -126,6 +172,8 @@ uint8_t   diaElemToggle::link(uint32_t onoff,diaElem *w)
     return 1;
 }
 //******************************************************
+// An UInt and a toggle linked...
+//******************************************************
 diaElemToggleUint::diaElemToggleUint(uint32_t *toggleValue,const char *toggleTitle, uint32_t *uintval, const char *name,uint32_t min,uint32_t max,const char *tip)
   : diaElem(ELEM_TOGGLE_UINT)
 {
@@ -146,7 +194,7 @@ diaElemToggleUint::~diaElemToggleUint()
 }
 void diaElemToggleUint::setMe(void *dialog, void *opaque,uint32_t line)
 {
- QCheckBox *box=new QCheckBox(paramTitle,(QWidget *)dialog);
+ ADM_QCheckBox *box=new ADM_QCheckBox(paramTitle,(QWidget *)dialog,this,TT_TOGGLE_UINT);
  QGridLayout *layout=(QGridLayout*) opaque;
  myWidget=(void *)box; 
  if( *(uint32_t *)param)
@@ -164,10 +212,12 @@ void diaElemToggleUint::setMe(void *dialog, void *opaque,uint32_t line)
  spin->setValue(*(uint32_t *)emb);
  spin->show();
  layout->addWidget(spin,line,1);
+ box->connectMe();
 }
+
 void diaElemToggleUint::getMe(void)
 {
-  QCheckBox *box=(QCheckBox *)myWidget;
+  ADM_QCheckBox *box=(ADM_QCheckBox *)myWidget;
   uint32_t *val=(uint32_t *)param;
   if(Qt::Checked==box->checkState())
   {
@@ -181,6 +231,7 @@ void diaElemToggleUint::getMe(void)
  if(u<_min) u=_min;
  if(u>_max) u=_max;
  *emb=u;
+  
 }
 void   diaElemToggleUint::finalize(void)
 {
@@ -192,7 +243,7 @@ void   diaElemToggleUint::updateMe(void)
   uint32_t rank=FALSE;
   ADM_assert(myWidget);
   
-  QCheckBox *box=(QCheckBox *)myWidget;
+  ADM_QCheckBox *box=(ADM_QCheckBox *)myWidget;
   QSpinBox *spin=(QSpinBox *)widgetUint;
   
   if(Qt::Checked==box->checkState())
@@ -203,7 +254,7 @@ void   diaElemToggleUint::updateMe(void)
 }
 void   diaElemToggleUint::enable(uint32_t onoff)
 {
-    QCheckBox *box=(QCheckBox *)myWidget;
+    ADM_QCheckBox *box=(ADM_QCheckBox *)myWidget;
       QSpinBox *spin=(QSpinBox *)widgetUint;
   ADM_assert(box);
   if(onoff)
@@ -219,6 +270,9 @@ void   diaElemToggleUint::enable(uint32_t onoff)
 }
 
 //******************************************************
+// An Int and a toggle linked...
+//******************************************************
+
 diaElemToggleInt::diaElemToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval, const char *name,int32_t min,int32_t max,const char *tip)
   : diaElemToggleUint(toggleValue,toggleTitle, NULL, name,0,0,tip)
 {
@@ -238,7 +292,7 @@ diaElemToggleInt::~diaElemToggleInt()
 }
 void diaElemToggleInt::setMe(void *dialog, void *opaque,uint32_t line)
 {
- QCheckBox *box=new QCheckBox(paramTitle,(QWidget *)dialog);
+ ADM_QCheckBox *box=new ADM_QCheckBox(paramTitle,(QWidget *)dialog,this,TT_TOGGLE_INT);
  QGridLayout *layout=(QGridLayout*) opaque;
  myWidget=(void *)box; 
  if( *(uint32_t *)param)
@@ -256,11 +310,12 @@ void diaElemToggleInt::setMe(void *dialog, void *opaque,uint32_t line)
  spin->setValue(*emb);
  spin->show();
  layout->addWidget(spin,line,1);
+ box->connectMe();
 }
 
 void diaElemToggleInt::getMe(void)
 {
-  QCheckBox *box=(QCheckBox *)myWidget;
+  ADM_QCheckBox *box=(ADM_QCheckBox *)myWidget;
   uint32_t *val=(uint32_t *)param;
   if(Qt::Checked==box->checkState())
   {

@@ -9,11 +9,13 @@ bitrate
 dialogFactory  
 button
 filesel        
+menu
+toggle
 )
 
 SET(${ADM_LIB}_SRCS
-FAC_bar.cpp    FAC_frame.cpp  FAC_integer.cpp  FAC_notch.cpp         FAC_toggle.cpp
-FAC_float.cpp  FAC_hex.cpp    FAC_menu.cpp     FAC_readOnlyText.cpp
+FAC_bar.cpp    FAC_frame.cpp  FAC_integer.cpp  FAC_notch.cpp         
+FAC_float.cpp  FAC_hex.cpp    FAC_readOnlyText.cpp
 )
 
 ################################

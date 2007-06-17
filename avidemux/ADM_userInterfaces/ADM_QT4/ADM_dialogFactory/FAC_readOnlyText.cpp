@@ -104,13 +104,20 @@ void diaElemText::getMe(void)
 {
   char **c=(char **)param;
   QLineEdit *lineEdit=(QLineEdit *)myWidget;
+  ADM_assert(lineEdit);
   if(*c) ADM_dealloc(*c);
   *c=ADM_strdup(lineEdit->text().toAscii().data());
  
 }
 void diaElemText::enable(uint32_t onoff)
 {
-  
+  ADM_assert(myWidget);
+ QLineEdit *lineEdit=(QLineEdit *)myWidget;
+  ADM_assert(lineEdit);
+  if(onoff)
+    lineEdit->setEnabled(TRUE);
+  else
+    lineEdit->setDisabled(TRUE);
 }
 
 //EOF
