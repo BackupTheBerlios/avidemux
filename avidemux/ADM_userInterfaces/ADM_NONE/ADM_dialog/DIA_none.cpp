@@ -42,7 +42,6 @@
 #include "ADM_audiofilter/audioencoder_lame_param.h"
 #include "ADM_encoder/adm_encmjpeg_param.h"
 #include "ADM_video/ADM_vidPartial_param.h"
-#include "ADM_video/ADM_vidTDeint_param.h"
 #include "ADM_video/ADM_vidEqualizer.h"
 #include "ADM_video/ADM_vidHue.h"
 #include "ADM_video/ADM_vobsubinfo.h"

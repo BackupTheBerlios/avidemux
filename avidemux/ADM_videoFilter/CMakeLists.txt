@@ -18,5 +18,8 @@ ADM_vidDecDec.cpp        ADM_vidFastConvolution.cpp  ADM_vidLuma.cpp            
 ADM_vidSwapFields.cpp
 ADM_vidYadif_asm.c
 ADM_guiResize.cpp  ADM_resizebis.cpp  ADM_resizeter.cpp  ADM_vidResize.cpp
+ADM_vidMPLResize.cpp  
+ADM_vidResize25.cpp
+ADM_vidTdeint.cpp
 )
 ADD_LIBRARY(ADM_videoFilter STATIC ${ADM_videoFilter_SRCS})

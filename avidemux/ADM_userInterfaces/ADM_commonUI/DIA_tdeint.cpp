@@ -31,7 +31,7 @@
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h" 
-#include "ADM_video/ADM_vidTDeint_param.h"
+#include "ADM_videoFilter/ADM_vidTDeint_param.h"
 /**
       \fn DIA_tdeint
       \brief Dialog for tdeint filter
