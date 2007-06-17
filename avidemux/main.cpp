@@ -98,9 +98,7 @@ void SpidermonkeyDestroy(void);
 
 extern pthread_mutex_t g_pSpiderMonkeyMutex;
 int CpuCaps::myCpuCaps=0;
-#ifdef ADM_WIN32
-#undef main
-#endif
+
 int main(int argc, char *argv[])
 {
 // Check for big files

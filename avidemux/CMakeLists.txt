@@ -354,6 +354,10 @@ add_libs_all_targets(winmm )
 add_libs_all_targets(wsock32 )
 
 change_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows xpm/adm.o -Wl,--export-all-symbols -Wl,-s")
+
+if(USE_SDL)
+add_definitions(${SDL_CFLAGS})
+endif(USE_SDL)
 ENDIF(WIN32)
 ########################
 # MacOsX
