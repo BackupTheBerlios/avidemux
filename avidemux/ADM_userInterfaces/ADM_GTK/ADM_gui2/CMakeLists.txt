@@ -12,6 +12,6 @@ ADD_ADM_LIB(${ADM_LIB} ADM_libraries)
 
 
 ################################
-ADD_definitions(${GTK_CFLAGS} -DADM_SUBVERSION=0 )
+ADD_definitions(${GTK_CFLAGS})
 include_directories(.. ../..)
 #/../ADM_osSupport ../../../ADM_inputs)

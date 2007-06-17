@@ -32,6 +32,24 @@ include(MacroEnsureOutOfSourceBuild)
 
 include(Po)
 include(CheckCXXCompilerFlag)
+
+#**************************************************
+# Subversion
+#**************************************************
+MESSAGE(STATUS "<Checking for Subversion>")
+MESSAGE(STATUS "<***********************>")
+include(FindSubversion)
+
+FIND_PACKAGE(Subversion)
+IF(Subversion_FOUND)
+	Subversion_WC_INFO(${PROJECT_SOURCE_DIR} Project)
+	MESSAGE(STATUS "Current revision is ${Project_WC_REVISION}")
+	SET(ADM_SUBVERSION ${Project_WC_REVISION})
+ELSE(Subversion_FOUND)
+	MESSAGE(STATUS "Could not find Subversion")
+	SET(ADM_SUBVERSION 0)
+ENDIF(Subversion_FOUND)
+
 #**************************************************
 # libxml2
 #**************************************************

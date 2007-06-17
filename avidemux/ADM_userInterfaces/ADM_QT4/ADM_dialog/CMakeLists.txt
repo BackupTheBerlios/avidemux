@@ -41,7 +41,6 @@ ENDIF(USE_FREETYPE)
 ################################
 include(adm_qt4)
 ################################
-ADD_definitions(-DADM_SUBVERSION=0 )
 include_directories(.. ../../../ADM_osSupport ../../../ADM_inputs)
 include_directories(${QT_INCLUDES})
 

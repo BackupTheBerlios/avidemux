@@ -21,7 +21,6 @@ Q_RCC(avidemux)
 #########################################"
 include(adm_qt4)
 ################################
-ADD_definitions(-DADM_SUBVERSION=0 )
 include_directories(.. .)
 include_directories(${QT_INCLUDES})
 
