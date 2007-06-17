@@ -218,13 +218,15 @@ if(USE_ARTS)
 add_libs_all_targets(artsc)
 endif(USE_ARTS)
 # libAMRNB
-if(USE_AMR_NB)
-add_libs_all_targets(amrnb)
-endif(USE_AMR_NB)
+if(USE_AMR_NB AND NOT USE_LATE_BINDING)
+	add_libs_all_targets(amrnb)
+endif(USE_AMR_NB AND NOT USE_LATE_BINDING)
+
 #libdts
-if(USE_LIBDCA)
-add_libs_all_targets(dts)
-endif(USE_LIBDCA)
+if(USE_LIBDCA AND NOT USE_LATE_BINDING)
+	add_libs_all_targets(dts)
+endif(USE_LIBDCA AND NOT USE_LATE_BINDING)
+
 # xvid
 if(USE_XVID_4)
 add_libs_all_targets(xvidcore)

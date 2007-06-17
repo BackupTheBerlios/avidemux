@@ -241,16 +241,27 @@ ADM_CHECK_HL(Xvid xvid.h xvidcore xvid_plugin_single USE_XVID_4)
 ########################################
 # AMR_NB
 ########################################
-ADM_CHECK_HL(AMRNB amrnb/interf_dec.h amrnb GP3Decoder_Interface_Decode USE_AMR_NB)
+if(USE_LATE_BINDING)
+	CHECK_INCLUDE_FILES(amrnb/interf_dec.h USE_AMR_NB)
+else(USE_LATE_BINDING)
+	ADM_CHECK_HL(AMRNB amrnb/interf_dec.h amrnb GP3Decoder_Interface_Decode USE_AMR_NB)
+endif(USE_LATE_BINDING)
+
 if(USE_AMR_NB)
-SET(CONFIG_AMR_NB 1)
+	SET(CONFIG_AMR_NB 1)
 endif(USE_AMR_NB)
 ########################################
 # Libdca
 ########################################
 SET(CMAKE_REQUIRED_FLAGS "-include stdint.h")
 SET(CMAKE_REQUIRED_LIBRARIES "-lm")
-ADM_CHECK_HL(libdca dts.h dts dts_init USE_LIBDCA)
+
+if(USE_LATE_BINDING)
+	CHECK_INCLUDE_FILES(dts.h USE_LIBDCA)
+else(USE_LATE_BINDING)
+	ADM_CHECK_HL(libdca dts.h dts dts_init USE_LIBDCA)
+endif(USE_LATE_BINDING)
+
 SET(CMAKE_REQUIRED_LIBRARIES)
 SET(CMAKE_REQUIRED_FLAGS)
 ########################################
