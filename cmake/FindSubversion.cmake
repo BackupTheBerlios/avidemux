@@ -65,8 +65,9 @@ IF(Subversion_SVN_EXECUTABLE)
       WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
       OUTPUT_VARIABLE Subversion_VERSION_SVN
       OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-    EXECUTE_PROCESS(COMMAND ${Subversion_SVN_EXECUTABLE} info ${dir}
+    MESSAGE(STATUS "Getting svn version from ${dir}")
+    EXECUTE_PROCESS(COMMAND ${Subversion_SVN_EXECUTABLE} info . 
+      WORKING_DIRECTORY ${dir}
       OUTPUT_VARIABLE ${prefix}_WC_INFO
       ERROR_VARIABLE Subversion_svn_info_error
       RESULT_VARIABLE Subversion_svn_info_result
@@ -92,7 +93,8 @@ IF(Subversion_SVN_EXECUTABLE)
     ENDIF(NOT ${Subversion_svn_info_result} EQUAL 0)
 
     EXECUTE_PROCESS(COMMAND
-      ${Subversion_SVN_EXECUTABLE} log -r BASE ${dir}
+      ${Subversion_SVN_EXECUTABLE} log -r BASE .
+      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
       OUTPUT_VARIABLE Subversion_LAST_CHANGED_LOG
       ERROR_VARIABLE Subversion_svn_log_error
       RESULT_VARIABLE Subversion_svn_log_result
