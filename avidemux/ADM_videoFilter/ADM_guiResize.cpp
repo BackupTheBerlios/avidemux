@@ -35,7 +35,7 @@ GUI part of resize.
 
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_resizebis.hxx"
+#include "ADM_resizebis.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include <ADM_assert.h>
