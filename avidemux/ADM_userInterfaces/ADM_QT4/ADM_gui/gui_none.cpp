@@ -49,16 +49,6 @@ void UI_toogleSide(void)
 void UI_toogleMain(void)
 {}
 
-uint8_t UI_getTimeShift(int *onoff,int *value)
-{
-  *onoff=0;
-  *value=0;
-  return 1;
-}
-uint8_t UI_setTimeShift(int onoff,int value)
-{
-  return 1;
-}
 
 
 uint8_t UI_shrink(uint32_t w,uint32_t h)

@@ -102,6 +102,7 @@ static Action searchTranslationTable(const char *name);
      MainWindow();
      Ui_MainWindow ui;
  public slots:
+     void timeChanged(int);
      void buttonPressed(void);
      void custom(void);
      void toolButtonPressed(bool z);
@@ -213,6 +214,11 @@ MainWindow::MainWindow()     : QMainWindow()
           ui.pushButtonVideoFilter->setEnabled(b);
           ui.pushButtonAudioConf->setEnabled(b);
           ui.pushButtonAudioFilter->setEnabled(b);
+          /* Time Shift */
+  connect(ui.checkBox_TimeShift,SIGNAL(stateChanged(int)),this,SLOT(timeChanged(int)));
+  connect(ui.spinBox_TimeValue,SIGNAL(valueChanged(int)),this,SLOT(timeChanged(int)));
+          
+          
           
           /* Build the custom menu */
           GUI_initCustom();
@@ -254,7 +260,14 @@ const char * GUI_getCustomScript(uint32_t nb)
     return customNames[nb];
 
 }
- 
+/**
+    \fn timeChanged
+    \brief Called whenever timeshift is on/off'ed or value changes
+*/
+void MainWindow::timeChanged(int)
+{
+   HandleAction (ACT_TimeShift) ;
+}
  /*
       We receive a button press event
  */
@@ -661,5 +674,33 @@ void GUI_initCustom(void )
   }
   printf("Found %u custom scripts, adding them\n",ADM_nbCustom);
 }
+/**
+      \fn UI_getTimeShift
+      \brief get state (on/off) and value for time Shift
+*/
+uint8_t UI_getTimeShift(int *onoff,int *value)
+{
+  if(WIDGET(checkBox_TimeShift)->checkState()==Qt::Checked)
+        *onoff=1;
+  else
+        *onoff=0;
+  *value=WIDGET(spinBox_TimeValue)->value();
+  return 1;
+}
+/**
+      \fn UI_setTimeShift
+      \brief get state (on/off) and value for time Shift
+*/
+
+uint8_t UI_setTimeShift(int onoff,int value)
+{
+  if(onoff)
+    WIDGET(checkBox_TimeShift)->setCheckState(Qt::Checked);
+  else
+    WIDGET(checkBox_TimeShift)->setCheckState(Qt::Unchecked);
+  WIDGET(spinBox_TimeValue)->setValue(value);
+  return 1;
+}
+
 //********************************************
 //EOF
