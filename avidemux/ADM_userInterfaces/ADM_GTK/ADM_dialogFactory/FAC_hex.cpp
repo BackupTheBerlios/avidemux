@@ -95,20 +95,36 @@ void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line)
   }
   myWidget=(void *)s;
   //*************************
-
-  buttonP = gtk_button_new ();
+  buttonP = gtk_button_new_with_label (_("Previous"));
   gtk_widget_show (buttonP);
-  gtk_box_pack_start (GTK_BOX (hbox1), buttonP, FALSE, FALSE, 0);
-  GTK_WIDGET_SET_FLAGS (buttonP, GTK_CAN_DEFAULT);
-
+  gtk_table_attach (GTK_TABLE (opaque), buttonP, 0, 1, line+1, line+2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+   g_signal_connect(GTK_OBJECT(buttonP), "clicked",
+                    GTK_SIGNAL_FUNC(prev), s);
+   
+  buttonN = gtk_button_new_with_label (_("Next"));
+  gtk_widget_show (buttonN);
+  gtk_table_attach (GTK_TABLE (opaque), buttonN, 1, 2, line+1, line+2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+   g_signal_connect(GTK_OBJECT(buttonN), "clicked",
+                    GTK_SIGNAL_FUNC(next), s);
+#if 0
   alignment1 = gtk_alignment_new (0.5, 0.5, 0, 0);
   gtk_widget_show (alignment1);
-  gtk_container_add (GTK_CONTAINER (buttonP), alignment1);
+  
 
   hbox1 = gtk_hbox_new (FALSE, 2);
   gtk_widget_show (hbox1);
   gtk_container_add (GTK_CONTAINER (alignment1), hbox1);
 
+  
+  
+  GTK_WIDGET_SET_FLAGS (buttonP, GTK_CAN_DEFAULT);
+  gtk_box_pack_start (GTK_BOX (hbox1), buttonP, FALSE, FALSE, 0);
+  gtk_container_add (GTK_CONTAINER (buttonP), alignment1);
+  
   image1 = gtk_image_new_from_stock ("gtk-go-back", GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, FALSE, 0);
@@ -117,16 +133,13 @@ void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_widget_show (label1);
   gtk_box_pack_start (GTK_BOX (hbox1), label1, FALSE, FALSE, 0);
 
-  gtk_table_attach (GTK_TABLE (opaque), buttonP, 0, 1, line+1, line+2,
+  gtk_table_attach (GTK_TABLE (opaque), hbox1, 0, 1, line+1, line+2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  
   g_signal_connect(GTK_OBJECT(buttonP), "clicked",
                     GTK_SIGNAL_FUNC(prev), s);
 
-  buttonN = gtk_button_new ();
-  gtk_widget_show (buttonN);
-  gtk_box_pack_start (GTK_BOX (hbox2), buttonN, FALSE, FALSE, 0);
-  GTK_WIDGET_SET_FLAGS (buttonN, GTK_CAN_DEFAULT);
 
   alignment2 = gtk_alignment_new (0.5, 0.5, 0, 0);
   gtk_widget_show (alignment2);
@@ -136,6 +149,12 @@ void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_widget_show (hbox2);
   gtk_container_add (GTK_CONTAINER (alignment2), hbox2);
 
+  buttonN = gtk_button_new ();
+  gtk_widget_show (buttonN);
+  gtk_box_pack_start (GTK_BOX (hbox2), buttonN, FALSE, FALSE, 0);
+  GTK_WIDGET_SET_FLAGS (buttonN, GTK_CAN_DEFAULT);
+
+  
   image2 = gtk_image_new_from_stock ("gtk-go-forward", GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (image2);
   gtk_box_pack_start (GTK_BOX (hbox2), image2, FALSE, FALSE, 0);
@@ -144,12 +163,12 @@ void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_widget_show (label2);
   gtk_box_pack_start (GTK_BOX (hbox2), label2, FALSE, FALSE, 0);
 
-  gtk_table_attach (GTK_TABLE (opaque), buttonN, 0, 1, line+2, line+3,
+  gtk_table_attach (GTK_TABLE (opaque), hbox2, 0, 1, line+2, line+3,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   g_signal_connect(GTK_OBJECT(buttonN), "clicked",
                     GTK_SIGNAL_FUNC(next),  s);
-  
+#endif
   updateMe(s);
 }
 void prev(void *z,hexStruct *s)
