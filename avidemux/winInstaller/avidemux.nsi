@@ -167,6 +167,14 @@ SectionGroup "User interfaces" SecGrpUI
 SectionGroupEnd
 
 SectionGroup "Additional languages" SecGrpLang
+    Section Catalan SecLangCatalan
+        SectionIn 2
+        SetOutPath $INSTDIR\share\locale\ca\LC_MESSAGES
+        SetOverwrite on
+        File ..\..\..\avidemux_2.4_build\share\locale\ca\LC_MESSAGES\avidemux.mo
+        WriteRegStr HKLM "${REGKEY}\Components" Catalan 1
+    SectionEnd
+    
     Section Czech SecLangCzech
         SectionIn 2
         SetOutPath $INSTDIR\share\locale\cs\LC_MESSAGES
@@ -207,12 +215,20 @@ SectionGroup "Additional languages" SecGrpLang
         WriteRegStr HKLM "${REGKEY}\Components" Russian 1
     SectionEnd
     
-    Section Serbian SecLangSerbian
+    Section "Serbian (Cyrillic)" SecLangSerbian
         SectionIn 2
         SetOutPath $INSTDIR\share\locale\sr\LC_MESSAGES
         SetOverwrite on
         File ..\..\..\avidemux_2.4_build\share\locale\sr\LC_MESSAGES\avidemux.mo
         WriteRegStr HKLM "${REGKEY}\Components" Serbian 1
+    SectionEnd
+    
+    Section "Serbian (Latin)" SecLangSerbianLatin
+        SectionIn 2
+        SetOutPath $INSTDIR\share\locale\sr@Latn\LC_MESSAGES
+        SetOverwrite on
+        File ..\..\..\avidemux_2.4_build\share\locale\sr@Latn\LC_MESSAGES\avidemux.mo
+        WriteRegStr HKLM "${REGKEY}\Components" SerbianLatin 1
     SectionEnd
     
     Section Spanish SecLangSpanish
@@ -223,6 +239,13 @@ SectionGroup "Additional languages" SecGrpLang
         WriteRegStr HKLM "${REGKEY}\Components" Spanish 1
     SectionEnd
 SectionGroupEnd
+
+Section "-Catalan GTK" SecLangCatalanGtk
+    SetOutPath $INSTDIR\lib\locale\ca\LC_MESSAGES
+    SetOverwrite on
+    File ..\..\..\avidemux_2.4_build\lib\locale\ca\LC_MESSAGES\gtk20.mo
+    WriteRegStr HKLM "${REGKEY}\Components" CatalanGtk 1
+SectionEnd
 
 Section "-Czech GTK" SecLangCzechGtk
     SetOutPath $INSTDIR\lib\locale\cs\LC_MESSAGES
@@ -264,6 +287,13 @@ Section "-Serbian GTK" SecLangSerbianGtk
     SetOverwrite on
     File ..\..\..\avidemux_2.4_build\lib\locale\sr\LC_MESSAGES\gtk20.mo
     WriteRegStr HKLM "${REGKEY}\Components" SerbianGtk 1
+SectionEnd
+
+Section "-Serbian Latin GTK" SecLangSerbianLatinGtk
+    SetOutPath $INSTDIR\lib\locale\sr@Latn\LC_MESSAGES
+    SetOverwrite on
+    File ..\..\..\avidemux_2.4_build\lib\locale\sr@Latn\LC_MESSAGES\gtk20.mo
+    WriteRegStr HKLM "${REGKEY}\Components" SerbianLatinGtk 1
 SectionEnd
 
 Section "-Spanish GTK" SecLangSpanishGtk
@@ -398,6 +428,11 @@ Section /o un.SerbianGtk UnSecLangSerbianGtk
     DeleteRegValue HKLM "${REGKEY}\Components" SerbianGtk
 SectionEnd
 
+Section /o un.SerbianLatinGtk UnSecLangSerbianLatinGtk
+    RmDir /r /REBOOTOK $INSTDIR\lib\locale\sr@Latn
+    DeleteRegValue HKLM "${REGKEY}\Components" SerbianLatinGtk
+SectionEnd
+
 Section /o un.RussianGtk UnSecLangRussianGtk
     RmDir /r /REBOOTOK $INSTDIR\lib\locale\ru
     DeleteRegValue HKLM "${REGKEY}\Components" RussianGtk
@@ -423,6 +458,11 @@ Section /o un.CzechGtk UnSecLangCzechGtk
     DeleteRegValue HKLM "${REGKEY}\Components" CzechGtk
 SectionEnd
 
+Section /o un.CatalanGtk UnSecLangCatalanGtk
+    RmDir /r /REBOOTOK $INSTDIR\lib\locale\ca
+    DeleteRegValue HKLM "${REGKEY}\Components" CatalanGtk
+SectionEnd
+
 Section /o un.Spanish UnSecLangSpanish
     RmDir /r /REBOOTOK $INSTDIR\share\locale\es
     DeleteRegValue HKLM "${REGKEY}\Components" Spanish
@@ -431,6 +471,11 @@ SectionEnd
 Section /o un.Serbian UnSecLangSerbian
     RmDir /r /REBOOTOK $INSTDIR\share\locale\sr
     DeleteRegValue HKLM "${REGKEY}\Components" Serbian
+SectionEnd
+
+Section /o un.SerbianLatin UnSecLangSerbianLatin
+    RmDir /r /REBOOTOK $INSTDIR\share\locale\sr@Latn
+    DeleteRegValue HKLM "${REGKEY}\Components" SerbianLatin
 SectionEnd
 
 Section /o un.Russian UnSecLangRussian
@@ -456,6 +501,11 @@ SectionEnd
 Section /o un.Czech UnSecLangCzech
     RmDir /r /REBOOTOK $INSTDIR\share\locale\cs
     DeleteRegValue HKLM "${REGKEY}\Components" Czech
+SectionEnd
+
+Section /o un.Catalan UnSecLangCatalan
+    RmDir /r /REBOOTOK $INSTDIR\share\locale\ca
+    DeleteRegValue HKLM "${REGKEY}\Components" Catalan
 SectionEnd
 
 Section /o un.GTK+ UnSecUiGtk
@@ -594,12 +644,14 @@ populate:
     !insertmacro SELECT_SECTION "Command line" ${SecUiCli}
     !insertmacro SELECT_SECTION Qt4 ${SecUiQt4}
     !insertmacro SELECT_SECTION GTK+ ${SecUiGtk}
+    !insertmacro SELECT_SECTION Catalan ${SecLangCatalan}
     !insertmacro SELECT_SECTION Czech ${SecLangCzech}
     !insertmacro SELECT_SECTION French ${SecLangFrench}
     !insertmacro SELECT_SECTION German ${SecLangGerman}
     !insertmacro SELECT_SECTION Japanese ${SecLangJapanese}
     !insertmacro SELECT_SECTION Russian ${SecLangRussian}
     !insertmacro SELECT_SECTION Serbian ${SecLangSerbian}
+    !insertmacro SELECT_SECTION "Serbian (Latin)" ${SecLangSerbianLatin}
     !insertmacro SELECT_SECTION Spanish ${SecLangSpanish}
     !insertmacro SELECT_SECTION "Sample external filter" ${SecFilter}
     !insertmacro SELECT_SECTION "AvsProxy" ${SecAvsProxy}
@@ -694,6 +746,11 @@ Function ActivateInternalSections
     SectionSetFlags ${SecStartMenuGtk} $1
     
     #GTK languages:
+    SectionGetFlags ${SecLangCatalan} $1
+    IntOp $1 $1 & ${SF_SELECTED}
+    IntOp $1 $0 & $1
+    SectionSetFlags ${SecLangCatalanGtk} $1
+    
     SectionGetFlags ${SecLangCzech} $1
     IntOp $1 $1 & ${SF_SELECTED}
     IntOp $1 $0 & $1
@@ -723,6 +780,11 @@ Function ActivateInternalSections
     IntOp $1 $1 & ${SF_SELECTED}
     IntOp $1 $0 & $1
     SectionSetFlags ${SecLangSerbianGtk} $1
+    
+    SectionGetFlags ${SecLangSerbianLatin} $1
+    IntOp $1 $1 & ${SF_SELECTED}
+    IntOp $1 $0 & $1
+    SectionSetFlags ${SecLangSerbianLatinGtk} $1
 
     SectionGetFlags ${SecLangSpanish} $1
     IntOp $1 $1 & ${SF_SELECTED}
@@ -794,19 +856,23 @@ Function un.onInit
     !insertmacro SELECT_SECTION "Command line" ${UnSecUiCli}
     !insertmacro SELECT_SECTION Qt4 ${UnSecUiQt4}
     !insertmacro SELECT_SECTION GTK+ ${UnSecUiGtk}
+    !insertmacro SELECT_SECTION Catalan ${UnSecLangCatalan}
     !insertmacro SELECT_SECTION Czech ${UnSecLangCzech}
     !insertmacro SELECT_SECTION French ${UnSecLangFrench}
     !insertmacro SELECT_SECTION German ${UnSecLangGerman}
     !insertmacro SELECT_SECTION Japanese ${UnSecLangJapanese}
     !insertmacro SELECT_SECTION Russian ${UnSecLangRussian}
     !insertmacro SELECT_SECTION Serbian ${UnSecLangSerbian}
+    !insertmacro SELECT_SECTION SerbianLatin ${UnSecLangSerbianLatin}
     !insertmacro SELECT_SECTION Spanish ${UnSecLangSpanish}
+    !insertmacro SELECT_SECTION CatalanGtk ${UnSecLangCatalanGtk}
     !insertmacro SELECT_SECTION CzechGtk ${UnSecLangCzechGtk}
     !insertmacro SELECT_SECTION FrenchGtk ${UnSecLangFrenchGtk}
     !insertmacro SELECT_SECTION GermanGtk ${UnSecLangGermanGtk}
     !insertmacro SELECT_SECTION JapaneseGtk ${UnSecLangJapaneseGtk}
     !insertmacro SELECT_SECTION RussianGtk ${UnSecLangRussianGtk}
     !insertmacro SELECT_SECTION SerbianGtk ${UnSecLangSerbianGtk}
+    !insertmacro SELECT_SECTION SerbianLatinGtk ${UnSecLangSerbianLatinGtk}
     !insertmacro SELECT_SECTION SpanishGtk ${UnSecLangSpanishGtk}
     !insertmacro SELECT_SECTION "AvsProxy" ${UnSecAvsProxy}
     !insertmacro SELECT_SECTION "Sample external filter" ${UnSecFilter}
