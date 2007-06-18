@@ -25,18 +25,29 @@ MACRO (add_libs_all_targets _libName)
   endif(QT4_FOUND)
 ENDMACRO (add_libs_all_targets _libName)
 
-MACRO (change_ldflags_all_targets _libName)
-        SET_TARGET_PROPERTIES(avidemux2_cli
-	PROPERTIES LINK_FLAGS ${_libName})
-  if(GTK_FOUND)
-        SET_TARGET_PROPERTIES(avidemux2_gtk
-	PROPERTIES LINK_FLAGS ${_libName})
-  endif(GTK_FOUND)
-  if(QT4_FOUND)
-        SET_TARGET_PROPERTIES(avidemux2_qt4
-	PROPERTIES LINK_FLAGS ${_libName})
-  endif(QT4_FOUND)
-ENDMACRO (change_ldflags_all_targets _libName)
+MACRO (add_link_flags _target _flg)
+   GET_TARGET_PROPERTY(_flags ${_target} LINK_FLAGS)
+
+   if (_flags)
+      set(_flags "${_flags} ${_flg}")
+   else (_flags)
+      set(_flags "${_flg}")
+   endif (_flags)
+
+   SET_TARGET_PROPERTIES(${_target} PROPERTIES LINK_FLAGS "${_flags}")
+ENDMACRO (add_link_flags)
+
+MACRO (add_ldflags_all_targets _libName)
+	add_link_flags(avidemux2_cli ${_libName})
+
+	if(GTK_FOUND)
+		add_link_flags(avidemux2_gtk ${_libName})
+	endif(GTK_FOUND)
+
+	if(QT4_FOUND)
+		add_link_flags(avidemux2_qt4 ${_libName})
+	endif(QT4_FOUND)
+ENDMACRO (add_ldflags_all_targets _libName)
 ##/ Small macro...
 
 
@@ -355,7 +366,11 @@ add_libs_all_targets(pthreadGC2 )
 add_libs_all_targets(winmm )
 add_libs_all_targets(wsock32 )
 
-change_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows xpm/adm.o -Wl,--export-all-symbols -Wl,-s")
+add_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows xpm/adm.o -Wl,--export-all-symbols")
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+add_ldflags_all_targets("-Wl,-s")
+endif(CMAKE_BUILD_TYPE STREQUAL "Release")
 
 if(USE_SDL)
 add_definitions(${SDL_CFLAGS})
