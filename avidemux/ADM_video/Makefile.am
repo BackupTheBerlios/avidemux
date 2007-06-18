@@ -12,26 +12,20 @@ libADM_video_a_SOURCES = \
  ADM_vidFont.cpp \
  ADM_vidSRT.cpp \
  ADM_vidContrast.cpp \
-	ADM_resizeter.cpp \
  ADM_vidCrop.cpp \
  ADM_vidNull.cpp \
-	ADM_vidResize.cpp \
 	ADM_vidClean.cpp \
-	ADM_resizebis.cpp \
  ADM_genvideo.cpp \
- ADM_vidResize25.cpp \
  ADM_vidFieldUtil.cpp \
  ADM_vidFieldUtil.h \
  ADM_confCouples.cpp \
  ADM_confCouple.h ADM_vidCommonFilter.h \
 	ADM_vidChromaShift.h ADM_vidChromaShift.cpp \
-	ADM_vidMPLResize.cpp \
  ADM_interlaced.cpp \
 	ADM_interlaced.h \
  ADM_vidRaw.cpp \
 	ADM_vidSRTRender.cpp \
  ADM_vidSRTload.cpp \
-	ADM_mpdetc.cpp \
  ADM_cache.cpp \
  ADM_vidEqualizer.cpp \
  ADM_vidVobsub.cpp \
@@ -43,10 +37,8 @@ libADM_video_a_SOURCES = \
  ADM_vidCNR2.cpp \
   ADM_vidDelta.cpp \
  ADM_vidUnblend.cpp \
- ADM_vidTdeint.cpp \
  ADM_vidMPdelogo.cpp \
  ADM_vidColorYuv.cpp  \
- ADM_guiResize.cpp \
  ADM_vidAnimated.cpp 
 
 				

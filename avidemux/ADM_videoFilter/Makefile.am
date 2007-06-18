@@ -7,6 +7,13 @@ libADM_videoFilter_a_METASOURCES = AUTO
 #INCLUDES = $(all_includes) 
 
 libADM_videoFilter_a_SOURCES =  \
+ADM_resizeter.cpp \
+ADM_vidResize.cpp \
+ADM_vidResize25.cpp \
+ADM_resizebis.cpp \
+ADM_vidMPLResize.cpp \
+ADM_vidTdeint.cpp \
+ADM_guiResize.cpp \
  ADM_vidASS.cpp \
  ADM_vidBlend.cpp \
  ADM_vidDeintASM.cpp \
