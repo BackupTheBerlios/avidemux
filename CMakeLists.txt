@@ -48,9 +48,12 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 		SET(ADM_SUBVERSION ${Project_WC_REVISION})
 	ELSE(Subversion_FOUND)
 		MESSAGE(STATUS "Could not find Subversion")
-		SET(ADM_SUBVERSION 0)
 	ENDIF(Subversion_FOUND)
 ENDIF(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+
+IF(NOT Subversion_FOUND)
+	SET(ADM_SUBVERSION 0)
+ENDIF(NOT Subversion_FOUND)
 
 #**************************************************
 # libxml2
