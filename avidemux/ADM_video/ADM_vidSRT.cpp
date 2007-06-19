@@ -218,13 +218,10 @@ unsigned char c,d;
 			// Try to detect utf16 files			
 			c=fgetc(_fd);
 			// Skip utf identifier if any
-			if(c==0xff)
+			if( (c&0xef)==0xef)
 			{
-				c=fgetc(_fd);
-				if(c==0xfe)
-				{
-					c=fgetc(_fd);
-				}
+                          int count=4;
+                                while(count-- && c&0x80) c=fgetc(_fd);
 			}
 			switch(c)
 			{

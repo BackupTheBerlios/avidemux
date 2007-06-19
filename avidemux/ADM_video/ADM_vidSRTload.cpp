@@ -292,7 +292,12 @@ ADMVideoSubtitle::loadSRT (void)
 	switch (state)
 	{
 	case 0:		// waiting for number	 
-		j = ADM_SubAtoi (final);
+                  if(!_line && (final[0]&0xfefe)==0xfefe)
+                  {
+                      j=ADM_SubAtoi (final+1);
+                  }
+                  else
+		      j = ADM_SubAtoi (final);
 		if (j == _line + 1)
 		{
 			stored=0;
