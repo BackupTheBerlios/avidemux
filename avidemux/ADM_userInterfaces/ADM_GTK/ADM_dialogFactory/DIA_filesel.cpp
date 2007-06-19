@@ -68,11 +68,11 @@ void diaElemFile::setMe(void *dialog, void *opaque,uint32_t line)
   
   /**/
   
-  hbox1 = gtk_hbox_new (FALSE, 2);
-  gtk_container_set_border_width (GTK_CONTAINER (hbox1), 6);
+  hbox1 = gtk_hbox_new (FALSE, 12);
   gtk_widget_show (hbox1);
   
   entry = gtk_entry_new ();
+  gtk_entry_set_width_chars (GTK_ENTRY (entry), 40);
   gtk_widget_show (entry);
   if(param)
   {
@@ -86,7 +86,7 @@ void diaElemFile::setMe(void *dialog, void *opaque,uint32_t line)
   
   /*  add button */
   
-  button = gtk_button_new_from_stock ("gtk-open");
+  button = gtk_button_new_with_mnemonic ("_Browse...");
   gtk_widget_show (button);
   gtk_box_pack_start (GTK_BOX (hbox1), button, FALSE, FALSE, 0);
 
@@ -192,8 +192,7 @@ void diaElemDirSelect::setMe(void *dialog, void *opaque,uint32_t line)
   
   /**/
   
-  hbox1 = gtk_hbox_new (FALSE, 2);
-  gtk_container_set_border_width (GTK_CONTAINER (hbox1), 6);
+  hbox1 = gtk_hbox_new (FALSE, 12);
   gtk_widget_show (hbox1);
   
   entry = gtk_entry_new ();
@@ -210,7 +209,7 @@ void diaElemDirSelect::setMe(void *dialog, void *opaque,uint32_t line)
   
   /*  add button */
   
-  button = gtk_button_new_from_stock ("gtk-open");
+  button = gtk_button_new_with_mnemonic ("_Browse...");
   gtk_widget_show (button);
   gtk_box_pack_start (GTK_BOX (hbox1), button, FALSE, FALSE, 0);
 

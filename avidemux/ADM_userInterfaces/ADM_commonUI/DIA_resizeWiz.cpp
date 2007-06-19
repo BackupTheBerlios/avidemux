@@ -40,9 +40,9 @@ uint8_t r=0;
                              ONELINE(VCD,"VCD"),
                              ONELINE(SVCD,"SVCD"),
                              ONELINE(DVD,"DVD"),
-                             ONELINE(DVD_HD1,"DVD Half D1"),
+                             ONELINE(DVD_HD1,"DVD half D1"),
                              ONELINE(PSP,"PSP"),
-                             ONELINE(PSP_FULLRES,"PSP Full Res"),
+                             ONELINE(PSP_FULLRES,"PSP full res"),
                           };
              diaMenuEntry menuFAspect[3]={
                {RESWIZ_AR_1_1,"1:1",NULL},
@@ -56,14 +56,14 @@ uint8_t r=0;
     uint32_t tsource=(uint32_t )*source;
     uint32_t tdestination=(uint32_t )*destination;
                           
-    diaElemMenu     menu1(&tformat,_("Target type"), 6,menuFTarget);
-    diaElemMenu     menu2(&tsource,_("Source aspect ratio"), 3,menuFAspect);
-    diaElemMenu     menu3(&tdestination,_("Dest. aspect ratio"), 3,menuFAspect);
+    diaElemMenu     menu1(&tformat,_("_Target type:"), 6,menuFTarget);
+    diaElemMenu     menu2(&tsource,_("_Source aspect ratio:"), 3,menuFAspect);
+    diaElemMenu     menu3(&tdestination,_("_Destination aspect ratio:"), 3,menuFAspect);
     
     
     
       diaElem *elems[3]={&menu1,&menu2,&menu3};
-    if(diaFactoryRun("Resize Type",3,elems))
+    if(diaFactoryRun("Auto Wizard",3,elems))
     {
        *format=(RESWIZ_FORMAT) tformat;
        *source=(RESWIZ_AR) tsource;

@@ -68,7 +68,7 @@ FFcodecSetting ffmpeg4Extra = {
 
 COMPRES_PARAMS ffmpegH263Codec = {
   CodecH263,
-  "H263 (lavc)",
+  "H.263 (lavc)",
   "H263",
   "Lavcodec H263",
   COMPRESS_CQ,
@@ -84,7 +84,7 @@ COMPRES_PARAMS ffmpegH263Codec = {
 };
 COMPRES_PARAMS ffmpegH263PCodec = {
   CodecH263P,
-  "H263+ (lavc)",
+  "H.263+ (lavc)",
   "H263P",
   "Lavcodec H263+",
   COMPRESS_CQ,
@@ -100,7 +100,7 @@ COMPRES_PARAMS ffmpegH263PCodec = {
 };
 COMPRES_PARAMS ffmpegMpeg4 = {
   CodecFF,
-  "Mpeg4 ASP (lavc)",
+  "MPEG-4 ASP (lavc)",
   "FFMpeg4",
   "Lavcodec Mpeg4",
   COMPRESS_CQ,
@@ -116,7 +116,7 @@ COMPRES_PARAMS ffmpegMpeg4 = {
 };
 COMPRES_PARAMS ffmpegDV = {
   CodecDV,
-  "DV",
+  "DV (lavc)",
   "DV",
   "DV",
   COMPRESS_CQ,
@@ -149,7 +149,7 @@ COMPRES_PARAMS ffmpegSnow = {
 };
 COMPRES_PARAMS ffmpegFFHUFF = {
   CodecFFhuff,
-  "FF HUFFYUV",
+  "FF Huffyuv (lavc)",
   "FFHUFF",
   "Lavcodec FF HUFFYUV",
   COMPRESS_CQ,
@@ -165,7 +165,7 @@ COMPRES_PARAMS ffmpegFFHUFF = {
 };
 COMPRES_PARAMS ffmpegHUFF = {
   CodecHuff,
-  "HUFFYUV",
+  "Huffyuv (lavc)",
   "HUFF",
   "Lavcodec HUFFYUV",
   COMPRESS_CQ,
@@ -181,7 +181,7 @@ COMPRES_PARAMS ffmpegHUFF = {
 };
 COMPRES_PARAMS ffmpegFFV1 = {
   CodecFFV1,
-  "FFV1 (lavcodec)",
+  "FFV1 (lavc)",
   "FFV1",
   "Lavcodec FFV1",
   COMPRESS_CQ,
@@ -199,7 +199,7 @@ static MJPEGConfig MjpegExtra = { 90, 0 };
 extern uint8_t DIA_mjpegCodecSetting (COMPRES_PARAMS * param);
 COMPRES_PARAMS MjpegCodec = {
   CodecMjpeg,
-  "Mjpeg",
+  "MJPEG (lavc)",
   "Mjpeg",
   "Mjpeg (lavcodec)",
   COMPRESS_CQ,
@@ -403,7 +403,7 @@ Mpeg2encParam VCDExtra = {
 
 COMPRES_PARAMS VCDCodec = {
   CodecVCD,
-  "VCD",
+  "VCD (mpeg2enc)",
   "VCD",
   "Mpeg2enc(VCD)",
   COMPRESS_CBR,
@@ -435,7 +435,7 @@ Mpeg2encParam SVCDExtra = {
 
 COMPRES_PARAMS SVCDCodec = {
   CodecSVCD,
-  "SVCD",
+  "SVCD (mpeg2enc)",
   "SVCD",
   "Mpeg2enc(SVCD)",
   COMPRESS_CQ,
@@ -454,7 +454,7 @@ COMPRES_PARAMS SVCDCodec = {
 uint32_t RequantFactorExtra=1000; // 1000* the actual requant factor
 COMPRES_PARAMS RequantCodec = {
     CodecRequant,
-    "Mpeg2 Requant",
+    "MPEG-2 requant",
     "REQUANT",
     "Mpeg2 Requantizer",
     COMPRESS_CQ,
@@ -481,7 +481,7 @@ Mpeg2encParam DVDExtra = {
 
 COMPRES_PARAMS DVDCodec = {
   CodecDVD,
-  "DVD ",
+  "DVD (mpeg2enc)",
   "DVD",
   "Mpeg2enc(DVD)",
   COMPRESS_CQ,
@@ -563,7 +563,7 @@ xvid4EncParam xvid4Extra = {
 extern uint8_t DIA_xvid4 (COMPRES_PARAMS * incoming);
 COMPRES_PARAMS Xvid4Codec = {
   CodecXvid4,
-  "Mpeg4 ASP (Xvid4)",
+  "MPEG-4 ASP (Xvid4)",
   "XVID4",
   "XVID 4 mpeg4",
   COMPRESS_CQ,
@@ -703,7 +703,7 @@ ADM_x264Param x264ExtraDefault=x264Extra;
 extern uint8_t DIA_x264 (COMPRES_PARAMS * conf);
 COMPRES_PARAMS x264Codec = {
   CodecX264,
-  "MPEG4 AVC (x264)",
+  "MPEG-4 AVC (x264)",
   "X264",
   "x264 h264 encoder",
   COMPRESS_AQ,

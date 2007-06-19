@@ -43,37 +43,37 @@ uint8_t  DIA_tdeint(TDEINT_PARAM *param)
          
 diaMenuEntry meField[]={
   {0,_("Auto (might not work)")},
-  {2,_("Top Field First")},
-  {1,_("Bottom Field First")}
+  {2,_("Top field first")},
+  {1,_("Bottom field first")}
 };       
 
 diaMenuEntry meInterpolate[]={
   {0,_("Auto (might not work)")},
-  {2,_("Bottom Field (keep top)")},
-  {1,_("Top Field (keep Bottom)")}
+  {2,_("Bottom field (keep top)")},
+  {1,_("Top field (keep bottom)")}
 };       
 
 
 diaMenuEntry meType[]={
-  {0,_("Cubic Interpolation")},
+  {0,_("Cubic interpolation")},
   {1,_("Modified ELA")},
-  {2,_("Kernel Interpolation")},
+  {2,_("Kernel interpolation")},
   {3,_("Modified ELA-2")},
   
 };       
 
 diaMenuEntry meMnt[]={
-  {0,_("4 Fields Check")},
-  {1,_("5 Fields Check")},
-  {2,_("4 Fields Check (no avg)")},
-  {3,_("5 Fields Check (no avg)")},
+  {0,_("4 fields check")},
+  {1,_("5 fields check")},
+  {2,_("4 fields check (no avg)")},
+  {3,_("5 fields check (no avg)")},
   
 };       
 
 
 diaMenuEntry meLink[]={
-  {0,_("No Link")},
-  {1,_("Full Link")},
+  {0,_("No link")},
+  {1,_("Full link")},
   {2,_("Y to UV")},
   {3,_("UV to Y")}
 };     
@@ -97,18 +97,18 @@ diaMenuEntry meAP[]={
       diaElemMenu     menuAP(PX(APType),_("_AP type:"),3,meAP);
 
       // Toggle
-      diaElemToggle    toggleUseChroma(PX(chroma),_("Use Chroma to evalute"));
-      diaElemToggle    toggleTryWeave(PX(tryWeave),_("Try weave"));
-      diaElemToggle    toggleDenoise(PX(denoise),_("Denoise"));
-      diaElemToggle    toggleSharp(PX(sharp),_("Sharp"));
-      diaElemToggle    toggleEvaluteAll(PX(full),_("Evalute all frames"));
+      diaElemToggle    toggleUseChroma(PX(chroma),_("Use ch_roma to evalute"));
+      diaElemToggle    toggleTryWeave(PX(tryWeave),_("Try _weave"));
+      diaElemToggle    toggleDenoise(PX(denoise),_("_Denoise"));
+      diaElemToggle    toggleSharp(PX(sharp),_("_Sharp"));
+      diaElemToggle    toggleEvaluteAll(PX(full),_("_Evalute all frames"));
       
       // int
-      diaElemUInteger  intMotionLuma(PX(mthreshL),_("Motion threshold, Luma:"),0,255);
-      diaElemUInteger  intMotionChroma(PX(mthreshC),_("Motion threshold, Chroma:"),0,255);
-      diaElemUInteger  intAreaCombing(PX(cthresh),_("Area combing threshold:"),0,255);
-      diaElemUInteger  intCombed(PX(MI),_("Combed threshold:"),0,255);
-      diaElemInteger   intArtefact(PX(AP),_("Artefact prot. threshold:"),-1,255);
+      diaElemUInteger  intMotionLuma(PX(mthreshL),_("Motion threshold, l_uma:"),0,255);
+      diaElemUInteger  intMotionChroma(PX(mthreshC),_("Motion threshold, c_hroma:"),0,255);
+      diaElemUInteger  intAreaCombing(PX(cthresh),_("Area com_bing threshold:"),0,255);
+      diaElemUInteger  intCombed(PX(MI),_("Combe_d threshold:"),0,255);
+      diaElemInteger   intArtefact(PX(AP),_("Artefact _protection threshold:"),-1,255);
 
          diaElem *diaRC[]={&menuFieldOrder,&menuInterpolaye,&menuType,&menuMnt,&menuLink,&menuAP,
                             &toggleUseChroma,&toggleTryWeave,&toggleDenoise,&toggleSharp,&toggleEvaluteAll,
@@ -117,7 +117,7 @@ diaMenuEntry meAP[]={
 
         
          
-        if( diaFactoryRun(_("TDEint Configuration"),16,diaRC))
+        if( diaFactoryRun(_("TDeint"),16,diaRC))
 	{
            param->order=(int)order-1;
            param->field=(int)field-1;

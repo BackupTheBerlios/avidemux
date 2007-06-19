@@ -900,7 +900,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (go1_menu), separator15);
   gtk_widget_set_sensitive (separator15, FALSE);
 
-  jum_to_frame1 = gtk_image_menu_item_new_with_mnemonic (_("_Jump to Frame..."));
+  jum_to_frame1 = gtk_image_menu_item_new_with_mnemonic (_("Go to Fra_me..."));
   gtk_widget_show (jum_to_frame1);
   gtk_container_add (GTK_CONTAINER (go1_menu), jum_to_frame1);
   gtk_widget_add_accelerator (jum_to_frame1, "activate", accel_group,
@@ -911,7 +911,7 @@ create_mainWindow (void)
   gtk_widget_show (image8219);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (jum_to_frame1), image8219);
 
-  jump_to_time1 = gtk_image_menu_item_new_with_mnemonic (_("Jump to _Time..."));
+  jump_to_time1 = gtk_image_menu_item_new_with_mnemonic (_("Go to _Time..."));
   gtk_widget_show (jump_to_time1);
   gtk_container_add (GTK_CONTAINER (go1_menu), jump_to_time1);
   gtk_widget_add_accelerator (jump_to_time1, "activate", accel_group,
@@ -1403,7 +1403,7 @@ create_mainWindow (void)
   gtk_entry_set_text (GTK_ENTRY (boxCurFrame), _("0"));
   gtk_entry_set_width_chars (GTK_ENTRY (boxCurFrame), 8);
 
-  labelTotalFrame = gtk_label_new (_("/0000000"));
+  labelTotalFrame = gtk_label_new (_("/ 0000000"));
   gtk_widget_show (labelTotalFrame);
   gtk_box_pack_start (GTK_BOX (hbox16), labelTotalFrame, FALSE, FALSE, 0);
   GTK_WIDGET_SET_FLAGS (labelTotalFrame, GTK_CAN_FOCUS);
@@ -1421,7 +1421,7 @@ create_mainWindow (void)
   gtk_entry_set_text (GTK_ENTRY (boxCurTime), _("00:00:00.000"));
   gtk_entry_set_width_chars (GTK_ENTRY (boxCurTime), 13);
 
-  labelTotalTime = gtk_label_new (_("/00:00:00,000"));
+  labelTotalTime = gtk_label_new (_("/ 00:00:00,000"));
   gtk_widget_show (labelTotalTime);
   gtk_box_pack_start (GTK_BOX (hbox16), labelTotalTime, FALSE, FALSE, 0);
   GTK_WIDGET_SET_FLAGS (labelTotalTime, GTK_CAN_FOCUS);

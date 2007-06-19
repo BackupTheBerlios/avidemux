@@ -38,7 +38,7 @@ int DIA_getMPParams( uint32_t *pplevel, uint32_t *ppstrength,uint32_t *swap)
 #define PX(x) x
         
     diaElemUInteger   postProcStrength(PX(ppstrength),_("_Filter strength:"),0,5);
-    diaElemToggle     swapuv(PX(swap),_("_Swap U & V"));
+    diaElemToggle     swapuv(PX(swap),_("_Swap U and V"));
     
     uint32_t hzd,vzd,dring;
     

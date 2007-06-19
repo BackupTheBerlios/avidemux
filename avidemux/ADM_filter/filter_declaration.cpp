@@ -60,8 +60,8 @@ printf(  "*********************\n");
 	REGISTERX("rotate","Rotate","Rotate the picture by 90, 180 or 270 degrees.",VF_ROTATE,1,rotate_create,rotate_script);
         //REGISTERX("chfps","Change FPS",VF_CHFPS,1,chfps_create,chfps_script);
         REGISTERX("resamplefps","Resample fps","Change framerate while keeping duration.",VF_RESAMPLE_FPS,1,resamplefps_create,resamplefps_script);                
-        REGISTERX("reverse","Reverse","Play video backward",VF_REVERSE,1,reverse_create,reverse_script);
-        REGISTERX("fade","Fade","Fade in/out",VF_FADE,1,fade_create,fade_script);     
+        REGISTERX("reverse","Reverse","Play video backward.",VF_REVERSE,1,reverse_create,reverse_script);
+        REGISTERX("fade","Fade","Fade in/out.",VF_FADE,1,fade_create,fade_script);     
 
 	registerFilter("----------- Interlacing -------------",VF_INVALID,2,NULL,NULL);
 	// Buggy : Removed REGISTER("IVTC",VF_IVTC,1,ivtc_create);
@@ -72,8 +72,8 @@ printf(  "*********************\n");
 	REGISTERX("kerneldeint","KernelDeint","Kernel deinterlacer by Donald Graft.",VF_KRNDEINT,1,kerneldeint_create,kerneldeint_script);
         REGISTERX("tdeint","TDeint","Motion adaptative deinterlacer by Tritical.",VF_TDEINT,1,tdeint_create,tdeint_script);
         REGISTERX("lavcppdeint","libavcodec deinterlacer","All FFmpeg deinterlace filters (bicubic, median, ...).",VF_LAVPP_DEINT,1,lavppdeint_create,lavppdeint_script);
-	REGISTERX("telecide","Decomb telecide","Great deinterlacing package including IVTC.",VF_DECOMB,1,decomb_create,decomb_script);
-	REGISTERX("decimate","Decomb decimate","Useful to remove dupes left by telecide.",VF_DECIMATE,1,decimate_create,decimate_script);
+	REGISTERX("telecide","Decomb Telecide","Great deinterlacing package including IVTC.",VF_DECOMB,1,decomb_create,decomb_script);
+	REGISTERX("decimate","Decomb Decimate","Useful to remove dupes left by Telecide.",VF_DECIMATE,1,decimate_create,decimate_script);
 	REGISTERX("pulldown","Pulldown","Convert 24 fps to 30 fps by repeating fields.",VF_PULLDOWN,1,pulldown_create,pulldown_script);
 	
 	REGISTERX("dgbob","DGBob","Bobber - convert each field into a full sized frame.",VF_DGBOB,1,dgbob_create,dgbob_script);
@@ -151,7 +151,7 @@ printf(  "*********************\n");
 	REGISTERX("subtitle","Subtitler","Add srt/sub subtitles to the picture.",VF_SUBTILE,1,subtitle_create,subtitle_script);
 	REGISTERX("ass","ASS","Add ASS/SSA subtitles to the picture.",VF_ASS,1,ass_create,ass_script);
 #endif
-        REGISTERX("vobsub","VobSub","Embed vosub subtitles into picture",VF_VOBSUB,1,vobsub_create,vobsub_script);
+        REGISTERX("vobsub","VobSub","Embed VobSub subtitles into picture.",VF_VOBSUB,1,vobsub_create,vobsub_script);
         
 
         //*********************

@@ -334,7 +334,7 @@ uint8_t  A_SaveAudioNVideo(const char *name)
                     if(GUI_Question(_("You may need smart copy.\n Enable it ?")))
                     {
                         value=4;
-                        if( ! GUI_getIntegerValue(&value, 2, 31, "Q Factor (set 4)"))
+                        if( ! GUI_getIntegerValue(&value, 2, 31, "_Q factor (set 4):"))
                                       return 0;
                         nw=new   GenericAviSaveSmart(value);
                     }

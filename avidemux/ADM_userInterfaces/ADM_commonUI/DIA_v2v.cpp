@@ -38,28 +38,28 @@ uint8_t ret=0;
 char *tmp=NULL,*tmp2=NULL,*tmp3=NULL;
 
         
-        diaElemFile eVob(0,&tmp,_("Vob file(s):"),"");
-        diaElemFile eIfo(0,&tmp2,_("IFO file:"),"");
-        diaElemFile eVsub(1,&tmp3,_("Vobsub file:"),"");
+        diaElemFile eVob(0,&tmp,_("_VOB file(s):"),"");
+        diaElemFile eIfo(0,&tmp2,_("_IFO file:"),"");
+        diaElemFile eVsub(1,&tmp3,_("Vob_Sub file:"),"");
         
         while(1)
         {
            diaElem *tabs[]={&eVob,&eIfo,&eVsub};
-          if( diaFactoryRun(_("Vob 2 Vobsub"),3,tabs))
+          if( diaFactoryRun(_("VOB to VobSub"),3,tabs))
 	  {
               if(!ADM_fileExist(tmp))
               {
-                GUI_Error_HIG(_("VOB file"),_("The selected vobfile does not exist.")); 
+                GUI_Error_HIG(_("The selected vobfile does not exist"), NULL); 
                 continue;
               }
               if(!ADM_fileExist(tmp2))
               {
-                GUI_Error_HIG(_("IFO file"),_("The selected IFO file does not exist.")); 
+                GUI_Error_HIG(_("The selected vobfile does not exist"), NULL); 
                 continue;
               }
               if(strlen(tmp3)<3)
               {
-                 GUI_Error_HIG(_("VobSub file"),_("Select a correct vobsub path/dir.")); 
+                 GUI_Error_HIG(_("Please select a correct VobSub path/dir"), NULL); 
                  continue;
               }
                   if(*vobname) ADM_dealloc(*vobname);

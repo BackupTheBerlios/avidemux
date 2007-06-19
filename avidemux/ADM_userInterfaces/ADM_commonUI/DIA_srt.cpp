@@ -85,7 +85,7 @@ diaMenuEntry encoding[]={
 };       
 
 #define PX(x) &(param->x)
-  diaElemFile subtitle(0,(char **)PX(_subname),_("_Subtitle File:"));
+  diaElemFile subtitle(0,(char **)PX(_subname),_("_Subtitle file:"));
   diaElemFile font(0,(char **)PX(_fontname),_("_Font (TTF):"));
   int colors[3]={param->_Y_percent,param->_U_percent,param->_V_percent};
   
@@ -101,15 +101,15 @@ diaMenuEntry encoding[]={
       {
           if(!strcmp(param->_charset,names[i].name)) myEncoding=i;
       }
-      diaElemMenu      encodingM(&myEncoding,_("Encoding:"),8,encoding);
+      diaElemMenu      encodingM(&myEncoding,_("_Encoding:"),8,encoding);
     //  diaElemUInteger  fontSize(PX(_fontsize),_("Font Si_Ze:"),8,120);
-      diaElemButton    color(_("Color"), colorCallBack,&(colors[0]));
-      diaElemButton    setBase(_("_Size and Position"), sizePositionCallback,&sizePos);
-      diaElemToggle    autoSplit(PX(_selfAdjustable),_("_Auto Split:"));
+      diaElemButton    color(_("S_elect C_olor"), colorCallBack,&(colors[0]));
+      diaElemButton    setBase(_("Set Size and _Position"), sizePositionCallback,&sizePos);
+      diaElemToggle    autoSplit(PX(_selfAdjustable),_("_Auto split"));
       diaElemInteger   delay(PX(_delay),_("_Delay (ms):"),-100000,100000);
          
       diaElem *tabs[]={&subtitle,&font,&encodingM,&color,&setBase,&autoSplit,&delay};
-      if( diaFactoryRun(_("Subtitles"),7,tabs))
+      if( diaFactoryRun(_("Subtitler"),7,tabs))
 	{
           if(param->_charset) ADM_dealloc(param->_charset);
           param->_charset=ADM_strdup(names[myEncoding].name);

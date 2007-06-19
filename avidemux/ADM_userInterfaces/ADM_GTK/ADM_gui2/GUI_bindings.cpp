@@ -585,8 +585,9 @@ void UI_setTitle(char *name)
 {
 	char title[1024];
 
-		strcpy(title,"Avidemux 2 ");
-		strncat(title,name,200);
+		strncpy(title,name,200);
+		strncat(title," - Avidemux", 11);
+		
 
  	gtk_window_set_title (GTK_WINDOW (guiRootWindow), title);
 
@@ -634,7 +635,7 @@ void UI_setFrameCount(uint32_t curFrame,uint32_t total)
    // sprintf(text, "%lu ", curFrame);
    // gtk_label_set_text((GtkLabel *) guiCurFrame, text);
     gtk_write_entry(guiCurFrame,curFrame);
-      sprintf(text, "/ %lu ", total);
+      sprintf(text, "/ %lu", total);
     gtk_label_set_text((GtkLabel *) guiTotalFrame, text);
     
 }
@@ -660,7 +661,7 @@ void UI_setTimeCount(uint32_t curFrame,uint32_t total, uint32_t fps)
      	gtk_write_entry_string(guiCurTime,text);
      
  	frame2time(total,fps, &hh, &mm, &ss, &ms);
-  	sprintf(text, "%02d:%02d:%02d.%03d", hh, mm, ss, ms);
+  	sprintf(text, "/ %02d:%02d:%02d.%03d", hh, mm, ss, ms);
      	gtk_label_set_text((GtkLabel *) guiTotalTime, text);     
 		gtk_markscale_setNbFrames(guiSlider, total);
 

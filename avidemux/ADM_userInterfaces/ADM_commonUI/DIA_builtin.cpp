@@ -125,14 +125,14 @@ uint8_t DIA_builtin(void)
 	gettext=1;
 #endif
     
-	diaElemFrame videoFrame(_("Video codecs:"));
+	diaElemFrame videoFrame(_("Video Codecs"));
 	diaElemNotch tXvid4(xvid4, _("Xvid"));
 	diaElemNotch tX264(X264, _("x264"));
 
 	videoFrame.swallow(&tXvid4);
 	videoFrame.swallow(&tX264);
 
-	diaElemFrame audioFrame(_("Audio codecs:"));	
+	diaElemFrame audioFrame(_("Audio Codecs"));	
 	diaElemNotch tAften(aften, _("Aften"));	
 	diaElemNotch tLibamrnb(libamrnb, _("amrnb"));
     diaElemNotch tFaac(faac, _("FAAC"));
@@ -141,7 +141,7 @@ uint8_t DIA_builtin(void)
 	diaElemNotch tA52dec(a52dec, _("liba52"));
 	diaElemNotch tLibdca(libdca, _("libdca"));
 	diaElemNotch tMad(mad, _("MAD"));
-	diaElemNotch tVorbis(vorbis, _("Ogg Vorbis"));
+	diaElemNotch tVorbis(vorbis, _("Vorbis"));
 
 	audioFrame.swallow(&tAften);
 	audioFrame.swallow(&tLibamrnb);	
@@ -153,47 +153,33 @@ uint8_t DIA_builtin(void)
 	audioFrame.swallow(&tMad);
 	audioFrame.swallow(&tVorbis);
 
-	diaElemFrame miscFrame(_("Miscellaneous libraries:"));
 	diaElemNotch tArts(arts, _("aRts"));
 	diaElemNotch tEsd(esd, _("ESD"));
-        diaElemNotch tFontConfig(fontconfig, _("FontConfig"));
+        diaElemNotch tFontConfig(fontconfig, _("Fontconfig"));
 	diaElemNotch tFreetype(freetype, _("FreeType 2"));
 	diaElemNotch tGettext(gettext, _("gettext"));
-        diaElemNotch tAlsa(alsa, _("Alsa"));
+        diaElemNotch tAlsa(alsa, _("ALSA"));
 	diaElemNotch tOss(oss, _("OSS"));
 	diaElemNotch tSdl(sdl, _("SDL"));
 	diaElemNotch tXvideo(xvideo, _("XVideo"));
 
-	miscFrame.swallow(&tArts);
-	miscFrame.swallow(&tEsd);
-	miscFrame.swallow(&tFreetype);
-        miscFrame.swallow(&tFontConfig);
-	miscFrame.swallow(&tGettext);
-	miscFrame.swallow(&tOss);
-        miscFrame.swallow(&tAlsa);
-	miscFrame.swallow(&tSdl);
-	miscFrame.swallow(&tXvideo);
-    
-	diaElemFrame systemFrame(_("CPU:"));
-    diaElemNotch tAltivec(altivec, _("AltiVec"));
+	diaElemNotch tAltivec(altivec, _("AltiVec"));
 	diaElemNotch tPowerPc(powerpc, _("PowerPC"));
 	diaElemNotch tX86(x86, _("x86"));
 	diaElemNotch tX86_64(x86_64, _("x86-64"));
 
-	systemFrame.swallow(&tAltivec);
-	systemFrame.swallow(&tPowerPc);
-	systemFrame.swallow(&tX86);
-	systemFrame.swallow(&tX86_64);
 
 	diaElem *codecElems[] = {&videoFrame, &audioFrame};
-	diaElem *miscElems[] = {&miscFrame, &systemFrame};
+	diaElem *libsElems[] = {&tArts, &tEsd, &tFontConfig, &tFreetype, &tGettext, &tAlsa, &tOss, &tSdl, &tXvideo};
+	diaElem *CPUElems[] = {&tAltivec, &tPowerPc, &tX86, &tX86_64};
 
 	diaElemTabs tabCodec(_("Codecs"), 2, codecElems);
-	diaElemTabs tabMisc(_("Miscellaneous"), 2, miscElems);
+	diaElemTabs tabLibs(_("Libraries"), 9, libsElems);
+	diaElemTabs tabCPU(_("CPU"), 4, CPUElems);
 
-	diaElemTabs *tabs[] = {&tabCodec, &tabMisc};
+	diaElemTabs *tabs[] = {&tabCodec, &tabLibs, &tabCPU};
 
-    diaFactoryRunTabs(_("Built-in Support"), 2, tabs);
+    diaFactoryRunTabs(_("Built-in Support"), 3, tabs);
 
     return 1;
 }

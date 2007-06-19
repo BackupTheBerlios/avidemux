@@ -80,9 +80,9 @@ uint8_t Telecide::configure(AVDMGenericVideoStream *in)
     ELEM_TYPE_FLOAT gthresh=(ELEM_TYPE_FLOAT)_param->gthresh;
 
          diaMenuEntry tStrategy[]={
-                             {GUIDE_NONE,   _("No Strategy"),NULL},
-                             {GUIDE_32,     _("3:2 Pulldown"),NULL},
-                             {GUIDE_22,     _("Pal/Secam"),NULL},
+                             {GUIDE_NONE,   _("No strategy"),NULL},
+                             {GUIDE_32,     _("3:2 pulldown"),NULL},
+                             {GUIDE_22,     _("PAL/SECAM"),NULL},
                              {GUIDE_32322,  _("NTSC converted from PAL"),NULL}
                           };
                           
@@ -101,26 +101,26 @@ uint8_t Telecide::configure(AVDMGenericVideoStream *in)
                              {POST_NONE,      _("None"),NULL},
                              {POST_METRICS,   _("None but compute"),NULL},
                              {POST_FULL,      _("Postproc on best match"),NULL},
-                             {POST_FULL_MAP,  _("Postproc and show zones(debug)"),NULL},
+                             {POST_FULL_MAP,  _("Postproc and show zones (debug)"),NULL},
                              {POST_FULL_NOMATCH,_("Process image (not fields)"),NULL},
-                             {POST_FULL_NOMATCH_MAP,_("Process image (not fields),debug"),NULL}
+                             {POST_FULL_NOMATCH_MAP,_("Process image (not fields), debug"),NULL}
           };
                              
           
-    diaElemMenu menuMode(PX(guide),   _("Strategy"), SZT(tStrategy),tStrategy);
-    diaElemMenu menuField(PX(order),  _("Field Order"), SZT(tField),tField);
-    diaElemMenu menuPost(PX(post),    _("Post Processing"), SZT(tPostproc),tPostproc);
-    diaElemMenu menuBackward(PX(back),_("Try backward"), SZT(tBackward),tBackward);
+    diaElemMenu menuMode(PX(guide),   _("_Strategy:"), SZT(tStrategy),tStrategy);
+    diaElemMenu menuField(PX(order),  _("_Field order:"), SZT(tField),tField);
+    diaElemMenu menuPost(PX(post),    _("_Postprocessing:"), SZT(tPostproc),tPostproc);
+    diaElemMenu menuBackward(PX(back),_("_Try backward:"), SZT(tBackward),tBackward);
     
-    diaElemFloat direct(&dthresh,_("Direct Threshold"),0,200. );
-    diaElemFloat backward(&bthresh,_("Backward Threshold"),0,200. );
-    diaElemFloat noise(&gthresh,_("Noise Threshold"),0,200. );
-    diaElemFloat post(&vthresh,_("Post Proc Threshold"),0,200. );
+    diaElemFloat direct(&dthresh,_("_Direct threshold:"),0,200. );
+    diaElemFloat backward(&bthresh,_("_Backward threshold:"),0,200. );
+    diaElemFloat noise(&gthresh,_("_Noise threshold:"),0,200. );
+    diaElemFloat post(&vthresh,_("Postp_rocessing threshold:"),0,200. );
     
-    diaElemToggle chroma(PX(chroma),_("Use Chroma to decide"));
-    diaElemToggle show(PX(show),_("Show info"));
-    diaElemToggle debug(PX(debug),_("Debug"));
-    diaElemToggle blend(PX(blend),_("Blend"));
+    diaElemToggle chroma(PX(chroma),_("_Use chroma to decide"));
+    diaElemToggle show(PX(show),_("Sho_w info"));
+    diaElemToggle debug(PX(debug),_("Debu_g"));
+    diaElemToggle blend(PX(blend),_("Bl_end"));
     
     
     
@@ -128,7 +128,7 @@ uint8_t Telecide::configure(AVDMGenericVideoStream *in)
         &direct,&backward,&noise,&post,&blend,
         &chroma,&show,&debug    };
     
-  if(diaFactoryRun("Decombe Telecide",12,elems))
+  if(diaFactoryRun("Decomb Telecide",12,elems))
   {
     
       _param->vthresh=(double)vthresh;

@@ -106,7 +106,6 @@ void diaElemText::setMe(void *dialog, void *opaque,uint32_t line)
   
   label2 = gtk_entry_new ();
   gtk_write_entry_string(label2, *input);
-  gtk_misc_set_alignment (GTK_MISC (label2), 0.0, 0.5);
   gtk_widget_show(label2);
   
  

@@ -11,7 +11,7 @@ typedef struct {
 {
                 {"copy","Copy", AUDIOENC_COPY},
 #ifdef HAVE_LIBMP3LAME
-                {"lame","MP3 (Lame)", AUDIOENC_MP3},
+                {"lame","MP3 (LAME)", AUDIOENC_MP3},
 #endif
 #ifdef USE_FAAC
                 {"aac","AAC (FAAC)", AUDIOENC_FAAC},
@@ -22,10 +22,10 @@ typedef struct {
 #ifdef USE_AFTEN
                 {"aften","AC3 (Aften)", AUDIOENC_AFTEN},
 #endif
-                {"twolame","MP2 (Twolame)", AUDIOENC_2LAME},
+                {"twolame","MP2 (TwoLAME)", AUDIOENC_2LAME},
                 {"mp2", "MP2 (lavc)", AUDIOENC_MP2},
                 {"ac3", "AC3 (lavc)",AUDIOENC_AC3},
-                {"none", "Wav PCM",AUDIOENC_NONE},
-                {"lpcm", "Wav LPCM",AUDIOENC_LPCM}
+                {"none", "WAV PCM",AUDIOENC_NONE},
+                {"lpcm", "WAV LPCM",AUDIOENC_LPCM}
 };
 #endif

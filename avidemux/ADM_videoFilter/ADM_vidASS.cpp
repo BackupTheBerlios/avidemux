@@ -82,15 +82,15 @@ uint8_t ADMVideoSubASS::configure(AVDMGenericVideoStream * instream)
     MKME(scale,font_scale);
     MKME(spacing,line_spacing);
     
-    diaElemFile       file(0,(char **)PX(subfile),_("_Subtitle file (ass/ssa)"));
-    diaElemFloat      dSpacing(&spacing,_("_Line spacing"),0.10,10.0);
-    diaElemFloat      dScale(&scale,_("_Font scale"),0.10,10.0);
-    diaElemUInteger   dTop(PX(top_margin),_("_Top margin"),0,200);
-    diaElemUInteger   dBottom(PX(bottom_margin),_("_Bottom margin"),0,200);
+    diaElemFile       file(0,(char **)PX(subfile),_("_Subtitle file (ASS/SSA):"));
+    diaElemFloat      dSpacing(&spacing,_("_Line spacing:"),0.10,10.0);
+    diaElemFloat      dScale(&scale,_("_Font scale:"),0.10,10.0);
+    diaElemUInteger   dTop(PX(top_margin),_("_Top margin:"),0,200);
+    diaElemUInteger   dBottom(PX(bottom_margin),_("Botto_m margin"),0,200);
     
        diaElem *elems[5]={&file,&dSpacing,&dScale,&dTop,&dBottom};
   
-   if( diaFactoryRun("Denoise",5,elems))
+   if( diaFactoryRun("ASS",5,elems))
    {
 #undef MKME
 #define MKME(x,y) _params->y=(float)x

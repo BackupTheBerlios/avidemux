@@ -46,7 +46,7 @@ char *tmp=NULL,*tmp2=NULL;
                                         
                                         int r;
                                         char *escape=NULL;
-                                                GUI_FileSelWrite(_("Select video to write"),&tmp);
+                                                GUI_FileSelWrite(_("Select Video to Write"),&tmp);
                                                 if(!tmp) continue;
                                                 escape=ADM_escape((ADM_filename *)tmp);
                                                 gtk_editable_delete_text(GTK_EDITABLE(WID(entryOutputFileName)), 0,-1);
@@ -60,13 +60,13 @@ char *tmp=NULL,*tmp2=NULL;
                                            tmp=gtk_editable_get_chars(GTK_EDITABLE (WID(entryOutputFileName)), 0, -1);
                                            if(!tmp || !*tmp)
                                            {
-                                             GUI_Error_HIG(_("Invalid filename"),_("Please select or enter a valid filename"));
+                                             GUI_Error_HIG(_("Invalid filename"),_("Please select or enter a valid filename."));
                                                         continue;
                                             }
                                            tmp2=gtk_editable_get_chars(GTK_EDITABLE (WID(entryJobName)), 0, -1);
                                            if(!tmp2 || !*tmp2)
                                            {
-                                             GUI_Error_HIG(_("Invalid jobname"),_("Please select or enter a valid jobname"));
+                                             GUI_Error_HIG(_("Invalid jobname"),_("Please select or enter a valid jobname."));
                                                         continue;
                                             }
                                             *jobname=ADM_strdup(tmp2);
@@ -98,7 +98,6 @@ GtkWidget       *create_dialog1 (void)
   GtkWidget *entryOutputFileName;
   GtkWidget *label1;
   GtkWidget *label2;
-  GtkWidget *hseparator1;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
@@ -110,9 +109,11 @@ GtkWidget       *create_dialog1 (void)
   gtk_container_set_border_width (GTK_CONTAINER (SaveJob), 6);
   gtk_window_set_title (GTK_WINDOW (SaveJob), _("Save Job"));
   gtk_window_set_type_hint (GTK_WINDOW (SaveJob), GDK_WINDOW_TYPE_HINT_DIALOG);
+  gtk_window_set_resizable (GTK_WINDOW (SaveJob), FALSE);
   gtk_dialog_set_has_separator (GTK_DIALOG (SaveJob), FALSE);
 
   dialog_vbox1 = GTK_DIALOG (SaveJob)->vbox;
+  gtk_box_set_spacing (GTK_BOX(dialog_vbox1), 12);
   gtk_widget_show (dialog_vbox1);
 
   table1 = gtk_table_new (2, 3, FALSE);
@@ -151,7 +152,7 @@ GtkWidget       *create_dialog1 (void)
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
   gtk_tooltips_set_tip (tooltips, entryJobName, _("Job name displayed in the job list and used as the script filename"), NULL);
-  gtk_entry_set_max_length (GTK_ENTRY (entryJobName), 32);
+  gtk_entry_set_max_length (GTK_ENTRY (entryJobName), 40);
   gtk_entry_set_width_chars (GTK_ENTRY (entryJobName), 40);
 
   entryOutputFileName = gtk_entry_new ();
@@ -175,12 +176,6 @@ GtkWidget       *create_dialog1 (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
-
-  hseparator1 = gtk_hseparator_new ();
-  gtk_widget_show (hseparator1);
-  gtk_table_attach (GTK_TABLE (table1), hseparator1, 2, 3, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
 
   dialog_action_area1 = GTK_DIALOG (SaveJob)->action_area;
   gtk_widget_show (dialog_action_area1);
@@ -212,7 +207,6 @@ GtkWidget       *create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (SaveJob, entryOutputFileName, "entryOutputFileName");
   GLADE_HOOKUP_OBJECT (SaveJob, label1, "label1");
   GLADE_HOOKUP_OBJECT (SaveJob, label2, "label2");
-  GLADE_HOOKUP_OBJECT (SaveJob, hseparator1, "hseparator1");
   GLADE_HOOKUP_OBJECT_NO_REF (SaveJob, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (SaveJob, cancelbutton1, "cancelbutton1");
   GLADE_HOOKUP_OBJECT (SaveJob, okbutton1, "okbutton1");

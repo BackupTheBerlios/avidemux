@@ -266,9 +266,9 @@ uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
       {180,_("180 degrees"),_("180°")},
       {270,_("270 degrees"),_("270°")}
   };
-  diaElemMenu     rotate(&(_param->angle),_("Angle"),4,rotateValues,NULL);
+  diaElemMenu     rotate(&(_param->angle),_("_Angle:"),4,rotateValues,NULL);
   diaElem *allWidgets[]={&rotate};
-  if( !diaFactoryRun(_("Rotate Params"),1,allWidgets)) return 0;
+  if( !diaFactoryRun(_("Rotate"),1,allWidgets)) return 0;
   
   uint32_t w,h;
   w=_in->getInfo()->width;

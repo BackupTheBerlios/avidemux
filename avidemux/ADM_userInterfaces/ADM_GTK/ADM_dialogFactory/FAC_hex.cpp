@@ -88,6 +88,8 @@ void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line)
   for(int i=0;i<HEX_NB_LINE;i++)
   {
     s->entry[i]=gtk_label_new("");
+    gtk_label_set_selectable(GTK_LABEL(s->entry[i]), TRUE);
+    gtk_misc_set_alignment (GTK_MISC (s->entry[i]), 0, 1);
     gtk_widget_show(s->entry[i]);
      gtk_table_attach (GTK_TABLE (hexTable), s->entry[i], 0, 1, i, i+1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -95,7 +97,7 @@ void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line)
   }
   myWidget=(void *)s;
   //*************************
-  buttonP = gtk_button_new_with_label (_("Previous"));
+  buttonP = gtk_button_new_with_mnemonic (_("_Previous"));
   gtk_widget_show (buttonP);
   gtk_table_attach (GTK_TABLE (opaque), buttonP, 0, 1, line+1, line+2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -103,7 +105,7 @@ void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line)
    g_signal_connect(GTK_OBJECT(buttonP), "clicked",
                     GTK_SIGNAL_FUNC(prev), s);
    
-  buttonN = gtk_button_new_with_label (_("Next"));
+  buttonN = gtk_button_new_with_mnemonic (_("_Next"));
   gtk_widget_show (buttonN);
   gtk_table_attach (GTK_TABLE (opaque), buttonN, 1, 2, line+1, line+2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),

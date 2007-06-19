@@ -168,22 +168,22 @@ uint8_t ADMVideoYadif::configure( AVDMGenericVideoStream *instream)
 {
   _in= instream;
      diaMenuEntry tMode[]={
-                             {0,      _("Temporal & Spatial check"),NULL},
-                             {1,   _("Bob, T+S check"),NULL},
+                             {0,      _("Temporal & spatial check"),NULL},
+                             {1,   _("Bob, temporal & spatial check"),NULL},
                              {2,      _("Skip spatial temporal check"),NULL},
-                             {3,  _("Bob, Skip spatial temporal check"),NULL}
+                             {3,  _("Bob, skip spatial temporal check"),NULL}
           };
      diaMenuEntry tOrder[]={
-                             {0,      _("Bottom Field first"),NULL},
-                             {1,   _("Top Field First"),NULL}
+                             {0,      _("Bottom field first"),NULL},
+                             {1,   _("Top field first"),NULL}
           };
   
-     diaElemMenu mMode(&(_param->mode),   _("Mode"), 4,tMode);
-     diaElemMenu morder(&(_param->order),   _("Order"), 2,tOrder);
+     diaElemMenu mMode(&(_param->mode),   _("_Mode:"), 4,tMode);
+     diaElemMenu morder(&(_param->order),   _("_Order:"), 2,tOrder);
      
      diaElem *elems[]={&mMode,&morder};
      
-     if(diaFactoryRun("Yadif  configuration",sizeof(elems)/sizeof(diaElem *),elems))
+     if(diaFactoryRun("yadif",sizeof(elems)/sizeof(diaElem *),elems))
      {
         updateInfo();
         return 1;

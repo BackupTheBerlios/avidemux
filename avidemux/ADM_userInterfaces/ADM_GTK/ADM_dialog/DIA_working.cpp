@@ -223,6 +223,7 @@ create_dialog1 (void)
   gtk_window_set_title (GTK_WINDOW (dialog1), _("Processing"));
   gtk_window_set_position (GTK_WINDOW (dialog1), GTK_WIN_POS_CENTER_ON_PARENT);
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
+  gtk_window_set_resizable (GTK_WINDOW (dialog1), FALSE);
 
   vbox1 = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox1);
@@ -240,7 +241,7 @@ create_dialog1 (void)
   gtk_table_set_row_spacings (GTK_TABLE (table1), 4);
   gtk_table_set_col_spacings (GTK_TABLE (table1), 12);
 
-  label2 = gtk_label_new (_("<b>Elasped:</b>"));
+  label2 = gtk_label_new (_("<b>Elapsed:</b>"));
   gtk_widget_show (label2);
   gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -255,7 +256,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (labelElapsed), 0, 0.5);
 
-  label4 = gtk_label_new (_("<b>Time Remaining:</b>"));
+  label4 = gtk_label_new (_("<b>Time remaining:</b>"));
   gtk_widget_show (label4);
   gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),

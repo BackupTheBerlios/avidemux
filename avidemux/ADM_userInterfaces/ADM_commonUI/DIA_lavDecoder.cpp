@@ -42,10 +42,10 @@ uint8_t DIA_lavDecoder(uint32_t *swapUv, uint32_t *showU)
 {
 int ret=0;	
          
-         diaElemToggle    swap(swapUv,_("Swap U & V:"));
-         diaElemToggle    show(showU,_("Show _Vectors:"));
+         diaElemToggle    swap(swapUv,_("_Swap U and V"));
+         diaElemToggle    show(showU,_("Show motion _vectors"));
          diaElem *tabs[]={&swap,&show};
-        if( diaFactoryRun(_("Lavcodec Decoder Configuration"),2,tabs))
+        if( diaFactoryRun(_("Decoder Options"),2,tabs))
 	{
           return 1;
         }

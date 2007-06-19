@@ -243,7 +243,7 @@ int nw;
 		return;
     
     case ACT_RunScript:
-                GUI_FileSelRead (_("Select ECMAScript to run "),(SELFILE_CB *) A_parseECMAScript);
+                GUI_FileSelRead (_("Select ECMAScript to Run"),(SELFILE_CB *) A_parseECMAScript);
                         
                         //
     		return;
@@ -370,12 +370,12 @@ int nw;
                 A_TimeShift();
                 break;
 	case ACT_OpenAvi:
-          GUI_FileSelRead (_("Select AVI file..."), (SELFILE_CB *)A_openAvi);
+          GUI_FileSelRead (_("Select AVI File..."), (SELFILE_CB *)A_openAvi);
 	  break;
 
 	case ACT_BrokenAvi:
 	  printf ("\n Opening in broken mode...\n");
-          GUI_FileSelRead (_("Select AVI file..."), A_openBrokenAvi);
+          GUI_FileSelRead (_("Select AVI File..."), A_openBrokenAvi);
 	  break;
 
 
@@ -428,13 +428,13 @@ int nw;
     case ACT_SaveUnpackedMpeg4:
       if(GUI_Question(_("This is to be used to undo packed VOP on MPEG-4.\nContinue ?")))
 			{ 
-                          GUI_FileSelWrite (_("Select AVI file to write"), (SELFILE_CB *)A_SaveUnpackedVop);
+                          GUI_FileSelWrite (_("Select AVI File to Write"), (SELFILE_CB *)A_SaveUnpackedVop);
 				
 			}
     			break;
 			
     case ACT_SaveOGM:
-                        GUI_FileSelWrite (_("Select OGM file to write"), (SELFILE_CB *)ogmSave);
+                        GUI_FileSelWrite (_("Select OGM File to Write"), (SELFILE_CB *)ogmSave);
     			break;
 				
     case ACT_FrameChanged:
@@ -445,7 +445,7 @@ int nw;
       			break;			
 
     case ACT_SaveWork:
-      GUI_FileSelWrite (_("Select workbench to save"), A_saveWorkbench);
+      GUI_FileSelWrite (_("Select Workbench to Save"), A_saveWorkbench);
       break;
     case ACT_ADD_JOB:
         A_addJob();
@@ -456,7 +456,7 @@ int nw;
          A_saveWorkbench( tmp ); // will write "actual_workbench_file" itself
          ADM_dealloc(tmp);
       }else{
-        GUI_FileSelWrite (_("Select workbench to save"), A_saveWorkbench);
+        GUI_FileSelWrite (_("Select Workbench to Save"), A_saveWorkbench);
       }
       break;
         case ACT_JumpToFrame: 
@@ -480,7 +480,7 @@ int nw;
                 }
                 break;
     case ACT_SaveRaw:
-      GUI_FileSelWrite (_("Select raw file to save"), (SELFILE_CB *)ADM_saveRaw);
+      GUI_FileSelWrite (_("Select Raw File to Save"), (SELFILE_CB *)ADM_saveRaw);
       break;
     case ACT_CutWizard:
       ADM_cutWizard ();
@@ -490,17 +490,17 @@ int nw;
                 break;
 
     case ACT_OpenAvi:
-      GUI_FileSelRead (_("Select AVI file..."),(SELFILE_CB *) A_openAvi);
+      GUI_FileSelRead (_("Select AVI File..."),(SELFILE_CB *) A_openAvi);
       break;
     case ACT_BrokenAvi:
-      GUI_FileSelRead (_("Select AVI file..."), A_openBrokenAvi);
+      GUI_FileSelRead (_("Select AVI File..."), A_openBrokenAvi);
       break;
     case ACT_AppendAvi:
-      GUI_FileSelRead (_("Select AVI file to append..."),(SELFILE_CB *) A_appendAvi);
+      GUI_FileSelRead (_("Select AVI File to Append..."),(SELFILE_CB *) A_appendAvi);
       break;
     case ACT_SaveWave:
       	{
-          GUI_FileSelWrite (_("Select file to save audio"),(SELFILE_CB *)A_audioSave);
+          GUI_FileSelWrite (_("Select File to Save Audio"),(SELFILE_CB *)A_audioSave);
 	
 	}
       break;
@@ -534,14 +534,14 @@ int nw;
       break;
 
     case ACT_SaveBunchJPG:
-      GUI_FileSelWrite (_("Select JPEG sequence to save"), A_saveBunchJpg);      
+      GUI_FileSelWrite (_("Select JPEG Sequence to Save"), A_saveBunchJpg);      
     	break;
     case ACT_SaveImg:
-      GUI_FileSelWrite (_("Select BMP to save"), A_saveImg);
+      GUI_FileSelWrite (_("Select BMP to Save"), A_saveImg);
       //GUI_FileSelWrite ("Select Jpg to save ", A_saveJpg);
       break;
     case ACT_SaveJPG :
-      GUI_FileSelWrite (_("Select JPEG to save"), (SELFILE_CB *)A_saveJpg);
+      GUI_FileSelWrite (_("Select JPEG to Save"), (SELFILE_CB *)A_saveJpg);
       	//GUI_FileSelWrite ("Select Jpg to save ", A_saveJpg);
       	break;
     
@@ -594,7 +594,7 @@ int nw;
       GUI_NextPrevBlackFrame(-1);
       break;
     case ACT_AllBlackFrames:    
-      GUI_FileSelWrite (_("Select file to save"), (SELFILE_CB *)A_ListAllBlackFrames);
+      GUI_FileSelWrite (_("Select File to Save"), (SELFILE_CB *)A_ListAllBlackFrames);
         break;                        
     
     case ACT_PreviousFrame:
@@ -646,13 +646,13 @@ int nw;
       break;
 
     case ACT_AudioSourceMP3:
-      GUI_FileSelRead (_("Select MP3 to load"), (SELFILE_CB *)A_loadMP3);
+      GUI_FileSelRead (_("Select MP3 to Load"), (SELFILE_CB *)A_loadMP3);
       break;
     case ACT_AudioSourceAC3:
-      GUI_FileSelRead (_("Select AC3 to load"), (SELFILE_CB *)A_loadAC3);
+      GUI_FileSelRead (_("Select AC3 to Load"), (SELFILE_CB *)A_loadAC3);
       break;
     case ACT_AudioSourceWAV:
-      GUI_FileSelRead (_("Select WAV to load"),(SELFILE_CB *) A_loadWave);
+      GUI_FileSelRead (_("Select WAV to Load"),(SELFILE_CB *) A_loadWave);
       break;
     case ACT_AudioSourceNone:
       //currentaudiostream=(AVDMGenericAudioStream *)NULL;
@@ -690,7 +690,7 @@ int nw;
     case ACT_Goto:
       uint32_t fn;
       fn=curframe;
-      if (DIA_GetIntegerValue ((int *)&fn,0,avifileinfo->nb_frames,"Go to Frame","Enter new frame number"))
+      if (DIA_GetIntegerValue ((int *)&fn,0,avifileinfo->nb_frames,"Go to Frame","_Go to frame:"))
 	{
 	  if (fn)
 	    {			// 0 probably means garbage
@@ -706,7 +706,7 @@ int nw;
       break;
 //----------------------test-----------------------
     case ACT_SaveAvi:
-      GUI_FileSelWrite (_("Select file to save"),(SELFILE_CB *)A_SaveWrapper); // A_SaveAudioNVideo);
+      GUI_FileSelWrite (_("Select File to Save"),(SELFILE_CB *)A_SaveWrapper); // A_SaveAudioNVideo);
       break;
 //---------------------------------------------------
     case ACT_Copy:
@@ -792,7 +792,7 @@ int nw;
 	fps/=1000.;
 
 
-      	if (DIA_GetFloatValue (&fps, 1., 60., _("Change Frames per Second"),_("New FPS?")))
+      	if (DIA_GetFloatValue (&fps, 1., 60., _("Frame Rate"),_("_Frames per second:")))
 	{
 	
 	  info.fps1000 = (uint32_t) (floor (fps * 1000.+0.49));
