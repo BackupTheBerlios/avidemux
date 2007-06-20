@@ -85,9 +85,9 @@ bool SpidermonkeyInit()
 void SpidermonkeyDestroy()
 {// begin SpidermonkeyDestroy
 #ifdef ADM_JS_THREADSAFE
-	JS_SetContextThread(g_pCx);
-	JS_DestroyContext(g_pCx);
+	JS_SetContextThread(g_pCx);	
 #endif
+	JS_DestroyContext(g_pCx);
 	JS_DestroyRuntime(g_pRt);
 }// end SpidermonkeyDestroy
 
