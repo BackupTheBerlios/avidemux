@@ -12,4 +12,8 @@ jsarray.c  jsdate.c    jsdtoa.c    jsfile.c  jshash.c  jslog2.c    jsnum.c   jsp
 ADD_LIBRARY(${ADM_LIB} STATIC ${${ADM_LIB}_SRCS})
 ADD_ADM_LIB(${ADM_LIB} ADM_libraries)
 ################################
-add_definitions( -DXP_UNIX -DSVR4 -DSYSV -D_BSD_SOURCE -DPOSIX_SOURCE -DHAVE_VA_COPY -DVA_COPY=va_copy)
+IF(WIN32)
+	add_definitions(-DXP_WIN)
+ELSE(WIN32)
+	add_definitions(-DXP_UNIX -DSVR4 -DSYSV -D_BSD_SOURCE -DPOSIX_SOURCE -DHAVE_VA_COPY -DVA_COPY=va_copy)
+ENDIF(WIN32)
