@@ -187,24 +187,18 @@ uint8_t flvHeader::open(char *name)
             uint8_t flags=read8();
             remaining--;
             int frameType=flags>>4;
+            
             int codec=(flags)&0xf;
-            if(!videoTrack->_nbIndex) // first frame..
-            {
-                printf("[FLV] Video Codec:%u\n",codec);
-                switch(codec)
-                {
-                  case FLV_CODECID_H263:            _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"FLV1");break;
-                  case FLV_CODECID_VP6:             _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"VP6F");break;
-               //???   case FLV_CODECID_SCREEN:          _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"VP6F");break;
-                  default :                         _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"XXX");break;
-                  
-                }
-            }
+            
             if(codec==FLV_CODECID_VP6)
             {
               read8(); // 1 byte of extraData
               remaining--;
               of++;
+            }
+            if(!videoTrack->_nbIndex) // first frame..
+            {
+                setVideoHeader(codec,&remaining);
             }
             insertVideo(pos+of,remaining,frameType,pts);
           }
@@ -234,10 +228,6 @@ uint8_t flvHeader::open(char *name)
     _video_bih.biBitCount=24;
     _videostream.dwInitialFrames= 0;
     _videostream.dwStart= 0;
-    _video_bih.biWidth=_mainaviheader.dwWidth=320;
-    _video_bih.biHeight=_mainaviheader.dwHeight=240;
-   
-        
     videoTrack->_index[0].flags=AVI_KEY_FRAME;
     
     // audio track
@@ -245,6 +235,35 @@ uint8_t flvHeader::open(char *name)
   printf("[FLV]FLV successfully read\n");
   
   return 1;
+}
+/**
+      \fn setVideoHeader
+      \brief Set codec and stuff
+*/
+uint8_t flvHeader::setVideoHeader(uint8_t codec,uint32_t *remaining)
+{
+    printf("[FLV] Video Codec:%u\n",codec);
+     _video_bih.biWidth=_mainaviheader.dwWidth=320;
+    _video_bih.biHeight=_mainaviheader.dwHeight=240;
+    switch(codec)
+    {
+      case FLV_CODECID_H263:            _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"FLV1");break;
+      case FLV_CODECID_VP6:             _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"VP6F");break;
+    //???   case FLV_CODECID_SCREEN:          _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"VP6F");break;
+      default :                         _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"XXX");break;
+      
+    }
+    if(codec==FLV_CODECID_VP6)
+    {
+        read8();
+        read8();
+        *remaining-=2;
+         
+         _video_bih.biHeight=_mainaviheader.dwHeight=read8()*16;
+         _video_bih.biWidth=_mainaviheader.dwWidth=read8()*16;
+        *remaining-=2; 
+    }
+   return 1;
 }
 /**
       \fn setAudioHeader
