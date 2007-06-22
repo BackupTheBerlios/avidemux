@@ -50,6 +50,17 @@ MACRO (add_ldflags_all_targets _libName)
 ENDMACRO (add_ldflags_all_targets _libName)
 ##/ Small macro...
 
+MACRO (add_compile_flags _target _flg)
+   GET_SOURCE_FILE_PROPERTY(_flags ${_target} COMPILE_FLAGS)
+
+   if (_flags)
+      set(_flags "${_flags} ${_flg}")
+   else (_flags)
+      set(_flags "${_flg}")
+   endif (_flags)
+   
+   SET_SOURCE_FILES_PROPERTIES(${_target} PROPERTIES COMPILE_FLAGS "${_flags}")   
+ENDMACRO (add_compile_flags)
 
 #
 # Normal subdirs, compile and link what is inside....
@@ -391,11 +402,14 @@ endif(CMAKE_OSX_SYSROOT)
 # all
 ########################
 SDLify(main.cpp )
+
 #FIXME : Set correct prefix for linguas
 if(HAVE_GETTEXT)
-    SET_SOURCE_FILES_PROPERTIES(main.cpp
-                                     PROPERTIES COMPILE_FLAGS -DADMLOCALE="\\"${CMAKE_INSTALL_PREFIX}/share/locale\\"") 
+	add_compile_flags(main.cpp "-DADMLOCALE=\"${CMAKE_INSTALL_PREFIX}/share/locale\"")
 endif(HAVE_GETTEXT)
+
+add_compile_flags(main.cpp "-DADM_SUBVERSION=${ADM_SUBVERSION}") 
+
 ###############
 # INSTALL
 ###############

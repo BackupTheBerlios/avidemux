@@ -101,22 +101,20 @@ int CpuCaps::myCpuCaps=0;
 
 int main(int argc, char *argv[])
 {
-// Check for big files
-int sdl_version=0;
+	int sdl_version=0;
 
-/*
-	Initialize Gettext if available
-*/
-
-
-
-// thx smurf uk :)
+	// thx smurf uk :)
     installSigHandler();
 
+    printf("\n*************************\n");
+    printf("  Avidemux v" VERSION);
 
-    printf("\n*******************\n");
-    printf("  Avidemux 2, v  " VERSION "\n");
-    printf("*******************\n");
+  	if(ADM_SUBVERSION)
+	{
+		printf(" (r%04u)", ADM_SUBVERSION);
+	}
+
+    printf("\n*************************\n");
     printf(" http://www.avidemux.org\n");
     printf(" Code      : Mean, JSC, Gruntster \n");
     printf(" GFX       : Nestor Di , nestordi@augcyl.org\n");
@@ -124,8 +122,7 @@ int sdl_version=0;
     printf(" FreeBSD   : Anish Mistry, amistry@am-productions.biz\n");
     printf(" Audio     : Mihail Zenkov\n");
     printf(" MacOsX    : Kuisathaverat\n");
-    printf(" Win32     : Gruntster\n");
-
+    printf(" Win32     : Gruntster\n\n");
 
 #if defined(ARCH_X86_32)
       printf("Compiled for X86_32 Arch.\n");
@@ -139,6 +136,7 @@ int sdl_version=0;
 printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 #endif
 #endif
+
 #ifdef HAVE_GETTEXT
   char *local=setlocale (LC_ALL, "");
 #ifndef ADM_WIN32
@@ -149,18 +147,18 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
   bind_textdomain_codeset ("avidemux", "UTF-8");
   
   if(local)
-    printf("[Locale] setlocale %s \n",local);
+    printf("\n[Locale] setlocale %s\n",local);
   local=textdomain(NULL);
   textdomain ("avidemux");
   if(local)
-    printf("[Locale] Textdomain was %s \n",local);
+    printf("[Locale] Textdomain was %s\n",local);
   local=textdomain(NULL);
   if(local)
-    printf("[Locale] Textdomain is now  %s \n",local);
+    printf("[Locale] Textdomain is now %s\n",local);
 #ifndef ADM_WIN32  
   printf("[Locale] Files for %s appear to be in %s\n","avidemux", ADMLOCALE);
 #endif
-  printf("[Locale] Test: %s \n",dgettext("avidemux","_File"));
+  printf("[Locale] Test: %s\n\n",dgettext("avidemux","_File"));
 #endif
 
    // Start counting memory
