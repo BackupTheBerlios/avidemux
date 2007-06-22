@@ -48,6 +48,7 @@ SET(EMULATE_FAST_INT    1)
 SET(RUNTIME_CPUDETECT    1)
 
 
+
 ########################################
 # taist : Should fail!
 ########################################
@@ -79,6 +80,10 @@ if(HAVE_LIBINTL_H)
       endif(WITH_LIBINTL)
   endif(WITHOUT_LIBINTL)
 endif(HAVE_LIBINTL_H)
+########################################
+# Locale
+########################################
+SET(ADM_LOCALE "${CMAKE_INSTALL_PREFIX}/share/locale")
 ########################################
 # WIN32
 ########################################
@@ -169,7 +174,7 @@ endif(NOT WIN32)
 # ARTS
 ########################################
 if(NOT WIN32)
-ADM_CHECK_HL(Arts artsc/artsc.h  artsc arts_init USE_ARTS)
+include(FindArts)
 endif(NOT WIN32)
 
 ########################################

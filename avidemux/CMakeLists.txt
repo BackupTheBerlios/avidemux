@@ -235,10 +235,12 @@ endif(QT4_FOUND)
 ###########################################
 TARGET_LINK_LIBRARIES(avidemux2_cli ${GLIB_LDFLAGS} )
 LINK_DIRECTORIES(avidemux2_cli ${GLIB_LIB}  )
+
 # ARTS
 if(USE_ARTS)
-add_libs_all_targets(artsc)
+add_libs_all_targets( ${ARTS_LDFLAGS})
 endif(USE_ARTS)
+
 # libAMRNB
 if(USE_AMR_NB AND NOT USE_LATE_BINDING)
 	add_libs_all_targets(amrnb)
@@ -402,14 +404,7 @@ endif(CMAKE_OSX_SYSROOT)
 # all
 ########################
 SDLify(main.cpp )
-
-#FIXME : Set correct prefix for linguas
-if(HAVE_GETTEXT)
-	add_compile_flags(main.cpp "-DADMLOCALE=\"${CMAKE_INSTALL_PREFIX}/share/locale\"")
-endif(HAVE_GETTEXT)
-
-add_compile_flags(main.cpp "-DADM_SUBVERSION=${ADM_SUBVERSION}") 
-
+add_compile_flags(main.cpp "-DADM_SUBVERSION=${ADM_SUBVERSION}")
 ###############
 # INSTALL
 ###############

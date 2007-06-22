@@ -17,7 +17,7 @@
 #include "config.h"
 #ifndef ADM_WIN32 
 #ifdef USE_ARTS
-#include <artsc/artsc.h>
+#include <artsc.h>
 
 #include <stdio.h>
 #include <stdlib.h>
