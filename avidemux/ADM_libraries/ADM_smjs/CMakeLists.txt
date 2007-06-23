@@ -18,7 +18,7 @@ ELSE(WIN32)
 	add_definitions(-DXP_UNIX -DSVR4 -DSYSV -D_BSD_SOURCE -DPOSIX_SOURCE -DHAVE_VA_COPY -DVA_COPY=va_copy)
 ENDIF(WIN32)
 
-add_definitions(-DNDEBUG -DTRIMMED -DEXPORT_JS_API  -DJS_USE_SAFE_ARENA -D_IEEE_LIBMi)
+add_definitions(-DNDEBUG -DTRIMMED -DEXPORT_JS_API  -DJS_USE_SAFE_ARENA -D_IEEE_LIBM)
 #-DJS_THREADSAFE)
 	add_definitions(-Dmalloc=ADM_alloc)
 	add_definitions(-Drealloc=ADM_realloc)
