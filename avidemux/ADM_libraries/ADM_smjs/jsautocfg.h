@@ -1,5 +1,5 @@
-#ifndef js_cpucfg___
-#define js_cpucfg___
+#ifndef js_autocfg___
+#define js_autocfg___
 
 /* AUTOMATICALLY GENERATED - DO NOT EDIT */
 #include "../../../config.h"
