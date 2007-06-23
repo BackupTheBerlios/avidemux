@@ -1531,8 +1531,16 @@ array_indexOfHelper(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
         start = js_DoubleToInteger(start);
         if (start < 0) {
             start += length;
-            i = (start < 0) ? 0 : (jsuint)start;
+            if (start < 0) {
+                if (isLast)
+                    goto not_found;
+                i = 0;
+            } else {
+                i = (jsuint)start;
+            }
         } else if (start >= length) {
+            if (!isLast)
+                goto not_found;
             i = length - 1;
         } else {
             i = (jsuint)start;
@@ -1894,7 +1902,7 @@ js_NewArrayObject(JSContext *cx, jsuint length, jsval *vector)
     if (!obj)
         return NULL;
     if (!InitArrayObject(cx, obj, length, vector)) {
-        cx->newborn[GCX_OBJECT] = NULL;
+        cx->weakRoots.newborn[GCX_OBJECT] = NULL;
         return NULL;
     }
     return obj;

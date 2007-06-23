@@ -1023,6 +1023,11 @@ lexHex:
             localMax = *src++;
             break;
         }
+        if (state->flags & JSREG_FOLD) {
+            c = JS_MAX(upcase((jschar) localMax), downcase((jschar) localMax));
+            if (c > localMax)
+                localMax = c;
+        }
         if (inRange) {
             if (rangeStart > localMax) {
                 JS_ReportErrorNumber(state->context,
@@ -1040,11 +1045,6 @@ lexHex:
                     continue;
                 }
             }
-        }
-        if (state->flags & JSREG_FOLD) {
-            c = JS_MAX(upcase((jschar)localMax), downcase((jschar)localMax));
-            if (c > localMax)
-                localMax = c;
         }
         if (localMax > max)
             max = localMax;
@@ -1966,6 +1966,8 @@ js_NewRegExp(JSContext *cx, JSTokenStream *ts,
             re = NULL;
             goto out;
         }
+        for (i = 0; i < re->classCount; i++)
+            re->classList[i].converted = JS_FALSE;
     } else {
         re->classList = NULL;
     }
@@ -3322,15 +3324,15 @@ js_ExecuteRegExp(JSContext *cx, JSRegExp *re, JSString *str, size_t *indexp,
                            JS_PropertyStub, JS_PropertyStub,                  \
                            JSPROP_ENUMERATE, NULL);                           \
     if (!ok) {                                                                \
-        cx->newborn[GCX_OBJECT] = NULL;                                       \
-        cx->newborn[GCX_STRING] = NULL;                                       \
+        cx->weakRoots.newborn[GCX_OBJECT] = NULL;                             \
+        cx->weakRoots.newborn[GCX_STRING] = NULL;                             \
         goto out;                                                             \
     }                                                                         \
 }
 
         matchstr = js_NewStringCopyN(cx, cp, matchlen, 0);
         if (!matchstr) {
-            cx->newborn[GCX_OBJECT] = NULL;
+            cx->weakRoots.newborn[GCX_OBJECT] = NULL;
             ok = JS_FALSE;
             goto out;
         }
@@ -3367,8 +3369,8 @@ js_ExecuteRegExp(JSContext *cx, JSRegExp *re, JSString *str, size_t *indexp,
                                    res->moreLength * sizeof(JSSubString));
                 }
                 if (!morepar) {
-                    cx->newborn[GCX_OBJECT] = NULL;
-                    cx->newborn[GCX_STRING] = NULL;
+                    cx->weakRoots.newborn[GCX_OBJECT] = NULL;
+                    cx->weakRoots.newborn[GCX_STRING] = NULL;
                     ok = JS_FALSE;
                     goto out;
                 }
@@ -3391,8 +3393,8 @@ js_ExecuteRegExp(JSContext *cx, JSRegExp *re, JSString *str, size_t *indexp,
                 parstr = js_NewStringCopyN(cx, gData.cpbegin + parsub->index,
                                            parsub->length, 0);
                 if (!parstr) {
-                    cx->newborn[GCX_OBJECT] = NULL;
-                    cx->newborn[GCX_STRING] = NULL;
+                    cx->weakRoots.newborn[GCX_OBJECT] = NULL;
+                    cx->weakRoots.newborn[GCX_STRING] = NULL;
                     ok = JS_FALSE;
                     goto out;
                 }
@@ -3401,8 +3403,8 @@ js_ExecuteRegExp(JSContext *cx, JSRegExp *re, JSString *str, size_t *indexp,
                                        JSPROP_ENUMERATE, NULL);
             }
             if (!ok) {
-                cx->newborn[GCX_OBJECT] = NULL;
-                cx->newborn[GCX_STRING] = NULL;
+                cx->weakRoots.newborn[GCX_OBJECT] = NULL;
+                cx->weakRoots.newborn[GCX_STRING] = NULL;
                 goto out;
             }
         }
@@ -4152,7 +4154,7 @@ js_CloneRegExpObject(JSContext *cx, JSObject *obj, JSObject *parent)
         return NULL;
     re = JS_GetPrivate(cx, obj);
     if (!JS_SetPrivate(cx, clone, re) || !js_SetLastIndex(cx, clone, 0)) {
-        cx->newborn[GCX_OBJECT] = NULL;
+        cx->weakRoots.newborn[GCX_OBJECT] = NULL;
         return NULL;
     }
     HOLD_REGEXP(cx, re);

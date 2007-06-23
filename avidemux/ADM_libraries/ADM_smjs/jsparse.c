@@ -963,7 +963,16 @@ FunctionDef(JSContext *cx, JSTokenStream *ts, JSTreeContext *tc,
     pn->pn_pos.begin = CURRENT_TOKEN(ts).pos.begin;
 
     TREE_CONTEXT_INIT(&funtc);
+
+    /*
+     * Temporarily transfer the owneship of the recycle list to funtc.
+     * See bug 313967.
+     */ 
+    funtc.nodeList = tc->nodeList;
+    tc->nodeList = NULL;
     body = FunctionBody(cx, ts, fun, &funtc);
+    tc->nodeList = funtc.nodeList;
+    funtc.nodeList = NULL;
     if (!body)
         return NULL;
 
@@ -3557,6 +3566,8 @@ XMLElementOrList(JSContext *cx, JSTokenStream *ts, JSTreeContext *tc,
     JSBool hadSpace;
     JSTokenType tt;
     JSAtom *startAtom, *endAtom;
+
+    CHECK_RECURSION();
 
     JS_ASSERT(CURRENT_TOKEN(ts).type == TOK_XMLSTAGO);
     pn = NewParseNode(cx, ts, PN_LIST, tc);

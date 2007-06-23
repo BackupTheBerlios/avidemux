@@ -55,7 +55,7 @@
  */
 
 #if defined(_WIN32) && !defined(__MWERKS__)
-#define JS_USE_FDLIBM_MATH 1
+/* MEANX #define JS_USE_FDLIBM_MATH 1*/
 
 #elif defined(SUNOS4)
 #define JS_USE_FDLIBM_MATH 1
@@ -70,7 +70,7 @@
 #define JS_USE_FDLIBM_MATH 1
 
 #elif defined(linux)
-#define JS_USE_FDLIBM_MATH 1
+/* MEANX #define JS_USE_FDLIBM_MATH 1 */
 
 #elif defined(OSF1)
 /* Want to use some fdlibm functions but fdlibm broken on OSF1/alpha. */
@@ -83,7 +83,7 @@
 #define JS_USE_FDLIBM_MATH 0
 #endif
 
-#if 1 //MEANX !JS_USE_FDLIBM_MATH
+#if !JS_USE_FDLIBM_MATH
 
 /*
  * Use system provided math routines.

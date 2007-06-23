@@ -805,7 +805,9 @@ OptimizeSpanDeps(JSContext *cx, JSCodeGenerator *cg)
                       case JSOP_DEFAULT:      op = JSOP_DEFAULTX; break;
                       case JSOP_TABLESWITCH:  op = JSOP_TABLESWITCHX; break;
                       case JSOP_LOOKUPSWITCH: op = JSOP_LOOKUPSWITCHX; break;
-                      default:                JS_ASSERT(0);
+                      default:
+                        ReportStatementTooLarge(cx, cg);
+                        return JS_FALSE;
                     }
                     *pc = (jsbytecode) op;
 
@@ -1651,11 +1653,16 @@ EmitAtomIndexOp(JSContext *cx, JSOp op, jsatomid atomIndex, JSCodeGenerator *cg)
     if (atomIndex >= JS_BIT(16)) {
         mode = (js_CodeSpec[op].format & JOF_MODEMASK);
         if (op != JSOP_SETNAME) {
-            prefixOp = (mode == JOF_NAME)
+            prefixOp = ((mode != JOF_NAME && mode != JOF_PROP) ||
+#if JS_HAS_XML_SUPPORT
+                        op == JSOP_GETMETHOD ||
+                        op == JSOP_SETMETHOD ||
+#endif
+                        op == JSOP_SETCONST)
+                       ? JSOP_LITOPX
+                       : (mode == JOF_NAME)
                        ? JSOP_FINDNAME
-                       : (mode == JOF_PROP)
-                       ? JSOP_LITERAL
-                       : JSOP_LITOPX;
+                       : JSOP_LITERAL;
             off = js_EmitN(cx, cg, prefixOp, 3);
             if (off < 0)
                 return JS_FALSE;
@@ -1683,7 +1690,19 @@ EmitAtomIndexOp(JSContext *cx, JSOp op, jsatomid atomIndex, JSCodeGenerator *cg)
           case JSOP_BINDNAME:   return JS_TRUE;
           case JSOP_SETNAME:    op = JSOP_SETELEM; break;
           case JSOP_SETPROP:    op = JSOP_SETELEM; break;
-          default:              JS_ASSERT(mode == 0); break;
+#if JS_HAS_EXPORT_IMPORT
+          case JSOP_EXPORTNAME:
+            ReportStatementTooLarge(cx, cg);
+            return JS_FALSE;
+#endif
+          default:
+#if JS_HAS_XML_SUPPORT
+            JS_ASSERT(mode == 0 || op == JSOP_SETCONST ||
+                      op == JSOP_GETMETHOD || op == JSOP_SETMETHOD);
+#else
+            JS_ASSERT(mode == 0 || op == JSOP_SETCONST);
+#endif
+            break;
         }
 
         return js_Emit1(cx, cg, op) >= 0;
@@ -2489,6 +2508,15 @@ EmitSwitch(JSContext *cx, JSCodeGenerator *cg, JSParseNode *pn,
             tableLength = (uint32)(high - low + 1);
             if (tableLength >= JS_BIT(16) || tableLength > 2 * caseCount)
                 switchOp = JSOP_LOOKUPSWITCH;
+        } else if (switchOp == JSOP_LOOKUPSWITCH) {
+            /*
+             * Lookup switch supports only atom indexes below 64K limit.
+             * Conservatively estimate the maximum possible index during
+             * switch generation and use conditional switch if it exceeds
+             * the limit.
+             */
+            if (caseCount + cg->atomList.count > JS_BIT(16))
+                switchOp = JSOP_CONDSWITCH;
         }
     }
 
@@ -4088,7 +4116,7 @@ js_EmitTree(JSContext *cx, JSCodeGenerator *cg, JSParseNode *pn)
          */
         pn2 = pn->pn_left;
         JS_ASSERT(pn2->pn_type != TOK_RP);
-        atomIndex = (jsatomid) -1; /* Suppress warning. */
+        atomIndex = (jsatomid) -1;
         switch (pn2->pn_type) {
           case TOK_NAME:
             if (!LookupArgOrVar(cx, &cg->treeContext, pn2))
@@ -4141,6 +4169,10 @@ js_EmitTree(JSContext *cx, JSCodeGenerator *cg, JSParseNode *pn)
 #if JS_HAS_GETTER_SETTER
         if (op == JSOP_GETTER || op == JSOP_SETTER) {
             /* We'll emit these prefix bytecodes after emitting the r.h.s. */
+            if (atomIndex != (jsatomid) -1 && atomIndex >= JS_BIT(16)) {
+                ReportStatementTooLarge(cx, cg);
+                return JS_FALSE;
+            }
         } else
 #endif
         /* If += or similar, dup the left operand and get its value. */
@@ -4706,6 +4738,11 @@ js_EmitTree(JSContext *cx, JSCodeGenerator *cg, JSParseNode *pn)
 #if JS_HAS_GETTER_SETTER
             op = pn2->pn_op;
             if (op == JSOP_GETTER || op == JSOP_SETTER) {
+                if (pn3->pn_type != TOK_NUMBER &&
+                    ALE_INDEX(ale) >= JS_BIT(16)) {
+                    ReportStatementTooLarge(cx, cg);
+                    return JS_FALSE;
+                }
                 if (js_Emit1(cx, cg, op) < 0)
                     return JS_FALSE;
             }

@@ -124,10 +124,8 @@
 #define JS_STATIC_DLL_CALLBACK(__x) static __x
 
 #endif
-/* MEANX
+
 #ifdef _WIN32
-*/
-#if 0
 #  if defined(__MWERKS__) || defined(__GNUC__)
 #    define JS_IMPORT_API(__x)      __x
 #  else
@@ -137,7 +135,7 @@
 #    define JS_IMPORT_API(__x)      JS_EXPORT_API (__x)
 #endif
 
-#if 0 // MEANX defined(_WIN32) && !defined(__MWERKS__)
+#if defined(_WIN32) && !defined(__MWERKS__)
 #    define JS_IMPORT_DATA(__x)      __declspec(dllimport) __x
 #else
 #    define JS_IMPORT_DATA(__x)     JS_EXPORT_DATA (__x)
@@ -160,7 +158,7 @@
 #define JS_FRIEND_API(t)    JS_PUBLIC_API(t)
 #define JS_FRIEND_DATA(t)   JS_PUBLIC_DATA(t)
 
-#if 0 //MEANXdef _WIN32
+#ifdef _WIN32
 #   define JS_INLINE __inline
 #elif defined(__GNUC__)
 #   define JS_INLINE

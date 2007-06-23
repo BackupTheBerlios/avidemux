@@ -60,6 +60,7 @@
 #include "jsobj.h"
 #include "jsopcode.h"
 #include "jsscan.h"
+#include "jsscope.h"
 #include "jsscript.h"
 #include "jsstr.h"
 
@@ -942,9 +943,12 @@ js_ExpandErrorArguments(JSContext *cx, JSErrorCallback callback,
 
 error:
     if (reportp->messageArgs) {
-        i = 0;
-        while (reportp->messageArgs[i])
-            JS_free(cx, (void *)reportp->messageArgs[i++]);
+        /* free the arguments only if we allocated them */
+        if (charArgs) {
+            i = 0;
+            while (reportp->messageArgs[i])
+                JS_free(cx, (void *)reportp->messageArgs[i++]);
+        }
         JS_free(cx, (void *)reportp->messageArgs);
         reportp->messageArgs = NULL;
     }
