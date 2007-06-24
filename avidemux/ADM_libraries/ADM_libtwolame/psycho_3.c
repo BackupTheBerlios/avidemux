@@ -107,13 +107,17 @@ static void psycho_3_powerdensityspectrum(FLOAT energy[BLKSIZE], FLOAT power[HBL
 /* Sect D.1 Step 2 - Determine the sound pressure level in each subband */
 static void psycho_3_spl(FLOAT *Lsb, FLOAT *power, FLOAT *scale) {
   int i;
-  FLOAT Xmax[SBLIMIT];
+  FLOAT Xmax[SBLIMIT+1]; // MEANX
 
   for (i=0;i<SBLIMIT;i++) {
     Xmax[i] = DBMIN;
   }
   /* Find the maximum SPL in the power spectrum */
   for (i=1;i<HBLKSIZE;i++) {
+    if(i<0 || i >HBLKSIZE)
+    { 
+        printf("CRASH!\n");
+    }
     int index = i>>4;
     if (Xmax[index] < power[i])
       Xmax[index] = power[i];
@@ -517,7 +521,7 @@ void psycho_3 (twolame_options *glopts, short int buffer[2][1152], FLOAT scale[2
   FLOAT Xtm[HBLKSIZE], Xnm[HBLKSIZE];
   int tonelabel[HBLKSIZE], noiselabel[HBLKSIZE];
   FLOAT LTg[HBLKSIZE];
-  FLOAT Lsb[SBLIMIT];
+  FLOAT Lsb[SBLIMIT+1]; // MEANX
 
   if (!glopts->p3mem) {		
     glopts->p3mem = psycho_3_init( glopts );
