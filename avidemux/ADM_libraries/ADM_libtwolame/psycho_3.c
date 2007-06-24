@@ -114,11 +114,8 @@ static void psycho_3_spl(FLOAT *Lsb, FLOAT *power, FLOAT *scale) {
   }
   /* Find the maximum SPL in the power spectrum */
   for (i=1;i<HBLKSIZE;i++) {
-    if(i<0 || i >HBLKSIZE)
-    { 
-        printf("CRASH!\n");
-    }
-    int index = i>>4;
+   
+    int index = (i-1)>>4;
     if (Xmax[index] < power[i])
       Xmax[index] = power[i];
   }
