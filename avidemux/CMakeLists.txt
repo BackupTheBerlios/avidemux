@@ -142,6 +142,7 @@ ADM_nuv
 ADM_ogm
 ADM_openDML
 ADM_flv
+ADM_amv
 )
 
 FOREACH(_current ${ADM_inputs})

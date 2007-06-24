@@ -58,6 +58,7 @@ typedef enum
                 Matroska_FileType=16,
                 ASF_FileType=17,
                 FLV_FileType=18,
+                AMV_FileType=19,
 		DUMMY_FILETYPE=99
 }fileType;
 

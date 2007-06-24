@@ -103,11 +103,18 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
     {
       printf (" \n Riff file detected...");
       if (fourCC::check (R32(magic[2]), (uint8_t *) "AVI "))
-	{
-	  printf (" \n AVI file detected...\n");
-	  *type = AVI_FileType;
-	  return 1;
-	}
+        {
+          printf (" \n AVI file detected...\n");
+          *type = AVI_FileType;
+          return 1;
+        }
+        if (fourCC::check (R32(magic[2]), (uint8_t *) "AMV "))
+        {
+          printf (" \n AMV file detected...\n");
+          *type = AMV_FileType;
+          return 1;
+        }
+
       printf (" \n Unknown Riff...");
       return 0;
     }
