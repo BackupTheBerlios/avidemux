@@ -583,13 +583,14 @@ if(_upd_in_progres) return;
 
 void UI_setTitle(char *name)
 {
-	char title[1024];
+        char title[1024];
 
-		strncpy(title,name,200);
-		strncat(title," - Avidemux", 11);
-		
+        strncpy(title,name,200);
+        title[200] = 0;
+        strncat(title," - Avidemux", 11);
 
- 	gtk_window_set_title (GTK_WINDOW (guiRootWindow), title);
+
+        gtk_window_set_title (GTK_WINDOW (guiRootWindow), title);
 
 }
 void UI_setFrameType( uint32_t frametype,uint32_t qp)
