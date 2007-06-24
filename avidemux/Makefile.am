@@ -119,6 +119,7 @@ ADM_filter/filter_saveload.o 				\
 ./ADM_inputs/ADM_nuv/libADM_nuv.a			\
 ./ADM_inputs/ADM_ogm/libADM_ogm.a			\
 ./ADM_inputs/ADM_flv/libADM_flv.a			\
+./ADM_inputs/ADM_amv/libADM_amv.a			\
 ./ADM_inputs/ADM_openDML/libADM_openDML.a		\
 ./ADM_inputs/ADM_avsproxy/libADM_avsproxy.a		\
 ./ADM_inputs/ADM_matroska/libADM_matroska.a		\
