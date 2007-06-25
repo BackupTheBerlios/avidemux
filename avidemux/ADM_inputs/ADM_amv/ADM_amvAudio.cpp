@@ -41,7 +41,9 @@
   if(_fd) fclose(_fd);
   _fd=NULL;
 }
+/**
 
+*/
 uint32_t    amvAudio::read(uint32_t len,uint8_t *buffer)
 {
   uint32_t l,sam;
@@ -50,11 +52,23 @@ uint32_t    amvAudio::read(uint32_t len,uint8_t *buffer)
     printf("[AMV] Packet %u/%u\n",curIndex,_track->nbIndex);
     return 0;
   }
-//  printf("[AMV] Packet %u/%u\n",curIndex,_track->nbIndex);
-  fseeko(_fd,_track->index[curIndex].pos,SEEK_SET);
-  fread(buffer,_track->index[curIndex].size,1,_fd);
-  curIndex++;
-  return _track->index[curIndex-1].size;
+  uint32_t sz=_track->index[curIndex].size;
+  uint32_t left=sz-curOffset;
+  if(left>=len)
+  {
+    fread(buffer,len,1,_fd);
+    curOffset+=len;
+    return len;
+  }
+  // Read remaining
+  
+       fread(buffer,left,1,_fd);
+       curIndex++;
+       curOffset=0;
+       if(curIndex>=_track->nbIndex)  return left;
+       fseeko(_fd,_track->index[curIndex].pos,SEEK_SET);
+       curOffset=0;
+       return left+read(len-left,buffer+left);
 }
 /**
       \fn goTo
@@ -62,6 +76,8 @@ uint32_t    amvAudio::read(uint32_t len,uint8_t *buffer)
 uint8_t             amvAudio::goTo(uint32_t newoffset)
 {
   curIndex=0;
+  curOffset=0;
+  fseeko(_fd,_track->index[0].pos,SEEK_SET);  
   return 1;
 }
 /**
@@ -110,7 +126,8 @@ uint8_t             amvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
     _length+=_track->index[i].size;
   printf("[AMVAUDIO] found %lu bytes\n",_length);
   curIndex=0;
-  
+  curOffset=0;
+  fseeko(_fd,_track->index[0].pos,SEEK_SET);  
 }
 //EOF
 

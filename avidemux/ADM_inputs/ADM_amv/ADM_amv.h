@@ -49,6 +49,7 @@ class amvAudio : public AVDMGenericAudioStream
     FILE                        *_fd;
     amvTrack                     *_track;
     uint32_t                      curIndex;
+    uint32_t                      curOffset;
   public:
                                 amvAudio(const char *name,amvTrack *track,WAVHeader *hdr);
                                 

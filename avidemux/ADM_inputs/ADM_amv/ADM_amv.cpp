@@ -181,10 +181,10 @@ uint8_t amvHeader::open(char *name)
     // If audio...
     if(audioTrack.index)
     {
-      wavHeader. 	encoding=WAV_MP3;
+      wavHeader. 	encoding=WAV_ULAW;
       wavHeader. 	channels=1;					/* 1 = mono, 2 = stereo */
       wavHeader. 	frequency=8000;				/* One of 11025, 22050, or 44100 48000 Hz */
-      wavHeader. 	byterate=128000/8;					/* Average bytes per second */
+      wavHeader. 	byterate=8000;					/* Average bytes per second */
       wavHeader. 	blockalign=1;				/* Bytes per sample block */
       wavHeader. 	bitspersample=16;	 
       _isaudiopresent=1;
