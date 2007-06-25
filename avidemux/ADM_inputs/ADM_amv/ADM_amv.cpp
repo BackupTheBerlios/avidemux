@@ -96,8 +96,6 @@ uint8_t amvHeader::open(char *name)
   
   _isvideopresent=0;
   _isaudiopresent=0;
-  audioTrack=NULL;
-  videoTrack=NULL;
   memset(&_mainaviheader,0,sizeof(_mainaviheader));
   _filename=ADM_strdup(name);
   _fd=fopen(name,"rb");
@@ -159,12 +157,12 @@ uint8_t amvHeader::open(char *name)
           ADM_assert(0);
     }
   }
-  if(_videoIndex) _videoIndex[0].flags=AVI_KEY_FRAME;
+  if(videoTrack.index) videoTrack.index[0].flags=AVI_KEY_FRAME;
   else return 0;
   _isvideopresent=1;
   // Build a fake stream/bih bih
 #define ENTRY(x,y) _videostream.x=y
-  uint32_t codec=MKFCC('x','x','x','x');
+  uint32_t codec=MKFCC('M','J','P','G');
     ENTRY(	fccType,MKFCC('v','i','d','s'));
     ENTRY(	fccHandler,codec);
     ENTRY(	dwInitialFrames,0);
@@ -179,6 +177,19 @@ uint8_t amvHeader::open(char *name)
     ENTRY(biHeight,_mainaviheader.dwHeight);
     ENTRY(biCompression,codec);
     printf("[AMV] Dimension %u * %u\n",_video_bih.biWidth,_video_bih.biHeight);
+    
+    // If audio...
+    if(audioTrack.index)
+    {
+      wavHeader. 	encoding=WAV_MP3;
+      wavHeader. 	channels=1;					/* 1 = mono, 2 = stereo */
+      wavHeader. 	frequency=8000;				/* One of 11025, 22050, or 44100 48000 Hz */
+      wavHeader. 	byterate=128000/8;					/* Average bytes per second */
+      wavHeader. 	blockalign=1;				/* Bytes per sample block */
+      wavHeader. 	bitspersample=16;	 
+      _isaudiopresent=1;
+      _audio=new amvAudio(name,&audioTrack,&wavHeader);
+    }
   return 1;
 }
 /**
@@ -189,8 +200,10 @@ uint8_t amvHeader::index(void)
 {
   printf("[AMV] Dimension %u * %u\n",_mainaviheader.dwWidth,_mainaviheader.dwHeight);
   printf("[AMV] # pics  %u \n",_mainaviheader.dwTotalFrames);
-  uint32_t type,size,nbPics=0;
+  uint32_t type,size,nbPics=0,nbAudio=0;
   uint32_t org=ftello(_fd);
+  
+  
   while(!feof(_fd))
   {
      type=read32();
@@ -202,6 +215,7 @@ uint8_t amvHeader::index(void)
           nbPics++;
           break;
         case MKFCC('0','1','w','b'):
+          nbAudio++;
           break;
         default:
             printf("[AMV] Unknown entry :%s\n",fourCC::tostring(type));
@@ -209,11 +223,17 @@ uint8_t amvHeader::index(void)
      fseeko(_fd,size,SEEK_CUR);
   }
   printf("Found %u pics\n",nbPics);
+  printf("Found %u audio\n",nbAudio);
   _mainaviheader.dwTotalFrames=nbPics;
-  // Allocate index, now that we have the # of pics
-                  
-      _videoIndex=new amvIndex[nbPics];
-      memset(_videoIndex,0,sizeof(amvIndex)*nbPics);
+  // Allocate video index
+  videoTrack.indexRoof=nbPics;
+  videoTrack.index=new amvIndex[nbPics];
+  videoTrack.nbIndex=0;
+  // Allocate audio index
+  audioTrack.indexRoof=nbAudio;
+  audioTrack.index=new amvIndex[nbAudio];
+  audioTrack.nbIndex=0;
+  
       
   //
   fseeko(_fd,org,SEEK_SET);
@@ -226,11 +246,19 @@ uint8_t amvHeader::index(void)
      switch(type)
         {
         case MKFCC('0','0','d','c'):
-          _videoIndex[idx].pos=ftello(_fd);
-          _videoIndex[idx].size=size;
+          videoTrack.index[idx].pos=ftello(_fd);
+          videoTrack.index[idx].size=size;
+          videoTrack.index[idx].flags=AVI_KEY_FRAME;
           idx++;
           break;
         case MKFCC('0','1','w','b'):
+        {
+          int adx=audioTrack.nbIndex;
+          audioTrack.index[adx].pos=ftello(_fd);
+          audioTrack.index[adx].size=size;
+          audioTrack.index[adx].flags=AVI_KEY_FRAME;
+          audioTrack.nbIndex++;
+        }
           break;
         default:
             printf("[AMV] Unknown entry :%s\n",fourCC::tostring(type));
@@ -299,7 +327,7 @@ uint8_t amvHeader::readTrack(int nb)
 */
 WAVHeader *amvHeader::getAudioInfo(void )
 {
-  if(_isaudiopresent)
+  if(_audio)
     return &wavHeader;
   else
       return NULL;
@@ -310,13 +338,12 @@ WAVHeader *amvHeader::getAudioInfo(void )
 
 uint8_t amvHeader::getAudioStream(AVDMGenericAudioStream **audio)
 {
-#if 0
-  if(_isaudiopresent)
+
+  if(_audio)
   {
-    *audio=_audioStream;
+    *audio=_audio;
     return 1;
   }
-#endif
   *audio=NULL;
   return 0; 
 }
@@ -335,18 +362,18 @@ void amvHeader::Dump(void)
 uint8_t amvHeader::close(void)
 {
   if(_filename) ADM_dealloc(_filename);
-  if(videoTrack) delete videoTrack;
-  if(audioTrack) delete audioTrack;
+  if(videoTrack.index) delete [] videoTrack.index;
+  if(audioTrack.index) delete [] audioTrack.index;
+  videoTrack.index=NULL;
+  audioTrack.index=NULL;
+  
   if(_fd) fclose(_fd);
 //  if(_audioStream) delete _audioStream;
   
   _fd=NULL;
   _filename=NULL;
-  videoTrack=NULL;
-  audioTrack=NULL;
-//  _audioStream=NULL;
-  if(_videoIndex) delete [] _videoIndex;
-  _videoIndex=NULL;
+  if(_audio) delete _audio;
+  _audio=NULL;
 }
 /*
     __________________________________________________________
@@ -356,12 +383,11 @@ uint8_t amvHeader::close(void)
 { 
     _fd=NULL;
     _filename=NULL;
-    videoTrack=NULL;
-    audioTrack=NULL;
-//    _audioStream=NULL;
+    memset(&videoTrack,0,sizeof(videoTrack));
+    memset(&audioTrack,0,sizeof(videoTrack));
     memset(&wavHeader,0,sizeof(wavHeader));
-    _videoIndex=NULL;
     _filename=NULL;
+    _audio=NULL;
 }
 /*
     __________________________________________________________
@@ -383,7 +409,7 @@ uint8_t amvHeader::close(void)
   uint8_t  amvHeader::setFlag(uint32_t frame,uint32_t flags)
 {
  if(frame>=_mainaviheader.dwTotalFrames) return 0;
- amvIndex *idx=&_videoIndex[frame];
+ amvIndex *idx=&(videoTrack.index[frame]);
  idx->flags=flags;
  return 1;
 }
@@ -394,7 +420,7 @@ uint8_t amvHeader::close(void)
 uint32_t amvHeader::getFlags(uint32_t frame,uint32_t *flags)
 {
  if(frame>=_mainaviheader.dwTotalFrames) return 0;
- amvIndex *idx=&_videoIndex[frame];
+ amvIndex *idx=&(videoTrack.index[frame]);
  *flags=idx->flags;
  return 1;
 }
@@ -405,10 +431,69 @@ uint32_t amvHeader::getFlags(uint32_t frame,uint32_t *flags)
 uint8_t  amvHeader::getFrameNoAlloc(uint32_t frame,ADMCompressedImage *img)
 {
  if(frame>=_mainaviheader.dwTotalFrames) return 0;
- amvIndex *idx=&_videoIndex[frame];
+ amvIndex *idx=&(videoTrack.index[frame]);
  fseeko(_fd,idx->pos,SEEK_SET);
- fread(img->data,idx->size,1,_fd);
- img->dataLength=idx->size;
+ 
+ uint8_t buffer[idx->size];
+ 
+ fread(buffer,idx->size,1,_fd);
+ // Now create a fake jpg header...
+ uint8_t *head,*tail;
+ 
+ tail=&(buffer[idx->size-2]);// Remove ff D9 EOI
+ head=buffer;
+ // Search SOI
+ while(  (head[0]!=0xff || head[1]!=0xD8) && head<tail-2) head++;
+ if(head>=tail-2) return 0;
+ head+=2;
+ // Build fake jpg header
+ // NB: It might not be jpg after all ...
+ uint8_t *m=img->data;
+ *m++=0xFF;
+ *m++=0xD8;
+ 
+  *m++=0xFF;
+  *m++=0xC0; // SOF0
+  
+  *m++=0x0; // Lf
+  *m++=0x8+3*2; // Lf
+  
+  
+  *m++=0x8; // P: Bits /channel
+  
+  
+  *m++=_video_bih.biHeight >>8;
+  *m++=_video_bih.biHeight &0xFF;
+
+  
+  *m++=_video_bih.biWidth >>8;
+  *m++=_video_bih.biWidth &0xFF;
+
+ //
+  *m++=3; // Nf
+  
+  *m++=1; // NCi
+  *m++=1*16+1; // Hvi/VZi
+  *m++=0; // Tqi
+  
+  *m++=2; // NCi
+  *m++=2*16+1; // Hvi/VZi
+  *m++=0; // Tqi
+  
+  *m++=3; // NCi
+  *m++=2*16+1; // Hvi/VZi
+  *m++=0; // Tqi
+  
+  *m++=0xFF; // 
+  *m++=0xDA; // Start of scan
+  
+  memcpy(m,head,tail-head);
+  m+=tail-head;
+  *m++=0xff;
+  *m++=0xD9; // end of image
+  
+  img->dataLength=m-img->data;
+  img->flags=AVI_KEY_FRAME;
  return 1;
 }
 /*
@@ -435,7 +520,7 @@ uint8_t  amvHeader::changeAudioStream(uint32_t newstream)
 uint8_t amvHeader::getFrameSize (uint32_t frame, uint32_t * size)
 {
   if(frame>=_mainaviheader.dwTotalFrames) return 0;
-  *size=_videoIndex[frame].size;
+  *size=videoTrack.index[frame].size;
   return 1;
 }
 

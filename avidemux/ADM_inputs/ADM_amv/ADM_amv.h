@@ -30,42 +30,48 @@ typedef struct
     uint32_t size;
     uint32_t flags;
 }amvIndex;
-//**********************************************
-#if 0
 
-class flvAudio : public AVDMGenericAudioStream
+class amvTrack 
+{
+  public:
+    amvIndex *index;
+    uint32_t nbIndex;
+    uint32_t indexRoof;
+};
+
+
+//**********************************************
+
+
+class amvAudio : public AVDMGenericAudioStream
 {
   protected:
     FILE                        *_fd;
-    flvTrak                     *_track;
-    uint32_t                    _curTimeCode;
-    uint8_t                      goToBlock(uint32_t x);
-    uint32_t                    _curBlock;
-    uint8_t                     getPacket(uint8_t *dest, uint32_t *packlen, uint32_t *samples,uint32_t *timecode);
+    amvTrack                     *_track;
+    uint32_t                      curIndex;
   public:
-                                flvAudio(const char *name,flvTrak *track,WAVHeader *hdr);
+                                amvAudio(const char *name,amvTrack *track,WAVHeader *hdr);
                                 
                                 
-    virtual                     ~flvAudio();
+    virtual                     ~amvAudio();
     virtual uint32_t            read(uint32_t len,uint8_t *buffer);
     virtual uint8_t             goTo(uint32_t newoffset);
-            uint8_t	        goToTime(uint32_t mstime);
-    virtual uint8_t             getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
-    
+   // virtual uint8_t             getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
     virtual uint8_t             extraData(uint32_t *l,uint8_t **d);
             
 };
-#endif
+
 //*****************************************************
 class amvHeader         :public vidHeader
 {
   protected:
                                 
     FILE                    *_fd;
+    amvAudio                *_audio;
     char                    *_filename;
-    amvIndex                *_videoIndex;
-    int                 *videoTrack;
-    int                 *audioTrack;
+    amvTrack                 videoTrack;
+    amvTrack                 audioTrack;
+    
     WAVHeader               wavHeader;
     uint8_t                 changeAudioStream(uint32_t newstream);
     uint32_t                getCurrentAudioStreamNumber(void);

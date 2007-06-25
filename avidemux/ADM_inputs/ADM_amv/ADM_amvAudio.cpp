@@ -30,81 +30,68 @@
 #include "ADM_amv.h"
 
 #define vprintf(...) {}
-#if 0
+
 /**
-    \fn ~flvAudio
+    \fn ~amvAudio
     
 */
- flvAudio ::~flvAudio()
+ amvAudio ::~amvAudio()
 {
   
   if(_fd) fclose(_fd);
   _fd=NULL;
 }
 
-uint32_t    flvAudio::read(uint32_t len,uint8_t *buffer)
+uint32_t    amvAudio::read(uint32_t len,uint8_t *buffer)
 {
   uint32_t l,sam;
-  if(!getPacket(buffer, &l, &sam)) return 0;
-  return l;
+  if(curIndex>=_track->nbIndex) 
+  {
+    printf("[AMV] Packet %u/%u\n",curIndex,_track->nbIndex);
+    return 0;
+  }
+//  printf("[AMV] Packet %u/%u\n",curIndex,_track->nbIndex);
+  fseeko(_fd,_track->index[curIndex].pos,SEEK_SET);
+  fread(buffer,_track->index[curIndex].size,1,_fd);
+  curIndex++;
+  return _track->index[curIndex-1].size;
 }
 /**
       \fn goTo
 */
-uint8_t             flvAudio::goTo(uint32_t newoffset)
+uint8_t             amvAudio::goTo(uint32_t newoffset)
 {
-  goToBlock(0);
+  curIndex=0;
   return 1;
 }
 /**
       \fn extraData
 */
-uint8_t             flvAudio::extraData(uint32_t *l,uint8_t **d)
+uint8_t             amvAudio::extraData(uint32_t *l,uint8_t **d)
 {
   *l=0;
   *d=NULL;
 }
+#if 0
 /**
     \fn getPacket
 */
-uint8_t             flvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32_t *samples)
+uint8_t             amvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32_t *samples)
 {
-  uint32_t t;
-  return  getPacket(dest, packlen,samples,&t);
+  *packlen=0;
+   if(curIndex>=_track->nbIndex) return 0;
+  fseeko(_fd,_track->index[curIndex].pos,SEEK_SET);
+  fread(dest,_track->index[curIndex].size,1,_fd);
+  curIndex++;
+  *packlen=_track->index[curIndex].size;
+  *samples=384;
+  return 1;
 }
-uint8_t             flvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32_t *samples,uint32_t *timecode)
-{
-  flvIndex *x;
-    if(!goToBlock(_curBlock))
-    {
-      printf("[FLVAUDIO] Get packet out of bound\n");
-      return 0;
-    }
-    x=&(_track->_index[_curBlock]);
-    fread(dest,x->size,1,_fd);
-    *packlen=x->size;
-    *timecode=x->timeCode;
-    int delta=0;
-    if(_curBlock<_track->_nbIndex-1)
-    {
-      delta= _track->_index[_curBlock+1].timeCode-x->timeCode;
-    }
-    else
-      delta=_track->_index[1].timeCode-_track->_index[0].timeCode;
-    // convert delta in ms to delta in sample
-    // 
-    float f=delta;
-    f=f*_wavheader->frequency;
-    f/=1000;
-    *samples=(uint32_t)floor(f+0.49);
-    _curBlock++;
-    //
-    return 1;
-}
+#endif
 /**
-      \fn flvAudio 
+      \fn amvAudio 
 */
-   flvAudio::flvAudio(const char *name,flvTrak *track,WAVHeader *hdr)
+   amvAudio::amvAudio(const char *name,amvTrack *track,WAVHeader *hdr)
   : AVDMGenericAudioStream()
 {
   _destroyable = 0; // Will be destroyed with master track
@@ -119,70 +106,11 @@ uint8_t             flvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
   // Compute total length in byte
   _length=0;
   // 
-  for(int i=0;i<_track->_nbIndex;i++)
-    _length+=_track->_index[i].size;
-  printf("[FLVAUDIO] found %lu bytes\n",_length);
-  // Guess bitrate
-  uint32_t duration=_track->_index[_track->_nbIndex-1].timeCode;
-  printf("[FLVAUDIO] Duration %u ms\n",duration);
+  for(int i=0;i<_track->nbIndex;i++)
+    _length+=_track->index[i].size;
+  printf("[AMVAUDIO] found %lu bytes\n",_length);
+  curIndex=0;
   
-  if(duration)
-  {
-    float f=_length;
-    f/=duration;
-    uint32_t bitrate,byterate;
-    
-
-    
-    bitrate=(uint32_t)f*8; // kbits/s
-    byterate=(uint32_t)(f*1000);         // byte/s
-    
-    printf("[FLVAUDIO] Byterate %u / %u kbps\n",byterate,bitrate); 
-    _wavheader->byterate=byterate;
-  }
-  
-  //
-  
-  goToBlock(0);
 }
-/**
-    \fn goToCluster
-    \brief Change the cluster parser...
-*/
-uint8_t flvAudio::goToBlock(uint32_t x)
-{
-  if(x>=_track->_nbIndex)
-  {
-    printf("[FLVAUDIO]Exceeding max cluster : asked: %u max :%u\n",x,_track->_nbIndex); 
-    return 0;  // FIXME
-  }
-  _curBlock=x;
-  fseeko(_fd,_track->_index[_curBlock].pos,SEEK_SET);
-  return 1;
-}
-/**
-      \fn goToTime
-      \brief seek in the current track until we meet the time give (in ms)
-*/
- uint8_t	flvAudio::goToTime(uint32_t mstime)
-{
-uint32_t target=mstime;
-uint32_t _nbClusters=_track->_nbIndex;
-
-      // First identify the cluster...
-      int clus=-1;
-            for(int i=0;i<_nbClusters-1;i++)
-            {
-              if(target>=_track->_index[i].timeCode && target<_track->_index[i+1].timeCode)
-              {
-                clus=i;
-                i=_nbClusters; 
-              }
-            }
-            if(clus==-1) clus=_nbClusters-1; // Hopefully in the last one
-            goToBlock(clus);
-            return 1;
-}
-
 //EOF
-#endif
+
