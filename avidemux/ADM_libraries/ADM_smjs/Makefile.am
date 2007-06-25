@@ -51,3 +51,5 @@ INCLUDES = $(all_includes) -DXP_WIN
 else
 INCLUDES = $(all_includes) -DXP_UNIX -DSVR4 -DSYSV -D_BSD_SOURCE -DPOSIX_SOURCE -DHAVE_VA_COPY -DVA_COPY=va_copy
 endif
+
+INCLUDES += -DNDEBUG -DTRIMMED -DEXPORT_JS_API -DJS_USE_SAFE_ARENA -D_IEEE_LIBM -Dmalloc=ADM_alloc -Drealloc=ADM_realloc -Dfree=ADM_dezalloc -Dcalloc=ADM_calloc -I/usr/include/nspr
