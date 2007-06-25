@@ -211,8 +211,6 @@ uint8_t	AUDMEncoder_Vorbis::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sa
 	
       if(vorbis_bitrate_flushpacket(&VD, &op)) 
       {
-        if(op.bytes<2) continue; // avoid the 1byte sized packet
-
         memcpy(dest, op.packet,op.bytes);
         *len=op.bytes;
         *samples=op.granulepos-_oldpos;
