@@ -36,7 +36,7 @@
 // Borrowed from lavformt/flv.h    
 
 uint32_t ADM_UsecFromFps1000(uint32_t fps1000);
-
+extern uint8_t extractH263FLVInfo(uint8_t *buffer,uint32_t len,uint32_t *w,uint32_t *h);
 /**
     \fn Skip
     \brief Skip some bytes from the file
@@ -196,11 +196,14 @@ uint8_t flvHeader::open(char *name)
               remaining--;
               of++;
             }
-            if(!videoTrack->_nbIndex) // first frame..
-            {
-                setVideoHeader(codec,&remaining);
-            }
+            int first=0;
+            if(!videoTrack->_nbIndex) first=1;
             insertVideo(pos+of,remaining,frameType,pts);
+            if(first) // first frame..
+            {
+                if(!setVideoHeader(codec,&remaining)) return 0;
+            }
+            
           }
            break;
       default: printf("[FLV]At 0x%x, unhandled type %u\n",pos,type);
@@ -262,6 +265,19 @@ uint8_t flvHeader::setVideoHeader(uint8_t codec,uint32_t *remaining)
          _video_bih.biHeight=_mainaviheader.dwHeight=read8()*16;
          _video_bih.biWidth=_mainaviheader.dwWidth=read8()*16;
         *remaining-=2; 
+    }
+    if(codec==FLV_CODECID_H263)
+    {
+      uint32_t len=*remaining,width,height;
+      uint8_t buffer[len];
+      read(len,buffer);
+      *remaining=0;
+       /* Decode header, from h263dec.c / lavcodec*/
+      if(extractH263FLVInfo(buffer,len,&width,&height))
+      {
+         _video_bih.biHeight=_mainaviheader.dwHeight=height;
+         _video_bih.biWidth=_mainaviheader.dwWidth=width;
+      }  
     }
    return 1;
 }

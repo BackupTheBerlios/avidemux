@@ -200,7 +200,62 @@ uint8_t extractVopInfo(uint8_t *data, uint32_t len,uint32_t timeincbits,uint32_t
            *time_inc=tinc;
            return 1;
 }
-
+/**
+      \brief extractH263FLVInfo
+      \fn Extract width/height from FLV header
+*/
+uint8_t extractH263FLVInfo(uint8_t *buffer,uint32_t len,uint32_t *w,uint32_t *h)
+{
+        GetBitContext gb;
+        int format;
+        init_get_bits( &gb,buffer, len*8);
+        if (get_bits_long(&gb, 17) != 1) {
+            printf("[FLV]Wrong FLV1 header\n");
+            return 0;
+        }
+        format = get_bits(&gb, 5);
+        if (format != 0 && format != 1) {
+            printf("[FLV]Wrong FLV1 header format\n");
+            return 0;        }
+        
+        get_bits(&gb, 8); /* picture timestamp */
+        format = get_bits(&gb, 3);
+        switch (format) {
+        case 0:
+            *w = get_bits(&gb, 8);
+            *h = get_bits(&gb, 8);
+            break;
+        case 1:
+            *w = get_bits(&gb, 16);
+            *h = get_bits(&gb, 16);
+            break;
+        case 2:
+            *w = 352;
+            *h = 288;
+            break;
+        case 3:
+            *w = 176;
+            *h = 144;
+            break;
+        case 4:
+            *w = 128;
+            *h = 96;
+            break;
+        case 5:
+            *w = 320;
+            *h = 240;
+            break;
+        case 6:
+            *w = 160;
+            *h = 120;
+            break;
+        default:
+             printf("[FLV]Wrong width format\n");
+             return 0;
+            break;
+        }
+        return 1;
+}
 /*
         Extract H263 width & height from header
 
