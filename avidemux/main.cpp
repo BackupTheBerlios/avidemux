@@ -30,8 +30,9 @@
 
 #ifdef ADM_WIN32
 #define WIN32_CLASH
-#include "windows.h"
-#include "wingdi.h"
+#include <windows.h>
+#include <wingdi.h>
+#include <excpt.h>
 #endif
 
 #define __DECLARE__
@@ -46,9 +47,11 @@
 #ifdef USE_XVID_4
 extern void xvid4_init(void);
 #endif
+
 extern uint8_t filterDynLoad(const char *path);
 typedef void *FCT_VOID(void *);
 uint8_t lavformat_init(void);
+
 #ifdef USE_FFMPEG
      extern "C" {
      extern void        avcodec_init(void );
@@ -70,19 +73,22 @@ void onexit( void );
 extern void registerVideoFilters( void );
 extern void filterCleanUp( void );
 extern void register_Encoders( void )  ;
-extern uint8_t dloadXvid( void );
-extern uint8_t dloadXvidCVS( void );
 
 extern void  buildDistMatrix( void );
 extern void initScaleTab( void );
 extern uint8_t initGUI( void );
-extern void     COL_init(void);
-extern uint8_t  initFileSelector(void);
+extern void COL_init(void);
+extern uint8_t initFileSelector(void);
 extern void AUDMEncoder_initDither(void);
 extern void ADM_memStat( void );
 extern void ADM_memStatInit( void );
 extern void ADM_memStatEnd( void );
+
+#ifdef ADM_WIN32
+extern EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, void* pEstablisherFrame, struct _CONTEXT* pContextRecord, void* pDispatcherContext);
+#else
 extern void installSigHandler(void);
+#endif
 
 extern uint8_t  quotaInit(void);
 extern void ADMImage_stat( void );
@@ -95,7 +101,6 @@ extern int UI_RunApp(void);
 bool SpidermonkeyInit(void);
 void SpidermonkeyDestroy(void);
 
-
 extern pthread_mutex_t g_pSpiderMonkeyMutex;
 int CpuCaps::myCpuCaps=0;
 
@@ -103,10 +108,12 @@ int main(int argc, char *argv[])
 {
 	int sdl_version=0;
 
+#ifndef ADM_WIN32
 	// thx smurf uk :)
     installSigHandler();
+#endif
 
-    printf("\n*************************\n");
+    printf("*************************\n");
     printf("  Avidemux v" VERSION);
 
   	if(ADM_SUBVERSION)
@@ -125,106 +132,118 @@ int main(int argc, char *argv[])
     printf(" Win32     : Gruntster\n\n");
 
 #if defined(ARCH_X86_32)
-      printf("Compiled for X86_32 Arch.\n");
+	printf("Compiled for X86_32 Arch.\n");
 #endif
 #if defined(ARCH_X86_64)
-      printf("Compiled for X86_64 Arch.\n");
+	printf("Compiled for X86_64 Arch.\n");
 #endif
 
-#ifdef     __USE_LARGEFILE
-#ifdef   __USE_LARGEFILE64
-printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
-#endif
+#if defined(__USE_LARGEFILE) && defined(__USE_LARGEFILE64)
+	printf("\nLARGE FILE AVAILABLE: %d offset\n", __USE_FILE_OFFSET64);
 #endif
 
 #ifdef HAVE_GETTEXT
-  char *local=setlocale (LC_ALL, "");
+	char *local=setlocale (LC_ALL, "");
+
 #ifndef ADM_WIN32
-  bindtextdomain ("avidemux", ADMLOCALE);
+	bindtextdomain ("avidemux", ADMLOCALE);
 #else
-  bindtextdomain ("avidemux", "./share/locale");
+	bindtextdomain ("avidemux", "./share/locale");
 #endif
-  bind_textdomain_codeset ("avidemux", "UTF-8");
+
+	bind_textdomain_codeset ("avidemux", "UTF-8");
   
-  if(local)
-    printf("\n[Locale] setlocale %s\n",local);
-  local=textdomain(NULL);
-  textdomain ("avidemux");
-  if(local)
-    printf("[Locale] Textdomain was %s\n",local);
-  local=textdomain(NULL);
-  if(local)
-    printf("[Locale] Textdomain is now %s\n",local);
-#ifndef ADM_WIN32  
-  printf("[Locale] Files for %s appear to be in %s\n","avidemux", ADMLOCALE);
+	if(local)
+		printf("\n[Locale] setlocale %s\n",local);
+
+	local=textdomain(NULL);
+	textdomain ("avidemux");
+
+	if(local)
+	    printf("[Locale] Textdomain was %s\n",local);
+
+	local=textdomain(NULL);
+
+	if(local)
+		printf("[Locale] Textdomain is now %s\n",local);
+
+#ifndef ADM_WIN32
+	printf("[Locale] Files for %s appear to be in %s\n","avidemux", ADMLOCALE);
 #endif
-  printf("[Locale] Test: %s\n\n",dgettext("avidemux","_File"));
+	printf("[Locale] Test: %s\n\n",dgettext("avidemux","_File"));
 #endif
 
    // Start counting memory
-  ADM_memStatInit(  );
-  ADM_intFloatInit();
-    printf("Initializing prefs\n");
-    initPrefs();
+	ADM_memStatInit();
+	ADM_intFloatInit();
 
-  register_Encoders( );
-  atexit(onexit);
+	printf("Initializing prefs\n");
+	initPrefs();
+
+	register_Encoders();
+	atexit(onexit);
   
 #ifdef USE_SDL
-    sdl_version=(SDL_Linked_Version()->major*1000)+(SDL_Linked_Version()->minor*100)+
-          (SDL_Linked_Version()->patch);
+    sdl_version=(SDL_Linked_Version()->major*1000)+(SDL_Linked_Version()->minor*100) + (SDL_Linked_Version()->patch);
     printf("SDL support on Version %d\n",sdl_version);
-  if(sdl_version>1209)
-  {
-      printf("Global SDL init...\n");
-      SDL_Init(SDL_INIT_EVERYTHING); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
-  }
+
+	if(sdl_version>1209)
+	{
+		printf("Global SDL init...\n");
+		SDL_Init(SDL_INIT_EVERYTHING); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
+	}
 #endif
 
-
-    
-#ifdef ADM_WIN32    
+#ifdef ADM_WIN32
     win32_netInit();
 #endif
+
     UI_Init(argc,argv);
     AUDMEncoder_initDither();
+
 #ifdef USE_XVID_4
     xvid4_init();
 #endif
+
     initFileSelector();
     CpuCaps::init();
     ADM_InitMemcpy();
-        
-// Load .avidemuxrc
+
+	// Load .avidemuxrc
     quotaInit();
     prefs->load();
 
-  if(!initGUI())
-        {
-                printf("\n Fatal : could not init GUI\n");
-                exit(-1);	
-        }
+	if(!initGUI())
+	{
+		printf("\n Fatal : could not init GUI\n");
+		exit(-1);
+	}
 
     video_body = new ADM_Composer;
+
 #ifdef HAVE_ENCODER
-     registerVideoFilters(  );
+     registerVideoFilters();
 #endif
-// Try load load external filter
-     uint32_t loadpref=0;
-     char *dynloadPath=NULL;
-     prefs->get(FILTERS_AUTOLOAD_ACTIVE,&loadpref);
-     prefs->get(FILTERS_AUTOLOAD_PATH,&dynloadPath);
-     
-     if(loadpref && dynloadPath)
-     {
-      filterDynLoad(dynloadPath);
-     }
+
+	// Try load load external filter
+	uint32_t loadpref=0;
+	char *dynloadPath=NULL;
+
+	prefs->get(FILTERS_AUTOLOAD_ACTIVE,&loadpref);
+	prefs->get(FILTERS_AUTOLOAD_PATH,&dynloadPath);
+
+	if(loadpref && dynloadPath)
+	{
+		filterDynLoad(dynloadPath);
+	}
+
 // external filter
 #ifdef USE_FFMPEG
     avcodec_init();
     avcodec_register_all();
     lavformat_init();
 #endif
+
 #ifdef HAVE_AUDIO
     AVDM_audioInit();
 #endif
@@ -236,25 +255,28 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 	initLibWrappers();
 
 #ifdef USE_SDL
-  if(sdl_version<=1209)
-  {
-    printf("Global SDL init...\n");
-    SDL_Init(0); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
-  }
+	if(sdl_version<=1209)
+	{
+		printf("Global SDL init...\n");
+		SDL_Init(0); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
+	}
 #endif
 
     if(SpidermonkeyInit() == true)
         printf("Spidermonkey initialized.\n");
     else
-    {
-      ADM_assert(0); 
-    }
+		ADM_assert(0); 
 
-    
+#ifdef ADM_WIN32
+	__try1(exceptionHandler);
+#endif
+
     UI_RunApp();
+
     printf("Normal exit\n");
     return 0;
 }
+
 void onexit( void )
 {
 	printf("Cleaning up\n");
@@ -270,7 +292,7 @@ void onexit( void )
 	destroyLibWrappers();
     printf("End of cleanup\n");
     ADMImage_stat();
-    ADM_memStat(  );
-    ADM_memStatEnd(  );
+    ADM_memStat();
+    ADM_memStatEnd();
     printf("\nGoodbye...\n\n");
 }

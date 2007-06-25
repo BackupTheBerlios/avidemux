@@ -376,9 +376,10 @@ endif(QT4_FOUND)
 IF(WIN32)
 add_libs_all_targets(z)
 add_libs_all_targets(ADM_osSupport)
-add_libs_all_targets(pthreadGC2 )
-add_libs_all_targets(winmm )
-add_libs_all_targets(wsock32 )
+add_libs_all_targets(pthreadGC2)
+add_libs_all_targets(winmm)
+add_libs_all_targets(wsock32)
+add_libs_all_targets(imagehlp)
 
 add_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows xpm/adm.o -Wl,--export-all-symbols")
 

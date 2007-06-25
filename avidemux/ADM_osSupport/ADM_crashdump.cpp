@@ -26,6 +26,14 @@
 #include <math.h>
 #include <ADM_assert.h>
 
+#if defined(ADM_WIN32)
+#define WIN32_CLASH
+#include <windows.h>
+#include <excpt.h>
+#include <imagehlp.h>
+#include <tlhelp32.h>
+#endif
+
 #include "default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
@@ -37,18 +45,120 @@ extern ADM_Composer *video_body;
 static void saveCrashProject(void);
 extern char *ADM_getBaseDir(void);
 extern void A_parseECMAScript(const char *name);
-#if defined(ADM_WIN32) || defined(__APPLE__)
-void installSigHandler()
-{
 
-}
+#ifdef __APPLE__
+void installSigHandler() {}
+
 void ADM_backTrack(int lineno,const char *file)
 {
- char bfr[1024];
-  saveCrashProject();
- snprintf(bfr,1024,"Assert Failed at file %s, line %d\n",file,lineno);
- GUI_Error_HIG("Fatal Error",bfr);
- assert(0);
+	char bfr[1024];
+	saveCrashProject();
+	snprintf(bfr,1024,"Assert Failed at file %s, line %d\n",file,lineno);
+	GUI_Error_HIG("Fatal Error",bfr);
+	assert(0);
+}
+#elif defined(WIN32)
+EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, void* pEstablisherFrame, struct _CONTEXT* pContextRecord, void* pDispatcherContext)
+{
+	static int running=0;
+
+	if(running)
+		exit(1);
+
+	running=1;
+	ADM_backTrack(0, "");
+}
+
+typedef struct STACK_FRAME
+{
+    STACK_FRAME* ebp;	// address of the calling function frame
+    uint8_t* retAddr;	// return address
+    uint32_t param[0];	// parameter list (could be empty)
+} STACK_FRAME;
+
+static bool getModuleByReturnAddress(uint8_t* retAddr, char* moduleName, uint8_t* &moduleAddr)
+{
+    MODULEENTRY32 me32;
+    void* hSnapshot;
+
+    moduleName[0] = 0;
+	me32.dwSize = sizeof(MODULEENTRY32);
+
+    hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, 0);
+    
+    if ((hSnapshot != INVALID_HANDLE_VALUE) && Module32First(hSnapshot, &me32))
+    {
+        do
+		{
+			if (uint32_t(retAddr - me32.modBaseAddr) < me32.modBaseSize)
+			{
+				memcpy(moduleName, me32.szExePath, MAX_PATH);
+				moduleAddr = me32.modBaseAddr;
+				break;
+			}
+        } while(Module32Next(hSnapshot, &me32));
+    }
+
+    CloseHandle(hSnapshot);
+
+    return !!moduleName[0];
+}
+
+static void dumpBackTrace()
+{
+	STACK_FRAME* stackFrame;
+	void* currentProcessId;
+    
+	// Get frame address using builtin GCC function.
+	stackFrame = (STACK_FRAME*)__builtin_frame_address(0);
+	currentProcessId = GetCurrentProcess();
+
+	const int maxAddrCount = 32;
+    char moduleName[MAX_PATH];
+    uint8_t* moduleAddr;
+
+	static char symbolBuffer[sizeof(IMAGEHLP_SYMBOL) + 512];
+	IMAGEHLP_SYMBOL* pSymbol;
+	DWORD symDisplacement;
+
+	pSymbol = (IMAGEHLP_SYMBOL*)symbolBuffer;
+    pSymbol->MaxNameLength = sizeof(symbolBuffer) - sizeof(IMAGEHLP_SYMBOL);
+
+	SymInitialize(currentProcessId, NULL, TRUE);
+
+    for (int retAddrCount = 0; (retAddrCount < maxAddrCount) && !IsBadReadPtr(stackFrame, sizeof(STACK_FRAME)) && !IsBadCodePtr(FARPROC(stackFrame->retAddr)); retAddrCount++, stackFrame = stackFrame->ebp)
+    {
+        // Find the module by a return address inside that module
+        if (getModuleByReturnAddress(stackFrame->retAddr, moduleName, moduleAddr))
+        {
+			printf("Frame %2d: %s(", retAddrCount, moduleName);
+
+			if (SymGetSymFromAddr(currentProcessId, (uint32_t)stackFrame->retAddr, &symDisplacement, pSymbol))
+			{
+				printf("%s", pSymbol->Name);
+			}
+			else
+				printf("<unknown>");
+
+			printf("+0x%X)[0x%08X]\n", stackFrame->retAddr - moduleAddr, stackFrame->retAddr);
+        }
+    }
+
+	SymCleanup(currentProcessId);
+}
+
+void ADM_backTrack(int lineno, const char *file)
+{	
+	saveCrashProject();
+
+	GUI_Error_HIG(_("Fatal Error"),_("A fatal error has occurred.\n\nClick OK to generate debug information. This may take a few minutes to complete."));
+
+	printf("\n*********** BACKTRACE **************\n");	
+	dumpBackTrace();
+	printf("*********** BACKTRACE **************\n");
+	printf("Assert failed at file %s, line %d\n\n",file,lineno);
+
+	exit(1);
 }
 #else
 #include <signal.h>
