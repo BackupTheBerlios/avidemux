@@ -31,7 +31,6 @@
 #include <windows.h>
 #include <excpt.h>
 #include <imagehlp.h>
-#include <tlhelp32.h>
 #endif
 
 #include "default.h"
@@ -76,34 +75,6 @@ typedef struct STACK_FRAME
     uint32_t param[0];	// parameter list (could be empty)
 } STACK_FRAME;
 
-static bool getModuleByReturnAddress(uint8_t* retAddr, char* moduleName, uint8_t* &moduleAddr)
-{
-    MODULEENTRY32 me32;
-    void* hSnapshot;
-
-    moduleName[0] = 0;
-	me32.dwSize = sizeof(MODULEENTRY32);
-
-    hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, 0);
-    
-    if ((hSnapshot != INVALID_HANDLE_VALUE) && Module32First(hSnapshot, &me32))
-    {
-        do
-		{
-			if (uint32_t(retAddr - me32.modBaseAddr) < me32.modBaseSize)
-			{
-				memcpy(moduleName, me32.szExePath, MAX_PATH);
-				moduleAddr = me32.modBaseAddr;
-				break;
-			}
-        } while(Module32Next(hSnapshot, &me32));
-    }
-
-    CloseHandle(hSnapshot);
-
-    return !!moduleName[0];
-}
-
 static void dumpBackTrace()
 {
 	STACK_FRAME* stackFrame;
@@ -115,11 +86,12 @@ static void dumpBackTrace()
 
 	const int maxAddrCount = 32;
     char moduleName[MAX_PATH];
-    uint8_t* moduleAddr;
+    HMODULE moduleAddr;
 
 	static char symbolBuffer[sizeof(IMAGEHLP_SYMBOL) + 512];
 	IMAGEHLP_SYMBOL* pSymbol;
 	DWORD symDisplacement;
+	MEMORY_BASIC_INFORMATION mbi;
 
 	pSymbol = (IMAGEHLP_SYMBOL*)symbolBuffer;
     pSymbol->MaxNameLength = sizeof(symbolBuffer) - sizeof(IMAGEHLP_SYMBOL);
@@ -128,9 +100,14 @@ static void dumpBackTrace()
 
     for (int retAddrCount = 0; (retAddrCount < maxAddrCount) && !IsBadReadPtr(stackFrame, sizeof(STACK_FRAME)) && !IsBadCodePtr(FARPROC(stackFrame->retAddr)); retAddrCount++, stackFrame = stackFrame->ebp)
     {
-        // Find the module by a return address inside that module
-        if (getModuleByReturnAddress(stackFrame->retAddr, moduleName, moduleAddr))
+		// Find the module using a return address inside that module
+		if (VirtualQuery(stackFrame->retAddr, &mbi, sizeof(mbi)))
         {
+			moduleName[0] = 0;
+			moduleAddr = (HMODULE)mbi.AllocationBase;
+			
+			GetModuleFileName(moduleAddr, moduleName, MAX_PATH);
+
 			printf("Frame %2d: %s(", retAddrCount, moduleName);
 
 			if (SymGetSymFromAddr(currentProcessId, (uint32_t)stackFrame->retAddr, &symDisplacement, pSymbol))
@@ -140,7 +117,7 @@ static void dumpBackTrace()
 			else
 				printf("<unknown>");
 
-			printf("+0x%X)[0x%08X]\n", stackFrame->retAddr - moduleAddr, stackFrame->retAddr);
+			printf("+0x%X)[0x%08X]\n", stackFrame->retAddr - (uint32_t)moduleAddr, stackFrame->retAddr);
         }
     }
 
