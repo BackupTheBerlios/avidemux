@@ -57,17 +57,6 @@ void ADM_backTrack(int lineno,const char *file)
 	assert(0);
 }
 #elif defined(WIN32)
-EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, void* pEstablisherFrame, struct _CONTEXT* pContextRecord, void* pDispatcherContext)
-{
-	static int running=0;
-
-	if(running)
-		exit(1);
-
-	running=1;
-	ADM_backTrack(0, "");
-}
-
 typedef struct STACK_FRAME
 {
     STACK_FRAME* ebp;	// address of the calling function frame
@@ -75,53 +64,133 @@ typedef struct STACK_FRAME
     uint32_t param[0];	// parameter list (could be empty)
 } STACK_FRAME;
 
-static void dumpBackTrace()
+static void dumpFrame(void* processId, void* frameAddr)
 {
-	STACK_FRAME* stackFrame;
-	void* currentProcessId;
-    
-	// Get frame address using builtin GCC function.
-	stackFrame = (STACK_FRAME*)__builtin_frame_address(0);
-	currentProcessId = GetCurrentProcess();
-
-	const int maxAddrCount = 32;
-    char moduleName[MAX_PATH];
-    HMODULE moduleAddr;
-
-	static char symbolBuffer[sizeof(IMAGEHLP_SYMBOL) + 512];
-	IMAGEHLP_SYMBOL* pSymbol;
-	DWORD symDisplacement;
 	MEMORY_BASIC_INFORMATION mbi;
+	char moduleName[MAX_PATH];
+	HMODULE moduleAddr;
+	DWORD symDisplacement;
+	IMAGEHLP_SYMBOL* pSymbol;
 
-	pSymbol = (IMAGEHLP_SYMBOL*)symbolBuffer;
-    pSymbol->MaxNameLength = sizeof(symbolBuffer) - sizeof(IMAGEHLP_SYMBOL);
+	if (VirtualQuery(frameAddr, &mbi, sizeof(mbi)))
+	{
+		moduleName[0] = 0;
+		moduleAddr = (HMODULE)mbi.AllocationBase;
+		
+		GetModuleFileName(moduleAddr, moduleName, MAX_PATH);
 
-	SymInitialize(currentProcessId, NULL, TRUE);
+		printf("%s(", moduleName);
+
+		if (SymGetSymFromAddr(processId, (uint32_t)frameAddr, &symDisplacement, pSymbol))
+			printf("%s", pSymbol->Name);
+		else
+			printf("<unknown>");
+
+		printf("+0x%X) [0x%08X]\n", (uint32_t)frameAddr - (uint32_t)moduleAddr, frameAddr);
+	}
+}
+	
+static void dumpExceptionInfo(void* processId, struct _EXCEPTION_RECORD* pExceptionRec, struct _CONTEXT* pContextRecord)
+{
+	printf("\n*********** EXCEPTION **************\n");
+	printf("Registers:\n");
+	printf("EAX: %08X  EBX: %08X  ECX: %08X  EDX: %08X  ESI: %08X\n", pContextRecord->Eax, pContextRecord->Ebx, pContextRecord->Ecx, pContextRecord->Edx, pContextRecord->Esi);
+	printf("EDI: %08X  ESP: %08X  EBP: %08X  EIP: %08X  EFlags: %08X\n\n", pContextRecord->Edi, pContextRecord->Esp, pContextRecord->Ebp, pContextRecord->Eip, pContextRecord->EFlags);
+
+	printf("Exception Code: ");
+
+	switch (pExceptionRec->ExceptionCode)
+	{
+		case EXCEPTION_ACCESS_VIOLATION:
+			printf("EXCEPTION_ACCESS_VIOLATION");
+			break;
+		case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
+			printf("EXCEPTION_ARRAY_BOUNDS_EXCEEDED");
+			break;
+		case EXCEPTION_BREAKPOINT:
+			printf("EXCEPTION_BREAKPOINT");
+			break;
+		case EXCEPTION_DATATYPE_MISALIGNMENT:
+			printf("EXCEPTION_DATATYPE_MISALIGNMENT");
+			break;
+		case EXCEPTION_FLT_DENORMAL_OPERAND:
+			printf("EXCEPTION_FLT_DENORMAL_OPERAND");
+			break;
+		case EXCEPTION_FLT_DIVIDE_BY_ZERO:
+			printf("EXCEPTION_FLT_DIVIDE_BY_ZERO");
+			break;
+		case EXCEPTION_FLT_INEXACT_RESULT:
+			printf("EXCEPTION_FLT_INEXACT_RESULT");
+			break;
+		case EXCEPTION_FLT_INVALID_OPERATION:
+			printf("EXCEPTION_FLT_INVALID_OPERATION");
+			break;
+		case EXCEPTION_FLT_OVERFLOW:
+			printf("EXCEPTION_FLT_OVERFLOW");
+			break;
+		case EXCEPTION_FLT_STACK_CHECK:
+			printf("EXCEPTION_FLT_STACK_CHECK");
+			break;
+		case EXCEPTION_FLT_UNDERFLOW:
+			printf("EXCEPTION_FLT_UNDERFLOW");
+			break;
+		case EXCEPTION_ILLEGAL_INSTRUCTION:
+			printf("EXCEPTION_ILLEGAL_INSTRUCTION");
+			break;
+		case EXCEPTION_IN_PAGE_ERROR:
+			printf("EXCEPTION_IN_PAGE_ERROR");
+			break;
+		case EXCEPTION_INT_DIVIDE_BY_ZERO:
+			printf("EXCEPTION_INT_DIVIDE_BY_ZERO");
+			break;
+		case EXCEPTION_INT_OVERFLOW:
+			printf("EXCEPTION_INT_OVERFLOW");
+			break;
+		case EXCEPTION_INVALID_DISPOSITION:
+			printf("EXCEPTION_INVALID_DISPOSITION");
+			break;
+		case EXCEPTION_NONCONTINUABLE_EXCEPTION:
+			printf("EXCEPTION_NONCONTINUABLE_EXCEPTION");
+			break;
+		case EXCEPTION_PRIV_INSTRUCTION:
+			printf("EXCEPTION_PRIV_INSTRUCTION");
+			break;
+		case EXCEPTION_SINGLE_STEP:
+			printf("EXCEPTION_SINGLE_STEP");
+			break;
+		case EXCEPTION_STACK_OVERFLOW:
+			printf("EXCEPTION_STACK_OVERFLOW");
+			break;
+		default:
+			printf("UNKNOWN");
+	}
+	
+	printf(" (%08X)\n", pExceptionRec->ExceptionCode);
+	printf("Exception Flags: %08X\n", pExceptionRec->ExceptionFlags);
+
+	printf("\nOrigin:\n");
+	dumpFrame(processId, (void*)pContextRecord->Eip);
+	printf("*********** EXCEPTION **************\n");
+	fflush(stdout);
+}
+
+static void dumpBackTrace(void* processId)
+{
+	const int maxAddrCount = 32;
+
+	printf("\n*********** BACKTRACE **************\n");
+
+	// Get frame address using builtin GCC function.
+	STACK_FRAME* stackFrame = (STACK_FRAME*)__builtin_frame_address(0);
 
     for (int retAddrCount = 0; (retAddrCount < maxAddrCount) && !IsBadReadPtr(stackFrame, sizeof(STACK_FRAME)) && !IsBadCodePtr(FARPROC(stackFrame->retAddr)); retAddrCount++, stackFrame = stackFrame->ebp)
     {
-		// Find the module using a return address inside that module
-		if (VirtualQuery(stackFrame->retAddr, &mbi, sizeof(mbi)))
-        {
-			moduleName[0] = 0;
-			moduleAddr = (HMODULE)mbi.AllocationBase;
-			
-			GetModuleFileName(moduleAddr, moduleName, MAX_PATH);
-
-			printf("Frame %2d: %s(", retAddrCount, moduleName);
-
-			if (SymGetSymFromAddr(currentProcessId, (uint32_t)stackFrame->retAddr, &symDisplacement, pSymbol))
-			{
-				printf("%s", pSymbol->Name);
-			}
-			else
-				printf("<unknown>");
-
-			printf("+0x%X)[0x%08X]\n", stackFrame->retAddr - (uint32_t)moduleAddr, stackFrame->retAddr);
-        }
+		printf("Frame %2d: ", retAddrCount);
+		dumpFrame(processId, stackFrame->retAddr);
+		fflush(stdout);
     }
 
-	SymCleanup(currentProcessId);
+	printf("*********** BACKTRACE **************\n\n");
 }
 
 void ADM_backTrack(int lineno, const char *file)
@@ -130,10 +199,38 @@ void ADM_backTrack(int lineno, const char *file)
 
 	GUI_Error_HIG(_("Fatal Error"),_("A fatal error has occurred.\n\nClick OK to generate debug information. This may take a few minutes to complete."));
 
-	printf("\n*********** BACKTRACE **************\n");	
-	dumpBackTrace();
-	printf("*********** BACKTRACE **************\n");
+	void* currentProcessId = GetCurrentProcess();
+
+	SymInitialize(currentProcessId, NULL, TRUE);
+	dumpBackTrace(currentProcessId);
+	SymCleanup(currentProcessId);
+
 	printf("Assert failed at file %s, line %d\n\n",file,lineno);
+
+	exit(1);
+}
+
+EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, void* pEstablisherFrame, struct _CONTEXT* pContextRecord, void* pDispatcherContext)
+{
+	static int running=0;
+
+	if(running)
+		exit(1);
+
+	running=1;
+
+	saveCrashProject();
+
+	GUI_Error_HIG(_("Fatal Error"),_("A fatal error has occurred.\n\nClick OK to generate debug information. This may take a few minutes to complete."));
+
+	void* currentProcessId = GetCurrentProcess();
+
+	SymInitialize(currentProcessId, NULL, TRUE);
+
+	dumpExceptionInfo(currentProcessId, pExceptionRec, pContextRecord);
+	dumpBackTrace(currentProcessId);
+
+	SymCleanup(currentProcessId);
 
 	exit(1);
 }
