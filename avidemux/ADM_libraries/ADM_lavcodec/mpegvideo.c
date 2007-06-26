@@ -4839,7 +4839,8 @@ static int pre_estimate_motion_thread(AVCodecContext *c, void *arg){
     return 0;
 }
 
-static int estimate_motion_thread(AVCodecContext *c, void *arg){
+static int attribute_align_arg estimate_motion_thread(AVCodecContext *c, void *arg)
+{
     MpegEncContext *s= arg;
 
     ff_check_alignment();
@@ -4866,7 +4867,8 @@ static int estimate_motion_thread(AVCodecContext *c, void *arg){
     return 0;
 }
 
-static int mb_var_thread(AVCodecContext *c, void *arg){
+static int attribute_align_arg mb_var_thread(AVCodecContext *c, void *arg)
+{
     MpegEncContext *s= arg;
     int mb_x, mb_y;
 
@@ -4908,7 +4910,8 @@ static void write_slice_end(MpegEncContext *s){
         s->misc_bits+= get_bits_diff(s);
 }
 
-static int encode_thread(AVCodecContext *c, void *arg){
+static int attribute_align_arg encode_thread(AVCodecContext *c, void* arg)
+{
     MpegEncContext *s= arg;
     int mb_x, mb_y, pdif = 0;
     int i, j;
