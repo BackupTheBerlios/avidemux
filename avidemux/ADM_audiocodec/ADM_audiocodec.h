@@ -258,5 +258,23 @@ class ADM_AudiocodecImaAdpcm : public     ADM_Audiocodec
 		virtual	uint8_t isCompressed(void) {return 1;}
 		virtual	uint8_t isDecompressable(void) {return 1;}
 };
+class ADM_AudiocodecMsAdpcm : public     ADM_Audiocodec
+{
+	protected:
+		uint32_t _inStock,_me,_channels;
+		int ss_div,ss_mul; // ???
+		void *_contextVoid;
+		uint8_t _buffer[ IMA_BUFFER];
+		uint32_t _head,_tail;
+
+	public:
+		ADM_AudiocodecMsAdpcm(uint32_t fourcc, WAVHeader *info);
+		virtual	~ADM_AudiocodecMsAdpcm();
+		virtual	uint8_t beginDecompress(void) {_head=_tail=0;return 1;}
+		virtual	uint8_t endDecompress(void) {_head=_tail=0;return 1;}
+		virtual	uint8_t run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut);
+		virtual	uint8_t isCompressed(void) {return 1;}
+		virtual	uint8_t isDecompressable(void) {return 1;}
+};
 
 #endif

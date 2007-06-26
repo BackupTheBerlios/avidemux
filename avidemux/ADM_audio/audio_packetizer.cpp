@@ -99,6 +99,7 @@ _refill:
 		case WAV_PCM:
                 case WAV_8BITS_UNSIGNED:
 		case WAV_ULAW:
+                case WAV_MSADPCM:
 				return getPacketPCM(dest,len,samples);
 				break;
 		case WAV_AC3:
@@ -188,7 +189,7 @@ uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len,
 				return 0;
 			}
                         if(_wavheader->encoding!=WAV_ULAW && _wavheader->encoding!=WAV_8BITS_UNSIGNED&&
-                                        _wavheader->encoding!=WAV_IMAADPCM)
+                                        _wavheader->encoding!=WAV_IMAADPCM  )
 			{
 				*samples=sample/2;
 			}

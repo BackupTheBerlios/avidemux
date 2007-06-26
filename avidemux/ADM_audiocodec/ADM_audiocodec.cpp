@@ -48,6 +48,10 @@ ADM_Audiocodec *out = NULL;
                                         printf("\n Audio codec:  IMA MS ADPCM\n");
                                         out= (ADM_Audiocodec *)new ADM_AudiocodecImaAdpcm(fourcc,info);
                                         break;
+                                case WAV_MSADPCM:
+                                        printf("\n Audio codec:   MS ADPCM\n");
+                                        out= (ADM_Audiocodec *)new ADM_AudiocodecMsAdpcm(fourcc,info);
+                                        break;
 				case WAV_PCM:
     					printf("\n Audio codec:  WAV\n");
 #ifdef ADM_BIG_ENDIAN				
