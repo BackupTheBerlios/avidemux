@@ -8,9 +8,8 @@
 INCLUDE(Po)
 
 SET(adm_EXE_SRCS ADM_preview.cpp  gtk_gui.cpp  gui_autodrive.cpp  GUI_jobs.cpp  gui_navigate.cpp  guiplay.cpp  gui_savenew.cpp  main.cpp )
-if(NOT WIN32)
+
 COMPILE_PO_FILES(${CMAKE_SOURCE_DIR}/po adm_EXE_SRCS)
-endif(NOT WIN32)
 
 include_directories(ADM_userInterfaces/ADM_commonUI ADM_outputs)
 
