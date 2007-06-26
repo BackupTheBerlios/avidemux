@@ -7,7 +7,7 @@ libADM_audiocodec_a_METASOURCES = AUTO
 libADM_audiocodec_a_SOURCES = ADM_codecwma.cpp  \
 	audiocodec_ogg.cpp ADM_codecwav.cpp ADM_codecmp3.cpp ADM_codecac3.cpp ADM_audiocodec.cpp \
 	ADM_lpcm.cpp ADM_8bits.cpp ADM_codecfaad.cpp ADM_codeculaw.cpp \
-ADM_codecimaadpcm.cpp ADM_dca.cpp
+ADM_codecimaadpcm.cpp ADM_dca.cpp ADM_codecmsadpcm.cpp
 
 
 EXTRA_DIST = \
