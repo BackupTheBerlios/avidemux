@@ -1188,8 +1188,11 @@ void putseq_next( int *type,int *quant )
 //		sync_guard_update( &cur_picture->completion, 0 );
 		mean_dts_picture=cur_picture->temp_ref+ss.gop_start_frame;
 #ifdef PUSH
-		assert(0==pushframe(cur_picture->temp_ref+ss.gop_start_frame,
-					cur_picture->curorg));
+		int result;
+
+		result = pushframe(cur_picture->temp_ref+ss.gop_start_frame, cur_picture->curorg);
+
+		assert(0==result);
 #else					
 		if( readframe(cur_picture->temp_ref+ss.gop_start_frame,cur_picture->curorg) )
 		{
