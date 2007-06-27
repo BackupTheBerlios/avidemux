@@ -75,7 +75,7 @@ uint8_t AVDMGenericAudioStream::isPaketizable( void)
 		case WAV_MP2:
 		case WAV_WMA:
 		case WAV_PCM:
-		case WAV_MSADPCM:
+
 		case WAV_LPCM:
 		case WAV_AC3:
 		case WAV_8BITS:
@@ -84,6 +84,7 @@ uint8_t AVDMGenericAudioStream::isPaketizable( void)
                 
 			return 1;
 			break;
+		case WAV_MSADPCM:
                 case WAV_IMAADPCM:
 		case WAV_MP4:		// No
 		case WAV_AAC:
