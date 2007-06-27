@@ -21,6 +21,6 @@ Q_RCC(avidemux)
 #########################################"
 include(adm_qt4)
 ################################
-include_directories(.. .)
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories(${QT_INCLUDES})
 

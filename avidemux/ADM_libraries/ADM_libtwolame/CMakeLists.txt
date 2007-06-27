@@ -17,5 +17,5 @@ include_directories(${LIBXML2_INCLUDE_DIR})
 
 ################################
 ADD_definitions(-DNDEBUG -DINLINE=inline)
-include_directories(.)
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
 
