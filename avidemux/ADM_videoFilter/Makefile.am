@@ -36,7 +36,7 @@ ADM_guiResize.cpp \
  ADM_vidFlipV.cpp \
  ADM_vidLuma.cpp \
  ADM_vidLargeMedian.cpp \
- ADM_vidChromaShift.cpp  
+ ADM_vidChromaShift.cpp   \
  ADM_vidChroma.cpp \
  ADM_vidMosaic.cpp \
  ADM_vidBlendRemoval.cpp  \
