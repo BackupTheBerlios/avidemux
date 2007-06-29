@@ -21,5 +21,6 @@ ADM_guiResize.cpp  ADM_resizebis.cpp  ADM_resizeter.cpp  ADM_vidResize.cpp
 ADM_vidMPLResize.cpp  
 ADM_vidResize25.cpp
 ADM_vidTdeint.cpp
+ADM_vidChromaShift.cpp  
 )
 ADD_LIBRARY(ADM_videoFilter STATIC ${ADM_videoFilter_SRCS})

@@ -37,7 +37,7 @@
 #include "ADM_assert.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flyDialogQt4.h"
-#include "ADM_video/ADM_vidChromaShift_param.h"
+#include "ADM_videoFilter/ADM_vidChromaShift_param.h"
 #include "DIA_flyChromaShift.h"
 class Ui_chromaShiftWindow : public QDialog
  {

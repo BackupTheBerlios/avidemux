@@ -46,7 +46,7 @@
 #include "ADM_video/ADM_vidHue.h"
 #include "ADM_video/ADM_vobsubinfo.h"
 #include "ADM_video/ADM_vidVobSub.h"
-#include "ADM_video/ADM_vidChromaShift_param.h"
+#include "ADM_videoFilter/ADM_vidChromaShift_param.h"
 #include "ADM_video/ADM_vidMPdelogo.h"
 #include "ADM_video/ADM_vidEq2.h"
 #include "ADM_video/ADM_vidContrast.h"

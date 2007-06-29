@@ -35,7 +35,7 @@
 #include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_assert.h"
 #include "DIA_flyDialog.h"
-#include "ADM_video/ADM_vidChromaShift_param.h"
+#include "ADM_videoFilter/ADM_vidChromaShift_param.h"
 #include "DIA_flyChromaShift.h"
 
 static int lock=0;

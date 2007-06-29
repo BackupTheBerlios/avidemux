@@ -20,7 +20,6 @@ libADM_video_a_SOURCES = \
  ADM_vidFieldUtil.h \
  ADM_confCouples.cpp \
  ADM_confCouple.h ADM_vidCommonFilter.h \
-	ADM_vidChromaShift.h ADM_vidChromaShift.cpp \
  ADM_interlaced.cpp \
 	ADM_interlaced.h \
  ADM_vidRaw.cpp \

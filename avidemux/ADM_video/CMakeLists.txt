@@ -23,7 +23,6 @@ ADM_vidDelta.cpp
 ADM_vidMPdelogo.cpp      
 ADM_vidSRT.cpp        
 ADM_vobsubinfo.cpp
-ADM_vidChromaShift.cpp  
 ADM_vidEq2.cpp             
 ADM_vidSRTload.cpp
 ADM_vidClean.cpp        
