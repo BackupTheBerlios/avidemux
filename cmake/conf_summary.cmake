@@ -31,6 +31,7 @@ MESSAGE("*** Audio Device ***")
 ADM_DISPLAY("ESD       " USE_ESD)
 ADM_DISPLAY("OSS       " OSS_SUPPORT)
 ADM_DISPLAY("ARTS      " USE_ARTS)
+ADM_DISPLAY("JACK      " USE_JACK)
 
 MESSAGE("*** Misc       ***")
 ADM_DISPLAY("SDL       " USE_SDL)

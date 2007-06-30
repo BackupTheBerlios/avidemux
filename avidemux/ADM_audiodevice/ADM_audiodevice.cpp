@@ -52,6 +52,10 @@
 #include "ADM_deviceEsd.h"
 #endif
 
+#ifdef USE_JACK
+#include "ADM_deviceJack.h"
+#endif
+
 #ifdef __APPLE__
 #include "ADM_audiodevice/ADM_deviceAudioCore.h"
 #endif
@@ -140,6 +144,7 @@ AUDIO_DEVICE id;
 			case DEVICE_SDL:
 			case DEVICE_WIN32:
 			case DEVICE_ESD:
+			case DEVICE_JACK:
 			
 						printf("Using real audio device\n");
 						AVDM_switch(id);
@@ -204,6 +209,12 @@ void AVDM_switch(AUDIO_DEVICE action)
 		  case  DEVICE_ESD :
 								device=new 	 esdAudioDevice;
 								currentDevice=DEVICE_ESD;;
+								break;
+#endif
+#if defined(USE_JACK) && !defined(ADM_WIN32)
+		  case  DEVICE_JACK:
+								device=new 	 jackAudioDevice;
+								currentDevice=DEVICE_JACK;
 								break;
 #endif
 #ifdef USE_ARTS

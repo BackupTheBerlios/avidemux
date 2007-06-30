@@ -251,6 +251,9 @@ uint32_t hzd,vzd,dring;
 #ifdef USE_ESD	
 	MKADID(ESD),
 #endif	
+#ifdef USE_JACK
+	MKADID(JACK),
+#endif	
         MKADID(DUMMY)
 };
         diaElemMenu menuAudio(&newdevice,_("_Audio output:"), sizeof(audioEntries)/sizeof(diaMenuEntry),audioEntries,"");

@@ -301,6 +301,11 @@ if(USE_ESD)
 add_libs_all_targets(esd )
 endif(USE_ESD)
 
+# JACK
+if(USE_JACK)
+add_libs_all_targets(jack )
+endif(USE_JACK)
+
 
 # x264
 if(USE_X264)

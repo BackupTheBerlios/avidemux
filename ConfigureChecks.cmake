@@ -184,6 +184,12 @@ if(NOT WIN32)
 ADM_CHECK_HL(Esd esd.h  esd esd_close USE_ESD)
 endif(NOT WIN32)
 ########################################
+# JACK
+########################################
+if(NOT WIN32)
+ADM_CHECK_HL(Jack jack/jack.h  jack jack_client_close USE_JACK)
+endif(NOT WIN32)
+########################################
 # Aften
 ########################################
 if(WIN32)

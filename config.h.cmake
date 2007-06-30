@@ -453,6 +453,9 @@
 /* ESD detected */
 #cmakedefine USE_ESD
 
+/* Jack detected */
+#cmakedefine USE_JACK
+
 /* "Use faac audio enccoder" */
 #cmakedefine USE_FAAC
 
