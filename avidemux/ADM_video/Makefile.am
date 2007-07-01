@@ -37,8 +37,7 @@ libADM_video_a_SOURCES = \
   ADM_vidDelta.cpp \
  ADM_vidUnblend.cpp \
  ADM_vidMPdelogo.cpp \
- ADM_vidColorYuv.cpp  \
- ADM_vidAnimated.cpp 
+ ADM_vidColorYuv.cpp  
 
 				
 

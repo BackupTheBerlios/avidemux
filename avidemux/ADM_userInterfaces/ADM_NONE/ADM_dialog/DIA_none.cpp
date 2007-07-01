@@ -33,7 +33,7 @@
 #include "ADM_toolkit/filesel.h"
 
 
-#include "ADM_video/ADM_vidAnimated_param.h"
+#include "ADM_videoFilter/ADM_vidAnimated_param.h"
 #include "ADM_video/ADM_vidASharp_param.h"
 #include "ADM_audiofilter/audiofilter_normalize_param.h"
 #include "ADM_video/ADM_vidCNR2_param.h"

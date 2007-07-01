@@ -96,7 +96,7 @@ uint32_t nfq,fqindex,brindex,index,nbframe=0;
 				a[7]=stream[start+7];
 				if(start>=maxSearch-7) break;
 				start++;
-				if(a[0]==0xff && ((a[1]&0xF0)==0xF0))
+				if(a[0]==0xff && ((a[1]&0xF6)==0xF0))
 				{
 					// Layer
                                         part=a[1]&0xf;

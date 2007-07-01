@@ -9,7 +9,6 @@ ADM_vidFieldUtil.cpp
 ADM_vidRaw.cpp        
 ADM_vidUnblend.cpp
 ADM_genvideo.cpp         
-ADM_vidAnimated.cpp     
 ADM_vidContrast.cpp   
 ADM_vidFont.cpp
 ADM_vidVobsub.cpp

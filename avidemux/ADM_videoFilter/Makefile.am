@@ -60,7 +60,8 @@ ADM_guiResize.cpp \
  ADM_vidFastConvolution.cpp  \
  ADM_vidRotate.cpp \
  ADM_vidYadif.cpp \
- ADM_vidYadif_asm.c
+ ADM_vidYadif_asm.c \
+ ADM_vidAnimated.cpp
 			
 
 

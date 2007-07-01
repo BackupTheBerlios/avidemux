@@ -32,7 +32,7 @@
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_filter/video_filters.h"
-#include"ADM_video/ADM_vidAnimated.h"
+#include "ADM_vidAnimated.h"
 
 
 #include "ADM_inputs/ADM_inpics/ADM_pics.h"
@@ -49,11 +49,12 @@ SCRIPT_CREATE(animated_script,ADMVideoAnimated,animated_template);
 #define CACHE_SIZE (LOOKUP*2+3)
 
 
-extern uint8_t DIA_animated(ANIMATED_PARAM *param);
+extern uint8_t DIA_animated(ANIMATED_PARAM *param,uint32_t w,uint32_t h, uint32_t n);
 
 uint8_t ADMVideoAnimated::configure(AVDMGenericVideoStream *in)
 {
-   if(DIA_animated(_param))
+  ADV_Info *f=in->getInfo();
+   if(DIA_animated(_param,f->width,f->height,f->nb_frames))
    {
       setup();
       return 1;

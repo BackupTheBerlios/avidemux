@@ -33,7 +33,7 @@
 #include "ADM_toolkit/filesel.h"
 
 
-#include "ADM_video/ADM_vidAnimated_param.h"
+#include "ADM_videoFilter/ADM_vidAnimated_param.h"
 #include "ADM_video/ADM_vidASharp_param.h"
 #include "ADM_audiofilter/audiofilter_normalize_param.h"
 #include "ADM_video/ADM_vidCNR2_param.h"
@@ -76,7 +76,6 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 		      uint32_t * br,uint32_t *fsize,xvidEncParam *param){return 0;}
 #endif
 int     DIA_coloryuv(COLOR_YUV_PARAM *param){return 0;}
-uint8_t DIA_animated(ANIMATED_PARAM *param){return 0;}
 uint8_t DIA_cnr2(CNR2Param *param){return 0;}
 uint8_t DIA_getEQ2Param(Eq2_Param *param, AVDMGenericVideoStream *in){return 0;}
 uint8_t DIA_getEqualizer(EqualizerParam *param, ADMImage *image){return 0;}
