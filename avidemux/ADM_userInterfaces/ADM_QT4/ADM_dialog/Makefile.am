@@ -2,6 +2,7 @@
 noinst_LIBRARIES = libADM_dialog.a 
 libADM_dialog_a_SOURCES = DIA_busy.cpp  alert_qt4.cpp DIA_none.cpp OCR_none.cpp  \
 AQ_props.cpp AQ_working.cpp AQ_encoding.cpp  DIA_xvid4.cpp AQ_resizing.cpp AT_flyDialog.cpp \
+AQ_jobs.cpp \
 AQ_crop.cpp AT_QCanvas.cpp \
 AQ_asharp.cpp AQ_chromashift.cpp \
 AQ_contrast.cpp AQ_hue.cpp \

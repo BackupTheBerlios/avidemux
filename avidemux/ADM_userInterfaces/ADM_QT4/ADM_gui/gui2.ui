@@ -907,6 +907,37 @@
     <addaction name="actionShow_built_in_support" />
     <addaction name="actionAbout_avidemux" />
    </widget>
+   <widget class="QMenu" name="menuAuto" >
+    <property name="title" >
+     <string>Auto</string>
+    </property>
+    <addaction name="actionVCD" />
+    <addaction name="actionSVCD" />
+    <addaction name="actionDVD" />
+    <addaction name="actionPSP" />
+    <addaction name="actionPSP_H264" />
+   </widget>
+   <widget class="QMenu" name="menuAudio" >
+    <property name="title" >
+     <string>Audio</string>
+    </property>
+    <addaction name="actionMain_Track" />
+    <addaction name="actionSecondary_Track" />
+    <addaction name="actionBuild_VBR_time_map" />
+    <addaction name="actionSave_2" />
+    <addaction name="actionFilters_2" />
+   </widget>
+   <widget class="QMenu" name="menuVideo" >
+    <property name="title" >
+     <string>Video</string>
+    </property>
+    <addaction name="actionDecoder_options" />
+    <addaction name="actionPostprocessing" />
+    <addaction name="separator" />
+    <addaction name="separator" />
+    <addaction name="actionFilters" />
+    <addaction name="actionFrame_rate" />
+   </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
      <string>File</string>
@@ -939,38 +970,10 @@
     <addaction name="actionSave_project" />
     <addaction name="actionSave_project_as" />
     <addaction name="separator" />
+    <addaction name="actionAdd_to_joblist" />
+    <addaction name="actionShow_Joblist" />
+    <addaction name="separator" />
     <addaction name="actionQuit" />
-   </widget>
-   <widget class="QMenu" name="menuAuto" >
-    <property name="title" >
-     <string>Auto</string>
-    </property>
-    <addaction name="actionVCD" />
-    <addaction name="actionSVCD" />
-    <addaction name="actionDVD" />
-    <addaction name="actionPSP" />
-    <addaction name="actionPSP_H264" />
-   </widget>
-   <widget class="QMenu" name="menuAudio" >
-    <property name="title" >
-     <string>Audio</string>
-    </property>
-    <addaction name="actionMain_Track" />
-    <addaction name="actionSecondary_Track" />
-    <addaction name="actionBuild_VBR_time_map" />
-    <addaction name="actionSave_2" />
-    <addaction name="actionFilters_2" />
-   </widget>
-   <widget class="QMenu" name="menuVideo" >
-    <property name="title" >
-     <string>Video</string>
-    </property>
-    <addaction name="actionDecoder_options" />
-    <addaction name="actionPostprocessing" />
-    <addaction name="separator" />
-    <addaction name="separator" />
-    <addaction name="actionFilters" />
-    <addaction name="actionFrame_rate" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -1409,6 +1412,16 @@
   <action name="actionPSP_H264" >
    <property name="text" >
     <string>PSP (H264)</string>
+   </property>
+  </action>
+  <action name="actionAdd_to_joblist" >
+   <property name="text" >
+    <string>Add to joblist</string>
+   </property>
+  </action>
+  <action name="actionShow_Joblist" >
+   <property name="text" >
+    <string>Show Joblist</string>
    </property>
   </action>
  </widget>
