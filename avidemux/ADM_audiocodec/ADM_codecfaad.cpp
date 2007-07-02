@@ -172,13 +172,10 @@ uint8_t first=0;
 			{
 				printf("Faad: Error %d :%s\n",info.error,
 					faacDecGetErrorMessage(info.error));
-					/*
-				xin=info.bytesconsumed ;
-				if(!xin) xin=1;
-				memmove(_buffer,_buffer+xin,_inbuffer-xin);
-				_inbuffer-=xin;
-				return 1;*/
-				return 0;
+				printf("Bye consumed %u, bytes dropped %u \n",info.bytesconsumed,_inbuffer);
+
+                                _inbuffer=0; // Purge buffer
+				return 1;
 			}
 			if(first)
 			{
