@@ -192,9 +192,9 @@ include(ConfigureChecks.cmake)
 # create config.h
 CONFIGURE_FILE(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 # #
- include_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/avidemux ${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries)
- include_directories(${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries/ADM_utilities/ ${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries/ADM_lavutil)
- include_directories(${CMAKE_CURRENT_BINARY_DIR}/avidemux/ADM_libraries/ADM_lavcodec  )
+ include_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/avidemux ${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries)
+ include_directories(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_utilities/ ${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_lavutil)
+ include_directories(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_lavcodec  )
 #**********************************************
 # Some CFLAGS
 #**********************************************

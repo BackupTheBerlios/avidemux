@@ -385,7 +385,7 @@ add_libs_all_targets(winmm)
 add_libs_all_targets(wsock32)
 add_libs_all_targets(imagehlp)
 
-add_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows xpm/adm.o -Wl,--export-all-symbols")
+add_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows ${CMAKE_SOURCE_DIR}/avidemux/xpm/adm.o -Wl,--export-all-symbols")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
 add_ldflags_all_targets("-Wl,-s")
