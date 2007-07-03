@@ -208,8 +208,7 @@ _again:
           return 0; 
         }
         ADM_assert(tmptail>=tmphead);
-        if(_wavheader->channels > 2)
-            reorderChannels(&(tmpbuffer[tmphead]),_chunk);
+        reorderChannels(&(tmpbuffer[tmphead]),*samples);
         *len = faacEncEncode(_handle, (int32_t *)&(tmpbuffer[tmphead]), _chunk, dest, FA_BUFFER_SIZE);
         if(!*len) 
         {

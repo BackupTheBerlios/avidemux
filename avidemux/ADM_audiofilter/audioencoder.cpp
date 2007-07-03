@@ -140,7 +140,6 @@ void AUDMEncoder::reorderChannels(float *data, uint32_t nb)
 	float tmp [_wavheader->channels];
 	static uint8_t reorder[MAX_CHANNELS];
 	static bool reorder_on;
-	uint32_t len = nb / _wavheader->channels;
 	
 	if (ch_route.mode < 1) {
 		reorder_on = 0;
@@ -168,7 +167,7 @@ void AUDMEncoder::reorderChannels(float *data, uint32_t nb)
 	}
 
 	if (reorder_on)
-		for (int i = 0; i < len; i++) {
+		for (int i = 0; i < nb; i++) {
 			memcpy(tmp, data, sizeof(tmp));
 			for (int c = 0; c < _wavheader->channels; c++)
 				*data++ = tmp[reorder[c]];
