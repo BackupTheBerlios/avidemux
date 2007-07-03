@@ -59,7 +59,7 @@ void DIA_StartBusy( void )
 {
 
 	UI_BusyCursor();
-        UI_purge();
+        //UI_purge();
 
 	
 }

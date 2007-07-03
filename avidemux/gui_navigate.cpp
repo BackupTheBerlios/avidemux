@@ -43,7 +43,7 @@
 #include "DIA_working.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-    
+#include "DIA_busy.h"
 extern void    UI_purge(void );
 //____________________________________
 
@@ -439,3 +439,19 @@ uint8_t A_rebuildKeyFrame(void)
 
         return video_body->rebuildFrameType();
 }
+/**
+    \fn GUI_PrevFrame
+    \brief Go to current frame -1
+*/
+void        GUI_PrevFrame(void )
+{
+      if (curframe)
+        {
+          
+          DIA_StartBusy ();
+          GUI_GoToFrame (curframe - 1);
+          DIA_StopBusy ();
+        }
+}
+//EOF
+        

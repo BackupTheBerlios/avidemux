@@ -26,6 +26,7 @@ void 			rebuild_status_bar(void );
 
 
 void GUI_NextFrame( void );
+void GUI_PrevFrame( void );
 void GUI_NextKeyFrame( void ) ;
 void GUI_NextPrevBlackFrame( int ) ;
 void GUI_PreviousKeyFrame( void );

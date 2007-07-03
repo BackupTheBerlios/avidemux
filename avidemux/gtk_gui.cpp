@@ -598,15 +598,7 @@ int nw;
         break;                        
     
     case ACT_PreviousFrame:
-      if (curframe)
-	{
-	  DIA_StartBusy ();
-	  GUI_GoToFrame (curframe - 1);
-	  DIA_StopBusy ();
-	  
-
-	}
-
+        GUI_PrevFrame();
       break;
 
     case ACT_Forward50Frames:
