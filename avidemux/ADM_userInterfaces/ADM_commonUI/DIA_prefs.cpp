@@ -19,8 +19,6 @@
 #include <string.h>
 #include <stdio.h>
 
-
-
 # include <config.h>
 
 #include "default.h"
@@ -34,6 +32,9 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_commonUI/DIA_factory.h"
 
+#ifdef ADM_WIN32
+#include "ADM_userInterfaces/ADM_commonUI/GUI_sdlRender.h"
+#endif
 
 extern void 		AVDM_audioPref( void );
 
@@ -195,7 +196,12 @@ uint32_t hzd,vzd,dring;
                              ,{RENDER_XV,   _("XVideo (best)"),NULL}
 #endif
 #ifdef USE_SDL
-                             ,{RENDER_SDL,      _("SDL (good)"),NULL}
+#ifdef ADM_WIN32
+                             ,{RENDER_SDL,      _("SDL (GDI)"),NULL}
+							 ,{RENDER_DIRECTX,      _("SDL (DirectX)"),NULL}
+#else
+							 ,{RENDER_SDL,      _("SDL (good)"),NULL}
+#endif
 #endif
         };        
         diaElemMenu menuVideoMode(&render,_("Video _display:"), sizeof(videoMode)/sizeof(diaMenuEntry),videoMode,"");
@@ -394,6 +400,11 @@ uint32_t hzd,vzd,dring;
                   prefs->set(FILTERS_AUTOLOAD_PATH, filterPath);
                 // Alternate mp3 tag (haali)
                 prefs->set(FEATURE_ALTERNATE_MP3_TAG,alternate_mp3_tag);
+
+			#ifdef ADM_WIN32
+				// Initialise SDL again as driver may have changed
+				initSdl();
+			#endif
 	}
 	return 1;
 }

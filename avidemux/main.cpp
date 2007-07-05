@@ -61,12 +61,16 @@ uint8_t lavformat_init(void);
 #endif                       
 
 #ifdef USE_SDL
-	extern "C" {
+extern "C" {
 	#include "SDL/SDL.h"
-	}
+}
+
+#include "ADM_userInterfaces/ADM_commonUI/GUI_sdlRender.h"
 #endif
+
 #include "ADM_osSupport/ADM_cpuCap.h"
 #include "ADM_osSupport/ADM_threads.h"
+
 void onexit( void );
 //extern void automation(int argc, char **argv);
 
@@ -106,8 +110,6 @@ int CpuCaps::myCpuCaps=0;
 
 int main(int argc, char *argv[])
 {
-	int sdl_version=0;
-
 #ifndef ADM_WIN32
 	// thx smurf uk :)
     installSigHandler();
@@ -146,7 +148,7 @@ int main(int argc, char *argv[])
 #elif defined(ARCH_X86_64)
 	printf(" (x86-64)");
 #elif defined(ARCH_POWERPC)
-	printf(" (PowerPC));
+	printf(" (PowerPC)");
 #endif
 
 printf("\n");
@@ -192,38 +194,15 @@ printf("\n");
 
 	printf("Initialising prefs\n");
 	initPrefs();
+	prefs->load();
 
 	register_Encoders();
-	atexit(onexit);
 
 #ifdef USE_SDL
-    sdl_version=(SDL_Linked_Version()->major*1000)+(SDL_Linked_Version()->minor*100) + (SDL_Linked_Version()->patch);
-    printf("\n[SDL] Version: %u.%u.%u\n",SDL_Linked_Version()->major, SDL_Linked_Version()->minor, SDL_Linked_Version()->patch);
-
-	if(sdl_version > 1209)
-	{
-		printf("[SDL] Initialisation ");
-
-		if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
-		{
-			printf("succeeded\n");
-
-			char driverName[100];
-
-			if (SDL_VideoDriverName(driverName, 100) != NULL)
-			{
-				printf("[SDL] Video Driver: %s\n", driverName);
-			}
-		}
-		else
-		{
-			printf("FAILED\n");
-			printf("[SDL] ERROR: %s\n", SDL_GetError());
-		}
-	}
-
-	printf("\n");
+	initSdl();
 #endif
+
+	atexit(onexit);
 
 #ifdef ADM_WIN32
     win32_netInit();
@@ -242,7 +221,6 @@ printf("\n");
 
 	// Load .avidemuxrc
     quotaInit();
-    prefs->load();
 
 	if(!initGUI())
 	{
@@ -284,15 +262,7 @@ printf("\n");
 
     COL_init();
 	initLibWrappers();
-
-#ifdef USE_SDL
-	if(sdl_version<=1209)
-	{
-		printf("[SDL] Initalising...\n");
-		SDL_Init(0); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
-	}
-#endif
-
+	
     if(SpidermonkeyInit() == true)
         printf("Spidermonkey initialized.\n");
     else
@@ -321,6 +291,11 @@ void onexit( void )
     destroyPrefs();
     filterCleanUp();
 	destroyLibWrappers();
+
+#ifdef USE_SDL
+	quitSdl();
+#endif
+
     printf("End of cleanup\n");
     ADMImage_stat();
     ADM_memStat();

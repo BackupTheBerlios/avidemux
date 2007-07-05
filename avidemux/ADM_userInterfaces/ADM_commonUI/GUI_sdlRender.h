@@ -12,8 +12,12 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "GUI_render.h"
+#include "GUI_accelRender.h"
+
 #ifndef TSDLRENDER_H
 #define TSDLRENDER_H
+
 class sdlAccelRender: public AccelRender
 {
   protected:
@@ -26,4 +30,6 @@ class sdlAccelRender: public AccelRender
               virtual   uint8_t display(uint8_t *ptr, uint32_t w, uint32_t h,renderZoom zoom);
 };
 
+void initSdl(void);
+void quitSdl(void);
 #endif

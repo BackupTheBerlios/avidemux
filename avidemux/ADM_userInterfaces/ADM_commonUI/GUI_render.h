@@ -95,6 +95,10 @@ typedef enum
 #endif
 #ifdef USE_SDL
         RENDER_SDL=2,
+
+#ifdef ADM_WIN32
+		RENDER_DIRECTX=3,
+#endif
 #endif
         RENDER_LAST       
 

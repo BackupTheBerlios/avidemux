@@ -24,24 +24,25 @@
 #include <time.h>
 #include <sys/time.h>
 
-
-
 extern "C" {
 #include "SDL/SDL.h"
 #include "SDL/SDL_syswm.h"
-
-
 }
 
 #include "default.h"
 
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_colorspace/ADM_rgb.h"
-#include "ADM_commonUI//GUI_render.h"
+#include "ADM_commonUI/GUI_render.h"
 
 #include "GUI_accelRender.h"
 #include "GUI_sdlRender.h"
 #include "ADM_assert.h"
+
+#ifdef ADM_WIN32
+#include "prefs.h"
+#include "ADM_userInterfaces/ADM_commonUI/GUI_render.h"
+#endif
 
 //******************************************
 static uint8_t sdl_running=0;
@@ -252,4 +253,65 @@ int page=w*h;
         return 1;
 }
 
+void initSdl(void)
+{
+	printf("\n");
+	quitSdl();
+
+    int sdl_version = (SDL_Linked_Version()->major*1000)+(SDL_Linked_Version()->minor*100) + (SDL_Linked_Version()->patch);
+
+    printf("[SDL] Version: %u.%u.%u\n",SDL_Linked_Version()->major, SDL_Linked_Version()->minor, SDL_Linked_Version()->patch);
+
+#ifdef ADM_WIN32
+	uint32_t videoDevice = RENDER_LAST;
+
+	if(!prefs->get(DEVICE_VIDEODEVICE, &videoDevice) || videoDevice != RENDER_DIRECTX)
+	{
+		printf("[SDL] Setting video driver to Microsoft Windows GDI\n");
+		putenv("SDL_VIDEODRIVER=windib");
+	}
+	else
+	{
+		printf("[SDL] Setting video driver to Microsoft DirectX\n");
+		putenv("SDL_VIDEODRIVER=directx");
+	}
+#endif
+
+	uint32_t sdlInitFlags;
+
+	if (sdl_version > 1209)
+		sdlInitFlags = SDL_INIT_EVERYTHING;
+	else
+		sdlInitFlags = 0;
+
+	printf("[SDL] Initialisation ");
+
+	if (SDL_Init(sdlInitFlags) == 0)
+	{
+		printf("succeeded\n");
+
+		char driverName[100];
+
+		if (SDL_VideoDriverName(driverName, 100) != NULL)
+		{
+			printf("[SDL] Video Driver: %s\n", driverName);
+		}
+	}
+	else
+	{
+		printf("FAILED\n");
+		printf("[SDL] ERROR: %s\n", SDL_GetError());
+	}
+
+	printf("\n");
+}
+
+void quitSdl(void)
+{
+	if (SDL_WasInit(SDL_INIT_EVERYTHING))
+	{
+		printf("[SDL] Quitting...\n");
+		SDL_Quit();
+	}
+}
 #endif

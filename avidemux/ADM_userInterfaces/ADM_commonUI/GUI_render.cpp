@@ -239,6 +239,9 @@ uint8_t r=0;
 
 #if defined(USE_SDL)
 			case RENDER_SDL:
+#ifdef ADM_WIN32
+			case RENDER_DIRECTX:
+#endif
 				accel_mode=new sdlAccelRender();
 
 				if(accel_mode->hasHwZoom()) r=accel_mode->init(&xinfo,phyW,phyH);
