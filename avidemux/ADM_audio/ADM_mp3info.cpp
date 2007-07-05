@@ -124,7 +124,11 @@ uint32_t nfq,fqindex,brindex,index;
 					// Check consistency
 					if(templ)
 					{
-						if(templ->samplerate!=mpegInfo->samplerate) continue;
+						if(templ->samplerate!=mpegInfo->samplerate)
+                                                {
+                                                  printf("[MP3]samplerate does not match\n");
+                                                  continue;
+                                                }
 					
 					}
 					found=1;

@@ -48,6 +48,7 @@
 #include "../ADM_editor/ADM_outputfmt.h"
 #include "../prefs.h"
 #include "../ADM_toolkit_gtk/gtkmarkscale.h"
+#include "../ADM_toolkit_gtk/jogshuttle.h"
 
 uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h,void *r);
 
@@ -329,8 +330,8 @@ uint8_t  bindGUI( void )
                       GTK_SIGNAL_FUNC(UI_looseFocus),                   (void *) NULL);	 
 
         
-        // navKey
-        gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"hscaleSensitive")), "value_changed",   
+        // Jog
+        gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"jogg")), "value_changed",   
                       GTK_SIGNAL_FUNC(volumeChange),                   (void *) NULL);  
 
 
@@ -562,24 +563,25 @@ if(_upd_in_progres) return;
 
 void volumeChange( void )
 {
-#ifdef HAVE_AUDIO
-GtkWidget *wid;
-GtkAdjustment *adj;
-int vol;
+    HandleAction(ACT_JOG);    
 
-
-if(_upd_in_progres) return;
- _upd_in_progres++;
-
-        wid=lookup_widget(guiRootWindow,"hscaleSensitive");
-        adj=gtk_range_get_adjustment (GTK_RANGE(wid));
-        vol=(int)floor(adj->value+0.5);
-        AVDM_setVolume( vol);
- _upd_in_progres--;
-#endif
 }
+/**
+    \fn UI_readJog
+    \brief Returns value of jog
+*/
+int32_t UI_readJog(void)
+{
+  GtkWidget *wid;
+  float val;
 
-
+        wid=lookup_widget(guiRootWindow,"jogg");
+        val=jog_shuttle_get_value(wid);
+        printf("Jog : %f\n",val);
+        val=val*100;
+        return (int32_t )val;
+        
+}
 
 void UI_setTitle(char *name)
 {

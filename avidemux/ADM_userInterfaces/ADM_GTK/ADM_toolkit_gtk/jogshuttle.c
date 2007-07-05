@@ -341,6 +341,7 @@ jog_shuttle_get_value (GtkWidget *wheel)
 {
 	JogShuttlePrivate *priv;
 	priv = JOG_SHUTTLE_GET_PRIVATE (wheel);
+        if(priv->pressed==FALSE) return 0;
 	return (priv->value);
 }
 

@@ -99,6 +99,9 @@ uint8_t initGUI( void ){return 1;}
 int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b) {return 0;}
 
 
-
+int32_t UI_readJog(void)
+{
+  return 0; 
+}
 //EOF
 

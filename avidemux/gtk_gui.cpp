@@ -169,6 +169,7 @@ extern gboolean SliderIsShifted;
 void GUI_showCurrentFrameHex(void);
 void GUI_avsProxy(void);
 uint8_t GUI_close(void);
+extern void A_jog(void);
 //___________________________________________
 // serialization of user event throught gui
 //
@@ -366,6 +367,8 @@ int nw;
     {
       switch (action)
 	{
+          case ACT_JOG:
+                break;
         case ACT_TimeShift:
                 A_TimeShift();
                 break;
@@ -389,6 +392,10 @@ int nw;
   // we have an AVI loaded
   switch (action)
     {
+       case ACT_JOG:
+                A_jog();
+                break;
+
        case ACT_CLOSE:
               GUI_close();
               break;

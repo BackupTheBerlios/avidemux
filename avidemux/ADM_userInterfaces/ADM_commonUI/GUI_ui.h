@@ -14,7 +14,7 @@ void 	UI_setScale( double  val );
 void 	UI_setFrameType( uint32_t frametype,uint32_t qp);
 void 	UI_setMarkers(uint32_t a, uint32_t b );
 void 	UI_setTitle(char *name);
-
+int32_t UI_readJog(void);
 
 void UI_setAProcessToggleStatus( uint8_t status );
 void UI_setVProcessToggleStatus( uint8_t status );

@@ -14,6 +14,7 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
+#include "../ADM_toolkit_gtk/jogshuttle.h"
 
 #include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 
@@ -246,7 +247,6 @@ create_mainWindow (void)
   GtkWidget *buttonEnd;
   GtkWidget *image2245;
   GtkWidget *sliderNavigate;
-  GtkWidget *hscaleSensitive;
   GtkWidget *hbox16;
   GtkWidget *label1;
   GtkWidget *boxCurFrame;
@@ -255,6 +255,7 @@ create_mainWindow (void)
   GtkWidget *boxCurTime;
   GtkWidget *labelTotalTime;
   GtkWidget *labelFrameType;
+  GtkWidget *jogg;
   extern GtkAccelGroup *accel_group;
   GtkTooltips *tooltips;
 
@@ -900,7 +901,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (go1_menu), separator15);
   gtk_widget_set_sensitive (separator15, FALSE);
 
-  jum_to_frame1 = gtk_image_menu_item_new_with_mnemonic (_("Go to Fra_me..."));
+  jum_to_frame1 = gtk_image_menu_item_new_with_mnemonic (_("_Jump to Frame..."));
   gtk_widget_show (jum_to_frame1);
   gtk_container_add (GTK_CONTAINER (go1_menu), jum_to_frame1);
   gtk_widget_add_accelerator (jum_to_frame1, "activate", accel_group,
@@ -911,7 +912,7 @@ create_mainWindow (void)
   gtk_widget_show (image8219);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (jum_to_frame1), image8219);
 
-  jump_to_time1 = gtk_image_menu_item_new_with_mnemonic (_("Go to _Time..."));
+  jump_to_time1 = gtk_image_menu_item_new_with_mnemonic (_("Jump to _Time..."));
   gtk_widget_show (jump_to_time1);
   gtk_container_add (GTK_CONTAINER (go1_menu), jump_to_time1);
   gtk_widget_add_accelerator (jump_to_time1, "activate", accel_group,
@@ -1376,15 +1377,6 @@ create_mainWindow (void)
   GTK_WIDGET_UNSET_FLAGS (sliderNavigate, GTK_CAN_FOCUS);
   gtk_scale_set_value_pos (GTK_SCALE (sliderNavigate), GTK_POS_LEFT);
 
-  hscaleSensitive = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (62.2951, 0, 100, 5, 5, 5)));
-  gtk_widget_show (hscaleSensitive);
-  gtk_table_attach (GTK_TABLE (table2), hscaleSensitive, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
-  gtk_scale_set_draw_value (GTK_SCALE (hscaleSensitive), FALSE);
-  gtk_scale_set_value_pos (GTK_SCALE (hscaleSensitive), GTK_POS_RIGHT);
-  gtk_scale_set_digits (GTK_SCALE (hscaleSensitive), 0);
-
   hbox16 = gtk_hbox_new (FALSE, 6);
   gtk_widget_show (hbox16);
   gtk_table_attach (GTK_TABLE (table2), hbox16, 0, 1, 2, 3,
@@ -1403,7 +1395,7 @@ create_mainWindow (void)
   gtk_entry_set_text (GTK_ENTRY (boxCurFrame), _("0"));
   gtk_entry_set_width_chars (GTK_ENTRY (boxCurFrame), 8);
 
-  labelTotalFrame = gtk_label_new (_("/ 0000000"));
+  labelTotalFrame = gtk_label_new (_("/0000000"));
   gtk_widget_show (labelTotalFrame);
   gtk_box_pack_start (GTK_BOX (hbox16), labelTotalFrame, FALSE, FALSE, 0);
   GTK_WIDGET_SET_FLAGS (labelTotalFrame, GTK_CAN_FOCUS);
@@ -1421,7 +1413,7 @@ create_mainWindow (void)
   gtk_entry_set_text (GTK_ENTRY (boxCurTime), _("00:00:00.000"));
   gtk_entry_set_width_chars (GTK_ENTRY (boxCurTime), 13);
 
-  labelTotalTime = gtk_label_new (_("/ 00:00:00,000"));
+  labelTotalTime = gtk_label_new (_("/00:00:00,000"));
   gtk_widget_show (labelTotalTime);
   gtk_box_pack_start (GTK_BOX (hbox16), labelTotalTime, FALSE, FALSE, 0);
   GTK_WIDGET_SET_FLAGS (labelTotalTime, GTK_CAN_FOCUS);
@@ -1433,6 +1425,14 @@ create_mainWindow (void)
   gtk_box_pack_start (GTK_BOX (hbox16), labelFrameType, FALSE, FALSE, 0);
   GTK_WIDGET_SET_FLAGS (labelFrameType, GTK_CAN_FOCUS);
   gtk_label_set_selectable (GTK_LABEL (labelFrameType), TRUE);
+
+  jogg = jog_shuttle_new ();
+  gtk_widget_show (jogg);
+  gtk_table_attach (GTK_TABLE (table2), jogg, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+  GTK_WIDGET_UNSET_FLAGS (jogg, GTK_CAN_FOCUS);
+  GTK_WIDGET_UNSET_FLAGS (jogg, GTK_CAN_DEFAULT);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (mainWindow, mainWindow, "mainWindow");
@@ -1648,7 +1648,6 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, buttonEnd, "buttonEnd");
   GLADE_HOOKUP_OBJECT (mainWindow, image2245, "image2245");
   GLADE_HOOKUP_OBJECT (mainWindow, sliderNavigate, "sliderNavigate");
-  GLADE_HOOKUP_OBJECT (mainWindow, hscaleSensitive, "hscaleSensitive");
   GLADE_HOOKUP_OBJECT (mainWindow, hbox16, "hbox16");
   GLADE_HOOKUP_OBJECT (mainWindow, label1, "label1");
   GLADE_HOOKUP_OBJECT (mainWindow, boxCurFrame, "boxCurFrame");
@@ -1657,6 +1656,7 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, boxCurTime, "boxCurTime");
   GLADE_HOOKUP_OBJECT (mainWindow, labelTotalTime, "labelTotalTime");
   GLADE_HOOKUP_OBJECT (mainWindow, labelFrameType, "labelFrameType");
+  GLADE_HOOKUP_OBJECT (mainWindow, jogg, "jogg");
   GLADE_HOOKUP_OBJECT_NO_REF (mainWindow, tooltips, "tooltips");
 
   gtk_window_add_accel_group (GTK_WINDOW (mainWindow), accel_group);

@@ -255,3 +255,7 @@ void            GUI_Quiet(void)
 {
   beQuiet=1;
 }
+int32_t UI_readJog(void)
+{
+ return 0; 
+}

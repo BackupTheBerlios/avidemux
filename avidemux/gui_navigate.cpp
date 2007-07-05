@@ -44,6 +44,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 #include "DIA_busy.h"
+#include "GUI_ui.h"
 extern void    UI_purge(void );
 //____________________________________
 
@@ -452,6 +453,66 @@ void        GUI_PrevFrame(void )
           GUI_GoToFrame (curframe - 1);
           DIA_StopBusy ();
         }
+}
+/**
+      \fn A_jogRead
+      \brief read an average value of jog
+*/
+#define NB_JOG_READ           3
+#define JOG_READ_PERIOD_US    5*1000 // 5ms
+#define JOG_THRESH1           40
+#define JOG_THRESH2           80
+#define JOG_THRESH1_PERIOD    100*1000 //us
+#define JOG_THRESH2_PERIOD    40*1000
+#define JOG_THRESH3_PERIOD    500
+/**
+    \fn A_jogRead
+    \brief Read an average value of jog
+*/
+uint32_t A_jogRead(void)
+{
+  int32_t sum=0,v;
+    for(int i=0;i<NB_JOG_READ;i++)
+    {
+        v=UI_readJog();
+        if(abs(v)<10) v=0;
+        sum+=v;
+        ADM_usleep(JOG_READ_PERIOD_US);
+    } 
+    return sum/NB_JOG_READ;
+}
+#define REFRESH 10000
+/**
+      \fn     A_jog
+      \brief  Handle jogshuttle widget
+*/
+void A_jog(void)
+{
+  int32_t r;
+  uint32_t a;
+  uint32_t slip;
+  static int jog=0;
+  if(jog) return;
+  jog++;
+  while(r=A_jogRead())
+  {
+      a=abs(r);
+      printf("%d \n",r);
+      if(a<JOG_THRESH1) slip=JOG_THRESH1_PERIOD;
+        else if(a<JOG_THRESH2) slip=JOG_THRESH2_PERIOD;
+          else slip=JOG_THRESH3_PERIOD;
+    
+      if(r>0) GUI_NextKeyFrame();
+      else GUI_PreviousKeyFrame();       
+      UI_purge();
+      for(int i=0;i<slip/REFRESH;i++)
+      {
+        UI_purge();
+        ADM_usleep(REFRESH);
+        UI_purge();
+      }
+  }
+  jog--;
 }
 //EOF
         
