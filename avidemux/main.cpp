@@ -131,15 +131,28 @@ int main(int argc, char *argv[])
     printf(" MacOsX    : Kuisathaverat\n");
     printf(" Win32     : Gruntster\n\n");
 
-#if defined(ARCH_X86_32)
-	printf("Compiled for X86_32 Arch.\n");
-#endif
-#if defined(ARCH_X86_64)
-	printf("Compiled for X86_64 Arch.\n");
+	printf("Compiled for ");
+
+#if defined(ADM_WIN32)
+	printf("Microsoft Windows");
+#elif defined(__APPLE__)
+	printf("Apple");
+#else
+	printf("Linux");
 #endif
 
+#if defined(ARCH_X86_32)
+	printf(" (x86)");
+#elif defined(ARCH_X86_64)
+	printf(" (x86-64)");
+#elif defined(ARCH_POWERPC)
+	printf(" (PowerPC));
+#endif
+
+printf("\n");
+
 #if defined(__USE_LARGEFILE) && defined(__USE_LARGEFILE64)
-	printf("\nLARGE FILE AVAILABLE: %d offset\n", __USE_FILE_OFFSET64);
+	printf("\nLarge file available: %d offset\n", __USE_FILE_OFFSET64);
 #endif
 
 #ifdef HAVE_GETTEXT
@@ -177,21 +190,39 @@ int main(int argc, char *argv[])
 	ADM_memStatInit();
 	ADM_intFloatInit();
 
-	printf("Initializing prefs\n");
+	printf("Initialising prefs\n");
 	initPrefs();
 
 	register_Encoders();
 	atexit(onexit);
-  
+
 #ifdef USE_SDL
     sdl_version=(SDL_Linked_Version()->major*1000)+(SDL_Linked_Version()->minor*100) + (SDL_Linked_Version()->patch);
-    printf("SDL support on Version %d\n",sdl_version);
+    printf("\n[SDL] Version: %u.%u.%u\n",SDL_Linked_Version()->major, SDL_Linked_Version()->minor, SDL_Linked_Version()->patch);
 
-	if(sdl_version>1209)
+	if(sdl_version > 1209)
 	{
-		printf("Global SDL init...\n");
-		SDL_Init(SDL_INIT_EVERYTHING); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
+		printf("[SDL] Initialisation ");
+
+		if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
+		{
+			printf("succeeded\n");
+
+			char driverName[100];
+
+			if (SDL_VideoDriverName(driverName, 100) != NULL)
+			{
+				printf("[SDL] Video Driver: %s\n", driverName);
+			}
+		}
+		else
+		{
+			printf("FAILED\n");
+			printf("[SDL] ERROR: %s\n", SDL_GetError());
+		}
 	}
+
+	printf("\n");
 #endif
 
 #ifdef ADM_WIN32
@@ -257,7 +288,7 @@ int main(int argc, char *argv[])
 #ifdef USE_SDL
 	if(sdl_version<=1209)
 	{
-		printf("Global SDL init...\n");
+		printf("[SDL] Initalising...\n");
 		SDL_Init(0); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
 	}
 #endif

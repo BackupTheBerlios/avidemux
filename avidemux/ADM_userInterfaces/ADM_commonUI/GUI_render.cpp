@@ -236,26 +236,26 @@ uint8_t r=0;
 		}
                 break;
 #endif
+
 #if defined(USE_SDL)
-              case RENDER_SDL:
-		printf("Trying SDL\n");
-		accel_mode=new sdlAccelRender();
-		if(accel_mode->hasHwZoom()) r=accel_mode->init(&xinfo,phyW,phyH);
+			case RENDER_SDL:
+				accel_mode=new sdlAccelRender();
+
+				if(accel_mode->hasHwZoom()) r=accel_mode->init(&xinfo,phyW,phyH);
                 else r=accel_mode->init(&xinfo,renderW,renderH);
+
                 if(!r)
-		{
-			delete accel_mode;
-			accel_mode=NULL;
-			printf("sdl init failed\n");
-		}
-		else
-		{
-			printf("SDL init ok\n");
-		}
+				{
+					delete accel_mode;
+					accel_mode=NULL;
+				}
+
                 break;
 #endif
-                default:break;
+
+            default:break;
         }
+
         if(!accel_mode)
         {
                 rgbConverter.reset(renderW,renderH);

@@ -81,94 +81,117 @@ uint8_t sdlAccelRender::end( void)
         sdl_running=0;
         sdl_overlay=NULL;
         sdl_display=NULL;
-        printf("SDL killed\n");
+        printf("[SDL] System closed and destroyed\n");
         
         
 }
 uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 {
-int bpp;
-int flags;
+	printf("[SDL] Initialising video subsystem\n");
 
-        // Ask for the position of the drawing window at start
-        //_______________________________________________________
-        
-        disp.w=w;
-        disp.h=h;
-        disp.x=0;
-        disp.y=0;
+	int bpp;
+	int flags;
 
-        if(!useYV12)
-        {
-            color=new ColBase(720,480);
-            decoded=new uint8_t[w*h*2];
+    // Ask for the position of the drawing window at start
+    disp.w=w;
+    disp.h=h;
+    disp.x=0;
+    disp.y=0;
+
+    if(!useYV12)
+    {
+		color=new ColBase(720,480);
+		decoded=new uint8_t[w*h*2];
     }
-        /* Hack to get SDL to use GTK window, ugly but works */
+
+    // Hack to get SDL to use GTK window, ugly but works
 #if !defined(CONFIG_DARWIN) && !defined(ADM_WIN32)
-        { char SDL_windowhack[32];
-          int winid=(int)window->window;
-                sprintf(SDL_windowhack,"SDL_WINDOWID=%ld",winid);
-                putenv(SDL_windowhack);
-        }
+	char SDL_windowhack[32];
+    int winid=(int)window->window;
+
+    sprintf(SDL_windowhack,"[SDL] SDL_WINDOWID=%ld",winid);
+    putenv(SDL_windowhack);
 #endif
-        if (  SDL_InitSubSystem(SDL_INIT_VIDEO) < 0 ) 
-        {
-                fprintf(stderr, "Unable to init SDL: %s\n", SDL_GetError());
-                return 0;
-          }
-        sdl_running=1;
-        flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE | SDL_NOFRAME;
-        bpp= SDL_VideoModeOK( w, h,  16, flags );
-        sdl_display= SDL_SetVideoMode( w, h,  bpp, flags );	
-        if(!sdl_display)
-        {
-                end();
-                printf("Cannot create get surface\n");
-                return 0;
-        
-        }
-        SDL_LockSurface(sdl_display);
+
+    if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) 
+    {
+		printf("[SDL] FAILED initialising video subsystem\n");
+		printf("[SDL] ERROR: %s\n", SDL_GetError());
+
+        return 0;
+    }
+
+    sdl_running=1;
+    flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE | SDL_NOFRAME;
+    bpp= SDL_VideoModeOK( w, h,  16, flags );
+    sdl_display= SDL_SetVideoMode( w, h,  bpp, flags );
+
+    if (!sdl_display)
+    {
+        end();
+        printf("[SDL] Cannot create surface\n");
+		printf("[SDL] ERROR: %s\n", SDL_GetError());
+        return 0;
+    }
+
+    SDL_LockSurface(sdl_display);
+
 #ifdef ADM_WIN32
 	struct SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
-       if(-1 != SDL_GetWMInfo(&wmInfo))
-       {
-          sdlWin32 = wmInfo.window;
-          SetParent(sdlWin32,(HWND) window->display);
-	  MoveWindow(sdlWin32,0,0,w,h,0);
-       }
-       else
-       {
-		printf("[SDL] reparenting failed\n");
-       }
+
+	if (-1 != SDL_GetWMInfo(&wmInfo))
+	{
+		sdlWin32 = wmInfo.window;
+		SetParent(sdlWin32,(HWND) window->display);
+		MoveWindow(sdlWin32,0,0,w,h,0);
+	}
+	else
+	{
+		printf("[SDL] Reparenting failed\n");
+	}
 #endif
+
         int cspace;
         
         if(useYV12) cspace=SDL_YV12_OVERLAY;
             else    cspace=SDL_YUY2_OVERLAY;
         //_______________________________________________________
-        sdl_overlay=SDL_CreateYUVOverlay((w),(h),
-        cspace,		
-                sdl_display);
+        sdl_overlay=SDL_CreateYUVOverlay((w),(h), cspace, sdl_display);
+
+		// DirectX may fail but overlay still created.
+		// Not a showstopper but log failure.
+		if (strlen(SDL_GetError()))
+		{
+			printf("[SDL] ERROR: %s\n", SDL_GetError());
+		}
+
         if(!sdl_overlay)
         {
-                end();
-                printf("Cannot create SDL overlay\n");
-                return 0;
+			end();
+			printf("[SDL] Cannot create SDL overlay\n");
+			printf("[SDL] ERROR: %s\n", SDL_GetError());
+
+			return 0;
         }
         
-        int pitch=sdl_overlay->pitches[0];
-        printf("SDL_init ok, type is : %d,planes :%d pitch:%d\n",sdl_overlay->hw_overlay,sdl_overlay->planes,pitch);
+        printf("[SDL] Overlay created; type: %d, planes: %d, pitch: %d\n", sdl_overlay->hw_overlay, sdl_overlay->planes, sdl_overlay->pitches[0]);
+
         if(!sdl_overlay->hw_overlay)
         {
-                printf("** HW Acceleration disabled **\n");
+            printf("[SDL] Hardware acceleration disabled\n");
         #ifdef CONFIG_DARWIN
-                printf("** Darwin**\n");
+            printf("[SDL] ** Darwin**\n");
         #endif
         }
+
         if(!useYV12) color->reset(w,h);
+
+		printf("[SDL] Video subsystem initalised successfully\n");
+
         return 1;
 }
+
 static void interleave(uint8_t *dst,uint8_t *src,int width, int stride, int lines)
 {
     for(int y=0;y<lines;y++)
@@ -226,7 +249,6 @@ int page=w*h;
         SDL_UnlockYUVOverlay(sdl_overlay);
         SDL_DisplayYUVOverlay(sdl_overlay,&disp);
         
-        //printf("*\n");
         return 1;
 }
 

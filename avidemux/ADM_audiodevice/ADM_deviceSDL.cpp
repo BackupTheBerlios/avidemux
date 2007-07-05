@@ -146,16 +146,18 @@ uint8_t sdlAudioDevice::init(uint8_t channels, uint32_t fq)
 SDL_AudioSpec spec,result;
 _channels = channels;
 		
-		printf("Opening SDL Audio, fq=%d\n",fq);
+		printf("[SDL] Opening audio, fq=%d\n",fq);
+
 		if(_inUse) 
 		{
-			printf("Already running ?\n");
+			printf("[SDL] Already running ?\n");
 			return 1; // ???
 		}
 		
-		if (  SDL_InitSubSystem(SDL_INIT_AUDIO) < 0 ) 
+		if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) 
 		{
-			printf("SDLAUDIOINIT failed\n");
+			printf("[SDL] FAILED initialising Audio subsystem\n");
+			printf("[SDL] ERROR: %s\n", SDL_GetError());
 			return 0;
 		}
 		memset(&spec,0,sizeof(spec));
@@ -170,7 +172,9 @@ _channels = channels;
 		int res=SDL_OpenAudio(&spec,&result);
 		if(res<0)
 		{
-			printf("Cannot init SDL audio %s\n", SDL_GetError());
+			printf("[SDL] Audio device FAILED to open\n");
+			printf("[SDL] ERROR: %s\n", SDL_GetError());
+
 			printf("fq   %d \n",spec.freq);
 			printf("chan %d \n", spec.channels);
 			printf("samples %d \n",spec.samples);
@@ -180,6 +184,7 @@ _channels = channels;
 			printf("chan %d \n", result.channels);
 			printf("samples %d \n",result.samples);
 			printf("format %d \n",result.format);
+
 			return 0;
 		}
 		
