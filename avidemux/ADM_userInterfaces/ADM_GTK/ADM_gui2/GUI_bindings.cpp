@@ -75,7 +75,7 @@ static GtkWidget *guiVideoToggle=NULL;
 static GdkCursor *guiCursorBusy=NULL;
 static GdkCursor *guiCursorNormal=NULL;
 static gint	  guiCursorEvtMask=0;
-static void     volumeChange( void );
+static gint       jogChange( void );
 
 static char     *customNames[ADM_MAC_CUSTOM_SCRIPT];
 static uint32_t ADM_nbCustom=0;
@@ -332,7 +332,7 @@ uint8_t  bindGUI( void )
         
         // Jog
         gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"jogg")), "value_changed",   
-                      GTK_SIGNAL_FUNC(volumeChange),                   (void *) NULL);  
+                      GTK_SIGNAL_FUNC(jogChange),                   (void *) NULL);  
 
 
 		       
@@ -561,11 +561,6 @@ if(_upd_in_progres) return;
    
 }
 
-void volumeChange( void )
-{
-    HandleAction(ACT_JOG);    
-
-}
 /**
     \fn UI_readJog
     \brief Returns value of jog
@@ -577,7 +572,7 @@ int32_t UI_readJog(void)
 
         wid=lookup_widget(guiRootWindow,"jogg");
         val=jog_shuttle_get_value(wid);
-        printf("Jog : %f\n",val);
+        //printf("Jog : %f\n",val);
         val=val*100;
         return (int32_t )val;
         
@@ -1144,6 +1139,110 @@ void trampoline(void)
     gdk_threads_enter();
     automation();
     gdk_threads_leave();
+}
+/*****************************/
+/*
+ * This is the wheel position <->time array
+ * */
+static uint32_t jogScale[10]={
+50,
+50,
+40,
+40,
+20,
+20,  // 5
+10,
+5,
+3,
+2
+};
+static int nbTimer=0;
+static int jogLock=0;
+static int count=0;
+/**
+        \fn tickToTime
+        \brief  convert tick (i.e. wheel value) between 0 and 9  to a number of tick to wait in 10 ms units. Should be exp/log TODO
+  */
+static uint32_t tickToTime(uint32_t tick)
+{
+        if(tick>9) tick=9;
+        return jogScale[tick];
+}
+/**
+                \fn jogTimer
+                \brief Function that is called every 10 ms and handle the fwd/bwd depending on wheel position
+ */
+static int jogTimer(void)
+{
+   int32_t v;
+   uint32_t r;
+    v=UI_readJog();
+    r=abs(v);
+    r=r/10;
+    if(!r)
+    {
+      return FALSE;
+    }
+    //printf("Arm %u\n",count);
+    if(count)     count--;
+    if(count)     return TRUE;
+    count=tickToTime(r);
+    if(jogLock) return FALSE;
+    
+    jogLock++;
+ //   printf("Arm Call\n");
+    gdk_threads_enter();
+    if(v>0) 
+         g_signal_emit_by_name (GTK_OBJECT (lookup_widget(guiRootWindow,"next_intra_frame1")), "activate",G_TYPE_NONE );
+      else  
+        g_signal_emit_by_name (GTK_OBJECT (lookup_widget(guiRootWindow,"previous_intra_frame1")), "activate",G_TYPE_NONE );
+      gdk_threads_leave();
+    jogLock--;
+      return TRUE;
+}
+/**
+ *      \fn jogDel
+ *      \brief Called when timer is deleted
+*/
+void jogDel(void *)
+{
+      nbTimer=0;
+      count=0;
+//      printf("Arm off\n");
+}
+/**
+ *      \fn jogChange
+ *      \brief Handler for wheel value changed event
+ * */
+gint jogChange(void)
+{
+  int32_t v;
+   uint32_t r;
+   if(nbTimer) return FALSE; // Already armed
+   
+   // Process First move
+      v=UI_readJog()/10;
+      r=abs(v);
+      if(!r)
+      {
+        return FALSE;
+      }
+      if(!jogLock)
+      {
+        jogLock++;
+        if(v>0) 
+          gtk_signal_emit_by_name (GTK_OBJECT (lookup_widget(guiRootWindow,"next_intra_frame1")), "activate" );
+          
+        else  
+          gtk_signal_emit_by_name (GTK_OBJECT (lookup_widget(guiRootWindow,"previous_intra_frame1")), "activate" );
+        jogLock--;
+        nbTimer=1;
+        count=0;//tickToTime(r);
+        g_timeout_add_full(G_PRIORITY_DEFAULT,10,(GCALL *)jogTimer,NULL,jogDel);
+
+      }      
+   // Armed!
+   return FALSE;
 }
 
 // EOF
