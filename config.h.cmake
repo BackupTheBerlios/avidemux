@@ -489,6 +489,9 @@
 /* libpng is available */
 #cmakedefine USE_PNG
 
+/* use libsamplerate */
+#cmakedefine USE_SRC
+
 /* SDL detected */
 #cmakedefine USE_SDL
 

@@ -205,6 +205,10 @@ SET(USE_AFTEN_07 1)
 endif(USE_AFTEN)
 SET(CMAKE_REQUIRED_FLAGS "")
 ########################################
+# SRC
+########################################
+ADM_CHECK_HL(libsamplerate samplerate.h samplerate src_get_version USE_SRC)
+########################################
 # ICONV
 ########################################
 # search ICON.h

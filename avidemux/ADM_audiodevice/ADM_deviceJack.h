@@ -11,6 +11,10 @@
 #include <jack/jack.h>
 #include <jack/ringbuffer.h>
 
+#ifdef USE_SRC
+#include <samplerate.h>
+#endif
+
 #define MAX_CHANNELS 9
 
 class jackAudioDevice : public audioDevice
@@ -30,5 +34,10 @@ protected:
 	jack_port_t *ports[MAX_CHANNELS];
 	jack_client_t *client;
 	jack_ringbuffer_t *ringbuffer;
+	#ifdef USE_SRC
+	float *src_out_buf;
+	SRC_STATE *src_state;
+	SRC_DATA src_data;
+	#endif
 };
 #endif

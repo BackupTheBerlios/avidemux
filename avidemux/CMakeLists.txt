@@ -354,6 +354,11 @@ if(NEEED_LIBICONV)
 add_libs_all_targets(iconv)
 endif(NEEED_LIBICONV)
 
+#libsamplerate
+if(USE_SRC)
+add_libs_all_targets(samplerate)
+endif(USE_SRC)
+
 # Xml2
 add_libs_all_targets(xml2 )
 ###########################################

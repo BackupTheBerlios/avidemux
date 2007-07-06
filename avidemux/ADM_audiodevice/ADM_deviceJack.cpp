@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
+
 #include "default.h"
 #include "ADM_audiodevice.h"
 #include <ADM_assert.h>
@@ -20,9 +21,17 @@
 #include "ADM_audiodevice/ADM_deviceALSA.h"
 #include "ADM_audiodevice/ADM_deviceJack.h"
 
+
+#define BUFSIZE 16385
+
 jackAudioDevice::jackAudioDevice()
 {
 	client = NULL;
+	ringbuffer = NULL;
+	#ifdef USE_SRC
+	src_out_buf = NULL;
+	src_state = NULL;
+	#endif
 }
 
 void jackAudioDevice::jack_shutdown(void *arg)
@@ -33,9 +42,18 @@ void jackAudioDevice::jack_shutdown(void *arg)
 uint8_t jackAudioDevice::stop()
 {
 	if (client) {
+		printf("[JACK] Stop\n");
 		jack_client_close(client);
 		client = NULL;
-		jack_ringbuffer_free(ringbuffer);
+		if (ringbuffer)
+			jack_ringbuffer_free(ringbuffer);
+		ringbuffer = NULL;
+		#ifdef USE_SRC
+		delete src_out_buf;
+		src_out_buf = NULL;
+		src_delete(src_state);
+		src_state = NULL;
+		#endif
 	}
 
 	return 1;
@@ -63,10 +81,35 @@ uint8_t jackAudioDevice::init(uint8_t channels, uint32_t fq)
 	if (status & JackServerStarted)
 		printf("[JACK] Server started\n");
 
+	if (jack_get_sample_rate(client) == fq) {
+		jack_set_process_callback(client, process_callback, this);
+	} else {
+		printf("[JACK] audio stream sample rate: %i\n", fq);
+		printf("[JACK] jack server sample rate: %i\n", (int)jack_get_sample_rate(client));
+		#ifdef USE_SRC
+			src_out_buf = new float[BUFSIZE * channels];
+			src_state = src_new(SRC_SINC_FASTEST, channels, NULL);
+			if (!src_state) {
+				printf("[JACK] Can't init libsamplerate\n");
+				stop();
+				return 0;
+			}
+			src_data.data_out = src_out_buf;
+			src_data.output_frames = BUFSIZE;
+			src_data.src_ratio = jack_get_sample_rate(client) / (double)fq;
+			src_data.end_of_input = 0;
+//			printf("[JACK] ratio: %f\n", src_data.src_ratio);
+		#else
+			printf("[JACK] For play this, you need avidemux compiled with libsamplerate support\n");
+			stop();
+			return 0;
+		#endif
+	}
+
+	ringbuffer = jack_ringbuffer_create(BUFSIZE * channels * sizeof(jack_default_audio_sample_t));
+
 	jack_set_process_callback(client, process_callback, this);
 	jack_on_shutdown(client, jack_shutdown, this);
-
-	ringbuffer = jack_ringbuffer_create(65536 * channels);
 
 	char name[10];
 	for (int i = 0; i < channels; i++) {
@@ -75,7 +118,7 @@ uint8_t jackAudioDevice::init(uint8_t channels, uint32_t fq)
 		if (!ports[i]) {
 			printf("[JACK] Can't create new port\n");
 			stop();
-			return 0; 
+			return 0;
 		}
 	}
 
@@ -126,8 +169,6 @@ int jackAudioDevice::process(jack_nframes_t nframes)
 	if (read != nframes)
 		printf("[JACK] UNDERRUN!\n");
 
-
-
 	return 0;
 }
 
@@ -139,18 +180,52 @@ int jackAudioDevice::process_callback(jack_nframes_t nframes, void* arg)
 
 uint8_t jackAudioDevice::play(uint32_t len, float *data)
 {
+//	static int min = 5000;
+	static int sleep = (int)((float)BUFSIZE / jack_get_sample_rate(client) / 2. * 1000000.);
 	size_t write;
+	float writef;
+	len /= _channels;
 
+	#ifdef USE_SRC
+	if (src_out_buf) {
+		while (len) {
+			writef = jack_ringbuffer_write_space(ringbuffer);
+			writef /= src_data.src_ratio * sizeof(jack_default_audio_sample_t) * _channels;
+			write = (size_t)writef;
+			if (write >= len) {
+				src_data.data_in = data;
+				src_data.input_frames = len;
+				src_process(src_state, &src_data);
+				jack_ringbuffer_write(ringbuffer,
+					(char *)src_out_buf,
+					src_data.output_frames_gen * sizeof(jack_default_audio_sample_t) * _channels);
+/*
+				if (len != src_data.input_frames_used)
+					printf("[JACK] len %i != %i input_frames_used\n", len, src_data.input_frames_used);
+				if (len < min)
+					min = len;
+				printf("[JACK] %i %i %i %f %i\n",min, src_data.input_frames_used, src_data.output_frames_gen, writef, len);
+				data += src_data.input_frames_used * _channels;
+				len -= src_data.input_frames_used;
+*/
+				return 1;
+			} else {
+				printf("[JACK] OVERRUN!\n");
+				usleep(sleep);
+			}
+		}
+	} else
+	#endif
 	while (len) {
-		if ((write = jack_ringbuffer_write_space(ringbuffer) / sizeof(jack_default_audio_sample_t)) > _channels) {
-			if (write > len)
-				write = len;
-			jack_ringbuffer_write(ringbuffer, (char *)data, write * sizeof(jack_default_audio_sample_t));
-			data += write;
-			len -= write;
+		writef = jack_ringbuffer_write_space(ringbuffer);
+		writef /= sizeof(jack_default_audio_sample_t) * _channels;
+		write = (size_t)writef;
+		if (write >= len) {
+			jack_ringbuffer_write(ringbuffer, (char *)data, len * sizeof(jack_default_audio_sample_t) * _channels);
+			return 1;
 		} else {
 			printf("[JACK] OVERRUN!\n");
-			usleep(10000);
+			usleep(sleep);
 		}
 	}
 
