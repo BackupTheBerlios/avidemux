@@ -41,7 +41,6 @@ extern "C" {
 
 #ifdef ADM_WIN32
 #include "prefs.h"
-#include "ADM_userInterfaces/ADM_commonUI/GUI_render.h"
 #endif
 
 //******************************************
@@ -82,9 +81,7 @@ uint8_t sdlAccelRender::end( void)
         sdl_running=0;
         sdl_overlay=NULL;
         sdl_display=NULL;
-        printf("[SDL] System closed and destroyed\n");
-        
-        
+        printf("[SDL] Video subsystem closed and destroyed\n");        
 }
 uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 {
@@ -125,6 +122,18 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
     sdl_running=1;
     flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE | SDL_NOFRAME;
     bpp= SDL_VideoModeOK( w, h,  16, flags );
+
+#ifdef ADM_WIN32
+	// SDL window is created and displayed before we get a chance to set the parent.
+	// Therefore, align the SDL overlay with the client area before it is displayed.
+	POINT screenPoint = {};
+	char origin[43];
+
+	ClientToScreen((HWND)window->display, &screenPoint);
+	snprintf(origin, 43, "SDL_VIDEO_WINDOW_POS=%i,%i", screenPoint.x, screenPoint.y);
+	putenv(origin);
+#endif
+
     sdl_display= SDL_SetVideoMode( w, h,  bpp, flags );
 
     if (!sdl_display)

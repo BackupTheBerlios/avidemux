@@ -132,7 +132,7 @@ void GUI_PlayAvi(void)
     one_frame /= 10; // Duration of a frame in ms, err =leftover in 1/10 ms
     
     // go to RealTime...    
-    printf(" One frame : %lu, err=%lu ms\n", one_frame, err);
+    printf("One frame : %lu, err=%lu ms\n", one_frame, err);
     
     // prepare 1st frame
 
@@ -162,7 +162,7 @@ void GUI_PlayAvi(void)
 
         if((played_frame)>=(max-1))
         {
-            printf("\n End met (%lu  / %lu )\n",played_frame,max);
+            printf("\nEnd met (%lu  / %lu )\n",played_frame,max);
             goto abort_play;
          }
         
