@@ -201,13 +201,13 @@ void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
 */
 void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo)
 {
-#if !defined(ADM_WIN32) && !defined(__APPLE__)
-        const QX11Info &info=videoWindow->x11Info();
-        xinfo->display=info.display();
-        xinfo->window=videoWindow->winId();
-         
+#if defined(ADM_WIN32)
+	xinfo->display=videoWindow->winId();
+#elif !defined(__APPLE__)
+    const QX11Info &info=videoWindow->x11Info();
+    xinfo->display=info.display();
+    xinfo->window=videoWindow->winId();
 #endif 
-
 }
 
 
