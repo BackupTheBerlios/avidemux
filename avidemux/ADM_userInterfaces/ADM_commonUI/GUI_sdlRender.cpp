@@ -153,8 +153,18 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 	if (-1 != SDL_GetWMInfo(&wmInfo))
 	{
 		sdlWin32 = wmInfo.window;
-		SetParent(sdlWin32,(HWND) window->display);
-		MoveWindow(sdlWin32,0,0,w,h,0);
+
+		// Make SDL window a child to prevent it from gaining focus
+		int windowFlags = GetWindowLongPtr(sdlWin32, GWL_STYLE);
+
+		SetWindowLongPtr(sdlWin32, GWL_STYLE, (windowFlags & ~WS_POPUP) | WS_CHILD);
+
+		// Set the SDL window's parent to the main window and reposition
+		SetParent(sdlWin32, (HWND)window->display);
+		SetWindowPos(sdlWin32, NULL, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+
+		// The SDL window stole focus before it was made a child, so set focus back to the main window
+		SetFocus((HWND)window->display);
 	}
 	else
 	{
