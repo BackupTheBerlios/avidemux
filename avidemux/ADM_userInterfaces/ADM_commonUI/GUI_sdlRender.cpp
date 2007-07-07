@@ -121,7 +121,7 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 
     sdl_running=1;
     flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE | SDL_NOFRAME;
-    bpp= SDL_VideoModeOK( w, h,  16, flags );
+    bpp= SDL_VideoModeOK( w, h,  32, flags );
 
 #ifdef ADM_WIN32
 	// SDL window is created and displayed before we get a chance to set the parent.
