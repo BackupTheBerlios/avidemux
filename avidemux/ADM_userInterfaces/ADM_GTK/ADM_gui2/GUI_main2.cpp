@@ -14,10 +14,9 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-#include "../ADM_toolkit_gtk/jogshuttle.h"
 
 #include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
-
+#include "../ADM_toolkit_gtk/jogshuttle.h"
 #include "../ADM_toolkit_gtk/gtkmarkscale.h"
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
@@ -1426,11 +1425,11 @@ create_mainWindow (void)
   GTK_WIDGET_SET_FLAGS (labelFrameType, GTK_CAN_FOCUS);
   gtk_label_set_selectable (GTK_LABEL (labelFrameType), TRUE);
 
-  jogg = jog_shuttle_new ();
+  jogg = jog_shuttle_new ();gtk_widget_set_size_request (jogg, -1, 16); 
   gtk_widget_show (jogg);
   gtk_table_attach (GTK_TABLE (table2), jogg, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
   GTK_WIDGET_UNSET_FLAGS (jogg, GTK_CAN_FOCUS);
   GTK_WIDGET_UNSET_FLAGS (jogg, GTK_CAN_DEFAULT);
 
