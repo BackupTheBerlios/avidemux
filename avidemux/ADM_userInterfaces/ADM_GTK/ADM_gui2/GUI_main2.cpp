@@ -1429,7 +1429,7 @@ create_mainWindow (void)
   gtk_widget_show (jogg);
   gtk_table_attach (GTK_TABLE (table2), jogg, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
   GTK_WIDGET_UNSET_FLAGS (jogg, GTK_CAN_FOCUS);
   GTK_WIDGET_UNSET_FLAGS (jogg, GTK_CAN_DEFAULT);
 
