@@ -28,7 +28,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_mkv.h"
-
+#include "ADM_audio/ADM_a52info.h"
 #define vprintf(...) {}
 
 /**
@@ -303,6 +303,23 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
   _currentLace=_maxLace=0;
   _clusterParser=NULL;
   goToCluster(0);
+  /* In case of AC3, do not trust the header...*/
+  if(_wavheader->encoding==WAV_AC3)
+  {
+    uint8_t ac3Buffer[20000];
+    uint32_t len,sample,timecode;
+     if( getPacket(ac3Buffer, &len, &sample,&timecode))
+     {
+       uint32_t fq,br,chan,syncoff;
+        if( ADM_AC3GetInfo(ac3Buffer, len, &fq, &br, &chan,&syncoff) )
+        {
+            _wavheader->channels=chan;
+            _wavheader->frequency=fq;
+            _wavheader->byterate=br;
+        }
+     }
+     goToCluster(0);
+  }
 }
 /**
     \fn goToCluster

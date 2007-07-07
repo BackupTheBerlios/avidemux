@@ -31,6 +31,7 @@
 
 #include "mkv_tags.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_idx_pg.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 #define VIDEO _tracks[0]
 /**
     \fn videoIndexer
@@ -45,7 +46,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
   const char *ss;
   
    parser->seek(0);
-   DIA_progressIndexing *work=new DIA_progressIndexing("Matroska Images");
+   DIA_working *work=new DIA_working("Matroska Images");
    // Start with a small index, it will grow automatically afterward
    for(int i=0;i<_nbAudioTrack+1;i++)
    {
@@ -53,7 +54,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
     _tracks[i]._index=new mkvIndex[_tracks[i]._indexMax];
    }
     //************
-   work->update(0,_nbClusters,0,0,0,0);
+   work->update(0);
    for(int clusters=0;clusters<_nbClusters;clusters++)
    {
    parser->seek(_clusters[clusters].pos);
@@ -61,7 +62,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
    int thiscluster=0;
    while(!cluster.finished())
    {
-      work->update(clusters,_nbClusters,VIDEO._nbIndex,0,0,0);
+      work->update(clusters,_nbClusters);
       cluster.readElemId(&id,&len);
       if(!ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type))
       {
@@ -403,22 +404,19 @@ uint8_t   mkvHeader::indexClusters(ADM_ebml_file *parser)
   _nbClusters=0;
   
   // Search segment
-   
-   parser->seek(0x7000000000LL); //Hackish, fixme
-   fileSize=parser->tell();
-   parser->seek(0);
-   
+   fileSize=parser->getFileSize();
    if(!parser->simplefind(MKV_SEGMENT,&vlen,1))
    {
      printf("[MKV] cluster indexer, cannot find CLUSTER atom\n");
      return 0;
    }
    ADM_ebml_file segment(parser,vlen);
-   DIA_progressIndexing *work=new DIA_progressIndexing("Matroska clusters");
+   DIA_working *work=new DIA_working("Matroska clusters");
    while(segment.simplefind(MKV_CLUSTER,&alen,0)) 
    {
+     
      // UI update
-     work->update(segment.tell()>>10,fileSize>>10,_nbClusters,0,0,0);
+     work->update(segment.tell()>>10,fileSize>>10);
      // Grow clusters index if needed
      if(_nbClusters==_clustersCeil-1)
      {

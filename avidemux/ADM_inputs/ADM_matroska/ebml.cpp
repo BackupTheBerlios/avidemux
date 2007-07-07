@@ -361,7 +361,7 @@ uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint32_t *len,uint32_t rewin
   const char *ss;
   
 
-    printf("[MKV] Simple Searching for tag %llx\n",prim);
+    vprintf("[MKV] Simple Searching for tag %llx\n",prim);
     if(rewind) seek(_begin);
    
       while(!finished())
