@@ -223,6 +223,26 @@ static void interleave(uint8_t *dst,uint8_t *src,int width, int stride, int line
 }
 uint8_t sdlAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h,renderZoom zoom)
 {
+#ifdef ADM_WIN32
+	// DirectX playback doesn't refresh correctly if the parent window is moved.
+	// Detect when the parent window has moved and force a coordinate update.
+	if (strcmp(getenv("SDL_VIDEODRIVER"), "directx") == 0)
+	{
+		static RECT lastPos;
+
+		RECT currentPos;
+		GetWindowRect(sdlWin32, &currentPos);
+
+		if (currentPos.left != lastPos.left || currentPos.top != lastPos.top)
+		{
+			// By default SetWindowPos doesn't work if the new coordinates are the same as the 
+			// current so use SWP_FRAMECHANGED to force an update.
+			SetWindowPos(sdlWin32, NULL, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+			lastPos = currentPos;
+		}
+	}
+#endif
+
 int pitch;
 int page=w*h;
         ADM_assert(sdl_overlay);
