@@ -170,6 +170,7 @@ void GUI_showCurrentFrameHex(void);
 void GUI_avsProxy(void);
 uint8_t GUI_close(void);
 extern void A_jog(void);
+extern void DIA_glyphEdit(void);
 //___________________________________________
 // serialization of user event throught gui
 //
@@ -197,6 +198,9 @@ int nw;
   }
   switch (action)
     {
+        case ACT_GLYPHEDIT: 
+                                DIA_glyphEdit();
+                                return;
         case ACT_AVS_PROXY:
                                 GUI_avsProxy();
                                 return;

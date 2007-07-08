@@ -59,4 +59,5 @@ admGlyph *searchGlyph(admGlyph *startGlyph, admGlyph *candidate);
 uint8_t  destroyGlyphTree(admGlyph *startGlyph);
 uint8_t  insertInGlyphTree(admGlyph *startGlyph, admGlyph *candidate);
 admGlyph *clippedGlyph(admGlyph *in);
+admGlyph *glyphSearchFather(admGlyph *in,admGlyph *head );
 #endif

@@ -135,5 +135,23 @@ admGlyph *nw=NULL;
             return nw;
 
 }
+/**
+    \fn glyphSearchFather
+    \brief Returns the father of the "in" glyph.
+    @param in : Glyph to search the father of
+    @param head : head of glyph list
+    @returns father or NULL if not found
+*/
+admGlyph *glyphSearchFather(admGlyph *in,admGlyph *head )
+{
+  admGlyph *cur=head;
+  while(cur)
+  {
+    if(!cur->next) return NULL;
+    if(cur->next==in) return cur; 
+    cur=cur->next;
+  }
+  return NULL;
+}
 /*************************************************/
 

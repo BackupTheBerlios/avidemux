@@ -158,5 +158,5 @@ int UI_RunApp(void)
     printf("*********************************\n");
     printf("*********************************\n");
 }
-
+uint8_t DIA_glyphEdit(void) {return 0;};
 //EOF

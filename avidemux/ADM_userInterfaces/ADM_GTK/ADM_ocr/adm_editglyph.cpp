@@ -34,6 +34,7 @@ static admGlyph *currentGlyph=NULL;
 static GtkWidget *dialog;
 
 static uint8_t loadGlyph(char *name,admGlyph *head,uint32_t *outNb);
+static uint8_t saveGlyph(char *name,admGlyph *head,uint32_t nb);
 static gboolean glyphDraw( void );
 static void glyphUpdate(void );
 /**
@@ -76,12 +77,21 @@ uint8_t DIA_glyphEdit(void)
   gtk_register_dialog(dialog);
   
   // Register callbacks
-  #define ASSOCIATE(x,y)   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),y)
-  #define CONNECT(x,y,z) 	gtk_signal_connect(GTK_OBJECT(WID(x)), #y,GTK_SIGNAL_FUNC(z),   NULL);
+#define ASSOCIATE(x,y)   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),y)
+#define CONNECT(x,y,z) 	gtk_signal_connect(GTK_OBJECT(WID(x)), #y,GTK_SIGNAL_FUNC(z),   NULL);
 #define ACTION_PREV 10
 #define ACTION_NEXT 20
+#define ACTION_PREV_EMPTY 30
+#define ACTION_NEXT_EMPTY 40
+#define ACTION_SAVE 50
+#define ACTION_DELETE 60
+  
   ASSOCIATE(buttonPrev,ACTION_PREV);
   ASSOCIATE(buttonNext,ACTION_NEXT);
+  ASSOCIATE(buttonEmptyPrev,ACTION_PREV_EMPTY);
+  ASSOCIATE(buttonNextEmpty,ACTION_NEXT_EMPTY);
+  ASSOCIATE(buttonSave,ACTION_SAVE);
+  ASSOCIATE(buttonDelete,ACTION_DELETE);
   
   CONNECT(drawingarea1,expose_event,glyphDraw);
   gtk_widget_show(dialog);
@@ -113,6 +123,67 @@ uint8_t DIA_glyphEdit(void)
                           glyphUpdate();
                         }
                         continue;break; 
+      case ACTION_NEXT_EMPTY: 
+                        printf("NEXT EMPTY\n");
+                        while(1)
+                        {
+                            if(currentGlyph->next)
+                            {
+                              currentGlyph=currentGlyph->next; 
+                              glyphUpdate();
+                              if(!currentGlyph->code || !*(currentGlyph->code))
+                              {
+                                break;
+                              }
+                            }
+                            else 
+                            {
+                              GUI_Error_HIG(_("End reached"),_("No more glyphs"));
+                              break;
+                            }
+                        }
+                        continue;break; 
+        case ACTION_PREV_EMPTY: 
+                        printf("PREV EMPTY\n");
+                        while(1)
+                        {
+                            if(currentGlyph!=head.next)
+                            {
+                              admGlyph *father;
+                              father=glyphSearchFather(currentGlyph,&head);
+                              if(father)
+                              {
+                                  currentGlyph=father;
+                                  glyphUpdate();
+                                   if(!currentGlyph->code || !*(currentGlyph->code))
+                                    {
+                                      break;
+                                    }
+                                  continue;
+                              } 
+                            } 
+                            GUI_Error_HIG(_("Head reached"),_("No more glyphs"));
+                            break;
+                        }
+                        continue;break;
+      case ACTION_SAVE:
+                    saveGlyph(glyphName,&head,nbGlyph);
+                    continue;break;
+      case ACTION_DELETE:
+                  {
+                      admGlyph *father;
+                      father=glyphSearchFather(currentGlyph,&head);
+                      ADM_assert(father);
+                      father->next=currentGlyph->next;
+                      delete currentGlyph;
+                      
+                      currentGlyph=father;
+                        if(father==&head && head.next)
+                          currentGlyph=head.next;
+                      nbGlyph--;
+                      glyphUpdate();
+                      continue;break; 
+                  }
     }
     break; // exit while(1)
   }
@@ -125,6 +196,43 @@ uint8_t DIA_glyphEdit(void)
 
 }
 /**
+    \fn       glyphSave
+    \brief    Save the glypset
+*/
+uint8_t saveGlyph(char *name,admGlyph *head,uint32_t nb)
+{
+  FILE *out;
+  uint32_t slen;
+    
+  admGlyph *glyph=head->next;
+    
+    
+  out=fopen(name,"wb");
+  if(!out)
+  {
+    GUI_Error_HIG(_("Could not write the file"), NULL);
+    return 0;
+  }
+#define WRITE(x) fwrite(&(x),sizeof(x),1,out);
+    WRITE(nb);
+    
+    while(glyph)
+    {
+      WRITE(glyph->width);
+      WRITE(glyph->height);
+      fwrite(glyph->data,glyph->width*glyph->height,1,out);
+      if(glyph->code) slen=strlen(glyph->code);
+      else slen=0;
+      WRITE(slen);
+      fwrite(glyph->code,slen,1,out);
+      glyph=glyph->next;
+    }
+    
+    fclose(out);
+    return 1;
+  
+}
+/**
     \fn glyphUpdate
     \brief Update all fields in the dialog wrt currentGlyph
 */
@@ -133,9 +241,9 @@ void glyphUpdate(void )
   if(!currentGlyph) return;
   gtk_widget_set_usize(WID(drawingarea1), currentGlyph->width+4, currentGlyph->height+4);
   glyphDraw();
+  gtk_editable_delete_text(GTK_EDITABLE(WID(entry1)), 0,-1); 
   if(currentGlyph->code)
   {
-    gtk_editable_delete_text(GTK_EDITABLE(WID(entry1)), 0,-1); 
     // Set our text
     gtk_entry_set_text (GTK_ENTRY (WID(entry1)), currentGlyph->code);
   }
@@ -206,18 +314,30 @@ uint8_t loadGlyph(char *name,admGlyph *head,uint32_t *outNb)
 
 
 //**********************************
-GtkWidget *create_dialog1 (void)
+
+GtkWidget*
+create_dialog1 (void)
 {
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
   GtkWidget *vbox2;
   GtkWidget *drawingarea1;
   GtkWidget *entry1;
-  GtkWidget *hbox1;
-  GtkWidget *buttonPrev;
+  GtkWidget *table1;
   GtkWidget *buttonNext;
-  GtkWidget *hseparator1;
-  GtkWidget *button3;
+  GtkWidget *buttonPrev;
+  GtkWidget *buttonEmptyPrev;
+  GtkWidget *alignment2;
+  GtkWidget *hbox4;
+  GtkWidget *image2;
+  GtkWidget *label2;
+  GtkWidget *buttonNextEmpty;
+  GtkWidget *alignment3;
+  GtkWidget *hbox5;
+  GtkWidget *image3;
+  GtkWidget *label3;
+  GtkWidget *buttonDelete;
+  GtkWidget *buttonSave;
   GtkWidget *dialog_action_area1;
   GtkWidget *closebutton1;
 
@@ -240,25 +360,77 @@ GtkWidget *create_dialog1 (void)
   gtk_widget_show (entry1);
   gtk_box_pack_start (GTK_BOX (vbox2), entry1, FALSE, FALSE, 0);
 
-  hbox1 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox1);
-  gtk_box_pack_start (GTK_BOX (vbox2), hbox1, TRUE, TRUE, 0);
-
-  buttonPrev = gtk_button_new_from_stock ("gtk-media-previous");
-  gtk_widget_show (buttonPrev);
-  gtk_box_pack_start (GTK_BOX (hbox1), buttonPrev, TRUE, TRUE, 0);
+  table1 = gtk_table_new (3, 2, FALSE);
+  gtk_widget_show (table1);
+  gtk_box_pack_start (GTK_BOX (vbox2), table1, TRUE, TRUE, 0);
 
   buttonNext = gtk_button_new_from_stock ("gtk-media-next");
   gtk_widget_show (buttonNext);
-  gtk_box_pack_start (GTK_BOX (hbox1), buttonNext, TRUE, TRUE, 0);
+  gtk_table_attach (GTK_TABLE (table1), buttonNext, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK), 0, 0);
 
-  hseparator1 = gtk_hseparator_new ();
-  gtk_widget_show (hseparator1);
-  gtk_box_pack_start (GTK_BOX (hbox1), hseparator1, TRUE, TRUE, 0);
+  buttonPrev = gtk_button_new_from_stock ("gtk-media-previous");
+  gtk_widget_show (buttonPrev);
+  gtk_table_attach (GTK_TABLE (table1), buttonPrev, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL), 0, 0);
 
-  button3 = gtk_button_new_from_stock ("gtk-save-as");
-  gtk_widget_show (button3);
-  gtk_box_pack_start (GTK_BOX (hbox1), button3, FALSE, FALSE, 0);
+  buttonEmptyPrev = gtk_button_new ();
+  gtk_widget_show (buttonEmptyPrev);
+  gtk_table_attach (GTK_TABLE (table1), buttonEmptyPrev, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK), 0, 0);
+
+  alignment2 = gtk_alignment_new (0.5, 0.5, 0, 0);
+  gtk_widget_show (alignment2);
+  gtk_container_add (GTK_CONTAINER (buttonEmptyPrev), alignment2);
+
+  hbox4 = gtk_hbox_new (FALSE, 2);
+  gtk_widget_show (hbox4);
+  gtk_container_add (GTK_CONTAINER (alignment2), hbox4);
+
+  image2 = gtk_image_new_from_stock ("gtk-media-previous", GTK_ICON_SIZE_BUTTON);
+  gtk_widget_show (image2);
+  gtk_box_pack_start (GTK_BOX (hbox4), image2, FALSE, FALSE, 0);
+
+  label2 = gtk_label_new_with_mnemonic (_("Prev. Empty"));
+  gtk_widget_show (label2);
+  gtk_box_pack_start (GTK_BOX (hbox4), label2, FALSE, FALSE, 0);
+
+  buttonNextEmpty = gtk_button_new ();
+  gtk_widget_show (buttonNextEmpty);
+  gtk_table_attach (GTK_TABLE (table1), buttonNextEmpty, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK), 0, 0);
+
+  alignment3 = gtk_alignment_new (0.5, 0.5, 0, 0);
+  gtk_widget_show (alignment3);
+  gtk_container_add (GTK_CONTAINER (buttonNextEmpty), alignment3);
+
+  hbox5 = gtk_hbox_new (FALSE, 2);
+  gtk_widget_show (hbox5);
+  gtk_container_add (GTK_CONTAINER (alignment3), hbox5);
+
+  image3 = gtk_image_new_from_stock ("gtk-media-next", GTK_ICON_SIZE_BUTTON);
+  gtk_widget_show (image3);
+  gtk_box_pack_start (GTK_BOX (hbox5), image3, FALSE, FALSE, 0);
+
+  label3 = gtk_label_new_with_mnemonic (_("Next Empty"));
+  gtk_widget_show (label3);
+  gtk_box_pack_start (GTK_BOX (hbox5), label3, FALSE, FALSE, 0);
+
+  buttonDelete = gtk_button_new_from_stock ("gtk-delete");
+  gtk_widget_show (buttonDelete);
+  gtk_table_attach (GTK_TABLE (table1), buttonDelete, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  buttonSave = gtk_button_new_from_stock ("gtk-save");
+  gtk_widget_show (buttonSave);
+  gtk_table_attach (GTK_TABLE (table1), buttonSave, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
@@ -275,15 +447,24 @@ GtkWidget *create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, vbox2, "vbox2");
   GLADE_HOOKUP_OBJECT (dialog1, drawingarea1, "drawingarea1");
   GLADE_HOOKUP_OBJECT (dialog1, entry1, "entry1");
-  GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
-  GLADE_HOOKUP_OBJECT (dialog1, buttonPrev, "buttonPrev");
+  GLADE_HOOKUP_OBJECT (dialog1, table1, "table1");
   GLADE_HOOKUP_OBJECT (dialog1, buttonNext, "buttonNext");
-  GLADE_HOOKUP_OBJECT (dialog1, hseparator1, "hseparator1");
-  GLADE_HOOKUP_OBJECT (dialog1, button3, "button3");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonPrev, "buttonPrev");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonEmptyPrev, "buttonEmptyPrev");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment2, "alignment2");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox4, "hbox4");
+  GLADE_HOOKUP_OBJECT (dialog1, image2, "image2");
+  GLADE_HOOKUP_OBJECT (dialog1, label2, "label2");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonNextEmpty, "buttonNextEmpty");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment3, "alignment3");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox5, "hbox5");
+  GLADE_HOOKUP_OBJECT (dialog1, image3, "image3");
+  GLADE_HOOKUP_OBJECT (dialog1, label3, "label3");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonDelete, "buttonDelete");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonSave, "buttonSave");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog1, closebutton1, "closebutton1");
 
   return dialog1;
 }
-
 

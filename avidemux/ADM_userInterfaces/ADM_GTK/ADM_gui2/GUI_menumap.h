@@ -101,5 +101,6 @@ CALLBACK(zoom_1_2                                   ,ACT_ZOOM_1_2);
 CALLBACK(zoom_1_1                                   ,ACT_ZOOM_1_1);
 CALLBACK(zoom_2_1                                   ,ACT_ZOOM_2_1);
 CALLBACK(zoom_4_1                                   ,ACT_ZOOM_4_1);
+CALLBACK(edit_glyph1                                ,ACT_GLYPHEDIT);
 
 
