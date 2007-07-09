@@ -191,5 +191,238 @@ int shutdown_win32(void)
 
 	return 0;
 }
+
+#ifndef PRODUCT_BUSINESS
+#define PRODUCT_BUSINESS 0x00000006
+#endif
+
+#ifndef PRODUCT_BUSINESS_N
+#define PRODUCT_BUSINESS_N 0x00000010
+#endif
+
+#ifndef PRODUCT_HOME_BASIC
+#define PRODUCT_HOME_BASIC 0x00000002
+#endif
+
+#ifndef PRODUCT_HOME_BASIC_N
+#define PRODUCT_HOME_BASIC_N 0x00000005
+#endif
+
+#ifndef PRODUCT_HOME_PREMIUM
+#define PRODUCT_HOME_PREMIUM 0x00000003
+#endif 
+
+#ifndef PRODUCT_STARTER
+#define PRODUCT_STARTER 0x0000000B
+#endif
+
+#ifndef PRODUCT_ENTERPRISE
+#define PRODUCT_ENTERPRISE 0x00000004
+#endif 
+
+#ifndef PRODUCT_ULTIMATE
+#define PRODUCT_ULTIMATE 0x00000001
+#endif
+
+bool getWindowsVersion(char* version)
+{
+	int index = 0;
+	OSVERSIONINFOEX osvi = {};
+
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+
+	if (!GetVersionEx((OSVERSIONINFO*)&osvi))
+		return false;
+
+	if (osvi.dwPlatformId != VER_PLATFORM_WIN32_NT)
+		return false;
+// Vista
+	if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0)
+	{
+		if (osvi.wProductType == VER_NT_WORKSTATION)
+		{
+			index += sprintf(version + index, "Microsoft Windows Vista");
+
+			uint32_t productType = 0;
+
+			HMODULE hKernel = GetModuleHandle("KERNEL32.DLL");
+
+			if (hKernel)
+			{
+				typedef bool (*funcGetProductInfo)(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t*);
+				funcGetProductInfo pGetProductInfo = (funcGetProductInfo)GetProcAddress(hKernel, "GetProductInfo"); 
+
+				if (pGetProductInfo)
+					pGetProductInfo(6, 0, 0, 0, &productType);
+	  
+				switch (productType)
+				{
+				case PRODUCT_STARTER:
+				{
+					index += sprintf(version + index, " Starter");
+					break;
+				}
+				case PRODUCT_HOME_BASIC_N:
+				{
+					index += sprintf(version + index, " Home Basic N");
+					break;
+				}
+				case PRODUCT_HOME_BASIC:
+				{
+					index += sprintf(version + index, " Home Basic");
+					break;
+				}
+				case PRODUCT_HOME_PREMIUM:
+				{
+					index += sprintf(version + index, " Home Premium");
+					break;
+				}
+				case PRODUCT_BUSINESS_N:
+				{
+					index += sprintf(version + index, " Business N");
+					break;
+				}
+				case PRODUCT_BUSINESS:
+				{
+					index += sprintf(version + index, " Business");
+					break;
+				}
+				case PRODUCT_ENTERPRISE:
+				{
+					index += sprintf(version + index, " Enterprise");
+					break;
+				}
+				case PRODUCT_ULTIMATE:
+				{
+					index += sprintf(version + index, " Ultimate");
+					break;
+				}
+				default:
+					break;
+				}
+			}
+		}
+		else if (osvi.wProductType == VER_NT_SERVER)
+		{
+			index += sprintf(version + index, "Microsoft Windows Server 2008");
+
+			if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
+				index += sprintf(version + index, " Datacenter Edition");
+			else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+				index += sprintf(version + index, " Enterprise Edition");
+			else if (osvi.wSuiteMask == VER_SUITE_BLADE)
+				index += sprintf(version + index, " Web Edition");
+			else
+				index += sprintf(version + index, " Standard Edition");
+		}
+	}
+// Windows Server 2003
+	else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
+	{
+		index += sprintf(version + index, "Microsoft Windows Server 2003");
+
+		if (GetSystemMetrics(SM_SERVERR2))
+			index += sprintf(version + index, " R2");
+
+		if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
+			index += sprintf(version + index, " Datacenter Edition");
+		else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+			index += sprintf(version + index, " Enterprise Edition");
+		else if (osvi.wSuiteMask == VER_SUITE_BLADE)
+			index += sprintf(version + index, " Web Edition");
+		else
+			index += sprintf(version + index, " Standard Edition");
+	}
+// Windows XP
+	else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1)
+	{
+		index += sprintf(version + index, "Microsoft Windows XP");
+
+		if (GetSystemMetrics(SM_MEDIACENTER))
+			index += sprintf(version + index, " Media Center Edition");
+		else if (GetSystemMetrics(SM_STARTER))
+			index += sprintf(version + index, " Starter Edition");
+		else if (GetSystemMetrics(SM_TABLETPC))
+			index += sprintf(version + index, " Tablet PC Edition");
+		else if (osvi.wSuiteMask & VER_SUITE_PERSONAL)
+			index += sprintf(version + index, " Home Edition");
+		else
+			index += sprintf(version + index, " Professional");
+	}
+// Windows 2000
+	else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0)
+	{
+		index += sprintf(version + index, "Microsoft Windows 2000");
+
+		if (osvi.wProductType == VER_NT_WORKSTATION)
+		{
+			index += sprintf(version + index, " Professional");
+		}
+		else if (osvi.wProductType == VER_NT_SERVER)
+		{
+			if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
+				index += sprintf(version + index, " Datacenter Server");
+			else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+				index += sprintf(version + index, " Advanced Server");
+			else
+				index += sprintf(version + index, " Server");
+		}
+	}
+// Windows NT 4
+	else if (osvi.dwMajorVersion == 4)
+	{
+		index += sprintf(version + index, "Microsoft Windows NT 4");
+
+		if (osvi.wProductType == VER_NT_WORKSTATION)
+		{
+			index += sprintf(version + index, " Workstation");
+		}
+		else if (osvi.wProductType == VER_NT_SERVER)
+		{
+			if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+				index += sprintf(version + index, " Server, Enterprise Edition");
+			else
+				index += sprintf(version + index, " Server");
+		}
+	}
+	else
+	{
+		index += sprintf(version + index, "Microsoft Windows");
+	}
+
+// Service pack and full version info
+	if (strlen(osvi.szCSDVersion) > 0)
+	{
+		index += sprintf(version + index, " %s", osvi.szCSDVersion);
+	}
+
+	index += sprintf(version + index, " (%d.%d.%d", osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber & 0xFFFF);
+
+// 64-bit Windows
+	bool isWow64 = false;
+	HMODULE hKernel = GetModuleHandle("kernel32.dll");
+
+	if (hKernel)
+	{
+		typedef bool (*funcIsWow64Process)(void*, bool*);  
+
+	    funcIsWow64Process pIsWow64Process = (funcIsWow64Process)GetProcAddress(hKernel, "IsWow64Process"); 
+
+	    if (pIsWow64Process)
+	    {
+			pIsWow64Process(GetCurrentProcess(), &isWow64);
+		}
+	}
+
+	if (isWow64)
+		index += sprintf(version + index, "; 64-bit");
+	else
+		index += sprintf(version + index, "; 32-bit");
+
+	index += sprintf(version + index, ")");
+	
+	return true;
+}
+
 #endif
 

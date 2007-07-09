@@ -90,6 +90,7 @@ extern void ADM_memStatEnd( void );
 
 #ifdef ADM_WIN32
 extern EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, void* pEstablisherFrame, struct _CONTEXT* pContextRecord, void* pDispatcherContext);
+extern bool getWindowsVersion(char* version);
 #else
 extern void installSigHandler(void);
 #endif
@@ -156,6 +157,15 @@ int main(int argc, char *argv[])
 #endif
 
 printf("\n");
+
+#ifdef ADM_WIN32
+	char version[250];
+
+	if (getWindowsVersion(version))
+	{
+		printf("Operating System: %s\n", version);
+	}
+#endif
 
 #if defined(__USE_LARGEFILE) && defined(__USE_LARGEFILE64)
 	printf("\nLarge file available: %d offset\n", __USE_FILE_OFFSET64);
