@@ -140,6 +140,7 @@ SectionGroup "User interfaces" SecGrpUI
         File /r ..\..\..\avidemux_2.4_build\share\themes\*
         SetOutPath $INSTDIR
         File ..\..\..\avidemux_2.4_build\avidemux2_gtk.exe
+        File ..\..\..\avidemux_2.4_build\gtk2_prefs.exe
         File ..\..\..\avidemux_2.4_build\libatk-1.0-0.dll
         File ..\..\..\avidemux_2.4_build\libcairo-2.dll
         File ..\..\..\avidemux_2.4_build\libgdk_pixbuf-2.0-0.dll
@@ -545,6 +546,7 @@ Section /o un.GTK+ UnSecUiGtk
     Delete /REBOOTOK $INSTDIR\libgdk_pixbuf-2.0-0.dll
     Delete /REBOOTOK $INSTDIR\libcairo-2.dll
     Delete /REBOOTOK $INSTDIR\libatk-1.0-0.dll
+    Delete /REBOOTOK $INSTDIR\gtk2_prefs.exe
     Delete /REBOOTOK $INSTDIR\avidemux2_gtk.exe
     RmDir /r /REBOOTOK $INSTDIR\share\themes
     RmDir /r /REBOOTOK $INSTDIR\lib\gtk-2.0
