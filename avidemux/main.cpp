@@ -133,7 +133,11 @@ int main(int argc, char *argv[])
     printf(" MacOsX    : Kuisathaverat\n");
     printf(" Win32     : Gruntster\n\n");
 
-	printf("Compiled for ");
+#ifdef __GNUC__
+	printf("Compiler: GCC %s\n", __VERSION__);
+#endif
+
+	printf("Build Target: ");
 
 #if defined(ADM_WIN32)
 	printf("Microsoft Windows");
