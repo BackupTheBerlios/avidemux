@@ -28,7 +28,7 @@
 #include "../ADM_GTK/ADM_toolkit_gtk/toolkit_gtk_include.h"
 
 #include "ADM_ocr/adm_glyph.h"
-
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 static GtkWidget *create_dialog1 (void);
 static admGlyph *currentGlyph=NULL;
 static GtkWidget *dialog;
@@ -36,6 +36,7 @@ static GtkWidget *dialog;
 static uint8_t loadGlyph(char *name,admGlyph *head,uint32_t *outNb);
 static uint8_t saveGlyph(char *name,admGlyph *head,uint32_t nb);
 static gboolean glyphDraw( void );
+static gboolean glyphActivate(void);
 static void glyphUpdate(void );
 /**
     \fn DIA_glyphEdit
@@ -85,6 +86,9 @@ uint8_t DIA_glyphEdit(void)
 #define ACTION_NEXT_EMPTY 40
 #define ACTION_SAVE 50
 #define ACTION_DELETE 60
+#define ACTION_ACTIVATE 70
+#define ACTION_SEARCH 80
+#define ACTION_REWIND 90
   
   ASSOCIATE(buttonPrev,ACTION_PREV);
   ASSOCIATE(buttonNext,ACTION_NEXT);
@@ -92,8 +96,13 @@ uint8_t DIA_glyphEdit(void)
   ASSOCIATE(buttonNextEmpty,ACTION_NEXT_EMPTY);
   ASSOCIATE(buttonSave,ACTION_SAVE);
   ASSOCIATE(buttonDelete,ACTION_DELETE);
+  ASSOCIATE(buttonSearch,ACTION_SEARCH);
+  ASSOCIATE(buttonRewind,ACTION_REWIND);
+  
   
   CONNECT(drawingarea1,expose_event,glyphDraw);
+  CONNECT(entry1,activate,glyphActivate);
+  
   gtk_widget_show(dialog);
   glyphUpdate();
   while(1)
@@ -101,6 +110,50 @@ uint8_t DIA_glyphEdit(void)
    gint b=gtk_dialog_run(GTK_DIALOG(dialog));
     switch(b)
     {
+      case ACTION_REWIND:
+                            currentGlyph=head.next;
+                            glyphUpdate();
+                            continue;
+      case ACTION_SEARCH:
+                          {
+                          char *tomatch=NULL;
+                          {
+                            // Dialog Factory to the rescue ! 
+                              
+                              diaElemText txt(&tomatch,_("String"),NULL);
+                              diaElem *elems[]={&txt};
+                              if(!diaFactoryRun(_("Search string"),1,elems))
+                              {
+                                  continue;
+                                  break;
+                              }
+                          }
+                          printf("Searched string <%s>\n",tomatch);
+                          
+                          while(currentGlyph->next)
+                          {
+                             currentGlyph=currentGlyph->next;
+                             glyphUpdate();
+                             
+                             if(currentGlyph->code)
+                             {
+                                printf("%s vs %s\n",currentGlyph->code,tomatch);
+                                if(!strcmp(currentGlyph->code,tomatch))
+                                {
+                                  
+                                  glyphUpdate();
+                                  break;  
+                                }
+                             }
+                          }
+                          ADM_dezalloc(tomatch);
+                          if(!currentGlyph->next)
+                                GUI_Error_HIG(_("End reached"),_("No more glyphs"));
+                          }
+                          
+                          continue;
+                          break;
+                        ;
       case ACTION_PREV: 
                         printf("PREV\n");
                         if(currentGlyph!=head.next)
@@ -184,6 +237,22 @@ uint8_t DIA_glyphEdit(void)
                       glyphUpdate();
                       continue;break; 
                   }
+      case ACTION_ACTIVATE:
+                  {
+                      const gchar  *old;
+                      if(currentGlyph->code) delete [] currentGlyph->code;
+                      currentGlyph->code=NULL;
+                      // Retrieve new one
+                      old=gtk_entry_get_text (GTK_ENTRY (WID(entry1)));
+                      
+                      if(old && strlen(old))
+                      {
+                        currentGlyph->code=new char[strlen(old)+1];
+                        strcpy(currentGlyph->code,old);
+                      }
+                    
+                  }
+                        continue;break; 
     }
     break; // exit while(1)
   }
@@ -248,6 +317,17 @@ void glyphUpdate(void )
     gtk_entry_set_text (GTK_ENTRY (WID(entry1)), currentGlyph->code);
   }
 }
+/**
+    \fn glyphActivate
+    \brief Transforms the enter keystroke into a dialog signal
+*/
+gboolean glyphActivate(void)
+{
+  printf("Activate\n");
+  gtk_dialog_response                 (GTK_DIALOG(dialog),    ACTION_ACTIVATE);
+  return true; 
+}
+
 /**
     \fn     glyphDraw
     \brief  display glyph
@@ -338,6 +418,8 @@ create_dialog1 (void)
   GtkWidget *label3;
   GtkWidget *buttonDelete;
   GtkWidget *buttonSave;
+  GtkWidget *buttonSearch;
+  GtkWidget *buttonRewind;
   GtkWidget *dialog_action_area1;
   GtkWidget *closebutton1;
 
@@ -360,7 +442,7 @@ create_dialog1 (void)
   gtk_widget_show (entry1);
   gtk_box_pack_start (GTK_BOX (vbox2), entry1, FALSE, FALSE, 0);
 
-  table1 = gtk_table_new (3, 2, FALSE);
+  table1 = gtk_table_new (4, 2, FALSE);
   gtk_widget_show (table1);
   gtk_box_pack_start (GTK_BOX (vbox2), table1, TRUE, TRUE, 0);
 
@@ -422,13 +504,25 @@ create_dialog1 (void)
 
   buttonDelete = gtk_button_new_from_stock ("gtk-delete");
   gtk_widget_show (buttonDelete);
-  gtk_table_attach (GTK_TABLE (table1), buttonDelete, 0, 1, 2, 3,
+  gtk_table_attach (GTK_TABLE (table1), buttonDelete, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
   buttonSave = gtk_button_new_from_stock ("gtk-save");
   gtk_widget_show (buttonSave);
-  gtk_table_attach (GTK_TABLE (table1), buttonSave, 1, 2, 2, 3,
+  gtk_table_attach (GTK_TABLE (table1), buttonSave, 1, 2, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  buttonSearch = gtk_button_new_from_stock ("gtk-find");
+  gtk_widget_show (buttonSearch);
+  gtk_table_attach (GTK_TABLE (table1), buttonSearch, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  buttonRewind = gtk_button_new_from_stock ("gtk-home");
+  gtk_widget_show (buttonRewind);
+  gtk_table_attach (GTK_TABLE (table1), buttonRewind, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
@@ -462,6 +556,8 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, label3, "label3");
   GLADE_HOOKUP_OBJECT (dialog1, buttonDelete, "buttonDelete");
   GLADE_HOOKUP_OBJECT (dialog1, buttonSave, "buttonSave");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonSearch, "buttonSearch");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonRewind, "buttonRewind");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog1, closebutton1, "closebutton1");
 
