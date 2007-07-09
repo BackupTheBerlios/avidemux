@@ -40,7 +40,7 @@
 //#define OPENDML_VERBOSE
 
 #if defined( ADM_WIN32) || defined(ARCH_X86_64)
-	#define PPACKED __attribute__ ((packed))
+	#define PPACKED __attribute__ ((packed, gcc_struct))
 #else
 	#define PPACKED 
 #endif
