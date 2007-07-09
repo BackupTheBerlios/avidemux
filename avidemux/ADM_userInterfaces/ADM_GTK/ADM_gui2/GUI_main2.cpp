@@ -170,6 +170,7 @@ create_mainWindow (void)
   GtkWidget *show_builtin_support1;
   GtkWidget *about1;
   GtkWidget *image8271;
+  GtkWidget *hbox20;
   GtkWidget *toolbar2;
   GtkIconSize tmp_toolbar_icon_size;
   GtkWidget *menutoolbuttonOpen;
@@ -182,6 +183,10 @@ create_mainWindow (void)
   GtkWidget *separatortoolitem2;
   GtkWidget *toolitem12;
   GtkWidget *comboboxPreview;
+  GtkWidget *hbox21;
+  GtkWidget *togglebutton1;
+  GtkWidget *image8272;
+  GtkWidget *hscalVolume;
   GtkWidget *vbox10;
   GtkWidget *hbox14;
   GtkWidget *alignment19;
@@ -950,9 +955,13 @@ create_mainWindow (void)
   gtk_widget_show (image8271);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (about1), image8271);
 
+  hbox20 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox20);
+  gtk_box_pack_start (GTK_BOX (vbox1), hbox20, TRUE, TRUE, 0);
+
   toolbar2 = gtk_toolbar_new ();
   gtk_widget_show (toolbar2);
-  gtk_box_pack_start (GTK_BOX (vbox1), toolbar2, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox20), toolbar2, TRUE, TRUE, 0);
   gtk_toolbar_set_style (GTK_TOOLBAR (toolbar2), GTK_TOOLBAR_BOTH_HORIZ);
   tmp_toolbar_icon_size = gtk_toolbar_get_icon_size (GTK_TOOLBAR (toolbar2));
 
@@ -1001,6 +1010,24 @@ create_mainWindow (void)
   comboboxPreview = gtk_combo_box_new_text ();
   gtk_widget_show (comboboxPreview);
   gtk_container_add (GTK_CONTAINER (toolitem12), comboboxPreview);
+
+  hbox21 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox21);
+  gtk_box_pack_start (GTK_BOX (hbox20), hbox21, TRUE, TRUE, 0);
+
+  togglebutton1 = gtk_toggle_button_new ();
+  gtk_widget_show (togglebutton1);
+  gtk_box_pack_start (GTK_BOX (hbox21), togglebutton1, FALSE, FALSE, 0);
+
+  image8272 = gtk_image_new_from_stock ("gtk-connect", GTK_ICON_SIZE_MENU);
+  gtk_widget_show (image8272);
+  gtk_container_add (GTK_CONTAINER (togglebutton1), image8272);
+
+  hscalVolume = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (99, 0, 100, 1, 1, 1)));
+  gtk_widget_show (hscalVolume);
+  gtk_box_pack_start (GTK_BOX (hbox21), hscalVolume, TRUE, TRUE, 0);
+  gtk_scale_set_draw_value (GTK_SCALE (hscalVolume), FALSE);
+  gtk_scale_set_digits (GTK_SCALE (hscalVolume), 0);
 
   vbox10 = gtk_vbox_new (FALSE, 3);
   gtk_widget_show (vbox10);
@@ -1579,6 +1606,7 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, show_builtin_support1, "show_builtin_support1");
   GLADE_HOOKUP_OBJECT (mainWindow, about1, "about1");
   GLADE_HOOKUP_OBJECT (mainWindow, image8271, "image8271");
+  GLADE_HOOKUP_OBJECT (mainWindow, hbox20, "hbox20");
   GLADE_HOOKUP_OBJECT (mainWindow, toolbar2, "toolbar2");
   GLADE_HOOKUP_OBJECT (mainWindow, menutoolbuttonOpen, "menutoolbuttonOpen");
   GLADE_HOOKUP_OBJECT (mainWindow, toolitem11, "toolitem11");
@@ -1589,6 +1617,10 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, separatortoolitem2, "separatortoolitem2");
   GLADE_HOOKUP_OBJECT (mainWindow, toolitem12, "toolitem12");
   GLADE_HOOKUP_OBJECT (mainWindow, comboboxPreview, "comboboxPreview");
+  GLADE_HOOKUP_OBJECT (mainWindow, hbox21, "hbox21");
+  GLADE_HOOKUP_OBJECT (mainWindow, togglebutton1, "togglebutton1");
+  GLADE_HOOKUP_OBJECT (mainWindow, image8272, "image8272");
+  GLADE_HOOKUP_OBJECT (mainWindow, hscalVolume, "hscalVolume");
   GLADE_HOOKUP_OBJECT (mainWindow, vbox10, "vbox10");
   GLADE_HOOKUP_OBJECT (mainWindow, hbox14, "hbox14");
   GLADE_HOOKUP_OBJECT (mainWindow, alignment19, "alignment19");

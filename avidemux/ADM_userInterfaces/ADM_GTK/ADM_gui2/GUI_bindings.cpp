@@ -196,9 +196,9 @@ buttonCallBack_S buttonCallback[]=
 	{"buttonGotoB"			,"clicked"		,ACT_GotoMarkB},	
 	{"toolbuttonCalc"		,"clicked"		,ACT_Bitrate},	
 
-	{"boxCurFrame"			,"editing_done"		,ACT_JumpToFrame},
+	//{"boxCurFrame"			,"editing_done"		,ACT_JumpToFrame},
 	{"boxCurFrame"			,"activate"		,ACT_JumpToFrame},
-	{"boxCurTime"			,"editing_done"		,ACT_TimeChanged},
+	//{"boxCurTime"			,"editing_done"		,ACT_TimeChanged},
 
         {"CheckButtonTimeshift"         ,"toggled"             ,ACT_TimeShift},
         {"spinbuttonTimeShift"          ,"value_changed"       ,ACT_TimeShift}
