@@ -267,9 +267,9 @@ uint8_t mkvHeader::addIndexEntry(uint32_t track,uint64_t where, uint32_t size,ui
   f/=1000. ;; // in seconds
   delta=(uint32_t)floor(f+0.49);
   //printf("Frame :%u rawTimeCode:%u convertedtoframe:%u \n",Track->_nbIndex,timecodeMS,delta);
-  if(delta+1<Track->_nbIndex)
+  if(delta+2<Track->_nbIndex)
   {
-    printf("[MKV] WARNING DELTA PTS/DTS is negative for frame %u (delta:%u)\n",Track->_nbIndex,delta); 
+    printf("[MKV] WARNING DELTA PTS/DTS is negative for frame %u (delta:%u, raw value %u,dwrate=%u)\n",Track->_nbIndex,delta,timecodeMS,_videostream.dwRate); 
     index[x].timeCode=0;
   }else
   {

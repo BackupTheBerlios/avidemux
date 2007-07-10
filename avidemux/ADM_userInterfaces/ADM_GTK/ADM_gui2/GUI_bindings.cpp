@@ -76,7 +76,7 @@ static GdkCursor *guiCursorBusy=NULL;
 static GdkCursor *guiCursorNormal=NULL;
 static gint	  guiCursorEvtMask=0;
 static gint       jogChange( void );
-
+static void volumeChange( void );
 static char     *customNames[ADM_MAC_CUSTOM_SCRIPT];
 static uint32_t ADM_nbCustom=0;
 // heek !
@@ -329,7 +329,10 @@ uint8_t  bindGUI( void )
 	gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"boxCurFrame")), "focus_out_event", 	
                       GTK_SIGNAL_FUNC(UI_looseFocus),                   (void *) NULL);	 
 
-        
+        // Volume
+         gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"hscalVolume")), "value_changed",   
+                      GTK_SIGNAL_FUNC(volumeChange),                   (void *) NULL);  
+
         // Jog
         gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"jogg")), "value_changed",   
                       GTK_SIGNAL_FUNC(jogChange),                   (void *) NULL);  
@@ -1243,6 +1246,28 @@ gint jogChange(void)
       }      
    // Armed!
    return FALSE;
+}
+/**
+  \fn volumeChange
+  \brief Called when the volume slider is moved
+*/
+void volumeChange( void )
+{
+#ifdef HAVE_AUDIO
+GtkWidget *wid;
+GtkAdjustment *adj;
+int vol;
+
+
+if(_upd_in_progres) return;
+ _upd_in_progres++;
+
+        wid=lookup_widget(guiRootWindow,"hscalVolume");
+        adj=gtk_range_get_adjustment (GTK_RANGE(wid));
+        vol=(int)floor(adj->value+0.5);
+        AVDM_setVolume( vol);
+ _upd_in_progres--;
+#endif
 }
 
 // EOF

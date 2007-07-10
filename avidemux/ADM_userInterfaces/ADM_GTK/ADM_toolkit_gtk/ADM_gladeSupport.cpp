@@ -59,6 +59,7 @@
 #include "xpm/film19.inc"
 #include "xpm/film21.inc"
 #include "xpm/film23.inc"
+#include "xpm/audio-volume-medium.inc"
 #include "xpm/preview-button.inc"
 
 typedef enum 
@@ -108,7 +109,7 @@ name2xpm iconTranslation[]=
         {A_ICON_PNG,"7.png",(void *) x7},
         {A_ICON_PNG,"avidemux_icon_small.png",         (void *) avidemux_icon_small},
         {A_ICON_PNG,"systray.png",                 (void *)systray},
-        {A_ICON_PNG,"systray2.png",                 (void *)systray2},
+        {A_ICON_PNG,"audio-volume-medium.png",                 (void *)audio_volume_medium},
         {A_ICON_PNG,"preview-button.png",                 (void *)preview_button},
 	// Jakub nice animation
 #define MKFILM(x) 	{A_ICON_PNG,"film"#x".png",                 (void *)film##x},
