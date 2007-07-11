@@ -124,7 +124,7 @@ ADM_filter/filter_saveload.o 				\
 ./ADM_inputs/ADM_avsproxy/libADM_avsproxy.a		\
 ./ADM_inputs/ADM_matroska/libADM_matroska.a		\
 ./ADM_infoExtractor/libADM_infoExtractor.a 		\
-./ADM_libraries/ADM_lavcodec/libpostproc/libpostproc.a	\
+./ADM_libraries/ADM_libpostproc/libpostproc.a	\
 ./ADM_libraries/ADM_mplex/libADM_mplex.a		\
 ./ADM_libraries/ADM_lvemux/libADM_lvemux.a		\
 ./ADM_libraries/ADM_lavformat/libADM_lavformat.a	\

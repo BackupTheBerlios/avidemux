@@ -1,6 +1,6 @@
 libavcodec_a_METASOURCES = AUTO
 noinst_LIBRARIES = libavcodec.a
-SUBDIRS=libpostproc i386 ppc 
+SUBDIRS=i386 ppc 
 LAVUTIL=../ADM_lavutil 
 if BUILD_MMX_COMPATIBLE
 EXTEND_MMX = i386/cputest.c     \
