@@ -185,7 +185,7 @@ uint8_t asfHeader::open(char *name)
 
 uint32_t asfHeader::getFlags(uint32_t frame,uint32_t *flags)
 {
-  ADM_assert(frame<nbImage);
+  if(frame>=nbImage) return 0;
   if(!frame) *flags=AVI_KEY_FRAME;
   else 
       *flags=_index[frame].flags;
