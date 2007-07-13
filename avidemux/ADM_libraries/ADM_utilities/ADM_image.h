@@ -149,25 +149,26 @@ void drawString(ADMImage *dst, int x, int y, const char *s) ;
 //
 //  Simple image resizer
 //
-
-
 class ADMImageResizer
 {
-private:
-        void    *_context;
-        uint32_t orgWidth,orgHeight;
-        uint32_t destWidth,destHeight;
-public:
-                ADMImageResizer(uint32_t ow,uint32_t oh, uint32_t dw, uint32_t dh);
-                ~ADMImageResizer();
-       uint8_t  resize(ADMImage *src,ADMImage *dest);
+	private:
+		void    *_context;
+		uint32_t orgFormat, destFormat;
+		uint32_t orgWidth, orgHeight;
+		uint32_t destWidth, destHeight;
+
+		void init(uint32_t ow, uint32_t oh, uint32_t dw, uint32_t dh, int srcFormat, int dstFormat);
+		void getYuvPlanes(uint8_t *source, uint32_t width, uint32_t height, uint8_t*& yPlane, uint8_t*& uPlane, uint8_t*& vPlane);
+	public:
+		ADMImageResizer(uint32_t ow,uint32_t oh, uint32_t dw, uint32_t dh);
+		ADMImageResizer(uint32_t ow, uint32_t oh, uint32_t dw, uint32_t dh, int srcFormat, int dstFormat);
+		~ADMImageResizer();
+		
+		uint8_t resize(ADMImage *src, ADMImage *dest);
+		uint8_t resize(uint8_t *src, uint8_t *dest);
 };
 
-
-
-
 // Misc utilities
-
 uint8_t BitBlit(uint8_t *dst, uint32_t pitchDest,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height);
 
 #endif
