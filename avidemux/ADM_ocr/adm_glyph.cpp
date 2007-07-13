@@ -13,6 +13,7 @@
  #include "ADM_assert.h"
  #include "default.h"
  #include "adm_glyph.h"
+#include "ADM_toolkit/toolkit.hxx"
  //*************************************************
 admGlyph::admGlyph(uint32_t w,uint32_t h)
 {
@@ -152,6 +153,91 @@ admGlyph *glyphSearchFather(admGlyph *in,admGlyph *head )
     cur=cur->next;
   }
   return NULL;
+}
+/*************************************************/
+/**
+    \fn       glyphSave
+    \brief    Save the glypset
+*/
+uint8_t saveGlyph(char *name,admGlyph *head,uint32_t nb)
+{
+  FILE *out;
+  uint32_t slen;
+    
+  admGlyph *glyph=head->next;
+    
+    
+  out=fopen(name,"wb");
+  if(!out)
+  {
+    GUI_Error_HIG(_("Could not write the file"), NULL);
+    return 0;
+  }
+#define WRITE(x) fwrite(&(x),sizeof(x),1,out);
+    WRITE(nb);
+    
+    while(glyph)
+    {
+      WRITE(glyph->width);
+      WRITE(glyph->height);
+      fwrite(glyph->data,glyph->width*glyph->height,1,out);
+      if(glyph->code) slen=strlen(glyph->code);
+      else slen=0;
+      WRITE(slen);
+      fwrite(glyph->code,slen,1,out);
+      glyph=glyph->next;
+    }
+    
+    fclose(out);
+    return 1;
+  
+}
+/**
+    \fn loadGlyph
+    \brief Load a glyph set
+*/
+uint8_t loadGlyph(char *name,admGlyph *head,uint32_t *outNb)
+{
+  FILE *out;
+  admGlyph *glyph,*nw;
+  uint32_t N,w,h,slen;
+  uint32_t nbGlyphs;
+ 
+  *outNb=0;
+  
+  glyph=head;
+  out=fopen(name,"rb");
+  if(!out)
+  {
+    GUI_Error_HIG(_("File error"), _("Could not read \"%s\"."), name);
+    return 0;
+  }
+#define READ(x) fread(&(x),sizeof(x),1,out);
+    nbGlyphs=0;
+    READ(N);
+    while(N--)
+    {
+        
+      READ(w);
+      READ(h);
+      nw=new admGlyph(w,h);
+      fread(nw->data,w*h,1,out);
+      READ(slen);
+      if(slen)
+      {
+        nw->code=new char[slen+1];
+        fread(nw->code,slen,1,out);
+        nw->code[slen]=0;
+      }
+      glyph->next=nw;
+      glyph=nw;
+      nbGlyphs++;
+    }
+    
+    fclose(out);
+    *outNb=nbGlyphs;
+    return 1;
+
 }
 /*************************************************/
 

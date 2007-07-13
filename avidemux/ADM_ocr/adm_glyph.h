@@ -60,4 +60,9 @@ uint8_t  destroyGlyphTree(admGlyph *startGlyph);
 uint8_t  insertInGlyphTree(admGlyph *startGlyph, admGlyph *candidate);
 admGlyph *clippedGlyph(admGlyph *in);
 admGlyph *glyphSearchFather(admGlyph *in,admGlyph *head );
+
+uint8_t loadGlyph(char *name,admGlyph *head,uint32_t *outNb);
+uint8_t saveGlyph(char *name,admGlyph *head,uint32_t nb);
+
+
 #endif

@@ -67,58 +67,42 @@
 #include "ADM_video/ADM_vidVobSub.h"
 #include "ADM_leftturn.h"
 #include "DIA_enter.h"
+#include "ADM_ocr.h"
 /******************************/
-#define GTK_PURGE {while (gtk_events_pending())                gtk_main_iteration(); }    
+
 #define TESTSUB "/home/fx/usbstick/subs/vts_01_0.idx"
 #define CONNECT(x,y,z) 	gtk_signal_connect(GTK_OBJECT(WID(x)), #y,GTK_SIGNAL_FUNC(z),   NULL);
-#define SUB_THRESH minThreshold
-
-typedef enum 
-{
-        ReplyOk=1,
-        ReplyClose=0,
-        ReplyCalibrate=2,
-        ReplySkip=3,
-        ReplySkipAll=4
-}ReplyType;
-
-static uint8_t mergeBitmap(uint8_t *bitin, uint8_t *bitout, uint8_t *maskin,uint32_t w, uint32_t h);
-static ReplyType ocrBitmap(uint8_t *data,uint32_t w,uint32_t h);
-static ReplyType handleGlyph(uint32_t start, uint32_t end,uint32_t w,uint32_t h,uint32_t base);
-static uint8_t lineEmpty(uint8_t *base, uint32_t stride, uint32_t width, uint32_t line);
-static uint8_t columnEmpty(uint8_t *base, uint32_t stride, uint32_t height);
-static ReplyType glyphToText(admGlyph *glyph);
-static uint8_t saveGlyph(void);
-static uint8_t loadGlyph(char *name);
-static void displaySmall( admGlyph *glyph );
-static int cb_accept(GtkObject * object, gpointer user_data);
-static ReplyType setup(void);
-static  vobSubParam subparam={NULL,0,0};
-static uint32_t minAlpha=7;
-static uint32_t minThreshold=0x80;
 
 
-/*++++++++++++++++++++++++++++++++++++++++*/
-extern  GtkWidget	*DIA_ocr(void);
+
+
+
+
+
 extern  uint8_t DIA_vobsub(vobSubParam *param);
-static gboolean gui_draw( void );
-static gboolean gui_draw_small( void );
-static char decodedString[1024];
-/*-------------------------*/
+//********************************************
+extern  GtkWidget *DIA_ocr(void);
+static gboolean   gui_draw( void );
+static gboolean   gui_draw_small( void );
+static void       displaySmall( admGlyph *glyph );
+static int        cb_accept(GtkObject * object, gpointer user_data);
+
 static GtkWidget *dialog;
 static GtkWidget *mainDisplay;
 static GtkWidget *smallDisplay;
-static vobSubBitmap *bitmap;
-
+static uint32_t redraw_x,redraw_y;
+//********************************************
+ReplyType glyphToText(admGlyph *glyph);
+static ReplyType setup(void);
+//********************************************
+static uint8_t ocrSaveGlyph(void);
+static  vobSubParam subparam={NULL,0,0};
 static uint8_t *workArea;
+static vobSubBitmap *bitmap;
 static admGlyph head(250,4);
 static uint32_t lang_index=0;
-
-
-static uint32_t redraw_x,redraw_y;
-
 static uint32_t nbGlyphs;
-
+static char decodedString[1024];
 
 typedef enum
 {
@@ -191,7 +175,7 @@ _again:
     // Everything ready go go go 
          
     redraw_x=redraw_y=0;
-    GTK_PURGE;
+    UI_purge();
 //  Time to go
     // Inactivate frame1=glyph    frame2=in/out  buttonStart
     gtk_widget_set_sensitive(WID(buttonStart),0);
@@ -268,34 +252,20 @@ againPlease:
            mergeBitmap(bitmap->_bitmap+first*w, workArea, bitmap->_alphaMask+first*w,  w,   h);
            if(oldw!=w || oldh !=h)
            {                
-                GTK_PURGE;  // Force redaw
+                UI_purge();  // Force redaw
            }
            // Merge
-             GTK_PURGE;
+             UI_purge();
              gui_draw();
-             GTK_PURGE; 
+             UI_purge();
              // OCR
-              reply=ocrBitmap(workArea,w,h);
+              reply=ocrBitmap(workArea,w,h,decodedString);
               if(reply==ReplyClose) goto endIt;
               if(reply==ReplyCalibrate)
                 {
                         //
                         //printf("TADA!!!!\n");
-                        int val;
-#if 0
-                         val=minAlpha;
-                        if(DIA_GetIntegerValue(&val, 3, 7, "Minimum alpha value", "Enter new minimum alpha"))
-                        {
-                                minAlpha=val;
-
-                        }
-#endif
-                        val=minThreshold;
-                        if(DIA_GetIntegerValue(&val, 0x30, 0x80, "Minimum pixel value", "Enter new minimum pixel"))
-                        {
-                                minThreshold=val;
-
-                        }
+                        ocrUpdateMinThreshold();
                         goto againPlease;
                 }
              
@@ -327,7 +297,9 @@ endIt:
    // gtk_widget_set_sensitive(WID(Current_Glyph),0); 
     
     if(nbGlyphs && actionSaveGlyph==gtk_dialog_run(GTK_DIALOG(dialog)))
-        saveGlyph();
+    {
+      ocrSaveGlyph();
+    }
     if(vobsub)
         delete vobsub;
     vobsub=NULL;
@@ -342,192 +314,22 @@ endIt:
     return 1;
 
 }
-
-//*****************************************************************************************
-//  Separate the bitmap into glyph and handle each glyph on itw own
-//
-//*****************************************************************************************
-
-ReplyType ocrBitmap(uint8_t *data,uint32_t w,uint32_t h)
-{
-uint8_t found;
-uint32_t colstart=0,colend=0,oldcol;
-uint32_t line=0,nbLine=1;
-uint32_t base=0,bottom,top;    
-ReplyType reply;
-    // Search First non nul colum
-    decodedString[0]=0;
-    // Search how much lines there is in the file
-    //
-    top=bottom=0;
-    while(top<h)
-    {
-        // Search non empty line as top
-        while(top<h && lineEmpty(workArea,w,w,top)) top++;
-        // Nothing found
-        if(top>=h-1) break;
-
-        // 
-       
-
-        bottom=top+1;
-        // Search empty line if any, bottom is the 1st line full of zero
-        while(bottom<h && (!lineEmpty(workArea,w,w,bottom) || bottom-top<7))
-        {
-            bottom++;
-        }
-        if(line) strcat(decodedString,"\n"); 
-        //printf("\n Top:%lu bottom:%lu\n",top,bottom);
-       
-        // Scan a full line
-        colstart=0;
-        oldcol=0;
-       
-        // Split a line into glyphs
-        while(colstart<w)
-        {
-            GTK_PURGE;
-            oldcol=colstart;
-            while( columnEmpty(workArea+colstart+top*w, w, bottom-top) && colstart<w) colstart++;
-            if(colstart>=w) break;
-            // if too far apart, it means probably a blank space
-            if(colstart-oldcol>6)
-            {
-                strcat(decodedString," ");
-            }
-       
-            // We have found a non null column
-            // Seek the end now
-            colend=colstart+1;
-            while( !columnEmpty(workArea+colend+top*w, w, bottom-top) && colend<w) colend++;
-         
-         
-            // printf("Found glyph: %lu %lu\n",colstart,colend);  
-            reply=handleGlyph(colstart,colend,w,bottom,top);
-            switch(reply)
-                {
-                        case ReplySkip:break;
-                        case ReplyOk:break;
-                        case ReplyClose:
-                        case ReplyCalibrate: return reply;break;
-            
-                        case ReplySkipAll: return ReplyOk;break;
-                        default: ADM_assert(0);
-                }
-            
-            
-            colstart=colend;
-      }
-      line++;      
-      top=bottom;
-      
-    }
-   
-    return ReplyOk;
-}
-//*****************************************************************************************
-/*
-    We now have a good candidate for the glyph.
-    We will do the following processing :
-        - Clip the glyph to have it in its bounding box
-        - extract its container. If the container is smaller than the glyph, it means
-                that we have in fact several glyphs that overlaps slightly. In
-                that case we use another method to extract the glyph.
-                We split it using leftturn method and do it again.
+/**
+    \fn ocrSaveGlyph
+    \brief bridge to saveGlyph
 */
-ReplyType handleGlyph(uint32_t start, uint32_t end,uint32_t w,uint32_t h,uint32_t base)
+uint8_t ocrSaveGlyph(void)
 {
-uint8_t found=0;
-static int inc=1;
-ReplyType reply;
-          
-    
-    // Ok now we have the cropped glyp
-    
-    admGlyph *glyph,*cand;
-    uint32_t minx,maxx,miny,maxy;
-    int     *raw=NULL;
-            glyph=new admGlyph(end-start,h-base);
-            glyph->create(workArea+start+base*w,w);
-            glyph=clippedGlyph(glyph);
-            if(!glyph->width) // Empty glyph
-            {
-                delete glyph;
-                return ReplyOk;
-            }
-            // now we have our full glyph, try harder to split it
-_nextglyph:
-            raw=new int[glyph->height];            
-            if(adm_estimate_glyphSize(glyph,&minx, &maxx,&miny,&maxy,raw))
-            {
-            //printf("Glyph width :%lu min:%lu max:%lu estimate width:%lu\n",glyph->width,minx,maxx,maxx-minx+1);
-            if((maxx-minx+2)<glyph->width && (maxx-minx>2) && (maxy-miny>2))
-            {
-                // Suspicously too small
-                // We have to split the glyph
-                // recursively to extract each glyph
-                uint32_t width=maxx-minx+1;
-                uint32_t defStride=width+1;
-                
-                if(defStride>glyph->width) defStride=glyph->width;
-                
-                admGlyph *lefty=new admGlyph(defStride,glyph->height);
-                for(int32_t i=miny;i<=maxy;i++)
-                {
-                    if(raw[i]!=-1) memcpy(&(lefty->data[0+i*defStride]),&(glyph->data[minx+i*glyph->width]),raw[i]+1-minx);
-                    else
-                            memcpy(&(lefty->data[0+i*defStride]),&(glyph->data[minx+i*glyph->width]),defStride);
-                }
-                lefty=clippedGlyph(lefty);
-              
-                {
-                    // Remove that from the original
-                    for(uint32_t i=0;i<glyph->height;i++)
-                    {
-                        //printf("%d:%d(%d)\n",i,raw[i],glyph->width);
-                        if(raw[i]!=-1) memset(&(glyph->data[i*glyph->width]),0,raw[i]+1);
-                        else           memset(&(glyph->data[i*glyph->width]),0,defStride); 
-                    }
-                    // Clip
-                    glyph=clippedGlyph(glyph);
-                
-                    if(lefty->width)
-                    {
-                        reply=glyphToText(lefty);
-                        if(reply!=ReplyOk)
-                        {
-                            printf("Glyph2text failed(1)\n");
-                            return reply;
-                        }
-                    }
-                    else
-                        delete lefty;
-                    if(glyph->width)
-                    {
-                        if(raw) delete [] raw;
-                        goto _nextglyph;                    
-                    } 
-                 }           
-            }
-            }//If
-            if(raw) delete [] raw;
-            if(glyph->width)
-            {
-                reply=glyphToText(glyph);
-                if(reply!=ReplyOk)                 
-                {
-                    printf("Glyph2text failed(2)\n");
-                    return reply;
-                }
-            }
-            else 
-            {
-                delete glyph;
-            }
-            
-    return ReplyOk;
+  char *name=NULL;
+          GUI_FileSelWrite(_("Select Glyphfile to save to"), &name);
+        if(!name)
+            return 0;
+        saveGlyph(name,&head,nbGlyphs);
+        ADM_dealloc(name);
+        return 1;
 
 }
+
 /**
         Search throught the existing glyphs , if not present create it
         and append the text to decodedString
@@ -605,39 +407,7 @@ ReplyType glyphToText(admGlyph *glyph)
            return ReplyOk;  
 
 }
-/**************************************************************************************
-    returns 1 if the line is empty
-    0 if not
-*/
 
-//*****************************************************************************************
-uint8_t mergeBitmap(uint8_t *bitin, uint8_t *bitout, uint8_t *maskin,uint32_t w, uint32_t h)
-{
-// Merge with alpha channel
-           uint8_t *in,*mask,*out;
-           uint32_t alp,nw;
-           in=bitin;
-           out=bitout;
-           mask=maskin;
-           for(uint32_t y=0;y<h;y++)
-           {
-            for(uint32_t x=0;x<w;x++)
-            {
-                   
-                    nw=in[x];
-                    alp=mask[x];
-
-                    if(alp>minAlpha&& nw >SUB_THRESH)  nw=0xff;
-                         else       nw=0;
-                        
-                    out[x]=nw;
-            }
-            out+=w;
-            in+=w;
-            mask+=w;
-           }    
-    return 1;
-}
 //*****************************************************************************************
 gboolean gui_draw( void )
 {
@@ -721,7 +491,7 @@ char text[1024];
     //gtk_widget_set_sensitive(WID(buttonAccept),0);
     //gtk_widget_set_sensitive(WID(buttonSkip),0);
     //gtk_widget_set_sensitive(WID(entryEntry),0);
-    GTK_PURGE;   
+    UI_purge();
     // Main loop : Only accept glyph load/save
     // Sub & srt select & start ocr
     gtk_widget_set_sensitive(WID(frameGlyph),1);
@@ -764,7 +534,7 @@ char text[1024];
                     GUI_FileSelRead(_("Select Glyoh to save"), &gly);
                     if(gly)
                     {
-                            loadGlyph(gly);
+                            loadGlyph(gly,&head,&nbGlyphs);
                             sprintf(text,"%03d",nbGlyphs);
                             gtk_label_set_text(GTK_LABEL(WID(labelNbGlyphs)),text);
                     }
@@ -778,8 +548,8 @@ char text[1024];
                       GUI_Error_HIG(_("No glyphs to save"), NULL);
                         break;
                     }                  
-                    saveGlyph();                                      
-                    break;
+                    ocrSaveGlyph();
+                        break;
         
         case GTK_RESPONSE_CLOSE: 
             printf("Close req\n");
@@ -792,16 +562,14 @@ char text[1024];
     }
 }
 /**
+    \fn cb_accept
+    \brief Bridge between dialog/Accept and gtk signals
 */
 int cb_accept(GtkObject * object, gpointer user_data)
 {
         //printf("Hopla\n");
         gtk_signal_emit_by_name(GTK_OBJECT(WID(buttonOk)),"clicked",(gpointer)1);
         return 0;
-
 }
 
-/**
- */
-#include "ADM_ocrLoadSave.h"
 //;

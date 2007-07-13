@@ -1,7 +1,7 @@
 /***************************************************************************
   Try to display interesting crash dump
 
-    copyright            : (C) 2007 by mean
+    copyright            : (C) 2007 by mean, (C) 2007 Grunster
     email                : fixounet@free.fr
  ***************************************************************************/
 
