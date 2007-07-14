@@ -22,23 +22,21 @@
 #include <unistd.h>
 
 #include <gtk/gtk.h>
-#ifndef ADM_WIN32
-#include <gdk/gdkx.h>
-#else
+#ifdef ADM_WIN32
 #include <gdk/gdkwin32.h>
+#else
+#include <gdk/gdkx.h>
 #endif
+
 #include <time.h>
 #include <sys/time.h>
 
-
-//#include "../avi_vars.h"
 #include <../ADM_assert.h>
 #define WIN32_CLASH
 #include "default.h"
 #include "../ADM_osSupport/ADM_misc.h"
 
 #include "ADM_commonUI/GUI_render.h"
-
 #include "ADM_commonUI/GUI_accelRender.h"
 
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
@@ -50,8 +48,10 @@
 
 void GUI_gtk_grow_off(int onff);
 
-extern GtkWidget *getDrawWidget( void );
- ColYuvRgb rgbConverter(640,480);
+extern GtkWidget *getDrawWidget(void);
+extern uint8_t UI_getPhysicalScreenSize(uint32_t *w, uint32_t *h);
+
+ColYuvRgb rgbConverter(640,480);
 uint32_t lastW,lastH;
 /**
     \brief return pointer to the drawing widget that displays video
@@ -70,7 +70,7 @@ void UI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr)
 
     if(lastW>w || lastH>h)
     {
-      printf("[Gtk] Warning window bigger than display %u x %u vs %u x %u\n",w,h,lastW,lastH);
+      printf("[GTK] Warning window bigger than display %u x %u vs %u x %u\n",w,h,lastW,lastH);
     }
 
     gdk_draw_rgb_32_image(widget->window, widget->style->fg_gc[GTK_STATE_NORMAL], 0,    // X
@@ -112,6 +112,40 @@ void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo)
         xinfo->display=	(void*)GDK_WINDOW_HWND(widget->window);
 #endif
 }
-#if 0
-#endif
+
+// Calculate the zoom ratio required to fit the whole image on the screen.
+float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight)
+{
+	int windowWidth, windowHeight;
+	int drawingWidth, drawingHeight;
+	uint32_t screenWidth, screenHeight;
+	
+	gtk_window_get_size(window, &windowWidth, &windowHeight);
+	gtk_widget_get_size_request(drawingArea, &drawingWidth, &drawingHeight);
+
+	UI_getPhysicalScreenSize(&screenWidth, &screenHeight);
+
+	// Take drawing area out of the equation, how much extra do we need for additional controls?
+	windowWidth -= drawingWidth;
+	windowHeight -= drawingHeight;
+
+	// Take borders and captions into consideration (GTK doesn't seem to support this so we'll have to guess)
+	windowWidth += 10;
+	windowHeight += 40;
+
+	// This is the true amount of screen real estate we can work with
+	screenWidth -= windowWidth;
+	screenHeight -= windowHeight;
+
+	// Calculate zoom ratio
+	if (imageWidth > screenWidth || imageHeight > screenHeight)
+	{
+		if ((imageWidth - screenWidth) > (imageHeight - screenHeight))
+			return (float)screenWidth / (float)imageWidth;
+		else
+			return (float)screenHeight / (float)imageHeight;
+	}
+	else
+		return 1;
+}
 // EOF

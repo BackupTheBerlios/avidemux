@@ -25,11 +25,7 @@
 #include <stdio.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-# include <math.h>
+#include <math.h>
 
 #include "default.h"
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
@@ -44,8 +40,7 @@
 #include "DIA_flyCrop.h"
 
 static GtkWidget	*create_dialog1 (void);
-static void 		draw (GtkWidget *dialog,uint32_t w,uint32_t h );
-
+extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
 
 /* Link between UI and core */
 static gboolean 	ui_draw( void );
@@ -66,69 +61,84 @@ static flyCrop *myCrop=NULL;
 //	Video is in YV12 Colorspace
 //
 //
-int DIA_getCropParams(	char *name,CROP_PARAMS *param,AVDMGenericVideoStream *in)
+int DIA_getCropParams(char *name, CROP_PARAMS *param, AVDMGenericVideoStream *in)
 {
-  uint32_t width,height;
-        // Allocate space for green-ised video
-        width=in->getInfo()->width;
-        height=in->getInfo()->height;
-        
-        
-  
-        uint8_t ret=0;
-  
-        dialog=create_dialog1();
-        gtk_register_dialog(dialog);
-        
-        gtk_widget_set_usize(WID(drawingarea1), width,height);
-        gtk_window_set_title (GTK_WINDOW (dialog), name);
-        gtk_widget_show(dialog);
-	
-#define CONNECT(x,y,z) 	gtk_signal_connect(GTK_OBJECT(WID(x)), #y,GTK_SIGNAL_FUNC(z),   NULL);
+	uint32_t width, height;
 
-        CONNECT(drawingarea1,expose_event,ui_draw);
-        CONNECT(buttonAutocrop,clicked,ui_autocrop);
-        CONNECT(buttonReset,clicked,ui_reset);
-        CONNECT(scale,value_changed,ui_frame_changed);
-                              
-          gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonCancel), GTK_RESPONSE_CANCEL);
-          gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonOk),      GTK_RESPONSE_OK);
-          gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonApply),  GTK_RESPONSE_APPLY);
+	// Allocate space for green-ised video
+	width = in->getInfo()->width;
+	height = in->getInfo()->height;
+
+	uint8_t ret=0;
+
+	dialog=create_dialog1();
+	gtk_register_dialog(dialog);
+	gtk_window_set_title(GTK_WINDOW(dialog), name);
+
+	float zoom = UI_calcZoomToFitScreen(GTK_WINDOW(dialog), WID(drawingarea1), width, height);
+
+	uint32_t zoomW = width * zoom;
+	uint32_t zoomH = height * zoom;
+
+	gtk_widget_set_usize(WID(drawingarea1), zoomW, zoomH);
+
+	if (zoom < 1)
+	{
+		gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+	}
+
+	gtk_widget_show(dialog);
+	
+#define CONNECT(x,y,z) 	gtk_signal_connect(GTK_OBJECT(WID(x)), #y, GTK_SIGNAL_FUNC(z), NULL);
+
+	CONNECT(drawingarea1,expose_event,ui_draw);
+	CONNECT(buttonAutocrop,clicked,ui_autocrop);
+	CONNECT(buttonReset,clicked,ui_reset);
+	CONNECT(scale,value_changed,ui_frame_changed);
+	                  
+	gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonCancel), GTK_RESPONSE_CANCEL);
+	gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonOk), GTK_RESPONSE_OK);
+	gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonApply), GTK_RESPONSE_APPLY);
 
 #define CONNECT_SPIN(x) CONNECT(spinbutton##x, value_changed,ui_update)
           
-          CONNECT_SPIN(Top);
-          CONNECT_SPIN(Left);
-          CONNECT_SPIN(Right);
-          CONNECT_SPIN(Bottom);
-          
-        myCrop=new flyCrop( width, height,in,WID(drawingarea1),WID(scale));
-        myCrop->left=param->left;
-        myCrop->right=param->right;
-        myCrop->top=param->top;
-        myCrop->bottom=param->bottom;
-        myCrop->upload();
-        myCrop->sliderChanged();
-        ret=0;
-        int response;
-        while( (response=gtk_dialog_run(GTK_DIALOG(dialog)))==GTK_RESPONSE_APPLY)
-        {
-          ui_update();
-        }
-        if(response==GTK_RESPONSE_OK)
-        {
-                ui_read( );
-                param->left=myCrop->left;
-                param->right=myCrop->right;
-                param->top=myCrop->top;
-                param->bottom=myCrop->bottom;
-                ret=1;
-        }
-        gtk_unregister_dialog(dialog);
-        gtk_widget_destroy(dialog);
-        delete myCrop;
-        return ret;
+	CONNECT_SPIN(Top);
+	CONNECT_SPIN(Left);
+	CONNECT_SPIN(Right);
+	CONNECT_SPIN(Bottom);
+
+	myCrop=new flyCrop(width, height,in,WID(drawingarea1),WID(scale));
+	myCrop->resizeImage(zoomW, zoomH);
+	myCrop->left=param->left;
+	myCrop->right=param->right;
+	myCrop->top=param->top;
+	myCrop->bottom=param->bottom;
+	myCrop->upload();	
+	myCrop->sliderChanged();	
+
+	int response;
+
+	while((response = gtk_dialog_run(GTK_DIALOG(dialog))) == GTK_RESPONSE_APPLY)
+	{
+	  ui_update();
+	}
+
+	if(response==GTK_RESPONSE_OK)
+	{
+		ui_read( );
+		param->left=myCrop->left;
+		param->right=myCrop->right;
+		param->top=myCrop->top;
+		param->bottom=myCrop->bottom;
+		ret=1;
+	}
+
+	gtk_unregister_dialog(dialog);
+	gtk_widget_destroy(dialog);
+	delete myCrop;
+	return ret;
 }
+
 /*
       Link GTK dialog and core
 */

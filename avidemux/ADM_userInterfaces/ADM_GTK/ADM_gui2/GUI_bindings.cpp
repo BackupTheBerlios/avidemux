@@ -50,7 +50,7 @@
 #include "../ADM_toolkit_gtk/gtkmarkscale.h"
 #include "../ADM_toolkit_gtk/jogshuttle.h"
 
-uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h,void *r);
+uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h);
 
 
 #define WOD(x) lookup_widget (guiRootWindow,#x)
@@ -229,7 +229,7 @@ uint32_t w,h;
 		GUI_initCursor(  );
     
                 
-                UI_getPhysicalScreenSize(&w,&h,NULL); //gtk_widget_get_parent_window (guiRootWindow));
+                UI_getPhysicalScreenSize(&w,&h); //gtk_widget_get_parent_window (guiRootWindow));
                 printf("The screen seems to be %u x %u px\n",w,h);
  
                  GUI_gtk_grow_off(1);
@@ -1107,7 +1107,7 @@ extern int global_argc;
 extern char **global_argv;
 typedef gboolean GCALL       (void *);
 extern int automation(void );
-extern uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h,void *root=NULL);
+extern uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h);
 int UI_Init(int argc, char **argv)
 {
   uint32_t w,h;

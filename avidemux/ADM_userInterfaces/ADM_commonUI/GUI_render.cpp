@@ -101,7 +101,6 @@ uint8_t renderUnlock(void)
 //----------------------------------------
 uint8_t renderResize(uint32_t w, uint32_t h,uint32_t pw, uint32_t ph)
 {
-int mul,xx,yy;
 	if(screenBuffer) 
         {
                 delete  [] screenBuffer;

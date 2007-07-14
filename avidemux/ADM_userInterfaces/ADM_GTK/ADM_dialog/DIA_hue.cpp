@@ -18,22 +18,14 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-
-
 #include <config.h>
-
 
 #include <string.h>
 #include <stdio.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-# include <math.h>
+#include <math.h>
 
 #include "default.h"
 #include "ADM_toolkit_gtk/ADM_gladeSupport.h"
@@ -64,6 +56,7 @@ static int lock=0;
 static GtkWidget *dialog=NULL;
 static flyHue *myCrop=NULL;
 
+extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
 
 /**
       \fn DIA_getHue
@@ -80,11 +73,20 @@ uint8_t DIA_getHue(Hue_Param *param, AVDMGenericVideoStream *in)
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
         
-        gtk_widget_set_usize(WID(drawingarea1), width,height);
         gtk_window_set_title (GTK_WINDOW (dialog), _("Hue"));
-        gtk_widget_show(dialog);
-	
-        
+
+		float zoom = UI_calcZoomToFitScreen(GTK_WINDOW(dialog), WID(drawingarea1), width, height);
+
+		uint32_t zoomW = width * zoom;
+		uint32_t zoomH = height * zoom;
+
+		gtk_widget_set_usize(WID(drawingarea1), zoomW, zoomH);
+
+		if (zoom < 1)
+		{
+			gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+		}
+
         gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
             GTK_SIGNAL_FUNC(draw),
             NULL);
@@ -93,10 +95,10 @@ uint8_t DIA_getHue(Hue_Param *param, AVDMGenericVideoStream *in)
         gtk_signal_connect(GTK_OBJECT(WID(hscaleHue)), "value_changed",GTK_SIGNAL_FUNC(hue_changed),   NULL);
         gtk_signal_connect(GTK_OBJECT(WID(hscaleSaturation)), "value_changed",GTK_SIGNAL_FUNC(hue_changed),   NULL);
         gtk_widget_show(dialog);
-
           
         myCrop=new flyHue( width, height,in,WID(drawingarea1),WID(hscale1));
         memcpy(&(myCrop->param),param,sizeof(Hue_Param));
+		myCrop->resizeImage(zoomW, zoomH);
         myCrop->upload();
         myCrop->sliderChanged();
         ret=0;

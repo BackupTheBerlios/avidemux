@@ -63,7 +63,7 @@ uint8_t UI_arrow_disabled(void)
 {
   return 1;
 }
-uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h,void *r)
+uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h)
 {
   *w=*h=10000; 
 }

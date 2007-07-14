@@ -29,7 +29,7 @@ void GUI_FileSelRead(const char *label, char * * name)
 void GUI_FileSelWrite(const char *label, char * * name)
 {}
 
-uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h,void *r)
+uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h)
 {
   *w=*h=10000; 
 }

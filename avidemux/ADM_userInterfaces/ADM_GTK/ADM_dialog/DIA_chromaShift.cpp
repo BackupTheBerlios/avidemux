@@ -19,10 +19,6 @@
 #include <stdio.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
 # include <math.h>
 
 #include "default.h"
@@ -52,6 +48,8 @@ static gboolean slider_update( void );
 static void update(void);
 
 static flyChromaShift *myCrop=NULL;
+
+extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
 //**************************************
 
 uint8_t DIA_getChromaShift( AVDMGenericVideoStream *instream,CHROMASHIFT_PARAM    *param );
@@ -67,13 +65,25 @@ uint8_t ret=0;
 
         dialog=create_ChromaShift();
         gtk_register_dialog(dialog);
-        
-        gtk_widget_set_usize(WID(drawingarea1), width,height);
         gtk_window_set_title (GTK_WINDOW (dialog), _("ASHARP"));
+
+		float zoom = UI_calcZoomToFitScreen(GTK_WINDOW(dialog), WID(drawingarea1), width, height);
+
+		uint32_t zoomW = width * zoom;
+		uint32_t zoomH = height * zoom;
+
+		gtk_widget_set_usize(WID(drawingarea1), zoomW, zoomH);
+
+		if (zoom < 1)
+		{
+			gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+		}
+
         gtk_widget_show(dialog);
 	
         myCrop=new flyChromaShift( width, height,in,WID(drawingarea1),WID(hscale));
         memcpy(&(myCrop->param),param,sizeof(CHROMASHIFT_PARAM));
+		myCrop->resizeImage(zoomW, zoomH);
         myCrop->upload();
         myCrop->sliderChanged();
         
