@@ -16,14 +16,10 @@
 
 #include <string.h>
 #include <stdio.h>
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
 # include <math.h>
+
+#include <gdk/gdkkeysyms.h>
+#include <gtk/gtk.h>
 
 #include "default.h"
 
@@ -31,21 +27,29 @@
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "default.h"
 
 #include "ADM_colorspace/ADM_rgb.h"
-
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "DIA_flyDialog.h"
 #include "ADM_assert.h"
+
 extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
+
 uint8_t  ADM_flyDialog::display(void)
 {
-  ADM_assert(_canvas);
-  ADM_assert(_rgbBufferOut);
-  GUI_RGBDisplay(_rgbBufferOut,_w,_h,_canvas);
-  return 1; 
+	ADM_assert(_canvas);
+	ADM_assert(_rgbBufferOut);
+
+	if (_resizer)
+	{
+		_resizer->resize(_rgbBufferOut, _rgbBufferDisplay);
+		GUI_RGBDisplay(_rgbBufferDisplay, _zoomW, _zoomH, _canvas);
+	}
+	else
+		GUI_RGBDisplay(_rgbBufferOut, _w, _h, _canvas);
+
+	return 1; 
 }
 uint32_t ADM_flyDialog::sliderGet(void)
 {

@@ -25,11 +25,15 @@
 
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_colorspace/ADM_rgb.h"
-#include "ADM_commonUI//GUI_render.h"
+#include "ADM_commonUI/GUI_render.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "DIA_flyDialog.h"
 
 #include "ADM_assert.h"
+
+extern "C" {
+#include "ADM_libraries/ADM_lavcodec/avcodec.h"
+}
 
 /**
     \fn ADM_flyDialog
@@ -37,8 +41,8 @@
  ADM_flyDialog::ADM_flyDialog(uint32_t width,uint32_t height,AVDMGenericVideoStream *in,
                                 void *canvas, void *slider,int yuv)
 {
-  _w=width;
-  _h=height;
+  _w=_zoomW=width;
+  _h=_zoomH=height;
   _isYuvProcessing=yuv;
   _in=in;
     if(isRgbInverted())
@@ -63,10 +67,12 @@
     _rgbBufferOut =new uint8_t [_w*_h*4];
   _slider=slider;
   _canvas=canvas;
-  
+
   ADM_assert(_slider);
   ADM_assert(_canvas);
   _cookie=NULL;
+  _rgbBufferDisplay=NULL;
+  _resizer=NULL;
 }
 /**
     \fn cleanup
@@ -77,11 +83,13 @@ uint8_t ADM_flyDialog::cleanup(void)
 #define DEL1(x)    if(x) {delete [] x;x=NULL;}
 #define DEL2(x)    if(x) {delete  x;x=NULL;}
   
-        DEL2(_yuvBufferOut);
-        DEL2(_yuvBuffer);
-        DEL1(_rgbBuffer);
-        DEL1(_rgbBufferOut);
-        DEL2(_rgb);
+	DEL2(_yuvBufferOut);
+	DEL2(_yuvBuffer);
+	DEL1(_rgbBuffer);
+	DEL1(_rgbBufferOut);
+	DEL1(_rgbBufferDisplay);
+	DEL2(_rgb);
+	DEL2(_resizer);
 }
 /**
     \fn ~ADM_flyDialog
@@ -132,6 +140,25 @@ uint8_t    ADM_flyDialog::sliderChanged(void)
     display();
 }
 
+void ADM_flyDialog::resizeImage(uint32_t width, uint32_t height)
+{
+	_zoomW = width;
+	_zoomH = height;
+
+	if (_resizer)
+	{
+		delete _resizer;
+		delete[] _rgbBufferDisplay;
+	}
+
+	if (width == _w && height == _h)
+		_resizer = NULL;
+	else
+	{
+		_resizer = new ADMImageResizer(_w, _h, _zoomW, _zoomH, PIX_FMT_RGB32, PIX_FMT_RGB32);
+		_rgbBufferDisplay = new uint8_t[_zoomW * _zoomH * 4];
+	}
+}
 
 //EOF
 

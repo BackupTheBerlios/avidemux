@@ -27,14 +27,17 @@
 class ADM_flyDialog
 {
   protected:
-          uint32_t _w,_h;
+          uint32_t _w,_h, _zoomW, _zoomH;
           AVDMGenericVideoStream *_in;
   
           ADMImage *_yuvBuffer;
           ADMImage *_yuvBufferOut;
           uint8_t  *_rgbBuffer;
           uint8_t  *_rgbBufferOut;
+		  uint8_t  *_rgbBufferDisplay;
           uint8_t  _isYuvProcessing;
+
+		  ADMImageResizer *_resizer;
   public:
           void    *_cookie; // whatever
           void    *_slider; // widget
@@ -55,6 +58,7 @@ class ADM_flyDialog
           uint8_t  isRgbInverted(void);
   virtual uint8_t  update(void) {};
           uint8_t  cleanup(void);
+		  void resizeImage(uint32_t width, uint32_t height);
          /*                               */
                   ADM_flyDialog(uint32_t width,uint32_t height,AVDMGenericVideoStream *in,
                                     void *canvas, void *slider,int yuv);
