@@ -37,6 +37,13 @@ typedef struct ass_image_s {
 	struct ass_image_s* next; // linked list
 } ass_image_t;
 
+/// Hinting type
+typedef enum {ASS_HINTING_NONE = 0,
+	      ASS_HINTING_LIGHT,
+	      ASS_HINTING_NORMAL,
+	      ASS_HINTING_NATIVE
+} ass_hinting_t;
+
 /**
  * \brief initialize the library
  * \return library handle or NULL if failed
@@ -77,6 +84,7 @@ void ass_set_margins(ass_renderer_t* priv, int t, int b, int l, int r);
 void ass_set_use_margins(ass_renderer_t* priv, int use);
 void ass_set_aspect_ratio(ass_renderer_t* priv, double ar);
 void ass_set_font_scale(ass_renderer_t* priv, double font_scale);
+void ass_set_hinting(ass_renderer_t* priv, ass_hinting_t ht);
 
 /**
  * \brief set font lookup defaults
@@ -89,7 +97,7 @@ int  ass_set_fonts(ass_renderer_t* priv, const char* default_font, const char* d
  * \param track subtitle track
  * \param now video timestamp in milliseconds
  */
-ass_image_t* ass_render_frame(ass_renderer_t *priv, ass_track_t* track, long long now);
+ass_image_t* ass_render_frame(ass_renderer_t *priv, ass_track_t* track, long long now, int* detect_change);
 
 
 // The following functions operate on track objects and do not need an ass_renderer //
@@ -177,12 +185,12 @@ ass_track_t* ass_read_memory(ass_library_t* library, char* buf, size_t bufsize, 
 int ass_read_styles(ass_track_t* track, char* fname, char* codepage);
 
 /**
- * \brief Process embedded matroska font. Saves it to ~/.mplayer/fonts.
+ * \brief Add a memory font.
  * \param name attachment name
  * \param data binary font data
  * \param data_size data size
 */
-void ass_process_font(ass_library_t* library, const char* name, char* data, int data_size);
+void ass_add_font(ass_library_t* library, char* name, char* data, int data_size);
 
 /**
  * \brief Calculates timeshift from now to the start of some other subtitle event, depending on movement parameter

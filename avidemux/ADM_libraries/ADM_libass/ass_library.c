@@ -26,17 +26,19 @@
 #include "ass.h"
 #include "ass_library.h"
 
-#define ADM_LEGACY_PROGGY
-#include "ADM_assert.h"
 
 ass_library_t* ass_library_init(void)
 {
-	return (ass_library_t *) calloc(1, sizeof(ass_library_t));
+	return calloc(1, sizeof(ass_library_t));
 }
 
 void ass_library_done(ass_library_t* priv)
 {
-	if (priv) free(priv);
+	if (priv) {
+		ass_set_fonts_dir(priv, NULL);
+		ass_set_style_overrides(priv, NULL);
+		free(priv);
+	}
 }
 
 void ass_set_fonts_dir(ass_library_t* priv, const char* fonts_dir)
@@ -68,8 +70,24 @@ void ass_set_style_overrides(ass_library_t* priv, char** list)
 
 	for (p = list, cnt = 0; *p; ++p, ++cnt) {}
 
-	priv->style_overrides = (char **)malloc((cnt + 1) * sizeof(char*));
+	priv->style_overrides = malloc((cnt + 1) * sizeof(char*));
 	for (p = list, q = priv->style_overrides; *p; ++p, ++q)
 		*q = strdup(*p);
 	priv->style_overrides[cnt] = NULL;
 }
+
+static void grow_array(void **array, int nelem, size_t elsize)
+{
+	if (!(nelem & 31))
+		*array = realloc(*array, (nelem + 32) * elsize);
+}
+
+void ass_add_font(ass_library_t* priv, char* name, char* data, int size)
+{
+	grow_array((void**)&priv->fontdata, priv->num_fontdata, sizeof(*priv->fontdata));
+	priv->fontdata[priv->num_fontdata].name = name;
+	priv->fontdata[priv->num_fontdata].data = data;
+	priv->fontdata[priv->num_fontdata].size = size;
+	priv->num_fontdata ++;
+}
+

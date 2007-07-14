@@ -28,10 +28,6 @@
 #include "mputils.h"
 #include "ass_bitmap.h"
 
-#define ADM_LEGACY_PROGGY
-#include "ADM_assert.h"
-
-
 struct ass_synth_priv_s {
 	int tmp_w, tmp_h;
 	unsigned short* tmp;
@@ -58,8 +54,8 @@ static int generate_tables(ass_synth_priv_t* priv, double radius)
 	priv->g_w = 2*priv->g_r+1;
 
 	if (priv->g_r) {
-		priv->g = (unsigned*)malloc(priv->g_w * sizeof(unsigned));
-		priv->gt2 = (unsigned*)malloc(256 * priv->g_w * sizeof(unsigned));
+		priv->g = malloc(priv->g_w * sizeof(unsigned));
+		priv->gt2 = malloc(256 * priv->g_w * sizeof(unsigned));
 		if (priv->g==NULL || priv->gt2==NULL) {
 			return -1;
 		}
@@ -105,12 +101,12 @@ static void resize_tmp(ass_synth_priv_t* priv, int w, int h)
 	while (priv->tmp_h < h) priv->tmp_h *= 2;
 	if (priv->tmp)
 		free(priv->tmp);
-	priv->tmp = (short unsigned int*)malloc((priv->tmp_w + 1) * priv->tmp_h * sizeof(short));
+	priv->tmp = malloc((priv->tmp_w + 1) * priv->tmp_h * sizeof(short));
 }
 
-ass_synth_priv_t* ass_synth_init()
+ass_synth_priv_t* ass_synth_init(void)
 {
-	ass_synth_priv_t* priv = (ass_synth_priv_t *)calloc(1, sizeof(ass_synth_priv_t));
+	ass_synth_priv_t* priv = calloc(1, sizeof(ass_synth_priv_t));
 	generate_tables(priv, blur_radius);
 	return priv;
 }
@@ -129,8 +125,8 @@ void ass_synth_done(ass_synth_priv_t* priv)
 static bitmap_t* alloc_bitmap(int w, int h)
 {
 	bitmap_t* bm;
-	bm = (bitmap_t *)calloc(1, sizeof(bitmap_t));
-	bm->buffer = (unsigned char *)malloc(w*h);
+	bm = calloc(1, sizeof(bitmap_t));
+	bm->buffer = malloc(w*h);
 	bm->w = w;
 	bm->h = h;
 	bm->left = bm->top = 0;
@@ -167,14 +163,14 @@ static bitmap_t* glyph_to_bitmap_internal(FT_Glyph glyph, int bord)
 
 	error = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, 0, 0);
 	if (error) {
-		mp_msg(MSGT_ASS, MSGL_WARN, "FT_Glyph_To_Bitmap error %d \n", error);
+		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_FT_Glyph_To_BitmapError, error);
 		return 0;
 	}
 
 	bg = (FT_BitmapGlyph)glyph;
 	bit = &(bg->bitmap);
 	if (bit->pixel_mode != FT_PIXEL_MODE_GRAY) {
-		mp_msg(MSGT_ASS, MSGL_WARN, "Unsupported pixel mode: %d\n", (int)(bit->pixel_mode));
+		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_UnsupportedPixelMode, (int)(bit->pixel_mode));
 		FT_Done_Glyph(glyph);
 		return 0;
 	}

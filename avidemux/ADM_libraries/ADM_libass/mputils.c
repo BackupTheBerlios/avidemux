@@ -13,15 +13,10 @@
 #include <enca.h>
 #endif
 
-
-#define ADM_LEGACY_PROGGY
-#include "ADM_assert.h"
-
-
 void my_mp_msg(int lvl, char *lvl_str, char *fmt, ...) {
+	va_list va;
 	if(lvl > MSGL_V) return;
 	printf("[ass] **%s**: ", lvl_str);
-	va_list va;
 	va_start(va, fmt);
 	vprintf(fmt, va);
 	va_end(va);
@@ -79,7 +74,7 @@ void blur(
 	    if(src){
 		register unsigned short *dstp= t + x-r;
 		int mx;
-		unsigned *m3= (unsigned *)(m2 + src*mwidth);
+		unsigned *m3= m2 + src*mwidth;
 		for(mx=r-x; mx<mwidth; mx++){
 		    dstp[mx]+= m3[mx];
 		}
@@ -91,7 +86,7 @@ void blur(
 	    if(src){
 		register unsigned short *dstp= t + x-r;
 		int mx;
-		unsigned *m3= (unsigned *)(m2 + src*mwidth);
+		unsigned *m3= m2 + src*mwidth;
 		for(mx=0; mx<mwidth; mx++){
 		    dstp[mx]+= m3[mx];
 		}
@@ -104,7 +99,7 @@ void blur(
 		register unsigned short *dstp= t + x-r;
 		int mx;
 		const int x2= r+width -x;
-		unsigned *m3= (unsigned *)(m2 + src*mwidth);
+		unsigned *m3= m2 + src*mwidth;
 		for(mx=0; mx<x2; mx++){
 		    dstp[mx]+= m3[mx];
 		}
@@ -123,7 +118,7 @@ void blur(
 	    if(src){
 		register unsigned short *dstp= srcp - 1 + width+1;
 		const int src2= (src + 128)>>8;
-		unsigned *m3= (unsigned *)(m2 + src2*mwidth);
+		unsigned *m3= m2 + src2*mwidth;
 
 		int mx;
 		*srcp= 128;
@@ -139,7 +134,7 @@ void blur(
 	    if(src){
 		register unsigned short *dstp= srcp - 1 - r*(width+1);
 		const int src2= (src + 128)>>8;
-		unsigned *m3= (unsigned *)(m2 + src2*mwidth);
+		unsigned *m3= m2 + src2*mwidth;
 
 		int mx;
 		*srcp= 128;
@@ -156,7 +151,7 @@ void blur(
 		const int y2=r+height-y;
 		register unsigned short *dstp= srcp - 1 - r*(width+1);
 		const int src2= (src + 128)>>8;
-		unsigned *m3= (unsigned *)(m2 + src2*mwidth);
+		unsigned *m3= m2 + src2*mwidth;
 
 		int mx;
 		*srcp= 128;

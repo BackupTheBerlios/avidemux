@@ -32,7 +32,7 @@
 typedef struct ass_style_s {
 	char* Name;
 	char* FontName;
-	int FontSize;
+	double FontSize;
 	uint32_t PrimaryColour;
 	uint32_t SecondaryColour;
 	uint32_t OutlineColour;
@@ -43,7 +43,7 @@ typedef struct ass_style_s {
 	int StrikeOut;
 	double ScaleX;
 	double ScaleY;
-	int Spacing;
+	double Spacing;
 	int Angle;
 	int BorderStyle;
 	double Outline;
@@ -80,14 +80,7 @@ typedef struct ass_event_s {
 typedef struct parser_priv_s parser_priv_t;
 
 typedef struct ass_library_s ass_library_t;
-/* MEANX */
-typedef enum 
-{
-    TRACK_TYPE_UNKNOWN = 0, 
-    TRACK_TYPE_ASS, 
-    TRACK_TYPE_SSA
-    }TRACK_TYPE;
-    /* MEANX */
+
 /// ass track represent either an external script or a matroska subtitle stream (no real difference between them)
 /// it can be used in rendering after the headers are parsed (i.e. events format line read)
 typedef struct ass_track_s {
@@ -100,8 +93,8 @@ typedef struct ass_track_s {
 
 	char* style_format; // style format line (everything after "Format: ")
 	char* event_format; // event format line
- 
-	TRACK_TYPE track_type; /* MEANX */
+
+	enum {TRACK_TYPE_UNKNOWN = 0, TRACK_TYPE_ASS, TRACK_TYPE_SSA} track_type;
 	
 	// script header fields
 	int PlayResX;

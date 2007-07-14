@@ -10,12 +10,14 @@
   Initial port from MPlayer by Moonz
 
 */
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "ADM_assert.h"
 
-#include "config.h"
+
 #include "fourcc.h"
 #include "avio.hxx"
 #include "avi_vars.h"
@@ -187,7 +189,8 @@ bool use_margins = ( _params->top_margin | _params->bottom_margin ) != 0;
        _ass_track = ass_read_file(_ass_lib, (char*)_params->subfile, NULL);
 
 //        ADM_assert(_ass_track);
-        GUI_Error_HIG("SSA Error","Cannot read_file for *%s*",(char*)_params->subfile);
+        if(!_ass_track)
+          GUI_Error_HIG("SSA Error","Cannot read_file for *%s*",(char*)_params->subfile);
         return 1;
 } 
 
@@ -283,8 +286,8 @@ uint8_t ADMVideoSubASS::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len, ADM
           printf("[Ass] No sub to render\n");
           return 1; 
         }
-
-        ass_image_t *img = ass_render_frame(_ass_rend, _ass_track, where);
+        int changed=0;
+        ass_image_t *img = ass_render_frame(_ass_rend, _ass_track, where,&changed);
         
 
         while(img) {

@@ -19,18 +19,12 @@
 */
 
 #include "config.h"
-#include <stdio.h>
+
 #include <stdlib.h>
 #include <inttypes.h>
-#include <sys/time.h>
-#include <time.h>
 
 #include "mputils.h"
 #include "ass_utils.h"
-
-#define ADM_LEGACY_PROGGY
-#include "ADM_assert.h"
-
 
 int mystrtoi(char** p, int base, int* res)
 {

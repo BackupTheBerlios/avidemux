@@ -37,7 +37,6 @@
 #include "ass.h"
 #include "ass_utils.h"
 #include "ass_library.h"
-#include "ass_types.h" /* MEANX */
 #include "mputils.h"
 
 typedef enum {PST_UNKNOWN = 0, PST_INFO, PST_STYLES, PST_EVENTS, PST_FONTS} parser_state_t;
@@ -52,9 +51,6 @@ struct parser_priv_s {
 
 #define ASS_STYLES_ALLOC 20
 #define ASS_EVENTS_ALLOC 200
-
-#define ADM_LEGACY_PROGGY
-#include "ADM_assert.h"
 
 void ass_free_track(ass_track_t* track) {
 	int i;
@@ -171,7 +167,7 @@ static int lookup_style(ass_track_t* track, char* name) {
 			return i;
 	}
 	i = track->default_style;
-	mp_msg(MSGT_ASS, MSGL_WARN, "[%p] Warning: no style named '%s' found, using '%s'\n", track, name, track->styles[i].Name);
+	mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_NoStyleNamedXFoundUsingY, track, name, track->styles[i].Name);
 	return i; // use the first style
 }
 
@@ -186,7 +182,7 @@ static long long string2timecode(char* p) {
 	long long tm;
 	int res = sscanf(p, "%1d:%2d:%2d.%2d", &h, &m, &s, &ms);
 	if (res < 4) {
-		mp_msg(MSGT_ASS, MSGL_WARN, "bad timestamp\n");
+		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_BadTimestamp);
 		return 0;
 	}
 	tm = ((h * 60 + m) * 60 + s) * 1000 + ms * 10;
@@ -351,12 +347,12 @@ void process_force_style(ass_track_t* track) {
 					COLORVAL(SecondaryColour)
 					COLORVAL(OutlineColour)
 					COLORVAL(BackColour)
-					INTVAL(FontSize)
+					FPVAL(FontSize)
 					INTVAL(Bold)
 					INTVAL(Italic)
 					INTVAL(Underline)
 					INTVAL(StrikeOut)
-					INTVAL(Spacing)
+					FPVAL(Spacing)
 					INTVAL(Angle)
 					INTVAL(BorderStyle)
 					INTVAL(Alignment)
@@ -439,12 +435,12 @@ static int process_style(ass_track_t* track, char *str)
 				// this will destroy SSA's TertiaryColour, but i'm not going to use it anyway
 				if (track->track_type == TRACK_TYPE_SSA)
 					target->OutlineColour = target->BackColour;
-			INTVAL(FontSize)
+			FPVAL(FontSize)
 			INTVAL(Bold)
 			INTVAL(Italic)
 			INTVAL(Underline)
 			INTVAL(StrikeOut)
-			INTVAL(Spacing)
+			FPVAL(Spacing)
 			INTVAL(Angle)
 			INTVAL(BorderStyle)
 			INTVAL(Alignment)
@@ -462,6 +458,9 @@ static int process_style(ass_track_t* track, char *str)
 	}
 	style->ScaleX /= 100.;
 	style->ScaleY /= 100.;
+	style->Bold = !!style->Bold;
+	style->Italic = !!style->Italic;
+	style->Underline = !!style->Underline;
 	if (!style->Name)
 		style->Name = strdup("Default");
 	if (!style->FontName)
@@ -557,10 +556,10 @@ static int decode_font(ass_track_t* track)
 	mp_msg(MSGT_ASS, MSGL_V, "font: %d bytes encoded data \n", track->parser_priv->fontdata_used);
 	size = track->parser_priv->fontdata_used;
 	if (size % 4 == 1) {
-		mp_msg(MSGT_ASS, MSGL_ERR, "bad encoded data size\n");
+		mp_msg(MSGT_ASS, MSGL_ERR, MSGTR_LIBASS_BadEncodedDataSize);
 		goto error_decode_font;
 	}
-	buf = (unsigned char*)malloc(size / 4 * 3 + 2);
+	buf = malloc(size / 4 * 3 + 2);
 	q = buf;
 	for (i = 0, p = (unsigned char*)track->parser_priv->fontdata; i < size / 4; i++, p+=4) {
 		q = decode_chars(p[0], p[1], p[2], p[3], q, 3);
@@ -573,8 +572,10 @@ static int decode_font(ass_track_t* track)
 	dsize = q - buf;
 	assert(dsize <= size / 4 * 3 + 2);
 	
-	if (track->library->extract_fonts)
-		ass_process_font(track->library, track->parser_priv->fontname, (char*)buf, dsize);
+	if (track->library->extract_fonts) {
+		ass_add_font(track->library, track->parser_priv->fontname, (char*)buf, dsize);
+		buf = 0;
+	}
 
 error_decode_font:
 	if (buf) free(buf);
@@ -587,8 +588,6 @@ error_decode_font:
 	return 0;
 }
 
-static char* validate_fname(char* name);
-
 static int process_fonts_line(ass_track_t* track, char *str)
 {
 	int len;
@@ -599,7 +598,7 @@ static int process_fonts_line(ass_track_t* track, char *str)
 		if (track->parser_priv->fontname) {
 			decode_font(track);
 		}
-		track->parser_priv->fontname = validate_fname(p);
+		track->parser_priv->fontname = strdup(p);
 		mp_msg(MSGT_ASS, MSGL_V, "fontname: %s\n", track->parser_priv->fontname);
 		return 0;
 	}
@@ -611,12 +610,12 @@ static int process_fonts_line(ass_track_t* track, char *str)
 
 	len = strlen(str);
 	if (len > 80) {
-		mp_msg(MSGT_ASS, MSGL_WARN, "Font line too long: %d, %s\n", len, str);
+		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_FontLineTooLong, len, str);
 		return 0;
 	}
 	if (track->parser_priv->fontdata_used + len > track->parser_priv->fontdata_size) {
 		track->parser_priv->fontdata_size += 100 * 1024;
-		track->parser_priv->fontdata =(char *) realloc(track->parser_priv->fontdata, track->parser_priv->fontdata_size);
+		track->parser_priv->fontdata = realloc(track->parser_priv->fontdata, track->parser_priv->fontdata_size);
 	}
 	memcpy(track->parser_priv->fontdata + track->parser_priv->fontdata_used, str, len);
 	track->parser_priv->fontdata_used += len;
@@ -697,7 +696,7 @@ static int process_text(ass_track_t* track, char* str)
 */ 
 void ass_process_codec_private(ass_track_t* track, char *data, int size)
 {
-	char* str = (char *)malloc(size + 1);
+	char* str = malloc(size + 1);
 	int sid;
 
 	memcpy(str, data, size);
@@ -751,14 +750,14 @@ void ass_process_chunk(ass_track_t* track, char *data, int size, long long timec
 	ass_event_t* event;
 
 	if (!track->event_format) {
-		mp_msg(MSGT_ASS, MSGL_WARN, "Event format header missing\n");
+		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_EventFormatHeaderMissing);
 		return;
 	}
 	
-	str = (char *)malloc(size + 1);
+	str = malloc(size + 1);
 	memcpy(str, data, size);
 	str[size] = '\0';
-	//mp_msg(MSGT_ASS, MSGL_V, "event at %" PRId64 ", +%" PRId64 ": %s  \n", (int64_t)timecode, (int64_t)duration, str);
+	mp_msg(MSGT_ASS, MSGL_V, "event at %" PRId64 ", +%" PRId64 ": %s  \n", (int64_t)timecode, (int64_t)duration, str);
 
 	eid = ass_alloc_event(track);
 	event = track->events + eid;
@@ -815,7 +814,7 @@ static char* sub_recode(char* data, size_t size, char* codepage)
 		if ((icdsc = iconv_open (tocp, cp_tmp)) != (iconv_t)(-1)){
 			mp_msg(MSGT_ASS,MSGL_V,"LIBSUB: opened iconv descriptor.\n");
 		} else
-			mp_msg(MSGT_ASS,MSGL_ERR,"LIBSUB: error opening iconv descriptor.\n");
+			mp_msg(MSGT_ASS,MSGL_ERR,MSGTR_LIBASS_ErrorOpeningIconvDescriptor);
 #ifdef HAVE_ENCA
 		if (cp_tmp) free(cp_tmp);
 #endif
@@ -829,7 +828,7 @@ static char* sub_recode(char* data, size_t size, char* codepage)
 		char* op;
 		size_t rc;
 		
-		outbuf = (char *)malloc(size);
+		outbuf = malloc(size);
 		ip = data;
 		op = outbuf;
 		
@@ -843,7 +842,7 @@ static char* sub_recode(char* data, size_t size, char* codepage)
 					osize += size;
 					oleft += size;
 				} else {
-					mp_msg(MSGT_ASS, MSGL_WARN, "LIBSUB: error recoding file.\n");
+					mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_ErrorRecodingFile);
 					return NULL;
 				}
 			}
@@ -876,12 +875,12 @@ static char* read_file(char* fname, size_t *bufsize)
 
 	FILE* fp = fopen(fname, "rb");
 	if (!fp) {
-		mp_msg(MSGT_ASS, MSGL_WARN, "ass_read_file(%s): fopen failed\n", fname);
+		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_FopenFailed, fname);
 		return 0;
 	}
 	res = fseek(fp, 0, SEEK_END);
 	if (res == -1) {
-		mp_msg(MSGT_ASS, MSGL_WARN, "ass_read_file(%s): fseek failed\n", fname);
+		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_FseekFailed, fname);
 		fclose(fp);
 		return 0;
 	}
@@ -890,20 +889,20 @@ static char* read_file(char* fname, size_t *bufsize)
 	rewind(fp);
 
 	if (sz > 10*1024*1024) {
-		mp_msg(MSGT_ASS, MSGL_INFO, "ass_read_file(%s): Refusing to load subtitles larger than 10M\n", fname);
+		mp_msg(MSGT_ASS, MSGL_INFO, MSGTR_LIBASS_RefusingToLoadSubtitlesLargerThan10M, fname);
 		fclose(fp);
 		return 0;
 	}
 	
 	mp_msg(MSGT_ASS, MSGL_V, "file size: %ld\n", sz);
 	
-	buf = (char *)malloc(sz + 1);
+	buf = malloc(sz + 1);
 	assert(buf);
 	bytes_read = 0;
 	do {
 		res = fread(buf + bytes_read, 1, sz - bytes_read, fp);
 		if (res <= 0) {
-			mp_msg(MSGT_ASS, MSGL_INFO, "Read failed, %d: %s\n", errno, strerror(errno));
+			mp_msg(MSGT_ASS, MSGL_INFO, MSGTR_LIBASS_ReadFailed, errno, strerror(errno));
 			fclose(fp);
 			free(buf);
 			return 0;
@@ -979,7 +978,7 @@ ass_track_t* ass_read_memory(ass_library_t* library, char* buf, size_t bufsize, 
 	if (!track)
 		return 0;
 
-	mp_msg(MSGT_ASS, MSGL_INFO, "LIBASS: added subtitle file: <memory> (%d styles, %d events)\n", track->n_styles, track->n_events);
+	mp_msg(MSGT_ASS, MSGL_INFO, MSGTR_LIBASS_AddedSubtitleFileMemory, track->n_styles, track->n_events);
 	return track;
 }
 
@@ -1015,7 +1014,7 @@ ass_track_t* ass_read_file(ass_library_t* library, char* fname, char* codepage)
 	
 	track->name = strdup(fname);
 
-	mp_msg(MSGT_ASS, MSGL_INFO, "LIBASS: added subtitle file: %s (%d styles, %d events)\n", fname, track->n_styles, track->n_events);
+	mp_msg(MSGT_ASS, MSGL_INFO, MSGTR_LIBASS_AddedSubtitleFileFname, fname, track->n_styles, track->n_events);
 	
 //	dump_events(forced_tid);
 	return track;
@@ -1052,86 +1051,6 @@ int ass_read_styles(ass_track_t* track, char* fname, char* codepage)
 	return 0;
 }
 
-static char* validate_fname(char* name)
-{
-	char* fname;
-	char* p;
-	char* q;
-	unsigned code;
-	int sz = strlen(name);
-
-	q = fname = (char *)malloc(sz + 1);
-	p = name;
-	while (*p) {
-		code = utf8_get_char(&p);
-		if (code == 0)
-			break;
-		if (	(code > 0x7F) ||
-			(code == '\\') ||
-			(code == '/') ||
-			(code == ':') ||
-			(code == '*') ||
-			(code == '?') ||
-			(code == '<') ||
-			(code == '>') ||
-			(code == '|') ||
-			(code == 0))
-		{
-			*q++ = '_';
-		} else {
-			*q++ = code;
-		}
-		if (p - name > sz)
-			break;
-	}
-	*q = 0;
-	return fname;
-}
-
-/**
- * \brief Process embedded matroska font. Saves it to ~/.mplayer/fonts.
- * \param name attachment name
- * \param data binary font data
- * \param data_size data size
-*/ 
-void ass_process_font(ass_library_t* library, const char* name, char* data, int data_size)
-{
-	char buf[1000];
-	FILE* fp = 0;
-	int rc;
-	struct stat st;
-	char* fname;
-	const char* fonts_dir = library->fonts_dir;
-
-	if (!fonts_dir)
-		return;
-	rc = stat(fonts_dir, &st);
-	if (rc) {
-		int res;
-#ifndef __MINGW32__
-		res = mkdir(fonts_dir, 0700);
-#else
-		res = mkdir(fonts_dir);
-#endif
-		if (res) {
-			mp_msg(MSGT_ASS, MSGL_WARN, "Failed to create: %s\n", fonts_dir);
-		}
-	} else if (!S_ISDIR(st.st_mode)) {
-		mp_msg(MSGT_ASS, MSGL_WARN, "Not a directory: %s\n", fonts_dir);
-	}
-	
-	fname = validate_fname((char*)name);
-
-	snprintf(buf, 1000, "%s/%s", fonts_dir, fname);
-	free(fname);
-
-	fp = fopen(buf, "wb");
-	if (!fp) return;
-
-	fwrite(data, data_size, 1, fp);
-	fclose(fp);
-}
-
 long long ass_step_sub(ass_track_t* track, long long now, int movement) {
 	int i;
 
@@ -1152,9 +1071,9 @@ long long ass_step_sub(ass_track_t* track, long long now, int movement) {
 }
 
 ass_track_t* ass_new_track(ass_library_t* library) {
-	ass_track_t* track = (ass_track_t *)calloc(1, sizeof(ass_track_t));
+	ass_track_t* track = calloc(1, sizeof(ass_track_t));
 	track->library = library;
-	track->parser_priv = (parser_priv_t *)calloc(1, sizeof(parser_priv_t));
+	track->parser_priv = calloc(1, sizeof(parser_priv_t));
 	return track;
 }
 
