@@ -200,6 +200,14 @@ SectionGroup "Additional languages" SecGrpLang
         WriteRegStr HKLM "${REGKEY}\Components" German 1
     SectionEnd
     
+    Section Italian SecLangItalian
+        SectionIn 2
+        SetOutPath $INSTDIR\share\locale\it\LC_MESSAGES
+        SetOverwrite on
+        File ..\..\..\avidemux_2.4_build\share\locale\it\LC_MESSAGES\avidemux.mo        
+        WriteRegStr HKLM "${REGKEY}\Components" Italian 1
+    SectionEnd
+    
     Section Japanese SecLangJapanese
         SectionIn 2
         SetOutPath $INSTDIR\share\locale\ja\LC_MESSAGES
@@ -275,6 +283,13 @@ Section "-German GTK" SecLangGermanGtk
     SetOverwrite on
     File ..\..\..\avidemux_2.4_build\lib\locale\de\LC_MESSAGES\gtk20.mo
     WriteRegStr HKLM "${REGKEY}\Components" GermanGtk 1
+SectionEnd
+
+Section "-Italian GTK" SecLangItalianGtk
+    SetOutPath $INSTDIR\lib\locale\it\LC_MESSAGES
+    SetOverwrite on
+    File ..\..\..\avidemux_2.4_build\lib\locale\it\LC_MESSAGES\gtk20.mo
+    WriteRegStr HKLM "${REGKEY}\Components" ItalianGtk 1
 SectionEnd
 
 Section "-Japanese GTK" SecLangJapaneseGtk
@@ -464,6 +479,11 @@ Section /o un.JapaneseGtk UnSecLangJapaneseGtk
     DeleteRegValue HKLM "${REGKEY}\Components" JapaneseGtk
 SectionEnd
 
+Section /o un.ItalianGtk UnSecLangItalianGtk
+    RmDir /r /REBOOTOK $INSTDIR\lib\locale\it
+    DeleteRegValue HKLM "${REGKEY}\Components" ItalianGtk
+SectionEnd
+
 Section /o un.GermanGtk UnSecLangGermanGtk
     RmDir /r /REBOOTOK $INSTDIR\lib\locale\de
     DeleteRegValue HKLM "${REGKEY}\Components" GermanGtk
@@ -512,6 +532,11 @@ SectionEnd
 Section /o un.Japanese UnSecLangJapanese
     RmDir /r /REBOOTOK $INSTDIR\share\locale\ja
     DeleteRegValue HKLM "${REGKEY}\Components" Japanese
+SectionEnd
+
+Section /o un.Italian UnSecLangItalian
+    RmDir /r /REBOOTOK $INSTDIR\share\locale\it
+    DeleteRegValue HKLM "${REGKEY}\Components" Italian
 SectionEnd
 
 Section /o un.German UnSecLangGerman
@@ -675,6 +700,7 @@ populate:
     !insertmacro SELECT_SECTION Czech ${SecLangCzech}
     !insertmacro SELECT_SECTION French ${SecLangFrench}
     !insertmacro SELECT_SECTION German ${SecLangGerman}
+    !insertmacro SELECT_SECTION Italian ${SecLangItalian}
     !insertmacro SELECT_SECTION Japanese ${SecLangJapanese}
     !insertmacro SELECT_SECTION Russian ${SecLangRussian}
     !insertmacro SELECT_SECTION Serbian ${SecLangSerbian}
@@ -794,6 +820,11 @@ Function ActivateInternalSections
     IntOp $1 $0 & $1
     SectionSetFlags ${SecLangGermanGtk} $1
     
+    SectionGetFlags ${SecLangItalian} $1
+    IntOp $1 $1 & ${SF_SELECTED}
+    IntOp $1 $0 & $1
+    SectionSetFlags ${SecLangItalianGtk} $1
+    
     SectionGetFlags ${SecLangJapanese} $1
     IntOp $1 $1 & ${SF_SELECTED}
     IntOp $1 $0 & $1
@@ -893,6 +924,7 @@ Function un.onInit
     !insertmacro SELECT_SECTION Czech ${UnSecLangCzech}
     !insertmacro SELECT_SECTION French ${UnSecLangFrench}
     !insertmacro SELECT_SECTION German ${UnSecLangGerman}
+    !insertmacro SELECT_SECTION Italian ${UnSecLangItalian}
     !insertmacro SELECT_SECTION Japanese ${UnSecLangJapanese}
     !insertmacro SELECT_SECTION Russian ${UnSecLangRussian}
     !insertmacro SELECT_SECTION Serbian ${UnSecLangSerbian}
@@ -903,6 +935,7 @@ Function un.onInit
     !insertmacro SELECT_SECTION CzechGtk ${UnSecLangCzechGtk}
     !insertmacro SELECT_SECTION FrenchGtk ${UnSecLangFrenchGtk}
     !insertmacro SELECT_SECTION GermanGtk ${UnSecLangGermanGtk}
+    !insertmacro SELECT_SECTION ItalianGtk ${UnSecLangItalianGtk}
     !insertmacro SELECT_SECTION JapaneseGtk ${UnSecLangJapaneseGtk}
     !insertmacro SELECT_SECTION RussianGtk ${UnSecLangRussianGtk}
     !insertmacro SELECT_SECTION SerbianGtk ${UnSecLangSerbianGtk}
