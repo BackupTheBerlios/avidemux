@@ -20,23 +20,13 @@
  *                                                                         *
  ***************************************************************************/
 
-
-
-#include <config.h>
-
+#include "config.h"
 
 #include <string.h>
 #include <stdio.h>
-
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-# include <math.h>
-
-#include "default.h"
+#include <math.h>
 
 #include "ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
@@ -50,6 +40,11 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidEqualizer.h"
 #include "ADM_assert.h"
+
+extern "C" {
+#include "ADM_libraries/ADM_lavcodec/avcodec.h"
+}
+
 static ColYuvRgb    *rgbConv=NULL;
 uint8_t DIA_getEqualizer(EqualizerParam *param, ADMImage *image);
 
@@ -66,12 +61,14 @@ static void 		compute_histogram(void);
 static void 		frame_changed( void );
 
 extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
+extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
 
 static ADMImage *imgsrc,*imgdst,*imgdisplay;
 static GtkWidget *dialog=NULL;
 static uint32_t scaler[256];
-static uint32_t w,h;
+static uint32_t w,h,zoomW,zoomH;
 static uint32_t *rgbbuffer=NULL;
+static ADMImageResizer *resizer=NULL;
 
 static uint32_t *histogram=NULL;
 static uint32_t *histogramout=NULL;
@@ -101,7 +98,6 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in)
 	h=in->getInfo()->height;
 	rgbConv=new ColYuvRgb(w,h);
         rgbConv->reset(w,h);
-	rgbbuffer=new uint32_t[w*h];
 	
 	histogram=new uint32_t [256*128];
         histogramout=new uint32_t [256*128];
@@ -120,12 +116,23 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in)
 
 	dialog=create_dialog1();
 	gtk_register_dialog(dialog);
-
-	gtk_widget_set_usize(WID(drawingarea1), w,h);
-
 	gtk_widget_set_usize(WID(drawingarea_histin), 256,128);
-        gtk_widget_set_usize(WID(drawingarea_histout), 256,128);
-	
+    gtk_widget_set_usize(WID(drawingarea_histout), 256,128);
+
+	float zoom = UI_calcZoomToFitScreen(GTK_WINDOW(dialog), WID(drawingarea1), w, h);
+
+	zoomW = w * zoom;
+	zoomH = h * zoom;
+	rgbbuffer=new uint32_t[zoomW*zoomH];
+
+	gtk_widget_set_usize(WID(drawingarea1), zoomW, zoomH);
+
+	if (zoom < 1)
+	{
+		gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+		resizer = new ADMImageResizer(w, h, zoomW, zoomH, PIX_FMT_YUV420P, PIX_FMT_RGB32);
+	}
+
 	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonCancel), GTK_RESPONSE_CANCEL);
 	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(button3),      GTK_RESPONSE_OK);
 	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonApply),  GTK_RESPONSE_APPLY);
@@ -183,6 +190,13 @@ _again:
 	delete [] histogram;
         delete [] histogramout;
     delete rgbConv;
+
+	if (resizer)
+	{
+		delete resizer;
+		resizer=NULL;
+	}
+
     rgbConv=NULL;    
 	histogram=NULL;
         histogramout=NULL;
@@ -287,7 +301,11 @@ void update( void)
 	// udate u & v
 	// now convert to rgb
 	//COL_yv12rgb(  w,   h,imgdisplay->data,(uint8_t *)rgbbuffer );
-	rgbConv->scale(imgdisplay->data,(uint8_t *)rgbbuffer );
+	if (resizer)
+		resizer->resize(imgdisplay->data, (uint8_t*)rgbbuffer);
+	else
+		rgbConv->scale(imgdisplay->data, (uint8_t*)rgbbuffer);
+
 	draw();
 }
 // Compute histogram
@@ -358,11 +376,9 @@ void compute_histogram(void)
 */
 gboolean draw (void)
 {
-	GtkWidget *draw;
+	GtkWidget *draw=WID(drawingarea1);
 
-	draw=WID(drawingarea1);
-
-	GUI_RGBDisplay((uint8_t *)rgbbuffer, w,h, (void *)draw);
+	GUI_RGBDisplay((uint8_t *)rgbbuffer, zoomW, zoomH, (void *)draw);
 /*	
 	draw=WID(histogram);
 	GUI_RGBDisplay((uint8_t *)bargraph, 256,256, (void *)draw);

@@ -165,6 +165,8 @@ class ADMImageResizer
 		~ADMImageResizer();
 		
 		uint8_t resize(ADMImage *src, ADMImage *dest);
+		uint8_t resize(uint8_t *src, ADMImage *dest);
+		uint8_t resize(ADMImage *src, uint8_t *dest);
 		uint8_t resize(uint8_t *src, uint8_t *dest);
 };
 

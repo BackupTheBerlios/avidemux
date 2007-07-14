@@ -89,6 +89,22 @@ uint8_t ADMImageResizer::resize(ADMImage *source, ADMImage *dest)
 	return resize(source->data, dest->data);
 }
 
+uint8_t ADMImageResizer::resize(ADMImage *source, uint8_t *dest)
+{
+    ADM_assert(source->_width == orgWidth);
+    ADM_assert(source->_height == orgHeight);
+
+	return resize(source->data, dest);
+}
+
+uint8_t ADMImageResizer::resize(uint8_t *source, ADMImage *dest)
+{
+    ADM_assert(dest->_width == destWidth);
+    ADM_assert(dest->_height == destHeight);
+
+	return resize(source, dest->data);
+}
+
 uint8_t ADMImageResizer::resize(uint8_t *source, uint8_t *dest)
 {
 	uint8_t *src[3];

@@ -20,21 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
-
-
-#include <config.h>
-
+#include "config.h"
 
 #include <string.h>
 #include <stdio.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-# include <math.h>
+#include <math.h>
 
 #include "default.h"
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
@@ -46,6 +39,11 @@
 #include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_assert.h"
 #include "ADM_video/ADM_vidMPdelogo.h"
+
+extern "C" {
+#include "ADM_libraries/ADM_lavcodec/avcodec.h"
+}
+
 static GtkWidget	*create_dialog1 (void);
 static void  		ui_read ( void);
 static void  		ui_update ( void);
@@ -61,15 +59,18 @@ static void		prepare(uint32_t img);
 static void 		frame_changed( void );
 
 extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
+extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
 
 static ColYuvRgb    *rgbConv=NULL;
 static uint8_t *working=NULL;
+static uint8_t *rgbBufferDisplay=NULL;
 static uint8_t *original=NULL;
 static GtkWidget *dialog=NULL;
-static uint32_t x,y,w,h,band;
+static uint32_t x,y,w,h,zoomW,zoomH,band;
 
 static AVDMGenericVideoStream *incoming=NULL;
 static ADMImage *imgsrc=NULL;
+static ADMImageResizer *resizer=NULL;
 
 static int lock=0,width,height;
 
@@ -84,8 +85,7 @@ uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in)
 	// Allocate space for green-ised video
 	width=in->getInfo()->width;
 	height=in->getInfo()->height;
-	
-	
+		
 	working=new uint8_t [width*height*4];	
 	original=NULL;
 
@@ -105,23 +105,31 @@ uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in)
 	
 	rgbConv=new ColYuvRgb(width,height);
         rgbConv->reset(width,height);
-	
-	gtk_widget_set_usize(WID(drawingarea1), width,height);
+
+	float zoom = UI_calcZoomToFitScreen(GTK_WINDOW(dialog), WID(drawingarea1), width, height);
+
+	zoomW = width * zoom;
+	zoomH = height * zoom;
+	rgbBufferDisplay=new uint8_t[zoomW*zoomH*4];
+
+	gtk_widget_set_usize(WID(drawingarea1), zoomW, zoomH);
+
+	if (zoom < 1)
+	{
+		gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+		resizer = new ADMImageResizer(width, height, zoomW, zoomH, PIX_FMT_RGB32, PIX_FMT_RGB32);
+	}
 
 	prepare(0);
 	gtk_widget_show(dialog);
 	
-
 	ui_upload();
-
 	ui_update();
 	
 #define CONNECT(x,y,z) 	gtk_signal_connect(GTK_OBJECT(WID(x)), #y,GTK_SIGNAL_FUNC(z),   NULL);
 
         CONNECT(drawingarea1,expose_event,gui_draw);
-        CONNECT(hscale1,value_changed,frame_changed);
-
-	  
+        CONNECT(hscale1,value_changed,frame_changed);	  
 		      
 #define CONNECT_SPIN(x) CONNECT(spinbutton##x, value_changed,ui_changed)
       	  
@@ -130,7 +138,6 @@ uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in)
         CONNECT_SPIN(W);
         CONNECT_SPIN(H);
         CONNECT_SPIN(Band);
-
 	  
 	draw(dialog,width,height);
 
@@ -156,6 +163,16 @@ uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in)
 	delete working;	
 	delete imgsrc;
 	delete rgbConv;
+
+	if (resizer)
+	{
+		delete resizer;
+		delete[] rgbBufferDisplay;
+
+		resizer=NULL;
+		rgbBufferDisplay=NULL;
+	}
+
 	working=NULL;
 	dialog=NULL;
 	original=NULL;
@@ -219,10 +236,15 @@ gboolean gui_draw( void )
 }
 void draw (GtkWidget *dialog,uint32_t w,uint32_t h )
 {
-	GtkWidget *draw;
-	draw=WID(drawingarea1);
+	GtkWidget *draw=WID(drawingarea1);
 
-	GUI_RGBDisplay(working, w,h, (void *)draw);
+	if (resizer)
+	{
+		resizer->resize(working, rgbBufferDisplay);
+		GUI_RGBDisplay(rgbBufferDisplay, zoomW, zoomH, (void*)draw);
+	}
+	else
+		GUI_RGBDisplay(working, w, h, (void*)draw);
 }
 /*---------------------------------------------------------------------------
 	Read entried from dialog box

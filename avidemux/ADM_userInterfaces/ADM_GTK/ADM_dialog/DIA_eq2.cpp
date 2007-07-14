@@ -21,31 +21,20 @@
 
 
 
-#include <config.h>
-
-
+#include "config.h"
 #include <string.h>
 #include <stdio.h>
-
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
+#include <math.h>
 
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-# include <math.h>
 #include "default.h"
-
 #include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_toolkit_gtk/ADM_gladeSupport.h"
-
-
-
 
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "default.h"
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
 
@@ -55,7 +44,9 @@
 
 #include "ADM_osSupport/ADM_cpuCap.h"
 
-
+extern "C" {
+#include "ADM_libraries/ADM_lavcodec/avcodec.h"
+}
 
 static GtkWidget*create_dialog1 (void);
 static float getAdj(GtkWidget *widget);
@@ -63,10 +54,11 @@ static void setAdj(GtkWidget *widget,float val);
 
 static ADMImage *imgsrc,*imgdst,*imgdisplay;
 static GtkWidget *dialog=NULL;
-static uint32_t w,h;
+static uint32_t w,h,zoomW,zoomH;
 static uint32_t *rgbbuffer=NULL;
 static AVDMGenericVideoStream *incoming;
 static Eq2_Param myEq2;
+static ADMImageResizer *resizer=NULL;
 
 static void             update ( void);
 static gboolean         draw (void );
@@ -75,6 +67,9 @@ static void             eq2_changed( void);
 static void frame_changed( void );
 static Eq2Settings mySettings;
 static ColYuvRgb    *rgbConv=NULL;
+
+extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
+
 /************************************************************************/
 uint8_t DIA_getEQ2Param(Eq2_Param *param, AVDMGenericVideoStream *in)
 {
@@ -87,8 +82,6 @@ uint8_t r=0;
         // Allocate space for green-ised video
         w=in->getInfo()->width;
         h=in->getInfo()->height;
-
-        rgbbuffer=new uint32_t[w*h];
 
         imgdst=new ADMImage(w,h);
         imgsrc=new ADMImage(w,h);
@@ -139,7 +132,20 @@ uint8_t r=0;
         HCONECT(GammaG);
         HCONECT(GammaB);
         
-        gtk_widget_set_usize(WID(drawingarea1), w,h);
+		float zoom = UI_calcZoomToFitScreen(GTK_WINDOW(dialog), WID(drawingarea1), w, h);
+
+		zoomW = w * zoom;
+		zoomH = h * zoom;
+		rgbbuffer=new uint32_t[zoomW*zoomH];
+
+		gtk_widget_set_usize(WID(drawingarea1), zoomW, zoomH);
+
+		if (zoom < 1)
+		{
+			gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+			resizer = new ADMImageResizer(w, h, zoomW, zoomH, PIX_FMT_YUV420P, PIX_FMT_RGB32);
+		}
+
         gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event", GTK_SIGNAL_FUNC(draw),   NULL);
         update();
         // run
@@ -158,6 +164,12 @@ uint8_t r=0;
         delete imgdisplay;
         delete [] rgbbuffer;
         delete rgbConv;
+
+		if (resizer)
+		{
+			delete resizer;
+			resizer=NULL;
+		}
 
         rgbbuffer=NULL;
         imgdst=NULL;
@@ -215,10 +227,9 @@ void eq2_changed( void)
 }
 gboolean draw (void)
 {
-    GtkWidget *draw;
-        draw=WID(drawingarea1);
-        GUI_RGBDisplay((uint8_t *)rgbbuffer, w,h, (void *)draw);
-        return true;
+	GUI_RGBDisplay((uint8_t *)rgbbuffer, zoomW, zoomH, WID(drawingarea1));
+
+	return true;
 }
 void update(void )
 {
@@ -271,9 +282,11 @@ uint32_t stride;
         dst+=stride;
         src+=stride;
     }
-    //
-    //COL_yv12rgb(  w,   h,imgdisplay->data,(uint8_t *)rgbbuffer );
-     rgbConv->scale(imgdisplay->data,(uint8_t *)rgbbuffer );
+
+	if (resizer)
+		resizer->resize(imgdisplay->data, (uint8_t*)rgbbuffer);
+	else
+		rgbConv->scale(imgdisplay->data, (uint8_t*)rgbbuffer);
 }
 
 //**
