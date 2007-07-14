@@ -177,7 +177,7 @@ uint32_t maxBFrame=0;
         uint32_t mxx=0;
         for(k=0;k<20;k++)
         {
-           if(display[k]>mxx) mxx=display[k];
+           if(display[k]>mxx) mxx=(uint32_t)display[k];
         }   
         for(k=0;k<20;k++)
         {

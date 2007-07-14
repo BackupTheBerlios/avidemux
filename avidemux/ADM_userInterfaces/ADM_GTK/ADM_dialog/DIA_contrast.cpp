@@ -164,7 +164,7 @@ uint8_t flyContrast::download (void)
   CHECKBOX (checkbuttonV, param.doChromaV);
   
   GtkAdjustment *adj=gtk_range_get_adjustment (GTK_RANGE(WID(hscaleBright)));
-  param.offset= GTK_ADJUSTMENT(adj)->value;
+  param.offset= (int32_t)GTK_ADJUSTMENT(adj)->value;
   
   adj=gtk_range_get_adjustment (GTK_RANGE(WID(hscaleContrast)));
   param.coef=GTK_ADJUSTMENT(adj)->value;
