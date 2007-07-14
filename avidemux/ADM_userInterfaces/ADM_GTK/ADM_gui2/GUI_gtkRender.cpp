@@ -140,7 +140,7 @@ float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t
 	// Calculate zoom ratio
 	if (imageWidth > screenWidth || imageHeight > screenHeight)
 	{
-		if ((imageWidth - screenWidth) > (imageHeight - screenHeight))
+		if ((int)(imageWidth - screenWidth) > (int)(imageHeight - screenHeight))
 			return (float)screenWidth / (float)imageWidth;
 		else
 			return (float)screenHeight / (float)imageHeight;
