@@ -159,4 +159,9 @@ int UI_RunApp(void)
     printf("*********************************\n");
 }
 uint8_t DIA_glyphEdit(void) {return 0;};
+#include "ADM_ocr/adm_glyph.h"
+uint8_t ADM_ocr_engine(  vobSubParam *subparam,const char *labelSrt,admGlyph *head)
+{
+  return 0; 
+}
 //EOF

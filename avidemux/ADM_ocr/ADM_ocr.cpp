@@ -23,7 +23,7 @@
 static uint32_t minThreshold=0x80;
 
 /* In the UI related code */
-extern ReplyType glyphToText(admGlyph *glyph);
+//extern ReplyType glyphToText(admGlyph *glyph);
 extern void UI_purge(void);
 
 extern uint8_t adm_estimate_glyphSize(admGlyph *glyph,uint32_t *minx, uint32_t *maxx,uint32_t *miny,uint32_t *maxy,int *raw);
@@ -75,7 +75,7 @@ uint8_t mergeBitmap(uint8_t *bitin, uint8_t *bitout, uint8_t *maskin,uint32_t w,
       @param h height of bitmap
       @param decodedString Will contain ocr'ed text
 */
-ReplyType ocrBitmap(uint8_t *workArea,uint32_t w,uint32_t h,char *decodedString)
+ReplyType ocrBitmap(uint8_t *workArea,uint32_t w,uint32_t h,char *decodedString,admGlyph *head)
 {
 uint8_t found;
 uint32_t colstart=0,colend=0,oldcol;
@@ -130,7 +130,7 @@ ReplyType reply;
          
          
             // printf("Found glyph: %lu %lu\n",colstart,colend);  
-            reply=handleGlyph(workArea,colstart,colend,w,bottom,top);
+            reply=handleGlyph(workArea,colstart,colend,w,bottom,top,head);
             switch(reply)
                 {
                         case ReplySkip:break;
@@ -170,7 +170,7 @@ ReplyType reply;
                 that case we use another method to extract the glyph.
                 We split it using leftturn method and do it again.
 */
-ReplyType handleGlyph(uint8_t *workArea,uint32_t start, uint32_t end,uint32_t w,uint32_t h,uint32_t base)
+ReplyType handleGlyph(uint8_t *workArea,uint32_t start, uint32_t end,uint32_t w,uint32_t h,uint32_t base,admGlyph *head)
 {
 uint8_t found=0;
 static int inc=1;
@@ -228,7 +228,7 @@ _nextglyph:
                 
                     if(lefty->width)
                     {
-                        reply=glyphToText(lefty);
+                        reply=glyphToText(lefty,head);
                         if(reply!=ReplyOk)
                         {
                             printf("Glyph2text failed(1)\n");
@@ -248,7 +248,7 @@ _nextglyph:
             if(raw) delete [] raw;
             if(glyph->width)
             {
-                reply=glyphToText(glyph);
+                reply=glyphToText(glyph,head);
                 if(reply!=ReplyOk)                 
                 {
                     printf("Glyph2text failed(2)\n");

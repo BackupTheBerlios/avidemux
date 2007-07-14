@@ -73,12 +73,6 @@
 #define TESTSUB "/home/fx/usbstick/subs/vts_01_0.idx"
 #define CONNECT(x,y,z) 	gtk_signal_connect(GTK_OBJECT(WID(x)), #y,GTK_SIGNAL_FUNC(z),   NULL);
 
-
-
-
-
-
-
 extern  uint8_t DIA_vobsub(vobSubParam *param);
 //********************************************
 extern  GtkWidget *DIA_ocr(void);
@@ -87,20 +81,19 @@ static gboolean   gui_draw_small( void );
 static void       displaySmall( admGlyph *glyph );
 static int        cb_accept(GtkObject * object, gpointer user_data);
 
-static GtkWidget *dialog;
-static GtkWidget *mainDisplay;
-static GtkWidget *smallDisplay;
+static GtkWidget *dialog=NULL;
+static GtkWidget *mainDisplay=NULL;
+static GtkWidget *smallDisplay=NULL;
 static uint32_t redraw_x,redraw_y;
 //********************************************
-ReplyType glyphToText(admGlyph *glyph);
+//ReplyType glyphToText(admGlyph *glyph,admGlyph *head);
 static ReplyType setup(void);
 //********************************************
-static uint8_t ocrSaveGlyph(void);
-static  vobSubParam subparam={NULL,0,0};
+static uint8_t ocrSaveGlyph(admGlyph *head);
+
 static uint8_t *workArea;
 static vobSubBitmap *bitmap;
-static admGlyph head(250,4);
-static uint32_t lang_index=0;
+static uint8_t *sdata=NULL;
 static uint32_t nbGlyphs;
 static char decodedString[1024];
 
@@ -120,12 +113,12 @@ typedef enum
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++
         Main
    +++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-uint8_t ADM_ocr_engine( void)
+   
+uint8_t ADM_ocr_engine(  vobSubParam *subparam,const char *labelSrt,admGlyph *head)
 {
 // 
     uint32_t nbSub=0;
     FILE *out=NULL;
-    head.next=NULL;
     ADMVideoVobSub *vobsub=NULL;
     uint32_t startTime,endTime;
     uint32_t w,h,oldw=0,oldh=0;
@@ -134,27 +127,30 @@ uint8_t ADM_ocr_engine( void)
     uint32_t first,last;
     uint32_t seqNum;
     char     text[1024];
-    lang_index=0;
     nbGlyphs=0;
     ReplyType reply;
+    
+    dialog=NULL;
+    mainDisplay=NULL;
+    smallDisplay=NULL;
+    workArea=NULL;
+    bitmap=NULL;
+    sdata=NULL;
+    
+
     
 // Create UI && prepare callback
     
     dialog=DIA_ocr();
     gtk_register_dialog(dialog);
 #define ASSOCIATE(x,y)   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),y)
-    ASSOCIATE(buttonStart,actionGo);
+    
     ASSOCIATE(buttonOk,   actionAccept);
     ASSOCIATE(buttonSkip,     actionSkip);
     ASSOCIATE(buttonSkipAll,     actionSkipAll);
     ASSOCIATE(buttonIgnore,   actionIgnore);
     ASSOCIATE(buttonCalibrate,   actionCalibrate);
     
-    ASSOCIATE(buttonGlyphLoad,   actionLoadGlyph);
-    ASSOCIATE(buttonGlyphSave,   actionSaveGlyph);
-    
-    ASSOCIATE(buttonVobsub,   actionLoadVob);
-    ASSOCIATE(buttonSrt,   actionSaveSub);
    
     gtk_widget_show(dialog);
 //  disable
@@ -167,8 +163,6 @@ uint8_t ADM_ocr_engine( void)
 
     CONNECT(entry,activate,cb_accept);
 _again:    
-    reply=setup();
-    if(reply==ReplyClose) goto endIt;
     
     printf("Go go go\n");
     
@@ -177,30 +171,17 @@ _again:
     redraw_x=redraw_y=0;
     UI_purge();
 //  Time to go
-    // Inactivate frame1=glyph    frame2=in/out  buttonStart
-    gtk_widget_set_sensitive(WID(buttonStart),0);
-    gtk_widget_set_sensitive(WID(frameGlyph),0);
-    gtk_widget_set_sensitive(WID(frameLoad),0);
+    
     gtk_widget_set_sensitive(WID(frameBitmap),1);
-
-    gtk_widget_set_sensitive(WID(buttonStart),0);
-   
-  
-   char *fileout;
-   fileout=(char *)gtk_label_get_text(GTK_LABEL(WID(labelSrt)));
-   if(!fileout)
-    {
-      GUI_Error_HIG(_("Incorrect output file"), NULL);
-        goto _again;
-    }
-    out=fopen(fileout,"wb");
+ 
+    out=fopen(labelSrt,"wb");
     if(!out)
     {
-      GUI_Error_HIG(_("Output file error"), _("Could not open \"%s\" for writing."), fileout);
-        goto _again;
+       GUI_Error_HIG(_("Output file error"), _("Could not open \"%s\" for writing."), labelSrt);
+       goto endIt;
     }
      
-    vobsub=new ADMVideoVobSub(subparam.subname,subparam.index);
+    vobsub=new ADMVideoVobSub(subparam->subname,subparam->index);
     nbSub=vobsub->getNbImage();
    
     if(!nbSub)
@@ -259,7 +240,7 @@ againPlease:
              gui_draw();
              UI_purge();
              // OCR
-              reply=ocrBitmap(workArea,w,h,decodedString);
+              reply=ocrBitmap(workArea,w,h,decodedString,head);
               if(reply==ReplyClose) goto endIt;
               if(reply==ReplyCalibrate)
                 {
@@ -290,16 +271,8 @@ againPlease:
 
 endIt:
     // Final round
-    gtk_widget_set_sensitive(WID(frameGlyph),1);
-    gtk_widget_set_sensitive(WID(frameLoad),0);
-    gtk_widget_set_sensitive(WID(buttonStart),0);  
     gtk_widget_set_sensitive(WID(frameBitmap),0);
-   // gtk_widget_set_sensitive(WID(Current_Glyph),0); 
-    
-    if(nbGlyphs && actionSaveGlyph==gtk_dialog_run(GTK_DIALOG(dialog)))
-    {
-      ocrSaveGlyph();
-    }
+   // gtk_widget_set_sensitive(WID(Current_Glyph),0);     
     if(vobsub)
         delete vobsub;
     vobsub=NULL;
@@ -308,9 +281,7 @@ endIt:
     out=NULL;
     gtk_unregister_dialog(dialog);
     gtk_widget_destroy(dialog);
-    if(head.next)
-        destroyGlyphTree(&head);
-    head.next=NULL;
+
     return 1;
 
 }
@@ -318,13 +289,13 @@ endIt:
     \fn ocrSaveGlyph
     \brief bridge to saveGlyph
 */
-uint8_t ocrSaveGlyph(void)
+uint8_t ocrSaveGlyph(admGlyph *head)
 {
   char *name=NULL;
           GUI_FileSelWrite(_("Select Glyphfile to save to"), &name);
         if(!name)
             return 0;
-        saveGlyph(name,&head,nbGlyphs);
+        saveGlyph(name,head,nbGlyphs);
         ADM_dealloc(name);
         return 1;
 
@@ -334,7 +305,7 @@ uint8_t ocrSaveGlyph(void)
         Search throught the existing glyphs , if not present create it
         and append the text to decodedString
 */
-ReplyType glyphToText(admGlyph *glyph)
+ReplyType glyphToText(admGlyph *glyph,admGlyph *head)
 {
  admGlyph *cand;
             //printf("2t: %d x %d\n",glyph->width,glyph->height);
@@ -343,7 +314,7 @@ ReplyType glyphToText(admGlyph *glyph)
                 delete glyph;
                 return ReplyOk;
             }
-            cand=searchGlyph(&head,glyph);
+            cand=searchGlyph(head,glyph);
             if(!cand) // New glyph
             {
                 char *string;
@@ -364,7 +335,7 @@ ReplyType glyphToText(admGlyph *glyph)
                 {
                 case actionIgnore:
                         glyph->code=NULL;
-                        insertInGlyphTree(&head,glyph);
+                        insertInGlyphTree(head,glyph);
                         nbGlyphs++;
                         break;
                 case actionCalibrate: return ReplyCalibrate;
@@ -373,7 +344,7 @@ ReplyType glyphToText(admGlyph *glyph)
                     if(string&& strlen(string))
                     {
                         glyph->code=ADM_strdup(string);
-                        insertInGlyphTree(&head,glyph);
+                        insertInGlyphTree(head,glyph);
                         //printf("New glyph:%s\n",glyph->code);
                         strcat(decodedString,glyph->code);
                         nbGlyphs++;
@@ -429,7 +400,7 @@ static int lastx=0,lasty=0;
 }
 //*****************************************************************************************
  static int sx=0,sy=0,sw=0,sh=0;
- uint8_t *sdata=NULL;
+
 void displaySmall( admGlyph *glyph)
 {
     if(sw!=glyph->width || sh!=glyph->height)
@@ -479,88 +450,7 @@ gboolean gui_draw_small(void)
     return true;
 }
 
-/******************************************************************************************
- Setup (input/output files etc..)
-*****************************************************************************************/
-ReplyType setup(void)
-{
-int sel;
-char text[1024];
-    while(1)
-    {
-    //gtk_widget_set_sensitive(WID(buttonAccept),0);
-    //gtk_widget_set_sensitive(WID(buttonSkip),0);
-    //gtk_widget_set_sensitive(WID(entryEntry),0);
-    UI_purge();
-    // Main loop : Only accept glyph load/save
-    // Sub & srt select & start ocr
-    gtk_widget_set_sensitive(WID(frameGlyph),1);
-    gtk_widget_set_sensitive(WID(frameLoad),1);
-    gtk_widget_set_sensitive(WID(buttonStart),1);
-    
-    gtk_widget_set_sensitive(WID(frameBitmap),0);
-    //gtk_widget_set_sensitive(WID(Current_Glyph),0); 
-     switch(sel=gtk_dialog_run(GTK_DIALOG(dialog)))
-     {
-        case actionLoadVob:
-                {
-                   
-                        subparam.index=lang_index;
-                        subparam.subname=NULL;
-                        if(DIA_vobsub(&subparam))
-                        {
-                            lang_index=subparam.index;
-                            gtk_label_set_text(GTK_LABEL(WID(labelVobsub)),subparam.subname);
-                        }
-                        
-                    
-                }
-                break;
-        case actionSaveSub:
-                {
-                    char *srt=NULL;
-                    GUI_FileSelWrite(_("Select SRT to save"), &srt);
-                    if(srt)
-                    {
-                        gtk_label_set_text(GTK_LABEL(WID(labelSrt)),srt);
-                    }
-                }
-                break;
-        
-        case actionLoadGlyph:
-            {
-                 char *gly=NULL;
-                    
-                    GUI_FileSelRead(_("Select Glyoh to save"), &gly);
-                    if(gly)
-                    {
-                            loadGlyph(gly,&head,&nbGlyphs);
-                            sprintf(text,"%03d",nbGlyphs);
-                            gtk_label_set_text(GTK_LABEL(WID(labelNbGlyphs)),text);
-                    }
-            }
-                break;
-        
-        case actionSaveGlyph:
-            
-                    if(!nbGlyphs)
-                    {
-                      GUI_Error_HIG(_("No glyphs to save"), NULL);
-                        break;
-                    }                  
-                    ocrSaveGlyph();
-                        break;
-        
-        case GTK_RESPONSE_CLOSE: 
-            printf("Close req\n");
-            return ReplyClose;
-        default:
-            printf("Other input:%d\n",sel);
-     }
-    // Everything selected, check
-    if(sel==actionGo) return ReplyOk;
-    }
-}
+
 /**
     \fn cb_accept
     \brief Bridge between dialog/Accept and gtk signals

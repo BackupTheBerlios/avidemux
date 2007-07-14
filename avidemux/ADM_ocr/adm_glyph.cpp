@@ -163,7 +163,7 @@ uint8_t saveGlyph(char *name,admGlyph *head,uint32_t nb)
 {
   FILE *out;
   uint32_t slen;
-    
+  nb=0;
   admGlyph *glyph=head->next;
     
     
@@ -173,9 +173,18 @@ uint8_t saveGlyph(char *name,admGlyph *head,uint32_t nb)
     GUI_Error_HIG(_("Could not write the file"), NULL);
     return 0;
   }
+    
+    /* First count how many glyphs */
+     while(glyph)
+    {
+      glyph=glyph->next;
+      nb++;
+    }
+    
 #define WRITE(x) fwrite(&(x),sizeof(x),1,out);
     WRITE(nb);
     
+    glyph=head->next;
     while(glyph)
     {
       WRITE(glyph->width);
@@ -187,7 +196,7 @@ uint8_t saveGlyph(char *name,admGlyph *head,uint32_t nb)
       fwrite(glyph->code,slen,1,out);
       glyph=glyph->next;
     }
-    
+    printf("[Glyph] Saved %u glyphs\n",nb);
     fclose(out);
     return 1;
   
@@ -236,6 +245,7 @@ uint8_t loadGlyph(char *name,admGlyph *head,uint32_t *outNb)
     
     fclose(out);
     *outNb=nbGlyphs;
+    printf("[Glyph] Loaded %u glyphs\n",nbGlyphs);
     return 1;
 
 }

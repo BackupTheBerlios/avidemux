@@ -202,15 +202,16 @@ LINK_DIRECTORIES(ADM_userInterfaces/ADM_NONE)
 
 
 TARGET_LINK_LIBRARIES(avidemux2_cli ADM_commonUI )
+TARGET_LINK_LIBRARIES(avidemux2_cli ADM_ocr )
 TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogNone )
 TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogFactoryNone )
 TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogFiltersNone )
 TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogGuiNone )
 
 if(GTK_FOUND)
+TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_commonUI )
 TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_ocrGtk )
 TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_ocr )
-TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_commonUI )
 TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_dialogGtk )
 TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_filtersGtk )
 TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_dialogFactoryGtk )
@@ -220,8 +221,8 @@ TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_commonUI )
 endif(GTK_FOUND)
 
 if(QT4_FOUND)
-TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_ocr )
 TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_commonUI )
+TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_ocr )
 TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_dialogQt4 )
 
 TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_dialogFactoryQt4 )

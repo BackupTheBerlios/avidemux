@@ -151,6 +151,7 @@ extern uint8_t A_autoDrive(Action action);
 int ignore_change;
 
 extern uint8_t ADM_ocr_engine( void);
+extern uint8_t DIA_ocrGen(void);
 uint8_t A_TimeShift(void);
 PARAM_MUX muxMode = MUX_REGULAR;
 int muxParam = 0;
@@ -229,7 +230,8 @@ int nw;
         case ACT_ViewMain: UI_toogleMain();return;
         case ACT_ViewSide: UI_toogleSide();return;
       case ACT_Ocr:
-                ADM_ocr_engine( );
+                DIA_ocrGen(); //
+                //ADM_ocr_engine( );
                 return;
       case ACT_AudioConfigure:
     		audioCodecSelect();

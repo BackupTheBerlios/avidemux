@@ -103,5 +103,11 @@ int32_t UI_readJog(void)
 {
   return 0; 
 }
+#include "ADM_ocr/adm_glyph.h"
+uint8_t ADM_ocr_engine(  vobSubParam *subparam,const char *labelSrt,admGlyph *head)
+{
+  return 0; 
+}
+
 //EOF
 

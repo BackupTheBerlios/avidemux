@@ -79,6 +79,10 @@ uint32_t alternate_mp3_tag=1;
 uint32_t pp_type=3;
 uint32_t pp_value=5;
 uint32_t hzd,vzd,dring;
+
+uint32_t useGlobalGlyph=0;
+char     *globalGlyphName=NULL;
+
 	olddevice=newdevice=AVDM_getCurrentDevice();
 
         // Default pp
@@ -97,6 +101,9 @@ uint32_t hzd,vzd,dring;
         prefs->get(FEATURE_AUTO_BUILDMAP,&autovbr);
         // autoindex
         prefs->get(FEATURE_AUTO_REBUILDINDEX,&autoindex);
+        // Global glyph
+        prefs->get(FEATURE_GLOBAL_GLYPH,&useGlobalGlyph);
+        prefs->get(FEATURE_GLOBAL_GLYPH_NAME,&globalGlyphName);
          // autoindex
         prefs->get(FEATURE_AUTO_UNPACK,&autounpack);
         // Alternate mp3 tag (haali)
@@ -294,7 +301,13 @@ uint32_t hzd,vzd,dring;
                filterPath = ADM_strdup("c:\\");
 #endif
         diaElemDirSelect  entryFilterPath(&filterPath,_("_Filter directory:"),"");
-        
+        /*********************************/
+        diaMenuEntry globalGlyhEntries[]={
+                             {0,       _("No"),NULL}
+                             ,{1,      _("Yes"),NULL}};
+        diaElemMenu  menuGlobaGlyh(&useGlobalGlyph,_("Use _Global GlyphSet:"), sizeof(globalGlyhEntries)/sizeof(diaMenuEntry),globalGlyhEntries,"");
+        diaElemFile  entryGLyphPath(0,&globalGlyphName,_("Gl_yphSet:"),"");
+        menuGlobaGlyh.link(&(globalGlyhEntries[1]),1,&entryGLyphPath);
         /**********************************************************************/
         /* First Tab : user interface */
         diaElem *diaUser[]={&useSysTray,&menuMessage};
@@ -325,14 +338,23 @@ uint32_t hzd,vzd,dring;
         diaElem *diaCpu[]={&multiThread, &menuEncodePriority, &menuIndexPriority, &menuPlaybackPriority};
         diaElemTabs tabCpu("CPU",4,(diaElem **)diaCpu);
         
-        /* seventh Tab : Xfilter */
+        /* 7th Tab : Global Glyph */
+        diaElem *diaGlyph[]={&menuGlobaGlyh,&entryGLyphPath};
+        diaElemTabs tabGlyph(_("Global Glyphset"),2,(diaElem **)diaGlyph);
+        
+        
+        /* 8th Tab : Xfilter */
         diaElem *diaXFilter[]={&loadEx,&entryFilterPath};
         diaElemTabs tabXfilter(_("External Filters"),2,(diaElem **)diaXFilter);
                                     
 // SET
-        diaElemTabs *tabs[]={&tabUser,&tabAuto,&tabInput,&tabOutput,&tabAudio,&tabVideo,&tabCpu,&tabXfilter};
-        if( diaFactoryRunTabs(_("Preferences"),8,tabs))
+        diaElemTabs *tabs[]={&tabUser,&tabAuto,&tabInput,&tabOutput,&tabAudio,&tabVideo,&tabCpu,&tabGlyph,&tabXfilter};
+        if( diaFactoryRunTabs(_("Preferences"),9,tabs))
 	{
+               prefs->set(FEATURE_GLOBAL_GLYPH,useGlobalGlyph);
+                prefs->set(FEATURE_GLOBAL_GLYPH_NAME,globalGlyphName);
+
+          
 		ret=1;
                 // Postproc
                 #undef DOME
