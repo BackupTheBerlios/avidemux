@@ -94,35 +94,31 @@ register_Encoders (void)
 {
   printf ("\n Registering Encoders\n");
   printf ("*********************\n");
+
 #ifdef USE_DIVX
   nb_encoder++;
-  printf ("Divx  encoder registred\n");
+  printf ("DivX encoder registered\n");
 #endif
+
 #ifdef USE_FFMPEG
   nb_encoder++;
-  printf ("Mjpeg encoder registred\n");
-
+  printf ("MJPEG encoder registered\n");
 #endif
+
 #ifdef USE_XX_XVID
-
-  {
     nb_encoder++;
-    printf ("Xvid  encoder registred\n");
-  }
-
+    printf ("Xvid encoder registered\n");
 #endif
+
 #ifdef USE_XVID_4
-
-  {
     nb_encoder++;
-    printf ("Xvid-4  encoder registred\n");
-  }
-
+    printf ("Xvid-4 encoder registered\n");
 #endif
+
 #ifdef USE_FFMPEG
   nb_encoder++;
-  printf ("FFMPEG  encoder registred\n");
+  printf ("FFmpeg encoder registered\n");
 #endif
-  printf ("\n %d encoder registered\n", nb_encoder);
 
+  printf ("\n%d encoder(s) registered\n", nb_encoder);
 }

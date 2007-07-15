@@ -42,6 +42,10 @@
 #include <ADM_assert.h>
 #include "gui_action.hxx"
 
+extern "C" {
+#include "ADM_libraries/ADM_lavcodec/avcodec.h"
+}
+
 extern void HandleAction (Action action);
 void GUI_detransient(void );
 void GUI_retransient(void );
@@ -55,14 +59,16 @@ static gboolean         cb_stack(GtkButton * button, gpointer user_data);
 static gboolean         cb_next(GtkButton * button, gpointer user_data);
 static gboolean 		preview_exit_short (GtkWidget * widget,GdkEvent * event, gpointer user_data);
 
-static uint8_t *rgb_render=NULL,*rgb_alternate=NULL;
+static uint8_t *rgb_render=NULL,*rgb_alternate=NULL,*rgbDisplay=NULL;
 static GtkWidget *dialog=NULL;
-static uint32_t 	uw, uh;
+static uint32_t 	uw, uh,zoomW,zoomH;
 int 			lock;
 uint8_t		needDestroy=0;
 static int      needResponse=0;
 static ColYuvRgb    rgbConv(100,100);
+static ADMImageResizer *resizer=NULL;
 
+extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
 
 //*************************************************************
 // Short cut for filter preview
@@ -70,32 +76,60 @@ static ColYuvRgb    rgbConv(100,100);
 //*************************************************************
 void GUI_PreviewShow(uint32_t w, uint32_t h, uint8_t *data)
 {
-                if(rgb_render)
-                {
-                        printf("\n Warning rgb render not null...\n");
-                        delete [] rgb_render;
-                        delete [] rgb_alternate;
-                        rgb_alternate=NULL;
-                        rgb_render=NULL;
-                }
-                ADM_assert(rgb_render=new uint8_t [w*h*4]);
-                ADM_assert(rgb_alternate=new uint8_t [w*h*4]);
-                uw=w;
-                uh=h;
-                rgbConv.reset(w,h); 
-                dialog=create_dialog1();
-                gtk_register_dialog(dialog);
-                gtk_widget_set_usize (lookup_widget(dialog,"drawingarea1"),w,h);
-                rgbConv.scale(data,rgb_render);
-                gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
-                       GTK_SIGNAL_FUNC(previewRender),    NULL);
-                gtk_dialog_run(GTK_DIALOG(dialog));
-                gtk_unregister_dialog(dialog);
-                gtk_widget_destroy(dialog);
-                delete [] rgb_render;
-                delete [] rgb_alternate;
-                rgb_alternate=NULL;
-                rgb_render=NULL;
+	if(rgb_render)
+	{
+		printf("\nWarning rgb render not null...\n");
+		delete[] rgb_render;
+		delete[] rgb_alternate;
+		rgb_alternate=NULL;
+		rgb_render=NULL;
+	}
+
+	rgb_render=new uint8_t [w*h*4];
+	rgb_alternate=new uint8_t [w*h*4];
+
+	uw=w;
+	uh=h;
+	rgbConv.reset(w,h);
+	rgbConv.scale(data,rgb_render);
+
+	dialog=create_dialog1();
+	gtk_register_dialog(dialog);
+
+	float zoom = UI_calcZoomToFitScreen(GTK_WINDOW(dialog), WID(drawingarea1), w, h);
+
+	zoomW = w * zoom;
+	zoomH = h * zoom;
+
+	gtk_widget_set_usize(WID(drawingarea1), zoomW, zoomH);
+
+	if (zoom < 1)
+	{
+		gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+		resizer = new ADMImageResizer(w, h, zoomW, zoomH, PIX_FMT_RGB32, PIX_FMT_RGB32);
+		rgbDisplay = new uint8_t[zoomW*zoomH*4];
+	}
+	
+	gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
+		   GTK_SIGNAL_FUNC(previewRender), NULL);
+
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_unregister_dialog(dialog);
+	gtk_widget_destroy(dialog);
+
+	delete[] rgb_render;
+	delete[] rgb_alternate;
+
+	if (resizer)
+	{
+		delete resizer;
+		delete rgbDisplay;
+		resizer=NULL;
+		rgbDisplay=NULL;
+	}
+
+	rgb_alternate=NULL;
+	rgb_render=NULL;
 }
 //*************************************************************
 // Init previewer
@@ -212,21 +246,26 @@ void GUI_PreviewEnd(void)
         dialog=NULL;
         needDestroy=0;
 }
+
 void previewRender(void)
 {
+	if(!dialog) return;
 
-if(!dialog) return;
-GUI_RGBDisplay(rgb_render, uw, uh ,lookup_widget(dialog,"drawingarea1"));
-
-
+	if (resizer)
+	{
+		resizer->resize(rgb_render, rgbDisplay);
+		GUI_RGBDisplay(rgbDisplay, zoomW, zoomH, WID(drawingarea1));
+	}
+	else
+		GUI_RGBDisplay(rgb_render, uw, uh, WID(drawingarea1));
 }
+
 gboolean         cb_stack(GtkButton * button, gpointer user_data)
 {
-
-        stacked^=1;
-        return FALSE;
-
+	stacked^=1;
+	return FALSE;
 }
+
 // Called when window is destroyed
 gboolean preview_exit_short (GtkWidget * widget, GdkEvent * event, gpointer user_data)
 {

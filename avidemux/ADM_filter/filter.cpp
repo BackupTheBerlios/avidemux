@@ -81,7 +81,7 @@ void filterCleanUp( void )
 void filterListAll( void )
 {
 char *name;
-	printf("\n Video filters\n");
+	printf("\nVideo filters\n");
 	for(uint32_t i=0;i<nb_video_filter;i++)
 	{
 		name=allfilters[ i].filtername;
@@ -128,7 +128,7 @@ void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable
 
         if(viewable==1)
 	{
-        	aprintf("\n Registred filter %lu: %s",nb_video_filter,name);
+        	aprintf("\nRegistered filter %lu: %s",nb_video_filter,name);
 	}
 }
 void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
@@ -147,7 +147,7 @@ void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
 
         if(viewable==1)
 	{
-        	aprintf("\n Registred filter %lu: %s",nb_video_filter,name);
+        	aprintf("\nRegistered filter %lu: %s",nb_video_filter,name);
 	}
 
 
