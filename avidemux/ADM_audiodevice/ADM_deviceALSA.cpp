@@ -214,6 +214,7 @@ If your hardware does not support a buffersize of 2^n, you can use the function 
 uint8_t alsaAudioDevice::play( uint32_t len, float *data )
 {
 	int ret;
+        int16_t *pcm;
 	/* Write num_frames frames from buffer data to    */
 	/* the PCM device pointed to by pcm_handle.       */
 	/* Returns the number of frames actually written. */
@@ -222,10 +223,10 @@ uint8_t alsaAudioDevice::play( uint32_t len, float *data )
 
 	if(2!=_init) return 0;
         len=len/_channels;
-
+        pcm=(int16_t *)data;
     	while(1)
 	{
-        	ret=snd_pcm_writei(pcm_handle, data, len);
+        	ret=snd_pcm_writei(pcm_handle, pcm, len);
 		if(ret==(int)len)
 		{
 			return 1;
@@ -252,8 +253,9 @@ uint8_t alsaAudioDevice::play( uint32_t len, float *data )
 		}
 		else
 		{
-			if(len<2) return 1;
+			//if(len<2) return 1;
 			len-=ret;
+                        pcm+=(ret*_channels);
 		}
 	}
 	return 1;
