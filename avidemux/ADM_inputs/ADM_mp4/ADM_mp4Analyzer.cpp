@@ -403,34 +403,47 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
            case ADM_MP4_CTTS: // Composition time to sample             
             {
                 uint32_t n,i,j,k,v;
+                
                   printf("ctts:%lu\n",son.read32()); // version & flags
                   n=son.read32();
                   if(n==1) // all the same , ignore
                   {
                     break;
                   }
-                info.Ctts=new uint32_t[n*4]; // keep a safe margin
-            
+                uint32_t *values=new uint32_t [n];
+                uint32_t *count=new uint32_t [n];
                 for(i=0;i<n;i++)
                 {
-                    j=son.read32();
-                    v=son.read32();
+                    count[i]=son.read32();
+                    values[i]=son.read32();
+                }
+                uint32_t sum=0;
+                for(i=0;i<n;i++)
+                {
+                    sum+=count[i];
+                }
+                info.Ctts=new uint32_t[sum+1]; // keep a safe margin
+                
+                for(i=0;i<n;i++)
+                {
                     if(i<20)
                     {
-                        adm_printf(ADM_PRINT_VERY_VERBOSE,"Ctts: nb: %u (%x) val:%u (%x)\n",j,j,v,v);   
+                        adm_printf(ADM_PRINT_VERY_VERBOSE,"Ctts: nb: %u (%x) val:%u (%x)\n",count[i],count[i],values[i],values[i]);   
                     }
-                    for(k=0;k<j;k++)
+                    for(k=0;k<count[i];k++)
                     {
-                        info.Ctts[info.nbCtts++]=v;
+                        info.Ctts[info.nbCtts++]=values[i];
                     }
                 }
+                delete [] values;
+                delete [] count;
                 if(!info.nbCtts)
                 {
                     delete [] info.Ctts;
                     info.Ctts=NULL;
                     printf("Destroying Ctts, seems invalid\n");
                 }
-                ADM_assert(info.nbCtts<n*4);
+                ADM_assert(info.nbCtts<sum+1);
                 printf("Found %u elements\n",info.nbCtts);
             }
             break;  
