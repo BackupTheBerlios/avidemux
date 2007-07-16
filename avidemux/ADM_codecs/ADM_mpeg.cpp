@@ -83,15 +83,16 @@ typedef struct yv12_instance_s
   uint8_t *buffer;
 } yv12_instance_t;
 
-static uint8_t *iBuff[3];
-static uint8_t *oBuff[3];
-static int strideTab[3], strideTab2[3];
-
-decoderMpeg::~decoderMpeg ()
+decoderMpeg::~decoderMpeg()
 {
-#warning clean up libmpeg2 here
-  kill_codec ();
-  delete[]unpackBuffer;
+	kill_codec();
+	delete[] unpackBuffer;
+
+	if (_seqHeader)
+	{
+		delete[] _seqHeader;
+		_seqHeader = NULL;
+	}
 }
 //____________________________________
 uint8_t decoderMpeg::isMpeg1 (void)
@@ -116,6 +117,7 @@ uint8_t decoderMpeg::kill_codec (void)
   mpeg2_close (MPEG2DEC);
   _decoder = NULL;
   yv12_close (output);
+  output = NULL;
 
   return 1;
 }
@@ -132,52 +134,48 @@ ________________________________________________________________________________
 		Constructor for mpeg decoder
 ______________________________________________________________________________________
 */
-decoderMpeg::decoderMpeg (uint32_t w, uint32_t h, uint32_t extraLen, uint8_t * extraData):decoders (w,
-	  h)
+decoderMpeg::decoderMpeg (uint32_t w, uint32_t h, uint32_t extraLen, uint8_t * extraData) : decoders (w,h)
 {
-  mpeg2_decoder_t *
-    dec;
-  uint32_t wmb, hmb;
-  yv12_instance_t *
-    inst;
-  _seqLen = extraLen;
-  if (extraLen)
-    {
-      _seqHeader = new uint8_t[extraLen];
-      memcpy (_seqHeader, extraData, extraLen);
-    }
-  else
-    {
-      _seqHeader = NULL;
-    }
-  // store for future use
-  _seqFound = 0;
-  par_width=par_height=1;
-  postprocessed = NULL;
-  // now init libmpeg2
-  printf ("\n initializing mpeg2 decoder %lu x %lu\n", _w, _h);
-  output = yv12_open ();
-  inst = (yv12_instance_t *) output;
-  unpackBuffer = new uint8_t[(w * h * 9) >> 1];
-  inst->buffer = unpackBuffer;
-  _decoder = mpeg2_init ();
-  dec = &((MPEG2DEC)->decoder);
-  wmb = (_w + 15) >> 4;;
-  hmb = (_h + 15) >> 4;;
-  dec->quant_stride = wmb;
-  dec->quant = (int8_t *) ADM_alloc ((wmb * hmb) * sizeof (int8_t));
-  //
-  feedData (extraLen, _seqHeader);
-  feedData (extraLen, _seqHeader);
+	mpeg2_decoder_t *dec;
+	uint32_t wmb, hmb;
+	yv12_instance_t *inst;
 
-  // Post processing settings
-  //___________________________
+	_seqLen = extraLen;
 
-  _swapUV = 0;
-  // Post Proc is disabled by default
+	if (extraLen)
+	{
+		_seqHeader = new uint8_t[extraLen];
+		memcpy (_seqHeader, extraData, extraLen);
+	}
+	else
+		_seqHeader = NULL;
 
-  printf ("\n done\n");
+	// store for future use
+	_seqFound = 0;
+	par_width=par_height=1;
 
+	printf ("\nInitializing MPEG2 decoder %lu x %lu\n", _w, _h);
+	output = yv12_open ();
+	inst = (yv12_instance_t *) output;
+	unpackBuffer = new uint8_t[(w * h * 9) >> 1];
+	inst->buffer = unpackBuffer;
+	_decoder = mpeg2_init();
+	dec = &((MPEG2DEC)->decoder);
+
+	wmb = (_w + 15) >> 4;;
+	hmb = (_h + 15) >> 4;;
+
+	dec->quant_stride = wmb;
+	dec->quant = (int8_t *)ADM_alloc ((wmb * hmb) * sizeof (int8_t));
+
+	feedData (extraLen, _seqHeader);
+	feedData (extraLen, _seqHeader);
+
+	// Post processing settings
+	_swapUV = 0;
+	// Post Proc is disabled by default
+
+	printf ("\nDone\n");
 }
 /*------------------------------------------------------------------*/
 uint8_t
@@ -411,8 +409,8 @@ yv12_setup (vo_instance_t * _instance, unsigned int width,
 void
 yv12_close (vo_instance_t * _instance)
 {
-  UNUSED_ARG (_instance);
-  printf (" yv12close called\n");
+	delete _instance;
+	printf ("yv12close called\n");
 }
 
 /**
