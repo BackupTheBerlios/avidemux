@@ -31,6 +31,8 @@ int main(void)
     DECLARE_DECODER (MSMPEG4V3, msmpeg4v3);
     DECLARE_DECODER(MJPEGB, mjpegb);
     DECLARE_DECODER (MJPEG, mjpeg);
+    DECLARE_DECODER(WMAV2, wmav2);
+    DECLARE_DECODER (DVVIDEO, dvvideo);
 
 #undef DECLARE_DECODER
 #define DECLARE_DECODER(a,b); printf("#define ENABLE_"#a"_DECODER 0\n"); 
@@ -111,7 +113,6 @@ int main(void)
     DECLARE_DECODER (ASV1, asv1);
     DECLARE_DECODER (ASV2, asv2);
     DECLARE_DECODER (BMP, bmp);
-    DECLARE_DECODER (DVVIDEO, dvvideo);
     DECLARE_DECODER (FFV1, ffv1);
     DECLARE_DECODER (FFVHUFF, ffvhuff);
     DECLARE_DECODER (FLASHSV, flashsv);
@@ -147,7 +148,6 @@ int main(void)
     DECLARE_DECODER (SONIC, sonic);
     DECLARE_DECODER (VORBIS, vorbis);
     DECLARE_DECODER(WMAV1, wmav1);
-    DECLARE_DECODER(WMAV2, wmav2);
     DECLARE_DECODER (PCM_ALAW, pcm_alaw);
     DECLARE_DECODER (PCM_MULAW, pcm_mulaw);
     DECLARE_DECODER (PCM_S8, pcm_s8);
@@ -220,6 +220,7 @@ int main(void)
     DECLARE_ENCODER (MPEG4, mpeg4);
     DECLARE_ENCODER (SNOW, snow);
     DECLARE_ENCODER (MP2, mp2);
+    DECLARE_ENCODER (DVVIDEO, dvvideo);
 
 #undef DECLARE_ENCODER
 #define DECLARE_ENCODER(a,b); printf("#define ENABLE_"#a"_ENCODER 0\n"); 
@@ -240,7 +241,6 @@ int main(void)
  DECLARE_ENCODER (ASV1, asv1);
     DECLARE_ENCODER (ASV2, asv2);
     DECLARE_ENCODER (BMP, bmp);
-    DECLARE_ENCODER (DVVIDEO, dvvideo);
     DECLARE_ENCODER (FLASHSV, flashsv);
     DECLARE_ENCODER (FLV, flv);
     DECLARE_ENCODER (GIF, gif);

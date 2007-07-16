@@ -27,6 +27,8 @@ SET(${ADM_LIB}_SRCS
                 mpeg12enc.c mpegaudioenc.c
                 ac3enc.c ac3.c ac3tab.c
                 mjpegenc.c mjpegdec.c
+                wma.c
+
 
 )
 # ADD x86 ones
