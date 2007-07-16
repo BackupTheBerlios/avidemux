@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -39,7 +38,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "common.h"
 #include "avcodec.h"
 
 #ifdef CONFIG_ZLIB
@@ -186,7 +184,7 @@ static int decode_rle(CamtasiaContext *c, unsigned int srcsize)
  */
 static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8_t *buf, int buf_size)
 {
-    CamtasiaContext * const c = (CamtasiaContext *)avctx->priv_data;
+    CamtasiaContext * const c = avctx->priv_data;
     unsigned char *encoded = (unsigned char *)buf;
     unsigned char *outptr;
 #ifdef CONFIG_ZLIB
@@ -257,11 +255,10 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
  */
 static int decode_init(AVCodecContext *avctx)
 {
-    CamtasiaContext * const c = (CamtasiaContext *)avctx->priv_data;
+    CamtasiaContext * const c = avctx->priv_data;
     int zret; // Zlib return code
 
     c->avctx = avctx;
-    avctx->has_b_frames = 0;
 
     c->pic.data[0] = NULL;
     c->height = avctx->height;
@@ -283,7 +280,7 @@ static int decode_init(AVCodecContext *avctx)
     case 24:
              avctx->pix_fmt = PIX_FMT_BGR24;
              break;
-    case 32: avctx->pix_fmt = PIX_FMT_RGBA32; break;
+    case 32: avctx->pix_fmt = PIX_FMT_RGB32; break;
     default: av_log(avctx, AV_LOG_ERROR, "Camtasia error: unknown depth %i bpp\n", avctx->bits_per_sample);
              return -1;
     }
@@ -321,7 +318,7 @@ static int decode_init(AVCodecContext *avctx)
  */
 static int decode_end(AVCodecContext *avctx)
 {
-    CamtasiaContext * const c = (CamtasiaContext *)avctx->priv_data;
+    CamtasiaContext * const c = avctx->priv_data;
 
     av_freep(&c->decomp_buf);
 

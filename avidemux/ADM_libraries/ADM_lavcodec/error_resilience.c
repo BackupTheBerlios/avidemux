@@ -30,7 +30,6 @@
 #include "avcodec.h"
 #include "dsputil.h"
 #include "mpegvideo.h"
-#include "common.h"
 
 static void decode_mb(MpegEncContext *s){
     s->dest[0] = s->current_picture.data[0] + (s->mb_y * 16* s->linesize  ) + s->mb_x * 16;
@@ -109,7 +108,7 @@ static void filter181(int16_t *data, int width, int height, int stride){
 }
 
 /**
- * guess the dc of blocks which dont have a undamaged dc
+ * guess the dc of blocks which do not have an undamaged dc
  * @param w     width in 8 pixel blocks
  * @param h     height in 8 pixel blocks
  */
@@ -612,11 +611,16 @@ void ff_er_frame_start(MpegEncContext *s){
  *               error of the same type occured
  */
 void ff_er_add_slice(MpegEncContext *s, int startx, int starty, int endx, int endy, int status){
-    const int start_i= clip(startx + starty * s->mb_width    , 0, s->mb_num-1);
-    const int end_i  = clip(endx   + endy   * s->mb_width    , 0, s->mb_num);
+    const int start_i= av_clip(startx + starty * s->mb_width    , 0, s->mb_num-1);
+    const int end_i  = av_clip(endx   + endy   * s->mb_width    , 0, s->mb_num);
     const int start_xy= s->mb_index2xy[start_i];
     const int end_xy  = s->mb_index2xy[end_i];
     int mask= -1;
+
+    if(start_i > end_i || start_xy > end_xy){
+        av_log(s->avctx, AV_LOG_ERROR, "internal error, slice end before start\n");
+        return;
+    }
 
     if(!s->error_resilience) return;
 

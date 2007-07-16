@@ -26,6 +26,11 @@
 #ifndef BITSTREAM_H
 #define BITSTREAM_H
 
+#include <stdint.h>
+#include <stdlib.h>
+#include <assert.h>
+#include "common.h"
+#include "bswap.h"
 #include "log.h"
 
 #if defined(ALT_BITSTREAM_READER_LE) && !defined(ALT_BITSTREAM_READER)
@@ -132,6 +137,7 @@ static inline void flush_put_bits(PutBitContext *s)
 
 void align_put_bits(PutBitContext *s);
 void ff_put_string(PutBitContext * pbc, char *s, int put_zero);
+void ff_copy_bits(PutBitContext *pb, uint8_t *src, int length);
 
 /* bit input */
 /* buffer, buffer_end and size_in_bits must be present and used by every reader */
@@ -166,7 +172,7 @@ typedef struct RL_VLC_ELEM {
     uint8_t run;
 } RL_VLC_ELEM;
 
-#if defined(ARCH_SPARC) || defined(ARCH_ARMV4L) || defined(ARCH_MIPS)
+#if defined(ARCH_SPARC) || defined(ARCH_ARMV4L) || defined(ARCH_MIPS) || defined(ARCH_BFIN)
 #define UNALIGNED_STORES_ARE_BAD
 #endif
 
@@ -335,8 +341,8 @@ static inline void skip_put_bytes(PutBitContext *s, int n){
 }
 
 /**
- * skips the given number of bits.
- * must only be used if the actual values in the bitstream dont matter
+ * Skips the given number of bits.
+ * Must only be used if the actual values in the bitstream do not matter.
  */
 static inline void skip_put_bits(PutBitContext *s, int n){
 #ifdef ALT_BITSTREAM_WRITER
@@ -662,7 +668,7 @@ static inline int get_sbits(GetBitContext *s, int n){
 }
 
 /**
- * reads 0-17 bits.
+ * reads 1-17 bits.
  * Note, the alt bitstream reader can read up to 25 bits, but the libmpeg2 reader can't
  */
 static inline unsigned int get_bits(GetBitContext *s, int n){
@@ -676,7 +682,7 @@ static inline unsigned int get_bits(GetBitContext *s, int n){
 }
 
 /**
- * shows 0-17 bits.
+ * shows 1-17 bits.
  * Note, the alt bitstream reader can read up to 25 bits, but the libmpeg2 reader can't
  */
 static inline unsigned int show_bits(GetBitContext *s, int n){
@@ -799,9 +805,19 @@ static inline void align_get_bits(GetBitContext *s)
     if(n) skip_bits(s, n);
 }
 
-int init_vlc(VLC *vlc, int nb_bits, int nb_codes,
+#define init_vlc(vlc, nb_bits, nb_codes,\
+                 bits, bits_wrap, bits_size,\
+                 codes, codes_wrap, codes_size,\
+                 flags)\
+        init_vlc_sparse(vlc, nb_bits, nb_codes,\
+                 bits, bits_wrap, bits_size,\
+                 codes, codes_wrap, codes_size,\
+                 NULL, 0, 0, flags)
+
+int init_vlc_sparse(VLC *vlc, int nb_bits, int nb_codes,
              const void *bits, int bits_wrap, int bits_size,
              const void *codes, int codes_wrap, int codes_size,
+             const void *symbols, int symbols_wrap, int symbols_size,
              int flags);
 #define INIT_VLC_USE_STATIC 1
 #define INIT_VLC_LE         2
@@ -873,7 +889,7 @@ void free_vlc(VLC *vlc);
  * parses a vlc code, faster then get_vlc()
  * @param bits is the number of bits which will be read at once, must be
  *             identical to nb_bits in init_vlc()
- * @param max_depth is the number of times bits bits must be readed to completly
+ * @param max_depth is the number of times bits bits must be read to completely
  *                  read the longest vlc code
  *                  = (max_vlc_length + bits - 1) / bits
  */
@@ -938,10 +954,10 @@ static inline int get_xbits_trace(GetBitContext *s, int n, char *file, const cha
 #define get_vlc(s, vlc)            get_vlc_trace(s, (vlc)->table, (vlc)->bits, 3, __FILE__, __PRETTY_FUNCTION__, __LINE__)
 #define get_vlc2(s, tab, bits, max) get_vlc_trace(s, tab, bits, max, __FILE__, __PRETTY_FUNCTION__, __LINE__)
 
-#define tprintf(...) av_log(NULL, AV_LOG_DEBUG, __VA_ARGS__)
+#define tprintf(p, ...) av_log(p, AV_LOG_DEBUG, __VA_ARGS__)
 
 #else //TRACE
-#define tprintf(...) {}
+#define tprintf(p, ...) {}
 #endif
 
 static inline int decode012(GetBitContext *gb){

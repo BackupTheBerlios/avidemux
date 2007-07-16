@@ -5,7 +5,6 @@ include(AdmLib)
 SET(ADM_LIB ADM_lavcodec)
 #
 SET(${ADM_LIB}_SRCS 
-ac3enc.c  
 		adpcm.c 	allcodecs.c 	cyuv.c 	dsputil.c 	dv.c 
 		error_resilience.c 		fdctref.c 	fft.c 	h263.c 	h263dec.c 	huffyuv.c 	imgconvert.c 
 		jfdctfst.c 	jfdctint.c 	jrevdct.c 	mace.c 	mdct.c 	 	mjpeg.c 
@@ -18,7 +17,17 @@ ac3enc.c
 		truemotion1.c flac.c g726.c 	qtrle.c lcl.c 	snow.c  
 		rangecoder.c bitstream.c h264idct.c h261.c amr.c tscc.c 
 		resample2.c pthread.c qdm2.c bitstream_filter.c eval.c 
-		vc1.c vc1dsp.c vp56.c vp56data.c vp6.c vp5.c indeo2.c smacker.c  opt.c
+		vc1.c vc1dsp.c vp56.c  vp6.c vp5.c indeo2.c smacker.c  opt.c
+                fraps.c dnxhddata.h  dnxhddec.c
+                mpeg12data.c  mpegaudiodata.c  msmpeg4data.c   vc1data.c   vp56data.c mjpegbdec.c
+                h263_parser.c
+                h264_parser.c
+                mpeg4video_parser.c
+                mpegvideo_enc.c
+                mpeg12enc.c mpegaudioenc.c
+                ac3enc.c ac3.c ac3tab.c
+                mjpegenc.c mjpegdec.c
+
 )
 # ADD x86 ones
 
@@ -38,5 +47,5 @@ ADD_ADM_LIB(${ADM_LIB} ADM_libraries)
 
 
 ################################
-add_definitions(-I.. -DHAVE_AV_CONFIG_H  -O3 -I../.. -I../ADM_lavutil -Drestrict=__restrict__ -fomit-frame-pointer)
+add_definitions(-I.. -DHAVE_AV_CONFIG_H  -O3 -I../.. -I../ADM_lavutil -Drestrict=__restrict__ -fomit-frame-pointer -include ffconf.h)
 

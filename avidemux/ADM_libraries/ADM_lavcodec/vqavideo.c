@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -69,7 +68,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "common.h"
 #include "avcodec.h"
 #include "dsputil.h"
 
@@ -133,13 +131,12 @@ typedef struct VqaContext {
 
 static int vqa_decode_init(AVCodecContext *avctx)
 {
-    VqaContext *s = (VqaContext *)avctx->priv_data;
+    VqaContext *s = avctx->priv_data;
     unsigned char *vqa_header;
     int i, j, codebook_index;;
 
     s->avctx = avctx;
     avctx->pix_fmt = PIX_FMT_PAL8;
-    avctx->has_b_frames = 0;
     dsputil_init(&s->dsp, avctx);
 
     /* make sure the extradata made it */
@@ -572,7 +569,7 @@ static int vqa_decode_frame(AVCodecContext *avctx,
                             void *data, int *data_size,
                             uint8_t *buf, int buf_size)
 {
-    VqaContext *s = (VqaContext *)avctx->priv_data;
+    VqaContext *s = avctx->priv_data;
 
     s->buf = buf;
     s->size = buf_size;
@@ -600,7 +597,7 @@ static int vqa_decode_frame(AVCodecContext *avctx,
 
 static int vqa_decode_end(AVCodecContext *avctx)
 {
-    VqaContext *s = (VqaContext *)avctx->priv_data;
+    VqaContext *s = avctx->priv_data;
 
     av_free(s->codebook);
     av_free(s->next_codebook_buffer);

@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
- *
+ */
+
+/*
  * How to use this decoder:
  * SVQ3 data is transported within Apple Quicktime files. Quicktime files
  * have stsd atoms to describe media trak properties. A stsd atom for a
@@ -37,7 +38,6 @@
  * You will know you have these parameters passed correctly when the decoder
  * correctly decodes this file:
  *  ftp://ftp.mplayerhq.hu/MPlayer/samples/V-codecs/SVQ3/Vertical400kbit.sorenson3.mov
- *
  */
 
 /**
@@ -183,8 +183,8 @@ static void svq3_add_idct_c (uint8_t *dst, DCTELEM *block, int stride, int qp, i
 static void pred4x4_down_left_svq3_c(uint8_t *src, uint8_t *topright, int stride){
     LOAD_TOP_EDGE
     LOAD_LEFT_EDGE
-    const __attribute__((unused)) int unu0= t0;
-    const __attribute__((unused)) int unu1= l0;
+    const av_unused int unu0= t0;
+    const av_unused int unu1= l0;
 
     src[0+0*stride]=(l1 + t1)>>1;
     src[1+0*stride]=
@@ -285,8 +285,8 @@ static inline void svq3_mc_dir_part (MpegEncContext *s,
       emu = 1;
     }
 
-    mx = clip (mx, -16, (s->h_edge_pos - width  + 15));
-    my = clip (my, -16, (s->v_edge_pos - height + 15));
+    mx = av_clip (mx, -16, (s->h_edge_pos - width  + 15));
+    my = av_clip (my, -16, (s->v_edge_pos - height + 15));
   }
 
   /* form component predictions */
@@ -361,8 +361,8 @@ static inline int svq3_mc_dir (H264Context *h, int size, int mode, int dir, int 
       }
 
       /* clip motion vector prediction to frame border */
-      mx = clip (mx, extra_width - 6*x, h_edge_pos - 6*x);
-      my = clip (my, extra_width - 6*y, v_edge_pos - 6*y);
+      mx = av_clip (mx, extra_width - 6*x, h_edge_pos - 6*x);
+      my = av_clip (my, extra_width - 6*y, v_edge_pos - 6*y);
 
       /* get (optional) motion vector differential */
       if (mode == PREDICT_MODE) {
@@ -480,7 +480,6 @@ static int svq3_decode_mb (H264Context *h, unsigned int mb_type) {
         N??11111
         N??11111
         N??11111
-        N
     */
 
     for (m=0; m < 2; m++) {
@@ -808,7 +807,7 @@ static int svq3_decode_frame (AVCodecContext *avctx,
     h->halfpel_flag = 1;
     h->thirdpel_flag = 1;
     h->unknown_svq3_flag = 0;
-    h->chroma_qp = 4;
+    h->chroma_qp[0] = h->chroma_qp[1] = 4;
 
     if (MPV_common_init (s) < 0)
       return -1;
@@ -826,7 +825,7 @@ static int svq3_decode_frame (AVCodecContext *avctx,
     }
 
     /* if a match was found, parse the extra data */
-    if (!memcmp (extradata, "SEQH", 4)) {
+    if (extradata && !memcmp (extradata, "SEQH", 4)) {
 
       GetBitContext gb;
 
@@ -892,11 +891,11 @@ static int svq3_decode_frame (AVCodecContext *avctx,
   s->current_picture.pict_type = s->pict_type;
   s->current_picture.key_frame = (s->pict_type == I_TYPE);
 
-  /* skip b frames if we dont have reference frames */
+  /* Skip B-frames if we do not have reference frames. */
   if (s->last_picture_ptr == NULL && s->pict_type == B_TYPE) return 0;
-  /* skip b frames if we are in a hurry */
+  /* Skip B-frames if we are in a hurry. */
   if (avctx->hurry_up && s->pict_type == B_TYPE) return 0;
-  /* skip everything if we are in a hurry >= 5 */
+  /* Skip everything if we are in a hurry >= 5. */
   if (avctx->hurry_up >= 5) return 0;
   if(  (avctx->skip_frame >= AVDISCARD_NONREF && s->pict_type==B_TYPE)
      ||(avctx->skip_frame >= AVDISCARD_NONKEY && s->pict_type!=I_TYPE)
@@ -910,7 +909,8 @@ static int svq3_decode_frame (AVCodecContext *avctx,
       s->next_p_frame_damaged = 0;
   }
 
-  frame_start (h);
+  if (frame_start (h) < 0)
+    return -1;
 
   if (s->pict_type == B_TYPE) {
     h->frame_num_offset = (h->slice_num - h->prev_frame_num);
@@ -938,7 +938,8 @@ static int svq3_decode_frame (AVCodecContext *avctx,
       int j;
       for(j=-1; j<4; j++)
         h->ref_cache[m][scan8[0] + 8*i + j]= 1;
-      h->ref_cache[m][scan8[0] + 8*i + j]= PART_NOT_AVAILABLE;
+      if(i<3)
+        h->ref_cache[m][scan8[0] + 8*i + j]= PART_NOT_AVAILABLE;
     }
   }
 
@@ -992,7 +993,7 @@ static int svq3_decode_frame (AVCodecContext *avctx,
 
   avctx->frame_number = s->picture_number - 1;
 
-  /* dont output the last pic after seeking */
+  /* Do not output the last pic after seeking. */
   if (s->last_picture_ptr || s->low_delay) {
     *data_size = sizeof(AVFrame);
   }

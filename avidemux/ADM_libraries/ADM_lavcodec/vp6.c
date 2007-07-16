@@ -4,6 +4,10 @@
  *
  * Copyright (C) 2006  Aurelien Jacobs <aurel@gnuage.org>
  *
+ * The VP6F decoder accepts an optional 1 byte extradata. It is composed of:
+ *  - upper 4bits: difference between encoded width and visible width
+ *  - lower 4bits: difference between encoded height and visible height
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -18,12 +22,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
- *
- * The VP6F decoder accept an optional 1 byte extradata. It is composed of:
- *  - upper 4bits: difference between encoded width and visible width
- *  - lower 4bits: difference between encoded height and visible height
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include <stdlib.h>
@@ -50,10 +49,10 @@ static int vp6_parse_header(vp56_context_t *s, uint8_t *buf, int buf_size,
     int res = 1;
     int separated_coeff = buf[0] & 1;
 
-    s->frames[VP56_FRAME_CURRENT].key_frame = !(buf[0] & 0x80);
+    s->framep[VP56_FRAME_CURRENT]->key_frame = !(buf[0] & 0x80);
     vp56_init_dequant(s, (buf[0] >> 1) & 0x3F);
 
-    if (s->frames[VP56_FRAME_CURRENT].key_frame) {
+    if (s->framep[VP56_FRAME_CURRENT]->key_frame) {
         sub_version = buf[1] >> 3;
         if (sub_version > 8)
             return 0;
@@ -205,7 +204,7 @@ static void vp6_parse_coeff_models(vp56_context_t *s)
             if (vp56_rac_get_prob(c, vp6_dccv_pct[pt][node])) {
                 def_prob[node] = vp56_rac_gets_nn(c, 7);
                 s->coeff_model_dccv[pt][node] = def_prob[node];
-            } else if (s->frames[VP56_FRAME_CURRENT].key_frame) {
+            } else if (s->framep[VP56_FRAME_CURRENT]->key_frame) {
                 s->coeff_model_dccv[pt][node] = def_prob[node];
             }
 
@@ -228,7 +227,7 @@ static void vp6_parse_coeff_models(vp56_context_t *s)
                     if (vp56_rac_get_prob(c, vp6_ract_pct[ct][pt][cg][node])) {
                         def_prob[node] = vp56_rac_gets_nn(c, 7);
                         s->coeff_model_ract[pt][ct][cg][node] = def_prob[node];
-                    } else if (s->frames[VP56_FRAME_CURRENT].key_frame) {
+                    } else if (s->framep[VP56_FRAME_CURRENT]->key_frame) {
                         s->coeff_model_ract[pt][ct][cg][node] = def_prob[node];
                     }
 
@@ -236,7 +235,7 @@ static void vp6_parse_coeff_models(vp56_context_t *s)
     for (pt=0; pt<2; pt++)
         for (ctx=0; ctx<3; ctx++)
             for (node=0; node<5; node++)
-                s->coeff_model_dcct[pt][ctx][node] = clip(((s->coeff_model_dccv[pt][node] * vp6_dccv_lc[ctx][node][0] + 128) >> 8) + vp6_dccv_lc[ctx][node][1], 1, 255);
+                s->coeff_model_dcct[pt][ctx][node] = av_clip(((s->coeff_model_dccv[pt][node] * vp6_dccv_lc[ctx][node][0] + 128) >> 8) + vp6_dccv_lc[ctx][node][1], 1, 255);
 }
 
 static void vp6_parse_vector_adjustment(vp56_context_t *s, vp56_mv_t *vect)
@@ -299,11 +298,6 @@ static void vp6_parse_coeff(vp56_context_t *s)
         for (coeff_idx=0; coeff_idx<64; ) {
             if ((coeff_idx>1 && ct==0) || vp56_rac_get_prob(c, model2[0])) {
                 /* parse a coeff */
-                if (coeff_idx == 0) {
-                    s->left_block[vp56_b6to4[b]].not_null_dc = 1;
-                    s->above_blocks[s->above_block_idx[b]].not_null_dc = 1;
-                }
-
                 if (vp56_rac_get_prob(c, model2[2])) {
                     if (vp56_rac_get_prob(c, model2[3])) {
                         idx = vp56_rac_get_tree(c, vp56_pc_tree, model);
@@ -331,10 +325,7 @@ static void vp6_parse_coeff(vp56_context_t *s)
             } else {
                 /* parse a run */
                 ct = 0;
-                if (coeff_idx == 0) {
-                    s->left_block[vp56_b6to4[b]].not_null_dc = 0;
-                    s->above_blocks[s->above_block_idx[b]].not_null_dc = 0;
-                } else {
+                if (coeff_idx > 0) {
                     if (!vp56_rac_get_prob(c, model2[1]))
                         break;
 
@@ -349,6 +340,9 @@ static void vp6_parse_coeff(vp56_context_t *s)
             cg = vp6_coeff_groups[coeff_idx+=run];
             model = model2 = s->coeff_model_ract[pt][ct][cg];
         }
+
+        s->left_block[vp56_b6to4[b]].not_null_dc =
+        s->above_blocks[s->above_block_idx[b]].not_null_dc = !!s->block_coeff[b][0];
     }
 }
 
@@ -380,14 +374,6 @@ static int vp6_block_variance(uint8_t *src, int stride)
     return (16*square_sum - sum*sum) >> 8;
 }
 
-static void vp6_filter_hv2(vp56_context_t *s, uint8_t *dst, uint8_t *src,
-                           int stride, int delta, int16_t weight)
-{
-    s->dsp.put_pixels_tab[1][0](dst, src, stride, 8);
-    s->dsp.biweight_h264_pixels_tab[3](dst, src+delta, stride, 2,
-                                       8-weight, weight, 0);
-}
-
 static void vp6_filter_hv4(uint8_t *dst, uint8_t *src, int stride,
                            int delta, const int16_t *weights)
 {
@@ -395,7 +381,7 @@ static void vp6_filter_hv4(uint8_t *dst, uint8_t *src, int stride,
 
     for (y=0; y<8; y++) {
         for (x=0; x<8; x++) {
-            dst[x] = clip_uint8((  src[x-delta  ] * weights[0]
+            dst[x] = av_clip_uint8((  src[x-delta  ] * weights[0]
                                  + src[x        ] * weights[1]
                                  + src[x+delta  ] * weights[2]
                                  + src[x+2*delta] * weights[3] + 64) >> 7);
@@ -409,18 +395,8 @@ static void vp6_filter_diag2(vp56_context_t *s, uint8_t *dst, uint8_t *src,
                              int stride, int h_weight, int v_weight)
 {
     uint8_t *tmp = s->edge_emu_buffer+16;
-    int x, xmax;
-
-    s->dsp.put_pixels_tab[1][0](tmp, src, stride, 8);
-    s->dsp.biweight_h264_pixels_tab[3](tmp, src+1, stride, 2,
-                                       8-h_weight, h_weight, 0);
-    /* we need a 8x9 block to do vertical filter, so compute one more line */
-    for (x=8*stride, xmax=x+8; x<xmax; x++)
-        tmp[x] = (src[x]*(8-h_weight) + src[x+1]*h_weight + 4) >> 3;
-
-    s->dsp.put_pixels_tab[1][0](dst, tmp, stride, 8);
-    s->dsp.biweight_h264_pixels_tab[3](dst, tmp+stride, stride, 2,
-                                       8-v_weight, v_weight, 0);
+    s->dsp.put_h264_chroma_pixels_tab[0](tmp, src, stride, 9, h_weight, 0);
+    s->dsp.put_h264_chroma_pixels_tab[0](dst, tmp, stride, 8, 0, v_weight);
 }
 
 static void vp6_filter_diag4(uint8_t *dst, uint8_t *src, int stride,
@@ -434,7 +410,7 @@ static void vp6_filter_diag4(uint8_t *dst, uint8_t *src, int stride,
 
     for (y=0; y<11; y++) {
         for (x=0; x<8; x++) {
-            t[x] = clip_uint8((  src[x-1] * h_weights[0]
+            t[x] = av_clip_uint8((  src[x-1] * h_weights[0]
                                + src[x  ] * h_weights[1]
                                + src[x+1] * h_weights[2]
                                + src[x+2] * h_weights[3] + 64) >> 7);
@@ -446,7 +422,7 @@ static void vp6_filter_diag4(uint8_t *dst, uint8_t *src, int stride,
     t = tmp + 8;
     for (y=0; y<8; y++) {
         for (x=0; x<8; x++) {
-            dst[x] = clip_uint8((  t[x-8 ] * v_weights[0]
+            dst[x] = av_clip_uint8((  t[x-8 ] * v_weights[0]
                                  + t[x   ] * v_weights[1]
                                  + t[x+8 ] * v_weights[2]
                                  + t[x+16] * v_weights[3] + 64) >> 7);
@@ -492,24 +468,16 @@ static void vp6_filter(vp56_context_t *s, uint8_t *dst, uint8_t *src,
         } else if (!x8) {               /* above or below combine */
             vp6_filter_hv4(dst, src+offset1, stride, stride,
                            vp6_block_copy_filter[select][y8]);
-        } else if ((mv.x^mv.y) >> 31) { /* lower-left or upper-right combine */
-            vp6_filter_diag4(dst, src+offset1-1, stride,
-                             vp6_block_copy_filter[select][x8],
-                             vp6_block_copy_filter[select][y8]);
-        } else {                        /* lower-right or upper-left combine */
-            vp6_filter_diag4(dst, src+offset1, stride,
+        } else {
+            vp6_filter_diag4(dst, src+offset1 + ((mv.x^mv.y)>>31), stride,
                              vp6_block_copy_filter[select][x8],
                              vp6_block_copy_filter[select][y8]);
         }
     } else {
-        if (!y8) {                      /* left or right combine */
-            vp6_filter_hv2(s, dst, src+offset1, stride, 1, x8);
-        } else if (!x8) {               /* above or below combine */
-            vp6_filter_hv2(s, dst, src+offset1, stride, stride, y8);
-        } else if ((mv.x^mv.y) >> 31) { /* lower-left or upper-right combine */
-            vp6_filter_diag2(s, dst, src+offset1-1, stride, x8, y8);
-        } else {                        /* lower-right or upper-left combine */
-            vp6_filter_diag2(s, dst, src+offset1, stride, x8, y8);
+        if (!x8 || !y8) {
+            s->dsp.put_h264_chroma_pixels_tab[0](dst, src+offset1, stride, 8, x8, y8);
+        } else {
+            vp6_filter_diag2(s, dst, src+offset1 + ((mv.x^mv.y)>>31), stride, x8, y8);
         }
     }
 }
@@ -541,6 +509,7 @@ AVCodec vp6_decoder = {
     NULL,
     vp56_free,
     vp56_decode_frame,
+    CODEC_CAP_DR1,
 };
 
 /* flash version, not flipped upside-down */
@@ -553,4 +522,5 @@ AVCodec vp6f_decoder = {
     NULL,
     vp56_free,
     vp56_decode_frame,
+    CODEC_CAP_DR1,
 };

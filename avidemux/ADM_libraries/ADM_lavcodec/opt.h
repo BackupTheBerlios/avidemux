@@ -27,6 +27,8 @@
  * AVOptions
  */
 
+#include "rational.h"
+
 enum AVOptionType{
     FF_OPT_TYPE_FLAGS,
     FF_OPT_TYPE_INT,
@@ -46,7 +48,7 @@ typedef struct AVOption {
 
     /**
      * short English text help.
-     * @fixme what about other languages
+     * @todo what about other languages
      */
     const char *help;
     int offset;             ///< offset to context structure where the parsed value should be stored
@@ -68,16 +70,18 @@ typedef struct AVOption {
 } AVOption;
 
 
-AVOption *av_set_string(void *obj, const char *name, const char *val);
-AVOption *av_set_double(void *obj, const char *name, double n);
-AVOption *av_set_q(void *obj, const char *name, AVRational n);
-AVOption *av_set_int(void *obj, const char *name, int64_t n);
-double av_get_double(void *obj, const char *name, AVOption **o_out);
-AVRational av_get_q(void *obj, const char *name, AVOption **o_out);
-int64_t av_get_int(void *obj, const char *name, AVOption **o_out);
-const char *av_get_string(void *obj, const char *name, AVOption **o_out, char *buf, int buf_len);
-AVOption *av_next_option(void *obj, AVOption *last);
+const AVOption *av_find_opt(void *obj, const char *name, const char *unit, int mask, int flags);
+const AVOption *av_set_string(void *obj, const char *name, const char *val);
+const AVOption *av_set_double(void *obj, const char *name, double n);
+const AVOption *av_set_q(void *obj, const char *name, AVRational n);
+const AVOption *av_set_int(void *obj, const char *name, int64_t n);
+double av_get_double(void *obj, const char *name, const AVOption **o_out);
+AVRational av_get_q(void *obj, const char *name, const AVOption **o_out);
+int64_t av_get_int(void *obj, const char *name, const AVOption **o_out);
+const char *av_get_string(void *obj, const char *name, const AVOption **o_out, char *buf, int buf_len);
+const AVOption *av_next_option(void *obj, const AVOption *last);
 int av_opt_show(void *obj, void *av_log_obj);
 void av_opt_set_defaults(void *s);
+void av_opt_set_defaults2(void *s, int mask, int flags);
 
 #endif

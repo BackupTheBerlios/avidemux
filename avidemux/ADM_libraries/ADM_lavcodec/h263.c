@@ -5,6 +5,10 @@
  * Copyright (c) 2001 Juan J. Sierralta P.
  * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
+ * ac prediction encoding, B-frame support, error resilience, optimizations,
+ * qpel decoding, gmc decoding, interlaced decoding
+ * by Michael Niedermayer <michaelni@gmx.at>
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -20,10 +24,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
- * ac prediction encoding, b-frame support, error resilience, optimizations,
- * qpel decoding, gmc decoding, interlaced decoding,
- * by Michael Niedermayer <michaelni@gmx.at>
  */
 
 /**
@@ -34,7 +34,6 @@
 //#define DEBUG
 #include <limits.h>
 
-#include "common.h"
 #include "dsputil.h"
 #include "avcodec.h"
 #include "mpegvideo.h"
@@ -87,7 +86,7 @@ static uint8_t uni_DCtab_chrom_len[512];
 static uint16_t uni_DCtab_lum_bits[512];
 static uint16_t uni_DCtab_chrom_bits[512];
 
-static uint8_t (*mv_penalty)[MAX_MV*2+1]= NULL;
+static uint8_t mv_penalty[MAX_FCODE+1][MAX_MV*2+1];
 static uint8_t fcode_tab[MAX_MV*2+1];
 static uint8_t umv_fcode_tab[MAX_MV*2+1];
 
@@ -111,6 +110,8 @@ max level: 53/16
 max run: 29/41
 */
 #endif
+
+static uint8_t static_rl_table_store[5][2][2*MAX_RUN + MAX_LEVEL + 3];
 
 #if 0 //3IV1 is quite rare and it slows things down a tiny bit
 #define IS_3IV1 s->codec_tag == ff_get_fourcc("3IV1")
@@ -211,7 +212,7 @@ void h263_encode_picture_header(MpegEncContext * s, int picture_number)
         for(i=0; i<2; i++){
             int div, error;
             div= (s->avctx->time_base.num*1800000LL + 500LL*s->avctx->time_base.den) / ((1000LL+i)*s->avctx->time_base.den);
-            div= clip(1, div, 127);
+            div= av_clip(div, 1, 127);
             error= FFABS(s->avctx->time_base.num*1800000LL - (1000LL+i)*s->avctx->time_base.den*div);
             if(error < best_error){
                 best_error= error;
@@ -496,7 +497,7 @@ static void ff_init_qscale_tab(MpegEncContext *s){
     for(i=0; i<s->mb_num; i++){
         unsigned int lam= s->lambda_table[ s->mb_index2xy[i] ];
         int qp= (lam*139 + FF_LAMBDA_SCALE*64) >> (FF_LAMBDA_SHIFT + 7);
-        qscale_table[ s->mb_index2xy[i] ]= clip(qp, s->avctx->qmin, s->avctx->qmax);
+        qscale_table[ s->mb_index2xy[i] ]= av_clip(qp, s->avctx->qmin, s->avctx->qmax);
     }
 }
 
@@ -1797,9 +1798,6 @@ static void init_mv_penalty_and_fcode(MpegEncContext *s)
     int f_code;
     int mv;
 
-    if(mv_penalty==NULL)
-        mv_penalty= av_mallocz( sizeof(uint8_t)*(MAX_FCODE+1)*(2*MAX_MV+1) );
-
     for(f_code=1; f_code<=MAX_FCODE; f_code++){
         for(mv=-MAX_MV; mv<=MAX_MV; mv++){
             int len;
@@ -2033,9 +2031,9 @@ void h263_encode_init(MpegEncContext *s)
 
         init_uni_dc_tab();
 
-        init_rl(&rl_inter, 1);
-        init_rl(&rl_intra, 1);
-        init_rl(&rl_intra_aic, 1);
+        init_rl(&rl_inter, static_rl_table_store[0]);
+        init_rl(&rl_intra, static_rl_table_store[1]);
+        init_rl(&rl_intra_aic, static_rl_table_store[2]);
 
         init_uni_mpeg4_rl_tab(&rl_intra, uni_mpeg4_intra_rl_bits, uni_mpeg4_intra_rl_len);
         init_uni_mpeg4_rl_tab(&rl_inter, uni_mpeg4_inter_rl_bits, uni_mpeg4_inter_rl_len);
@@ -2261,25 +2259,12 @@ void ff_mpeg4_stuffing(PutBitContext * pbc)
 }
 
 /* must be called before writing the header */
-void ff_set_mpeg4_time(MpegEncContext * s, int picture_number){
-    int time_div, time_mod;
-
-    assert(s->current_picture_ptr->pts != AV_NOPTS_VALUE);
-    s->time= s->current_picture_ptr->pts*s->avctx->time_base.num;
-
-    time_div= s->time/s->avctx->time_base.den;
-    time_mod= s->time%s->avctx->time_base.den;
-
+void ff_set_mpeg4_time(MpegEncContext * s){
     if(s->pict_type==B_TYPE){
-        s->pb_time= s->pp_time - (s->last_non_b_time - s->time);
-        assert(s->pb_time > 0 && s->pb_time < s->pp_time);
         ff_mpeg4_init_direct_mv(s);
     }else{
         s->last_time_base= s->time_base;
-        s->time_base= time_div;
-        s->pp_time= s->time - s->last_non_b_time;
-        s->last_non_b_time= s->time;
-        assert(picture_number==0 || s->pp_time > 0);
+        s->time_base= s->time/s->avctx->time_base.den;
     }
 }
 
@@ -2361,6 +2346,8 @@ static void mpeg4_encode_visual_object_header(MpegEncContext * s){
 static void mpeg4_encode_vol_header(MpegEncContext * s, int vo_number, int vol_number)
 {
     int vo_ver_id;
+
+    if (!ENABLE_MPEG4_ENCODER)  return;
 
     if(s->max_b_frames || s->quarter_sample){
         vo_ver_id= 5;
@@ -2517,23 +2504,6 @@ void mpeg4_encode_picture_header(MpegEncContext * s, int picture_number)
 }
 
 #endif //CONFIG_ENCODERS
-
-/**
- * set qscale and update qscale dependant variables.
- */
-void ff_set_qscale(MpegEncContext * s, int qscale)
-{
-    if (qscale < 1)
-        qscale = 1;
-    else if (qscale > 31)
-        qscale = 31;
-
-    s->qscale = qscale;
-    s->chroma_qscale= s->chroma_qscale_table[qscale];
-
-    s->y_dc_scale= s->y_dc_scale_table[ qscale ];
-    s->c_dc_scale= s->c_dc_scale_table[ s->chroma_qscale ];
-}
 
 /**
  * predicts the dc.
@@ -2919,59 +2889,6 @@ static VLC mb_type_b_vlc;
 static VLC h263_mbtype_b_vlc;
 static VLC cbpc_b_vlc;
 
-void init_vlc_rl(RLTable *rl, int use_static)
-{
-    int i, q;
-
-    /* Return if static table is already initialized */
-    if(use_static && rl->rl_vlc[0])
-        return;
-
-    init_vlc(&rl->vlc, 9, rl->n + 1,
-             &rl->table_vlc[0][1], 4, 2,
-             &rl->table_vlc[0][0], 4, 2, use_static);
-
-
-    for(q=0; q<32; q++){
-        int qmul= q*2;
-        int qadd= (q-1)|1;
-
-        if(q==0){
-            qmul=1;
-            qadd=0;
-        }
-        if(use_static)
-            rl->rl_vlc[q]= av_mallocz_static(rl->vlc.table_size*sizeof(RL_VLC_ELEM));
-        else
-            rl->rl_vlc[q]= av_malloc(rl->vlc.table_size*sizeof(RL_VLC_ELEM));
-        for(i=0; i<rl->vlc.table_size; i++){
-            int code= rl->vlc.table[i][0];
-            int len = rl->vlc.table[i][1];
-            int level, run;
-
-            if(len==0){ // illegal code
-                run= 66;
-                level= MAX_LEVEL;
-            }else if(len<0){ //more bits needed
-                run= 0;
-                level= code;
-            }else{
-                if(code==rl->n){ //esc
-                    run= 66;
-                    level= 0;
-                }else{
-                    run=   rl->table_run  [code] + 1;
-                    level= rl->table_level[code] * qmul + qadd;
-                    if(code >= rl->last) run+=192;
-                }
-            }
-            rl->rl_vlc[q][i].len= len;
-            rl->rl_vlc[q][i].level= level;
-            rl->rl_vlc[q][i].run= run;
-        }
-    }
-}
-
 /* init vlcs */
 
 /* XXX: find a better solution to handle static init */
@@ -2994,11 +2911,11 @@ void h263_decode_init_vlc(MpegEncContext *s)
         init_vlc(&mv_vlc, MV_VLC_BITS, 33,
                  &mvtab[0][1], 2, 1,
                  &mvtab[0][0], 2, 1, 1);
-        init_rl(&rl_inter, 1);
-        init_rl(&rl_intra, 1);
-        init_rl(&rvlc_rl_inter, 1);
-        init_rl(&rvlc_rl_intra, 1);
-        init_rl(&rl_intra_aic, 1);
+        init_rl(&rl_inter, static_rl_table_store[0]);
+        init_rl(&rl_intra, static_rl_table_store[1]);
+        init_rl(&rvlc_rl_inter, static_rl_table_store[3]);
+        init_rl(&rvlc_rl_intra, static_rl_table_store[4]);
+        init_rl(&rl_intra_aic, static_rl_table_store[2]);
         init_vlc_rl(&rl_inter, 1);
         init_vlc_rl(&rl_intra, 1);
         init_vlc_rl(&rvlc_rl_inter, 1);
@@ -3388,7 +3305,7 @@ int ff_h263_resync(MpegEncContext *s){
         if(ret>=0)
             return 0;
     }
-    //ok, it's not where its supposed to be ...
+    //OK, it's not where it is supposed to be ...
     s->gb= s->last_resync_gb;
     align_get_bits(&s->gb);
     left= s->gb.size_in_bits - get_bits_count(&s->gb);
@@ -4722,7 +4639,7 @@ retry:
         i += run;
         if (i >= 64){
             if(s->alt_inter_vlc && rl == &rl_inter && !s->mb_intra){
-                //looks like a hack but no, it's the way its supposed to work ...
+                //Looks like a hack but no, it's the way it is supposed to work ...
                 rl = &rl_intra_aic;
                 i = 0;
                 s->gb= gb;
@@ -5141,7 +5058,7 @@ int h263_decode_picture_header(MpegEncContext *s)
         if (ufep == 1) {
             /* OPPTYPE */
             format = get_bits(&s->gb, 3);
-            dprintf("ufep=1, format: %d\n", format);
+            dprintf(s->avctx, "ufep=1, format: %d\n", format);
             s->custom_pcf= get_bits1(&s->gb);
             s->umvplus = get_bits(&s->gb, 1); /* Unrestricted Motion Vector */
             if (get_bits1(&s->gb) != 0) {
@@ -5191,7 +5108,7 @@ int h263_decode_picture_header(MpegEncContext *s)
             if (format == 6) {
                 /* Custom Picture Format (CPFMT) */
                 s->aspect_ratio_info = get_bits(&s->gb, 4);
-                dprintf("aspect: %d\n", s->aspect_ratio_info);
+                dprintf(s->avctx, "aspect: %d\n", s->aspect_ratio_info);
                 /* aspect ratios:
                 0 - forbidden
                 1 - 1:1
@@ -5204,7 +5121,7 @@ int h263_decode_picture_header(MpegEncContext *s)
                 width = (get_bits(&s->gb, 9) + 1) * 4;
                 skip_bits1(&s->gb);
                 height = get_bits(&s->gb, 9) * 4;
-                dprintf("\nH.263+ Custom picture: %dx%d\n",width,height);
+                dprintf(s->avctx, "\nH.263+ Custom picture: %dx%d\n",width,height);
                 if (s->aspect_ratio_info == FF_ASPECT_EXTENDED) {
                     /* aspected dimensions */
                     s->avctx->sample_aspect_ratio.num= get_bits(&s->gb, 8);
@@ -5666,6 +5583,11 @@ static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
                 skip_bits1(gb); /* marker */
             }
             s->num_sprite_warping_points= get_bits(gb, 6);
+            if(s->num_sprite_warping_points > 3){
+                av_log(s->avctx, AV_LOG_ERROR, "%d sprite_warping_points\n", s->num_sprite_warping_points);
+                s->num_sprite_warping_points= 0;
+                return -1;
+            }
             s->sprite_warping_accuracy = get_bits(gb, 2);
             s->sprite_brightness_change= get_bits1(gb);
             if(s->vol_sprite_usage==STATIC_SPRITE)

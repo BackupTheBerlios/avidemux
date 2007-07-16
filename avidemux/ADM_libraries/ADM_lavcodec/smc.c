@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -34,7 +33,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "common.h"
 #include "avcodec.h"
 #include "dsputil.h"
 
@@ -432,11 +430,10 @@ static void smc_decode_stream(SmcContext *s)
 
 static int smc_decode_init(AVCodecContext *avctx)
 {
-    SmcContext *s = (SmcContext *)avctx->priv_data;
+    SmcContext *s = avctx->priv_data;
 
     s->avctx = avctx;
     avctx->pix_fmt = PIX_FMT_PAL8;
-    avctx->has_b_frames = 0;
     dsputil_init(&s->dsp, avctx);
 
     s->frame.data[0] = NULL;
@@ -448,7 +445,7 @@ static int smc_decode_frame(AVCodecContext *avctx,
                              void *data, int *data_size,
                              uint8_t *buf, int buf_size)
 {
-    SmcContext *s = (SmcContext *)avctx->priv_data;
+    SmcContext *s = avctx->priv_data;
 
     s->buf = buf;
     s->size = buf_size;
@@ -472,7 +469,7 @@ static int smc_decode_frame(AVCodecContext *avctx,
 
 static int smc_decode_end(AVCodecContext *avctx)
 {
-    SmcContext *s = (SmcContext *)avctx->priv_data;
+    SmcContext *s = avctx->priv_data;
 
     if (s->frame.data[0])
         avctx->release_buffer(avctx, &s->frame);

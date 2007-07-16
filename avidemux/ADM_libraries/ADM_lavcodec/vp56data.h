@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #ifndef VP56DATA_H
@@ -30,6 +30,7 @@ typedef enum {
     VP56_FRAME_CURRENT  = 0,
     VP56_FRAME_PREVIOUS = 1,
     VP56_FRAME_GOLDEN   = 2,
+    VP56_FRAME_UNUSED   = 3,
 } vp56_frame_t;
 
 typedef enum {

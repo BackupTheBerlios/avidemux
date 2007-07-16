@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
  */
 
 /**
@@ -25,6 +24,10 @@
  * Context Adaptive Binary Arithmetic Coder.
  */
 
+#ifndef CABAC_H
+#define CABAC_H
+
+#include "bitstream.h"
 
 //#undef NDEBUG
 #include <assert.h>
@@ -363,7 +366,7 @@ static inline void renorm_cabac_decoder_once(CABACContext *c){
         refill(c);
 }
 
-static int av_always_inline get_cabac_inline(CABACContext *c, uint8_t * const state){
+static av_always_inline int get_cabac_inline(CABACContext *c, uint8_t * const state){
     //FIXME gcc generates duplicate load/stores for c->low and c->range
 #define LOW          "0"
 #define RANGE        "4"
@@ -376,7 +379,7 @@ static int av_always_inline get_cabac_inline(CABACContext *c, uint8_t * const st
 #define BYTE        "16"
 #define BYTEEND     "20"
 #endif
-#if defined(ARCH_X86) && !(defined(PIC) && defined(__GNUC__))
+#if defined(ARCH_X86) && defined(CONFIG_7REGS) && defined(HAVE_EBX_AVAILABLE) && !defined(BROKEN_RELOCATIONS)
     int bit;
 
 #ifndef BRANCHLESS_CABAC_DECODER
@@ -462,7 +465,7 @@ static int av_always_inline get_cabac_inline(CABACContext *c, uint8_t * const st
 #else /* BRANCHLESS_CABAC_DECODER */
 
 
-#if defined CMOV_IS_FAST
+#if defined HAVE_FAST_CMOV
 #define BRANCHLESS_GET_CABAC_UPDATE(ret, cabac, statep, low, lowword, range, tmp, tmpbyte)\
         "mov    "tmp"       , %%ecx                                     \n\t"\
         "shl    $17         , "tmp"                                     \n\t"\
@@ -472,7 +475,7 @@ static int av_always_inline get_cabac_inline(CABACContext *c, uint8_t * const st
         "and    %%ecx       , "tmp"                                     \n\t"\
         "sub    "tmp"       , "low"                                     \n\t"\
         "xor    %%ecx       , "ret"                                     \n\t"
-#else /* CMOV_IS_FAST */
+#else /* HAVE_FAST_CMOV */
 #define BRANCHLESS_GET_CABAC_UPDATE(ret, cabac, statep, low, lowword, range, tmp, tmpbyte)\
         "mov    "tmp"       , %%ecx                                     \n\t"\
         "shl    $17         , "tmp"                                     \n\t"\
@@ -485,7 +488,7 @@ static int av_always_inline get_cabac_inline(CABACContext *c, uint8_t * const st
         "and    "tmp"       , %%ecx                                     \n\t"\
         "sub    %%ecx       , "low"                                     \n\t"\
         "xor    "tmp"       , "ret"                                     \n\t"
-#endif /* CMOV_IS_FAST */
+#endif /* HAVE_FAST_CMOV */
 
 
 #define BRANCHLESS_GET_CABAC(ret, cabac, statep, low, lowword, range, tmp, tmpbyte)\
@@ -532,10 +535,10 @@ static int av_always_inline get_cabac_inline(CABACContext *c, uint8_t * const st
     );
     bit&=1;
 #endif /* BRANCHLESS_CABAC_DECODER */
-#else /* defined(ARCH_X86) && !(defined(PIC) && defined(__GNUC__)) */
+#else /* defined(ARCH_X86) && defined(CONFIG_7REGS) && defined(HAVE_EBX_AVAILABLE) && !defined(BROKEN_RELOCATIONS) */
     int s = *state;
     int RangeLPS= ff_h264_lps_range[2*(c->range&0xC0) + s];
-    int bit, lps_mask attribute_unused;
+    int bit, lps_mask av_unused;
 
     c->range -= RangeLPS;
 #ifndef BRANCHLESS_CABAC_DECODER
@@ -571,11 +574,11 @@ static int av_always_inline get_cabac_inline(CABACContext *c, uint8_t * const st
     if(!(c->low & CABAC_MASK))
         refill2(c);
 #endif /* BRANCHLESS_CABAC_DECODER */
-#endif /* defined(ARCH_X86) && !(defined(PIC) && defined(__GNUC__)) */
+#endif /* defined(ARCH_X86) && defined(CONFIG_7REGS) && defined(HAVE_EBX_AVAILABLE) && !defined(BROKEN_RELOCATIONS) */
     return bit;
 }
 
-static int __attribute((noinline)) get_cabac_noinline(CABACContext *c, uint8_t * const state){
+static int av_noinline get_cabac_noinline(CABACContext *c, uint8_t * const state){
     return get_cabac_inline(c,state);
 }
 
@@ -679,8 +682,8 @@ static av_always_inline int get_cabac_bypass_sign(CABACContext *c, int val){
 }
 
 //FIXME the x86 code from this file should be moved into i386/h264 or cabac something.c/h (note ill kill you if you move my code away from under my fingers before iam finished with it!)
-//FIXME use some macros to avoid duplicatin get_cabac (cant be done yet as that would make optimization work hard)
-#if defined(ARCH_X86) && !(defined(PIC) && defined(__GNUC__))
+//FIXME use some macros to avoid duplicatin get_cabac (cannot be done yet as that would make optimization work hard)
+#if defined(ARCH_X86) && defined(CONFIG_7REGS) && defined(HAVE_EBX_AVAILABLE) && !defined(BROKEN_RELOCATIONS)
 static int decode_significance_x86(CABACContext *c, int max_coeff, uint8_t *significant_coeff_ctx_base, int *index){
     void *end= significant_coeff_ctx_base + max_coeff - 1;
     int minusstart= -(int)significant_coeff_ctx_base;
@@ -786,7 +789,7 @@ static int decode_significance_8x8_x86(CABACContext *c, uint8_t *significant_coe
     );
     return coeff_count;
 }
-#endif /* defined(ARCH_X86) && !(defined(PIC) && defined(__GNUC__)) */
+#endif /* defined(ARCH_X86) && && defined(CONFIG_7REGS) && defined(HAVE_EBX_AVAILABLE) && !defined(BROKEN_RELOCATIONS) */
 
 /**
  *
@@ -857,3 +860,5 @@ static int get_cabac_ueg(CABACContext *c, uint8_t * state, int max, int is_signe
     }else
         return i;
 }
+
+#endif /* CABAC_H */

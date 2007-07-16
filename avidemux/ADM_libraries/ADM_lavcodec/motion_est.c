@@ -3,6 +3,7 @@
  * Copyright (c) 2000,2001 Fabrice Bellard.
  * Copyright (c) 2002-2004 Michael Niedermayer
  *
+ * new motion estimation (X1/EPZS) by Michael Niedermayer <michaelni@gmx.at>
  *
  * This file is part of FFmpeg.
  *
@@ -19,8 +20,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
- * new Motion Estimation (X1/EPZS) by Michael Niedermayer <michaelni@gmx.at>
  */
 
 /**
@@ -103,6 +102,9 @@ static int get_flags(MotionEstContext *c, int direct, int chroma){
            + (chroma ? FLAG_CHROMA : 0);
 }
 
+/*! \brief compares a block (either a full macroblock or a partition thereof)
+    against a proposed motion-compensated prediction of that block
+ */
 static av_always_inline int cmp(MpegEncContext *s, const int x, const int y, const int subx, const int suby,
                       const int size, const int h, int ref_index, int src_index,
                       me_cmp_func cmp_func, me_cmp_func chroma_cmp_func, const int flags){
@@ -276,7 +278,9 @@ void ff_init_me(MpegEncContext *s){
         c->uvstride=  8*s->mb_width + 16;
     }
 
-    // 8x8 fullpel search would need a 4x4 chroma compare, which we dont have yet, and even if we had the motion estimation code doesnt expect it
+    /* 8x8 fullpel search would need a 4x4 chroma compare, which we do
+     * not have yet, and even if we had, the motion estimation code
+     * does not expect it. */
     if(s->codec_id != CODEC_ID_SNOW){
         if((c->avctx->me_cmp&FF_CMP_CHROMA)/* && !s->dsp.me_cmp[2]*/){
             s->dsp.me_cmp[2]= zero_cmp;
@@ -1798,15 +1802,15 @@ static inline int direct_search(MpegEncContext * s, int mb_x, int mb_y)
     c->pred_x=0;
     c->pred_y=0;
 
-    P_LEFT[0]        = clip(mv_table[mot_xy - 1][0], xmin<<shift, xmax<<shift);
-    P_LEFT[1]        = clip(mv_table[mot_xy - 1][1], ymin<<shift, ymax<<shift);
+    P_LEFT[0]        = av_clip(mv_table[mot_xy - 1][0], xmin<<shift, xmax<<shift);
+    P_LEFT[1]        = av_clip(mv_table[mot_xy - 1][1], ymin<<shift, ymax<<shift);
 
     /* special case for first line */
-    if (!s->first_slice_line) { //FIXME maybe allow this over thread boundary as its clipped
-        P_TOP[0]      = clip(mv_table[mot_xy - mot_stride             ][0], xmin<<shift, xmax<<shift);
-        P_TOP[1]      = clip(mv_table[mot_xy - mot_stride             ][1], ymin<<shift, ymax<<shift);
-        P_TOPRIGHT[0] = clip(mv_table[mot_xy - mot_stride + 1         ][0], xmin<<shift, xmax<<shift);
-        P_TOPRIGHT[1] = clip(mv_table[mot_xy - mot_stride + 1         ][1], ymin<<shift, ymax<<shift);
+    if (!s->first_slice_line) { //FIXME maybe allow this over thread boundary as it is clipped
+        P_TOP[0]      = av_clip(mv_table[mot_xy - mot_stride             ][0], xmin<<shift, xmax<<shift);
+        P_TOP[1]      = av_clip(mv_table[mot_xy - mot_stride             ][1], ymin<<shift, ymax<<shift);
+        P_TOPRIGHT[0] = av_clip(mv_table[mot_xy - mot_stride + 1         ][0], xmin<<shift, xmax<<shift);
+        P_TOPRIGHT[1] = av_clip(mv_table[mot_xy - mot_stride + 1         ][1], ymin<<shift, ymax<<shift);
 
         P_MEDIAN[0]= mid_pred(P_LEFT[0], P_TOP[0], P_TOPRIGHT[0]);
         P_MEDIAN[1]= mid_pred(P_LEFT[1], P_TOP[1], P_TOPRIGHT[1]);
@@ -1977,7 +1981,7 @@ void ff_estimate_b_frame_motion(MpegEncContext * s,
             type |= CANDIDATE_MB_TYPE_BIDIR_I;
         }
          //FIXME something smarter
-        if(dmin>256*256*16) type&= ~CANDIDATE_MB_TYPE_DIRECT; //dont try direct mode if its invalid for this MB
+        if(dmin>256*256*16) type&= ~CANDIDATE_MB_TYPE_DIRECT; //do not try direct mode if it is invalid for this MB
         if(s->codec_id == CODEC_ID_MPEG4 && type&CANDIDATE_MB_TYPE_DIRECT && s->flags&CODEC_FLAG_MV0 && *(uint32_t*)s->b_direct_mv_table[xy])
             type |= CANDIDATE_MB_TYPE_DIRECT0;
 #if 0

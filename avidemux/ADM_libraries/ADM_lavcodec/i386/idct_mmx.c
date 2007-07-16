@@ -15,12 +15,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * along with mpeg2dec; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include "common.h"
-#include "../dsputil.h"
+#include "dsputil.h"
 
 #include "mmx.h"
 
@@ -33,7 +33,7 @@
 #define rounder(bias) {round (bias), round (bias)}
 
 #if 0
-/* C row IDCT - its just here to document the MMXEXT and MMX versions */
+/* C row IDCT - it is just here to document the MMXEXT and MMX versions */
 static inline void idct_row (int16_t * row, int offset,
                              int16_t * table, int32_t * rounder)
 {
@@ -313,7 +313,7 @@ static inline void mmx_row_mid (int16_t * row, int store,
 
 
 #if 0
-// C column IDCT - its just here to document the MMXEXT and MMX versions
+// C column IDCT - it is just here to document the MMXEXT and MMX versions
 static inline void idct_col (int16_t * col, int offset)
 {
 /* multiplication - as implemented on mmx */
