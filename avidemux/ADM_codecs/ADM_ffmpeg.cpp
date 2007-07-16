@@ -20,10 +20,10 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
 #define __STDC_CONSTANT_MACROS // Lavcodec crap
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <string.h>
 #include <math.h>
