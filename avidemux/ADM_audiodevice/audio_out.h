@@ -72,6 +72,7 @@ static const DEVICELIST audioDeviceList[]=
 
 void 		AVDM_audioSave( void );
 void 		AVDM_audioInit( void );
+void		AVDM_cleanup(void);
 void 		AVDM_switch( AUDIO_DEVICE action );
 
 uint8_t 	AVDM_AudioPlay(float *ptr, uint32_t nb);

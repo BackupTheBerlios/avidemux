@@ -179,15 +179,25 @@ AUDIO_DEVICE id;
 		#endif
 		}
 }
+
+void AVDM_cleanup(void)
+{
+	if(device)
+	{
+		delete device;
+		device=NULL;
+	}
+}
 // Switch the audio device class we are using
 //
 void AVDM_switch(AUDIO_DEVICE action)
 {
 	if(device)
-	       {
-				delete device;
-			}
-	device=NULL;
+	{
+		delete device;
+		device=NULL;
+	}
+
 	 currentDevice=DEVICE_DUMMY;
 	switch(action)
 	{

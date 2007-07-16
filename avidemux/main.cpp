@@ -310,6 +310,10 @@ void onexit( void )
 	quitSdl();
 #endif
 
+#ifdef HAVE_AUDIO
+	AVDM_cleanup();
+#endif
+
     printf("End of cleanup\n");
     ADMImage_stat();
     ADM_memStat();
