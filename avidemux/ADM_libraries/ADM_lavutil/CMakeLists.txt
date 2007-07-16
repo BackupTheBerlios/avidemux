@@ -6,6 +6,7 @@ SET(ADM_LIB ADM_lavutil)
 #
 SET(${ADM_LIB}_SRCS 
 integer.c  intfloat_readwrite.c  mathematics.c  rational.c md5.c crc.c log.c  adler32.c lls.c
+string.c
 
 )
 ADD_LIBRARY(${ADM_LIB} STATIC ${${ADM_LIB}_SRCS})

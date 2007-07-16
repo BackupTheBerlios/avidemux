@@ -37,19 +37,17 @@
 #    include <string.h>
 #    include <ctype.h>
 #    include <limits.h>
-#    ifndef __BEOS__
-#        include <errno.h>
-#    else
-#        include "berrno.h"
-#    endif
+#    include <errno.h>
 #    include <math.h>
 #endif /* HAVE_AV_CONFIG_H */
 
 #ifndef av_always_inline
 #if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
 #    define av_always_inline __attribute__((always_inline)) inline
+#    define av_noinline __attribute__((noinline))
 #else
 #    define av_always_inline inline
+#    define av_noinline
 #endif
 #endif
 
@@ -65,10 +63,15 @@
 #endif
 #endif
 
-#ifndef INT64_C
-#define INT64_C(c)     (c ## LL)
-#define UINT64_C(c)    (c ## ULL)
+#ifndef av_unused
+#if defined(__GNUC__)
+#    define av_unused __attribute__((unused))
+#else
+#    define av_unused
 #endif
+#endif
+
+#include "mem.h"
 
 //rounded divison & shift
 #define RSHIFT(a,b) ((a) > 0 ? ((a) + ((1<<(b))>>1))>>(b) : ((a) + ((1<<(b))>>1)-1)>>(b))
@@ -165,7 +168,7 @@ static inline int mid_pred(int a, int b, int c)
  * @param amax maximum value of the clip range
  * @return clipped value
  */
-static inline int clip(int a, int amin, int amax)
+static inline int av_clip(int a, int amin, int amax)
 {
     if (a < amin)      return amin;
     else if (a > amax) return amax;
@@ -177,7 +180,7 @@ static inline int clip(int a, int amin, int amax)
  * @param a value to clip
  * @return clipped value
  */
-static inline uint8_t clip_uint8(int a)
+static inline uint8_t av_clip_uint8(int a)
 {
     if (a&(~255)) return (-a)>>31;
     else          return a;
@@ -202,14 +205,14 @@ static inline int ff_get_fourcc(const char *s){
 
 /*!
  * \def GET_UTF8(val, GET_BYTE, ERROR)
- * converts a utf-8 character (up to 4 bytes long) to its 32-bit ucs-4 encoded form
+ * converts a UTF-8 character (up to 4 bytes long) to its 32-bit UCS-4 encoded form
  * \param val is the output and should be of type uint32_t. It holds the converted
- * ucs-4 character and should be a left value.
- * \param GET_BYTE gets utf-8 encoded bytes from any proper source. It can be
+ * UCS-4 character and should be a left value.
+ * \param GET_BYTE gets UTF-8 encoded bytes from any proper source. It can be
  * a function or a statement whose return value or evaluated value is of type
- * uint8_t. It will be executed up to 4 times for values in the valid utf-8 range,
+ * uint8_t. It will be executed up to 4 times for values in the valid UTF-8 range,
  * and up to 7 times in the general case.
- * \param ERROR action that should be taken when an invalid utf-8 byte is returned
+ * \param ERROR action that should be taken when an invalid UTF-8 byte is returned
  * from GET_BYTE. It should be a statement that jumps out of the macro,
  * like exit(), goto, return, break, or continue.
  */
@@ -230,17 +233,17 @@ static inline int ff_get_fourcc(const char *s){
 
 /*!
  * \def PUT_UTF8(val, tmp, PUT_BYTE)
- * converts a 32-bit unicode character to its utf-8 encoded form (up to 4 bytes long).
+ * converts a 32-bit unicode character to its UTF-8 encoded form (up to 4 bytes long).
  * \param val is an input only argument and should be of type uint32_t. It holds
- * a ucs4 encoded unicode character that is to be converted to utf-8. If
+ * a ucs4 encoded unicode character that is to be converted to UTF-8. If
  * val is given as a function it's executed only once.
  * \param tmp is a temporary variable and should be of type uint8_t. It
  * represents an intermediate value during conversion that is to be
  * outputted by PUT_BYTE.
- * \param PUT_BYTE writes the converted utf-8 bytes to any proper destination.
+ * \param PUT_BYTE writes the converted UTF-8 bytes to any proper destination.
  * It could be a function or a statement, and uses tmp as the input byte.
  * For example, PUT_BYTE could be "*output++ = tmp;" PUT_BYTE will be
- * executed up to 4 times for values in the valid utf-8 range and up to
+ * executed up to 4 times for values in the valid UTF-8 range and up to
  * 7 times in the general case, depending on the length of the converted
  * unicode character.
  */
@@ -264,7 +267,7 @@ static inline int ff_get_fourcc(const char *s){
         }\
     }
 
-#if defined(ARCH_X86) || defined(ARCH_POWERPC)
+#if defined(ARCH_X86) || defined(ARCH_POWERPC) || defined(ARCH_BFIN)
 #if defined(ARCH_X86_64)
 static inline uint64_t read_time(void)
 {
@@ -282,6 +285,19 @@ static inline long long read_time(void)
                 : "=A" (l)
         );
         return l;
+}
+#elif ARCH_BFIN
+static inline uint64_t read_time(void)
+{
+    union {
+        struct {
+            unsigned lo;
+            unsigned hi;
+        } p;
+        unsigned long long c;
+    } t;
+    asm volatile ("%0=cycles; %1=cycles2;" : "=d" (t.p.lo), "=d" (t.p.hi));
+    return t.c;
 }
 #else //FIXME check ppc64
 static inline uint64_t read_time(void)
@@ -314,7 +330,7 @@ tend= read_time();\
   static uint64_t tsum=0;\
   static int tcount=0;\
   static int tskip_count=0;\
-  if(tcount<2 || tend - tstart < 8*tsum/tcount){\
+  if(tcount<2 || tend - tstart < FFMAX(8*tsum/tcount, 2000)){\
       tsum+= tend - tstart;\
       tcount++;\
   }else\
@@ -327,22 +343,5 @@ tend= read_time();\
 #define START_TIMER
 #define STOP_TIMER(id) {}
 #endif
-
-/* memory */
-
-#ifdef __GNUC__
-  #define DECLARE_ALIGNED(n,t,v)       t v __attribute__ ((aligned (n)))
-#else
-  #define DECLARE_ALIGNED(n,t,v)      __declspec(align(n)) t v
-#endif
-
-/* memory */
-void *av_malloc(unsigned int size);
-void *av_realloc(void *ptr, unsigned int size);
-void av_free(void *ptr);
-
-void *av_mallocz(unsigned int size);
-char *av_strdup(const char *s);
-void av_freep(void *ptr);
 
 #endif /* COMMON_H */

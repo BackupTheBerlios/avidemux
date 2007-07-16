@@ -26,13 +26,13 @@
 #ifndef INTERNAL_H
 #define INTERNAL_H
 
-#ifndef attribute_align_arg
-#if defined(__GNUC__) && (__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__ > 1)
-#    define attribute_align_arg __attribute__((force_align_arg_pointer))
-#else
-#    define attribute_align_arg
+#if !defined(DEBUG) && !defined(NDEBUG)
+#    define NDEBUG
 #endif
-#endif
+
+#include <stdint.h>
+#include <stddef.h>
+#include <assert.h>
 
 #ifndef attribute_used
 #if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
@@ -42,44 +42,8 @@
 #endif
 #endif
 
-#ifndef attribute_unused
-#if defined(__GNUC__)
-#    define attribute_unused __attribute__((unused))
-#else
-#    define attribute_unused
-#endif
-#endif
-
 #ifndef M_PI
 #define M_PI    3.14159265358979323846
-#endif
-
-#ifndef PRId64
-#define PRId64 "lld"
-#endif
-
-#ifndef PRIu64
-#define PRIu64 "llu"
-#endif
-
-#ifndef PRIx64
-#define PRIx64 "llx"
-#endif
-
-#ifndef PRIX64
-#define PRIX64 "llX"
-#endif
-
-#ifndef PRId32
-#define PRId32 "d"
-#endif
-
-#ifndef PRIdFAST16
-#define PRIdFAST16 PRId32
-#endif
-
-#ifndef PRIdFAST32
-#define PRIdFAST32 PRId32
 #endif
 
 #ifndef INT16_MIN
@@ -126,45 +90,20 @@
 #    define PIC
 #endif
 
-#ifndef ENODATA
-#    define ENODATA  61
-#endif
-
 #include "intreadwrite.h"
 #include "bswap.h"
 
-#include <stddef.h>
 #ifndef offsetof
 #    define offsetof(T,F) ((unsigned int)((char *)&((T *)0)->F))
 #endif
 
-#ifdef __MINGW32__
-#    ifdef _DEBUG
-#        define DEBUG
-#    endif
-
-#    define snprintf _snprintf
-#    define vsnprintf _vsnprintf
-
-#    ifdef CONFIG_WINCE
-#        define perror(a)
-#        define abort()
-#    endif
-
-/* __MINGW32__ end */
-#elif defined (CONFIG_OS2)
-/* OS/2 EMX */
-
-#    include <float.h>
-
-#endif /* !__MINGW32__ && CONFIG_OS2 */
-
 #ifdef USE_FASTMEMCPY
 #    include "libvo/fastmemcpy.h"
+#    define memcpy(a,b,c) fast_memcpy(a,b,c)
 #endif
 
 // Use rip-relative addressing if compiling PIC code on x86-64.
-#if defined(__MINGW32__) || defined(__APPLE__)|| defined(__CYGWIN__) || \
+#if defined(__MINGW32__) || defined(__CYGWIN__) || \
     defined(__OS2__) || (defined (__OpenBSD__) && !defined(__ELF__))
 #    if defined(ARCH_X86_64) && defined(PIC)
 #        define MANGLE(a) "_" #a"(%%rip)"
@@ -183,16 +122,11 @@
 
 /* debug stuff */
 
-#if !defined(DEBUG) && !defined(NDEBUG)
-#    define NDEBUG
-#endif
-#include <assert.h>
-
 /* dprintf macros */
 #ifdef DEBUG
-#    define dprintf(fmt,...) av_log(NULL, AV_LOG_DEBUG, fmt, __VA_ARGS__)
+#    define dprintf(pctx, ...) av_log(pctx, AV_LOG_DEBUG, __VA_ARGS__)
 #else
-#    define dprintf(fmt,...)
+#    define dprintf(pctx, ...)
 #endif
 
 #define av_abort()      do { av_log(NULL, AV_LOG_ERROR, "Abort at %s:%d\n", __FILE__, __LINE__); abort(); } while (0)
@@ -234,16 +168,16 @@ extern const uint8_t ff_sqrt_tab[128];
 static inline int ff_sqrt(int a)
 {
     int ret=0;
-    int s;
-    int ret_sq=0;
+    int s, b;
 
     if(a<128) return ff_sqrt_tab[a];
 
-    for(s=15; s>=0; s--){
-        int b= ret_sq + (1<<(s*2)) + (ret<<s)*2;
+    for(s=30; s>=0; s-=2){
+        ret+=ret;
+        b= (1+2*ret)<<s;
         if(b<=a){
-            ret_sq=b;
-            ret+= 1<<s;
+            a-=b;
+            ret++;
         }
     }
     return ret;
@@ -270,7 +204,7 @@ asm volatile (\
     "cmovl %3, %0       \n\t"\
     "cmovl %4, %1       \n\t"\
     "cmovl %5, %2       \n\t"\
-    : "+r" (x), "+r" (a), "+r" (c)\
+    : "+&r" (x), "+&r" (a), "+r" (c)\
     : "r" (y), "r" (b), "r" (d)\
 );
 #else
@@ -283,16 +217,30 @@ if((y)<(x)){\
 #endif
 
 /* avoid usage of various functions */
+#undef  malloc
 #define malloc please_use_av_malloc
+#undef  free
 #define free please_use_av_free
+#undef  realloc
 #define realloc please_use_av_realloc
+#undef  time
 #define time time_is_forbidden_due_to_security_issues
-#define rand rand_is_forbidden_due_to_state_trashing
-#define srand srand_is_forbidden_due_to_state_trashing
+#undef  rand
+#define rand rand_is_forbidden_due_to_state_trashing_use_av_random
+#undef  srand
+#define srand srand_is_forbidden_due_to_state_trashing_use_av_init_random
+#undef  random
+#define random random_is_forbidden_due_to_state_trashing_use_av_random
+#undef  sprintf
 #define sprintf sprintf_is_forbidden_due_to_security_issues_use_snprintf
-#define strcat strcat_is_forbidden_due_to_security_issues_use_pstrcat
-#if !(defined(LIBAVFORMAT_BUILD) || defined(_FRAMEHOOK_H))
+#undef  strcat
+#define strcat strcat_is_forbidden_due_to_security_issues_use_av_strlcat
+#undef  exit
+#define exit exit_is_forbidden
+#if !(defined(LIBAVFORMAT_BUILD) || defined(FRAMEHOOK_H))
+#undef  printf
 #define printf please_use_av_log
+#undef  fprintf
 #define fprintf please_use_av_log
 #endif
 
@@ -311,21 +259,7 @@ if((y)<(x)){\
 /* btw, rintf() is existing on fbsd too -- alex */
 static av_always_inline long int lrintf(float x)
 {
-#ifdef __MINGW32__
-#  ifdef ARCH_X86_32
-    int32_t i;
-    asm volatile(
-        "fistpl %0\n\t"
-        : "=m" (i) : "t" (x) : "st"
-    );
-    return i;
-#  else
-    /* XXX: incorrect, but make it compile */
-    return (int)(x + (x < 0 ? -0.5 : 0.5));
-#  endif /* ARCH_X86_32 */
-#else
     return (int)(rint(x));
-#endif /* __MINGW32__ */
 }
 #endif /* HAVE_LRINTF */
 
