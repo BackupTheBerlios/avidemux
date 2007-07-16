@@ -259,6 +259,7 @@ printf("\n");
 	{
 		filterDynLoad(dynloadPath);
 	}
+	ADM_dealloc(dynloadPath);
 
 // external filter
 #ifdef USE_FFMPEG
