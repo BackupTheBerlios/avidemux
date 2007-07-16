@@ -357,6 +357,8 @@
 
 /* post proc */
 #cmakedefine HAVE_MMX
+#cmakedefine ENABLE_MMX ${ENABLE_MMX}
+#cmakedefine ENABLE_THREADS ${ENABLE_THREADS}
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #cmakedefine HAVE_STDINT_H
