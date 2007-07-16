@@ -462,6 +462,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
                 }
                 delete [] str;
         }
+		ADM_dealloc(tmpname);
         if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_ACCEPT)
 	{
 
