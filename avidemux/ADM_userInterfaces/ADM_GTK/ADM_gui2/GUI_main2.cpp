@@ -1150,7 +1150,7 @@ create_mainWindow (void)
   gtk_box_pack_start (GTK_BOX (hbox19), CheckButtonTimeshift, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, CheckButtonTimeshift, _("Enable time shift"), NULL);
 
-  spinbuttonTimeShift_adj = gtk_adjustment_new (0, -9999, 9999, 1, 10, 10);
+  spinbuttonTimeShift_adj = gtk_adjustment_new (0, -99999, 99999, 1, 10, 10);
   spinbuttonTimeShift = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonTimeShift_adj), 1, 0);
   gtk_widget_show (spinbuttonTimeShift);
   gtk_box_pack_start (GTK_BOX (hbox19), spinbuttonTimeShift, TRUE, TRUE, 0);

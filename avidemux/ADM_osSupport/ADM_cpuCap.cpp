@@ -17,7 +17,7 @@
 #if defined( ARCH_X86)  || defined(ARCH_X86_64)
 extern "C" 
 {
-#include "ADM_lavcodec/dsputil.h"
+#include "ADM_lavcodec/dsputil_cpu.h"
 }
 #endif
 
@@ -49,3 +49,4 @@ uint32_t multi;
         if(multi<2) multi=0; // On thread means no threading...
         return multi;
 }
+

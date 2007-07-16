@@ -14,7 +14,6 @@
 #include <stdio.h>
 #include "default.h"
 #include "ADM_audio/ADM_dcainfo.h"
-#include "ADM_assert.h"
 extern "C"
 {
 #include "ADM_lavutil/common.h"
@@ -22,6 +21,7 @@ extern "C"
 #include "ADM_lavcodec/bitstream.h"
 
 }
+#include "ADM_assert.h"
 
 /*
         Borrowed from libdca

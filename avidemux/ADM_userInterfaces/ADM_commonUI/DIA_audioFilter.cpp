@@ -61,7 +61,7 @@ int DIA_getAudioFilter(GAINparam *gain,
        
    diaElemToggle    eDRC(&vDRC,_("_Dynamic range compression"));
    
-   diaElemToggleInt eTimeShift(&vTshift,_("_Time shift (ms):"),&vTshiftValue,_("Time shift value (ms)"),-10000,10000);
+   diaElemToggleInt eTimeShift(&vTshift,_("_Time shift (ms):"),&vTshiftValue,_("Time shift value (ms)"),-1000*100,1000*100);
    
 //    diaElemToggle    eTimeShift(&vTshift,_("Enable _time shift"));
 //    diaElemInteger  eShift(&vTshiftValue,_("Time shift _value (ms):"),-10000,10000);
