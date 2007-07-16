@@ -50,6 +50,7 @@ asfPacket::asfPacket(FILE *f,uint32_t nb,uint32_t pSize,ADM_queue *q,uint32_t st
  }
  asfPacket::~asfPacket()
  {
+	 purge();
  }
  uint8_t   asfPacket::readChunkPayload(uint8_t *data, uint32_t *dataLen)
  {
@@ -304,11 +305,14 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
    bit->stream=stream;
    bit->packet=packetnb;
    bit->flags=keyframe;
+
    if(!read(bit->data,bit->len))
    {
-     delete bit;
-     return 0; 
+		delete[] bit->data;
+		delete bit;
+		return 0; 
    }
+
    queue->push((void *)bit);
    return 1;
  }

@@ -36,7 +36,16 @@
 
 asfAudio::~asfAudio()
 {
-  printf("[asfAudio] Destroying track\n");
+	printf("[asfAudio] Destroying track\n");
+
+	fclose(_fd);
+	_fd = NULL;
+
+	delete _wavheader;
+	delete _packet;
+
+	_wavheader = NULL;
+	_packet = NULL;
 }
 /*
     __________________________________________________________

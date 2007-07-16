@@ -68,6 +68,11 @@ void asfHeader::Dump(void)
 
 uint8_t asfHeader::close(void)
 {
+	if (_fd) 
+		fclose(_fd);
+
+	_fd=NULL;
+
   if(_videoExtraData)
   {
     delete [] _videoExtraData;
@@ -255,7 +260,7 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
           {
             aprintf("Dropping seq=%u too old for %u delta %d\n",
                   bit->sequence,_index[framenum].segNb,delta);
-            delete bit->data;
+            delete[] bit->data;
             delete bit;
             if(delta<230)
             {
@@ -271,7 +276,7 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
           curSeq=bit->sequence;
           memcpy(img->data,bit->data,bit->len);
           len=bit->len;
-          delete bit->data;
+          delete[] bit->data;
           delete bit;
           continue;
       }
@@ -288,6 +293,7 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
       // still same sequence ...add
       memcpy(img->data+len,bit->data,bit->len);
       len+=bit->len;
+	  delete[] bit->data;
       delete bit;
     }
     if(!_packet->nextPacket(_videoStreamId))
@@ -722,7 +728,7 @@ uint8_t asfHeader::buildIndex(void)
           printf("Unmapped stream %u\n",bit->stream); 
         }
       }
-     delete bit->data;
+     delete[] bit->data;
      delete bit;
     }
     //working->update(packet,_nbPackets);
@@ -739,7 +745,7 @@ uint8_t asfHeader::buildIndex(void)
   delete [] tmpIndex;
   
   fseeko(_fd,_dataStartOffset,SEEK_SET);
-  printf("[ASF]%u images found\n",nbImage);
+  printf("[ASF] %u images found\n",nbImage);
   printf("[ASF] ******** End of buildindex *******\n");
   _videostream.dwLength=_mainaviheader.dwTotalFrames=nbImage;
   if(!nbImage) return 0;
