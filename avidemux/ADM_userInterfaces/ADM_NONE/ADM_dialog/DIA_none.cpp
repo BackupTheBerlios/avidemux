@@ -114,6 +114,7 @@ void DIA_properties( void){return ;}
 int GUI_handleVFilter (void){return 0;}
 uint8_t  initFileSelector(void){return 0;}
 uint8_t initGUI( void ){return 1;}
+void destroyGUI(void) {}
 
 uint8_t DIA_job(uint32_t nb,char **name){return 0;}
 //uint8_t DIA_lavDecoder(uint32_t *swapUv, uint32_t *showU){return 0;}

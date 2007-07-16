@@ -1626,30 +1626,31 @@ A_saveAudioDecodedTest (char *name)
 //      Clean up
 //      free all pending stuff, make leakchecker happy
 //
-void
-cleanUp (void)
+void cleanUp (void)
 {
-  if (avifileinfo)
-  {
-    delete avifileinfo;
-    avifileinfo=NULL;
-   }
-  if (currentaudiostream)
-    {
-      // always destroyable on exit           if(currentaudiostream->isDestroyable())
-      delete currentaudiostream;
-      currentaudiostream=NULL;
-    }
-  if (video_body)
-  {
-    delete video_body;
-    video_body=NULL;
-   }
-  //
-  filterCleanUp ();
+	if (avifileinfo)
+	{
+		delete avifileinfo;
+		avifileinfo=NULL;
+	}
 
+	if (currentaudiostream)
+	{
+	// always destroyable on exit           if(currentaudiostream->isDestroyable())
+		delete currentaudiostream;
+		currentaudiostream=NULL;
+	}
 
+	if (video_body)
+	{
+		delete video_body;
+		video_body=NULL;
+	}
+
+	filterCleanUp();
+	admPreview::cleanUp();
 }
+
 extern uint8_t selecEncoder (uint8_t * codec);
 
 

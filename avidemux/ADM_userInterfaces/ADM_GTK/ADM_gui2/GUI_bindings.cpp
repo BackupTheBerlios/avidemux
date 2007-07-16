@@ -237,6 +237,12 @@ uint32_t w,h;
                
 	return ret;
 }
+
+void destroyGUI(void)
+{
+	renderDestroy();
+}
+
 /**
     \fn GUI_gtk_grow_off
     \brief allow main window to grow or not

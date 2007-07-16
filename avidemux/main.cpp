@@ -81,6 +81,7 @@ extern void register_Encoders( void )  ;
 extern void  buildDistMatrix( void );
 extern void initScaleTab( void );
 extern uint8_t initGUI( void );
+extern void destroyGUI(void);
 extern void COL_init(void);
 extern uint8_t initFileSelector(void);
 extern void AUDMEncoder_initDither(void);
@@ -314,6 +315,8 @@ void onexit( void )
 #ifdef HAVE_AUDIO
 	AVDM_cleanup();
 #endif
+
+	destroyGUI();
 
     printf("End of cleanup\n");
     ADMImage_stat();

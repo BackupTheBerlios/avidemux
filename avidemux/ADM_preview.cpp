@@ -527,4 +527,36 @@ void admPreview::displayNow(uint32_t framenum)
     }
 }
 
+void admPreview::cleanUp(void)
+{
+	if(rdrImage)
+	{
+		delete rdrImage;
+		rdrImage = NULL;
+	}
+
+	if(original)
+    {
+		delete original;
+		original=NULL;
+	}
+
+	if(previewImage)
+	{
+		delete previewImage; 
+		previewImage=NULL;
+	}
+
+	if(resized)
+	{
+		delete resized;
+		resized=NULL;
+	}
+
+	if(resizer)
+	{
+		delete resizer;
+		resizer=NULL;
+	}
+}
 // EOF

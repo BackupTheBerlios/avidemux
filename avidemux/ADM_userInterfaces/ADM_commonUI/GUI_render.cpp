@@ -79,6 +79,16 @@ uint8_t renderInit( void )
 	draw=UI_getDrawWidget(  );
 	return 1;
 }
+
+void renderDestroy(void)
+{
+	if(screenBuffer) 
+	{
+		delete[] screenBuffer;
+		screenBuffer = NULL;
+	}
+}
+
 /**
     \fn renderLock
     \brief Take the weak lock (i.e. not threadsafe)

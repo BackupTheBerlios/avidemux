@@ -61,14 +61,11 @@ class admPreview
       static void updateFilters(AVDMGenericVideoStream *first,AVDMGenericVideoStream *last);
       static void deferDisplay(uint32_t onoff,uint32_t startat);
       static void displayNow(uint32_t framenum);
-  
+	  static void cleanUp(void);  
 };
 
-
-
-
-
 uint8_t renderInit( void );
+void renderDestroy(void);
 uint8_t renderResize(uint32_t w, uint32_t h,uint32_t phyW,uint32_t phyH);
 uint8_t renderRefresh(void);
 uint8_t renderExpose(void);
