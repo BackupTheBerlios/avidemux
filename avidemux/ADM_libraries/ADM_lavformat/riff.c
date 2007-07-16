@@ -97,12 +97,16 @@ const AVCodecTag codec_bmp_tags[] = {
     { CODEC_ID_MPEG1VIDEO, 0x10000001 },
     { CODEC_ID_MPEG2VIDEO, 0x10000002 },
     { CODEC_ID_MPEG2VIDEO, MKTAG('D', 'V', 'R', ' ') },
+    { CODEC_ID_MPEG2VIDEO, MKTAG('M', 'M', 'E', 'S') },
     { CODEC_ID_MJPEG, MKTAG('M', 'J', 'P', 'G') },
     { CODEC_ID_MJPEG, MKTAG('L', 'J', 'P', 'G') },
     { CODEC_ID_LJPEG, MKTAG('L', 'J', 'P', 'G') },
     { CODEC_ID_MJPEG, MKTAG('J', 'P', 'G', 'L') }, /* Pegasus lossless JPEG */
+    { CODEC_ID_JPEGLS,MKTAG('M', 'J', 'L', 'S') }, /* JPEG-LS custom FOURCC for avi - encoder */
     { CODEC_ID_MJPEG, MKTAG('M', 'J', 'L', 'S') }, /* JPEG-LS custom FOURCC for avi - decoder */
-    { CODEC_ID_JPEGLS, MKTAG('M', 'J', 'L', 'S') }, /* JPEG-LS custom FOURCC for avi - encoder */
+    { CODEC_ID_MJPEG, MKTAG('j', 'p', 'e', 'g') },
+    { CODEC_ID_MJPEG, MKTAG('I', 'J', 'P', 'G') },
+    { CODEC_ID_MJPEG, MKTAG('A', 'V', 'R', 'n') },
     { CODEC_ID_HUFFYUV, MKTAG('H', 'F', 'Y', 'U') },
     { CODEC_ID_FFVHUFF, MKTAG('F', 'F', 'V', 'H') },
     { CODEC_ID_CYUV, MKTAG('C', 'Y', 'U', 'V') },
@@ -153,6 +157,7 @@ const AVCodecTag codec_bmp_tags[] = {
     { CODEC_ID_QPEG, MKTAG('Q', '1', '.', '1') },
     { CODEC_ID_WMV3, MKTAG('W', 'M', 'V', '3') },
     { CODEC_ID_VC1, MKTAG('W', 'V', 'C', '1') },
+    { CODEC_ID_VC1, MKTAG('W', 'M', 'V', 'A') },
     { CODEC_ID_LOCO, MKTAG('L', 'O', 'C', 'O') },
     { CODEC_ID_WNV1, MKTAG('W', 'N', 'V', '1') },
     { CODEC_ID_AASC, MKTAG('A', 'A', 'S', 'C') },
@@ -166,6 +171,7 @@ const AVCodecTag codec_bmp_tags[] = {
     { CODEC_ID_CAVS, MKTAG('C', 'A', 'V', 'S') },
     { CODEC_ID_JPEG2000, MKTAG('M', 'J', '2', 'C') },
     { CODEC_ID_VMNC, MKTAG('V', 'M', 'n', 'c') },
+    { CODEC_ID_TARGA, MKTAG('t', 'g', 'a', ' ') },
     { CODEC_ID_NONE, 0 },
 };
 
@@ -198,6 +204,8 @@ const AVCodecTag codec_wav_tags[] = {
     { CODEC_ID_TRUESPEECH, 0x22 },
     { CODEC_ID_FLAC, 0xF1AC },
     { CODEC_ID_IMC, 0x401 },
+    { CODEC_ID_GSM_MS, 0x31 },
+    { CODEC_ID_ATRAC3, 0x270 },
 
     /* FIXME: All of the IDs below are not 16 bit and thus illegal. */
     // for NuppelVideo (nuv.c)
@@ -206,69 +214,6 @@ const AVCodecTag codec_wav_tags[] = {
     { CODEC_ID_MP3, MKTAG('M', 'P', '3', ' ') },
     { 0, 0 },
 };
-
-unsigned int codec_get_tag(const AVCodecTag *tags, int id)
-{
-    while (tags->id != CODEC_ID_NONE) {
-        if (tags->id == id)
-            return tags->tag;
-        tags++;
-    }
-    return 0;
-}
-
-enum CodecID codec_get_id(const AVCodecTag *tags, unsigned int tag)
-{
-    while (tags->id != CODEC_ID_NONE) {
-        if(   toupper((tag >> 0)&0xFF) == toupper((tags->tag >> 0)&0xFF)
-           && toupper((tag >> 8)&0xFF) == toupper((tags->tag >> 8)&0xFF)
-           && toupper((tag >>16)&0xFF) == toupper((tags->tag >>16)&0xFF)
-           && toupper((tag >>24)&0xFF) == toupper((tags->tag >>24)&0xFF))
-            return tags->id;
-        tags++;
-    }
-    return CODEC_ID_NONE;
-}
-
-unsigned int av_codec_get_tag(const AVCodecTag *tags[4], enum CodecID id)
-{
-    int i;
-    for(i=0; i<4 && tags[i]; i++){
-        int tag= codec_get_tag(tags[i], id);
-        if(tag) return tag;
-    }
-    return 0;
-}
-
-enum CodecID av_codec_get_id(const AVCodecTag *tags[4], unsigned int tag)
-{
-    int i;
-    for(i=0; i<4 && tags[i]; i++){
-        enum CodecID id= codec_get_id(tags[i], tag);
-        if(id!=CODEC_ID_NONE) return id;
-    }
-    return CODEC_ID_NONE;
-}
-
-unsigned int codec_get_bmp_tag(int id)
-{
-    return codec_get_tag(codec_bmp_tags, id);
-}
-
-unsigned int codec_get_wav_tag(int id)
-{
-    return codec_get_tag(codec_wav_tags, id);
-}
-
-enum CodecID codec_get_bmp_id(unsigned int tag)
-{
-    return codec_get_id(codec_bmp_tags, tag);
-}
-
-enum CodecID codec_get_wav_id(unsigned int tag)
-{
-    return codec_get_id(codec_wav_tags, tag);
-}
 
 #ifdef CONFIG_MUXERS
 offset_t start_tag(ByteIOContext *pb, const char *tag)
@@ -296,8 +241,6 @@ int put_wav_header(ByteIOContext *pb, AVCodecContext *enc)
     int hdrsize = 18;
 
     if(!enc->codec_tag || enc->codec_tag > 0xffff)
-       enc->codec_tag = codec_get_tag(codec_wav_tags, enc->codec_id);
-    if(!enc->codec_tag || enc->codec_tag > 0xffff)
         return -1;
 
     put_le16(pb, enc->codec_tag);
@@ -307,7 +250,7 @@ int put_wav_header(ByteIOContext *pb, AVCodecContext *enc)
         enc->codec_id == CODEC_ID_PCM_ALAW ||
         enc->codec_id == CODEC_ID_PCM_MULAW) {
         bps = 8;
-    } else if (enc->codec_id == CODEC_ID_MP2 || enc->codec_id == CODEC_ID_MP3) {
+    } else if (enc->codec_id == CODEC_ID_MP2 || enc->codec_id == CODEC_ID_MP3 || enc->codec_id == CODEC_ID_GSM_MS) {
         bps = 0;
     } else if (enc->codec_id == CODEC_ID_ADPCM_IMA_WAV || enc->codec_id == CODEC_ID_ADPCM_MS || enc->codec_id == CODEC_ID_ADPCM_G726 || enc->codec_id == CODEC_ID_ADPCM_YAMAHA) { //
         bps = 4;
@@ -318,9 +261,12 @@ int put_wav_header(ByteIOContext *pb, AVCodecContext *enc)
     } else {
         bps = 16;
     }
+    if(bps != enc->bits_per_sample && enc->bits_per_sample){
+        av_log(enc, AV_LOG_WARNING, "requested bits_per_sample (%d) and actually stored (%d) differ\n", enc->bits_per_sample, bps);
+    }
 
-    if (enc->codec_id == CODEC_ID_MP2 || enc->codec_id == CODEC_ID_MP3) {
-        blkalign = enc->frame_size; //this is wrong, but seems many demuxers dont work if this is set correctly
+    if (enc->codec_id == CODEC_ID_MP2 || enc->codec_id == CODEC_ID_MP3 || enc->codec_id == CODEC_ID_GSM_MS) {
+        blkalign = enc->frame_size; //this is wrong, but it seems many demuxers do not work if this is set correctly
         //blkalign = 144 * enc->bit_rate/enc->sample_rate;
     } else if (enc->codec_id == CODEC_ID_ADPCM_G726) { //
         blkalign = 1;
@@ -358,10 +304,14 @@ int put_wav_header(ByteIOContext *pb, AVCodecContext *enc)
         put_le16(pb, 16); /* fwHeadFlags */
         put_le32(pb, 0);  /* dwPTSLow */
         put_le32(pb, 0);  /* dwPTSHigh */
+    } else if (enc->codec_id == CODEC_ID_GSM_MS) {
+        put_le16(pb, 2); /* wav_extra_size */
+        hdrsize += 2;
+        put_le16(pb, enc->frame_size); /* wSamplesPerBlock */
     } else if (enc->codec_id == CODEC_ID_ADPCM_IMA_WAV) {
         put_le16(pb, 2); /* wav_extra_size */
         hdrsize += 2;
-        put_le16(pb, ((enc->block_align - 4 * enc->channels) / (4 * enc->channels)) * 8 + 1); /* wSamplesPerBlock */
+        put_le16(pb, enc->frame_size); /* wSamplesPerBlock */
     } else if(enc->extradata_size){
         put_le16(pb, enc->extradata_size);
         put_buffer(pb, enc->extradata, enc->extradata_size);
@@ -387,10 +337,7 @@ void put_bmp_header(ByteIOContext *pb, AVCodecContext *enc, const AVCodecTag *ta
 
     put_le16(pb, enc->bits_per_sample ? enc->bits_per_sample : 24); /* depth */
     /* compression type */
-
-    // MEANX we dont need that
-        assert(0);
-/*    put_le32(pb, for_asf ? (enc->codec_tag ? enc->codec_tag : av_codec_get_tag(asf_muxer.codec_tag, enc->codec_id)) : enc->codec_tag); //*/
+    put_le32(pb, enc->codec_tag);
     put_le32(pb, enc->width * enc->height * 3);
     put_le32(pb, 0);
     put_le32(pb, 0);
@@ -427,22 +374,30 @@ void get_wav_header(ByteIOContext *pb, AVCodecContext *codec, int size)
         codec->bits_per_sample = 8;
     }else
         codec->bits_per_sample = get_le16(pb);
-    codec->codec_id = wav_codec_get_id(id, codec->bits_per_sample);
-
-    if (size > 16) {  /* We're obviously dealing with WAVEFORMATEX */
-        codec->extradata_size = get_le16(pb);
-        if (codec->extradata_size > 0) {
-            if (codec->extradata_size > size - 18)
-                codec->extradata_size = size - 18;
+    if (size >= 18) {  /* We're obviously dealing with WAVEFORMATEX */
+        int cbSize = get_le16(pb); /* cbSize */
+        size -= 18;
+        cbSize = FFMIN(size, cbSize);
+        if (cbSize >= 22 && id == 0xfffe) { /* WAVEFORMATEXTENSIBLE */
+            codec->bits_per_sample = get_le16(pb);
+            get_le32(pb); /* dwChannelMask */
+            id = get_le32(pb); /* 4 first bytes of GUID */
+            url_fskip(pb, 12); /* skip end of GUID */
+            cbSize -= 22;
+            size -= 22;
+        }
+        codec->extradata_size = cbSize;
+        if (cbSize > 0) {
             codec->extradata = av_mallocz(codec->extradata_size + FF_INPUT_BUFFER_PADDING_SIZE);
             get_buffer(pb, codec->extradata, codec->extradata_size);
-        } else
-            codec->extradata_size = 0;
+            size -= cbSize;
+        }
 
         /* It is possible for the chunk to contain garbage at the end */
-        if (size - codec->extradata_size - 18 > 0)
-            url_fskip(pb, size - codec->extradata_size - 18);
+        if (size > 0)
+            url_fskip(pb, size);
     }
+    codec->codec_id = wav_codec_get_id(id, codec->bits_per_sample);
 }
 
 

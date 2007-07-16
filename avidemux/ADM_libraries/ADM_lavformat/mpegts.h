@@ -19,6 +19,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#ifndef AVFORMAT_MPEGTS_H
+#define AVFORMAT_MPEGTS_H
+
+#include "avformat.h"
+
 #define TS_FEC_PACKET_SIZE 204
 #define TS_DVHS_PACKET_SIZE 192
 #define TS_PACKET_SIZE 188
@@ -46,14 +51,12 @@
 #define STREAM_TYPE_AUDIO_AAC       0x0f
 #define STREAM_TYPE_VIDEO_MPEG4     0x10
 #define STREAM_TYPE_VIDEO_H264      0x1b
+#define STREAM_TYPE_VIDEO_VC1       0xea
 
 #define STREAM_TYPE_AUDIO_AC3       0x81
 #define STREAM_TYPE_AUDIO_DTS       0x8a
 
 #define STREAM_TYPE_SUBTITLE_DVB    0x100
-
-unsigned int mpegts_crc32(const uint8_t *data, int len);
-extern AVOutputFormat mpegts_muxer;
 
 typedef struct MpegTSContext MpegTSContext;
 
@@ -61,3 +64,5 @@ MpegTSContext *mpegts_parse_open(AVFormatContext *s);
 int mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
                         const uint8_t *buf, int len);
 void mpegts_parse_close(MpegTSContext *ts);
+
+#endif /* AVFORMAT_MPEGTS_H */

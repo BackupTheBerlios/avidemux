@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
+#include "avstring.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/time.h>
@@ -31,7 +32,7 @@ static int file_open(URLContext *h, const char *filename, int flags)
     int access;
     int fd;
 
-    strstart(filename, "file:", &filename);
+    av_strstart(filename, "file:", &filename);
 
     if (flags & URL_RDWR) {
         access = O_CREAT | O_TRUNC | O_RDWR;
@@ -40,12 +41,12 @@ static int file_open(URLContext *h, const char *filename, int flags)
     } else {
         access = O_RDONLY;
     }
-#if defined(__MINGW32__) || defined(CONFIG_OS2) || defined(__CYGWIN__)
+#ifdef O_BINARY
     access |= O_BINARY;
 #endif
     fd = open(filename, access, 0666);
     if (fd < 0)
-        return -ENOENT;
+        return AVERROR(ENOENT);
     h->priv_data = (void *)(size_t)fd;
     return 0;
 }
@@ -95,7 +96,7 @@ static int pipe_open(URLContext *h, const char *filename, int flags)
     } else {
         fd = 0;
     }
-#if defined(__MINGW32__) || defined(CONFIG_OS2) || defined(__CYGWIN__)
+#ifdef O_BINARY
     setmode(fd, O_BINARY);
 #endif
     h->priv_data = (void *)(size_t)fd;

@@ -611,12 +611,9 @@ extern "C"
      extern  int        movenc_init(void );
 };
 extern URLProtocol file_protocol ;
-extern AVInputFormat matroska_demuxer;
 uint8_t lavformat_init(void)
 {
-//                mpegps_init();
                 movenc_init();
-                av_register_input_format(&matroska_demuxer);
                 register_protocol(&file_protocol);
 }
 extern "C"

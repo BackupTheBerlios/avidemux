@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
+#include "avstring.h"
 
 static int default_interrupt_cb(void);
 
@@ -67,12 +68,12 @@ int url_open(URLContext **puc, const char *filename, int flags)
             goto found;
         up = up->next;
     }
-    err = -ENOENT;
+    err = AVERROR(ENOENT);
     goto fail;
  found:
     uc = av_malloc(sizeof(URLContext) + strlen(filename) + 1);
     if (!uc) {
-        err = -ENOMEM;
+        err = AVERROR(ENOMEM);
         goto fail;
     }
 #if LIBAVFORMAT_VERSION_INT >= (52<<16)
@@ -124,7 +125,7 @@ offset_t url_seek(URLContext *h, offset_t pos, int whence)
     offset_t ret;
 
     if (!h->prot->url_seek)
-        return -EPIPE;
+        return AVERROR(EPIPE);
     ret = h->prot->url_seek(h, pos, whence);
     return ret;
 }
@@ -154,20 +155,14 @@ offset_t url_filesize(URLContext *h)
     size= url_seek(h, 0, AVSEEK_SIZE);
     if(size<0){
         pos = url_seek(h, 0, SEEK_CUR);
-        size = url_seek(h, -1, SEEK_END)+1;
+        if ((size = url_seek(h, -1, SEEK_END)) < 0)
+            return size;
+        size++;
         url_seek(h, pos, SEEK_SET);
     }
     return size;
 }
 
-/*
- * Return the maximum packet size associated to packetized file
- * handle. If the file is not packetized (stream like http or file on
- * disk), then 0 is returned.
- *
- * @param h file handle
- * @return maximum packet size in bytes
- */
 int url_get_max_packet_size(URLContext *h)
 {
     return h->max_packet_size;
@@ -175,7 +170,7 @@ int url_get_max_packet_size(URLContext *h)
 
 void url_get_filename(URLContext *h, char *buf, int buf_size)
 {
-    pstrcpy(buf, buf_size, h->filename);
+    av_strlcpy(buf, h->filename, buf_size);
 }
 
 
@@ -184,12 +179,6 @@ static int default_interrupt_cb(void)
     return 0;
 }
 
-/**
- * The callback is called in blocking functions to test regulary if
- * asynchronous interruption is needed. -EINTR is returned in this
- * case by the interrupted function. 'NULL' means no interrupt
- * callback is given.
- */
 void url_set_interrupt_cb(URLInterruptCB *interrupt_cb)
 {
     if (!interrupt_cb)
