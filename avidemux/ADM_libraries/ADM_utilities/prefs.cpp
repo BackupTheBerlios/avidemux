@@ -974,11 +974,21 @@ int initPrefs(  void )
   prefs = new preferences();
   return 1;
 }
-int destroyPrefs(  void )
+
+int destroyPrefs(void)
 {
-  delete prefs;
-  prefs=NULL;
-  return 1;
+	for (int i = 0; i < num_opts; i++)
+	{
+		if (opt_defs[i].current_val)
+		{
+			ADM_dealloc(opt_defs[i].current_val);
+			opt_defs[i].current_val=NULL;
+		}
+	}
+
+	delete prefs;
+	prefs = NULL;
+	return 1;
 }
 
 // EOF
