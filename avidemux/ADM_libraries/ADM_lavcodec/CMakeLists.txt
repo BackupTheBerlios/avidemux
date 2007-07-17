@@ -28,8 +28,9 @@ SET(${ADM_LIB}_SRCS
                 ac3enc.c ac3.c ac3tab.c
                 mjpegenc.c mjpegdec.c
                 wma.c
-
-
+                dvbsub_parser.c
+                dvbsubdec.c
+                dvbsub.c
 )
 # ADD x86 ones
 

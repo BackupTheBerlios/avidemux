@@ -33,6 +33,17 @@ int main(void)
     DECLARE_DECODER (MJPEG, mjpeg);
     DECLARE_DECODER(WMAV2, wmav2);
     DECLARE_DECODER (DVVIDEO, dvvideo);
+    DECLARE_DECODER (HUFFYUV, huffyuv);
+    DECLARE_DECODER (FFVHUFF, ffvhuff);
+    DECLARE_DECODER(SVQ3, svq3);
+    DECLARE_DECODER(TSCC, tscc);
+    DECLARE_DECODER(QDM2, qdm2);
+    DECLARE_DECODER (FFV1, ffv1);
+    DECLARE_DECODER (MPEG1VIDEO, mpeg1video);
+    DECLARE_DECODER (MPEG2VIDEO, mpeg2video);
+    DECLARE_DECODER (RV10, rv10);
+    DECLARE_DECODER (RV20, rv20);
+    DECLARE_DECODER (DVBSUB, dvbsub);
 
 #undef DECLARE_DECODER
 #define DECLARE_DECODER(a,b); printf("#define ENABLE_"#a"_DECODER 0\n"); 
@@ -65,13 +76,11 @@ int main(void)
     DECLARE_DECODER(SMACKER, smacker);
     DECLARE_DECODER(SMC, smc);
     DECLARE_DECODER(SP5X, sp5x);
-    DECLARE_DECODER(SVQ3, svq3);
     DECLARE_DECODER(THEORA, theora);
     DECLARE_DECODER(THP, thp);
     DECLARE_DECODER(TIERTEXSEQVIDEO, tiertexseqvideo);
     DECLARE_DECODER(TRUEMOTION1, truemotion1);
     DECLARE_DECODER(TRUEMOTION2, truemotion2);
-    DECLARE_DECODER(TSCC, tscc);
     DECLARE_DECODER(TXD, txd);
     DECLARE_DECODER(ULTI, ulti);
     DECLARE_DECODER(VMDVIDEO, vmdvideo);
@@ -95,7 +104,6 @@ int main(void)
     DECLARE_DECODER(MP3ADU, mp3adu);
     DECLARE_DECODER(MP3ON4, mp3on4);
     DECLARE_DECODER(MPC7, mpc7);
-    DECLARE_DECODER(QDM2, qdm2);
     DECLARE_DECODER(RA_144, ra_144);
     DECLARE_DECODER(RA_288, ra_288);
     DECLARE_DECODER(SHORTEN, shorten);
@@ -113,23 +121,16 @@ int main(void)
     DECLARE_DECODER (ASV1, asv1);
     DECLARE_DECODER (ASV2, asv2);
     DECLARE_DECODER (BMP, bmp);
-    DECLARE_DECODER (FFV1, ffv1);
-    DECLARE_DECODER (FFVHUFF, ffvhuff);
     DECLARE_DECODER (FLASHSV, flashsv);
     DECLARE_DECODER (FLV, flv);
     DECLARE_DECODER (GIF, gif);
     DECLARE_DECODER (H261, h261);
     DECLARE_DECODER (H263, h263);
-    DECLARE_DECODER (HUFFYUV, huffyuv);
     DECLARE_DECODER (JPEGLS, jpegls);
-    DECLARE_DECODER (MPEG1VIDEO, mpeg1video);
-    DECLARE_DECODER (MPEG2VIDEO, mpeg2video);
     DECLARE_DECODER (PNG, png);
     DECLARE_DECODER (QTRLE, qtrle);
     DECLARE_DECODER (RAWVIDEO, rawvideo);
     DECLARE_DECODER (ROQ, roq);
-    DECLARE_DECODER (RV10, rv10);
-    DECLARE_DECODER (RV20, rv20);
     DECLARE_DECODER (SGI, sgi);
     DECLARE_DECODER (SNOW, snow);
     DECLARE_DECODER (SVQ1, svq1);
@@ -184,7 +185,6 @@ int main(void)
     DECLARE_DECODER (ADPCM_SWF, adpcm_swf);
     DECLARE_DECODER (ADPCM_XA, adpcm_xa);
     DECLARE_DECODER (ADPCM_YAMAHA, adpcm_yamaha);
-    DECLARE_DECODER (DVBSUB, dvbsub);
     DECLARE_DECODER (DVDSUB, dvdsub);
 
 #define DECLARE_PARSER(a,b); printf("#define ENABLE_"#a"_PARSER 1\n"); 
@@ -221,6 +221,8 @@ int main(void)
     DECLARE_ENCODER (SNOW, snow);
     DECLARE_ENCODER (MP2, mp2);
     DECLARE_ENCODER (DVVIDEO, dvvideo);
+    DECLARE_ENCODER (HUFFYUV, huffyuv);
+    DECLARE_ENCODER (DVBSUB, dvbsub);
 
 #undef DECLARE_ENCODER
 #define DECLARE_ENCODER(a,b); printf("#define ENABLE_"#a"_ENCODER 0\n"); 
@@ -245,7 +247,6 @@ int main(void)
     DECLARE_ENCODER (FLV, flv);
     DECLARE_ENCODER (GIF, gif);
     DECLARE_ENCODER (H261, h261);
-    DECLARE_ENCODER (HUFFYUV, huffyuv);
     DECLARE_ENCODER (JPEGLS, jpegls);
     DECLARE_ENCODER (MSMPEG4V1, msmpeg4v1);
     DECLARE_ENCODER (MSMPEG4V2, msmpeg4v2);
@@ -308,7 +309,6 @@ int main(void)
     DECLARE_ENCODER (ADPCM_SWF, adpcm_swf);
     DECLARE_ENCODER (ADPCM_XA, adpcm_xa);
     DECLARE_ENCODER (ADPCM_YAMAHA, adpcm_yamaha);
-    DECLARE_ENCODER (DVBSUB, dvbsub);
     DECLARE_ENCODER (DVDSUB, dvdsub);
 
 printf("#define ENABLE_LIBVORBIS_ENCODER        0\n");
