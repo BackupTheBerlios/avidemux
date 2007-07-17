@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #ifndef SWSCALE_INTERNAL_H
@@ -33,13 +33,6 @@
 #define AVV(x...) {x}
 #endif
 
-#define MSG_WARN(args...) av_log(NULL, AV_LOG_DEBUG, ##args )
-#define MSG_FATAL(args...) av_log(NULL, AV_LOG_ERROR, ##args )
-#define MSG_ERR(args...) av_log(NULL, AV_LOG_ERROR, ##args )
-#define MSG_V(args...) av_log(NULL, AV_LOG_INFO, ##args )
-#define MSG_DBG2(args...) av_log(NULL, AV_LOG_DEBUG, ##args )
-#define MSG_INFO(args...) av_log(NULL, AV_LOG_INFO, ##args )
-
 #define MAX_FILTER_SIZE 256
 
 typedef int (*SwsFunc)(struct SwsContext *context, uint8_t* src[], int srcStride[], int srcSliceY,
@@ -47,109 +40,114 @@ typedef int (*SwsFunc)(struct SwsContext *context, uint8_t* src[], int srcStride
 
 /* this struct should be aligned on at least 32-byte boundary */
 typedef struct SwsContext{
-	/**
-	 *
-	 * Note the src,dst,srcStride,dstStride will be copied, in the sws_scale() warper so they can freely be modified here
-	 */
-	SwsFunc swScale;
-	int srcW, srcH, dstH;
-	int chrSrcW, chrSrcH, chrDstW, chrDstH;
-	int lumXInc, chrXInc;
-	int lumYInc, chrYInc;
-	int dstFormat, srcFormat;               ///< format 4:2:0 type is allways YV12
-	int origDstFormat, origSrcFormat;       ///< format
-	int chrSrcHSubSample, chrSrcVSubSample;
-	int chrIntHSubSample, chrIntVSubSample;
-	int chrDstHSubSample, chrDstVSubSample;
-	int vChrDrop;
-        int sliceDir;
-	double param[2];
+    /**
+     * info on struct for av_log
+     */
+    AVClass *av_class;
 
-	int16_t **lumPixBuf;
-	int16_t **chrPixBuf;
-	int16_t *hLumFilter;
-	int16_t *hLumFilterPos;
-	int16_t *hChrFilter;
-	int16_t *hChrFilterPos;
-	int16_t *vLumFilter;
-	int16_t *vLumFilterPos;
-	int16_t *vChrFilter;
-	int16_t *vChrFilterPos;
+    /**
+     *
+     * Note the src,dst,srcStride,dstStride will be copied, in the sws_scale() warper so they can freely be modified here
+     */
+    SwsFunc swScale;
+    int srcW, srcH, dstH;
+    int chrSrcW, chrSrcH, chrDstW, chrDstH;
+    int lumXInc, chrXInc;
+    int lumYInc, chrYInc;
+    int dstFormat, srcFormat;               ///< format 4:2:0 type is always YV12
+    int origDstFormat, origSrcFormat;       ///< format
+    int chrSrcHSubSample, chrSrcVSubSample;
+    int chrIntHSubSample, chrIntVSubSample;
+    int chrDstHSubSample, chrDstVSubSample;
+    int vChrDrop;
+    int sliceDir;
+    double param[2];
 
-	uint8_t formatConvBuffer[4000]; //FIXME dynamic alloc, but we have to change alot of code for this to be usefull
+    int16_t **lumPixBuf;
+    int16_t **chrPixBuf;
+    int16_t *hLumFilter;
+    int16_t *hLumFilterPos;
+    int16_t *hChrFilter;
+    int16_t *hChrFilterPos;
+    int16_t *vLumFilter;
+    int16_t *vLumFilterPos;
+    int16_t *vChrFilter;
+    int16_t *vChrFilterPos;
 
-	int hLumFilterSize;
-	int hChrFilterSize;
-	int vLumFilterSize;
-	int vChrFilterSize;
-	int vLumBufSize;
-	int vChrBufSize;
+    uint8_t formatConvBuffer[4000]; //FIXME dynamic alloc, but we have to change a lot of code for this to be useful
 
-	uint8_t *funnyYCode;
-	uint8_t *funnyUVCode;
-	int32_t *lumMmx2FilterPos;
-	int32_t *chrMmx2FilterPos;
-	int16_t *lumMmx2Filter;
-	int16_t *chrMmx2Filter;
+    int hLumFilterSize;
+    int hChrFilterSize;
+    int vLumFilterSize;
+    int vChrFilterSize;
+    int vLumBufSize;
+    int vChrBufSize;
 
-	int canMMX2BeUsed;
+    uint8_t *funnyYCode;
+    uint8_t *funnyUVCode;
+    int32_t *lumMmx2FilterPos;
+    int32_t *chrMmx2FilterPos;
+    int16_t *lumMmx2Filter;
+    int16_t *chrMmx2Filter;
 
-	int lastInLumBuf;
-	int lastInChrBuf;
-	int lumBufIndex;
-	int chrBufIndex;
-	int dstY;
-	int flags;
-	void * yuvTable;			// pointer to the yuv->rgb table start so it can be freed()
-	void * table_rV[256];
-	void * table_gU[256];
-	int    table_gV[256];
-	void * table_bU[256];
+    int canMMX2BeUsed;
 
-	//Colorspace stuff
-	int contrast, brightness, saturation;	// for sws_getColorspaceDetails
-	int srcColorspaceTable[4];
-	int dstColorspaceTable[4];
-	int srcRange, dstRange;
+    int lastInLumBuf;
+    int lastInChrBuf;
+    int lumBufIndex;
+    int chrBufIndex;
+    int dstY;
+    int flags;
+    void * yuvTable;            // pointer to the yuv->rgb table start so it can be freed()
+    uint8_t * table_rV[256];
+    uint8_t * table_gU[256];
+    int    table_gV[256];
+    uint8_t * table_bU[256];
 
-#define RED_DITHER   "0*8"
-#define GREEN_DITHER "1*8"
-#define BLUE_DITHER  "2*8"
-#define Y_COEFF      "3*8"
-#define VR_COEFF     "4*8"
-#define UB_COEFF     "5*8"
-#define VG_COEFF     "6*8"
-#define UG_COEFF     "7*8"
-#define Y_OFFSET     "8*8"
-#define U_OFFSET     "9*8"
-#define V_OFFSET     "10*8"
+    //Colorspace stuff
+    int contrast, brightness, saturation;    // for sws_getColorspaceDetails
+    int srcColorspaceTable[4];
+    int dstColorspaceTable[4];
+    int srcRange, dstRange;
+
+#define RED_DITHER            "0*8"
+#define GREEN_DITHER          "1*8"
+#define BLUE_DITHER           "2*8"
+#define Y_COEFF               "3*8"
+#define VR_COEFF              "4*8"
+#define UB_COEFF              "5*8"
+#define VG_COEFF              "6*8"
+#define UG_COEFF              "7*8"
+#define Y_OFFSET              "8*8"
+#define U_OFFSET              "9*8"
+#define V_OFFSET              "10*8"
 #define LUM_MMX_FILTER_OFFSET "11*8"
 #define CHR_MMX_FILTER_OFFSET "11*8+4*4*256"
-#define DSTW_OFFSET  "11*8+4*4*256*2" //do not change, its hardcoded in the asm
-#define ESP_OFFSET  "11*8+4*4*256*2+8"
-#define VROUNDER_OFFSET "11*8+4*4*256*2+16"
-#define U_TEMP       "11*8+4*4*256*2+24"
-#define V_TEMP       "11*8+4*4*256*2+32"
+#define DSTW_OFFSET           "11*8+4*4*256*2" //do not change, it is hardcoded in the asm
+#define ESP_OFFSET            "11*8+4*4*256*2+8"
+#define VROUNDER_OFFSET       "11*8+4*4*256*2+16"
+#define U_TEMP                "11*8+4*4*256*2+24"
+#define V_TEMP                "11*8+4*4*256*2+32"
 
-	uint64_t redDither   __attribute__((aligned(8)));
-	uint64_t greenDither __attribute__((aligned(8)));
-	uint64_t blueDither  __attribute__((aligned(8)));
+    uint64_t redDither   __attribute__((aligned(8)));
+    uint64_t greenDither __attribute__((aligned(8)));
+    uint64_t blueDither  __attribute__((aligned(8)));
 
-	uint64_t yCoeff      __attribute__((aligned(8)));
-	uint64_t vrCoeff     __attribute__((aligned(8)));
-	uint64_t ubCoeff     __attribute__((aligned(8)));
-	uint64_t vgCoeff     __attribute__((aligned(8)));
-	uint64_t ugCoeff     __attribute__((aligned(8)));
-	uint64_t yOffset     __attribute__((aligned(8)));
-	uint64_t uOffset     __attribute__((aligned(8)));
-	uint64_t vOffset     __attribute__((aligned(8)));
-	int32_t  lumMmxFilter[4*MAX_FILTER_SIZE];
-	int32_t  chrMmxFilter[4*MAX_FILTER_SIZE];
-	int dstW;
-	uint64_t esp __attribute__((aligned(8)));
-	uint64_t vRounder     __attribute__((aligned(8)));
-	uint64_t u_temp       __attribute__((aligned(8)));
-	uint64_t v_temp       __attribute__((aligned(8)));
+    uint64_t yCoeff      __attribute__((aligned(8)));
+    uint64_t vrCoeff     __attribute__((aligned(8)));
+    uint64_t ubCoeff     __attribute__((aligned(8)));
+    uint64_t vgCoeff     __attribute__((aligned(8)));
+    uint64_t ugCoeff     __attribute__((aligned(8)));
+    uint64_t yOffset     __attribute__((aligned(8)));
+    uint64_t uOffset     __attribute__((aligned(8)));
+    uint64_t vOffset     __attribute__((aligned(8)));
+    int32_t  lumMmxFilter[4*MAX_FILTER_SIZE];
+    int32_t  chrMmxFilter[4*MAX_FILTER_SIZE];
+    int dstW;
+    uint64_t esp          __attribute__((aligned(8)));
+    uint64_t vRounder     __attribute__((aligned(8)));
+    uint64_t u_temp       __attribute__((aligned(8)));
+    uint64_t v_temp       __attribute__((aligned(8)));
 
 #ifdef HAVE_ALTIVEC
 
@@ -160,9 +158,25 @@ typedef struct SwsContext{
   vector signed short   CGV;
   vector signed short   OY;
   vector unsigned short CSHIFT;
-  vector signed short *vYCoeffsBank, *vCCoeffsBank;
+  vector signed short   *vYCoeffsBank, *vCCoeffsBank;
 
 #endif
+
+
+#ifdef ARCH_BFIN
+    uint32_t oy           __attribute__((aligned(4)));
+    uint32_t oc           __attribute__((aligned(4)));
+    uint32_t zero         __attribute__((aligned(4)));
+    uint32_t cy           __attribute__((aligned(4)));
+    uint32_t crv          __attribute__((aligned(4)));
+    uint32_t rmask        __attribute__((aligned(4)));
+    uint32_t cbu          __attribute__((aligned(4)));
+    uint32_t bmask        __attribute__((aligned(4)));
+    uint32_t cgu          __attribute__((aligned(4)));
+    uint32_t cgv          __attribute__((aligned(4)));
+    uint32_t gmask        __attribute__((aligned(4)));
+#endif
+
 
 } SwsContext;
 //FIXME check init (where 0)
@@ -173,21 +187,49 @@ int yuv2rgb_c_init_tables (SwsContext *c, const int inv_table[4], int fullRange,
 char *sws_format_name(int format);
 
 //FIXME replace this with something faster
-#define isPlanarYUV(x) ((x)==PIX_FMT_YUV410P || (x)==PIX_FMT_YUV420P	\
-			|| (x)==PIX_FMT_YUV411P || (x)==PIX_FMT_YUV422P	\
-			|| (x)==PIX_FMT_YUV444P || (x)==PIX_FMT_NV12	\
-			|| (x)==PIX_FMT_NV21)
-#define isYUV(x)       ((x)==PIX_FMT_UYVY422 || (x)==PIX_FMT_YUYV422 || isPlanarYUV(x))
-#define isGray(x)      ((x)==PIX_FMT_GRAY8 || (x)==PIX_FMT_GRAY16BE || (x)==PIX_FMT_GRAY16LE)
-#define isGray16(x)    ((x)==PIX_FMT_GRAY16BE || (x)==PIX_FMT_GRAY16LE)
-#define isRGB(x)       ((x)==PIX_FMT_BGR32 || (x)==PIX_FMT_RGB24	\
-			|| (x)==PIX_FMT_RGB565 || (x)==PIX_FMT_RGB555	\
-			|| (x)==PIX_FMT_RGB8 || (x)==PIX_FMT_RGB4	\
-			|| (x)==PIX_FMT_MONOBLACK)
-#define isBGR(x)       ((x)==PIX_FMT_RGB32 || (x)==PIX_FMT_BGR24	\
-			|| (x)==PIX_FMT_BGR565 || (x)==PIX_FMT_BGR555	\
-			|| (x)==PIX_FMT_BGR8 || (x)==PIX_FMT_BGR4	\
-			|| (x)==PIX_FMT_MONOBLACK)
+#define isPlanarYUV(x)  (           \
+           (x)==PIX_FMT_YUV410P     \
+        || (x)==PIX_FMT_YUV420P     \
+        || (x)==PIX_FMT_YUV411P     \
+        || (x)==PIX_FMT_YUV422P     \
+        || (x)==PIX_FMT_YUV444P     \
+        || (x)==PIX_FMT_NV12        \
+        || (x)==PIX_FMT_NV21        \
+    )
+#define isYUV(x)        (           \
+           (x)==PIX_FMT_UYVY422     \
+        || (x)==PIX_FMT_YUYV422     \
+        || isPlanarYUV(x)           \
+    )
+#define isGray(x)       (           \
+           (x)==PIX_FMT_GRAY8       \
+        || (x)==PIX_FMT_GRAY16BE    \
+        || (x)==PIX_FMT_GRAY16LE    \
+    )
+#define isGray16(x)     (           \
+           (x)==PIX_FMT_GRAY16BE    \
+        || (x)==PIX_FMT_GRAY16LE    \
+    )
+#define isRGB(x)        (           \
+           (x)==PIX_FMT_BGR32       \
+        || (x)==PIX_FMT_RGB24       \
+        || (x)==PIX_FMT_RGB565      \
+        || (x)==PIX_FMT_RGB555      \
+        || (x)==PIX_FMT_RGB8        \
+        || (x)==PIX_FMT_RGB4        \
+        || (x)==PIX_FMT_RGB4_BYTE   \
+        || (x)==PIX_FMT_MONOBLACK   \
+    )
+#define isBGR(x)        (           \
+           (x)==PIX_FMT_RGB32       \
+        || (x)==PIX_FMT_BGR24       \
+        || (x)==PIX_FMT_BGR565      \
+        || (x)==PIX_FMT_BGR555      \
+        || (x)==PIX_FMT_BGR8        \
+        || (x)==PIX_FMT_BGR4        \
+        || (x)==PIX_FMT_BGR4_BYTE   \
+        || (x)==PIX_FMT_MONOBLACK   \
+    )
 
 static inline int fmt_depth(int fmt)
 {
