@@ -81,6 +81,23 @@ aviWrite::aviWrite( void )
 
 // MOD Feb 2005 by GMV: remove ODML index
 aviWrite::~aviWrite(){
+	if (myindex)
+		delete myindex;
+
+	if (LAll)
+		delete LAll;
+
+	if (LMovie)
+		delete LMovie;
+
+	if (LMain)
+		delete LMain;
+
+	myindex = NULL;
+	LAll = NULL;
+	LMovie = NULL;
+	LMain = NULL;
+
 	odml_destroy_index();
 }
 // END MOD Feb 2005 by GMV

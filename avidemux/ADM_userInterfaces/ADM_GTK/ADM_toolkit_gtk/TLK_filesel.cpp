@@ -398,7 +398,6 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 			}
 			fclose(fd);
 			cb(name);
-			ADM_dealloc(name);
 		} // no callback -> return value
 	}
 }
@@ -495,6 +494,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
         if(cb)
         {
                 fileReadWrite(cb, rw, name);
+				ADM_dealloc(name);
         }
         else
         {
