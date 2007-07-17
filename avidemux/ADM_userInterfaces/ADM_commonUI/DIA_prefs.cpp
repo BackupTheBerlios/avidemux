@@ -428,6 +428,11 @@ char     *globalGlyphName=NULL;
 				initSdl();
 			#endif
 	}
+
+	ADM_dealloc(alsaDevice);
+	ADM_dealloc(filterPath);
+	ADM_dealloc(globalGlyphName);
+
 	return 1;
 }
 extern int DIA_getMPParams( uint32_t *pplevel, uint32_t *ppstrength,uint32_t *swap);
