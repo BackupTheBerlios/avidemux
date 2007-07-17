@@ -60,9 +60,6 @@ static void FillAudio(void);
 extern void UI_purge(void);
 #define EVEN(x) (x&0xffffffe)
 
- 
-
- extern uint8_t GUI_getFrame(uint32_t frameno,  uint32_t *flags);
 //___________________________________
 uint8_t stop_req;
 static int called = 0;
@@ -217,10 +214,9 @@ abort_play:
     // go back to normal display mode
     //____________________________________
     playing = 0;
-    uint32_t f;
           
 	   getFirstVideoFilter( );
-	   //GUI_getFrame(curframe,&f);
+
            admPreview::deferDisplay(0,0);
            UI_purge();
            // Updated by expose ? 
@@ -351,7 +347,7 @@ void ComputePreload(void)
     channels= playback->getInfo()->channels;
     one_audio_frame = (one_frame * wavinfo->frequency * channels);	// 1000 *nb audio bytes per ms
     one_audio_frame /= 1000; // In elemtary info (float)
-    printf("\n 1 audio frame = %lu bytes (1)", one_audio_frame);
+    printf("1 audio frame = %lu bytes\n", one_audio_frame);
     // 3 sec buffer..               
     wavbuf =  (float *)  ADM_alloc((3 *  channels * wavinfo->frequency*wavinfo->channels));
     ADM_assert(wavbuf);
