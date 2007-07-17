@@ -55,6 +55,7 @@ diaElemMenu::~diaElemMenu()
   for(int i=0;i<nbMenu;i++)
       delete menus[i];
   delete [] menus;
+  delete dyna;
   
 }
 void diaElemMenu::setMe(void *dialog, void *opaque,uint32_t line)

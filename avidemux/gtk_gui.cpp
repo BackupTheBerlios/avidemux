@@ -1641,6 +1641,18 @@ void cleanUp (void)
 		currentaudiostream=NULL;
 	}
 
+	if (currentAudioName)
+	{
+		ADM_dealloc(currentAudioName);
+		currentAudioName = NULL;
+	}
+
+	if (actual_workbench_file)
+	{
+		ADM_dealloc(actual_workbench_file);
+		actual_workbench_file = NULL;
+	}
+
 	if (video_body)
 	{
 		delete video_body;
@@ -1650,11 +1662,6 @@ void cleanUp (void)
 	filterCleanUp();
 	admPreview::cleanUp();
 }
-
-extern uint8_t selecEncoder (uint8_t * codec);
-
-
-
 
 #warning fixme
 
