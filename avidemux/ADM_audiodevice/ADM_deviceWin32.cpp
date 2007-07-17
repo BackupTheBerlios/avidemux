@@ -27,9 +27,9 @@
 #include "ADM_osSupport/ADM_debugID.h"
 #include "ADM_osSupport/ADM_debug.h"
 
-#define BUCKET_SIZE 16384
 #define NB_BUCKET 8
 
+static uint32_t bucketSize;
 static HWAVEOUT myDevice;
 static MMRESULT myError;
 
@@ -75,7 +75,7 @@ uint8_t win32AudioDevice::stop(void)
 
 uint8_t win32AudioDevice::init(uint8_t channels, uint32_t fq) 
 {
-	printf("[Win32] Opening Audio, fq=%d\n",fq);
+	printf("[Win32] Opening Audio, channels=%u freq=%u\n",channels, fq);
 
 	if (_inUse) 
 	{
@@ -85,6 +85,7 @@ uint8_t win32AudioDevice::init(uint8_t channels, uint32_t fq)
 
 	_inUse = 1;
 	_channels = channels;
+	bucketSize = channels * fq;
 
 	WAVEFORMATEX wav;
 
@@ -110,13 +111,14 @@ uint8_t win32AudioDevice::init(uint8_t channels, uint32_t fq)
 	{
 		memset(&waveHdr[i], 0, sizeof(WAVEHDR));
 
-		waveHdr[i].lpData = (char*)new uint8_t[BUCKET_SIZE];
+		waveHdr[i].dwBufferLength = bucketSize;
+		waveHdr[i].lpData = (char*)new uint8_t[bucketSize];
 
 		if (waveOutPrepareHeader(myDevice, &waveHdr[i], sizeof(WAVEHDR)) != MMSYSERR_NOERROR)
 			printf("[Win32] waveOutPrepareHeader error\n");
 
-		if (waveOutWrite(myDevice, &waveHdr[i], sizeof(WAVEHDR)) != MMSYSERR_NOERROR)
-			printf("[Win32] waveOutWrite error\n");
+		waveHdr[i].dwBufferLength = 0;
+		waveHdr[i].dwFlags |= WHDR_DONE;
 	}
 
 	return 1;
@@ -136,6 +138,9 @@ uint8_t  win32AudioDevice::setVolume(int volume)
 
 uint8_t win32AudioDevice::play(uint32_t len, float *data)
 {
+	if (len == 0)
+		return 1;
+
 	dither16(data, len, _channels);
 	len *= 2;
 	uint8_t success = 0;
@@ -146,8 +151,8 @@ uint8_t win32AudioDevice::play(uint32_t len, float *data)
 		{
 			waveHdr[i].dwFlags &= ~WHDR_DONE;
 
-			if (len > BUCKET_SIZE)
-				waveHdr[i].dwBufferLength = BUCKET_SIZE;
+			if (len > bucketSize)
+				waveHdr[i].dwBufferLength = bucketSize;
 			else
 				waveHdr[i].dwBufferLength = len;
 
@@ -163,6 +168,12 @@ uint8_t win32AudioDevice::play(uint32_t len, float *data)
 
 		if (len == 0)
 			break;
+	}
+
+	if (len != 0)
+	{
+		printf("[Win32] No audio buffer available, %u bytes discarded\n", len);
+		return 0;
 	}
 
 	return success;
