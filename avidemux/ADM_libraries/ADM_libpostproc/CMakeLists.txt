@@ -13,5 +13,8 @@ ADD_ADM_LIB(${ADM_LIB} ADM_libraries)
 
 
 ################################
-add_definitions(-I.. -DHAVE_AV_CONFIG_H  -O3 -I../.. -I../ADM_lavutil -Drestrict=__restrict__ -fomit-frame-pointer -msse )
+add_definitions(-I.. -DHAVE_AV_CONFIG_H  -O3 -I../.. -I../ADM_lavutil -Drestrict=__restrict__ -fomit-frame-pointer)
 
+IF(ARCH_X86_64)
+add_definitions(-msse)
+ENDIF(ARCH_X86_64)
