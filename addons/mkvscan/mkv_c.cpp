@@ -104,6 +104,15 @@ void ADM_mkvWalk(ADM_ebml_file *working, uint32_t size)
                   val=son.readUnsignedInt(len);
                   recTab();printf("\tval uint: %llu (0x%llx) \n",val,val);
                   break;
+        case ADM_MKV_TYPE_UTF8:
+        {
+                  char string[len+1];
+                  string[0]=0;
+                  son.readString(string,len);
+                  recTab();printf("\tval utf8 as string: <%s> \n",string);
+        }
+                  break;
+                  
         case ADM_MKV_TYPE_FLOAT:
                   recTab();printf("\tval float: %f \n",son.readFloat(len));
                   break;

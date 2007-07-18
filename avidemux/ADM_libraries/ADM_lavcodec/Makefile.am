@@ -36,7 +36,7 @@ else
 EXTEND_PPC=
 
 endif
-MYCFLAGS= -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -I../.. -I$(LAVUTIL) -Drestrict=__restrict__ -fomit-frame-pointer
+MYCFLAGS= -I. -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -I../.. -I$(LAVUTIL) -Drestrict=__restrict__ -fomit-frame-pointer -include ffconf.h
 # for SSE we need special compil flags
 fft_sse.o:i386/fft_sse.c
 	$(CC) -o $@ $< -c $(MYCFLAGS) $(CFLAGS) $(all_includes) -I..   -msse -I$(LAVUTIL) -I../../..
@@ -56,7 +56,21 @@ libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c  \
 		truemotion1.c flac.c g726.c 	qtrle.c lcl.c 	snow.c  \
 		rangecoder.c bitstream.c h264idct.c h261.c amr.c tscc.c \
 		resample2.c pthread.c qdm2.c bitstream_filter.c eval.c \
-		vc1.c vc1dsp.c vp56.c vp56data.c vp6.c vp5.c indeo2.c indeo3.c  smacker.c  opt.c
+		vc1.c vc1dsp.c vp56.c vp56data.c vp6.c vp5.c indeo2.c indeo3.c  smacker.c  opt.c \
+		 fraps.c dnxhddata.h  dnxhddec.c	\
+                mpeg12data.c  mpegaudiodata.c  msmpeg4data.c   vc1data.c   vp56data.c mjpegbdec.c \
+                h263_parser.c \
+                h264_parser.c \
+                mpeg4video_parser.c \
+                mpegvideo_enc.c \
+                mpeg12enc.c mpegaudioenc.c \
+                ac3enc.c ac3.c ac3tab.c \
+                mjpegenc.c mjpegdec.c \
+                wma.c \
+                dvbsub_parser.c \
+                dvbsubdec.c \
+                dvbsub.c
+
 	
 
 EXTRA_DIST = ac3.h    faandct.h      internal.h   \

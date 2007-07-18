@@ -11,7 +11,8 @@ DIA_flyHue.cpp \
 DIA_flySrtPos.cpp \
 DIA_tdeint.cpp DIA_v2v.cpp \
 DIA_lavDecoder.cpp  DIA_srt.cpp \
-DIA_animated.cpp
+DIA_animated.cpp \
+DIA_ocr.cpp
 
 
 INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@ADM_SUBVERSION@ \
