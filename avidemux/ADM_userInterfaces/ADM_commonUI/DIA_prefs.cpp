@@ -102,7 +102,7 @@ char     *globalGlyphName=NULL;
         // autoindex
         prefs->get(FEATURE_AUTO_REBUILDINDEX,&autoindex);
         // Global glyph
-        prefs->get(FEATURE_GLOBAL_GLYPH,&useGlobalGlyph);
+        prefs->get(FEATURE_GLOBAL_GLYPH_ACTIVE,&useGlobalGlyph);
         prefs->get(FEATURE_GLOBAL_GLYPH_NAME,&globalGlyphName);
          // autoindex
         prefs->get(FEATURE_AUTO_UNPACK,&autounpack);
@@ -351,7 +351,7 @@ char     *globalGlyphName=NULL;
         diaElemTabs *tabs[]={&tabUser,&tabAuto,&tabInput,&tabOutput,&tabAudio,&tabVideo,&tabCpu,&tabGlyph,&tabXfilter};
         if( diaFactoryRunTabs(_("Preferences"),9,tabs))
 	{
-               prefs->set(FEATURE_GLOBAL_GLYPH,useGlobalGlyph);
+               prefs->set(FEATURE_GLOBAL_GLYPH_ACTIVE,useGlobalGlyph);
                 prefs->set(FEATURE_GLOBAL_GLYPH_NAME,globalGlyphName);
 
           

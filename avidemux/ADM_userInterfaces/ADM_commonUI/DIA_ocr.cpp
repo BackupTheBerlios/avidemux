@@ -62,7 +62,7 @@ uint8_t DIA_ocrGen(void)
   admGlyph head(16,16);
   char *globalGlyph=NULL;
   uint32_t globalGlyphOn=0;
-  prefs->get(FEATURE_GLOBAL_GLYPH,&globalGlyphOn);
+  prefs->get(FEATURE_GLOBAL_GLYPH_ACTIVE,&globalGlyphOn);
   if(globalGlyphOn)
   {
      prefs->get(FEATURE_GLOBAL_GLYPH_NAME,&globalGlyph);
