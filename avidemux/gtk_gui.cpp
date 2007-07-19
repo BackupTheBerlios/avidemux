@@ -982,7 +982,7 @@ int A_openAvi2 (char *name, uint8_t mode)
         }
 	for(i=strlen(longname);i>=0;i--)
 #ifdef ADM_WIN32
-		if( longname[i] == '\\' ){
+		if( longname[i] == '\\' || longname[i] == '/' ){
 #else
 		if( longname[i] == '/' ){
 #endif
