@@ -46,6 +46,7 @@ int main(void)
     DECLARE_DECODER (RV10, rv10);
     DECLARE_DECODER (RV20, rv20);
     DECLARE_DECODER (DVBSUB, dvbsub);
+    DECLARE_DECODER (FLV, flv);
 
 #undef DECLARE_DECODER
 #define DECLARE_DECODER(a,b); printf("#define ENABLE_"#a"_DECODER 0\n"); 
@@ -124,7 +125,6 @@ int main(void)
     DECLARE_DECODER (ASV2, asv2);
     DECLARE_DECODER (BMP, bmp);
     DECLARE_DECODER (FLASHSV, flashsv);
-    DECLARE_DECODER (FLV, flv);
     DECLARE_DECODER (GIF, gif);
     DECLARE_DECODER (H261, h261);
     DECLARE_DECODER (H263, h263);
@@ -218,6 +218,7 @@ int main(void)
     DECLARE_ENCODER (MPEG1VIDEO, mpeg1video);
     DECLARE_ENCODER (MPEG2VIDEO, mpeg2video);
     DECLARE_ENCODER (MPEG4, mpeg4);
+    DECLARE_ENCODER (FLV, flv);
     DECLARE_ENCODER (SNOW, snow);
     DECLARE_ENCODER (MP2, mp2);
     DECLARE_ENCODER (DVVIDEO, dvvideo);
@@ -244,7 +245,6 @@ int main(void)
     DECLARE_ENCODER (ASV2, asv2);
     DECLARE_ENCODER (BMP, bmp);
     DECLARE_ENCODER (FLASHSV, flashsv);
-    DECLARE_ENCODER (FLV, flv);
     DECLARE_ENCODER (GIF, gif);
     DECLARE_ENCODER (H261, h261);
     DECLARE_ENCODER (JPEGLS, jpegls);
