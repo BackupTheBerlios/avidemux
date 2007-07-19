@@ -72,8 +72,8 @@ static targetFmt VCD={352, 352, 288, 240};
 static targetFmt SVCD={480, 720, 576, 480};
 static targetFmt DVD={720, 720, 576, 480};
 static targetFmt DVDHD1={352, 720, 576, 480};
-static targetFmt PSP={320, 320, 240, 240};
-static targetFmt PSPH264={480, 480, 272, 272};
+static targetFmt PSP={480, 480, 272, 272};
+static targetFmt PSPH264={720, 720, 480, 480};
 /* Dont forget to update DIA_resizeWiz if you change something here */
 
 targetFmt *allFormats[6]={&VCD,&SVCD,&DVD,&DVDHD1,&PSP,&PSPH264};

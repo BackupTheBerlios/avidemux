@@ -87,7 +87,11 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
 
   param.i_fps_num = fps1000;
   param.i_fps_den = 1000;
-  
+  if(zparam->idc)
+  {
+    MKPARAM(i_level_idc,idc);
+    printf("***Forcing level =%d\n",param.i_level_idc);
+  }
   // KeyframeBoost ?
   // BframeReduction ?
   // PartitionDecision ?

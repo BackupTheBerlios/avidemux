@@ -633,7 +633,7 @@ NULL,//     char      *logfile;
 1, //        ChromaME
 0, // Mixed Ref
 0, //NoiseReduction
-51, // level IDC for psp  
+0, // level IDC for psp  
 0, // fastPSkip;
 1,  //DCTDecimate;
 0,   //interlaced;
@@ -656,7 +656,7 @@ NULL,//     char      *logfile;
 51,//     uint32_t  MaxQp;
 4,//     uint32_t  QpStep;
 //     //
-1, //     uint32_t maxRefScene
+2, //     uint32_t maxRefScene
 0,//     uint32_t  SceneCut;
 25,//     uint32_t  MinIdr;
 250,//     uint32_t  MaxIdr;
@@ -668,7 +668,7 @@ NULL,//     char      *logfile;
 0,//     uint32_t   _8X8I;
 0,//     uint32_t   _4x4I;
 //     //
-0,//     uint32_t  MaxBFrame;
+3,//     uint32_t  MaxBFrame;
 0,//     int32_t   Bias;
 //     //
 0,//     uint32_t BasReference;
@@ -682,6 +682,7 @@ NULL,//     char      *logfile;
 1,//     uint32_t Method;
 1,//     uint32_t AR_Num;
 1,//     uint32_t AR_Den;
+0,//    AR as input
 0,//     uint32_t DeblockingFilter;
 0,//     int32_t  Strength;
 0,//     int32_t  Threshold;

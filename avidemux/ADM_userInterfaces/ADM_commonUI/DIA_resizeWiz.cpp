@@ -41,8 +41,8 @@ uint8_t r=0;
                              ONELINE(SVCD,"SVCD"),
                              ONELINE(DVD,"DVD"),
                              ONELINE(DVD_HD1,"DVD half D1"),
-                             ONELINE(PSP,"PSP"),
-                             ONELINE(PSP_FULLRES,"PSP full res"),
+                             ONELINE(PSP,"PSP 480*272"),
+                             ONELINE(PSP_FULLRES,"PSP full res (720*480"),
                           };
              diaMenuEntry menuFAspect[3]={
                {RESWIZ_AR_1_1,"1:1",NULL},
