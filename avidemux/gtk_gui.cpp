@@ -1552,6 +1552,13 @@ A_saveAudioDecodedTest (char *name)
 
 
         saveFilter =  buildAudioFilter (currentaudiostream,video_body->getTime (frameStart));
+
+		if (saveFilter == NULL)
+		{
+			fclose(out);
+			ADM_dealloc(outbuffer);
+			return;
+		}
    
     	DIA_working *work=new DIA_working(_("Saving audio"));
 

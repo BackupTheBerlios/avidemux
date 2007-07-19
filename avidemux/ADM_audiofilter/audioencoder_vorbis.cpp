@@ -127,6 +127,9 @@ uint8_t AUDMEncoder_Vorbis::init(ADM_audioEncoderDescriptor *config)
   }
   if (err!=0) 
   {
+	  delete (vorbisStruct*)_handle;
+	  _handle = NULL;
+
     printf("[vorbis] init error %d\n",err);
     return 0;
   }
