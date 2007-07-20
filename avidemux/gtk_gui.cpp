@@ -92,7 +92,6 @@ void A_externalAudioTrack( void );
 
 void HandleAction (Action action);
 uint8_t A_rebuildKeyFrame (void);
-extern int GUI_handleFilter (void);
 extern int GUI_handleVFilter (void);
 extern void filterCleanUp (void);
 int A_audioSave(char *name);

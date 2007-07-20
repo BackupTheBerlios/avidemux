@@ -41,19 +41,25 @@ extern "C" {
  ADM_flyDialog::ADM_flyDialog(uint32_t width,uint32_t height,AVDMGenericVideoStream *in,
                                 void *canvas, void *slider,int yuv)
 {
+	ADM_assert(_canvas);
+
+	if (slider)
+		ADM_assert(in);
+
   _w=_zoomW=width;
   _h=_zoomH=height;
   _isYuvProcessing=yuv;
   _in=in;
+
     if(isRgbInverted())
-    {
         _rgb=new ColYuvRgb(_w,_h,1);
-    }
     else
     _rgb=new ColYuvRgb(_w,_h);
+
   _rgb->reset(_w,_h);
-  ADM_assert(in);
+
   _yuvBuffer=new ADMImage(_w,_h);
+
   if(_isYuvProcessing)
   {
      _yuvBufferOut=new ADMImage(_w,_h);
@@ -65,14 +71,14 @@ extern "C" {
     _yuvBufferOut=NULL;
   }
     _rgbBufferOut =new uint8_t [_w*_h*4];
+
   _slider=slider;
   _canvas=canvas;
-
-  ADM_assert(_slider);
-  ADM_assert(_canvas);
   _cookie=NULL;
   _rgbBufferDisplay=NULL;
   _resizer=NULL;
+
+  postInit(width, height, in, canvas, slider, yuv);
 }
 /**
     \fn cleanup
@@ -106,17 +112,12 @@ ADM_flyDialog::~ADM_flyDialog(void)
 */
 uint8_t    ADM_flyDialog::sliderChanged(void)
 {
-  uint32_t fn= sliderGet(),nb;
+  uint32_t fn= sliderGet();
   uint32_t len,flags;
   
     ADM_assert(_yuvBuffer);
     ADM_assert(_rgbBufferOut);
     ADM_assert(_in);
-    
-    nb=_in->getInfo()->nb_frames;
-    fn=fn*nb;
-    fn/=100;
-    if(fn>=nb) fn=nb-1;
     
     if(!_in->getFrameNumberNoAlloc(fn,&len,_yuvBuffer,&flags))
     {

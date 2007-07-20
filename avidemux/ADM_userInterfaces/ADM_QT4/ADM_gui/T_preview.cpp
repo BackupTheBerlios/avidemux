@@ -54,31 +54,13 @@ extern QWidget *QuiMainWindows;
  ColYuvRgb rgbConverter(640,480,1);
 extern void UI_purge( void );
 extern uint8_t UI_sliderResize(uint32_t w);;
-//****************************************************************************************************
-void GUI_PreviewInit(uint32_t w , uint32_t h, uint32_t modal)
-{}
-//****************************************************************************************************
-uint8_t 	GUI_PreviewUpdate(uint8_t *data)
-{
-  return 1;
-}
-//****************************************************************************************************
-void 	GUI_PreviewEnd( void)
-{}
-//****************************************************************************************************
-uint8_t  	GUI_PreviewRun(uint8_t *data)
-{
-  return 1;
-}
-//****************************************************************************************************
-uint8_t GUI_PreviewStillAlive( void )
-{
-  return 1;
-}
-//****************************************************************************************************
-void GUI_PreviewShow(uint32_t w, uint32_t h, uint8_t *data)
-{
-}
+
+void DIA_previewInit(uint32_t width, uint32_t height) {}
+uint8_t DIA_previewUpdate(uint8_t *data) {return 1;}
+void DIA_previewEnd(void) {}
+uint8_t DIA_previewStillAlive(void) {return 1;}
+uint8_t	DIA_filterPreview(char *captionText, AVDMGenericVideoStream *videoStream, uint32_t frame) {}
+
 //****************************************************************************************************
 /*
   Function to display

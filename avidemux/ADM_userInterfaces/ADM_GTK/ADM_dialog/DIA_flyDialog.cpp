@@ -12,29 +12,30 @@
 *                                                                         *
 ***************************************************************************///
 
-#include <config.h>
+#include "config.h"
 
-#include <string.h>
-#include <stdio.h>
-# include <math.h>
-
-#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
 #include "default.h"
-
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_toolkit_gtk/toolkit_gtk_include.h"
-#include "ADM_toolkit/toolkit.hxx"
-
-#include "ADM_colorspace/ADM_rgb.h"
-#include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "DIA_flyDialog.h"
 #include "ADM_assert.h"
 
 extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
+
+void ADM_flyDialog::postInit(uint32_t width, uint32_t height, AVDMGenericVideoStream *in,
+							 void *canvas, void *slider, int yuv)
+{
+	if (slider != NULL)
+	{
+		GtkAdjustment *adj = (GtkAdjustment*)gtk_adjustment_new(0, 0, in->getInfo()->nb_frames - 1, 0, 0, 0);
+
+		gtk_range_set_adjustment(GTK_RANGE(_slider), adj);
+		gtk_scale_set_digits(GTK_SCALE(_slider), 0);
+	}
+}
 
 uint8_t  ADM_flyDialog::display(void)
 {
@@ -51,20 +52,30 @@ uint8_t  ADM_flyDialog::display(void)
 
 	return 1; 
 }
+
 uint32_t ADM_flyDialog::sliderGet(void)
 {
-  ADM_assert(_slider);
-  GtkAdjustment *adj=gtk_range_get_adjustment (GTK_RANGE(_slider));
-  return (uint32_t)GTK_ADJUSTMENT(adj)->value;
+	ADM_assert(_slider);
+	GtkAdjustment *adj=gtk_range_get_adjustment (GTK_RANGE(_slider));
+	return (uint32_t)GTK_ADJUSTMENT(adj)->value;
 }
-uint8_t     ADM_flyDialog::sliderSet(uint32_t value)
+
+uint8_t ADM_flyDialog::sliderSet(uint32_t value)
 {
-  ADM_assert(_slider);
-  return 1; 
+	ADM_assert(_slider);
+
+	GtkAdjustment *adj = gtk_range_get_adjustment(GTK_RANGE(_slider));
+
+	adj->value = value;
+
+	gtk_range_set_adjustment(GTK_RANGE(_slider), adj);
+
+	return 1; 
 }
-uint8_t  ADM_flyDialog::isRgbInverted(void)
+
+uint8_t ADM_flyDialog::isRgbInverted(void)
 {
-  return 0; 
+	return 0; 
 }
 
 //EOF

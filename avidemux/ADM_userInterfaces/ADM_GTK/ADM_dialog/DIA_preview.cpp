@@ -1,6 +1,6 @@
 /***************************************************************************
-                          ADM_vidpreview.cpp  -  description
-                             -------------------
+                             DIA_preview.cpp
+                             ---------------
 
        Previewer, we switch to RGB (only one Xv at a time)   and display the incoming
        YV12 buffer in a nice windowd
@@ -20,366 +20,193 @@
  ***************************************************************************/
 
 #include "config.h"
- 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <gtk/gtk.h>
-#include <time.h>
-#include <sys/time.h>
 
-#include "config.h"
-#include "fourcc.h"
-#include "avio.hxx"
-
-#include "avi_vars.h"
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "default.h"
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_toolkit_gtk/toolkit_gtk_include.h"
-#include "ADM_colorspace/ADM_rgb.h"
-#include "prototype.h"
-#include <ADM_assert.h>
-#include "gui_action.hxx"
+#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_assert.h"
 
-extern "C" {
-#include "ADM_libraries/ADM_lavcodec/avcodec.h"
-}
+#include "DIA_flyDialog.h"
+#include "DIA_flyPreview.h"
 
-extern void HandleAction (Action action);
-void GUI_detransient(void );
-void GUI_retransient(void );
-
-static GtkWidget	*create_dialog1 (void);
-static uint8_t      stacked=0;
-static void 			previewRender(void);
-static gboolean		preview_exit(GtkButton * button, gpointer user_data);
-static gboolean         cb_prev(GtkButton * button, gpointer user_data);
-static gboolean         cb_stack(GtkButton * button, gpointer user_data);
-static gboolean         cb_next(GtkButton * button, gpointer user_data);
-static gboolean 		preview_exit_short (GtkWidget * widget,GdkEvent * event, gpointer user_data);
-
-static uint8_t *rgb_render=NULL,*rgb_alternate=NULL,*rgbDisplay=NULL;
-static GtkWidget *dialog=NULL;
-static uint32_t 	uw, uh,zoomW,zoomH;
-int 			lock;
-uint8_t		needDestroy=0;
-static int      needResponse=0;
-static ColYuvRgb    rgbConv(100,100);
-static ADMImageResizer *resizer=NULL;
-
+static GtkWidget *create_dialog1(void);
 extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
 
-//*************************************************************
-// Short cut for filter preview
-// It is a modal blocking display of the datas given as arg
-//*************************************************************
-void GUI_PreviewShow(uint32_t w, uint32_t h, uint8_t *data)
+static GtkWidget *dialog = NULL;
+
+static flySeekablePreview *seekablePreview;
+static void seekablePreview_draw(void);
+static void seekablePreview_frame_changed(void);
+
+/* =================================
+            Filter Preview
+   ================================= */
+uint8_t DIA_filterPreview(char *captionText, AVDMGenericVideoStream *videoStream, uint32_t frame)
 {
-	if(rgb_render)
-	{
-		printf("\nWarning rgb render not null...\n");
-		delete[] rgb_render;
-		delete[] rgb_alternate;
-		rgb_alternate=NULL;
-		rgb_render=NULL;
-	}
+	ADM_assert(frame <= videoStream->getInfo()->nb_frames);
 
-	rgb_render=new uint8_t [w*h*4];
-	rgb_alternate=new uint8_t [w*h*4];
+	GtkWidget *hbuttonbox1, *buttonOk, *scale;
 
-	uw=w;
-	uh=h;
-	rgbConv.reset(w,h);
-	rgbConv.scale(data,rgb_render);
+	dialog = create_dialog1();
+	
+	scale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 110, 1, 10, 10)));
+	gtk_widget_show (scale);
+	gtk_box_pack_start (GTK_BOX(WID(vbox1)), scale, FALSE, TRUE, 0);
 
-	dialog=create_dialog1();
+	hbuttonbox1 = gtk_hbutton_box_new ();
+	gtk_widget_show (hbuttonbox1);
+	gtk_box_pack_start (GTK_BOX(WID(vbox1)), hbuttonbox1, FALSE, TRUE, 0);
+	gtk_button_box_set_layout (GTK_BUTTON_BOX(hbuttonbox1), GTK_BUTTONBOX_END);
+
+	buttonOk = gtk_button_new_from_stock ("gtk-ok");
+	gtk_widget_show(buttonOk);
+	gtk_container_add (GTK_CONTAINER(hbuttonbox1), buttonOk);
+	GTK_WIDGET_SET_FLAGS (buttonOk, GTK_CAN_DEFAULT);
+
+	GLADE_HOOKUP_OBJECT (dialog, scale, "scale");
+	GLADE_HOOKUP_OBJECT(dialog, hbuttonbox1, "hbuttonbox1");
+	GLADE_HOOKUP_OBJECT(dialog, buttonOk, "buttonOk");	
+	
 	gtk_register_dialog(dialog);
 
-	float zoom = UI_calcZoomToFitScreen(GTK_WINDOW(dialog), WID(drawingarea1), w, h);
+	if (captionText)
+		gtk_window_set_title(GTK_WINDOW(dialog), captionText);
 
-	zoomW = w * zoom;
-	zoomH = h * zoom;
+	uint32_t width, height;
+
+	width = videoStream->getInfo()->width;
+	height = videoStream->getInfo()->height;
+
+	float zoom = UI_calcZoomToFitScreen(GTK_WINDOW(dialog), WID(drawingarea1), width, height);
+
+	uint32_t zoomW = width * zoom;
+	uint32_t zoomH = height * zoom;
 
 	gtk_widget_set_usize(WID(drawingarea1), zoomW, zoomH);
 
 	if (zoom < 1)
-	{
 		gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
-		resizer = new ADMImageResizer(w, h, zoomW, zoomH, PIX_FMT_RGB32, PIX_FMT_RGB32);
-		rgbDisplay = new uint8_t[zoomW*zoomH*4];
-	}
-	
-	gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
-		   GTK_SIGNAL_FUNC(previewRender), NULL);
 
-	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_signal_connect(GTK_OBJECT(WID(scale)), "value_changed", GTK_SIGNAL_FUNC(seekablePreview_frame_changed), NULL);
+	gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event", GTK_SIGNAL_FUNC(seekablePreview_draw), NULL);
+	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), WID(buttonOk), GTK_RESPONSE_OK);
+
+	gtk_widget_show(dialog);
+
+	seekablePreview = new flySeekablePreview(width, height, videoStream, WID(drawingarea1), WID(scale));
+	seekablePreview->resizeImage(zoomW, zoomH);
+	seekablePreview->sliderSet(frame);
+	seekablePreview->sliderChanged();
+
+	int response;
+
+	while((response = gtk_dialog_run(GTK_DIALOG(dialog))) == GTK_RESPONSE_APPLY)
+	{
+		seekablePreview_draw();
+	}
+
 	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
+	delete seekablePreview;
 
-	delete[] rgb_render;
-	delete[] rgb_alternate;
+	return (response == GTK_RESPONSE_OK);
+}
 
-	if (resizer)
+void seekablePreview_draw(void)
+{
+	seekablePreview->display();
+}
+
+void seekablePreview_frame_changed(void)
+{
+	seekablePreview->sliderChanged();
+}
+
+/* =================================
+                Preview
+   ================================= */
+static flyPreview *preview;
+static void preview_draw(void);
+
+void DIA_previewInit(uint32_t width, uint32_t height)
+{
+	dialog = create_dialog1();
+	gtk_widget_set_usize(WID(drawingarea1), width, height);
+
+	gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event", GTK_SIGNAL_FUNC(preview_draw), NULL);
+	gtk_widget_show(dialog);
+
+	preview = new flyPreview(width, height, WID(drawingarea1));
+}
+
+uint8_t DIA_previewStillAlive(void)
+{
+	return (dialog != NULL);
+}
+
+uint8_t DIA_previewUpdate(uint8_t *buffer)
+{
+	if (dialog)
 	{
-		delete resizer;
-		delete rgbDisplay;
-		resizer=NULL;
-		rgbDisplay=NULL;
+		preview->setData(buffer);
+		preview->display();
+
+		return 1;
 	}
 
-	rgb_alternate=NULL;
-	rgb_render=NULL;
-}
-//*************************************************************
-// Init previewer
-// It is a independant window, so we cannot use gtk_dialog_run
-//
-//*************************************************************
-uint8_t GUI_PreviewStillAlive( void )
-{
- 	if(dialog==NULL) return 0;
-  	return 1;
-
-}
-void GUI_PreviewInit(uint32_t w , uint32_t h,uint32_t modal)
-{
-        if(rgb_render)
-        {
-                printf("\n Warning rgb render not null...\n");
-                delete [] rgb_render;
-                delete [] rgb_alternate;
-                rgb_alternate=NULL;
-                rgb_render=NULL;
-        }
-        stacked=0;
-       ADM_assert(rgb_render=new uint8_t [w*h*4]);
-       ADM_assert(rgb_alternate=new uint8_t [w*h*4]);
-       uw=w;
-       uh=h;
-       rgbConv.reset(w,h); 
-
-       // add callback for destroy
-        lock=0;
-        needDestroy=1;
-
-#define CNX(x,y,z)  gtk_signal_connect(GTK_OBJECT(x), #y, \
-                       GTK_SIGNAL_FUNC(z),                   (void *) NULL);
-
-        dialog=create_dialog1();
-/*
-        CNX(WID(buttonNext),clicked     ,cb_next);
-        CNX(WID(buttonPrev),clicked     ,cb_prev);
-*/
-        CNX(WID(drawingarea1),expose_event,previewRender);
-
- //       CNX(dialog    ,delete_event,preview_exit_short);
-
-        gtk_widget_set_usize (lookup_widget(dialog,"drawingarea1"),w,h);
-        gtk_widget_show(  dialog);
+	return 0;
 }
 
-static uint8_t stack(uint8_t *out, uint8_t *in, int width,int height)
+void DIA_previewEnd(void)
 {
- uint8_t *o1,*o2,*i;
- int x,y;
-        o1=out;
-        o2=out+((width*height)>>1);
-        i=in;
-        for(y=0;y<height>>1;y++)
-        {
-            memcpy(o1,i,width); 
-            memcpy(o2,i+width,width);  
-            o1+=width;
-            o2+=width;
-            i+=2*width;        
-        }   
-    return 1;
-}
-// return 1 if preview is still running
-uint8_t  GUI_PreviewUpdate(uint8_t *data)
-{
-        if(  dialog)
-        {
-
-                // First convert YV12 to RGB
-                // COL_yv12rgb( uw, uh,data, rgb_render);
-                if(!stacked)
-                {
-                        rgbConv.scale(data,rgb_render);
-                }else
-                {
-                        stack(rgb_alternate,data, uw,uh);
-                        stack(rgb_alternate+uw*uh,data+uw*uh, uw>>1,uh>>1);
-                        stack(rgb_alternate+((5*uw*uh)>>2),data+((5*uw*uh)>>2), uw>>1,uh>>1);
-                        rgbConv.scale(rgb_alternate,rgb_render);
-                }
-                previewRender();
-                if(lock==1)
-                {
-                        dialog=NULL;
-                        return 0;
-                }
-                else
-                        return 1;
-        }
-        return 0;
-}
-uint8_t  GUI_PreviewRun(uint8_t *data)
-{
-    ADM_assert(0);
-}
-
-void GUI_PreviewEnd(void)
-{
-        if(dialog && needDestroy)
-        {
-                gtk_widget_destroy(dialog);
-        }
-        if(rgb_render)
-        {
-                delete [] rgb_render;
-                rgb_render=NULL;
-                delete [] rgb_alternate;
-                rgb_alternate=NULL;
-        }
-        dialog=NULL;
-        needDestroy=0;
-}
-
-void previewRender(void)
-{
-	if(!dialog) return;
-
-	if (resizer)
+	if(dialog)
 	{
-		resizer->resize(rgb_render, rgbDisplay);
-		GUI_RGBDisplay(rgbDisplay, zoomW, zoomH, WID(drawingarea1));
+		delete preview;
+
+		gtk_widget_destroy(dialog);
+		dialog = NULL;
 	}
-	else
-		GUI_RGBDisplay(rgb_render, uw, uh, WID(drawingarea1));
 }
 
-gboolean         cb_stack(GtkButton * button, gpointer user_data)
+void preview_draw(void)
 {
-	stacked^=1;
-	return FALSE;
+	preview->display();
 }
 
-// Called when window is destroyed
-gboolean preview_exit_short (GtkWidget * widget, GdkEvent * event, gpointer user_data)
-{
-    UNUSED_ARG(widget);
-    UNUSED_ARG(event);
-    UNUSED_ARG(user_data);
-//	printf("destroyed\n");
-        printf("Destroy call\n");
-    if(lock==0 )
-    {
-    		lock=-1;
-		//printf(">\n");
-		needDestroy=0;
-    		GUI_PreviewEnd();
-                printf("Destroyed\n");
-                
-    }
-	return FALSE;
-}
-static gboolean         cb_prev(GtkButton * button, gpointer user_data)
-{
-        HandleAction(ACT_PreviousFrame);
-        return TRUE;
-}
-static gboolean         cb_next(GtkButton * button, gpointer user_data)
-{
-        HandleAction(ACT_NextFrame);
-        return FALSE;
-}
-/**********************************************************
-***********************************************************
-***********************************************************/
+
+/* =================================
+             Common Dialog
+   ================================= */
 GtkWidget*
 create_dialog1 (void)
 {
-  GtkWidget *dialog1;
-  GtkWidget *dialog_vbox1;
-  GtkWidget *vbox1;
-  GtkWidget *toolbar1;
-  GtkIconSize tmp_toolbar_icon_size;
-  GtkWidget *toolitem1;
-  GtkWidget *buttonPrev;
-  GtkWidget *toolitem2;
-  GtkWidget *buttonNext;
-  GtkWidget *toolitem3;
-  GtkWidget *buttonStack;
-  GtkWidget *drawingarea1;
-  GtkWidget *dialog_action_area1;
+	GtkWidget *dialog1;
+	GtkWidget *dialog_vbox1;
+	GtkWidget *vbox1;
+	GtkWidget *drawingarea1;
 
-  dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Preview"));
-  gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
+	dialog1 = gtk_dialog_new ();
+	gtk_window_set_title (GTK_WINDOW (dialog1), _("Preview"));
 
-  dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
-  gtk_widget_show (dialog_vbox1);
+	dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
+	gtk_widget_show (dialog_vbox1);
 
-  vbox1 = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (vbox1);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
+	vbox1 = gtk_vbox_new (FALSE, 0);
+	gtk_widget_show (vbox1);
+	gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
 
-  toolbar1 = gtk_toolbar_new ();
-  gtk_widget_show (toolbar1);
-  gtk_box_pack_start (GTK_BOX (vbox1), toolbar1, FALSE, FALSE, 0);
-  gtk_toolbar_set_style (GTK_TOOLBAR (toolbar1), GTK_TOOLBAR_BOTH);
-  tmp_toolbar_icon_size = gtk_toolbar_get_icon_size (GTK_TOOLBAR (toolbar1));
+	drawingarea1 = gtk_drawing_area_new ();
+	gtk_widget_show (drawingarea1);
+	gtk_box_pack_start (GTK_BOX (vbox1), drawingarea1, FALSE, TRUE, 0);
+	gtk_widget_set_size_request (drawingarea1, 100, 100);
 
-  toolitem1 = (GtkWidget*) gtk_tool_item_new ();
-  gtk_widget_show (toolitem1);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolitem1);
+	// Store pointers to all widgets, for use by lookup_widget().
+	GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
+	GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
+	GLADE_HOOKUP_OBJECT (dialog1, vbox1, "vbox1");
+	GLADE_HOOKUP_OBJECT (dialog1, drawingarea1, "drawingarea1");
 
-  buttonPrev = gtk_button_new_from_stock ("gtk-media-previous");
-  gtk_widget_show (buttonPrev);
-  gtk_container_add (GTK_CONTAINER (toolitem1), buttonPrev);
-
-  toolitem2 = (GtkWidget*) gtk_tool_item_new ();
-  gtk_widget_show (toolitem2);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolitem2);
-
-  buttonNext = gtk_button_new_from_stock ("gtk-media-next");
-  gtk_widget_show (buttonNext);
-  gtk_container_add (GTK_CONTAINER (toolitem2), buttonNext);
-
-  toolitem3 = (GtkWidget*) gtk_tool_item_new ();
-  gtk_widget_show (toolitem3);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolitem3);
-
-  buttonStack = gtk_button_new_with_mnemonic (_("Stack Field"));
-  gtk_widget_show (buttonStack);
-  gtk_container_add (GTK_CONTAINER (toolitem3), buttonStack);
-
-  drawingarea1 = gtk_drawing_area_new ();
-  gtk_widget_show (drawingarea1);
-  gtk_box_pack_start (GTK_BOX (vbox1), drawingarea1, TRUE, TRUE, 0);
-
-  dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
-  gtk_widget_show (dialog_action_area1);
-  gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
-
-  /* Store pointers to all widgets, for use by lookup_widget(). */
-  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
-  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
-  GLADE_HOOKUP_OBJECT (dialog1, vbox1, "vbox1");
-  GLADE_HOOKUP_OBJECT (dialog1, toolbar1, "toolbar1");
-  GLADE_HOOKUP_OBJECT (dialog1, toolitem1, "toolitem1");
-  GLADE_HOOKUP_OBJECT (dialog1, buttonPrev, "buttonPrev");
-  GLADE_HOOKUP_OBJECT (dialog1, toolitem2, "toolitem2");
-  GLADE_HOOKUP_OBJECT (dialog1, buttonNext, "buttonNext");
-  GLADE_HOOKUP_OBJECT (dialog1, toolitem3, "toolitem3");
-  GLADE_HOOKUP_OBJECT (dialog1, buttonStack, "buttonStack");
-  GLADE_HOOKUP_OBJECT (dialog1, drawingarea1, "drawingarea1");
-  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
-
-  return dialog1;
+	return dialog1;
 }
-
-
-

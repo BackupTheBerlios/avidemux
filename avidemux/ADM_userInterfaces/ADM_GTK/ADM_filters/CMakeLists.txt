@@ -5,7 +5,7 @@ include(AdmLib)
 SET(ADM_LIB ADM_filtersGtk)
 #
 SET(${ADM_LIB}_SRCS
-gui_filter.cpp  gui_filterlist.cpp  gui_filtermanager.cpp  gui_filtermanager_dialog.cpp  gui_filtersub.cpp
+gui_filterlist.cpp  gui_filtermanager.cpp  gui_filtermanager_dialog.cpp  gui_filtersub.cpp
 
 )
 ADD_LIBRARY(${ADM_LIB} STATIC ${${ADM_LIB}_SRCS})

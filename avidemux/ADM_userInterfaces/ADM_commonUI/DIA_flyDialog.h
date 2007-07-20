@@ -38,6 +38,9 @@ class ADM_flyDialog
           uint8_t  _isYuvProcessing;
 
 		  ADMImageResizer *_resizer;
+
+  virtual void postInit(uint32_t width,uint32_t height,AVDMGenericVideoStream *in,
+                                    void *canvas, void *slider,int yuv);
   public:
           void    *_cookie; // whatever
           void    *_slider; // widget

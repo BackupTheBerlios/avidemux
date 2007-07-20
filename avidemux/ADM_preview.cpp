@@ -187,7 +187,7 @@ void 	admPreview::start( void )
             switch(previewMode)
             {
               case  ADM_PREVIEW_SEPARATE:
-                  GUI_PreviewInit(preview->getInfo()->width,preview->getInfo()->height,0);
+                  DIA_previewInit(preview->getInfo()->width,preview->getInfo()->height);
                   
                   /* no break here, not a mistake */
               case  ADM_PREVIEW_NONE:
@@ -255,7 +255,7 @@ void admPreview::stop( void )
 {
   renderLock();
       if(previewMode==ADM_PREVIEW_SEPARATE)
-                GUI_PreviewEnd();
+                DIA_previewEnd();
       if(  previewMode==ADM_PREVIEW_SIDE || previewMode==ADM_PREVIEW_TOP)
       {
         ADM_assert(original);
@@ -386,13 +386,13 @@ uint8_t admPreview::update(uint32_t framenum)
                 if(!defered_display) 
                   renderUpdateImage(resized->data,zoom);
             }
-          if( GUI_PreviewStillAlive())
+          if( DIA_previewStillAlive())
           {
                   aprintf("Preview: Ask for frame %lu\n",framenum);
                   if(framenum<=preview->getInfo()->nb_frames-1)
                   {
                           preview->getFrameNumberNoAlloc(framenum,&len,previewImage,&fl);
-                          if(!defered_display) GUI_PreviewUpdate(previewImage->data);
+                          if(!defered_display) DIA_previewUpdate(previewImage->data);
                   }
           }
           break;
@@ -507,9 +507,9 @@ void admPreview::displayNow(uint32_t framenum)
                 ADM_assert(resized);
                 renderUpdateImage(resized->data,zoom);
             }
-            if( GUI_PreviewStillAlive())
+            if( DIA_previewStillAlive())
             {
-                GUI_PreviewUpdate(previewImage->data);
+                DIA_previewUpdate(previewImage->data);
             }
           break;
       case ADM_PREVIEW_SIDE:
@@ -529,6 +529,8 @@ void admPreview::displayNow(uint32_t framenum)
 
 void admPreview::cleanUp(void)
 {
+	admPreview::stop();
+
 	if(rdrImage)
 	{
 		delete rdrImage;
@@ -545,18 +547,6 @@ void admPreview::cleanUp(void)
 	{
 		delete previewImage; 
 		previewImage=NULL;
-	}
-
-	if(resized)
-	{
-		delete resized;
-		resized=NULL;
-	}
-
-	if(resizer)
-	{
-		delete resizer;
-		resizer=NULL;
 	}
 }
 // EOF

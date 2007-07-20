@@ -40,13 +40,6 @@
 #include "ADM_video/ADM_confCouple.h"
 #include "ADM_image.h"
 
-
-void     GUI_PreviewInit(uint32_t w , uint32_t h, uint32_t modal);
-uint8_t  GUI_PreviewUpdate(uint8_t *data);
-void 	 GUI_PreviewEnd( void);
-uint8_t  GUI_PreviewRun(uint8_t *data);
-uint8_t  GUI_PreviewStillAlive( void );
-void     GUI_PreviewShow(uint32_t w, uint32_t h, uint8_t *data);
 #define Pixel uint8_t
 typedef struct
  {
@@ -126,6 +119,12 @@ typedef struct
          virtual uint8_t	getCoupledConf( CONFcouple **couples)
 	  				{*couples=NULL;return 0;};
  };
+
+void     DIA_previewInit(uint32_t width, uint32_t height);
+uint8_t  DIA_previewUpdate(uint8_t *data);
+void 	 DIA_previewEnd(void);
+uint8_t  DIA_previewStillAlive(void);
+uint8_t	 DIA_filterPreview(char *captionText, AVDMGenericVideoStream *videoStream, uint32_t frame);
 
  // Pseudo class used to register filters automagically
  // Does not work atm
