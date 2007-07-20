@@ -41,7 +41,7 @@ extern "C" {
  ADM_flyDialog::ADM_flyDialog(uint32_t width,uint32_t height,AVDMGenericVideoStream *in,
                                 void *canvas, void *slider,int yuv)
 {
-	ADM_assert(_canvas);
+	ADM_assert(canvas);
 
 	if (slider)
 		ADM_assert(in);
