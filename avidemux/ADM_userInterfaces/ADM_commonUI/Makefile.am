@@ -1,4 +1,4 @@
-noinst_LIBRARIES = libADM_CommonUI.a 
+noinst_LIBRARIES = libADM_CommonUI.a libmergedCommonUI.a
 libADM_CommonUI_a_METASOURCES = AUTO
 libADM_CommonUI_a_SOURCES = GUI_sdlRender.cpp  GUI_xvRender.cpp  \
 DIA_resizeWiz.cpp DIA_builtin.cpp DIA_postproc.cpp DIA_enter.cpp \
@@ -14,6 +14,10 @@ DIA_lavDecoder.cpp  DIA_srt.cpp \
 DIA_animated.cpp \
 DIA_ocr.cpp
 
+commonObjs:=$(subst .cpp,.o,$(libADM_CommonUI_a_SOURCES))
+
+libmergedCommonUI.a :  $(commonObjs) 
+	$(LD) -r -o libmergedCommonUI.o  $(commonObjs)  && touch libmergedCommonUI.a 
 
 INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@ADM_SUBVERSION@ \
 		-I./../../ADM_libraries/ADM_utilities \

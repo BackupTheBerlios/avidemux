@@ -1,14 +1,14 @@
 
-noinst_LIBRARIES = libADM_dialog.a 
+noinst_LIBRARIES = libADM_dialogGtk.a 
 
 INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@ADM_SUBVERSION@ \
 		-I../../../ADM_libraries/ADM_utilities \
 		-I../../ADM_commonUI -I../../.. -I../../../ADM_libraries/ADM_lavutil \
 		-I../../../ADM_inputs -I../../../ADM_outputs
 
-libADM_dialog_a_METASOURCES = AUTO
+libADM_dialogGtk_a_METASOURCES = AUTO
 
-libADM_dialog_a_SOURCES =  DIA_vcodec.cpp DIA_acodec.cpp \
+libADM_dialogGtk_a_SOURCES =  DIA_vcodec.cpp DIA_acodec.cpp \
 	DIA_properties.cpp  DIA_about.cpp DIA_recent.cpp \
 	DIA_resize.cpp DIA_working.cpp \
 	DIA_working.h DIA_busy.cpp DIA_busy.h DIA_exLame.cpp DIA_pipe.cpp  \
