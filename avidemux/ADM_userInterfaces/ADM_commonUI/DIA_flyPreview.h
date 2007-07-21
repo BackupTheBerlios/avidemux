@@ -23,7 +23,7 @@ public:
 	uint8_t cleanup(void) {return 1;}
 
 	flySeekablePreview(uint32_t width, uint32_t height, AVDMGenericVideoStream *videoStream, void *canvas, void *slider) : 
-		ADM_flyDialog(width, height, videoStream, canvas, slider, 0) {delete _rgbBufferOut;};
+		ADM_flyDialog(width, height, videoStream, canvas, slider, 0) {delete _rgbBufferOut; _rgbBufferOut = NULL;};
 	virtual ~flySeekablePreview(void) {_rgbBufferOut = NULL;};
 };
 #endif

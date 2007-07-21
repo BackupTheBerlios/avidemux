@@ -293,7 +293,6 @@ void admPreview::updateFilters(AVDMGenericVideoStream *first,AVDMGenericVideoStr
               case  ADM_PREVIEW_SEPARATE:
                   preview=last;
                   break;
-                  /* no break here, not a mistake */
               case  ADM_PREVIEW_NONE:
                   break;
               case  ADM_PREVIEW_OUTPUT:
@@ -370,15 +369,19 @@ uint8_t admPreview::update(uint32_t framenum)
       case ADM_PREVIEW_SEPARATE:
             ADM_assert(preview);
             ADM_assert(previewImage);
-            if(zoom==ZOOM_1_1 || renderHasAccelZoom()  )
-            {
+
               if( !video_body->getUncompressedFrame(framenum+playbackOffset,rdrImage,&flags))
               {
                   return 0; 
               }
               UI_setFrameType(  rdrImage->flags,rdrImage->_Qp);
-              if(!defered_display) renderUpdateImage(rdrImage->data,zoom);
-            }else
+
+            if(zoom==ZOOM_1_1 || renderHasAccelZoom()  )
+            {
+              if(!defered_display) 
+				  renderUpdateImage(rdrImage->data,zoom);
+            }
+			else
             {
                 ADM_assert(resizer);
                 ADM_assert(resized);
