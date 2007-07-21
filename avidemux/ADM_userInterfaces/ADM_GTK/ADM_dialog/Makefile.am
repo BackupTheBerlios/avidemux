@@ -1,4 +1,4 @@
-
+#
 noinst_LIBRARIES = libADM_dialogGtk.a 
 
 INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@ADM_SUBVERSION@ \
