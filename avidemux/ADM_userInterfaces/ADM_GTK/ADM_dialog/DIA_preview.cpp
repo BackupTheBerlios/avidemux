@@ -96,6 +96,7 @@ uint8_t DIA_filterPreview(char *captionText, AVDMGenericVideoStream *videoStream
 	gtk_widget_show(dialog);
 
 	seekablePreview = new flySeekablePreview(width, height, videoStream, WID(drawingarea1), WID(scale));
+	seekablePreview->process();
 	seekablePreview->resizeImage(zoomW, zoomH);
 	seekablePreview->sliderSet(frame);
 	seekablePreview->sliderChanged();
