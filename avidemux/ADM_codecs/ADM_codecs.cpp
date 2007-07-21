@@ -319,7 +319,7 @@ if (fourCC::check (fcc, (uint8_t *) "FFV1"))
 
   if (isMpeg4Compatible (fcc) == 1)
     {
-      return (decoders *) (new decoderFFMpeg4 (w, h, extraLen, extraData));
+      return (decoders *) (new decoderFFMpeg4 (w, h, fcc,extraLen, extraData));
       //    return(decoders *)( new decoderXvid(w,h));
       //    return(decoders *)( new decoderDIVX(w,h));
     }

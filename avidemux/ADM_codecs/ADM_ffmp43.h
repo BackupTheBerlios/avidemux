@@ -94,7 +94,7 @@ protected:
 
 
 public:
-  decoderFFMpeg4 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d);
+  decoderFFMpeg4 (uint32_t w, uint32_t h, uint32_t fcc,uint32_t l, uint8_t * d);
   // mpeg4 can have B-frame
   virtual uint8_t bFramePossible (void)
   {

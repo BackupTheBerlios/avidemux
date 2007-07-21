@@ -51,14 +51,10 @@ extern void xvid4_init(void);
 extern uint8_t filterDynLoad(const char *path);
 typedef void *FCT_VOID(void *);
 uint8_t lavformat_init(void);
-
-#ifdef USE_FFMPEG
-     extern "C" {
-     extern void        avcodec_init(void );
-     extern  void 	avcodec_register_all(void );
+extern void     ADM_lavInit();
+extern "C" {
      extern uint8_t     ADM_InitMemcpy(void);
-                       };
-#endif                       
+};
 
 #ifdef USE_SDL
 extern "C" {
@@ -262,13 +258,7 @@ printf("\n");
 	}
 	ADM_dealloc(dynloadPath);
 
-// external filter
-#ifdef USE_FFMPEG
-    avcodec_init();
-    avcodec_register_all();
-    lavformat_init();
-#endif
-
+    ADM_lavInit();
 #ifdef HAVE_AUDIO
     AVDM_audioInit();
 #endif

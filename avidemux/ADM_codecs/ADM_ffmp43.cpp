@@ -51,6 +51,8 @@
 AVCodec *codec=avcodec_find_decoder(x);\
 if(!codec) {GUI_Alert(_("Internal error finding codec"#x));ADM_assert(0);} \
   codecId=x; \
+  _context->workaround_bugs=FF_BUG_AUTODETECT; \
+  _context->error_concealment=3; \
   if (avcodec_open(_context, codec) < 0)  \
                       { \
                                         printf(" Decoder init: Lavcodec :"#x" video decoder failed!\n"); \
@@ -445,8 +447,9 @@ decoderFFMpeg4VopPacked::decoderFFMpeg4VopPacked (uint32_t w, uint32_t h):decode
   _allowNull = 1;
   decoderMultiThread ();
   WRAP_Open (CODEC_ID_MPEG4);
+  printf("Non low delay mpeg4 decoder initialized\n");
 }
-decoderFFMpeg4::decoderFFMpeg4 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,
+decoderFFMpeg4::decoderFFMpeg4 (uint32_t w, uint32_t h, uint32_t fcc,uint32_t l, uint8_t * d):decoderFF (w,
 	   h)
 {
 // force low delay as avidemux don't handle B-frames
@@ -456,6 +459,8 @@ decoderFFMpeg4::decoderFFMpeg4 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d)
   _refCopy = 1;			// YUV420 only
   _context->extradata = (uint8_t *) d;
   _context->extradata_size = (int) l;
+  _context->codec_tag=fcc;
+  _context->stream_codec_tag=fcc;
   decoderMultiThread ();
   //  _context->flags|=FF_DEBUG_VIS_MV;
   WRAP_Open (CODEC_ID_MPEG4);
@@ -634,6 +639,36 @@ decoderFFFLV1::decoderFFFLV1 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):d
   WRAP_Open (CODEC_ID_FLV1);
 }
 
+extern uint8_t  lavformat_init(void);
+extern void     avcodec_init(void );
+extern  void    avcodec_register_all(void );
+extern "C"
+{
+  void adm_lavLogCallback(void  *instance, int level, const char* fmt, va_list list);
+}
+/**
+    \fn ADM_lavInit
+    \brief Init both lavcodec and lavformat
+*/
+void ADM_lavInit(void)
+{
+    avcodec_init();
+    avcodec_register_all();
+    lavformat_init();
+    av_log_set_callback(adm_lavLogCallback);
+#ifdef ADM_DEBUG
+  //  av_log_set_level(AV_LOG_DEBUG);
+#endif
+
+}
+void adm_lavLogCallback(void  *instance, int level, const char* fmt, va_list list)
+{
+    if(level>1) return;
+    char buf[256];
+  
+    vsnprintf(buf, sizeof(buf), fmt, list);
+    printf("[LAV] %s\n",buf);
+}
 
 
 #endif
