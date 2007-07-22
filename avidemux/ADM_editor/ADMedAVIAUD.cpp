@@ -359,8 +359,7 @@ uint8_t ADM_Composer::getAudioStream (AVDMGenericAudioStream ** audio)
 {
   if (*audio)
     {
-      delete *
-	audio;
+      delete *audio;
       *audio = NULL;
     }
   if (!_videos[0]._audiostream)

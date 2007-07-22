@@ -1468,9 +1468,11 @@ uint8_t A_changeAudioStream (AVDMGenericAudioStream * newaudio, AudioSource nwso
 {
   if (currentaudiostream)
     {
-	delete currentaudiostream;
-        currentaudiostream=NULL;
-
+       if (currentaudiostream->isDestroyable ())        
+      {
+          delete currentaudiostream;
+          currentaudiostream=NULL;
+      }
       currentAudioSource=AudioNone;
       if(currentAudioName) ADM_dealloc(currentAudioName);
       currentAudioName=NULL;
@@ -2410,7 +2412,7 @@ uint8_t GUI_close(void)
       avifileinfo = (aviInfo *) NULL;
       video_body->cleanup ();
       curframe = 0;
-	  aviaudiostream=NULL;
+      currentaudiostream=NULL;
       A_changeAudioStream (NULL, AudioNone,NULL);
       filterCleanUp ();
       return 1;
