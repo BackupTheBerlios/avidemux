@@ -19,7 +19,20 @@
  ***************************************************************************/
 #ifdef USE_FFMPEG
 
+class decoderFFSubs
+{
+  protected:
+     int      codecId;
+     uint32_t subId;
+     AVCodecContext *_context;
+  public:
 
+    decoderFFSubs (uint32_t subId);
+    virtual ~ decoderFFSubs ();
+    virtual uint8_t uncompress (ADMCompressedImage * in, AVSubtitle * out); 
+};
+
+/****************************/
 class decoderFF:public decoders
 {
 protected:
@@ -301,6 +314,12 @@ class decoderFFFLV1:public decoderFF
 protected:
 public:
   decoderFFFLV1 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d);
+};
+class decoderFFDVBSub:public decoderFF
+{
+protected:
+public:
+  decoderFFDVBSub (uint32_t w, uint32_t h, uint32_t l, uint8_t * d);
 };
 
 #endif

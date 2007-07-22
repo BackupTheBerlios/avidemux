@@ -302,7 +302,38 @@ retry:
                 }
                 return 1;
 }
+/**
+      \fn readPes
+      \brief Read a complete PES packet
+*/
+uint8_t dmx_demuxerTS::readPes(uint8_t *data, uint32_t *pesBlockLen, uint32_t *dts,uint32_t *pts)
+{
+  uint32_t total=0;
+    if(!refill())
+    {
+      printf("[DMX] Refill failed\n");
+      return 0; 
+    }
+    *dts=_pesDTS;
+    *pts=_pesPTS;
+    total=_pesBufferLen;
+    memcpy(data,_pesBuffer,_pesBufferLen);
+    while(packLen)
+    {
+        if(!refill())
+        {
+          printf("[DMX] Refill failed\n");
+          return 0; 
+        }
 
+        memcpy(data+total,_pesBuffer,_pesBufferLen);
+        total+=_pesBufferLen;      
+      
+    }
+    *pesBlockLen=total;
+    printf("[DMX] Read %d bytes, packMode %u, pesLen %u\n",*pesBlockLen,packMode,packLen);
+    return 1;
+}
 //
 //      Refill the pesBuffer
 //              Read packet of correct PID, locate a PES start and read the whole PES packet

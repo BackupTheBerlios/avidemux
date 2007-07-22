@@ -152,6 +152,7 @@ printf(  "*********************\n");
 	REGISTERX("ass","ASS","Add ASS/SSA subtitles to the picture.",VF_ASS,1,ass_create,ass_script);
 #endif
         REGISTERX("vobsub","VobSub","Embed VobSub subtitles into picture.",VF_VOBSUB,1,vobsub_create,vobsub_script);
+        REGISTERX("dvbsub","DVB sub","Embed DVB-T subtitle.",VF_DVBSUB,1,dvbsub_create,dvbsub_script);
         
 
         //*********************

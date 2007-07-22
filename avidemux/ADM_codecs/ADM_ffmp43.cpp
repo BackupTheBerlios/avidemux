@@ -639,6 +639,50 @@ decoderFFFLV1::decoderFFFLV1 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):d
   WRAP_Open (CODEC_ID_FLV1);
 }
 
+decoderFFDVBSub::decoderFFDVBSub (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,	   h)
+{
+  _context->sub_id=1;
+  WRAP_Open (CODEC_ID_DVB_SUBTITLE);
+}
+//*********************
+/**
+    \fn decoderFFSubs
+    \brief Constructor for DVB subtitles...
+*/
+
+decoderFFSubs::decoderFFSubs (uint32_t subid)
+{
+  _context = avcodec_alloc_context ();
+  codecId= CODEC_ID_DVB_SUBTITLE;
+  subId=subid;
+  _context->sub_id=subId;
+  WRAP_Open (CODEC_ID_DVB_SUBTITLE);
+}
+decoderFFSubs:: ~ decoderFFSubs ()
+{
+  avcodec_close (_context);
+  ADM_dealloc (_context);
+  _context=NULL;
+  
+}
+
+uint8_t decoderFFSubs::uncompress (ADMCompressedImage * in, AVSubtitle * out)
+{
+  int ret=0;
+  int got_picture=0;
+  ret=avcodec_decode_subtitle(_context, out,
+                            &got_picture,
+                            in->data, in->dataLength); 
+     if(ret<0) 
+     {
+        printf("[FFSUB] Error %d\n",ret);
+        return 0; 
+     }
+     return 1;
+}
+
+
+//***************
 extern uint8_t  lavformat_init(void);
 extern void     avcodec_init(void );
 extern  void    avcodec_register_all(void );
