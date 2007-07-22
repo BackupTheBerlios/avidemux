@@ -226,6 +226,7 @@ void decodePMT(void)
 			case 0x3: type="mpeg1 audio";break;
 			case 0x4: type="mpeg2 audio";break;
 			case 0x1b: type="h264 video";break;
+                        case 0x6: type="Private Stream";break;
 			default:;
 		}
 		printf("\tStream Type    :0x%x (%s)\n",buffer[index],type);
@@ -337,6 +338,8 @@ int decodeDescriptor(uint8_t *data, uint32_t len)
 	switch(tag)
 	{
 		case 0x52: printf("Stream identifier");break;
+                case 0x59: printf("DVB subtitles");break;
+                case 0x56: printf("Teletext");break;
 		case 0x0a: printf("Language descriptor");break;
 		default : printf("unknown");break;
 	}
