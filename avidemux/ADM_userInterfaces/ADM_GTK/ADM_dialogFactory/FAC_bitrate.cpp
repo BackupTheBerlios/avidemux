@@ -92,15 +92,11 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
   combo = gtk_combo_box_new_text ();
   gtk_widget_show (combo);
   
-  
   gtk_label_set_mnemonic_widget (GTK_LABEL(label1), combo);
-  
-#define add(x) gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_(#x));
-  
-  add(Single pass - bitrate);
-  add(Single pass - constant quality);
-  add(Two pass - video size);
-  add(Two pass - average bitrate);
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Single pass - bitrate"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Single pass - constant quality"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Two pass - video size"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Two pass - average bitrate"));
   
   PUT_ARRAY(1,0,combo);
   
@@ -201,36 +197,36 @@ void diaElemBitrate::updateMe(void)
   GtkSpinButton *spin=(GtkSpinButton*)w[3];
   GtkLabel *label=(GtkLabel*)w[1];
   int rank=gtk_combo_box_get_active(GTK_COMBO_BOX(combo));
-#undef P
+//#undef P
 #undef M
 #undef S
-#define P(x) gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_(#x));
+//#define P(x) gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_(#x));
 #define M(x,y) gtk_spin_button_set_range  (GTK_SPIN_BUTTON(spin),x,y)
 #define S(x)   gtk_spin_button_set_value  (GTK_SPIN_BUTTON(spin),x)
   switch(rank)
   {
     case 0: //CBR
-          P(_Bitrate (kb/s):);
+          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("_Bitrate (kb/s):"));
           M(0,20000);
           S(copy.bitrate);
           break; 
     case 1:// CQ
-          P(_Quantizer:);
+          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("_Quantizer:"));
           M(2,maxQ);
           S(copy.qz);
           break;
     case 2 : // 2pass Filesize
-          P(_Video size (MB):);
+          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("_Video size (MB):"));
           M(1,8000);
           S(copy.finalsize);
           break;
     case 3 : // 2pass Avg
-          P(_Average bitrate (kb/s):);
+          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("_Average bitrate (kb/s):"));
           M(0,20000);
           S(copy.avg_bitrate);
           break;
     case 4 : // Same Qz as input
-          P(-);
+          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("-"));
           M(0,0);
           break;
     default:ADM_assert(0);

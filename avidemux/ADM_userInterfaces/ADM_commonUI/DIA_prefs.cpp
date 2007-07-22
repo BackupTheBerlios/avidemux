@@ -311,32 +311,32 @@ char     *globalGlyphName=NULL;
         /**********************************************************************/
         /* First Tab : user interface */
         diaElem *diaUser[]={&useSysTray,&menuMessage};
-        diaElemTabs tabUser("User Interface",2,diaUser);
+        diaElemTabs tabUser(_("User Interface"),2,diaUser);
         
          /* First Tab bis: user interface : Auto*/
         diaElem *diaAuto[]={&autoSwap,&togAutoVbr,&togAutoIndex,&togAutoUnpack,&autoIndex,};
-        diaElemTabs tabAuto("Automation",5,diaAuto);
+        diaElemTabs tabAuto(_("Automation"),5,diaAuto);
         
         /* Second Tab : input */
         diaElem *diaInput[]={&nuvAudio,&useLavcodec};
-        diaElemTabs tabInput("Input",2,(diaElem **)diaInput);
+        diaElemTabs tabInput(_("Input"),2,(diaElem **)diaInput);
         
         /* Third Tab : output */
         diaElem *diaOutput[]={&autoSplit,&openDml,&allowAnyMpeg,&togTagMp3};
-        diaElemTabs tabOutput("Output",4,(diaElem **)diaOutput);
+        diaElemTabs tabOutput(_("Output"),4,(diaElem **)diaOutput);
         
         /* Fourth Tab : audio */
         diaElem *diaAudio[]={&menuMixer,&menuVolume,&menuAudio,&entryAlsaDevice};
-        diaElemTabs tabAudio("Audio",4,(diaElem **)diaAudio);
+        diaElemTabs tabAudio(_("Audio"),4,(diaElem **)diaAudio);
         
         /* Fifth Tab : video */
         
         diaElem *diaVideo[]={&menuVideoMode,&framePP};
-        diaElemTabs tabVideo("Video",2,(diaElem **)diaVideo);
+        diaElemTabs tabVideo(_("Video"),2,(diaElem **)diaVideo);
         
         /* Sixth Tab : mthread */
         diaElem *diaCpu[]={&multiThread, &menuEncodePriority, &menuIndexPriority, &menuPlaybackPriority};
-        diaElemTabs tabCpu("CPU",4,(diaElem **)diaCpu);
+        diaElemTabs tabCpu(_("CPU"),4,(diaElem **)diaCpu);
         
         /* 7th Tab : Global Glyph */
         diaElem *diaGlyph[]={&menuGlobaGlyh,&entryGLyphPath};
