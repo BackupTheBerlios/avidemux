@@ -98,7 +98,7 @@ void COL_init(void)
     CLEANUP();
     FLAGS();
     PixelFormat fmt=TARGET_COLORSPACE;
-   
+    if(!ww || !hh) return 0;   
 	 _context=(void *)sws_getContext(
                       ww,hh,
                       PIX_FMT_YUV420P ,
@@ -275,7 +275,7 @@ uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
  int flags=0;
 	CLEANUP();
     FLAGS();
-   
+   if(!ww || !hh) return 0;
 	 _context=(void *)sws_getContext(
 				    		ww,hh,
 						PIX_FMT_YUV420P ,
