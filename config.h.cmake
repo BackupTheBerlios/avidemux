@@ -13,7 +13,7 @@
 #cmakedefine ADM_BIG_ENDIAN
 
 #define PACKAGE   "avidemux"
-#define ADM_LOCALE "${ADM_LOCALE}"
+#define ADMLOCALE "${ADM_LOCALE}"
 
 /* If we need to explictely link to iconv */
 #cmakedefine NEEED_LIBICONV
