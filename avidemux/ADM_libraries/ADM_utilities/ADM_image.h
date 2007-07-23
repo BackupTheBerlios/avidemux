@@ -112,7 +112,7 @@ public:
 		ADMImage(uint32_t width, uint32_t height);
                 ADMImage(uint32_t width, uint32_t height,uint32_t dummy); /// To create linked datas image        
 
-                
+                uint8_t   LumaReduceBy2(void);
 		~ADMImage();
         uint8_t getWidthHeight(uint32_t *w,uint32_t *h)
                     {

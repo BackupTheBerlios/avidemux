@@ -190,12 +190,14 @@ uint8_t *org=NULL;
               for(int col=0;col<r->nb_colors;col++)
               {
                     // Color is RGB, convert to YUV
-                    uint32_t y,a;
+                    uint32_t y,u,v,a;
                     uint32_t rgb=r->rgba_palette[col];
                 
                           y=rgba2y(rgb);
+                          u=rgba2u(rgb)&0xff;
+                          v=rgba2v(rgb)&0xff;
                           a=_a(rgb);
-                          r->rgba_palette[col]=y+(a<<8);
+                          r->rgba_palette[col]=y+(u<<8)+(v<<16)+(a<<24);
                           printf("Color %d, alpha %u luma %u rgb:%x\n",col,a,y,rgb);
               }
               // Palette is ready, display !
@@ -216,24 +218,28 @@ uint8_t *org=NULL;
                       clipH=FFMIN(_info.height,r->y+r->h)-r->y;
                       
                       ADMImage image(r->w,r->h);
+                      ADMImage imageU(r->w,r->h);
+                      ADMImage imageV(r->w,r->h);
                       ADMImage alphaImage(r->w,r->h);
                       
                       uint8_t *ptr=image.data;
+                      uint8_t *ptrU=imageU.data;
+                      uint8_t *ptrV=imageV.data;
                       uint8_t *ptrAlpha=alphaImage.data;
                       uint8_t *in=r->bitmap;
                       for(int yy=0;yy<r->h;yy++)
                       {
                           for(int xx=0;xx<r->w;xx++)
                           {
-                            uint32_t alpha;
+                            uint32_t alpha,valout;
                             uint32_t val=*in++;
                             
                                   val=r->rgba_palette[val];
-                                  alpha=val>>8;
-                                  val&=0xff;
                                   
-                                  *ptr++=val;
-                                  *ptrAlpha++=alpha;
+                                  *ptrAlpha++=(val>>24)&0xff;
+                                  *ptr++=(val&0xff);;
+                                  *ptrU++=(val>>8)&0xff;
+                                  *ptrV++=(val>>16)&0xff;
                           }
                       }
               
@@ -259,6 +265,55 @@ uint8_t *org=NULL;
                                   *org++=val;
                           }
                       }
+                      // Shrink alpha  & u & v
+                     alphaImage.LumaReduceBy2();
+                     imageU.LumaReduceBy2();
+                     imageV.LumaReduceBy2();
+                     r->x>>=1;
+                     r->y>>=1;
+                     r->w>>=1;
+                     r->h>>=1;
+                     clipH>>=1;
+                     clipW>>=1;
+                     
+                     
+                      uint8_t *orgU=(uint8_t *)(UPLANE(data)+(r->y)*(_info.width>>1)+(r->x));
+                      uint8_t *orgV=(uint8_t *)(VPLANE(data)+(r->y)*(_info.width>>1)+(r->x));
+#if 1
+                      // Merge
+                      for(int yy=0;yy<clipH;yy++)
+                      {
+                          ptrAlpha=alphaImage.data+yy*(r->w);
+                          ptrU=imageU.data+yy*r->w;
+                          ptrV=imageV.data+yy*r->w;
+                        
+                          for(int xx=0;xx<clipW;xx++)
+                          {
+                            uint32_t val,valU,valV,before,alpha;
+                            uint32_t newU,newV;
+                                  
+                                  newU=*ptrU++;
+                                  newV=*ptrV++;  // New color
+                                 
+                                   newU=(newU+newV)/2;
+                                   newV=newU;
+                                  
+                                  alpha=*ptrAlpha++;
+                                  
+                                  before=*orgU; // old color
+                                  valU=newU*alpha+(255-alpha)*before;
+                                  
+                                  before=*orgV;
+                                  valV=newV*alpha+(255-alpha)*before;
+                                  
+                                  valU=valU>>8;
+                                  valV=valV>>8;
+                                  
+                                  *orgU++=valU;
+                                  *orgV++=valV;
+                          }
+                      }
+#endif
               }
                // Delete palette & data
 _skip:
@@ -273,7 +328,7 @@ _skip:
 uint8_t	ADMVideoSubDVB::getCoupledConf(CONFcouple **conf) 
 {
 
-        *conf=NULL; //new CONFcouple(0);
+        *conf=new CONFcouple(0);
 #if 0
 #define _COUPLE_SET(x) (*conf)->setCouple(#x, _params->x);
         _COUPLE_SET(font_scale)

@@ -487,4 +487,31 @@ uint8_t  ADMImage::saveAsJpg(const char *filename)
         delete [] buffer;
         return 1;
 }
+/**
+      \fn LumaReduceBy2
+      \brief Very simple reduce by 2 both hz & vz for luma plane only.
+*/
+ uint8_t   ADMImage::LumaReduceBy2(void)
+{
+  uint8_t *ptr1,*ptr2,*outptr;
+  for(int y=0;y<_height>>1;y++)
+  {
+    
+    ptr1=data+y*_width*2;
+    ptr2=ptr1+_width;
+    outptr=data+(_width>>1)*y;
+    for(int x=0;x<_width>>1;x++)
+    {
+      uint32_t a,b,c,d;  
+          a=ptr1[0]+ptr1[1];
+          b=ptr2[0]+ptr2[1];
+          ptr1+=2;
+          ptr2+=2;
+          a=(a+b)>>2;
+          *outptr++=a;
+    }
+  }
+  return 1;
+  
+}
 //EOF
