@@ -55,7 +55,11 @@ EXTERN uint8_t 	playing
 ;
 
 
-EXTERN AVDMGenericAudioStream *aviaudiostream;
+EXTERN AVDMGenericAudioStream *aviaudiostream
+#ifdef __DECLARE__
+=(AVDMGenericAudioStream *)NULL
+#endif
+;
 EXTERN AVDMGenericAudioStream *currentaudiostream
 #ifdef __DECLARE__
 =(AVDMGenericAudioStream *)NULL

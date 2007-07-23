@@ -69,11 +69,8 @@
 
 #include "ADM_libmpeg2enc/ADM_mpeg2enc.h"
 
-#include "ADM_filter/video_filters.h"
-
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
-#include "ADM_assert.h"
 void A_handleSecondTrack (int tracktype);
 int A_delete(uint32_t start, uint32_t end);
 void A_saveImg (char *name);
@@ -1035,28 +1032,7 @@ void  updateLoaded ()
     }
   else
     {
-      /*
-      ** <JSC> Sat Feb 21 15:30:15 CET 2004
-      ** problem: second edl load will raise a crash
-      ** why: 1) the last run generates aviaudiostream [video_body->getAudioStream()]
-      **         which is set to currentaudiostream    [changeAudioStream()]
-      **      2) second call of video_body->getAudioStream() will free(aviaudiostream)
-      **         which is the same as free(currentaudiostream)
-      **      3) following changeAudioStream() call will use the free()'d memory
-      **         [currentaudiostream->isDestroyable()]
-      **      efence with EF_PROTECT_FREE=1 will raise SIGSEGV and show you
-      **      currentaudiostream is not accessable
-      **      warning: without efense it will crash somethere other
-      **
-      ** I'm not sure why aviaudiostream is global. This issue will not
-      ** occure if aviaudiostream is local and be lost at end of this block.
-      ** nasty workaround: only the raise condition will be fixed
-      */
-      if( currentaudiostream == aviaudiostream ){
-         aviaudiostream = NULL; // free of memory done in changeAudioStream()
-      }
-      /* </JSC> */
-      video_body->getAudioStream (&aviaudiostream);
+	  video_body->getAudioStream (&aviaudiostream);
       A_changeAudioStream (aviaudiostream, AudioAvi,NULL);
       if (aviaudiostream)
 	if (!aviaudiostream->isDecompressable ())
@@ -1468,11 +1444,6 @@ uint8_t A_changeAudioStream (AVDMGenericAudioStream * newaudio, AudioSource nwso
 {
   if (currentaudiostream)
     {
-       if (currentaudiostream->isDestroyable ())        
-      {
-          delete currentaudiostream;
-          currentaudiostream=NULL;
-      }
       currentAudioSource=AudioNone;
       if(currentAudioName) ADM_dealloc(currentAudioName);
       currentAudioName=NULL;
@@ -1639,17 +1610,28 @@ void cleanUp (void)
 		avifileinfo=NULL;
 	}
 
-	if (currentaudiostream)
+	if (aviaudiostream)
 	{
-	// always destroyable on exit           if(currentaudiostream->isDestroyable())
-		delete currentaudiostream;
-		currentaudiostream=NULL;
+		delete aviaudiostream;
+		aviaudiostream=NULL;
+	}
+
+	if (secondaudiostream)
+	{
+		delete secondaudiostream;
+		secondaudiostream=NULL;
 	}
 
 	if (currentAudioName)
 	{
 		ADM_dealloc(currentAudioName);
 		currentAudioName = NULL;
+	}
+
+	if (secondAudioName)
+	{
+		ADM_dealloc(secondAudioName);
+		secondAudioName = NULL;
 	}
 
 	if (actual_workbench_file)
@@ -1664,6 +1646,7 @@ void cleanUp (void)
 		video_body=NULL;
 	}
 
+	currentaudiostream=NULL;
 	filterCleanUp();
 	admPreview::cleanUp();
 }
@@ -2412,8 +2395,17 @@ uint8_t GUI_close(void)
       avifileinfo = (aviInfo *) NULL;
       video_body->cleanup ();
       curframe = 0;
-      currentaudiostream=NULL;
       A_changeAudioStream (NULL, AudioNone,NULL);
+
+	  if (aviaudiostream)
+		delete aviaudiostream;
+
+	  if (secondaudiostream)
+		delete secondaudiostream;
+
+	  aviaudiostream=NULL;
+	  secondaudiostream=NULL;
+
       filterCleanUp ();
       return 1;
     }
