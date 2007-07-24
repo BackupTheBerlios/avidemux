@@ -46,9 +46,7 @@
 
 
 extern uint8_t BitBlit(uint8_t *dst, uint32_t pitchDest,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height);
-
 extern void UI_purge(void);
-extern uint8_t UI_shrink(uint32_t w,uint32_t h);
 
 static uint8_t	updateWindowSize(void * win, uint32_t w, uint32_t h);
 static uint8_t  GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h);

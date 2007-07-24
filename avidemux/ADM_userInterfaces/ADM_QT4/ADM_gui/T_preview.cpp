@@ -37,14 +37,14 @@
 #if !defined(ADM_WIN32) && !defined(__APPLE__)
 #include <QX11Info>
 #endif
-#include "fourcc.h"
 #include "avio.hxx"
 
 #include "ADM_colorspace/ADM_rgb.h"
 #include "GUI_render.h"
 #include "GUI_accelRender.h"
 #include "prefs.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
+#include "ui_gui2.h"
     
 void UI_QT4VideoWidget(QFrame *host);
 static QFrame *hostFrame=NULL;
@@ -146,37 +146,40 @@ void UI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr)
     
 }
 
-#define ADM_RSZ(a,x,y) {a->resize(x,y);a->setMinimumSize(x,y);}
-#define ADM_RSZ_MAX(a,x,y) {a->resize(x,y);a->setMinimumSize(x,y);a->setMaximumSize(x,y);}
+#define ADM_RSZ(a,x,y) {a->setMinimumSize(x,y); a->resize(x,y);}
+#define ADM_RSZ_MAX(a,x,y) {a->setMinimumSize(x,y); a->setMaximumSize(x,y); a->resize(x,y);}
 /**
       \brief Resize the window
 */
 void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
 {
-  if(displayW==w && displayH==h && rgbDataBuffer) return ;
-  if(rgbDataBuffer) delete [] rgbDataBuffer;
-  rgbDataBuffer=NULL;
-  rgbDataBuffer=new uint8_t [w*h*4]; // 32 bits / color
-  displayW=w;
-  displayH=h;
-  // Resize Host window
-  // It depends on where the frame start
-  printf("[RDR] %d x %d\n",hostFrame->x(),hostFrame->y());
-  uint32_t totalw=displayW+hostFrame->x();
-  uint32_t totalh=displayH+hostFrame->y()+50;
-  ADM_RSZ(QuiMainWindows,totalw,totalh);
-  // And resize child windows
-  
-  ADM_RSZ_MAX(hostFrame,displayW,displayH);
-  ADM_RSZ_MAX(videoWindow,displayW,displayH);
-  
-  UI_sliderResize(w);
-  
-  UI_purge();
-  
+	if(displayW == w && displayH == h && rgbDataBuffer)
+		return;
 
-  printf("[RDR] Resizing to %u x %u\n",displayW,displayH);
-  return ;
+	QMainWindow *mainWindow = (QMainWindow*)hostFrame->parentWidget()->parentWidget();
+	QWidget *centralWidget = hostFrame->parentWidget();
+
+	uint32_t totalW = w + hostFrame->x();
+	uint32_t totalH = (mainWindow->height() - centralWidget->height()) + hostFrame->y() + h;
+
+	if(rgbDataBuffer)
+		delete[] rgbDataBuffer;
+
+	rgbDataBuffer = new uint8_t[w * h * 4]; // 32 bits / color
+	displayW = w;
+	displayH = h;
+
+	// Resize host window
+	ADM_RSZ(QuiMainWindows, totalW, totalH);
+
+	// And resize child windows
+	ADM_RSZ_MAX(hostFrame, displayW, displayH);
+	ADM_RSZ_MAX(videoWindow, displayW, displayH);
+
+	UI_sliderResize(w);
+	UI_purge();
+
+	printf("[RDR] Resizing to %u x %u\n", displayW, displayH);
 }
 /**
       \brief Retrieve info from window, needed for accel layer

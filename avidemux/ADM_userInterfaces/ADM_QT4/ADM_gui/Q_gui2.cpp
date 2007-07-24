@@ -43,6 +43,7 @@
 #include "ADM_toolkit/filesel.h"
 #include "prefs.h"
 
+extern uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h);
 extern int automation(void );
 extern void HandleAction(Action a);
 extern uint32_t encoderGetNbEncoder (void);
@@ -337,6 +338,11 @@ Q_INIT_RESOURCE(filter);
     
     a.connect( &a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()) );
     
+	uint32_t w, h;
+
+	UI_getPhysicalScreenSize(&w,&h); //gtk_widget_get_parent_window (guiRootWindow));
+    printf("The screen seems to be %u x %u px\n",w,h);
+
     mw->show();
     
     QuiMainWindows=(QWidget*)mw;

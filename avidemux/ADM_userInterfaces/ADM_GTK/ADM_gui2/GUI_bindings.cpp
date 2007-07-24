@@ -1080,11 +1080,6 @@ static Action recent[4]={ACT_RECENT0,ACT_RECENT1,ACT_RECENT2,ACT_RECENT3};
         return 1;
 }
 
-uint8_t UI_shrink(uint32_t w,uint32_t h)
-{
-        gtk_widget_set_usize(guiRootWindow, w, h);
-        return 1;
-}
 // Override arrow keys to quickly navigate
 uint8_t UI_arrow_enabled(void)
 {

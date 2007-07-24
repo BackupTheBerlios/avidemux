@@ -44,7 +44,6 @@ uint8_t UI_setTimeShift(int onoff,int value);
 
 uint8_t UI_updateRecentMenu( void );
 
-uint8_t UI_shrink(uint32_t w,uint32_t h);
 uint8_t UI_arrow_enabled(void);
 uint8_t UI_arrow_disabled(void);
 #endif

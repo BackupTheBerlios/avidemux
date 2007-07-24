@@ -126,10 +126,6 @@ uint8_t UI_updateRecentMenu( void )
   return 1;
 }
 
-uint8_t UI_shrink(uint32_t w,uint32_t h)
-{
-  return 1;
-}
 uint8_t UI_arrow_enabled(void)
 {
   return 1;
