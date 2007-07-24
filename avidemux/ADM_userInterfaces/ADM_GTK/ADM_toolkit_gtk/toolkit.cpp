@@ -20,14 +20,11 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include <math.h>
+#include <gtk/gtk.h>
+
 #ifndef ADM_WIN32
 #include <unistd.h>
 #endif
-#include <gtk/gtk.h>
-#include <ctype.h>
-#include <sys/time.h>
 
 #include "avi_vars.h"
 #include "ADM_misc.h"
@@ -195,6 +192,9 @@ gint r;
 */
 uint8_t UI_getPhysicalScreenSize(uint32_t *w, uint32_t *h)
 {
+#ifdef ADM_WIN32
+	getWorkingArea(w, h);
+#else
 	static int inited = 0;
 	static int ww,hh;
 
@@ -208,7 +208,8 @@ uint8_t UI_getPhysicalScreenSize(uint32_t *w, uint32_t *h)
 
     *w=ww;
     *h=hh;
+#endif
 
-    return 1;
+	return 1;
 }
 //EOF

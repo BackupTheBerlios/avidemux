@@ -85,6 +85,7 @@ uint8_t         ADM_fileExist(char *name);
 	#define SHTDN_REASON_FLAG_PLANNED 0x80000000
 
 	int shutdown_win32(void);
+	void getWorkingArea(uint32_t *width, uint32_t *height);
 #else
 	#include <sys/resource.h>
 #endif

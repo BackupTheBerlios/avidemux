@@ -1,18 +1,17 @@
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include "default.h" 
-#include "ADM_misc.h"
-
 
 #ifdef ADM_WIN32
+#define WIN32_CLASH
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "default.h" 
+#include "ADM_misc.h"
 #include "windows.h"
-#include "winbase.h"
 #include "io.h"
 #include "winsock2.h"
-#define WIN32_CLASH
 #include "ADM_assert.h" 
+
 uint8_t win32_netInit(void);
 
 void ADM_usleep(unsigned long us)
@@ -424,5 +423,39 @@ bool getWindowsVersion(char* version)
 	return true;
 }
 
+#define MONITOR_DEFAULTTONEAREST    0x00000002
+
+void getWorkingArea(uint32_t *width, uint32_t *height)
+{
+	typedef void* (WINAPI *MonitorFromWindow)(HWND hwnd, uint32_t dwFlags);
+	typedef bool (WINAPI *GetMonitorInfo)(void *hMonitor, LPMONITORINFO lpmi);
+
+	static HMODULE user32 = GetModuleHandle("user32.dll");
+	static MonitorFromWindow pMonitorFromWindow = (MonitorFromWindow)GetProcAddress(user32, "MonitorFromWindow");
+	static GetMonitorInfo pGetMonitorInfo = (GetMonitorInfo)GetProcAddress(user32, "GetMonitorInfoA");
+
+	if (pMonitorFromWindow == NULL)
+	{
+		RECT rect;
+
+		// Required for NT4 - no multi-monitor support
+		SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+
+		*width = rect.right - rect.left;
+		*height = rect.bottom - rect.top;
+	}
+	else
+	{
+		void *hMonitor = pMonitorFromWindow(GetForegroundWindow(), MONITOR_DEFAULTTONEAREST);
+
+		MONITORINFO monitorInfo;
+
+		monitorInfo.cbSize = sizeof(MONITORINFO);
+		pGetMonitorInfo(hMonitor, &monitorInfo);
+
+		*width = monitorInfo.rcWork.right - monitorInfo.rcWork.left;
+		*height = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
+	}
+}
 #endif
 
