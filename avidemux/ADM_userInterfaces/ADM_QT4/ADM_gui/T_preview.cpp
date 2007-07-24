@@ -30,6 +30,7 @@
 #include <QtGui/QButtonGroup>
 #include <QtGui/QFrame>
 #include <QtGui/QGraphicsView>
+#include <QtGui/QSlider>
 #include <QMessageBox>
 #include <QPainter>
 #include <QImage>
