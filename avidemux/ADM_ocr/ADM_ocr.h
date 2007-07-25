@@ -1,34 +1,40 @@
-//
-// C++ Interface: %{MODULE}
-//
-// Description: 
-//
-//
-// Author: %{AUTHOR} <%{EMAIL}>, (C) %{YEAR}
-//
-// Copyright: See COPYING file that comes with this distribution
-//
-//
+/***************************************************************************
+                         
+     External Interface for OCR engine
+     
+    copyright            : (C) 2007 by mean
+    email                : fixounet@free.fr
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 #ifndef ADM_OCR_H
 #define ADM_OCR_H
-#include "adm_glyph.h"
-
-
-typedef enum 
+#include "ADM_video/ADM_vobsubinfo.h"
+#include "ADM_video/ADM_vidVobSub.h"
+#include "ADM_ocr/adm_glyph.h"
+typedef enum
 {
-        ReplyOk=1,
-        ReplyClose=0,
-        ReplyCalibrate=2,
-        ReplySkip=3,
-        ReplySkipAll=4
-}ReplyType;
-// GUI independant part
-ReplyType handleGlyph(uint8_t *workArea,uint32_t start, uint32_t end,uint32_t w,uint32_t h,uint32_t base,admGlyph *head);
-ReplyType ocrBitmap(uint8_t *workArea,uint32_t w,uint32_t h,char *decodedString,admGlyph *head);
-uint8_t   mergeBitmap(uint8_t *bitin, uint8_t *bitout, uint8_t *maskin,uint32_t w, uint32_t h);
-void ocrUpdateMinThreshold(void);
+	ADM_OCR_TYPE_VOBSUB=1,
+	ADM_OCR_TYPE_TS=2,
+}ADM_OCR_SOURCE_TYPE;
 
-// In GUI dependant part
-ReplyType glyphToText(admGlyph *glyph,admGlyph *head);
+
+typedef struct
+{
+	ADM_OCR_SOURCE_TYPE type;
+	vobSubParam *subparam;
+	char		*TsFile;
+}ADM_OCR_SOURCE;
+
+
+uint8_t ADM_ocr_engine(   ADM_OCR_SOURCE & source,const char *labelSrt,admGlyph *head);
+
 
 #endif 

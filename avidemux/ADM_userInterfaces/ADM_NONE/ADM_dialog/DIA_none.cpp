@@ -63,7 +63,7 @@ class ADMfont;
 #include "ADM_codecs/ADM_ffmpegConfig.h"
 
 #include "DIA_resizeWiz.h"
-    
+#include "ADM_ocr/ADM_ocr.h"
 #include "ADM_assert.h"
 int SliderIsShifted=0;
 
@@ -161,7 +161,7 @@ int UI_RunApp(void)
 }
 uint8_t DIA_glyphEdit(void) {return 0;};
 #include "ADM_ocr/adm_glyph.h"
-uint8_t ADM_ocr_engine(  vobSubParam *subparam,const char *labelSrt,admGlyph *head)
+uint8_t ADM_ocr_engine(   ADM_OCR_SOURCE & source,const char *labelSrt,admGlyph *head)
 {
   return 0; 
 }

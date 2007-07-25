@@ -45,8 +45,10 @@
 #include "prefs.h"
 #include "ADM_assert.h"
 
+#include "ADM_ocr/ADM_ocr.h"
+
 extern uint8_t DIA_vobsub(vobSubParam *param);
-extern uint8_t ADM_ocr_engine(  vobSubParam *subparam,const char *labelSrt,admGlyph *head);
+
 static void cb_idx(void *foo);
 static void cleanupSub(vobSubParam *p);
 /**
@@ -129,7 +131,10 @@ _again:
             printf("[GLYPH] Found %u glyph\n");
          }
         // We have our SRT and our idx/sub files : Go go go
-        ADM_ocr_engine(&subparam,srtFileName,&head);
+         ADM_OCR_SOURCE source;
+         source.type=ADM_OCR_TYPE_VOBSUB;
+         source.subparam=&subparam;
+        ADM_ocr_engine(source,srtFileName,&head);
         
         // Save glyph set 
 _save:

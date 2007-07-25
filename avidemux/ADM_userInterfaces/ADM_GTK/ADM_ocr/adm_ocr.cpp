@@ -67,6 +67,7 @@
 #include "ADM_video/ADM_vidVobSub.h"
 #include "ADM_leftturn.h"
 #include "DIA_enter.h"
+#include "ADM_ocrInternal.h"
 #include "ADM_ocr.h"
 /******************************/
 
@@ -114,7 +115,7 @@ typedef enum
         Main
    +++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
    
-uint8_t ADM_ocr_engine(  vobSubParam *subparam,const char *labelSrt,admGlyph *head)
+uint8_t ADM_ocr_engine(   ADM_OCR_SOURCE & source,const char *labelSrt,admGlyph *head)
 {
 // 
     uint32_t nbSub=0;
@@ -181,7 +182,7 @@ _again:
        goto endIt;
     }
      
-    vobsub=new ADMVideoVobSub(subparam->subname,subparam->index);
+    vobsub=new ADMVideoVobSub(source.subparam->subname,source.subparam->index);
     nbSub=vobsub->getNbImage();
    
     if(!nbSub)

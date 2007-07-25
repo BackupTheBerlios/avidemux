@@ -16,7 +16,12 @@
  #include <string.h>
  #include "ADM_assert.h"
  #include "default.h"
+
+ #include "ADM_editor/ADM_edit.hxx"
+ #include "ADM_video/ADM_genvideo.hxx"
+
  #include "ADM_ocr.h"
+#include "ADM_ocrInternal.h"
  #include "ADM_toolkit/toolkit.hxx"
  #include "ADM_userInterfaces/ADM_commonUI/DIA_enter.h"
 
