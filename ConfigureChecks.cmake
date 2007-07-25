@@ -284,8 +284,10 @@ SET(CMAKE_REQUIRED_FLAGS)
 # X264
 ########################################
 SET(CMAKE_REQUIRED_FLAGS "-include stdint.h")
+SET(CMAKE_REQUIRED_LIBRARIES "-lm -lpthread")
 ADM_CHECK_HL(x264 x264.h x264 x264_encoder_open USE_X264)
 SET(CMAKE_REQUIRED_FLAGS)
+SET(CMAKE_REQUIRED_LIBRARIES)
 ########################################
 # PNG
 ########################################
@@ -318,9 +320,9 @@ endif(USE_FAAD)
 ########################################
 # FAAC
 ########################################
+SET(CMAKE_REQUIRED_FLAGS "-include stdint.h")
 ADM_CHECK_HL(FAAC faac.h faac faacEncClose USE_FAAC)
-
-
+SET(CMAKE_REQUIRED_FLAGS)
 ########################################
 # FreeType
 ########################################
