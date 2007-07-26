@@ -173,6 +173,7 @@ uint8_t  asfAudio::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
       *len=bit->len;
 #warning FIXME      
       *samples=384; // ?
+	  delete[] bit->data;
       delete bit;
       return 1;
     }
