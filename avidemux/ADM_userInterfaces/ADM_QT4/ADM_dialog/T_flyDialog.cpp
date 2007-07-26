@@ -33,8 +33,8 @@
 #include "DIA_flyDialogQt4.h"
 #include "ADM_assert.h"
 
-void ADM_flyDialog::postInit(uint32_t width, uint32_t height, AVDMGenericVideoStream *in,
-							 void *canvas, void *slider, int yuv) {}
+void ADM_flyDialog::postInit() {}
+float ADM_flyDialog::calcZoomFactor(void) {return 1;}
 
 uint8_t  ADM_flyDialog::display(void)
 {

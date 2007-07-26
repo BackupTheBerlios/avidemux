@@ -98,6 +98,8 @@ uint8_t    flyCrop::process(void)
                 in+=4*w;
   
         }
+
+		copyRgbFinalToDisplay();
 }
 
 /*----------------------------------

@@ -40,7 +40,6 @@
 #include "DIA_flyCrop.h"
 
 static GtkWidget	*create_dialog1 (void);
-extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
 
 /* Link between UI and core */
 static gboolean 	ui_draw( void );
@@ -74,19 +73,6 @@ int DIA_getCropParams(char *name, CROP_PARAMS *param, AVDMGenericVideoStream *in
 	dialog=create_dialog1();
 	gtk_register_dialog(dialog);
 	gtk_window_set_title(GTK_WINDOW(dialog), name);
-
-	float zoom = UI_calcZoomToFitScreen(GTK_WINDOW(dialog), WID(drawingarea1), width, height);
-
-	uint32_t zoomW = width * zoom;
-	uint32_t zoomH = height * zoom;
-
-	gtk_widget_set_usize(WID(drawingarea1), zoomW, zoomH);
-
-	if (zoom < 1)
-	{
-		gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
-	}
-
 	gtk_widget_show(dialog);
 	
 #define CONNECT(x,y,z) 	gtk_signal_connect(GTK_OBJECT(WID(x)), #y, GTK_SIGNAL_FUNC(z), NULL);
@@ -108,7 +94,6 @@ int DIA_getCropParams(char *name, CROP_PARAMS *param, AVDMGenericVideoStream *in
 	CONNECT_SPIN(Bottom);
 
 	myCrop=new flyCrop(width, height,in,WID(drawingarea1),WID(scale));
-	myCrop->resizeImage(zoomW, zoomH);
 	myCrop->left=param->left;
 	myCrop->right=param->right;
 	myCrop->top=param->top;

@@ -54,8 +54,6 @@ static int lock=0;
 static GtkWidget *dialog=NULL;
 static flyASharp *myCrop=NULL;
 
-extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
-
 //
 //      Video is in YV12 Colorspace
 //
@@ -71,19 +69,6 @@ uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in)
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
         gtk_window_set_title (GTK_WINDOW (dialog), _("ASHARP"));
-
-		float zoom = UI_calcZoomToFitScreen(GTK_WINDOW(dialog), WID(drawingarea1), width, height);
-
-		uint32_t zoomW = width * zoom;
-		uint32_t zoomH = height * zoom;
-
-		gtk_widget_set_usize(WID(drawingarea1), zoomW, zoomH);
-
-		if (zoom < 1)
-		{
-			gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
-		}
-
         gtk_widget_show(dialog);
 
         gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
@@ -99,7 +84,6 @@ uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in)
           
         myCrop=new flyASharp( width, height,in,WID(drawingarea1),WID(hscale1));
         memcpy(&(myCrop->param),param,sizeof(ASHARP_PARAM));
-		myCrop->resizeImage(zoomW, zoomH);
         myCrop->upload();
         myCrop->sliderChanged();
         ret=0;

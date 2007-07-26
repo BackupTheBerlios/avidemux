@@ -72,7 +72,6 @@ static GtkWidget *dialog=NULL;
 static flySrtPos *myCrop=NULL;
 static int lock=0;
 
-extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
 /**
       \fn DIA_srtPos
       \brief Dialog that handles subtitle size and position
@@ -90,19 +89,6 @@ int DIA_srtPos(AVDMGenericVideoStream *in,uint32_t *size,uint32_t *position)
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
         gtk_window_set_title (GTK_WINDOW (dialog), _("Subtitle Size and Position"));
-
-		float zoom = UI_calcZoomToFitScreen(GTK_WINDOW(dialog), WID(drawingarea1), width, height);
-
-		uint32_t zoomW = width * zoom;
-		uint32_t zoomH = height * zoom;
-
-		gtk_widget_set_usize(WID(drawingarea1), zoomW, zoomH);
-
-		if (zoom < 1)
-		{
-			gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
-		}
-
         gtk_widget_show(dialog);
 	
         myCrop=new flySrtPos( width, height,in,WID(drawingarea1),WID(hscale1));
@@ -111,7 +97,6 @@ int DIA_srtPos(AVDMGenericVideoStream *in,uint32_t *size,uint32_t *position)
 
         gtk_range_set_range(GTK_RANGE(WID(vscale1)),0,height-1);
 
-		myCrop->resizeImage(zoomW, zoomH);
         myCrop->upload();
         myCrop->sliderChanged();
         

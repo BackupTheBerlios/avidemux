@@ -18,21 +18,17 @@
 
 #include <stdio.h>         
 #include <stdlib.h>
-#include <math.h>
 #include <unistd.h>
 
 #include <gtk/gtk.h>
 #ifdef ADM_WIN32
+#define WIN32_CLASH
 #include <gdk/gdkwin32.h>
 #else
 #include <gdk/gdkx.h>
 #endif
 
-#include <time.h>
-#include <sys/time.h>
-
-#include <../ADM_assert.h>
-#define WIN32_CLASH
+#include "../ADM_assert.h"
 #include "default.h"
 #include "../ADM_osSupport/ADM_misc.h"
 
@@ -41,10 +37,8 @@
 
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
 
-#include "../prefs.h"
 #include "../../../ADM_colorspace/ADM_rgb.h"
 #include "../../../ADM_libraries/ADM_libswscale/ADM_mp.h"
-#include "../gtkgui.h"
 
 void GUI_gtk_grow_off(int onff);
 
@@ -147,5 +141,25 @@ float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t
 	}
 	else
 		return 1;
+}
+
+// GTK doesn't centre the window correctly.  Use this function to centre windows with a canvas that is yet to resized.
+void UI_centreCanvasWindow(GtkWindow *window, GtkWidget *canvas, int newCanvasWidth, int newCanvasHeight)
+{
+	int winWidth, winHeight, widgetWidth, widgetHeight;
+	uint32_t resWidth, resHeight;
+
+	UI_getPhysicalScreenSize(&resWidth, &resHeight);
+	gtk_widget_get_size_request((GtkWidget*)canvas, &widgetWidth, &widgetHeight);
+	gtk_window_get_size(window, &winWidth, &winHeight);
+
+	winWidth = newCanvasWidth;
+	winHeight = (winHeight - widgetHeight) + newCanvasHeight;
+
+	// Take borders and captions into consideration (GTK doesn't seem to support this so we'll have to guess)
+	winWidth += 10;
+	winHeight += 40;
+
+	gtk_window_move(window, ((int)resWidth - winWidth) / 2, ((int)resHeight - winHeight) / 2);
 }
 // EOF

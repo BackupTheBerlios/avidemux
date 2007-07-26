@@ -60,6 +60,7 @@ static void 		frame_changed( void );
 
 extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
 extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
+extern void UI_centreCanvasWindow(GtkWindow *window, GtkWidget *canvas, int newCanvasWidth, int newCanvasHeight);
 
 static ColYuvRgb    *rgbConv=NULL;
 static uint8_t *working=NULL;
@@ -116,7 +117,7 @@ uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in)
 
 	if (zoom < 1)
 	{
-		gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+		UI_centreCanvasWindow((GtkWindow*)dialog, WID(drawingarea1), zoomW, zoomH);
 		resizer = new ADMImageResizer(width, height, zoomW, zoomH, PIX_FMT_RGB32, PIX_FMT_RGB32);
 	}
 

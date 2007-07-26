@@ -32,7 +32,6 @@
 #include "DIA_flyPreview.h"
 
 static GtkWidget *create_dialog1(void);
-extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
 
 static GtkWidget *dialog = NULL;
 
@@ -79,16 +78,6 @@ uint8_t DIA_filterPreview(char *captionText, AVDMGenericVideoStream *videoStream
 	width = videoStream->getInfo()->width;
 	height = videoStream->getInfo()->height;
 
-	float zoom = UI_calcZoomToFitScreen(GTK_WINDOW(dialog), WID(drawingarea1), width, height);
-
-	uint32_t zoomW = width * zoom;
-	uint32_t zoomH = height * zoom;
-
-	gtk_widget_set_usize(WID(drawingarea1), zoomW, zoomH);
-
-	if (zoom < 1)
-		gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
-
 	gtk_signal_connect(GTK_OBJECT(WID(scale)), "value_changed", GTK_SIGNAL_FUNC(seekablePreview_frame_changed), NULL);
 	gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event", GTK_SIGNAL_FUNC(seekablePreview_draw), NULL);
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), WID(buttonOk), GTK_RESPONSE_OK);
@@ -97,7 +86,6 @@ uint8_t DIA_filterPreview(char *captionText, AVDMGenericVideoStream *videoStream
 
 	seekablePreview = new flySeekablePreview(width, height, videoStream, WID(drawingarea1), WID(scale));
 	seekablePreview->process();
-	seekablePreview->resizeImage(zoomW, zoomH);
 	seekablePreview->sliderSet(frame);
 	seekablePreview->sliderChanged();
 

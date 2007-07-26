@@ -42,7 +42,7 @@ uint8_t  flyASharp::update(void)
 {
     download();
     process();
-    _rgb->scale(_yuvBufferOut->data,_rgbBufferOut);
+	copyYuvFinalToRgb();
     display();
     return 1;
 }
@@ -50,7 +50,7 @@ uint8_t flyASharp::process(void)
 {
 uint8_t *src,*dst;
 uint32_t stride;
-int32_t T,D,B,B2;   
+int32_t T,D,B,B2;
 uint32_t ww,hh;
 
 

@@ -16,70 +16,95 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include <time.h>
-#include <sys/time.h>
 
 #include "default.h"
 
-#include "ADM_colorspace/colorspace.h"
 #include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_commonUI/GUI_render.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "DIA_flyDialog.h"
-
 #include "ADM_assert.h"
 
 extern "C" {
 #include "ADM_libraries/ADM_lavcodec/avcodec.h"
 }
 
-/**
-    \fn ADM_flyDialog
-*/
- ADM_flyDialog::ADM_flyDialog(uint32_t width,uint32_t height,AVDMGenericVideoStream *in,
-                                void *canvas, void *slider,int yuv)
+ADM_flyDialog::ADM_flyDialog(uint32_t width,uint32_t height,AVDMGenericVideoStream *in,
+                                void *canvas, void *slider,int yuv, ResizeMethod resizeMethod)
 {
 	ADM_assert(canvas);
 
 	if (slider)
 		ADM_assert(in);
 
-  _w=_zoomW=width;
-  _h=_zoomH=height;
-  _isYuvProcessing=yuv;
-  _in=in;
+	_w = width;
+	_h = height;
+	_isYuvProcessing = yuv;
+	_in = in;
+	_slider = slider;
+	_canvas = canvas;
+	_cookie = NULL;
+	_resizeMethod = resizeMethod;
 
-    if(isRgbInverted())
-        _rgb=new ColYuvRgb(_w,_h,1);
-    else
-    _rgb=new ColYuvRgb(_w,_h);
+	if (isRgbInverted())
+		_rgb=new ColYuvRgb(_w,_h,1);
+	else
+		_rgb=new ColYuvRgb(_w,_h);
 
-  _rgb->reset(_w,_h);
+	_rgb->reset(_w,_h);
 
-  _yuvBuffer=new ADMImage(_w,_h);
+	_yuvBuffer=new ADMImage(_w,_h);
 
-  if(_isYuvProcessing)
-  {
-     _yuvBufferOut=new ADMImage(_w,_h);
-     _rgbBuffer=NULL;
-  }
-  else
-  {
-    _rgbBuffer =new uint8_t [_w*_h*4];
-    _yuvBufferOut=NULL;
-  }
-    _rgbBufferOut =new uint8_t [_w*_h*4];
+	if(_isYuvProcessing)
+	{
+		_yuvBufferOut=new ADMImage(_w,_h);
+		_rgbBuffer=NULL;
+	}
+	else
+	{
+		_rgbBuffer =new uint8_t [_w*_h*4];
+		_yuvBufferOut=NULL;
+	}
 
-  _slider=slider;
-  _canvas=canvas;
-  _cookie=NULL;
-  _rgbBufferDisplay=NULL;
-  _resizer=NULL;
+	_rgbBufferOut =new uint8_t [_w*_h*4];
 
-  postInit(width, height, in, canvas, slider, yuv);
+	if (_resizeMethod == RESIZE_AUTO || _resizeMethod == RESIZE_LAST)
+	{
+		float zoom = calcZoomFactor();
+
+		if (zoom == 1)
+			_resizeMethod = RESIZE_NONE;
+		else
+		{
+			_zoomW = _w * zoom;
+			_zoomH = _h * zoom;
+		}
+	}
+
+	if (_resizeMethod == RESIZE_AUTO || _resizeMethod == RESIZE_LAST)
+	{
+		PixelFormat sourceColour;
+
+		if (_resizeMethod == RESIZE_AUTO || _isYuvProcessing)
+			sourceColour = PIX_FMT_YUV420P;
+		else
+			sourceColour = PIX_FMT_RGB32;
+
+		_resizer = new ADMImageResizer(_w, _h, _zoomW, _zoomH, sourceColour, PIX_FMT_RGB32);
+		_rgbBufferDisplay = new uint8_t[_w * _h * 4];
+	}
+	else
+	{
+		_zoomW = _w;
+		_zoomH = _h;
+
+		_resizer = NULL;
+		_rgbBufferDisplay = NULL;
+	}
+
+	postInit();
 }
+
 /**
     \fn cleanup
     \brief deallocate
@@ -124,40 +149,49 @@ uint8_t    ADM_flyDialog::sliderChanged(void)
       printf("[FlyDialog] Cannot get frame %u\n",fn); 
       return 0;
     }
-    /* Process...*/
-    
+
+    // Process...    
     if(_isYuvProcessing)
     {
         process();
-        _rgb->scale(_yuvBufferOut->data,_rgbBufferOut);
-        
-    } else // RGB Processing
-      
+		copyYuvFinalToRgb();
+    }
+	else // RGB Processing      
     {
         ADM_assert(_rgbBuffer);
-        _rgb->scale(_yuvBuffer->data,_rgbBuffer);
+		copyYuvScratchToRgb();
         process();
     }
+
     display();
 }
 
-void ADM_flyDialog::resizeImage(uint32_t width, uint32_t height)
+void ADM_flyDialog::copyYuvFinalToRgb(void)
 {
-	_zoomW = width;
-	_zoomH = height;
-
-	if (_resizer)
-	{
-		delete _resizer;
-		delete[] _rgbBufferDisplay;
-	}
-
-	if (width == _w && height == _h)
-		_resizer = NULL;
+	if (_resizeMethod == RESIZE_AUTO || _resizeMethod == RESIZE_LAST)
+		_resizer->resize(_yuvBufferOut->data, _rgbBufferOut);
 	else
+		_rgb->scale(_yuvBufferOut->data, _rgbBufferOut);
+}
+
+void ADM_flyDialog::copyYuvScratchToRgb(void)
+{
+	if (_resizeMethod == RESIZE_AUTO)
+		_resizer->resize(_yuvBuffer->data,_rgbBuffer);
+	else
+		_rgb->scale(_yuvBuffer->data,_rgbBuffer);
+}
+
+void ADM_flyDialog::copyRgbFinalToDisplay(void)
+{
+	if (_resizeMethod == RESIZE_LAST)
 	{
-		_resizer = new ADMImageResizer(_w, _h, _zoomW, _zoomH, PIX_FMT_RGB32, PIX_FMT_RGB32);
-		_rgbBufferDisplay = new uint8_t[_zoomW * _zoomH * 4];
+		_resizer->resize(_rgbBufferOut, _rgbBufferDisplay);
+
+		uint8_t* tempRgb = _rgbBufferDisplay;
+
+		_rgbBufferDisplay = _rgbBufferOut;
+		_rgbBufferOut = tempRgb;
 	}
 }
 

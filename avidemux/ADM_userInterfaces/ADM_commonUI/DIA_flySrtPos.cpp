@@ -59,7 +59,7 @@ uint8_t    flySrtPos::update(void)
 {
     download();
     process();
-    _rgb->scale(_yuvBufferOut->data,_rgbBufferOut);
+	copyYuvFinalToRgb();
     display();
 }
 #endif

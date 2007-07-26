@@ -24,6 +24,12 @@
  ***************************************************************************/
 #ifndef ADM_FLY_DIALOG_H
 #define ADM_FLY_DIALOG_H
+enum ResizeMethod {
+    RESIZE_NONE = 0,	// No automatic resize
+	RESIZE_AUTO = 1,	// Resize image when convenient (YUV: after filter, RGB: before applying filter)
+	RESIZE_LAST = 2		// Resize image after filter has been applied (slower for RGB)
+};
+
 class ADM_flyDialog
 {
   protected:
@@ -36,11 +42,15 @@ class ADM_flyDialog
           uint8_t  *_rgbBufferOut;
 		  uint8_t  *_rgbBufferDisplay;
           uint8_t  _isYuvProcessing;
-
+		  ResizeMethod _resizeMethod;
 		  ADMImageResizer *_resizer;
 
-  virtual void postInit(uint32_t width,uint32_t height,AVDMGenericVideoStream *in,
-                                    void *canvas, void *slider,int yuv);
+  virtual void postInit(void);
+		  float calcZoomFactor(void);
+          void copyYuvFinalToRgb(void);
+          void copyYuvScratchToRgb(void);
+		  void copyRgbFinalToDisplay(void);
+
   public:
           void    *_cookie; // whatever
           void    *_slider; // widget
@@ -61,11 +71,10 @@ class ADM_flyDialog
           uint8_t  isRgbInverted(void);
   virtual uint8_t  update(void) {};
           uint8_t  cleanup(void);
-		  void resizeImage(uint32_t width, uint32_t height);
-         /*                               */
-                  ADM_flyDialog(uint32_t width,uint32_t height,AVDMGenericVideoStream *in,
-                                    void *canvas, void *slider,int yuv);
-    virtual      ~ADM_flyDialog(void);
+
+          ADM_flyDialog(uint32_t width, uint32_t height, AVDMGenericVideoStream *in,
+                             void *canvas, void *slider, int yuv, ResizeMethod resizeMethod);
+  virtual ~ADM_flyDialog(void);
 };
 
 #endif

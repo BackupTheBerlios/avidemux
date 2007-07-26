@@ -49,7 +49,7 @@ uint8_t    flyChromaShift::update(void)
 {
    download();
     process();
-    _rgb->scale(_yuvBufferOut->data,_rgbBufferOut);
+	copyYuvFinalToRgb();
     display();
 }
 //EOF

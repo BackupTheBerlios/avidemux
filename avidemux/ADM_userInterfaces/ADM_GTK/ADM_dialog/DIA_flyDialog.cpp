@@ -24,17 +24,29 @@
 #include "ADM_assert.h"
 
 extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
+extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
+extern void UI_centreCanvasWindow(GtkWindow *window, GtkWidget *canvas, int newCanvasWidth, int newCanvasHeight);
 
-void ADM_flyDialog::postInit(uint32_t width, uint32_t height, AVDMGenericVideoStream *in,
-							 void *canvas, void *slider, int yuv)
+void ADM_flyDialog::postInit(void)
 {
-	if (slider != NULL)
+	if (_slider)
 	{
-		GtkAdjustment *adj = (GtkAdjustment*)gtk_adjustment_new(0, 0, in->getInfo()->nb_frames - 1, 0, 0, 0);
+		GtkAdjustment *adj = (GtkAdjustment*)gtk_adjustment_new(0, 0, _in->getInfo()->nb_frames - 1, 0, 1, 0);
 
 		gtk_range_set_adjustment(GTK_RANGE(_slider), adj);
 		gtk_scale_set_digits(GTK_SCALE(_slider), 0);
 	}
+
+	GtkWindow *window = (GtkWindow*)gtk_widget_get_ancestor((GtkWidget*)_canvas, GTK_TYPE_WINDOW);
+	UI_centreCanvasWindow(window, (GtkWidget*)_canvas, _zoomW, _zoomH);
+	gtk_widget_set_usize((GtkWidget*)_canvas, _zoomW, _zoomH);
+}
+
+float ADM_flyDialog::calcZoomFactor(void)
+{
+	GtkWindow *window = (GtkWindow*)gtk_widget_get_ancestor((GtkWidget*)_canvas, GTK_TYPE_WINDOW);
+
+	return UI_calcZoomToFitScreen(window, (GtkWidget*)_canvas, _w, _h);
 }
 
 uint8_t  ADM_flyDialog::display(void)
@@ -42,13 +54,7 @@ uint8_t  ADM_flyDialog::display(void)
 	ADM_assert(_canvas);
 	ADM_assert(_rgbBufferOut);
 
-	if (_resizer)
-	{
-		_resizer->resize(_rgbBufferOut, _rgbBufferDisplay);
-		GUI_RGBDisplay(_rgbBufferDisplay, _zoomW, _zoomH, _canvas);
-	}
-	else
-		GUI_RGBDisplay(_rgbBufferOut, _w, _h, _canvas);
+	GUI_RGBDisplay(_rgbBufferOut, _zoomW, _zoomH, _canvas);
 
 	return 1; 
 }

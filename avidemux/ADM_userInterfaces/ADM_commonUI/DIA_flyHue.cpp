@@ -46,7 +46,7 @@ uint8_t  flyHue::update(void)
 {
     download();
     process();
-    _rgb->scale(_yuvBufferOut->data,_rgbBufferOut);
+	copyYuvFinalToRgb();
     display();
     return 1;
 }        

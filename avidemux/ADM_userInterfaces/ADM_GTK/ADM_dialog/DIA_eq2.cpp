@@ -69,6 +69,7 @@ static Eq2Settings mySettings;
 static ColYuvRgb    *rgbConv=NULL;
 
 extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
+extern void UI_centreCanvasWindow(GtkWindow *window, GtkWidget *canvas, int newCanvasWidth, int newCanvasHeight);
 
 /************************************************************************/
 uint8_t DIA_getEQ2Param(Eq2_Param *param, AVDMGenericVideoStream *in)
@@ -142,7 +143,7 @@ uint8_t r=0;
 
 		if (zoom < 1)
 		{
-			gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+			UI_centreCanvasWindow((GtkWindow*)dialog, WID(drawingarea1), zoomW, zoomH);
 			resizer = new ADMImageResizer(w, h, zoomW, zoomH, PIX_FMT_YUV420P, PIX_FMT_RGB32);
 		}
 
