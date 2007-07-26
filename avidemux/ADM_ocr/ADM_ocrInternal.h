@@ -30,5 +30,21 @@ void ocrUpdateMinThreshold(void);
 // In GUI dependant part
 ReplyType glyphToText(admGlyph *glyph,admGlyph *head);
 
+/**
+ * \class ADM_BitmapSource
+ * \brief Front end base class for all OCR'able bitmap source
+ */
+class ADM_BitmapSource
+{
+				
+public: 
+								ADM_BitmapSource(void) {};
+			virtual uint8_t     init(ADM_OCR_SOURCE *source)=0;
+			virtual 			~ADM_BitmapSource() {};
+			virtual uint32_t 	getNbImages(void)=0;
+			virtual vobSubBitmap *getBitmap(uint32_t nb,uint32_t *start, uint32_t *end,uint32_t *first,uint32_t *last)=0;
+};
+
+ADM_BitmapSource *ADM_buildBitmapSource(ADM_OCR_SOURCE *source);
 
 #endif 

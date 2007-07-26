@@ -67,8 +67,9 @@
 #include "ADM_video/ADM_vidVobSub.h"
 #include "ADM_leftturn.h"
 #include "DIA_enter.h"
-#include "ADM_ocrInternal.h"
+
 #include "ADM_ocr.h"
+#include "ADM_ocrInternal.h"
 /******************************/
 
 #define TESTSUB "/home/fx/usbstick/subs/vts_01_0.idx"
@@ -120,7 +121,7 @@ uint8_t ADM_ocr_engine(   ADM_OCR_SOURCE & source,const char *labelSrt,admGlyph 
 // 
     uint32_t nbSub=0;
     FILE *out=NULL;
-    ADMVideoVobSub *vobsub=NULL;
+    ADM_BitmapSource *bitmapSource=NULL;
     uint32_t startTime,endTime;
     uint32_t w,h,oldw=0,oldh=0;
     uint32_t oldbitmapw=0;
@@ -181,15 +182,24 @@ _again:
        GUI_Error_HIG(_("Output file error"), _("Could not open \"%s\" for writing."), labelSrt);
        goto endIt;
     }
-     
-    vobsub=new ADMVideoVobSub(source.subparam->subname,source.subparam->index);
-    nbSub=vobsub->getNbImage();
+    bitmapSource=ADM_buildBitmapSource(&source);
+    if(!bitmapSource)
+    {
+    	goto _again;
+    }
+    if(!bitmapSource->init(&source))
+    {
+    		printf("[OCR] Bitmap source failed\n");
+    		goto _again;
+    }
+    
+    nbSub=bitmapSource->getNbImages();
    
     if(!nbSub)
     {
       GUI_Error_HIG(_("Problem loading sub"), NULL);
-        delete vobsub;
-        vobsub=NULL;
+        delete bitmapSource;
+        bitmapSource=NULL;
         goto _again;
      }
     seqNum=1;   // Sub number in srt file
@@ -201,7 +211,7 @@ _again:
     for(uint32_t i=0;i<nbSub;i++)
     {
             first=last=0;
-            bitmap=vobsub->getBitmap(i,&startTime, &endTime,&first,&last);
+            bitmap=bitmapSource->getBitmap(i,&startTime, &endTime,&first,&last);
             ADM_assert(last>=first);
             
             // something ?
@@ -274,9 +284,9 @@ endIt:
     // Final round
     gtk_widget_set_sensitive(WID(frameBitmap),0);
    // gtk_widget_set_sensitive(WID(Current_Glyph),0);     
-    if(vobsub)
-        delete vobsub;
-    vobsub=NULL;
+    if(bitmapSource)
+        delete bitmapSource;
+    bitmapSource=NULL;
     if(out) 
         fclose(out);
     out=NULL;
