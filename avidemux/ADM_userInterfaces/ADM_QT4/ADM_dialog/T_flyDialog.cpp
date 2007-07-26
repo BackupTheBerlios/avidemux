@@ -14,26 +14,23 @@
 
 #include "config.h"
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-
-
 #include <QtGui/QGraphicsView>
 #include <QtGui/QSlider>
 
 #include "default.h"
-#include "ADM_toolkit/toolkit.hxx"
-#include "ADM_colorspace/ADM_rgb.h"
-
-#include "ADM_image.h"
+#include "ADM_assert.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "DIA_flyDialog.h"
 #include "DIA_flyDialogQt4.h"
-#include "ADM_assert.h"
 
-void ADM_flyDialog::postInit() {}
+void ADM_flyDialog::postInit()
+{
+	QWidget *graphicsView = ((ADM_QCanvas*)_canvas)->parentWidget();
+
+	graphicsView->setMinimumSize(_w, _h);
+	graphicsView->resize(_w, _h);
+}
+
 float ADM_flyDialog::calcZoomFactor(void) {return 1;}
 
 uint8_t  ADM_flyDialog::display(void)

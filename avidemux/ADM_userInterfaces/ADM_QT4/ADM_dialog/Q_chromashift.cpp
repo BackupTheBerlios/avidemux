@@ -77,7 +77,6 @@ class Ui_chromaShiftWindow : public QDialog
         ui.spinBoxV->setMaximum(boundary/2);
         ui.spinBoxV->setMinimum(-boundary);
         
-        ui.graphicsView->resize(width,height);
         canvas=new ADM_QCanvas(ui.graphicsView,width,height);
         
         myCrop=new flyChromaShift( width, height,in,canvas,ui.horizontalSlider);

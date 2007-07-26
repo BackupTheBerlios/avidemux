@@ -73,7 +73,7 @@ class Ui_contrastWindow : public QDialog
         // Allocate space for green-ised video
         width=in->getInfo()->width;
         height=in->getInfo()->height;
-        ui.graphicsView->resize(width,height);
+
         canvas=new ADM_QCanvas(ui.graphicsView,width,height);
         
         myCrop=new flyContrast( width, height,in,canvas,ui.horizontalSlider);
