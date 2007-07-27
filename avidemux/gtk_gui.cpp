@@ -147,6 +147,7 @@ extern uint8_t A_autoDrive(Action action);
 int ignore_change;
 
 extern uint8_t DIA_ocrGen(void);
+extern uint8_t DIA_ocrDvb(void);
 uint8_t A_TimeShift(void);
 PARAM_MUX muxMode = MUX_REGULAR;
 int muxParam = 0;
@@ -224,6 +225,9 @@ int nw;
                 return;
         case ACT_ViewMain: UI_toogleMain();return;
         case ACT_ViewSide: UI_toogleSide();return;
+        case ACT_DVB_Ocr:
+        		DIA_ocrDvb();
+        		break;
       case ACT_Ocr:
                 DIA_ocrGen(); //
                 return;

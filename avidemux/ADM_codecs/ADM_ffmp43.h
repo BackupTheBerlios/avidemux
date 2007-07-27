@@ -18,7 +18,7 @@
  *                                                                         *
  ***************************************************************************/
 #ifdef USE_FFMPEG
-
+#include "ADM_lavcodec.h"
 class decoderFFSubs
 {
   protected:

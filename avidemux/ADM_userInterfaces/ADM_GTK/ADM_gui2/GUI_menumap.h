@@ -75,6 +75,10 @@ CALLBACK(calculator1                            ,ACT_Bitrate);
  
  CALLBACK(run_script1		   	        ,ACT_RunScript);
  CALLBACK( ocr_vobsub_2_srt                     ,ACT_Ocr);
+ 
+ CALLBACK( ocr_dvb                     ,ACT_DVB_Ocr);
+ 
+ 
 CALLBACK(item1                                 ,ACT_AllBlackFrames);
 
 CALLBACK(first_frame1                          ,ACT_Begin);

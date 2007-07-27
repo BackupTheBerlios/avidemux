@@ -1,6 +1,10 @@
 /***************************************************************************
                          DVB-T subtitle filter
     
+    This is a dummy DVB-T Filter and should be only used through OCR
+    The filter exists just for debugging purpose and should not be exposed
+    to end user at all.
+    
     copyright            : (C) 2007 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
@@ -37,37 +41,10 @@
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 #include "DIA_factory.h"
-#include "ADM_inputs/ADM_mpegdemuxer/dmx_mpegstartcode.h"
-#include "ADM_inputs/ADM_mpegdemuxer/dmx_demuxerTS.h"
 
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_codecs/ADM_codec.h"
-#include "ADM_codecs/ADM_ffmp43.h"
-
-#define READ_BUFFER_SIZE (64*1024)
-
-class ADMVideoSubDVB : public AVDMGenericVideoStream 
-{
-protected:
-        virtual char* printConf(void);
-       
-        uint8_t init(void);
-        
-        decoderFFSubs *decoder;
-        ADMCompressedImage *binary;
-        dmx_demuxerTS *demuxer;
-        AVSubtitle  sub;
-        uint8_t     readBuffer[READ_BUFFER_SIZE];
-        uint32_t    _inited;
-        
-public:
-        ADMVideoSubDVB(AVDMGenericVideoStream *in, CONFcouple *conf);
-        virtual ~ADMVideoSubDVB();
-        virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len, ADMImage *data,uint32_t *flags);
-        uint8_t configure(AVDMGenericVideoStream *instream);
-        uint8_t	getCoupledConf(CONFcouple **conf);
-};
-
+#include "ADM_vidDvbSub.h"
 static FILTER_PARAM assParam={7,
         { /* float */ "font_scale",
           /*float*/ "line_spacing",
@@ -94,7 +71,34 @@ uint8_t ADMVideoSubDVB::configure(AVDMGenericVideoStream * instream)
   
    return 1;
 }
+//_______________________________________________________________
 
+ADMVideoSubDVB::ADMVideoSubDVB(const char *ts, uint32_t pid,uint32_t w, uint32_t h) 
+{
+        _in=NULL;		
+        memset(&_info,0,sizeof(_info));
+        _info.width=w;
+        _info.height=h;
+        _inited=0;
+        
+      
+        _uncompressed=new ADMImage(getInfo()->width,getInfo()->height);
+        ADM_assert(_uncompressed);
+        _info.encoding=1;
+        
+        decoder=new decoderFFSubs(1);
+        binary=new ADMCompressedImage;
+        binary->data=readBuffer+2;
+        
+        MPEG_TRACK track;
+        track.pid=pid;
+
+        
+        demuxer=new dmx_demuxerTS(1,&track,0,DMX_MPG_TS);
+      
+
+      
+}
 //_______________________________________________________________
 
 ADMVideoSubDVB::ADMVideoSubDVB(AVDMGenericVideoStream *in, CONFcouple *conf) 
@@ -117,14 +121,17 @@ ADMVideoSubDVB::ADMVideoSubDVB(AVDMGenericVideoStream *in, CONFcouple *conf)
 
         
         demuxer=new dmx_demuxerTS(1,&track,0,DMX_MPG_TS);
-        _inited=init();
+        _inited=init(NULL);
 
       
 }
 // **********************************
-uint8_t ADMVideoSubDVB::init(void)
+uint8_t ADMVideoSubDVB::init(const char  *tsFileName)
 {
-const char  *tsFileName="/capture/grey/Grey_anatomy_2007_05_22_Avec_Le_Temp.mpg";
+	// For test only!
+#ifdef ADM_DEBUG
+	if(!tsFileName) tsFileName="/capture/grey/Grey_anatomy_2007_05_22_Avec_Le_Temp.mpg";
+#endif
     // First create our demuxer
      
      if(!demuxer->open(tsFileName))
@@ -133,7 +140,7 @@ const char  *tsFileName="/capture/grey/Grey_anatomy_2007_05_22_Avec_Le_Temp.mpg"
         return 0; 
      }
       memset(&sub,0,sizeof(sub));
-     
+      _inited=1;
      return 1;
 } 
 
@@ -244,7 +251,6 @@ uint8_t *org=NULL;
                       }
               
                       // Merge Luma
-                      
                       for(int yy=0;yy<clipH;yy++)
                       {
                           org=data->data+(yy+r->y)*_info.width+r->x;
@@ -324,22 +330,124 @@ _skip:
         
         return 1;
 }
+/**
+ * \fn 			getNextBitmap
+ * \brief 		Decode a bitmap and store the result (luma only) in the caller supplied vobSubBitmap
+ * @param data  (in) Vobsubbitmap to put image in
+ * @param pts   Raw pts in 90 Khz Tick
+ * @return      0 on failure, 1 on success 
+ * */
+uint8_t ADMVideoSubDVB::getNextBitmap(vobSubBitmap *data,uint32_t *pts) 
+{
+uint8_t *org=NULL;
 
+        uint32_t packetLen,dts; //,pts;
+        // Clear incoming picture
+        	data->clear();
+        
+          if(!demuxer->readPes(readBuffer,&packetLen, &dts,pts)) return 0;
+          binary->dataLength=packetLen-3; // -2 for stream iD, -1 for ????
+          if(packetLen<=5) return 1;
+          // And decompress...
+          decoder->uncompress(binary,&sub);
+            
+          // Process All rectangles
+          
+            printf("Found %d rects to process\n",sub.num_rects);
+            for(int i=0;i<sub.num_rects;i++)
+            {
+              AVSubtitleRect *r=&(sub.rects[i]);
+              // First convert RGB to Y+ALPHA
+              for(int col=0;col<r->nb_colors;col++)
+              {
+                    // Color is RGB, convert to YUV
+                    uint32_t y,u,v,a;
+                    uint32_t rgb=r->rgba_palette[col];
+                
+                          y=rgba2y(rgb);
+                          u=rgba2u(rgb)&0xff;
+                          v=rgba2v(rgb)&0xff;
+                          a=_a(rgb);
+                          r->rgba_palette[col]=y+(u<<8)+(v<<16)+(a<<24);
+                          printf("Color %d, alpha %u luma %u rgb:%x\n",col,a,y,rgb);
+              }
+              // Palette is ready, display !
+              if(r->x>_info.width || r->y>_info.height)
+              {
+                  printf("[DVBSUB]Box is outside image\n");
+                  goto _skipX;
+              }
+                  printf("x :%d\n",r->x);
+                  printf("y :%d\n",r->y);
+                  printf("w :%d\n",r->w);
+                  printf("h :%d\n",r->h);
+
+                  {
+                      uint32_t clipW,clipH;
+                      
+                      clipW=FFMIN(_info.width,r->x+r->w)-r->x;
+                      clipH=FFMIN(_info.height,r->y+r->h)-r->y;
+                      
+                      ADMImage image(r->w,r->h);
+                      ADMImage alphaImage(r->w,r->h);
+                      
+                      uint8_t *ptr=image.data;
+                      uint8_t *ptrAlpha=alphaImage.data;
+                      uint8_t *in=r->bitmap;
+                      for(int yy=0;yy<r->h;yy++)
+                      {
+                          for(int xx=0;xx<r->w;xx++)
+                          {
+                            uint32_t alpha,valout;
+                            uint32_t val=*in++;
+                            
+                                  val=r->rgba_palette[val];
+                                  
+                                  *ptrAlpha++=(val>>24)&0xff;
+                                  *ptr++=(val&0xff);;
+                          }
+                      }
+              
+                      // Merge Luma
+                      
+                      for(int yy=0;yy<clipH;yy++)
+                      {
+                          org=data->_bitmap+(yy+r->y)*_info.width+r->x;
+                          
+                          ptrAlpha=alphaImage.data+yy*r->w;
+                          ptr=image.data+yy*r->w;
+                          int clean=0;
+                          for(int xx=0;xx<clipW;xx++)
+                          {
+                            uint32_t val,before,alpha;
+                            
+                                  //before=*org;
+                                  val=*ptr++;
+                                  alpha=*ptrAlpha++;
+                                  
+                                  val=val*alpha;//+(255-alpha)*before;
+                                  val=val>>8;
+                                  if(val>10) clean=1; // Remove noise
+                                  *org++=val;
+                                  
+                          }
+                          if(clean) data->setDirty(r->y+yy);
+                      }
+                  }
+                   // We dont need chroma here...
+               // Delete palette & data
+_skipX:
+               av_free(r->rgba_palette);
+               av_free(r->bitmap);
+            } // Next rec..
+            memset(&sub,0,sizeof(sub));
+        
+        return 1;
+}
 uint8_t	ADMVideoSubDVB::getCoupledConf(CONFcouple **conf) 
 {
 
         *conf=new CONFcouple(0);
-#if 0
-#define _COUPLE_SET(x) (*conf)->setCouple(#x, _params->x);
-        _COUPLE_SET(font_scale)
-        _COUPLE_SET(line_spacing)
-        _COUPLE_SET(top_margin)
-        _COUPLE_SET(bottom_margin)
-        _COUPLE_SET(subfile)
-        _COUPLE_SET(fonts_dir)
-        _COUPLE_SET(extract_embedded_fonts)
-#endif
-     
         return 1;
 }
 /************************************************/

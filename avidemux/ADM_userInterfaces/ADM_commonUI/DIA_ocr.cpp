@@ -137,7 +137,6 @@ _again:
         ADM_ocr_engine(source,srtFileName,&head);
         
         // Save glyph set 
-_save:
         if(globalGlyph)
         {
           uint32_t nb=1;
@@ -154,7 +153,112 @@ _save:
             }
             if(save) ADM_dezalloc(save);
         }
-cleanup:
+
+  cleanupSub(&subparam);
+  if(srtFileName )ADM_dezalloc(srtFileName);
+  srtFileName=NULL;
+  destroyGlyphTree(&head);
+  return 1;  
+}
+/**
+    \fn DIA_ocrDvb
+    \brief Dialog to select input & output files before calling the actual ocr engine
+*/
+uint8_t DIA_ocrDvb(void)
+{
+
+  vobSubParam subparam={NULL,0,0};
+  char *srtFileName=NULL;
+  char *glyphFileName=NULL;
+  admGlyph head(16,16);
+  char *globalGlyph=NULL;
+  uint32_t globalGlyphOn=0;
+  prefs->get(FEATURE_GLOBAL_GLYPH_ACTIVE,&globalGlyphOn);
+  if(globalGlyphOn)
+  {
+     prefs->get(FEATURE_GLOBAL_GLYPH_NAME,&globalGlyph);
+     if(!*globalGlyph)
+     {
+        ADM_dezalloc(globalGlyph);
+        globalGlyph=NULL; 
+     }
+  }
+
+  if(globalGlyph)
+  {
+    glyphFileName=globalGlyph;
+  }
+_againX:  
+  // Fist build a dialogFactory to get input and output files
+  diaElemFile     selectGlyph(1,&glyphFileName,_("Use glyphset (optional):"),NULL);  
+  diaElemFile     selectSrt(1,&srtFileName,_("Output SRT file"),NULL);
+  
+  diaElem *elems[]={&selectSrt,&selectGlyph};
+  
+  
+   uint32_t n=2;
+   if(globalGlyph)
+   {
+     n--; // Remove glyph from dialog
+   }
+  
+        if( !diaFactoryRun(_("Select input and ouput files"),n,elems))
+        {
+          cleanupSub(&subparam);
+          if(srtFileName )ADM_dezalloc(srtFileName);
+          srtFileName=NULL;
+          destroyGlyphTree(&head);
+          return 0;
+        }
+       // TODO Check input TS file
+        if(!srtFileName || !*srtFileName)
+        {
+          GUI_Error_HIG(_("File error"),_("Please Select a valid output SRT file."));
+          goto _againX; 
+        }
+         if(glyphFileName && *glyphFileName)
+         {
+           if(!ADM_fileExist(glyphFileName))
+            {
+              GUI_Error_HIG(_("File error"),_("The idx/sub file does not exist."));
+              goto _againX; 
+            }
+            // Purge previous glyph set if any
+            destroyGlyphTree(&head);
+            uint32_t nb;
+            printf("[OCR] Loading glyphset :<%s>\n",glyphFileName);
+            if(!loadGlyph(glyphFileName,&head,&nb))
+            {
+              GUI_Error_HIG(_("File error"),_("Cannot load the glyphset file."));
+              goto _againX;               
+            }
+            printf("[GLYPH] Found %u glyph\n");
+         }
+        // We have our SRT and our idx/sub files : Go go go
+         ADM_OCR_SOURCE source;
+         source.type=ADM_OCR_TYPE_TS;
+         source.TsFile=NULL;
+         ADM_ocr_engine(source,srtFileName,&head);
+        
+        // Save glyph set 
+
+        if(globalGlyph)
+        {
+          uint32_t nb=1;
+           saveGlyph(globalGlyph,&head,nb);
+        }else
+        {
+            char *save=NULL;
+            uint32_t nb=1;
+              diaElemFile     selectSave(1,&save,_("Glyphset filename"),NULL);
+              diaElem *elems2[]={&selectSave};
+            if( diaFactoryRun(_("Save Glyph"),1,elems2))
+            {
+              saveGlyph(save,&head,nb);
+            }
+            if(save) ADM_dezalloc(save);
+        }
+
   cleanupSub(&subparam);
   if(srtFileName )ADM_dezalloc(srtFileName);
   srtFileName=NULL;
