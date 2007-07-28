@@ -284,7 +284,13 @@ SET(CMAKE_REQUIRED_FLAGS)
 # X264
 ########################################
 SET(CMAKE_REQUIRED_FLAGS "-include stdint.h")
+
+if(WIN32)
+SET(CMAKE_REQUIRED_LIBRARIES "-lm -lpthreadGC2")
+else(WIN32)
 SET(CMAKE_REQUIRED_LIBRARIES "-lm -lpthread")
+endif(WIN32)
+
 ADM_CHECK_HL(x264 x264.h x264 x264_encoder_open USE_X264)
 SET(CMAKE_REQUIRED_FLAGS)
 SET(CMAKE_REQUIRED_LIBRARIES)
