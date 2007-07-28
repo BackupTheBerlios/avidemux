@@ -3,6 +3,9 @@
 MACRO (ADM_CHECK_HL _banner _includeName _libName _libFunc _varToSet)
 MESSAGE(STATUS "<Checking for ${_banner}>")
 MESSAGE(STATUS "<******************************>")
+if(NO_${_banner})
+message(status "<disabled per request>")
+else(NO_${_banner})
  SET(_oldCRF ${CMAKE_REQUIRED_FLAGS})
  SET(CMAKE_REQUIRED_FLAGS "$ENV{CFLAGS} ${_oldCRF}")
 #MESSAGE(STATUS "CMAKE_REQUIRED_FLAGS:${CMAKE_REQUIRED_FLAGS}")
@@ -29,6 +32,7 @@ else(${_varToSet})
      MESSAGE(STATUS "${_banner} support off")
 endif(${_varToSet})
 SET(CMAKE_REQUIRED_FLAGS "${_oldCRF}")
+endif(NO_${_banner})
 ENDMACRO (ADM_CHECK_HL _includeName _libName _libFunc _varToSet)
 
 

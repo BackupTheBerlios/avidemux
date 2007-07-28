@@ -2,6 +2,9 @@
 
 MESSAGE(STATUS "<** ARTS **>")
 MESSAGE(STATUS "<---------->")
+if(NO_ARTS)
+message(status "<disabled per request>")
+else(NO_ARTS)
 FIND_PROGRAM(ARTS_CONFIG_EXECUTABLE artsc-config)
 MARK_AS_ADVANCED(ARTS_CONFIG_EXECUTABLE)
 
@@ -18,6 +21,7 @@ IF(ARTS_CONFIG_EXECUTABLE)
 ELSE(ARTS_CONFIG_EXECUTABLE)
 MESSAGE(STATUS "Not found")
 ENDIF(ARTS_CONFIG_EXECUTABLE)
+endif(NO_ARTS)
 
 
 # FindSubversion.cmake ends here.

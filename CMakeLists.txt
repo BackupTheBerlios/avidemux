@@ -81,6 +81,9 @@ MESSAGE(STATUS "OK ${PKGCONFIG_EXECUTABLE}")
 #**************************************************
 MESSAGE(STATUS "<Checking for FreeType through PKG-CONFIG>")
 MESSAGE(STATUS "<****************************************>")
+if(NO_FREETYPE)
+message(status "<disabled per request>")
+else(NO_FREETYPE)
 PKGCONFIG(freetype2 FT_INCLUDE FT_LIB FT_LDFLAGS FT_CFLAGS)
 
 IF(NOT FT_INCLUDE)
@@ -96,6 +99,7 @@ ELSE(NOT FT_INCLUDE)
     MESSAGE(STATUS "FreeType Found ("${FT_CFLAGS} ${FT_INCLUDE}")")
     
 ENDIF(NOT FT_INCLUDE)
+endif(NO_FREETYPE)
 #**************************************************
 # Search for  X11 (not on windows)
 #**************************************************
@@ -131,6 +135,9 @@ ENDIF(NOT GLIB_INCLUDE)
 #**************************************************
 MESSAGE(STATUS "<Checking for GTK>")
 MESSAGE(STATUS "<******************************>")
+if(NO_GTK)
+message(status "<disabled per request>")
+else(NO_GTK)
 PKGCONFIG(gtk+-2.0 GTK_INCLUDE GTK_LIB GTK_LDFLAGS GTK_CFLAGS)
 
 IF(NOT GTK_CFLAGS)
@@ -142,6 +149,7 @@ ELSE(NOT GTK_CFLAGS)
     SET(GTK_LIB,${GTK_LIB})
     MESSAGE(STATUS OK)
 ENDIF(NOT GTK_CFLAGS)
+endif(NO_GTK)
 #**************************************************
 # Search for Gthread through PKG-Config
 #**************************************************
@@ -161,6 +169,9 @@ ENDIF(NOT GTHREAD_CFLAGS)
 #**************************************************
 MESSAGE(STATUS "<Checking for QT4>")
 MESSAGE(STATUS "<******************************>")
+if(NO_QT4)
+message(status "<disabled per request>")
+else(NO_QT4)
 include(FindQt4)
 if(QT4_FOUND AND MINGW)
 if(XMINGW) # Cross compile ?
@@ -185,6 +196,7 @@ else(XMINGW)
 	SET(QT_RCC_EXECUTABLE rcc)
 endif(XMINGW)
 endif(QT4_FOUND AND MINGW)
+endif(NO_QT4)
 
 # do config checks
 include(ConfigureChecks.cmake)
