@@ -227,7 +227,13 @@ _againX:
           destroyGlyphTree(&head);
           return 0;
         }
-       // TODO Check input TS file
+        // TS file exists ?
+        if(!ADM_fileExist(tsFileName))
+        {
+        	  GUI_Error_HIG(_("File error"),_("Please Select a valid TS file."));
+        	  goto _againX;
+        }
+       
         if(!srtFileName || !*srtFileName)
         {
           GUI_Error_HIG(_("File error"),_("Please Select a valid output SRT file."));
@@ -252,8 +258,7 @@ _againX:
             printf("[GLYPH] Found %u glyph\n");
          }
         // We have our SRT and our TS file
-         
-  
+        // Call the OCR engine...
          source.TsFile=ADM_strdup(tsFileName);
          source.TsPid=pid;
          ADM_ocr_engine(source,srtFileName,&head);
