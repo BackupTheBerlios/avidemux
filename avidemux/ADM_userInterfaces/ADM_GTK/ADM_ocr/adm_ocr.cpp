@@ -75,6 +75,12 @@
 #define TESTSUB "/home/fx/usbstick/subs/vts_01_0.idx"
 #define CONNECT(x,y,z) 	gtk_signal_connect(GTK_OBJECT(WID(x)), #y,GTK_SIGNAL_FUNC(z),   NULL);
 
+
+/* Minimal size of the current glyph display window */
+#define MAX_W 65
+#define MAX_H 65
+
+
 extern  uint8_t DIA_vobsub(vobSubParam *param);
 //********************************************
 extern  GtkWidget *DIA_ocr(void);
@@ -87,6 +93,7 @@ static GtkWidget *dialog=NULL;
 static GtkWidget *mainDisplay=NULL;
 static GtkWidget *smallDisplay=NULL;
 static uint32_t redraw_x,redraw_y;
+static uint32_t clipW=0,clipH=0;
 //********************************************
 //ReplyType glyphToText(admGlyph *glyph,admGlyph *head);
 static ReplyType setup(void);
@@ -138,7 +145,8 @@ uint8_t ADM_ocr_engine(   ADM_OCR_SOURCE & source,const char *labelSrt,admGlyph 
     workArea=NULL;
     bitmap=NULL;
     sdata=NULL;
-    
+    clipW=0;
+    clipH=0;
 
     
 // Create UI && prepare callback
@@ -155,10 +163,14 @@ uint8_t ADM_ocr_engine(   ADM_OCR_SOURCE & source,const char *labelSrt,admGlyph 
     
    
     gtk_widget_show(dialog);
+    //
+    
 //  disable
     
     mainDisplay=WID(drawingareaBitmap);
     smallDisplay=WID(drawingareaSmall);
+    
+   
     
     CONNECT(drawingareaBitmap,expose_event,gui_draw);
     CONNECT(drawingareaSmall,expose_event,gui_draw_small);
@@ -204,14 +216,15 @@ _again:
      }
     seqNum=1;   // Sub number in srt file
     oldw=oldh=0;
-
+    uint32_t eos;
     //******************    
     // Load all bitmaps
     //******************
     for(uint32_t i=0;i<nbSub;i++)
     {
             first=last=0;
-            bitmap=bitmapSource->getBitmap(i,&startTime, &endTime,&first,&last);
+            bitmap=bitmapSource->getBitmap(i,&startTime, &endTime,&first,&last,&eos);
+            if(eos) break;
             ADM_assert(last>=first);
             
             // something ?
@@ -267,6 +280,12 @@ againPlease:
              uint16_t hh,mm,ss,ms;
              ms2time(startTime, &hh, &mm, &ss, &ms);
              fprintf(out,"%02d:%02d:%02d,%03d --> ",hh,mm,ss,ms);
+             
+             // Update Timecode
+             char timeCode[100];
+             snprintf(timeCode,100,"%02d:%02d:%02d,%03d",hh,mm,ss,ms);
+             gtk_label_set_text(GTK_LABEL(WID(labelTime)),timeCode);
+             
              ms2time(endTime, &hh, &mm, &ss, &ms);
              fprintf(out,"%02d:%02d:%02d,%03d\n",hh,mm,ss,ms);
              fprintf(out,"%s\n\n",decodedString);
@@ -416,12 +435,20 @@ void displaySmall( admGlyph *glyph)
 {
     if(sw!=glyph->width || sh!=glyph->height)
     {
+    	
         if(sdata) delete [] sdata;
         sdata=NULL;
         sw=glyph->width;
         sh=glyph->height;
         sdata=new uint8_t[(sw*2+2)*(sh*2+2)];
-        gtk_widget_set_usize(smallDisplay, sw*2+2, sh*2+2);
+        clipW= sw*2+2;
+        clipH=  sh*2+2;
+#ifndef MAX
+        #define MAX(a,b) a>b?a:b
+#endif
+        clipW=MAX(MAX_W,clipW);
+        clipH=MAX(MAX_H,clipH);
+        gtk_widget_set_usize(smallDisplay, clipW,clipH);
     }
     uint32_t stride=sw*2+2;
     uint8_t *in=glyph->data;
@@ -449,15 +476,29 @@ void displaySmall( admGlyph *glyph)
 
 gboolean gui_draw_small(void)
 { 
+	if(clipW && clipH)
+	{
+		 gdk_draw_rectangle(smallDisplay->window,
+				 				smallDisplay->style->fg_gc[GTK_STATE_NORMAL],
+				 				1, // Filled
+		                        0,                          // X
+		                        0,                          // y
+		                        clipW,
+		                        clipH);
+		
+	
+	}
  if(sw && sh && sdata)
+ {
     gdk_draw_gray_image(smallDisplay->window, smallDisplay->style->fg_gc[GTK_STATE_NORMAL],
-                        0,                          // X
-                        0,                          // y
-                        sw*2+2,                          //width
-                        sh*2+2,                          //h*2, // heigth
+                        1,                          // X
+                        1,                          // y
+                        sw*2+1,                          //width
+                        sh*2+1,                          //h*2, // heigth
                         GDK_RGB_DITHER_NONE,
                         sdata, // buffer
                         sw*2+2 );
+ }
     return true;
 }
 

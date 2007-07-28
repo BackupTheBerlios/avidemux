@@ -213,11 +213,12 @@ uint8_t *org=NULL;
                   printf("[DVBSUB]Box is outside image\n");
                   goto _skip;
               }
+#if 0
                   printf("x :%d\n",r->x);
                   printf("y :%d\n",r->y);
                   printf("w :%d\n",r->w);
                   printf("h :%d\n",r->h);
-
+#endif
                   {
                       uint32_t clipW,clipH;
                       
@@ -369,7 +370,9 @@ uint8_t *org=NULL;
                           v=rgba2v(rgb)&0xff;
                           a=_a(rgb);
                           r->rgba_palette[col]=y+(u<<8)+(v<<16)+(a<<24);
+#if 0
                           printf("Color %d, alpha %u luma %u rgb:%x\n",col,a,y,rgb);
+#endif
               }
               // Palette is ready, display !
               if(r->x>_info.width || r->y>_info.height)
@@ -377,11 +380,12 @@ uint8_t *org=NULL;
                   printf("[DVBSUB]Box is outside image\n");
                   goto _skipX;
               }
+#if 0
                   printf("x :%d\n",r->x);
                   printf("y :%d\n",r->y);
                   printf("w :%d\n",r->w);
                   printf("h :%d\n",r->h);
-
+#endif
                   {
                       uint32_t clipW,clipH;
                       

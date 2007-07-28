@@ -32,10 +32,11 @@ DIA_ocr (void)
   GtkWidget *label9;
   GtkWidget *labelNbGlyphs;
   GtkWidget *labelNbLines;
+  GtkWidget *label15;
+  GtkWidget *labelTime;
   GtkWidget *label7;
   GtkWidget *frameBitmap;
   GtkWidget *vbox7;
-  GtkWidget *drawingareaBitmap;
   GtkWidget *table2;
   GtkWidget *label13;
   GtkWidget *drawingareaSmall;
@@ -48,6 +49,7 @@ DIA_ocr (void)
   GtkWidget *buttonSkip;
   GtkWidget *buttonIgnore;
   GtkWidget *buttonOk;
+  GtkWidget *drawingareaBitmap;
   GtkWidget *hseparator1;
   GtkWidget *label12;
   GtkWidget *dialog_action_area1;
@@ -68,7 +70,7 @@ DIA_ocr (void)
   gtk_widget_show (frame5);
   gtk_box_pack_start (GTK_BOX (vbox1), frame5, FALSE, FALSE, 0);
 
-  table1 = gtk_table_new (2, 2, FALSE);
+  table1 = gtk_table_new (3, 2, FALSE);
   gtk_widget_show (table1);
   gtk_container_add (GTK_CONTAINER (frame5), table1);
 
@@ -100,6 +102,20 @@ DIA_ocr (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (labelNbLines), 0, 0.5);
 
+  label15 = gtk_label_new (_("TimeCode:"));
+  gtk_widget_show (label15);
+  gtk_table_attach (GTK_TABLE (table1), label15, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label15), 0, 0.5);
+
+  labelTime = gtk_label_new (_("0:0:0"));
+  gtk_widget_show (labelTime);
+  gtk_table_attach (GTK_TABLE (table1), labelTime, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelTime), 0, 0.5);
+
   label7 = gtk_label_new (_("<b>Stats</b>"));
   gtk_widget_show (label7);
   gtk_frame_set_label_widget (GTK_FRAME (frame5), label7);
@@ -113,14 +129,9 @@ DIA_ocr (void)
   gtk_widget_show (vbox7);
   gtk_container_add (GTK_CONTAINER (frameBitmap), vbox7);
 
-  drawingareaBitmap = gtk_drawing_area_new ();
-  gtk_widget_show (drawingareaBitmap);
-  gtk_box_pack_start (GTK_BOX (vbox7), drawingareaBitmap, FALSE, FALSE, 0);
-  gtk_widget_set_size_request (drawingareaBitmap, 5, 11);
-
   table2 = gtk_table_new (2, 2, FALSE);
   gtk_widget_show (table2);
-  gtk_box_pack_start (GTK_BOX (vbox7), table2, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox7), table2, FALSE, FALSE, 0);
 
   label13 = gtk_label_new (_("Current Glyph"));
   gtk_widget_show (label13);
@@ -155,7 +166,7 @@ DIA_ocr (void)
 
   hbuttonbox1 = gtk_hbutton_box_new ();
   gtk_widget_show (hbuttonbox1);
-  gtk_box_pack_start (GTK_BOX (vbox7), hbuttonbox1, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox7), hbuttonbox1, FALSE, FALSE, 0);
 
   buttonCalibrate = gtk_button_new_with_mnemonic (_("Calibrate"));
   gtk_widget_show (buttonCalibrate);
@@ -181,6 +192,11 @@ DIA_ocr (void)
   gtk_widget_show (buttonOk);
   gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonOk);
   GTK_WIDGET_SET_FLAGS (buttonOk, GTK_CAN_DEFAULT);
+
+  drawingareaBitmap = gtk_drawing_area_new ();
+  gtk_widget_show (drawingareaBitmap);
+  gtk_box_pack_start (GTK_BOX (vbox7), drawingareaBitmap, TRUE, TRUE, 0);
+  gtk_widget_set_size_request (drawingareaBitmap, 5, 11);
 
   hseparator1 = gtk_hseparator_new ();
   gtk_widget_show (hseparator1);
@@ -210,10 +226,11 @@ DIA_ocr (void)
   GLADE_HOOKUP_OBJECT (dialog1, label9, "label9");
   GLADE_HOOKUP_OBJECT (dialog1, labelNbGlyphs, "labelNbGlyphs");
   GLADE_HOOKUP_OBJECT (dialog1, labelNbLines, "labelNbLines");
+  GLADE_HOOKUP_OBJECT (dialog1, label15, "label15");
+  GLADE_HOOKUP_OBJECT (dialog1, labelTime, "labelTime");
   GLADE_HOOKUP_OBJECT (dialog1, label7, "label7");
   GLADE_HOOKUP_OBJECT (dialog1, frameBitmap, "frameBitmap");
   GLADE_HOOKUP_OBJECT (dialog1, vbox7, "vbox7");
-  GLADE_HOOKUP_OBJECT (dialog1, drawingareaBitmap, "drawingareaBitmap");
   GLADE_HOOKUP_OBJECT (dialog1, table2, "table2");
   GLADE_HOOKUP_OBJECT (dialog1, label13, "label13");
   GLADE_HOOKUP_OBJECT (dialog1, drawingareaSmall, "drawingareaSmall");
@@ -226,6 +243,7 @@ DIA_ocr (void)
   GLADE_HOOKUP_OBJECT (dialog1, buttonSkip, "buttonSkip");
   GLADE_HOOKUP_OBJECT (dialog1, buttonIgnore, "buttonIgnore");
   GLADE_HOOKUP_OBJECT (dialog1, buttonOk, "buttonOk");
+  GLADE_HOOKUP_OBJECT (dialog1, drawingareaBitmap, "drawingareaBitmap");
   GLADE_HOOKUP_OBJECT (dialog1, hseparator1, "hseparator1");
   GLADE_HOOKUP_OBJECT (dialog1, label12, "label12");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");

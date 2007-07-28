@@ -41,7 +41,7 @@ public:
 			virtual uint8_t     init(ADM_OCR_SOURCE *source);
 			virtual 			~ADM_BitmapSource_VobSub();
 			virtual uint32_t 	getNbImages(void);
-			virtual vobSubBitmap *getBitmap(uint32_t nb,uint32_t *start, uint32_t *end,uint32_t *first,uint32_t *last);
+			virtual vobSubBitmap *getBitmap(uint32_t nb,uint32_t *start, uint32_t *end,uint32_t *first,uint32_t *last,uint32_t *eos);
 };
 
 ADM_BitmapSource_VobSub::ADM_BitmapSource_VobSub(void)
@@ -73,8 +73,9 @@ uint32_t 	ADM_BitmapSource_VobSub::getNbImages(void)
  * 		\fn getBitmap
  * 		\brief returns a bitmap in black & white (luma+alpha)
  * */
-vobSubBitmap *ADM_BitmapSource_VobSub::getBitmap(uint32_t nb,uint32_t *start, uint32_t *end,uint32_t *first,uint32_t *last)
+vobSubBitmap *ADM_BitmapSource_VobSub::getBitmap(uint32_t nb,uint32_t *start, uint32_t *end,uint32_t *first,uint32_t *last,uint32_t *endofstream)
 {
+	*endofstream=0;
 	return _vobsub->getBitmap(nb,start, end,first,last);
 }
 /*  *****************************
@@ -83,18 +84,21 @@ vobSubBitmap *ADM_BitmapSource_VobSub::getBitmap(uint32_t nb,uint32_t *start, ui
  */
 #define TS_WIDTH  720
 #define TS_HEIGHT 576
+#define NO_STARTING_TIMECODE 0xFFFFFFF
 class ADM_BitmapSource_TsSub : public ADM_BitmapSource
 {
 protected:
 			uint32_t		_nbPics;
 			ADMVideoSubDVB  *_dvb;
 			vobSubBitmap    *_bitmap;
+			uint32_t		_firstTimeCode;
 public: 
 								ADM_BitmapSource_TsSub(void);
 			virtual uint8_t     init(ADM_OCR_SOURCE *source);
 			virtual 			~ADM_BitmapSource_TsSub();
 			virtual uint32_t 	getNbImages(void);
-			virtual vobSubBitmap *getBitmap(uint32_t nb,uint32_t *start, uint32_t *end,uint32_t *first,uint32_t *last);
+			virtual vobSubBitmap *getBitmap(uint32_t nb,uint32_t *start, uint32_t *end,uint32_t *first,uint32_t *last,
+									uint32_t *eos);
 };
 
 ADM_BitmapSource_TsSub::ADM_BitmapSource_TsSub(void)
@@ -102,6 +106,7 @@ ADM_BitmapSource_TsSub::ADM_BitmapSource_TsSub(void)
 	_nbPics=0x7FFFF;
 	_dvb=NULL;
 	_bitmap=new vobSubBitmap(TS_WIDTH,TS_HEIGHT);
+	_firstTimeCode=NO_STARTING_TIMECODE;
 }
 ADM_BitmapSource_TsSub::~ADM_BitmapSource_TsSub()
 {
@@ -112,10 +117,10 @@ ADM_BitmapSource_TsSub::~ADM_BitmapSource_TsSub()
 }
 uint8_t     ADM_BitmapSource_TsSub::init(ADM_OCR_SOURCE *source)
 {
-	_dvb=new ADMVideoSubDVB("/capture/grey/Grey_anatomy_2007_05_22_Avec_Le_Temp.mpg",0x96,TS_WIDTH,TS_HEIGHT);
+	_dvb=new ADMVideoSubDVB(source->TsFile,source->TsPid,TS_WIDTH,TS_HEIGHT);
 	
 	ADM_assert(_dvb);
-	return _dvb->init("/capture/grey/Grey_anatomy_2007_05_22_Avec_Le_Temp.mpg");
+	return _dvb->init(source->TsFile);
 }
 uint32_t 	ADM_BitmapSource_TsSub::getNbImages(void)
 {
@@ -130,14 +135,22 @@ uint32_t 	ADM_BitmapSource_TsSub::getNbImages(void)
  * 		@first : First non empty line
  * 		@last  : Last non empty line
  * */
-vobSubBitmap *ADM_BitmapSource_TsSub::getBitmap(uint32_t nb,uint32_t *start, uint32_t *end,uint32_t *first,uint32_t *last)
+vobSubBitmap *ADM_BitmapSource_TsSub::getBitmap(uint32_t nb,uint32_t *start, uint32_t *end,uint32_t *first,uint32_t *last,uint32_t *endOfStream)
 {
 	uint32_t pts;
+	//
+	*endOfStream=0;
 	// First get our bitmap
 	  if(! _dvb->getNextBitmap(_bitmap,&pts))
 	  {
 		  printf("[BitmapSource] cannot get next bitmap\n");
+		  *endOfStream=1;
 		  return NULL;
+	  }
+	  // First ?
+	  if(_firstTimeCode==NO_STARTING_TIMECODE)
+	  {
+		  _firstTimeCode=pts;
 	  }
 	  // Now build it
 	  // First & last are the 1st and last non empty lines
@@ -167,7 +180,14 @@ vobSubBitmap *ADM_BitmapSource_TsSub::getBitmap(uint32_t nb,uint32_t *start, uin
 	        *last=bottom;
 	        
 	  // start & end are timecodes
-	  *start=pts/90;
+#define WRAP_TIMECODE 0x3FFFFFFF
+	  if(pts>_firstTimeCode)
+	  {
+		  *start=(pts-_firstTimeCode)/90;
+	  }else
+	  {
+		  *start=((WRAP_TIMECODE-pts)+_firstTimeCode)/90;
+	  }
 	  *end=*start+1000;
 			  
 	  // Set alpha as luma

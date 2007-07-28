@@ -31,6 +31,7 @@ typedef struct
 	ADM_OCR_SOURCE_TYPE type;
 	vobSubParam *subparam;
 	char		*TsFile;
+	uint32_t    TsPid;
 }ADM_OCR_SOURCE;
 
 

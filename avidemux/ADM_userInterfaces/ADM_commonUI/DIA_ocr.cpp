@@ -50,7 +50,7 @@
 extern uint8_t DIA_vobsub(vobSubParam *param);
 
 static void cb_idx(void *foo);
-static void cleanupSub(vobSubParam *p);
+static void cleanupSub(ADM_OCR_SOURCE *p);
 /**
     \fn DIA_ocrGen
     \brief Dialog to select input & output files before calling the actual ocr engine
@@ -64,6 +64,14 @@ uint8_t DIA_ocrGen(void)
   admGlyph head(16,16);
   char *globalGlyph=NULL;
   uint32_t globalGlyphOn=0;
+  ADM_OCR_SOURCE source;
+  
+  memset(&source,0,sizeof(source));
+  
+  source.type=ADM_OCR_TYPE_VOBSUB;
+  source.subparam=&subparam;
+  
+  
   prefs->get(FEATURE_GLOBAL_GLYPH_ACTIVE,&globalGlyphOn);
   if(globalGlyphOn)
   {
@@ -96,7 +104,7 @@ _again:
   
         if( !diaFactoryRun(_("Select input and ouput files"),n,elems))
         {
-          cleanupSub(&subparam);
+          cleanupSub(&source);
           if(srtFileName )ADM_dezalloc(srtFileName);
           srtFileName=NULL;
           destroyGlyphTree(&head);
@@ -131,9 +139,9 @@ _again:
             printf("[GLYPH] Found %u glyph\n");
          }
         // We have our SRT and our idx/sub files : Go go go
-         ADM_OCR_SOURCE source;
-         source.type=ADM_OCR_TYPE_VOBSUB;
-         source.subparam=&subparam;
+         
+         
+         
         ADM_ocr_engine(source,srtFileName,&head);
         
         // Save glyph set 
@@ -154,7 +162,7 @@ _again:
             if(save) ADM_dezalloc(save);
         }
 
-  cleanupSub(&subparam);
+  cleanupSub(&source);
   if(srtFileName )ADM_dezalloc(srtFileName);
   srtFileName=NULL;
   destroyGlyphTree(&head);
@@ -170,9 +178,16 @@ uint8_t DIA_ocrDvb(void)
   vobSubParam subparam={NULL,0,0};
   char *srtFileName=NULL;
   char *glyphFileName=NULL;
+  char *tsFileName=NULL;
   admGlyph head(16,16);
   char *globalGlyph=NULL;
   uint32_t globalGlyphOn=0;
+  uint32_t pid=0x96;
+  ADM_OCR_SOURCE source;
+  
+  memset(&source,0,sizeof(source));
+  source.type=ADM_OCR_TYPE_TS;
+  
   prefs->get(FEATURE_GLOBAL_GLYPH_ACTIVE,&globalGlyphOn);
   if(globalGlyphOn)
   {
@@ -190,13 +205,15 @@ uint8_t DIA_ocrDvb(void)
   }
 _againX:  
   // Fist build a dialogFactory to get input and output files
+  diaElemFile     selectTs(1,&tsFileName,_("Input TS:"),NULL);
+  diaElemUInteger selectPid(&pid,_("Subtitle PID:"),0,255);
   diaElemFile     selectGlyph(1,&glyphFileName,_("Use glyphset (optional):"),NULL);  
   diaElemFile     selectSrt(1,&srtFileName,_("Output SRT file"),NULL);
   
-  diaElem *elems[]={&selectSrt,&selectGlyph};
+  diaElem *elems[]={&selectTs,&selectPid,&selectSrt,&selectGlyph};
   
   
-   uint32_t n=2;
+   uint32_t n=4;
    if(globalGlyph)
    {
      n--; // Remove glyph from dialog
@@ -204,7 +221,7 @@ _againX:
   
         if( !diaFactoryRun(_("Select input and ouput files"),n,elems))
         {
-          cleanupSub(&subparam);
+          cleanupSub(&source);
           if(srtFileName )ADM_dezalloc(srtFileName);
           srtFileName=NULL;
           destroyGlyphTree(&head);
@@ -234,10 +251,11 @@ _againX:
             }
             printf("[GLYPH] Found %u glyph\n");
          }
-        // We have our SRT and our idx/sub files : Go go go
-         ADM_OCR_SOURCE source;
-         source.type=ADM_OCR_TYPE_TS;
-         source.TsFile=NULL;
+        // We have our SRT and our TS file
+         
+  
+         source.TsFile=ADM_strdup(tsFileName);
+         source.TsPid=pid;
          ADM_ocr_engine(source,srtFileName,&head);
         
         // Save glyph set 
@@ -259,29 +277,51 @@ _againX:
             if(save) ADM_dezalloc(save);
         }
 
-  cleanupSub(&subparam);
+  cleanupSub(&source);
   if(srtFileName )ADM_dezalloc(srtFileName);
   srtFileName=NULL;
+  
+  if(tsFileName )ADM_dezalloc(tsFileName);
+  tsFileName=NULL;
+  
   destroyGlyphTree(&head);
   return 1;  
 }
 /**
-
+		\fn 	cleanupSub
+		\brief 	Free all ressources allocated to source
 */
-void cleanupSub(vobSubParam *p)
+void cleanupSub(ADM_OCR_SOURCE *p)
 {
-  if(p->subname) ADM_dezalloc(p->subname);
-  p->subname=NULL; 
+  if(p->TsFile)
+  {
+	  	ADM_dezalloc(p->TsFile);
+	  	p->TsFile=NULL;
+  }
+  if(p->subparam)
+  {
+	  vobSubParam *subparam=p->subparam;
+	  if(subparam->subname)
+	  {
+		  ADM_dezalloc(subparam->subname);
+		  subparam->subname=NULL;
+	  }
+	  
+  }
   
 }
 /**
-
+	\fn cb_idx
+	\brief Callback to select sub/language/...
 */
 void cb_idx(void *foo)
 {
    vobSubParam *bar=(vobSubParam *)foo;
-   
-    cleanupSub(bar);
+   if(bar->subname)
+   	  {
+   		  ADM_dezalloc(bar->subname);
+   		  bar->subname=NULL;
+   	  }
     DIA_vobsub(bar);
 }
 //EOF
