@@ -15,6 +15,7 @@ props
 resizing
 jobs
 working
+vobsub
 )
 #
 SET(${ADM_LIB}_T

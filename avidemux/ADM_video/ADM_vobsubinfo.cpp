@@ -222,7 +222,7 @@ uint8_t vobSubDestroyLanguage(vobSubLanguage *lingua)
   return 1;
 }
 //*****************************************
-uint8_t vobSubGetLanguage(char *filename,vobSubLanguage *lingua)
+uint8_t vobSubGetLanguage(const char *filename,vobSubLanguage *lingua)
 {
   char str[1024];
   char s[16];

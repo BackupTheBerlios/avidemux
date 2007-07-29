@@ -52,7 +52,7 @@ typedef struct VobSubInfo
 uint8_t vobSubRead(char *filename,int index,VobSubInfo **info);
 uint8_t destroySubInfo(VobSubInfo *sub);
 
-uint8_t         vobSubGetLanguage(char *filename,vobSubLanguage *lingua);
+uint8_t         vobSubGetLanguage(const char *filename,vobSubLanguage *lingua);
 vobSubLanguage  *vobSubAllocateLanguage(void);
 uint8_t         vobSubDestroyLanguage(vobSubLanguage *lingua);
 

@@ -82,7 +82,7 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, ADMImage *image){return 0;}
 uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in){return 0;}
 uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in){return 0;}
 //uint8_t DIA_getPartial(PARTIAL_CONFIG *param,AVDMGenericVideoStream *son,AVDMGenericVideoStream *previous){return 0;}
-uint8_t DIA_vobsub(vobSubParam *param){return 0;}
+//uint8_t DIA_vobsub(vobSubParam *param){return 0;}
 //uint8_t DIA_x264(COMPRES_PARAMS *config){return 0;}
 //uint8_t DIA_job(uint32_t nb,char **name){return 0;}
 uint8_t DIA_videoCodec (SelectCodecType * codec){return 0;}
