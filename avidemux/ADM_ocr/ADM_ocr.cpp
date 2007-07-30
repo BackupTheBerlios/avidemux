@@ -28,7 +28,6 @@
 static uint32_t minThreshold=0x80;
 
 /* In the UI related code */
-//extern ReplyType glyphToText(admGlyph *glyph);
 extern void UI_purge(void);
 
 extern uint8_t adm_estimate_glyphSize(admGlyph *glyph,uint32_t *minx, uint32_t *maxx,uint32_t *miny,uint32_t *maxy,int *raw);
@@ -135,7 +134,7 @@ ReplyType reply;
          
          
             // printf("Found glyph: %lu %lu\n",colstart,colend);  
-            reply=handleGlyph(workArea,colstart,colend,w,bottom,top,head);
+            reply=handleGlyph(workArea,colstart,colend,w,bottom,top,head,decodedString);
             switch(reply)
                 {
                         case ReplySkip:break;
@@ -175,7 +174,8 @@ ReplyType reply;
                 that case we use another method to extract the glyph.
                 We split it using leftturn method and do it again.
 */
-ReplyType handleGlyph(uint8_t *workArea,uint32_t start, uint32_t end,uint32_t w,uint32_t h,uint32_t base,admGlyph *head)
+ReplyType handleGlyph(uint8_t *workArea,uint32_t start, uint32_t end,uint32_t w,uint32_t h,uint32_t base,
+							admGlyph *head,char *decodedString)
 {
 uint8_t found=0;
 static int inc=1;
@@ -233,7 +233,7 @@ _nextglyph:
                 
                     if(lefty->width)
                     {
-                        reply=glyphToText(lefty,head);
+                        reply=glyphToText(lefty,head,decodedString);
                         if(reply!=ReplyOk)
                         {
                             printf("Glyph2text failed(1)\n");
@@ -253,7 +253,7 @@ _nextglyph:
             if(raw) delete [] raw;
             if(glyph->width)
             {
-                reply=glyphToText(glyph,head);
+                reply=glyphToText(glyph,head,decodedString);
                 if(reply!=ReplyOk)                 
                 {
                     printf("Glyph2text failed(2)\n");

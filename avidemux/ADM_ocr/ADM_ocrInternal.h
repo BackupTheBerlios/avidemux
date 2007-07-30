@@ -22,13 +22,14 @@ typedef enum
 }ReplyType;
 
 // GUI independant part
-ReplyType handleGlyph(uint8_t *workArea,uint32_t start, uint32_t end,uint32_t w,uint32_t h,uint32_t base,admGlyph *head);
+ReplyType handleGlyph(uint8_t *workArea,uint32_t start, uint32_t end,uint32_t w,uint32_t h,uint32_t base,
+							admGlyph *head,char *decodedstring);
 ReplyType ocrBitmap(uint8_t *workArea,uint32_t w,uint32_t h,char *decodedString,admGlyph *head);
 uint8_t   mergeBitmap(uint8_t *bitin, uint8_t *bitout, uint8_t *maskin,uint32_t w, uint32_t h);
 void ocrUpdateMinThreshold(void);
 
 // In GUI dependant part
-ReplyType glyphToText(admGlyph *glyph,admGlyph *head);
+ReplyType glyphToText(admGlyph *glyph,admGlyph *head,char *decodedString);
 
 /**
  * \class ADM_BitmapSource

@@ -84,27 +84,12 @@
 extern  uint8_t DIA_vobsub(vobSubParam *param);
 //********************************************
 extern  GtkWidget *DIA_ocr(void);
-static gboolean   gui_draw( void );
-static gboolean   gui_draw_small( void );
-static void       displaySmall( admGlyph *glyph );
-static int        cb_accept(GtkObject * object, gpointer user_data);
 
-static GtkWidget *dialog=NULL;
-static GtkWidget *mainDisplay=NULL;
-static GtkWidget *smallDisplay=NULL;
-static uint32_t redraw_x,redraw_y;
-static uint32_t clipW=0,clipH=0;
+ReplyType glyphToText(admGlyph *glyph,admGlyph *head,char *decodedString);
 //********************************************
-//ReplyType glyphToText(admGlyph *glyph,admGlyph *head);
-static ReplyType setup(void);
-//********************************************
-static uint8_t ocrSaveGlyph(admGlyph *head);
 
-static uint8_t *workArea;
-static vobSubBitmap *bitmap;
-static uint8_t *sdata=NULL;
-static uint32_t nbGlyphs;
-static char decodedString[1024];
+
+
 
 typedef enum
 {
@@ -126,92 +111,14 @@ typedef enum
 uint8_t ADM_ocrUpdateNbLines(void *ui,uint32_t cur,uint32_t total);
 uint8_t ADM_ocrUpdateNbGlyphs(void *ui,uint32_t nbGlyphs);
 uint8_t ADM_ocrUpdateTextAndTime(void *ui,char *decodedString,char *timeCode);
-uint8_t ADM_ocrDrawFull(void *d);
+uint8_t ADM_ocrDrawFull(void *d,uint8_t *data);
 uint8_t ADM_ocrUiEnd(void *d);
-void *ADM_ocrUiSetup(void);
+void 	*ADM_ocrUiSetup(void);
+uint8_t ADM_ocrSetRedrawSize(uint32_t w,uint32_t h);
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++
         Main
    +++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-uint8_t ADM_ocrUpdateNbLines(void *ui,uint32_t cur,uint32_t total)
-{
-char text[50];         
-         snprintf(text,50,"%03d/%03d",cur,total);
-         gtk_label_set_text(GTK_LABEL(WID(labelNbLines)),text);
-         return 1;
-}
-uint8_t ADM_ocrUpdateNbGlyphs(void *ui,uint32_t nbGlyphs)
-{
-char text[50];         
-         snprintf(text,50,"%03d",nbGlyphs);
-         gtk_label_set_text(GTK_LABEL(WID(labelNbGlyphs)),text);
-         return 1;
-}
-uint8_t ADM_ocrUpdateTextAndTime(void *ui,char *decodedString,char *timeCode)
-{
-             gtk_label_set_text(GTK_LABEL(WID(labelText)),decodedString);
-             gtk_label_set_text(GTK_LABEL(WID(labelTime)),timeCode);
-             return 1;
-}            
-uint8_t ADM_ocrDrawFull(void *d)
-{
-			UI_purge();
-             gui_draw();
-             UI_purge();
-             return 1;
-}
 
-uint8_t ADM_ocrUiEnd(void *d)
-{
-	GtkWidget *dialog=(GtkWidget *)d;
-	ADM_assert(dialog);
-		// Final round
-	    gtk_widget_set_sensitive(WID(frameBitmap),0);
-	   // gtk_widget_set_sensitive(WID(Current_Glyph),0);     
-	  
-	  
-	    gtk_unregister_dialog(dialog);
-	    gtk_widget_destroy(dialog);
-
-}
-void *ADM_ocrUiSetup(void)
-{
-	// Create UI && prepare callback
-	 	dialog=NULL;
-	    mainDisplay=NULL;
-	    smallDisplay=NULL;
-	    workArea=NULL;
-	    bitmap=NULL;
-	    sdata=NULL;
-	    clipW=0;
-	    clipH=0;
-	    dialog=DIA_ocr();
-	    gtk_register_dialog(dialog);
-	#define ASSOCIATE(x,y)   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),y)
-	    
-	    ASSOCIATE(buttonOk,   actionAccept);
-	    ASSOCIATE(buttonSkip,     actionSkip);
-	    ASSOCIATE(buttonSkipAll,     actionSkipAll);
-	    ASSOCIATE(buttonIgnore,   actionIgnore);
-	    ASSOCIATE(buttonCalibrate,   actionCalibrate);
-	    
-	   
-	    gtk_widget_show(dialog);
-	    //
-	    
-	//  disable
-	    
-	    mainDisplay=WID(drawingareaBitmap);
-	    smallDisplay=WID(drawingareaSmall);
-	    
-	   
-	    
-	    CONNECT(drawingareaBitmap,expose_event,gui_draw);
-	    CONNECT(drawingareaSmall,expose_event,gui_draw_small);
-
-	    CONNECT(entry,activate,cb_accept);
-	    return (void *)dialog;
-	
-}
 /**
  * 		\fn 		ADM_ocr_engine
  * 		\brief 		Common part of the OCR engine
@@ -221,6 +128,7 @@ uint8_t ADM_ocr_engine(   ADM_OCR_SOURCE & source,const char *labelSrt,admGlyph 
 // 
     uint32_t nbSub=0;
     FILE *out=NULL;
+    vobSubBitmap *bitmap=NULL;
     ADM_BitmapSource *bitmapSource=NULL;
     uint32_t startTime,endTime;
     uint32_t w,h,oldw=0,oldh=0;
@@ -229,9 +137,11 @@ uint8_t ADM_ocr_engine(   ADM_OCR_SOURCE & source,const char *labelSrt,admGlyph 
     uint32_t first,last;
     uint32_t seqNum;
     char     text[1024];
-    nbGlyphs=0;
     ReplyType reply;
     void *ui=NULL;
+    char decodedString[1024];
+    uint8_t *workArea=NULL;
+    uint32_t nbGlyphs=0;
     
     ui=ADM_ocrUiSetup();
     
@@ -242,11 +152,11 @@ _again:
     
     // Everything ready go go go 
          
-    redraw_x=redraw_y=0;
+   
     UI_purge();
 //  Time to go
     
-    gtk_widget_set_sensitive(WID(frameBitmap),1);
+    //gtk_widget_set_sensitive(WID(frameBitmap),1);
  
     out=fopen(labelSrt,"wb");
     if(!out)
@@ -308,8 +218,8 @@ _again:
            // 
            w=bitmap->_width;
            h=last-first+1;
-           redraw_x=w;
-           redraw_y=h;
+           
+           ADM_ocrSetRedrawSize(w,h);
            //**
            
            // Build
@@ -320,7 +230,7 @@ againPlease:
                 UI_purge();  // Force redaw
            }
            // Merge & draw
-             ADM_ocrDrawFull(ui);
+             ADM_ocrDrawFull(ui,workArea);
              // OCR
               reply=ocrBitmap(workArea,w,h,decodedString,head);
               if(reply==ReplyClose) goto endIt;
@@ -371,27 +281,26 @@ endIt:
     return 1;
 
 }
-/**
-    \fn ocrSaveGlyph
-    \brief bridge to saveGlyph
-*/
-uint8_t ocrSaveGlyph(admGlyph *head)
-{
-  char *name=NULL;
-          GUI_FileSelWrite(_("Select Glyphfile to save to"), &name);
-        if(!name)
-            return 0;
-        saveGlyph(name,head,nbGlyphs);
-        ADM_dealloc(name);
-        return 1;
 
-}
 /************************ UI Dependant part ********************/
 /**
         Search throught the existing glyphs , if not present create it
         and append the text to decodedString
 */
-ReplyType glyphToText(admGlyph *glyph,admGlyph *head)
+
+static GtkWidget *dialog=NULL;
+static GtkWidget *mainDisplay=NULL;
+static GtkWidget *smallDisplay=NULL;
+
+static uint32_t clipW=0,clipH=0;
+
+static gboolean   gui_draw( void );
+static gboolean   gui_draw_small( void );
+static void       displaySmall( admGlyph *glyph );
+static int        cb_accept(GtkObject * object, gpointer user_data);
+
+
+ReplyType glyphToText(admGlyph *glyph,admGlyph *head,char *decodedString)
 {
  admGlyph *cand;
             //printf("2t: %d x %d\n",glyph->width,glyph->height);
@@ -422,7 +331,7 @@ ReplyType glyphToText(admGlyph *glyph,admGlyph *head)
                 case actionIgnore:
                         glyph->code=NULL;
                         insertInGlyphTree(head,glyph);
-                        nbGlyphs++;
+                        //*nbGl++;
                         break;
                 case actionCalibrate: return ReplyCalibrate;
                 case actionAccept:
@@ -433,7 +342,7 @@ ReplyType glyphToText(admGlyph *glyph,admGlyph *head)
                         insertInGlyphTree(head,glyph);
                         //printf("New glyph:%s\n",glyph->code);
                         strcat(decodedString,glyph->code);
-                        nbGlyphs++;
+                        //*nbGl++;
                        
                     }
                     else delete glyph;
@@ -464,11 +373,22 @@ ReplyType glyphToText(admGlyph *glyph,admGlyph *head)
            return ReplyOk;  
 
 }
+static int sx=0,sy=0,sw=0,sh=0;
+static int redraw_x=0,redraw_y=0;
+static uint8_t *drawing=NULL;
+static uint8_t *sdata=NULL;
+uint8_t ADM_ocrSetRedrawSize(uint32_t w,uint32_t h)
+{
+		redraw_x=w;
+		redraw_y=h;
+		return 1;
+}
 
 //*****************************************************************************************
 gboolean gui_draw( void )
 {
 static int lastx=0,lasty=0;
+	if(!drawing) return true;
     if(lastx!=redraw_x || lasty!=redraw_y)
         gtk_widget_set_usize(mainDisplay, redraw_x, redraw_y);
     lastx=redraw_x;
@@ -480,13 +400,12 @@ static int lastx=0,lasty=0;
                         redraw_x,                          //width
                         redraw_y,                          //h*2, // heigth
                         GDK_RGB_DITHER_NONE,
-                        workArea, // buffer
+                        drawing, // buffer
                         redraw_x );
     return true;
 }
 //*****************************************************************************************
- static int sx=0,sy=0,sw=0,sh=0;
-
+ 
 void displaySmall( admGlyph *glyph)
 {
     if(sw!=glyph->width || sh!=glyph->height)
@@ -569,5 +488,84 @@ int cb_accept(GtkObject * object, gpointer user_data)
         gtk_signal_emit_by_name(GTK_OBJECT(WID(buttonOk)),"clicked",(gpointer)1);
         return 0;
 }
+uint8_t ADM_ocrUpdateNbLines(void *ui,uint32_t cur,uint32_t total)
+{
+char text[50];         
+         snprintf(text,50,"%03d/%03d",cur,total);
+         gtk_label_set_text(GTK_LABEL(WID(labelNbLines)),text);
+         return 1;
+}
+uint8_t ADM_ocrUpdateNbGlyphs(void *ui,uint32_t nbGlyphs)
+{
+char text[50];         
+         snprintf(text,50,"%03d",nbGlyphs);
+         gtk_label_set_text(GTK_LABEL(WID(labelNbGlyphs)),text);
+         return 1;
+}
+uint8_t ADM_ocrUpdateTextAndTime(void *ui,char *decodedString,char *timeCode)
+{
+             gtk_label_set_text(GTK_LABEL(WID(labelText)),decodedString);
+             gtk_label_set_text(GTK_LABEL(WID(labelTime)),timeCode);
+             return 1;
+}            
+uint8_t ADM_ocrDrawFull(void *d,uint8_t *data)
+{
+		    drawing=data;;
+			UI_purge();
+             gui_draw();
+             UI_purge();
+             return 1;
+}
 
+uint8_t ADM_ocrUiEnd(void *d)
+{
+	GtkWidget *dialog=(GtkWidget *)d;
+	ADM_assert(dialog);
+		// Final round
+	    gtk_widget_set_sensitive(WID(frameBitmap),0);
+	   // gtk_widget_set_sensitive(WID(Current_Glyph),0);     
+	  
+	  
+	    gtk_unregister_dialog(dialog);
+	    gtk_widget_destroy(dialog);
+
+}
+void *ADM_ocrUiSetup(void)
+{
+	// Create UI && prepare callback
+	 	dialog=NULL;
+	    mainDisplay=NULL;
+	    smallDisplay=NULL;
+	    drawing=NULL;
+	    sdata=NULL;
+	    clipW=0;
+	    clipH=0;
+	    dialog=DIA_ocr();
+	    gtk_register_dialog(dialog);
+	#define ASSOCIATE(x,y)   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),y)
+	    
+	    ASSOCIATE(buttonOk,   actionAccept);
+	    ASSOCIATE(buttonSkip,     actionSkip);
+	    ASSOCIATE(buttonSkipAll,     actionSkipAll);
+	    ASSOCIATE(buttonIgnore,   actionIgnore);
+	    ASSOCIATE(buttonCalibrate,   actionCalibrate);
+	    
+	   
+	    gtk_widget_show(dialog);
+	    //
+	    
+	//  disable
+	    
+	    mainDisplay=WID(drawingareaBitmap);
+	    smallDisplay=WID(drawingareaSmall);
+	    
+	   
+	    
+	    CONNECT(drawingareaBitmap,expose_event,gui_draw);
+	    CONNECT(drawingareaSmall,expose_event,gui_draw_small);
+
+	    CONNECT(entry,activate,cb_accept);
+	    return (void *)dialog;
+	
+}
 //;
