@@ -2,6 +2,12 @@
 # FOR AQ
 # Q_foo.cpp and foo.ui => AQ_foo.cpp, ui_foo.h and Q_foo.moc
 ##############################################################"
+IF(WIN32)
+	SET(VERBATIM "")
+ELSE(WIN32)
+	SET(VERBATIM "VERBATIM")
+ENDIF(WIN32)
+
 MACRO(Q_UIMOCIFY _source)
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/AQ_${_source}.cpp
                      COMMAND  ${QT_UIC_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${_source}.ui -o ui_${_source}.h
@@ -9,7 +15,7 @@ MACRO(Q_UIMOCIFY _source)
                      COMMAND  echo "#include \"Q_${_source}.cpp\"" > AQ_${_source}.cpp
                      COMMAND  echo "#include \"Q_${_source}.moc\"" >> AQ_${_source}.cpp
                      DEPENDS  ${CMAKE_CURRENT_SOURCE_DIR}/${_source}.ui  ${CMAKE_CURRENT_SOURCE_DIR}/Q_${_source}.cpp
-                     VERBATIM
+                     ${VERBATIM}
                 )
 ENDMACRO(Q_UIMOCIFY _source)
 
@@ -22,7 +28,7 @@ MACRO(Q_RCC _source)
   ADD_CUSTOM_COMMAND(OUTPUT   ${CMAKE_CURRENT_BINARY_DIR}/${_source}_rsc.cpp
                      COMMAND  ${QT_RCC_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${_source}.qrc -o ${_source}_rsc.cpp -name ${_source}
                      DEPENDS  ${CMAKE_CURRENT_SOURCE_DIR}/${_source}.qrc
-                     VERBATIM
+                     ${VERBATIM}
                 )
 ENDMACRO(Q_RCC _source)
 
@@ -36,7 +42,7 @@ MACRO(Q_MOCIFY _source)
                      COMMAND  echo "#include \"T_${_source}.cpp\"" > AT_${_source}.cpp
                      COMMAND  echo "#include \"T_${_source}.moc\"" >> AT_${_source}.cpp
                      DEPENDS  ${CMAKE_CURRENT_SOURCE_DIR}/T_${_source}.cpp
-                     VERBATIM
+                     ${VERBATIM}
                 )
 ENDMACRO(Q_MOCIFY _source)
 
