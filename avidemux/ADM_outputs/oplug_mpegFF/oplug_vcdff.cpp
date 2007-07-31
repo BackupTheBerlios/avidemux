@@ -91,15 +91,13 @@ static char *twoFake=NULL;
 uint8_t oplug_mpegff(const char *name, ADM_OUT_FORMAT type)
 {
 AVDMGenericVideoStream *_incoming;
-//EncoderFFMPEGMpeg1  *encoder;
-Encoder  *encoder;
-
+Encoder  *encoder=NULL;
 ADMMpegMuxer	*muxer=NULL;
 FILE 		*file=NULL;
 uint8_t		audioBuffer[48000];
 uint32_t	audioLen=0;
 uint32_t _w,_h,_fps1000,_page,total;	
-AVDMGenericAudioStream	*audio;
+AVDMGenericAudioStream	*audio=NULL;
 uint32_t len,flags;
 uint32_t size;
 ADM_MUXER_TYPE mux;
@@ -110,6 +108,7 @@ uint32_t  sample_target=0;
 uint32_t  total_sample=0;
 ADMBitstream bitstream(0);
 uint32_t audioSum=0;
+DIA_encoding  *encoding;
 
         twoPass=new char[strlen(name)+6];
         twoFake=new char[strlen(name)+6];
@@ -141,7 +140,7 @@ uint32_t audioSum=0;
                     if(!currentaudiostream)
                     {
                       GUI_Error_HIG(_("There is no audio track"), NULL);
-                        return 0;
+					  goto finishvcdff;
                     }
                     audio=mpt_getAudioStream();
                     mux=MUXER_TS;
@@ -152,7 +151,7 @@ uint32_t audioSum=0;
                 if(!currentaudiostream)
                 {
                   GUI_Error_HIG(_("There is no audio track"), NULL);
-                        return 0;
+				  goto finishvcdff;
                 }
                 audio=mpt_getAudioStream();
                 // Have to check the type
@@ -162,7 +161,7 @@ uint32_t audioSum=0;
                 if(!audio)
                 {
                   GUI_Error_HIG(_("Audio track is not suitable"), NULL);
-                        return 0;
+				  goto finishvcdff;
                 }
                 // Check
                 WAVHeader *hdr=audio->getInfo();	
@@ -172,8 +171,7 @@ uint32_t audioSum=0;
                         if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
                         {
                             GUI_Error_HIG(("Incompatible audio"),_( "For VCD, audio must be 44.1 kHz MP2."));
-                            deleteAudioFilter(audio);
-                            return 0;
+							goto finishvcdff;
                         }
                         mux=MUXER_VCD;
                         printf("X*CD: Using VCD PS\n");
@@ -192,9 +190,8 @@ uint32_t audioSum=0;
                             if(hdr->frequency!=48000 || 
                                 (hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3 && hdr->encoding!=WAV_LPCM))
                             {
-                                deleteAudioFilter(audio);
                                 GUI_Error_HIG(_("Incompatible audio"), _("For DVD, audio must be 48 kHz MP2, AC3 or LPCM."));
-                                return 0 ;
+								goto finishvcdff;
                             }
                             mux=MUXER_DVD;
                             printf("X*VCD: Using DVD PS\n");
@@ -248,19 +245,14 @@ uint32_t audioSum=0;
 
       encoder->setLogFile(twoPass,total);
       if(!encoder->configure(_incoming))
-      {
-              delete encoder;
-              return 0;
-      }
-
+              goto finishvcdff;
 
       _buffer=new uint8_t[_page]; // Might overflow if _page only
       _outbuffer=new uint8_t[_page];
 
       ADM_assert(  _buffer);
       ADM_assert(  _outbuffer);
-    
-      DIA_encoding  *encoding;
+
       encoding =new DIA_encoding(_fps1000);
       switch(current_codec)
       {
@@ -329,10 +321,7 @@ uint32_t audioSum=0;
                                         }
                                         encoding->setFrame(i,bitstream.len,bitstream.out_quantizer,total);
                                         if(!encoding->isAlive())
-                                        {
-
                                               goto finishvcdff;
-                                        }
                                 }
                         }
                         encoder->startPass2();
@@ -358,11 +347,8 @@ uint32_t audioSum=0;
               {
                 if(!muxer->open(name,0,mux,avifileinfo,audio->getInfo()))
                 {
-                  delete muxer;
-                  muxer=NULL;
-                  deleteAudioFilter(audio);
                   printf("Muxer init failed\n");
-                  return 0 ;
+				  goto finishvcdff;
                 }
                 double sample_time;
 
@@ -378,7 +364,7 @@ uint32_t audioSum=0;
                 if(!file)
                 {
                   GUI_Error_HIG(_("File error"), _("Cannot open \"%s\" for writing."), name);
-                  return 0 ;
+				  goto finishvcdff;
                 }
               }
           if(encoder->isDualPass())
@@ -435,7 +421,6 @@ uint32_t audioSum=0;
                  {
                    printf("[mpegFF]Both audio & video done\n");
                    if(context.audioDone==1 && context.videoDone==1) ret=1;
-                   else ret=0;
                    accessMutex.unlock();
                    goto finishvcdff;
                  }
@@ -454,7 +439,6 @@ uint32_t audioSum=0;
              {
                printf("[mpegFF]Both audio & video done\n");
                if(context.audioDone==1 && context.videoDone==1) ret=1;
-               else ret=0;
                accessMutex.unlock();
                goto finishvcdff;
              }
@@ -515,31 +499,31 @@ uint32_t audioSum=0;
                 encoding->setFrame(i,bitstream.len,bitstream.out_quantizer,total);
                 encoding->setAudioSize(audioSum);
                 if(!encoding->isAlive ())
-                        {
-                                  ret=0;        
                                   goto finishvcdff;
-                        }
         }
         ret=1;
 finishvcdff:
         printf("[MPEGFF] Finishing..\n");
         delete encoding;
         end();
+
         if(file)
         {
                 fclose(file);
                 file=NULL;
         }
-        else
-        {  
-            if(muxer)
-            {
+        else if(muxer)
+        {
                 muxer->close();
                 delete muxer;
                 muxer=NULL;
-            }
         }
+
         delete encoder;
+
+		if (audio)
+			deleteAudioFilter(audio);
+
         return ret;
 }
 	

@@ -182,7 +182,7 @@ int slaveThread( WAVHeader *audioheader )
         mplexStreamDescriptor audioDesc;
         mplexStreamDescriptor videoDesc;
 
-        printf("[Muxer Slave Thread] Slave thread : creating job & muxer\n");
+        printf("[Muxer Slave Thread] Creating job & muxer\n");
 
         
         printf("output file created\n");
@@ -205,10 +205,12 @@ int slaveThread( WAVHeader *audioheader )
         
         Multiplexor mux(job, *outputStream);
                
-        printf("Slave :Muxing\n");
+        printf("[Muxer Slave Thread] Muxing\n");
         mux.Multiplex();
+		mux.Close();
+
         slaveRunning=0;
-        printf("Slace Thread exiting\n");
+        printf("[Muxer Slave Thread] Exiting\n");
         pthread_exit(0);
 }        
 //___________________________________________________________________________

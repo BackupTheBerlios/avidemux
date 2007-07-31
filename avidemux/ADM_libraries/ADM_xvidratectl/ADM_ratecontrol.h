@@ -43,7 +43,7 @@ protected:
 		ADM_rstate _state;
 public:
 			ADM_ratecontrol(uint32_t fps1000, char *logname);
-	virtual 	~ADM_ratecontrol() {};
+	virtual 	~ADM_ratecontrol();
 	/** Maxbr & minbr in Bps, vbvsize in kBytes); Default is none */
 	virtual 	uint8_t setVBVInfo(uint32_t maxbr,uint32_t minbr, uint32_t vbvsize) FORBIDDEN ;
 	virtual		uint8_t startPass1( void )FORBIDDEN;

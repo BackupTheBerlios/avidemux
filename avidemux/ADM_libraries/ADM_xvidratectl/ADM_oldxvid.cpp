@@ -29,6 +29,11 @@ ADM_ratecontrol::ADM_ratecontrol(uint32_t fps1000, char *logname)
 	_state=RS_IDLE;
 	_nbFrames++;
 }
+
+ADM_ratecontrol::~ADM_ratecontrol()
+{
+	delete _logname;
+}
 #if 0 // RMED
 extern "C" {
 #include "ADM_encoder/xvid_vbr.h"
@@ -42,7 +47,6 @@ ADM_oldXvidRc::~ADM_oldXvidRc()
 		vbrFinish(&mpegvbr);
 	}
 	_state=RS_IDLE;
-
 }
 //
 ADM_oldXvidRc::ADM_oldXvidRc(uint32_t fps1000, char *logname) : ADM_ratecontrol(fps1000,logname)

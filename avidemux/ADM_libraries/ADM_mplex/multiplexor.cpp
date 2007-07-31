@@ -63,6 +63,14 @@ Multiplexor::Multiplexor(MultiplexJob &job, OutputStream &output)
 
 }
 
+void Multiplexor::Close(void)
+{
+	std::vector<ElementaryStream *>::iterator str;
+
+	for( str = estreams.begin(); str < estreams.end(); ++str )
+		delete (*str);
+}
+
 
 /******************************************************************
  *

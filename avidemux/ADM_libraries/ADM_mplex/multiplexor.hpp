@@ -13,14 +13,11 @@
 class Multiplexor
 {
 public:
-	Multiplexor(MultiplexJob &job, OutputStream &output);
+	Multiplexor(MultiplexJob &job, OutputStream &output);	
+	void Close(void);
 	void Multiplex ();
-
-
-	void ByteposTimecode( bitcount_t bytepos, clockticks &ts );
-	
+	void ByteposTimecode( bitcount_t bytepos, clockticks &ts );	
 	inline Sys_header_struc *SystemHeader() { return &sys_header; }
-
 	unsigned int PacketPayload(	MuxStream &strm,
 								bool buffers, bool PTSstamp, bool DTSstamp );
 	unsigned int WritePacket( unsigned int     max_packet_data_size,
