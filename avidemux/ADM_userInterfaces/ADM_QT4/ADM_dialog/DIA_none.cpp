@@ -105,48 +105,7 @@ int32_t UI_readJog(void)
   return 0; 
 }
 
-// OCR Stubs
-#include "ADM_ocr/ADM_ocr.h"
-#include "ADM_ocr/ADM_ocrInternal.h"
-uint8_t ADM_ocrUpdateNbLines(void *ui,uint32_t cur,uint32_t total)
-{
-	return 0;
-}
-uint8_t ADM_ocrUpdateNbGlyphs(void *ui,uint32_t nbGlyphs)
-{
-	return 0;
-}
-;
-uint8_t ADM_ocrUpdateTextAndTime(void *ui,char *decodedString,char *timeCode)
-{
-	return 0;
-}
-;
-uint8_t ADM_ocrDrawFull(void *d,uint8_t *data)
-{
-	return 0;
-}
-;
-uint8_t ADM_ocrUiEnd(void *d)
-{
-	return 0;
-}
-;
-void 	*ADM_ocrUiSetup(void)
-{
-	return 0;
-}
-;
-uint8_t ADM_ocrSetRedrawSize(uint32_t w,uint32_t h)
-{
-	return 0;
-}
-;
 
-ReplyType glyphToText(admGlyph *glyph,admGlyph *head,char *decodedString)
-{
-	return ReplyOk;
-}
 
 //EOF
 

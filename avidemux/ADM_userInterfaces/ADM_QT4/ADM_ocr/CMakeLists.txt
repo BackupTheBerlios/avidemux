@@ -2,7 +2,7 @@
 #
 ################################
 include(AdmLib)
-SET(ADM_LIB ADM_ocrQT4)
+SET(ADM_LIB ADM_ocrQt4)
 #
 SET(${ADM_LIB}_Q
 ocr
