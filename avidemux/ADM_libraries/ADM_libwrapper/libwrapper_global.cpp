@@ -28,3 +28,4 @@ extern "C" ADM_LibWrapperAmrnb* getAmrnbWrapper(void)
 	return amrnb;
 }
 #endif
+//EOF

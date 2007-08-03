@@ -17,7 +17,7 @@ PROCESS(actionLoad_run_project,ACT_RunScript) \
 PROCESS(actionSave_project,ACT_DUMMY) \
 PROCESS(actionSave_project_as,ACT_SaveWork) \
 PROCESS(actionConnect_to_AvsProxy,ACT_AVS_PROXY) \
-PROCESS(actionReset_Edits,ACT_ResetSegments) \	
+PROCESS(actionReset_Edits,ACT_ResetSegments) \
 PROCESS(actionOCR_DVB_T_TS_files,ACT_DVB_Ocr) \
 PROCESS(actionGlyphs_Edit,ACT_GLYPHEDIT) \
 PROCESS(actionZoom_1_4,ACT_ZOOM_1_4) \

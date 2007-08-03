@@ -11,7 +11,8 @@ http://developer.apple.com/documentation/QuickTime/QTFF/QTFFChap2/chapter_3_sect
 #ifndef ADMMP4_TAB_LEAF
 #define MKMP4LEAF(a,b,c) ADM_MP4_##b
 #else
-#define MKMP4LEAF(a,b,c) {a,ADM_MP4_##b,c}
+#undef MKMP4LEAF
+#define MKMP4LEAF(a,b,c) {(uint32_t)a,ADM_MP4_##b,c}
 #endif
 
 /* Container atom */

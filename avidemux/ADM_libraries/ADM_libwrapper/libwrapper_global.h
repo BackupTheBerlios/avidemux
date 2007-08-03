@@ -2,6 +2,14 @@
 #define LIBWRAPPER_GLOBAL
 
 #include "config.h"
+//
+#if defined(__DECLARE__)
+#define ZZ_PREFIX
+#define ZZ_POSTFIX =NULL
+#else
+#define ZZ_PREFIX extern
+#define ZZ_POSTFIX 
+#endif //__DECLARE__
 
 // AMRNB
 #ifdef USE_AMR_NB
@@ -10,11 +18,7 @@
 #include "libwrapper_amrnb.h"
 
 #if defined(__cplusplus)
-extern ADM_LibWrapperAmrnb* amrnb
-#if defined(__DECLARE__)
-=NULL
-#endif	// __DECLARE__
-;
+ZZ_PREFIX ADM_LibWrapperAmrnb  *amrnb ZZ_POSTFIX;
 #else
 struct ADM_LibWrapperAmrnb* getAmrnbWrapper(void);
 #endif	// __cplusplus
@@ -24,15 +28,10 @@ struct ADM_LibWrapperAmrnb* getAmrnbWrapper(void);
 #if defined(USE_LIBDCA) && defined(__cplusplus)
 #include "libwrapper_dca.h"
 
-extern ADM_LibWrapperDca* dca
-#ifdef __DECLARE__
-=NULL
-#endif
-;
-#endif
+ZZ_PREFIX ADM_LibWrapperDca* dca ZZ_POSTFIX;
 
 // funcs
 void initLibWrappers();
 void destroyLibWrappers();
-
-#endif
+#endif // USE LIBDCA
+#endif // LIBWRAPPER

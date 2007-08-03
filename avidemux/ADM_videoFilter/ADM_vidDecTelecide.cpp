@@ -1024,9 +1024,9 @@ uint8_t *finalpU,*finalpV;
                         {
                                 for (x = 0; x < w; x++)
                                 {
-                                        v1 = (int) dstp[x] - dthresh;
+                                        v1 = (int)(dstp[x] - dthresh);
                                         if (v1 < 0) v1 = 0; 
-                                        v2 = (int) dstp[x] + dthresh;
+                                        v2 = (int) (dstp[x] + dthresh);
                                         if (v2 > 235) v2 = 235; 
                                         if ((v1 > dstpp[x] && v1 > dstpn[x]) || (v2 < dstpp[x] && v2 < dstpn[x]))
                                         {
@@ -1106,9 +1106,9 @@ uint8_t *finalpU,*finalpV;
                                         {
                                                 for (x = 0; x < wover2; x++)
                                                 {
-                                                        v1 = (int) dstp[x] - dthresh;
+                                                        v1 = (int)( dstp[x] - dthresh);
                                                         if (v1 < 0) v1 = 0; 
-                                                        v2 = (int) dstp[x] + dthresh;
+                                                        v2 = (int)( dstp[x] + dthresh);
                                                         if (v2 > 235) v2 = 235; 
                                                         if ((v1 > dstpp[x] && v1 > dstpn[x]) || (v2 < dstpp[x] && v2 < dstpn[x]))
                                                         {
@@ -1145,7 +1145,7 @@ uint8_t *finalpU,*finalpV;
                 {
                         for (x = 0; x < w; x++)
                         {
-                                v1 = (int) dstp[x] - dthresh;
+                                v1 = (int) (dstp[x] - dthresh);
                                 if (v1 < 0) v1 = 0; 
                                 v2 = (int) dstp[x] + dthresh;
                                 if (v2 > 235) v2 = 235; 

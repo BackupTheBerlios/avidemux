@@ -121,7 +121,7 @@ int nbChunk;
         {
           nbChunk=(_tail-_head)/_blockalign;
           pout=SCRATCH_PAD_SIZE;
-          out=avcodec_decode_audio(_context,(int16_t *)scratchPad,
+          out=avcodec_decode_audio2(_context,(int16_t *)scratchPad,
                                    &pout,_buffer+_head,nbChunk*_blockalign);
                 
           if(out<0)
@@ -218,7 +218,7 @@ int16_t *run16;
         _tail+=nbIn;
         while(_tail-_head>AMR_PACKET)
         {
-          out=avcodec_decode_audio(_context,(int16_t *)scratchPad,
+          out=avcodec_decode_audio2(_context,(int16_t *)scratchPad,
                                    &pout,_buffer+_head,_tail-_head);
                 
                 if(out<0)

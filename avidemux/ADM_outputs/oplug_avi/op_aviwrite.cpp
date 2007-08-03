@@ -556,7 +556,7 @@ uint32_t is;
 
                         aprintf("Fps1000:%f\n",fps);
                         fps=600*fps; // 10 mn worth;
-                odml_index_size=floor(fps);
+                odml_index_size=(int)floor(fps);
 
 		aprintf("\nnumber of frames per index: %lu\n",odml_index_size);
 		// get number or indexes per stream
