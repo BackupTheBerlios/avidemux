@@ -39,9 +39,16 @@ class  ADM_QCanvas : public QWidget
         ADM_QCanvas(QWidget *z,uint32_t w,uint32_t h)  ;
         ~ADM_QCanvas() ;
         void paintEvent(QPaintEvent *ev);
+        void changeSize(uint32_t w,uint32_t h);
 };
 
-
+void ADM_QCanvas::changeSize(uint32_t w,uint32_t h)
+{
+	_w=w;
+	_h=h;
+	dataBuffer=NULL;
+    resize(w,h);
+}
 
 ADM_QCanvas::ADM_QCanvas(QWidget *z,uint32_t w,uint32_t h) : QWidget(z) 
 {

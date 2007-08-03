@@ -16,13 +16,14 @@ PROCESS(actionSave_jpeg,ACT_SaveJPG) \
 PROCESS(actionLoad_run_project,ACT_RunScript) \
 PROCESS(actionSave_project,ACT_DUMMY) \
 PROCESS(actionSave_project_as,ACT_SaveWork) \
-PROCESS(actionMain_toolbar,ACT_SaveCurrentWork) \
-PROCESS(actionA_V_toolbar,ACT_DUMMY) \
+PROCESS(actionConnect_to_AvsProxy,ACT_AVS_PROXY) \
+PROCESS(actionReset_Edits,ACT_ResetSegments) \	
+PROCESS(actionOCR_DVB_T_TS_files,ACT_DVB_Ocr) \
+PROCESS(actionGlyphs_Edit,ACT_GLYPHEDIT) \
 PROCESS(actionZoom_1_4,ACT_ZOOM_1_4) \
 PROCESS(actionZoom_1_2,ACT_ZOOM_1_2) \
 PROCESS(actionZoom_1_1,ACT_ZOOM_1_1) \
 PROCESS(actionZoom_2_1,ACT_ZOOM_2_1) \
-PROCESS(actionZoom_4_1,ACT_ZOOM_4_1) \
 PROCESS(actionDecoder_options,ACT_DecoderOption) \
 PROCESS(actionPostprocessing,ACT_SetPostProcessing) \
 PROCESS(actionPreview,ACT_PreviewToggle) \
@@ -70,8 +71,13 @@ PROCESS(actionPSP_H264,ACT_AUTO_PSP_H264)\
 PROCESS(actionAdd_to_joblist,ACT_ADD_JOB) \
 PROCESS(actionShow_Joblist,ACT_HANDLE_JOB)  
 
+#if 0
+// PROCESS(actionZoom_4_1,ACT_ZOOM_4_1) \
+PROCESS(actionMain_toolbar,ACT_SaveCurrentWork) \
+PROCESS(actionA_V_toolbar,ACT_DUMMY) \
 
 
+#endif
 #define LIST_OF_BUTTONS     \
 PROCESS(pushButtonVideoConf ,ACT_VideoCodec)  \
 PROCESS(pushButtonVideoFilter , ACT_VideoParameter  ) \

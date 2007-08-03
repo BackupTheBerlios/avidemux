@@ -15,6 +15,7 @@ class  ADM_QCanvas : public QWidget
         ADM_QCanvas(QWidget *z,uint32_t w,uint32_t h)  ;
         ~ADM_QCanvas() ;
         void paintEvent(QPaintEvent *ev);
+        void changeSize(uint32_t w,uint32_t h);
 };
 #endif
 

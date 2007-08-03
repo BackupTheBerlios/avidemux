@@ -201,7 +201,7 @@ static int sx=0,sy=0,sw=0,sh=0;
 static int redraw_x=0,redraw_y=0;
 static uint8_t *drawing=NULL;
 static uint8_t *sdata=NULL;
-uint8_t ADM_ocrSetRedrawSize(uint32_t w,uint32_t h)
+uint8_t ADM_ocrSetRedrawSize(void *ui,uint32_t w,uint32_t h)
 {
 		redraw_x=w;
 		redraw_y=h;

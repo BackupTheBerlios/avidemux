@@ -35,7 +35,7 @@ uint8_t ADM_ocrUpdateTextAndTime(void *ui,char *decodedString,char *timeCode);
 uint8_t ADM_ocrDrawFull(void *d,uint8_t *data);
 uint8_t ADM_ocrUiEnd(void *d);
 void 	*ADM_ocrUiSetup(void);
-uint8_t ADM_ocrSetRedrawSize(uint32_t w,uint32_t h);
+uint8_t ADM_ocrSetRedrawSize(void *ui,uint32_t w,uint32_t h);
 
 extern void UI_purge(void);
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -142,7 +142,7 @@ _again:
            w=bitmap->_width;
            h=last-first+1;
            
-           ADM_ocrSetRedrawSize(w,h);
+           ADM_ocrSetRedrawSize(ui,w,h);
            //**
            
            // Build

@@ -194,7 +194,7 @@ void 	*ADM_ocrUiSetup(void)
 	return 0;
 }
 ;
-uint8_t ADM_ocrSetRedrawSize(uint32_t w,uint32_t h)
+uint8_t ADM_ocrSetRedrawSize(void *ui,uint32_t w,uint32_t h)
 {
 	return 0;
 }
