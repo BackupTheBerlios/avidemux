@@ -160,38 +160,19 @@ uint8_t mplexMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE
         printf("Init ok\n");
         return 1;
 }
-static uint8_t wavToStreamType(WAVHeader *hdr,mplexStreamDescriptor *desc)
-{
-    ADM_assert(hdr);
-    desc->frequency=hdr->frequency;
-    desc->channel=hdr->channels;
-    switch(hdr->encoding)
-    {
-        case WAV_LPCM:  desc->kind= LPCM_AUDIO;break;
-        case WAV_AC3:   desc->kind=  AC3_AUDIO;;break;
-        case WAV_MP2: case WAV_MP3:   desc->kind=  MPEG_AUDIO;;break;
-        case WAV_DTS:    desc->kind=  DTS_AUDIO;;break;
-        default: return 0;
-    }
-  return 1;
-}
+
 extern const char *getStrFromAudioCodec( uint32_t codec);
 int slaveThread( WAVHeader *audioheader )
 {
         MultiplexJob job;
-        mplexStreamDescriptor audioDesc;
-        mplexStreamDescriptor videoDesc;
 
         printf("[Muxer Slave Thread] Creating job & muxer\n");
-
         
         printf("output file created\n");
-        wavToStreamType(audioheader,&audioDesc);
-        audioin=new IFileBitStream(channelaudio,&audioDesc);
+        audioin=new IFileBitStream(channelaudio);
         
         printf("audio done (%s), creating video bitstream\n",getStrFromAudioCodec(audioheader->encoding));
-        videoDesc.kind=MPEG_VIDEO;
-        videoin=new IFileBitStream(channelvideo,&videoDesc);
+        videoin=new IFileBitStream(channelvideo);
         
         printf("Both stream ready\n");
          
@@ -200,14 +181,11 @@ int slaveThread( WAVHeader *audioheader )
         
         job.mux_format=mux_format;
         job.SetupInputStreams( inputs );
-        
 
-        
         Multiplexor mux(job, *outputStream);
                
         printf("[Muxer Slave Thread] Muxing\n");
         mux.Multiplex();
-		mux.Close();
 
         slaveRunning=0;
         printf("[Muxer Slave Thread] Exiting\n");

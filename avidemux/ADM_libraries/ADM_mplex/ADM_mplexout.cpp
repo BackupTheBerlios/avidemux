@@ -58,9 +58,7 @@ bool IFileBitStream::EndOfStream(void)
 
 }
 
-IFileBitStream::IFileBitStream(PacketQueue *q,mplexStreamDescriptor *desc,
-                                unsigned int buf_size) :
-    IBitStream(desc)
+IFileBitStream::IFileBitStream(PacketQueue *q, unsigned int buf_size) : IBitStream()
 {
         queue=q;        
         SetBufSize(buf_size);

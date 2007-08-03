@@ -51,6 +51,7 @@ static const unsigned int dts_packet_samples[4] =
 DTSStream::DTSStream(IBitStream &ibs, Multiplexor &into) : 
 	AudioStream( ibs, into )
 {
+	num_frames = 0;
 }
 
 bool DTSStream::Probe(IBitStream &bs )
@@ -136,7 +137,6 @@ void DTSStream::Init ( const int _stream_num)
                 bs.StreamName()
                 );
 
-	InitAUbuffer();
 	AU_start = bs.bitcount();
     if (bs.GetBits(32)==DTS_SYNCWORD)
     {
@@ -156,7 +156,7 @@ void DTSStream::Init ( const int _stream_num)
 		num_frames++;
         access_unit.start = AU_start;
 		access_unit.length = framesize;
-        mjpeg_info( "dts frame size = %d\n", framesize );
+        mjpeg_info( "dts frame size = %d", framesize );
 		samples_per_second = dts_frequency[frequency];
 
 		/* Presentation time-stamping  */
@@ -166,7 +166,7 @@ void DTSStream::Init ( const int _stream_num)
 		access_unit.DTS = access_unit.PTS;
 		access_unit.dorder = decoding_order;
 		++decoding_order;
-		aunits.append( access_unit );
+		aunits.Append( access_unit );
 
     } else
     {
@@ -204,7 +204,7 @@ void DTSStream::FillAUbuffer(unsigned int frames_to_buffer )
         {
             mjpeg_warn( "Discarding incomplete final frame dts stream %d!",
                        stream_num);
-            aunits.droplast();
+            aunits.DropLast();
             decoding_order--;
             break;
         }
@@ -238,7 +238,7 @@ void DTSStream::FillAUbuffer(unsigned int frames_to_buffer )
 		access_unit.DTS = access_unit.PTS;
 		access_unit.dorder = decoding_order;
 		decoding_order++;
-		aunits.append( access_unit );
+		aunits.Append( access_unit );
 		num_frames++;
 
 		num_syncword++;

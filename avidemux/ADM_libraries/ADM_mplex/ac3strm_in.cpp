@@ -66,6 +66,7 @@ static const unsigned int ac3_frequency[4] =
 AC3Stream::AC3Stream(IBitStream &ibs, Multiplexor &into) : 
 	AudioStream( ibs, into )
 {
+num_frames = 0;
 }
 
 bool AC3Stream::Probe(IBitStream &bs )
@@ -220,7 +221,6 @@ void AC3Stream::Init ( const int _stream_num)
                 bs.StreamName()
                 );
 
-	InitAUbuffer();
 	AU_start = bs.bitcount();
     if (bs.GetBits(16)==AC3_SYNCWORD)
     {
@@ -236,10 +236,10 @@ void AC3Stream::Init ( const int _stream_num)
             
         header_skip = 5;        // Initially skipped past  5 bytes of header 
 
-		num_frames++;
+	num_frames++;
         access_unit.start = AU_start;
-		access_unit.length = framesize;
-        mjpeg_info( "AC3 frame size = %d\n", framesize );
+	access_unit.length = framesize;
+        mjpeg_info( "AC3 frame size = %d", framesize );
         bit_rate = ac3_bitrate_index[framesize_code>>1];
 		samples_per_second = ac3_frequency[frequency];
 
@@ -250,7 +250,7 @@ void AC3Stream::Init ( const int _stream_num)
 		access_unit.DTS = access_unit.PTS;
 		access_unit.dorder = decoding_order;
 		++decoding_order;
-		aunits.append( access_unit );
+		aunits.Append( access_unit );
 
     } else
     {
@@ -292,7 +292,7 @@ void AC3Stream::FillAUbuffer(unsigned int frames_to_buffer )
         {
             mjpeg_warn( "Discarding incomplete final frame AC3 stream %d!",
                        stream_num);
-            aunits.droplast();
+            aunits.DropLast();
             --decoding_order;
             break;
         }
@@ -324,7 +324,7 @@ void AC3Stream::FillAUbuffer(unsigned int frames_to_buffer )
 		access_unit.DTS = access_unit.PTS;
 		access_unit.dorder = decoding_order;
 		decoding_order++;
-		aunits.append( access_unit );
+		aunits.Append( access_unit );
 		num_frames++;
 		
 		num_syncword++;

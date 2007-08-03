@@ -25,7 +25,6 @@
 #include <assert.h>
 
 #include "mjpeg_types.h"
-#include "fastintfns.h"
 #include "audiostrm.hpp"
 #include "multiplexor.hpp"
 
@@ -35,13 +34,6 @@ AudioStream::AudioStream(IBitStream &ibs, Multiplexor &into) :
 	num_syncword(0)
 {
     FRAME_CHUNK = 24;
-}
-
-void AudioStream::InitAUbuffer()
-{
-	unsigned int i;
-	for( i = 0; i < aunits.BUF_SIZE; ++i )
-		aunits.init( new AAunit );
 }
 
 
@@ -57,15 +49,6 @@ bool AudioStream::RunOutComplete()
 			( muxinto.running_out && RequiredPTS() >= muxinto.runout_PTS));
 }
 
-bool AudioStream::AUBufferNeedsRefill()
-{
-    return 
-        !eoscan
-        && ( aunits.current()+FRAME_CHUNK > last_buffered_AU
-             || 
-             bs.BufferedBytes() < muxinto.sector_size
-            );
-}
 
 /******************************************************************
 	Output_Audio

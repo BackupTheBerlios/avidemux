@@ -83,7 +83,18 @@ public:
  *
  **********************************************************************/
 
-#include "streamType.h"
+enum StreamKind
+  {
+    MPEG_AUDIO,
+    AC3_AUDIO,
+    LPCM_AUDIO,
+    DTS_AUDIO,
+    MPEG_VIDEO
+#ifdef ZALPHA
+    ,
+    Z_ALPHA
+#endif
+  };
 
 class JobStream
 {
@@ -128,7 +139,7 @@ public:
     Program ID
 *************************************************************************/
  
-#define MPLEX_VER    "2.2.3"
+#define MPLEX_VER    "2.2.4"
 #define MPLEX_DATE   "$Date$"
 
 #endif // __INTERACT_H__

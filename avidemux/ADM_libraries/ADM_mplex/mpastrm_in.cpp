@@ -27,7 +27,6 @@
 #include "interact.hpp"
 #include "multiplexor.hpp"
 
-#define mjpeg_info mjpeg_warn
 
 static const char *mpa_audio_version[4] =
 {
@@ -125,8 +124,6 @@ void MPAStream::Init ( const int stream_num )
                 bs.StreamName()
                 );
 
-	InitAUbuffer();
-	
 	/* A.Stevens 2000 - update to be compatible up to  MPEG2.5
 	 */
     AU_start = bs.bitcount();
@@ -151,8 +148,8 @@ void MPAStream::Init ( const int stream_num )
 			mpa_slots[layer] *1000 /
 			mpa_freq_table[version_id][frequency];
 
-		size_frames[0] = framesize;
-		size_frames[1] = framesize+( layer == 0 ? 4 : 1);
+		size_frames[0] = framesize * ( layer == 0 ? 4 : 1);
+		size_frames[1] = (framesize+1) * ( layer == 0 ? 4 : 1);
 		num_frames[padding_bit]++;
         access_unit.start  = AU_start;
 		access_unit.length = size_frames[padding_bit];
@@ -166,7 +163,7 @@ void MPAStream::Init ( const int stream_num )
 		access_unit.DTS = access_unit.PTS;
 		access_unit.dorder = decoding_order;
 		++decoding_order;
-		aunits.append( access_unit );
+		aunits.Append( access_unit );
 
     } else
     {
@@ -186,9 +183,9 @@ unsigned int MPAStream::NominalBitRate()
 
 unsigned int MPAStream::SizeFrame( int rate_code, int padding )
 {
-	return mpa_bitrates_kbps[version_id][layer][rate_code]  * 
+	return ( mpa_bitrates_kbps[version_id][layer][rate_code]  * 
 		mpa_slots [layer] *1000 /
-		mpa_freq_table[version_id][frequency] + padding;
+		mpa_freq_table[version_id][frequency] + padding ) * ( layer == 0 ? 4 : 1);
 }
 
 void MPAStream::FillAUbuffer(unsigned int frames_to_buffer )
@@ -216,7 +213,7 @@ void MPAStream::FillAUbuffer(unsigned int frames_to_buffer )
             mjpeg_warn("Discarding incomplete final frame MPEG audio stream %02x!",
                        stream_id
                        );
-            aunits.droplast();
+            aunits.DropLast();
             --decoding_order;
             break;
         }
@@ -248,7 +245,7 @@ void MPAStream::FillAUbuffer(unsigned int frames_to_buffer )
 		access_unit.DTS = access_unit.PTS;
 		access_unit.dorder = decoding_order;
 		decoding_order++;
-		aunits.append( access_unit );
+		aunits.Append( access_unit );
 		num_frames[padding_bit]++;
 
 		bs.GetBits( 9);

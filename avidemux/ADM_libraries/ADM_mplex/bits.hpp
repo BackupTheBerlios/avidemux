@@ -6,7 +6,7 @@
 
 typedef uint64_t bitcount_t;
 
-#include "streamType.h"
+
 class BitStreamBuffering
 {
 public:
@@ -120,12 +120,10 @@ protected:
 class IBitStream : public IBitStreamUndo 
 {
 public:
-        mplexStreamDescriptor      streamDesc;
- 	IBitStream(mplexStreamDescriptor *desc) :
+ 	IBitStream() :
 		IBitStreamUndo(),
 		streamname( "unnamed" )
 		{
-                    streamDesc=*desc;
 		}
 	virtual ~IBitStream() { Release(); }
 
@@ -154,7 +152,6 @@ public:
 	void Flush( bitcount_t byte_position );
 
 	inline const char *StreamName() { return streamname; }
-
 protected:
 	bool ReadIntoBuffer( unsigned int to_read = BUFFER_SIZE );
 	virtual size_t ReadStreamBytes( uint8_t *buf, size_t number ) = 0;

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-
+#define STREAM_LOGGING
 #include <config.h>
 #include <math.h>
 #include <stdlib.h>
@@ -36,9 +36,6 @@
 #endif
 #include "multiplexor.hpp"
 
-#define MAX_UNDERRUN 10
-//#define mjpeg_info mjpeg_warn
-//#define STREAM_LOGGING 1
 
 /****************
  *
@@ -50,9 +47,6 @@
 
 Multiplexor::Multiplexor(MultiplexJob &job, OutputStream &output)
 {
-
-        
-
     underrun_ignore = 0;
     underruns = 0;
 	start_of_new_pack = false;
@@ -61,14 +55,6 @@ Multiplexor::Multiplexor(MultiplexJob &job, OutputStream &output)
 
     psstrm = new PS_Stream(mpeg, sector_size, output, max_segment_size );
 
-}
-
-void Multiplexor::Close(void)
-{
-	std::vector<ElementaryStream *>::iterator str;
-
-	for( str = estreams.begin(); str < estreams.end(); ++str )
-		delete (*str);
 }
 
 
@@ -105,10 +91,9 @@ void Multiplexor::InitSyntaxParameters(MultiplexJob &job)
 	{
 	case MPEG_FORMAT_VCD :
 		data_rate = 75*2352;  			 /* 75 raw CD sectors/sec */ 
-	  	vbr = false;
- 
 	case MPEG_FORMAT_VCD_NSR : /* VCD format, non-standard rate */
 		mjpeg_info( "Selecting VCD output profile");
+		video_buffers_iframe_only = false;
 		mpeg = 1;
 	 	packets_per_pack = 1;
 	  	sys_header_in_pack1 = 0;
@@ -127,6 +112,11 @@ void Multiplexor::InitSyntaxParameters(MultiplexJob &job)
 		sector_align_iframeAUs = false;
         timestamp_iframe_only = false;
 		seg_starts_with_video = true;
+        if( job.video_tracks == 0 )
+        {
+            mjpeg_info( "Audio-only VCD track - variable-bit-rate (VCD2.0)");
+            vbr = true;
+        }
 		break;
 		
 	case  MPEG_FORMAT_MPEG2 : 
@@ -143,9 +133,10 @@ void Multiplexor::InitSyntaxParameters(MultiplexJob &job)
 		buffers_in_audio = 1;
 		always_buffers_in_audio = 1;
 		vcd_zero_stuffing = 0;
-        dtspts_for_all_vau = 0;
-        timestamp_iframe_only = false;
-        video_buffers_iframe_only = false;
+		vbr = true;
+        	dtspts_for_all_vau = 0;
+        	timestamp_iframe_only = false;
+        	video_buffers_iframe_only = false;
 		break;
 
 	case MPEG_FORMAT_SVCD :
@@ -281,7 +272,6 @@ void Multiplexor::InitSyntaxParameters(MultiplexJob &job)
         video_buffers_iframe_only = false;
 		break;
 	}
-	
 }
 
 /**************************************
@@ -387,10 +377,6 @@ void Multiplexor::InitInputStreamsForVideo(MultiplexJob & job )
 	std::vector<VideoParams *>::iterator vidparm = job.video_param.begin();
 	std::vector<LpcmParams *>::iterator lpcmparm = job.lpcm_param.begin();
 
-    if( job.video_tracks < 1 && job.mux_format == MPEG_FORMAT_VCD )
-    {
-        mjpeg_warn( "Multiplexing audio-only for a standard VCD is very inefficient");
-    }
 
     std::vector<JobStream *>::iterator i;
     for( i = job.streams.begin() ; i < job.streams.end() ; ++i )
@@ -760,7 +746,7 @@ void Multiplexor::MuxStatus(log_level_t level)
 			mjpeg_log( level,
 					   "Video %02x: buf=%7d frame=%06d sector=%08d",
 					   (*str)->stream_id,
-					   (*str)->bufmodel.Space(),
+					   (*str)->BufferSize()-(*str)->bufmodel.Space(),
 					   (*str)->DecodeOrder(),
 					   (*str)->nsec
 				);
@@ -769,7 +755,7 @@ void Multiplexor::MuxStatus(log_level_t level)
 			mjpeg_log( level,
 					   "Audio %02x: buf=%7d frame=%06d sector=%08d",
 					   (*str)->stream_id,
-					   (*str)->bufmodel.Space(),
+					   (*str)->BufferSize()-(*str)->bufmodel.Space(),
 					   (*str)->DecodeOrder(),
 					   (*str)->nsec
 				);
@@ -839,6 +825,9 @@ void Multiplexor::OutputPrefix( )
 		{
 				mjpeg_error_exit1("VCD man only have max. 1 audio and 1 video stream");
 		}
+
+        if( vstreams.size() > 0 )
+        {
 		/* First packet carries video-info-only sys_header */
 		psstrm->CreateSysHeader (&sys_header, mux_rate, 
 								 false, true, 
@@ -846,15 +835,20 @@ void Multiplexor::OutputPrefix( )
 		sys_header_ptr = &sys_header;
 		pack_header_ptr = &pack_header;
 	  	OutputPadding( false);		
+        }
 
-		/* Second packet carries audio-info-only sys_header */
-		psstrm->CreateSysHeader (&sys_header, mux_rate,  
-                                 false, true, 
-								 true, true, amux );
-		sys_header_ptr = &sys_header;
-		pack_header_ptr = &pack_header;
-	  	OutputPadding( true );
-		break;
+        if( astreams.size() > 0 )
+        {
+
+            /* Second packet carries audio-info-only sys_header */
+            psstrm->CreateSysHeader (&sys_header, mux_rate,  
+                                     false, true, 
+                                     true, true, amux );
+            sys_header_ptr = &sys_header;
+            pack_header_ptr = &pack_header;
+            OutputPadding( true );
+        }
+        break;
 		
 	case MPEG_FORMAT_SVCD :
 	case MPEG_FORMAT_SVCD_NSR :
@@ -1134,25 +1128,25 @@ void Multiplexor::Multiplex()
                 mjpeg_info( "Starting new output file...");
                 psstrm->NextSegment();
 			}
-			else if( master != 0 && master->EndSeq() )
+			else if( master != 0 && master->SeqEndRunOut() )
 			{
-				if(  split_at_seq_end && master->Lookahead( ) != 0 )
+                const AUnit *nextIframe = master->NextIFrame();
+				if(  split_at_seq_end && nextIframe != 0)
 				{
-					if( ! master->SeqHdrNext() || 
-						master->NextAUType() != IFRAME)
-					{
-						mjpeg_error_exit1( "Sequence split detected %d but no following sequence found...", master->NextAUType());
-					}
-						
-					runout_PTS = master->NextRequiredPTS();
-                    mjpeg_info( "Running out...");
-                    mjpeg_debug("Run out PTS limit to %lld SCR=%lld", 
-                                runout_PTS/300, 
-                                current_SCR/300 );
+					runout_PTS = master->RequiredPTS(nextIframe);
+                    mjpeg_info( "Sequence end marker! Running out...");
+                    mjpeg_info("Run out PTS limit to AU %d %lld SCR=%lld", 
+                               nextIframe->dorder,
+                               runout_PTS/300, 
+                               current_SCR/300 );
                     MuxStatus( LOG_INFO );
 					running_out = true;
 					seg_state = runout_segment;
 				}
+                else
+                {
+                    mjpeg_warn( "Sequence end without following I-frame!" );
+                }
 			}
 			break;
 			
@@ -1176,11 +1170,14 @@ void Multiplexor::Multiplex()
 		for( str = estreams.begin(); str < estreams.end(); ++str )
 		{
 #ifdef STREAM_LOGGING
-            mjpeg_warn("STREAM %02x: SCR=%lld mux=%d reqDTS=%lld", 
+            mjpeg_debug("%02x: SCR=%lld (%.3f) mux=%d %d reqDTS=%lld ", 
                         (*str)->stream_id,
-                        current_SCR /300,
+                        current_SCR,
+                        static_cast<double>(current_SCR) /(90.0*300.0),
                         (*str)->MuxPossible(current_SCR),
+                        (*str)->BufferSize()-(*str)->bufmodel.Space(),
                         (*str)->RequiredDTS()/300
+                        
 				);
 #endif
 			if( (*str)->MuxPossible(current_SCR) && 
@@ -1202,22 +1199,19 @@ void Multiplexor::Multiplex()
 		{
 			despatch->BufferAndOutputSector();
 			video_first = false;
-#if 0                        
+			if( current_SCR >=  earliest && underrun_ignore == 0)
+			{
 				mjpeg_warn( "Stream %02x: data will arrive too late sent(SCR)=%lld required(DTS)=%lld", 
 							despatch->stream_id, 
 							current_SCR/300, 
 							earliest/300 );
-#endif                                                        
 				MuxStatus( LOG_WARN );
-                        if( current_SCR >=  earliest && underrun_ignore == 0)
-                        {
-                                                        
 				// Give the stream a chance to recover
 				underrun_ignore = 300;
 				++underruns;
-				if( underruns > MAX_UNDERRUN  )
+				if( underruns > 10  )
 				{
-					//mjpeg_error_exit1("Too many frame drops -exiting" );
+					mjpeg_error_exit1("Too many frame drops -exiting" );
 				}
 			}
             if( despatch->nsec > 50 &&
@@ -1245,8 +1239,11 @@ void Multiplexor::Multiplex()
                 {
                     clockticks change_time = (*str)->bufmodel.NextChange();
                     if( next_change == 0 || change_time < next_change )
+                    {
                         next_change = change_time;
+                    }
                 }
+
                 unsigned int bumps = 5;
                 while( bumps > 0 
                        && next_change > current_SCR + ticks_per_sector)
@@ -1254,6 +1251,7 @@ void Multiplexor::Multiplex()
                     NextPosAndSCR();
                     --bumps;
                 }
+                            
             }
             else
             {
@@ -1312,11 +1310,11 @@ void Multiplexor::Multiplex()
 
     if( underruns> 0 )
 	{
-		mjpeg_warn( "MUX STATUS: Frame data under-runs detected!" );
+		mjpeg_error_exit1( "MUX STATUS: Frame data under-runs detected!" );
 	}
 	else
 	{
-		mjpeg_warn( "MUX STATUS: no under-runs detected.");
+		mjpeg_info( "MUX STATUS: no under-runs detected.");
 	}
 }
 

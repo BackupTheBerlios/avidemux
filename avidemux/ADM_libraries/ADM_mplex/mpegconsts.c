@@ -41,21 +41,21 @@ mpeg_framerates[] = {
 
 
 #define MPEG_NUM_RATES (sizeof(mpeg_framerates)/sizeof(mpeg_framerates[0]))
-static const mpeg_framerate_code_t MX_mpeg_num_framerates = MPEG_NUM_RATES;
+static const mpeg_framerate_code_t mpeg_num_framerates = MPEG_NUM_RATES;
 
-static const char *
-framerate_definitions[MPEG_NUM_RATES] =
-{
-   "illegal", 
-  "24000.0/1001.0 (NTSC 3:2 pulldown converted FILM)",
-  "24.0 (NATIVE FILM)",
-  "25.0 (PAL/SECAM VIDEO / converted FILM)",
-  "30000.0/1001.0 (NTSC VIDEO)",
-  "30.0",
-  "50.0 (PAL FIELD RATE)",
-  "60000.0/1001.0 (NTSC FIELD RATE)",
-  "60.0"
-};
+//static const char *
+//framerate_definitions[MPEG_NUM_RATES] =
+//{
+//   "illegal", 
+//  "24000.0/1001.0 (NTSC 3:2 pulldown converted FILM)",
+//  "24.0 (NATIVE FILM)",
+//  "25.0 (PAL/SECAM VIDEO / converted FILM)",
+//  "30000.0/1001.0 (NTSC VIDEO)",
+//  "30.0",
+//  "50.0 (PAL FIELD RATE)",
+//  "60000.0/1001.0 (NTSC FIELD RATE)",
+//  "60.0"
+//};
 
 
 static const char *mpeg1_aspect_ratio_definitions[] =
@@ -121,13 +121,13 @@ static const char **aspect_ratio_definitions[2] =
 	mpeg2_aspect_ratio_definitions
 };
 
-static const y4m_ratio_t *mpeg_aspect_ratios[2] = 
-{
-	mpeg1_aspect_ratios,
-	mpeg2_aspect_ratios
-};
+//static const y4m_ratio_t *mpeg_aspect_ratios[2] = 
+//{
+//	mpeg1_aspect_ratios,
+//	mpeg2_aspect_ratios
+//};
 
-static const mpeg_aspect_code_t MX_mpeg_num_aspect_ratios[2] = 
+static const mpeg_aspect_code_t mpeg_num_aspect_ratios[2] = 
 {
   sizeof(mpeg1_aspect_ratios)/sizeof(mpeg1_aspect_ratios[0]),
   sizeof(mpeg2_aspect_ratios)/sizeof(mpeg2_aspect_ratios[0])
@@ -139,9 +139,9 @@ static const mpeg_aspect_code_t MX_mpeg_num_aspect_ratios[2] =
  */
 
 int
-mpeg_valid_framerate_code( mpeg_framerate_code_t code )
+MX_mpeg_valid_framerate_code( mpeg_framerate_code_t code )
 {
-    return ((code > 0) && (code < MX_mpeg_num_framerates)) ? 1 : 0;
+    return ((code > 0) && (code < mpeg_num_framerates)) ? 1 : 0;
 }
 
 
@@ -149,39 +149,60 @@ mpeg_valid_framerate_code( mpeg_framerate_code_t code )
  * Convert MPEG frame-rate code to corresponding frame-rate
  */
 
-// y4m_ratio_t
-// mpeg_framerate( mpeg_framerate_code_t code )
-// {
-//     if ((code > 0) && (code < mpeg_num_framerates))
-// 		return mpeg_framerates[code];
-//     else
-// 		return y4m_fps_UNKNOWN;
-// }
+y4m_ratio_t
+MX_mpeg_framerate( mpeg_framerate_code_t code )
+{
+    if ((code > 0) && (code < mpeg_num_framerates))
+		return mpeg_framerates[code];
+    else
+		return y4m_fps_UNKNOWN;
+}
 
-/*
- * Look-up MPEG frame rate code for a (exact) frame rate.
- */
-
-
-// mpeg_framerate_code_t 
-// mpeg_framerate_code( y4m_ratio_t framerate )
-// {
-// 	mpeg_framerate_code_t i;
-//   
-// 	y4m_ratio_reduce(&framerate);
-//     /* start at '1', because 0 is unknown/illegal */
-// 	for (i = 1; i < mpeg_num_framerates; ++i) {
-// 		if (Y4M_RATIO_EQL(framerate, mpeg_framerates[i]))
-// 			return i;
-// 	}
-// 	return 0;
-// }
-
-
-/* small enough to distinguish 1/1000 from 1/1001 */
-#define MPEG_FPS_TOLERANCE 0.0001
-
-
+///*
+// * Look-up MPEG frame rate code for a (exact) frame rate.
+// */
+//
+//
+//mpeg_framerate_code_t 
+//mpeg_framerate_code( y4m_ratio_t framerate )
+//{
+//	mpeg_framerate_code_t i;
+//  
+//	y4m_ratio_reduce(&framerate);
+//    /* start at '1', because 0 is unknown/illegal */
+//	for (i = 1; i < mpeg_num_framerates; ++i) {
+//		if (Y4M_RATIO_EQL(framerate, mpeg_framerates[i]))
+//			return i;
+//	}
+//	return 0;
+//}
+//
+//
+///* small enough to distinguish 1/1000 from 1/1001 */
+//#define MPEG_FPS_TOLERANCE 0.0001
+//
+//
+//y4m_ratio_t
+//mpeg_conform_framerate( double fps )
+//{
+//	mpeg_framerate_code_t i;
+//	y4m_ratio_t result;
+//
+//	/* try to match it to a standard frame rate */
+//    /* (start at '1', because 0 is unknown/illegal) */
+//	for (i = 1; i < mpeg_num_framerates; i++) 
+//	{
+//		double deviation = 1.0 - (Y4M_RATIO_DBL(mpeg_framerates[i]) / fps);
+//		if ( (deviation > -MPEG_FPS_TOLERANCE) &&
+//			 (deviation < +MPEG_FPS_TOLERANCE) )
+//			return mpeg_framerates[i];
+//	}
+//	/* no luck?  just turn it into a ratio (6 decimal place accuracy) */
+//	result.n = (int)((fps * 1000000.0) + 0.5);
+//	result.d = 1000000;
+//	y4m_ratio_reduce(&result);
+//	return result;
+//}
 
   
 
@@ -190,270 +211,270 @@ mpeg_valid_framerate_code( mpeg_framerate_code_t code )
  */
 
 int
-mpeg_valid_aspect_code( int version, mpeg_framerate_code_t c )
+MX_mpeg_valid_aspect_code( int version, mpeg_framerate_code_t c )
 {
 	if ((version == 1) || (version == 2))
-        return ((c > 0) && (c < MX_mpeg_num_aspect_ratios[version-1])) ? 1 : 0;
+        return ((c > 0) && (c < mpeg_num_aspect_ratios[version-1])) ? 1 : 0;
     else
         return 0;
 }
 
 
+///*
+// * Convert MPEG aspect-ratio code to corresponding aspect-ratio
+// */
+//
+//y4m_ratio_t 
+//mpeg_aspect_ratio( int mpeg_version,  mpeg_aspect_code_t code )
+//{
+//	y4m_ratio_t ratio;
+//    if ((mpeg_version >= 1) && (mpeg_version <= 2) &&
+//        (code > 0) && (code < mpeg_num_aspect_ratios[mpeg_version-1]))
+//	{
+//		ratio = mpeg_aspect_ratios[mpeg_version-1][code];
+//		y4m_ratio_reduce(&ratio);
+//		return ratio;
+//	}
+//    else
+//		return y4m_sar_UNKNOWN;
+//}
+//
+//
+//
+///*
+// * Look-up corresponding MPEG aspect ratio code given an exact aspect ratio.
+// *
+// * WARNING: The semantics of aspect ratio coding *changed* between
+// * MPEG1 and MPEG2.  In MPEG1 it is the *pixel* aspect ratio. In
+// * MPEG2 it is the (far more sensible) aspect ratio of the eventual
+// * display.
+// *
+// */
+//
+//mpeg_aspect_code_t 
+//mpeg_frame_aspect_code( int mpeg_version, y4m_ratio_t aspect_ratio )
+//{
+//	mpeg_aspect_code_t i;
+//	y4m_ratio_t red_ratio = aspect_ratio;
+//	y4m_ratio_reduce( &red_ratio );
+//	if( mpeg_version < 1 || mpeg_version > 2 )
+//		return 0;
+//    /* (start at '1', because 0 is unknown/illegal) */
+//	for( i = 1; i < mpeg_num_aspect_ratios[mpeg_version-1]; ++i )
+//	{
+//		y4m_ratio_t red_entry =  mpeg_aspect_ratios[mpeg_version-1][i];
+//		y4m_ratio_reduce( &red_entry );
+//		if(  Y4M_RATIO_EQL( red_entry, red_ratio) )
+//			return i;
+//	}
+//
+//	return 0;
+//			
+//}
+//
+//
+//
+///*
+// * Guess the correct MPEG aspect ratio code,
+// *  given the true sample aspect ratio and frame size of a video stream
+// *  (and the MPEG version, 1 or 2).
+// *
+// * Returns 0 if it has no good guess.
+// *
+// */
+//
+//
+///* this is big enough to accommodate the difference between 720 and 704 */
+//#define GUESS_ASPECT_TOLERANCE 0.03
+//
+//mpeg_aspect_code_t 
+//mpeg_guess_mpeg_aspect_code(int mpeg_version, y4m_ratio_t sampleaspect,
+//							int frame_width, int frame_height)
+//{
+//	if (Y4M_RATIO_EQL(sampleaspect, y4m_sar_UNKNOWN))
+//    {
+//		return 0;
+//    }
+//	switch (mpeg_version) {
+//	case 1:
+//		if (Y4M_RATIO_EQL(sampleaspect, y4m_sar_SQUARE))
+//		{
+//			return 1;
+//		} 
+//		else if (Y4M_RATIO_EQL(sampleaspect, y4m_sar_NTSC_CCIR601))
+//		{
+//			return 12;
+//		} 
+//		else if (Y4M_RATIO_EQL(sampleaspect, y4m_sar_NTSC_16_9))
+//		{
+//			return 6;
+//		} 
+//		else if (Y4M_RATIO_EQL(sampleaspect, y4m_sar_PAL_CCIR601))
+//		{
+//			return 8;
+//		} 
+//		else if (Y4M_RATIO_EQL(sampleaspect, y4m_sar_PAL_16_9))
+//		{
+//			return 3;
+//		} 
+//		return 0;
+//		break;
+//	case 2:
+//		if (Y4M_RATIO_EQL(sampleaspect, y4m_sar_SQUARE))
+//		{
+//			return 1;  /* '1' means square *pixels* in MPEG-2; go figure. */
+//		}
+//		else
+//		{
+//			int i;
+//			double true_far;  /* true frame aspect ratio */
+//			true_far = 
+//				(double)(sampleaspect.n * frame_width) /
+//				(double)(sampleaspect.d * frame_height);
+//			/* start at '2'... */
+//			for (i = 2; i < (int)(mpeg_num_aspect_ratios[mpeg_version-1]); i++) 
+//			{
+//				double ratio = 
+//					true_far / Y4M_RATIO_DBL(mpeg_aspect_ratios[mpeg_version-1][i]);
+//				if ( (ratio > (1.0 - GUESS_ASPECT_TOLERANCE)) &&
+//					 (ratio < (1.0 + GUESS_ASPECT_TOLERANCE)) )
+//					return i;
+//			}
+//			return 0;
+//		}
+//		break;
+//	default:
+//		return 0;
+//		break;
+//	}
+//}
+//
+//
+//
+//
+///*
+// * Guess the true sample aspect ratio of a video stream,
+// *  given the MPEG aspect ratio code and the actual frame size
+// *  (and the MPEG version, 1 or 2).
+// *
+// * Returns y4m_sar_UNKNOWN if it has no good guess.
+// *
+// */
+//y4m_ratio_t 
+//mpeg_guess_sample_aspect_ratio(int mpeg_version,
+//							   mpeg_aspect_code_t code,
+//							   int frame_width, int frame_height)
+//{
+//	switch (mpeg_version) 
+//	{
+//	case 1:
+//		/* MPEG-1 codes turn into SAR's, just not quite the right ones.
+//		   For the common/known values, we provide the ratio used in practice,
+//		   otherwise say we don't know.*/
+//		switch (code)
+//		{
+//		case 1:  return y4m_sar_SQUARE;        break;
+//		case 3:  return y4m_sar_PAL_16_9;      break;
+//		case 6:  return y4m_sar_NTSC_16_9;     break;
+//		case 8:  return y4m_sar_PAL_CCIR601;   break;
+//		case 12: return y4m_sar_NTSC_CCIR601;  break;
+//		default:
+//			return y4m_sar_UNKNOWN;       break;
+//		}
+//		break;
+//	case 2:
+//		/* MPEG-2 codes turn into Display Aspect Ratios, though not exactly the
+//		   DAR's used in practice.  For common/standard frame sizes, we provide
+//		   the original SAR; otherwise, we say we don't know. */
+//		if (code == 1) 
+//		{
+//			return y4m_sar_SQUARE; /* '1' means square *pixels* in MPEG-2 */
+//		}
+//		else if ((code >= 2) && (code <= 4))
+//		{
+//            return y4m_guess_sar(frame_width, frame_height,
+//                                 mpeg2_aspect_ratios[code]);
+//		} 
+//		else
+//		{
+//			return y4m_sar_UNKNOWN;
+//		}
+//		break;
+//	default:
+//		return y4m_sar_UNKNOWN;
+//		break;
+//	}
+//}
+//
+//
+//
+//
+//
+///*
+// * Look-up MPEG explanatory definition string for frame rate code
+// *
+// */
+//
+//
+//const char *
+//mpeg_framerate_code_definition(   mpeg_framerate_code_t code  )
+//{
+//	if( code == 0 || code >=  mpeg_num_framerates )
+//		return "UNDEFINED: illegal/reserved frame-rate ratio code";
+//
+//	return framerate_definitions[code];
+//}
+
 /*
- * Convert MPEG aspect-ratio code to corresponding aspect-ratio
+ * Look-up MPEG explanatory definition string aspect ratio code for an
+ * aspect ratio code
+ *
  */
 
-// y4m_ratio_t 
-// mpeg_aspect_ratio( int mpeg_version,  mpeg_aspect_code_t code )
-// {
-// 	y4m_ratio_t ratio;
-//     if ((mpeg_version >= 1) && (mpeg_version <= 2) &&
-//         (code > 0) && (code < mpeg_num_aspect_ratios[mpeg_version-1]))
-// 	{
-// 		ratio = mpeg_aspect_ratios[mpeg_version-1][code];
-// 		y4m_ratio_reduce(&ratio);
-// 		return ratio;
-// 	}
-//     else
-// 		return y4m_sar_UNKNOWN;
-// }
-// 
-// 
+const char *
+MX_mpeg_aspect_code_definition( int mpeg_version,  mpeg_aspect_code_t code  )
+{
+	if( mpeg_version < 1 || mpeg_version > 2 )
+		return "UNDEFINED: illegal MPEG version";
+	
+	if( code < 1 || code >=  mpeg_num_aspect_ratios[mpeg_version-1] )
+		return "UNDEFINED: illegal aspect ratio code";
 
-/*
- * Look-up corresponding MPEG aspect ratio code given an exact aspect ratio.
- *
- * WARNING: The semantics of aspect ratio coding *changed* between
- * MPEG1 and MPEG2.  In MPEG1 it is the *pixel* aspect ratio. In
- * MPEG2 it is the (far more sensible) aspect ratio of the eventual
- * display.
- *
- */
-// 
-// mpeg_aspect_code_t 
-// mpeg_frame_aspect_code( int mpeg_version, y4m_ratio_t aspect_ratio )
-// {
-// 	mpeg_aspect_code_t i;
-// 	y4m_ratio_t red_ratio = aspect_ratio;
-// 	y4m_ratio_reduce( &red_ratio );
-// 	if( mpeg_version < 1 || mpeg_version > 2 )
-// 		return 0;
-//     /* (start at '1', because 0 is unknown/illegal) */
-// 	for( i = 1; i < mpeg_num_aspect_ratios[mpeg_version-1]; ++i )
-// 	{
-// 		y4m_ratio_t red_entry =  mpeg_aspect_ratios[mpeg_version-1][i];
-// 		y4m_ratio_reduce( &red_entry );
-// 		if(  Y4M_RATIO_EQL( red_entry, red_ratio) )
-// 			return i;
-// 	}
-// 
-// 	return 0;
-// 			
-// }
+	return aspect_ratio_definitions[mpeg_version-1][code];
+}
 
 
+///*
+// * Look-up explanatory definition of interlace field order code
+// *
+// */
+//
+//const char *
+//mpeg_interlace_code_definition( int yuv4m_interlace_code )
+//{
+//	const char *def;
+//	switch( yuv4m_interlace_code )
+//	{
+//	case Y4M_UNKNOWN :
+//		def = "unknown";
+//		break;
+//	case Y4M_ILACE_NONE :
+//		def = "none/progressive";
+//		break;
+//	case Y4M_ILACE_TOP_FIRST :
+//		def = "top-field-first";
+//		break;
+//	case Y4M_ILACE_BOTTOM_FIRST :
+//		def = "bottom-field-first";
+//		break;
+//	default :
+//		def = "UNDEFINED: illegal video interlacing type-code!";
+//		break;
+//	}
+//	return def;
+//}
 
-/*
- * Guess the correct MPEG aspect ratio code,
- *  given the true sample aspect ratio and frame size of a video stream
- *  (and the MPEG version, 1 or 2).
- *
- * Returns 0 if it has no good guess.
- *
- */
-
-
-/* this is big enough to accommodate the difference between 720 and 704 */
-#define GUESS_ASPECT_TOLERANCE 0.03
-
-// mpeg_aspect_code_t 
-// mpeg_guess_mpeg_aspect_code(int mpeg_version, y4m_ratio_t sampleaspect,
-// 							int frame_width, int frame_height)
-// {
-// 	if (Y4M_RATIO_EQL(sampleaspect, y4m_sar_UNKNOWN))
-//     {
-// 		return 0;
-//     }
-// 	switch (mpeg_version) {
-// 	case 1:
-// 		if (Y4M_RATIO_EQL(sampleaspect, y4m_sar_SQUARE))
-// 		{
-// 			return 1;
-// 		} 
-// 		else if (Y4M_RATIO_EQL(sampleaspect, y4m_sar_NTSC_CCIR601))
-// 		{
-// 			return 12;
-// 		} 
-// 		else if (Y4M_RATIO_EQL(sampleaspect, y4m_sar_NTSC_16_9))
-// 		{
-// 			return 6;
-// 		} 
-// 		else if (Y4M_RATIO_EQL(sampleaspect, y4m_sar_PAL_CCIR601))
-// 		{
-// 			return 8;
-// 		} 
-// 		else if (Y4M_RATIO_EQL(sampleaspect, y4m_sar_PAL_16_9))
-// 		{
-// 			return 3;
-// 		} 
-// 		return 0;
-// 		break;
-// 	case 2:
-// 		if (Y4M_RATIO_EQL(sampleaspect, y4m_sar_SQUARE))
-// 		{
-// 			return 1;  /* '1' means square *pixels* in MPEG-2; go figure. */
-// 		}
-// 		else
-// 		{
-// 			int i;
-// 			double true_far;  /* true frame aspect ratio */
-// 			true_far = 
-// 				(double)(sampleaspect.n * frame_width) /
-// 				(double)(sampleaspect.d * frame_height);
-// 			/* start at '2'... */
-// 			for (i = 2; i < (int)(mpeg_num_aspect_ratios[mpeg_version-1]); i++) 
-// 			{
-// 				double ratio = 
-// 					true_far / Y4M_RATIO_DBL(mpeg_aspect_ratios[mpeg_version-1][i]);
-// 				if ( (ratio > (1.0 - GUESS_ASPECT_TOLERANCE)) &&
-// 					 (ratio < (1.0 + GUESS_ASPECT_TOLERANCE)) )
-// 					return i;
-// 			}
-// 			return 0;
-// 		}
-// 		break;
-// 	default:
-// 		return 0;
-// 		break;
-// 	}
-// }
-// 
-// 
-// 
-// 
-// /*
-//  * Guess the true sample aspect ratio of a video stream,
-//  *  given the MPEG aspect ratio code and the actual frame size
-//  *  (and the MPEG version, 1 or 2).
-//  *
-//  * Returns y4m_sar_UNKNOWN if it has no good guess.
-//  *
-//  */
-// y4m_ratio_t 
-// mpeg_guess_sample_aspect_ratio(int mpeg_version,
-// 							   mpeg_aspect_code_t code,
-// 							   int frame_width, int frame_height)
-// {
-// 	switch (mpeg_version) 
-// 	{
-// 	case 1:
-// 		/* MPEG-1 codes turn into SAR's, just not quite the right ones.
-// 		   For the common/known values, we provide the ratio used in practice,
-// 		   otherwise say we don't know.*/
-// 		switch (code)
-// 		{
-// 		case 1:  return y4m_sar_SQUARE;        break;
-// 		case 3:  return y4m_sar_PAL_16_9;      break;
-// 		case 6:  return y4m_sar_NTSC_16_9;     break;
-// 		case 8:  return y4m_sar_PAL_CCIR601;   break;
-// 		case 12: return y4m_sar_NTSC_CCIR601;  break;
-// 		default:
-// 			return y4m_sar_UNKNOWN;       break;
-// 		}
-// 		break;
-// 	case 2:
-// 		/* MPEG-2 codes turn into Display Aspect Ratios, though not exactly the
-// 		   DAR's used in practice.  For common/standard frame sizes, we provide
-// 		   the original SAR; otherwise, we say we don't know. */
-// 		if (code == 1) 
-// 		{
-// 			return y4m_sar_SQUARE; /* '1' means square *pixels* in MPEG-2 */
-// 		}
-// 		else if ((code >= 2) && (code <= 4))
-// 		{
-//             return y4m_guess_sar(frame_width, frame_height,
-//                                  mpeg2_aspect_ratios[code]);
-// 		} 
-// 		else
-// 		{
-// 			return y4m_sar_UNKNOWN;
-// 		}
-// 		break;
-// 	default:
-// 		return y4m_sar_UNKNOWN;
-// 		break;
-// 	}
-// }
-// 
-// 
-// 
-// 
-// 
-// /*
-//  * Look-up MPEG explanatory definition string for frame rate code
-//  *
-//  */
-// 
-// 
-// const char *
-// mpeg_framerate_code_definition(   mpeg_framerate_code_t code  )
-// {
-// 	if( code == 0 || code >=  mpeg_num_framerates )
-// 		return "UNDEFINED: illegal/reserved frame-rate ratio code";
-// 
-// 	return framerate_definitions[code];
-// }
-// 
-// /*
-//  * Look-up MPEG explanatory definition string aspect ratio code for an
-//  * aspect ratio code
-//  *
-//  */
-// 
-// const char *
-// mpeg_aspect_code_definition( int mpeg_version,  mpeg_aspect_code_t code  )
-// {
-// 	if( mpeg_version < 1 || mpeg_version > 2 )
-// 		return "UNDEFINED: illegal MPEG version";
-// 	
-// 	if( code < 1 || code >=  mpeg_num_aspect_ratios[mpeg_version-1] )
-// 		return "UNDEFINED: illegal aspect ratio code";
-// 
-// 	return aspect_ratio_definitions[mpeg_version-1][code];
-// }
-// 
-// 
-// /*
-//  * Look-up explanatory definition of interlace field order code
-//  *
-//  */
-// 
-// const char *
-// mpeg_interlace_code_definition( int yuv4m_interlace_code )
-// {
-// 	const char *def;
-// 	switch( yuv4m_interlace_code )
-// 	{
-// 	case Y4M_UNKNOWN :
-// 		def = "unknown";
-// 		break;
-// 	case Y4M_ILACE_NONE :
-// 		def = "none/progressive";
-// 		break;
-// 	case Y4M_ILACE_TOP_FIRST :
-// 		def = "top-field-first";
-// 		break;
-// 	case Y4M_ILACE_BOTTOM_FIRST :
-// 		def = "bottom-field-first";
-// 		break;
-// 	default :
-// 		def = "UNDEFINED: illegal video interlacing type-code!";
-// 		break;
-// 	}
-// 	return def;
-// }
-// 
-// 
+
 /* 
  * Local variables:
  *  c-file-style: "stroustrup"
