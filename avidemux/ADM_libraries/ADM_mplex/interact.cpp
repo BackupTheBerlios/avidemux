@@ -114,7 +114,24 @@ void MultiplexJob::GetInputStreams( vector<JobStream *> &res, StreamKind kind )
 }
 
 
+// MEANX
+static const char *kindToString(StreamKind kind)
+{
+#define KID(x)  x##_AUDIO:return #x;
+    switch(kind)
+    {
+        case KID(MPEG)
+       case  KID(AC3)
+        case KID(LPCM)
+        case KID(DTS)
+        default: 
+            printf("Kind %d\n",kind);
+            assert(0);
+    }
+  return "Oops";
+}
 
+// /MEANS
 void MultiplexJob::SetupInputStreams( std::vector< IBitStream *> &inputs )
 {
     IBitStream *bs;
@@ -127,6 +144,34 @@ void MultiplexJob::SetupInputStreams( std::vector< IBitStream *> &inputs )
         bs = inputs[i];
         // Remember the streams initial state...
         bs->PrepareUndo( undo );
+// MEANX : Use the info we have to be sure of the stream type
+// Else we cannot detect safly LPCM/PCM/DTS
+        switch(bs->streamDesc.kind)
+        {
+            case MPEG_AUDIO:
+            case AC3_AUDIO:
+            case LPCM_AUDIO:
+            case DTS_AUDIO:
+                mjpeg_info ("File %s looks like an %s Audio stream (fq %u, channel %u).\n", bs->StreamName() , kindToString(bs->streamDesc.kind),bs->streamDesc.frequency,bs->streamDesc.channel);
+                bs->UndoChanges( undo );
+                streams.push_back( new JobStream( bs, bs->streamDesc.kind) );
+                ++audio_tracks;
+                if(bs->streamDesc.kind==LPCM_AUDIO) 
+                    lpcm_param.push_back(LpcmParams::Checked(  bs->streamDesc.frequency,                                         
+                                                   bs->streamDesc.channel,16));//++lpcm_tracks;
+                continue;
+            case MPEG_VIDEO:
+                mjpeg_info ("File %s looks like an Video stream.", bs->StreamName() );
+                bs->UndoChanges( undo );
+                streams.push_back( new JobStream( bs,MPEG_VIDEO) );
+                ++video_tracks;
+                continue;
+            default: assert(0);
+            
+        }
+    }
+
+#if 0 //MEANX
         if( LPCMStream::Probe( *bs ) )
         {
             mjpeg_info ("File %s looks like an LPCM Audio stream.",
@@ -199,7 +244,7 @@ void MultiplexJob::SetupInputStreams( std::vector< IBitStream *> &inputs )
         mjpeg_error ("File %s unrecogniseable!", bs->StreamName());
         delete bs;
     }
-    
+#endif // MEANX IF 0 
     if( bad_file )
     {
         mjpeg_error_exit1( "Unrecogniseable file(s)... exiting.");

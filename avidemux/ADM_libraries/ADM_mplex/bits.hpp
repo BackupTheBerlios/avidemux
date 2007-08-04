@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 #include <assert.h>
+// MEANX
+#include "streamType.h"
+// /MEANX
 
 typedef uint64_t bitcount_t;
 
@@ -120,10 +123,13 @@ protected:
 class IBitStream : public IBitStreamUndo 
 {
 public:
- 	IBitStream() :
+           mplexStreamDescriptor      streamDesc; //MEANX
+
+ 	IBitStream(mplexStreamDescriptor *desc) :
 		IBitStreamUndo(),
 		streamname( "unnamed" )
 		{
+                streamDesc=*desc; // MEANX
 		}
 	virtual ~IBitStream() { Release(); }
 

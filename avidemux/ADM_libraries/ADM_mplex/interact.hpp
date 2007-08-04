@@ -30,6 +30,9 @@
 #include "stream_params.hpp"
 #include "systems.hpp"
 
+// MEANX
+#include "streamType.h"
+// /MEANX
 class IBitStream;
 
 using std::vector;
@@ -82,7 +85,8 @@ public:
  *
  *
  **********************************************************************/
-
+// MEANX MOVED TO STREAMTYPE.H
+#if 0
 enum StreamKind
   {
     MPEG_AUDIO,
@@ -95,6 +99,8 @@ enum StreamKind
     Z_ALPHA
 #endif
   };
+#endif
+// MEANX MOVED TO STREAMTYPE.H
 
 class JobStream
 {

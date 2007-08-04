@@ -39,7 +39,7 @@ private:
 class IFileBitStream : public IBitStream
 {
 public:
-        IFileBitStream( PacketQueue *inQueue, unsigned int buf_size = BUFFER_SIZE);
+        IFileBitStream( PacketQueue *inQueue, mplexStreamDescriptor *streamDesc,unsigned int buf_size = BUFFER_SIZE);
         ~IFileBitStream();
 
 private:
