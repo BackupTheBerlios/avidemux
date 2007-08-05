@@ -63,7 +63,9 @@ static int _upd_in_progres=0;
 static char     *customNames[ADM_MAC_CUSTOM_SCRIPT];
 static QAction  *customActions[ADM_MAC_CUSTOM_SCRIPT];
 static uint32_t ADM_nbCustom=0;
-
+#ifdef HAVE_AUDIO
+extern uint8_t AVDM_setVolume(int volume);
+#endif
 
 #include "ui_gui2.h"
 
@@ -149,6 +151,18 @@ static Action searchTranslationTable(const char *name);
             HandleAction (ACT_Scale) ;
           }
         }
+      void volumeChange( int u )
+      {
+      #ifdef HAVE_AUDIO
+      
+      if(_upd_in_progres) return;
+       _upd_in_progres++;
+       int vol;
+              vol=ui.horizontalSlider_2->value();
+              AVDM_setVolume( vol);
+       _upd_in_progres--;
+      #endif
+      }
  private slots:
    
 
@@ -182,8 +196,12 @@ MainWindow::MainWindow()     : QMainWindow()
           slider->setMinimum(0);
           slider->setMaximum(1000);
           connect( slider,SIGNAL(valueChanged(int)),this,SLOT(sliderMoved(int)));
-          //connect( slider,SIGNAL(sliderMoved()),this,SLOT(sliderMoved()));
-  
+          // Volume slider
+          QSlider *volSlider=ui.horizontalSlider_2;
+          
+          volSlider->setMinimum(0);
+          volSlider->setMaximum(100);
+          connect( volSlider,SIGNAL(valueChanged(int)),this,SLOT(volumeChange(int)));
           // Add a second toolbar
           QToolBar *toolBarMove;
             toolBarMove = new QToolBar(this);
