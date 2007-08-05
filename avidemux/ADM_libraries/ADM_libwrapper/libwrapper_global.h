@@ -29,9 +29,9 @@ struct ADM_LibWrapperAmrnb* getAmrnbWrapper(void);
 #include "libwrapper_dca.h"
 
 ZZ_PREFIX ADM_LibWrapperDca* dca ZZ_POSTFIX;
+#endif // USE LIBDCA
 
 // funcs
 void initLibWrappers();
 void destroyLibWrappers();
-#endif // USE LIBDCA
 #endif // LIBWRAPPER
