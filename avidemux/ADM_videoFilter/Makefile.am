@@ -62,7 +62,8 @@ ADM_guiResize.cpp \
  ADM_vidYadif.cpp \
  ADM_vidYadif_asm.c \
  ADM_vidAnimated.cpp \
- ADM_vidDvbSub.cpp
+ ADM_vidDvbSub.cpp \
+ ADM_vidLogo.cpp
 			
 
 

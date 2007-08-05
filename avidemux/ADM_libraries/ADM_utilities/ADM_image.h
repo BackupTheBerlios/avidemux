@@ -172,5 +172,5 @@ class ADMImageResizer
 
 // Misc utilities
 uint8_t BitBlit(uint8_t *dst, uint32_t pitchDest,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height);
-
+ADMImage *createImageFromFile(const char *filename);
 #endif

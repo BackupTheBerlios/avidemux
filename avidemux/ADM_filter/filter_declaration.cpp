@@ -152,8 +152,9 @@ printf(  "*********************\n");
 	REGISTERX("ass","ASS","Add ASS/SSA subtitles to the picture.",VF_ASS,1,ass_create,ass_script);
 #endif
         REGISTERX("vobsub","VobSub","Embed VobSub subtitles into picture.",VF_VOBSUB,1,vobsub_create,vobsub_script);
+#ifdef ADM_DEBUG
         REGISTERX("dvbsub","DVB sub","Embed DVB-T subtitle.",VF_DVBSUB,1,dvbsub_create,dvbsub_script);
-        
+#endif
 
         //*********************
  registerFilter("-------- Deblender ---------",VF_INVALID,2,NULL,NULL);
@@ -163,6 +164,7 @@ printf(  "*********************\n");
         REGISTERX("whirl","Whirl","Useless whirlwind effect.",VF_WHIRL,1,whirl_create,whirl_script);
         REGISTERX("mosaic","Mosaic","Split the picture into tiny thumbnails.",VF_MOSAIC,1,     mosaic_create,mosaic_script);
         REGISTERX("mpdelogo","MPlayer delogo","Blend a logo by interpolating its surrounding box.",VF_MPDELOGO,1,mpdelogo_create,mpdelogo_script);
+        REGISTERX("logo","Logo","Add a png as logo.",VF_LOGO,1,logo_create,logo_script);
         REGISTERX("animatedmenu","Animated Menu",
             "Create a video made of 6 mini windows, very useful to do DVD menus.",
             VF_ANIMATED,1,animated_create,animated_script);

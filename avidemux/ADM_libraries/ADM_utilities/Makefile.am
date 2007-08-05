@@ -8,7 +8,7 @@ libADM_library_a_METASOURCES = AUTO
 libADM_library_a_SOURCES = subchunk.cpp  fourcc.cpp broken.cpp \
 		aviio.cpp aviindexer.cpp aviframe.cpp avidemutils.cpp ADM_image.cpp \
 	ADM_fileio.cpp ADM_print.cpp ADM_imageUtils.cpp ADM_bitstream.cpp \
-	ADM_imageResizer.cpp ADM_pp.cpp prefs.cpp
+	ADM_imageResizer.cpp ADM_pp.cpp prefs.cpp ADM_imageLoader.cpp
 
 
 EXTRA_DIST =  ADM_bitstream.cpp  ADM_image.cpp     \

@@ -99,6 +99,7 @@ typedef enum
                 VF_ASS,
                 VF_YADIF,
                 VF_DVBSUB,
+                VF_LOGO,
                 VF_DUMMY,
                 VF_EXTERNAL_START=0xF0000000
           }VF_FILTERS;

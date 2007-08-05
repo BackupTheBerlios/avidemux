@@ -1,0 +1,191 @@
+/***************************************************************************
+
+		Put a logon on video
+
+    copyright            : (C) 2007 by mean
+    email                : fixounet@free.fr
+ ***************************************************************************/
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+/*
+  Initial port from MPlayer by Moonz
+
+*/
+#include "config.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "ADM_assert.h"
+
+#include "default.h"
+
+
+
+#include "ADM_toolkit/toolkit.hxx"
+#include "ADM_editor/ADM_edit.hxx"
+#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_video/ADM_vidCommonFilter.h"
+#include "ADM_filter/video_filters.h"
+#include "ADM_colorspace/ADM_rgb.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+
+static FILTER_PARAM logoParam={4,
+        { /* float */ "image",
+          /*float*/ "x",
+          /* int */ "y",
+          /* int */ "alpha"}};
+
+
+typedef struct 
+{
+		char *image;
+		uint32_t x,y;
+		uint32_t alpha;
+}PARAM_LOGO;
+
+
+class ADMVideoLogo : public AVDMGenericVideoStream
+{
+  
+	PARAM_LOGO   *_param;
+	ADMImage	 *_image;
+	uint32_t	 _inited;
+	uint8_t		 init(void);
+	uint8_t		 cleanup(void);
+  public:
+                                
+	  				ADMVideoLogo(AVDMGenericVideoStream *in,CONFcouple *couples);    
+                    ~ADMVideoLogo(void);
+    uint8_t         getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+                                          ADMImage *data,uint32_t *flags);
+        
+    char            *printConf( void );
+    uint8_t         configure(AVDMGenericVideoStream *in);
+    uint8_t         getCoupledConf( CONFcouple **couples);
+};
+SCRIPT_CREATE(logo_script,ADMVideoLogo,logoParam);
+BUILD_CREATE(logo_create,ADMVideoLogo);
+
+//***********************************
+char *ADMVideoLogo::printConf() 
+{
+      static char buf[50];
+      snprintf((char *)buf,50,"Logo at %u %u, alpha %u",_param->x,_param->y);;
+      return buf;
+}
+
+
+uint8_t ADMVideoLogo::configure(AVDMGenericVideoStream * instream)
+{
+ 
+
+     return 1;
+}
+
+//_______________________________________________________________
+
+ADMVideoLogo::ADMVideoLogo(AVDMGenericVideoStream *in, CONFcouple *couples) 
+{
+        _in=in;		
+        memcpy(&_info,_in->getInfo(),sizeof(_info));
+        _param = new PARAM_LOGO;
+        ADM_assert(_param);
+        
+        
+        if(couples) {
+        
+                GET(image)
+                GET(x)
+                GET(y)
+                GET(alpha)
+        }	
+        else {
+        	 		_param->image=ADM_strdup("/work/samples/r01.jpg");
+        	 		_param->x=0;
+        	 		_param->y=0;
+        	 		_param->alpha=255;
+        }
+        _image=NULL;
+        _inited=init();
+        
+        
+        _info.encoding=1;
+
+}
+// **********************************
+uint8_t ADMVideoLogo::init(void)
+{
+		cleanup();
+		_image=createImageFromFile(_param->image);
+		if(_image) return 1;
+        return 0;
+} 
+// **********************************
+uint8_t ADMVideoLogo::cleanup(void)
+{
+	if(_image) delete _image;
+	_image=NULL;
+	
+	return 1;
+} 
+
+//*******************************************
+ADMVideoLogo::~ADMVideoLogo() 
+{
+    
+      
+      if(_param) 
+      {
+    	 if(_param->image) delete _param->image;
+    	 _param->image=NULL;
+    	 delete _param;
+    	 _param=NULL;
+      }
+      cleanup();
+
+}
+//*******************************************
+uint8_t ADMVideoLogo::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len, ADMImage *data, uint32_t *flags) 
+{
+       
+
+        if(frame>=_info.nb_frames)
+        {
+          printf("[Logo] out of bound %u/%u\n",frame,_info.nb_frames); 
+          return 0;
+        }
+        ADM_assert(_param);
+
+        if(!_in->getFrameNumberNoAlloc(frame, len, data, flags))
+                return 0;
+
+        if(!_image)
+        {
+        	printf("[LOGO] No image to put\n");
+        	return 1;
+        }
+        // No alpha ATM
+        _image->copyTo(data,_param->x,_param->y);
+        return 1;
+}
+
+uint8_t	ADMVideoLogo::getCoupledConf(CONFcouple **couples) 
+{
+        *couples=new CONFcouple(4);
+
+#define COUPLE_SET(x) (*couples)->setCouple((char *)#x,(_param->x));
+        COUPLE_SET(image)
+        COUPLE_SET(x)
+        COUPLE_SET(y)
+        COUPLE_SET(alpha)
+        return 1;
+}
+/************************************************/
+//EOF
