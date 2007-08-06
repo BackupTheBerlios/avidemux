@@ -24,7 +24,7 @@
 #include <string.h>
 #include <math.h>
 
-#ifdef USE_FFMPEG
+
 #include <ADM_assert.h>
 
 #include "ADM_lavcodec.h"
@@ -75,6 +75,7 @@ extern "C"
 uint8_t decoderFF::clonePic (AVFrame * src, ADMImage * out)
 {
   uint32_t    u,v;
+  ADM_assert(out->_isRef);
   out->_planes[0] = (uint8_t *) src->data[0];
   out->_planeStride[0] = src->linesize[0];
   if (_swapUV)
@@ -713,6 +714,4 @@ void adm_lavLogCallback(void  *instance, int level, const char* fmt, va_list lis
     vsnprintf(buf, sizeof(buf), fmt, list);
     printf("[LAV] %s\n",buf);
 }
-
-
-#endif
+// EOF
