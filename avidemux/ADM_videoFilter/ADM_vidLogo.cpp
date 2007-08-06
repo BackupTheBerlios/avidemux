@@ -84,9 +84,20 @@ char *ADMVideoLogo::printConf()
 
 uint8_t ADMVideoLogo::configure(AVDMGenericVideoStream * instream)
 {
- 
-
-     return 1;
+#define PX(x) &(_param->x)
+	   diaElemFile       file(0,(char **)PX(image),_("_Logo (jpg file):"));
+	   diaElemUInteger   positionX(PX(x),_("_X Position:"),0,_info.width);
+	   diaElemUInteger   positionY(PX(y),_("_Y Position:"),0,_info.height);
+	   diaElemUInteger   alpha(PX(alpha),_("_Alpha:"),0,255);
+	    
+	   diaElem *elems[4]={&file,&positionX,&positionY,&alpha};
+	  
+	   if( diaFactoryRun("Logo",4,elems))
+	   {
+		   init();
+		   return 1;
+	   }
+	   return 0;
 }
 
 //_______________________________________________________________

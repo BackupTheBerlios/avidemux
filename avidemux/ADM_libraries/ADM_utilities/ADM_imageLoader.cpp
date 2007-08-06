@@ -1,5 +1,5 @@
 /***************************************************************************
-    copyright            : (C) 2003-2005 by mean
+    copyright            : (C) 2007 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -29,13 +29,10 @@
 
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_ffmp43.h"
+#include "ADM_toolkit/toolkit.hxx"
 
 
-/*
- * 	\fn 	createImageFromFile
- *  \brief 	Create an image from a file. Only jpg supporter ATM
- * 
- */
+
 static uint8_t read8(FILE *fd)
 {
 	return fgetc(fd);
@@ -49,7 +46,11 @@ static uint32_t read16(FILE *fd)
 	return (a<<8)+b;
 		
 }
+/*
+		\fn 	createImageFromFile
+		\brief 	Create and returns an ADMImage from a file, only YV12 jpg supported ATM
 
+*/
 ADMImage *createImageFromFile(const char *filename)
 {
 		int32_t nnum;
@@ -133,8 +134,8 @@ ADMImage *createImageFromFile(const char *filename)
 		    fread(data,_imgSize,1,fd);
 		    fclose(fd);
 		  //
-		    ADMImage *image=new ADMImage(w,h);
-		    ADMImage tmpImage(w,h);
+		    
+		    ADMImage tmpImage(w,h,1); // It is a reference image
 		    // Now unpack it ...
 		    decoderFFMJPEG *decoder=new decoderFFMJPEG(w,h);
 		    ADMCompressedImage bin;
@@ -142,15 +143,21 @@ ADMImage *createImageFromFile(const char *filename)
 		    bin.dataLength=_imgSize; // This is more than actually, but who cares...
 		    
 		    decoder->uncompress (&bin, &tmpImage);
-		    
+		    //
+		    ADMImage *image=NULL;
+		    if(tmpImage._colorspace==ADM_COLOR_YV12)
+		    {
+		    	GUI_Error_HIG(_("Wrong Colorspace"),_("Only YV12/I420 JPegs are supported"));
+		    }else
+		    {		    
+		    		image=new ADMImage(w,h);
+		    		image->duplicate(&tmpImage);
+		    }
+		    // Cannot destroy decoder earlier as tmpImage has pointers to its internals
 		    delete decoder;
 		    decoder=NULL;
-		    //
-		    image->duplicate(&tmpImage);
-		   // 
 		    delete [] data;
-		    return image;
-		
+		    return image;		
 }
 
 //EOF
