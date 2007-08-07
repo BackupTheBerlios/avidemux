@@ -133,6 +133,7 @@ public:
         uint8_t substract(ADMImage *src1,ADMImage *src2);
         uint8_t blacken(void);
         uint8_t copyTo(ADMImage *target, uint32_t x, uint32_t y);
+        uint8_t copyToAlpha(ADMImage *target, uint32_t x, uint32_t y,uint32_t alpha);
         uint8_t pack(uint8_t invertChroma);     /// Transfer data from planes to regular packed space
         
         /* Some utilitarian functions */
@@ -172,5 +173,7 @@ class ADMImageResizer
 
 // Misc utilities
 uint8_t BitBlit(uint8_t *dst, uint32_t pitchDest,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height);
+uint8_t BitBlitAlpha(uint8_t *dst, uint32_t pitchDst,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height,uint32_t alpha);
+
 ADMImage *createImageFromFile(const char *filename);
 #endif

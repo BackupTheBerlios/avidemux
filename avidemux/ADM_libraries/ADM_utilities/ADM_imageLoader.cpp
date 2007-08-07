@@ -145,7 +145,7 @@ ADMImage *createImageFromFile(const char *filename)
 		    decoder->uncompress (&bin, &tmpImage);
 		    //
 		    ADMImage *image=NULL;
-		    if(tmpImage._colorspace==ADM_COLOR_YV12)
+		    if(tmpImage._colorspace!=ADM_COLOR_YV12)
 		    {
 		    	GUI_Error_HIG(_("Wrong Colorspace"),_("Only YV12/I420 JPegs are supported"));
 		    }else

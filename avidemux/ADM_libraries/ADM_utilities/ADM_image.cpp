@@ -319,6 +319,66 @@ uint8_t ADMImage::copyTo(ADMImage *dest, uint32_t x,uint32_t y)
     return 1;
 
 }
+/*
+    \fn    copyToAlpha
+    \brief Copy "this" image into dest image at x,y position using alpha alpha
+    @param alpha alpha value (0--255)
+
+*/
+uint8_t ADMImage::copyToAlpha(ADMImage *dest, uint32_t x,uint32_t y,uint32_t alpha)
+{
+      
+    uint32_t box_w=_width, box_h=_height;
+    // Clip if needed
+    if(y>dest->_height)
+    {
+        printf("Y out : %u %u\n",y,dest->_height);
+         return 1;
+    }
+    if(x>dest->_width) 
+    {
+        printf("X out : %u %u\n",x,dest->_width);
+         return 1;
+    }
+    
+    if(x+box_w>dest->_width) box_w=dest->_width-x;
+    if(y+box_h>dest->_height) box_h=dest->_height-y;
+
+    // do y
+    BitBlitAlpha(YPLANE(dest)+x+dest->_width*y,dest->_width,         data,_width,            box_w,box_h,alpha);
+    // Do u
+    BitBlitAlpha(UPLANE(dest)+x/2+(dest->_width*y)/4,dest->_width/2,   UPLANE(this),_width>>1,  box_w>>1,box_h>>1,alpha);
+    // and V
+    BitBlitAlpha(VPLANE(dest)+x/2+(dest->_width*y)/4,dest->_width/2, VPLANE(this),_width>>1, box_w>>1,box_h>>1,alpha);
+
+
+    return 1;
+
+}
+/**
+ * 		\fn BitBlitAlpha
+ * 		\brief Alpha blit from dst to src
+ */
+uint8_t BitBlitAlpha(uint8_t *dst, uint32_t pitchDst,uint8_t *src,uint32_t pitchSrc,
+		uint32_t width, uint32_t height,uint32_t alpha)
+{
+    
+    for(int y=0;y<height;y++)
+    {
+    	for(int x=0;x<width;x++)
+    	{
+    		uint32_t s=src[x],d=dst[x];
+    		
+    		d=s*alpha+(255-alpha)*d;
+    		d>>=8;
+    		dst[x]=d;
+    	}
+        src+=pitchSrc;
+        dst+=pitchDst;   
+    }
+    return 1;
+}
+
 uint8_t BitBlit(uint8_t *dst, uint32_t pitchDst,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height)
 {
     

@@ -183,7 +183,7 @@ uint8_t ADMVideoLogo::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len, ADMIm
         	return 1;
         }
         // No alpha ATM
-        _image->copyTo(data,_param->x,_param->y);
+        _image->copyToAlpha(data,_param->x,_param->y,_param->alpha);
         return 1;
 }
 
