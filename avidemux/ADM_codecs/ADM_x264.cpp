@@ -61,14 +61,6 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
 
   printf ("Opening X264 for %lu x %lu\n", _w, _h);
 
-  param.cpu = 0;
-#define ADX_CHECK(x)  if(CpuCaps::has##x()) param.cpu|=X264_CPU_##x;
-  ADX_CHECK (MMX);
-  ADX_CHECK (SSE);
-  ADX_CHECK (SSE2);
-  ADX_CHECK (MMXEXT);
-  ADX_CHECK (3DNOW);
-
   param.i_threads = zparam->nbThreads;
   param.i_width = _w;
   param.i_height = _h;
