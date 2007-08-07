@@ -71,13 +71,12 @@ ADM_editor
 ADM_audiocodec 
 ADM_audio
 ADM_script 
-
 ADM_videoFilter
 ADM_filter
 ADM_video 
-ADM_colorspace 
 ADM_audiodevice
 ADM_ocr  
+ADM_colorspace 
 )
 
 
@@ -181,6 +180,7 @@ ADM_libwrapper
 ADM_lvemux
 ADM_smjs
 ADM_utilities
+ADM_colorspace 
 ADM_xvidratectl
 ADM_libpostproc
 )

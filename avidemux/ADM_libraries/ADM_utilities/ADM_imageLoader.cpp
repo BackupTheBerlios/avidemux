@@ -30,9 +30,9 @@
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_ffmp43.h"
 #include "ADM_toolkit/toolkit.hxx"
-
-
-
+//**********************************
+static ADMImage *createImageFromFile_jpeg(const char *filename);
+//***********************************
 static uint8_t read8(FILE *fd)
 {
 	return fgetc(fd);
@@ -53,12 +53,9 @@ static uint32_t read16(FILE *fd)
 */
 ADMImage *createImageFromFile(const char *filename)
 {
-		int32_t nnum;
 	    uint32_t *fcc;
 	    uint8_t fcc_tab[4];
 	    FILE *fd;
-	    uint32_t _imgSize;
-	    uint32_t w = 0, h = 0;
 
 	    // 1- identity the file type
 	    //
@@ -71,13 +68,25 @@ ADMImage *createImageFromFile(const char *filename)
 	    }
 	    fread(fcc_tab, 4, 1, fd);
 	    fclose(fd);
-	   if (fcc_tab[0] == 0xff && fcc_tab[1] == 0xd8) 
-	   {
-		
-		} else {
-			printf("[imageLoader] Unrecognized file!\n");
-			return NULL;
-		    }
+	    if (fcc_tab[0] == 0xff && fcc_tab[1] == 0xd8) 
+	    {
+		   	return createImageFromFile_jpeg(filename);
+		} 
+	    printf("[imageLoader] Unrecognized file!\n");
+	    return NULL;
+}
+/**
+ * 	\fn createImageFromFile_jpeg
+ *  \brief Create image from jpeg file
+ */
+ADMImage *createImageFromFile_jpeg(const char *filename)
+{
+	
+	FILE *fd;
+	uint32_t _imgSize;
+	uint32_t w = 0, h = 0;
+	   
+
 		fd = fopen(filename, "rb");
 		fseek(fd, 0, SEEK_END);
 		_imgSize = ftell(fd);
@@ -145,13 +154,24 @@ ADMImage *createImageFromFile(const char *filename)
 		    decoder->uncompress (&bin, &tmpImage);
 		    //
 		    ADMImage *image=NULL;
-		    if(tmpImage._colorspace!=ADM_COLOR_YV12)
+		    switch(tmpImage._colorspace)
 		    {
-		    	GUI_Error_HIG(_("Wrong Colorspace"),_("Only YV12/I420 JPegs are supported"));
-		    }else
-		    {		    
-		    		image=new ADMImage(w,h);
-		    		image->duplicate(&tmpImage);
+		    case ADM_COLOR_YV12:
+		    {
+		    	printf("[imageLoader] YV12\n");
+	    		image=new ADMImage(w,h);
+	    		image->duplicate(&tmpImage);
+	    		break;
+		    }
+		    case ADM_COLOR_YUV422:
+		    {
+		    	printf("[imageLoader] YUY2\n");
+		    	image=new ADMImage(w,h);
+		    	COL_422_YV12(tmpImage._planes, tmpImage._planeStride,  image->data,w,h);
+		    	break;
+		    }
+		    default:
+		    	GUI_Error_HIG(_("Wrong Colorspace"),_("Only YV12/I420 or YUY2/I422 JPegs are supported"));
 		    }
 		    // Cannot destroy decoder earlier as tmpImage has pointers to its internals
 		    delete decoder;
