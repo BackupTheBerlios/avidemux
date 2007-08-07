@@ -423,7 +423,7 @@ char     *globalGlyphName=NULL;
                 // Alternate mp3 tag (haali)
                 prefs->set(FEATURE_ALTERNATE_MP3_TAG,alternate_mp3_tag);
 
-			#ifdef ADM_WIN32
+			#if defined(ADM_WIN32) && defined(USE_SDL)
 				// Initialise SDL again as driver may have changed
 				initSdl();
 			#endif
