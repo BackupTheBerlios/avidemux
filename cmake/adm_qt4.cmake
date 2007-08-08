@@ -1,13 +1,21 @@
+SET(VERBATIM "VERBATIM")
+
+# Cygwin and MSYS require escaping but standalone MinGW doesn't.
+# Since CMake doesn't provide a way of detecting MSYS, check for
+# sh.exe in the path.  MinGW makefiles can't be genereated if sh
+# is in the path.
+IF(MINGW)
+	FIND_PROGRAM(SH_EXECUTABLE NAMES sh)
+	
+	IF(NOT SH_EXECUTABLE)   # if not Cygwin or MSYS
+		SET(VERBATIM "")
+	ENDIF(NOT SH_EXECUTABLE)
+ENDIF(MINGW)
+
 ##############################################################"
 # FOR AQ
 # Q_foo.cpp and foo.ui => AQ_foo.cpp, ui_foo.h and Q_foo.moc
 ##############################################################"
-IF(WIN32)
-	SET(VERBATIM "")
-ELSE(WIN32)
-	SET(VERBATIM "VERBATIM")
-ENDIF(WIN32)
-
 MACRO(Q_UIMOCIFY _source)
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/AQ_${_source}.cpp
                      COMMAND  ${QT_UIC_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${_source}.ui -o ui_${_source}.h
