@@ -26,6 +26,13 @@
 #include <math.h>
 
 #include "ADM_utilities/default.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+extern "C" {
+#include "ADM_lavcodec/avcodec.h"
+}
+#endif
+#include "ADM_libswscale/swscale.h"
 
 
 #include "colorspace.h"
@@ -200,4 +207,78 @@ uint8_t COL_YuvToRgb( uint8_t y,int8_t u,int8_t v,uint8_t *r,uint8_t *g,uint8_t 
 	return 1;
 
 }
+/**
+ * 		\fn COL_RGB24_to_YV12
+ *		\brief Convert RGB to YV12 using swscale
+ */
+uint8_t COL_RGB24_to_YV12_revert(uint32_t w,uint32_t h,uint8_t *rgb, uint8_t *yuv)
+{
+	int flags = SWS_SPLINE;
+	struct SwsContext *context=NULL;
+	
+	#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+		#define ADD(x, y) if (CpuCaps::has##x()) flags |= SWS_CPU_CAPS_##y;
 
+		ADD(MMX,MMX);
+		ADD(3DNOW,3DNOW);
+		ADD(MMXEXT,MMX2);
+	#endif
+
+	#ifdef USE_ALTIVEC
+	    flags |= SWS_CPU_CAPS_ALTIVEC;
+	#endif
+	    context = sws_getContext(w, h,
+	    									  PIX_FMT_RGB24,
+	    									  w, h,
+	    									  PIX_FMT_YUV420P,
+	    									  flags, NULL, NULL,NULL);
+	    ADM_assert(context);
+	
+	    uint8_t *src[3]={rgb+w*h*3-w*3,NULL,NULL};
+	    int srcStride[3]={-w*3,0,0};
+	    int dstStride[3]={w,w>>1,w>>1};
+	    uint8_t *dst[3]={yuv,yuv+w*h,yuv+((w*h*5)>>2)};
+//	    int sws_scale(struct SwsContext *context, uint8_t* src[], int srcStride[], int srcSliceY,
+//	                  int srcSliceH, uint8_t* dst[], int dstStride[]);	    
+	    sws_scale(context, src, srcStride, 0, h, dst, dstStride);
+	    
+		sws_freeContext(context);
+}
+/**
+ * 		\fn COL_RGB24_to_YV12
+ *		\brief Convert RGB to YV12 using swscale
+ */
+uint8_t COL_RGB24_to_YV12(uint32_t w,uint32_t h,uint8_t *rgb, uint8_t *yuv)
+{
+	int flags = SWS_SPLINE;
+	struct SwsContext *context=NULL;
+	
+	#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+		#define ADD(x, y) if (CpuCaps::has##x()) flags |= SWS_CPU_CAPS_##y;
+
+		ADD(MMX,MMX);
+		ADD(3DNOW,3DNOW);
+		ADD(MMXEXT,MMX2);
+	#endif
+
+	#ifdef USE_ALTIVEC
+	    flags |= SWS_CPU_CAPS_ALTIVEC;
+	#endif
+	    context = sws_getContext(w, h,
+	    									  PIX_FMT_RGB24,
+	    									  w, h,
+	    									  PIX_FMT_YUV420P,
+	    									  flags, NULL, NULL,NULL);
+	    ADM_assert(context);
+	
+	    uint8_t *src[3]={rgb,NULL,NULL};
+	    int srcStride[3]={w*3,0,0};
+	    int dstStride[3]={w,w>>1,w>>1};
+	    uint8_t *dst[3]={yuv,yuv+((w*h*5)>>2),yuv+w*h};
+//	    int sws_scale(struct SwsContext *context, uint8_t* src[], int srcStride[], int srcSliceY,
+//	                  int srcSliceH, uint8_t* dst[], int dstStride[]);	    
+	    sws_scale(context, src, srcStride, 0, h, dst, dstStride);
+	    
+		sws_freeContext(context);
+}
+//EOF

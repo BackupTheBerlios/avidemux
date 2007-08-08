@@ -21,6 +21,7 @@
 
 #include "ADM_lavcodec.h"
 #include "ADM_utilities/default.h"
+#include "ADM_utilities/fourcc.h"
 
 #include "ADM_colorspace/colorspace.h"
 
@@ -29,9 +30,14 @@
 
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_ffmp43.h"
+#include "ADM_codecs/ADM_png.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_toolkit/bitmap.h"
 //**********************************
 static ADMImage *createImageFromFile_jpeg(const char *filename);
+static ADMImage *createImageFromFile_Bmp(const char *filename);
+static ADMImage *createImageFromFile_Bmp2(const char *filename);
+static ADMImage *createImageFromFile_png(const char *filename);
 //***********************************
 static uint8_t read8(FILE *fd)
 {
@@ -46,6 +52,18 @@ static uint32_t read16(FILE *fd)
 	return (a<<8)+b;
 		
 }
+static uint32_t read32(FILE *fd)
+{
+	uint32_t a,b,c,d;
+	
+	a=fgetc(fd);
+	b=fgetc(fd);
+	c=fgetc(fd);
+	d=fgetc(fd);
+	return (a<<24)+(b<<16)+(c<<8)+d;
+		
+}
+
 /*
 		\fn 	createImageFromFile
 		\brief 	Create and returns an ADMImage from a file, only YV12 jpg supported ATM
@@ -67,11 +85,28 @@ ADMImage *createImageFromFile(const char *filename)
 	    	return NULL;
 	    }
 	    fread(fcc_tab, 4, 1, fd);
+	    fcc = (uint32_t *) fcc_tab;
 	    fclose(fd);
 	    if (fcc_tab[0] == 0xff && fcc_tab[1] == 0xd8) 
 	    {
 		   	return createImageFromFile_jpeg(filename);
 		} 
+	    if (fourCC::check(*fcc, (uint8_t *) "RIFF")) 
+	    {
+	    	printf("[imageLoader] It looks like BMP (RIFF)...\n");
+	    	return createImageFromFile_Bmp(filename);
+	     }
+	    if (fcc_tab[0] == 'B' && fcc_tab[1] == 'M') 
+	    {
+	    	printf("[imageLoader] It looks like BMP2 (BM)...\n");
+	    	return createImageFromFile_Bmp2(filename);
+
+	    	} 
+	    if (fcc_tab[1] == 'P' && fcc_tab[2] == 'N' && fcc_tab[3] == 'G') 
+	    {
+	    	printf("[imageLoader] It looks like PNG...\n");
+	    	return createImageFromFile_png(filename);	    	
+	    }
 	    printf("[imageLoader] Unrecognized file!\n");
 	    return NULL;
 }
@@ -178,6 +213,159 @@ ADMImage *createImageFromFile_jpeg(const char *filename)
 		    decoder=NULL;
 		    delete [] data;
 		    return image;		
+}
+/**
+ * 	\fn createImageFromFile_jpeg
+ *  \brief Create image from Bmp
+ */
+ADMImage *createImageFromFile_Bmp(const char *filename)
+{
+	
+	FILE *fd;
+	uint32_t _imgSize;
+	uint32_t w = 0, h = 0;
+    uint16_t  s16;
+    uint32_t s32;
+
+		fd = fopen(filename, "rb");
+		fseek(fd, 0, SEEK_END);
+		_imgSize = ftell(fd);
+		fseek(fd, 0, SEEK_SET);
+
+		//Retrieve width & height
+		//_______________________
+		   		BITMAPHEADER bmph;
+
+			    fread(&s16, 2, 1, fd);
+			    if (s16 != 0x4D42) 
+			    {
+			    	printf("[imageLoader] incorrect bmp sig.\n");
+			    	fclose(fd);
+			    	return NULL;
+			    }
+			    fread(&s32, 4, 1, fd);
+			    fread(&s32, 4, 1, fd);
+			    fread(&s32, 4, 1, fd);
+			    fread(&bmph, sizeof(bmph), 1, fd);
+			    if (bmph.compressionScheme != 0) 
+			    {
+			    	printf("[imageLoader]cannot handle compressed bmp\n");
+			    	fclose(fd);
+			    	return NULL;
+			    }
+			    
+			    w = bmph.width;
+			    h = bmph.height;
+			    
+			    
+			    printf("[ImageLoader] BMP %u * %u\n",w,h);
+
+		// Load the binary coded image
+		    uint8_t *data=new uint8_t[w*h*3];
+		    fread(data,w*h*3,1,fd);
+		    fclose(fd);
+		    
+		  // Colorconversion
+		    
+		    	ADMImage *image=new ADMImage(w,h);
+		    	COL_RGB24_to_YV12( w, h,data,image->data);
+		    
+		    delete [] data;
+		    return image;		
+}
+/**
+ * 	\fn createImageFromFile_bmp2
+ *  \brief Create image from Bmp2 (BM6)
+ */
+ADMImage *createImageFromFile_Bmp2(const char *filename)
+{
+    
+	BITMAPHEADER bmph;
+    uint8_t fcc_tab[4];
+    uint32_t offset;
+    FILE *fd=NULL;
+    uint32_t w,h;
+
+		fd = fopen(filename, "rb");
+ 	    fseek(fd, 10, SEEK_SET);
+
+ #define MK32() (fcc_tab[0]+(fcc_tab[1]<<8)+(fcc_tab[2]<<16)+ \
+ 						(fcc_tab[3]<<24))
+
+ 	    fread(fcc_tab, 4, 1, fd);
+ 	    offset = MK32();
+ 	    // size, width height follow as int32 
+ 	    fread(&bmph, sizeof(bmph), 1, fd);
+ #ifdef ADM_BIG_ENDIAN
+ 	    Endian_BitMapInfo(&bmph);
+ #endif
+ 	    if (bmph.compressionScheme != 0) 
+ 	    {
+ 	    	printf("[imageLoader] BMP2:Cannot handle compressed bmp\n");
+ 	    	fclose(fd);
+ 	    	return NULL;
+ 	    }
+ 	    w = bmph.width;
+ 	    h = bmph.height;
+ 	    printf("[imageLoader] BMP2 W: %d H: %d offset : %d\n", w, h, offset);
+// Load the binary coded image
+ 	fseek(fd,offset,SEEK_SET);
+    uint8_t *data=new uint8_t[w*h*3];
+    fread(data,w*h*3,1,fd);
+    fclose(fd);
+    
+  // Colorconversion
+    
+    	ADMImage *image=new ADMImage(w,h);
+    	COL_RGB24_to_YV12_revert( w, h,data,image->data);
+    
+    	delete [] data;
+    	return image;		
+}
+/**
+ * 	\fn createImageFromFile_png
+ *  \brief Create image from PNG
+ */
+ADMImage *createImageFromFile_png(const char *filename)
+{
+    
+	BITMAPHEADER bmph;
+    uint8_t fcc_tab[4];
+    uint32_t offset,size;
+    FILE *fd=NULL;
+    uint32_t w,h;
+
+		fd = fopen(filename, "rb");
+ 	    fseek(fd, 0, SEEK_END);
+ 	    size=ftell(fd);
+ 	   fseek(fd, 0, SEEK_SET);
+ 	   read32(fd);
+ 	   read32(fd);
+ 	   read32(fd);
+ 	   read32(fd);
+ 	   w=read32(fd);
+ 	   h=read32(fd);
+ 	   fseek(fd,0,SEEK_SET);
+ 	   uint8_t *data=new uint8_t[size];
+ 	   fread(data,size,1,fd);
+ 	   fclose(fd);
+    
+  
+    
+ 	   ADMImage tmpImage(w,h,1);
+    	// Decode PNG
+    	decoderPng decoder(w,h);
+    	ADMCompressedImage bin;
+    	bin.data=data;
+    	bin.dataLength=size; // This is more than actually, but who cares...
+    			    
+    	decoder.uncompress (&bin, &tmpImage);
+    	
+    	ADMImage *image=new ADMImage(w,h);
+    	COL_RGB24_to_YV12( w, h,tmpImage._planes[0],image->data);
+    
+    	delete [] data;
+    	return image;		
 }
 
 //EOF
