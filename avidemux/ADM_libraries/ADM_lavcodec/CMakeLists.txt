@@ -38,7 +38,7 @@ IF(ARCH_X86)
 SET(${ADM_LIB}_SRCS  ${${ADM_LIB}_SRCS}
                         i386/cputest.c     
 			i386/mpegvideo_mmx.c     i386/vp3dsp_mmx.c 
-			i386/dsputil_mmx.c  i386/idct_mmx.c  
+			i386/dsputil_mmx.c   
 			i386/fdct_mmx.c   i386/motion_est_mmx.c  i386/simple_idct_mmx.c 
 			i386/fft_sse.c i386/vp3dsp_sse2.c  
 			i386/idct_mmx_xvid.c i386/fft_3dn2.c 

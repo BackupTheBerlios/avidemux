@@ -184,9 +184,6 @@
 /* stricter prototyping */
 #cmakedefine ICONV_NEED_CONST
 
-/* SSE on Cywin */
-#cmakedefine MEMALIGN_HACK
-
 /* use classing FAAD support */
 #cmakedefine OLD_FAAD_PROTO
 
