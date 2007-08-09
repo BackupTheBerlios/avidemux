@@ -4,10 +4,10 @@
 #cmakedefine ACCEL_DETECT
 
 #if ${WIN32_DEF}
-#define rindex ADM_rindex
-#define index ADM_index
-#define ftello ftello_adm
-#define fseeko fseeko_adm
+#define rindex strrchr
+#define index strchr
+#define ftello ftello64
+#define fseeko fseeko64
 #endif
 /* Big endian CPU - SPARC or PowerPC */
 #cmakedefine ADM_BIG_ENDIAN
@@ -520,18 +520,3 @@
 
 /* Define to 1 if the X Window System is missing or not being used. */
 #cmakedefine X_DISPLAY_MISSING
-
-/* "" */
-#cmakedefine fseeko
-
-/* "" */
-#cmakedefine ftello
-
-/* "rindex does not exist on Cygwin" */
-#cmakedefine index
-
-/* roundup function */
-#cmakedefine restrict
-
-/* "rindex does not exist on Cygwin" */
-#cmakedefine rindex

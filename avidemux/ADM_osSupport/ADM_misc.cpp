@@ -245,33 +245,7 @@ void  LowerCase(char *string)
         }
 
 }
-// Does not exist in cygwin
-char *ADM_rindex(const char *s, int c)
-{
-      if(!s) return NULL;
-      if(!*s) return NULL;
-      uint32_t l=strlen(s)-1;
-      while(l)
-      {
-              if(s[l]==c) return (char *)(s+l);
-              l--;
-      }
-      return NULL;
-}
-// Does not exist in cygwin
-char  *ADM_index(const char *s, int c)
-{
-      if(!s) return NULL;
-      if(!*s) return NULL;
-      uint32_t m=strlen(s);
-      uint32_t l=0;
-      while(l<m)
-      {
-              if(s[l]==c) return (char *)(s+l);
-              l++;
-      }
-      return NULL;
-}
+
 uint8_t         ADM_fileExist(char *name)
 {
 FILE *file;
