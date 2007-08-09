@@ -45,10 +45,8 @@ SET(USE_FFMPEG    1)
 SET(USE_MJPEG    1)
 SET(USE_LIBXML2    1)
 SET(HAVE_LRINTF    1)
-SET(EMULATE_FAST_INT    1)
+SET(HAVE_FAST_UNALIGNED 1)
 SET(RUNTIME_CPUDETECT    1)
-
-
 
 ########################################
 # taist : Should fail!
@@ -390,8 +388,6 @@ MESSAGE("<CPU:${CMAKE_SYSTEM_PROCESSOR}>")
    SET(ARCH_X86    1)
    SET(HAVE_MMX    1)
    SET(ENABLE_MMX    1)
-   SET(ARCH_X86    1)
-   SET(HAVE_MMX    1)
    SET(ARCH_X86_32    1)
    SET(FPM_INTEL    1)
    SET(MEMALIGN_HACK    1)
@@ -425,6 +421,11 @@ MESSAGE("<CPU:${CMAKE_SYSTEM_PROCESSOR}>")
          SET(ENABLE_MMX    1)
      endif( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "amd64")
  endif(WIN32)
+ 
+ IF (ARCH_X86_64)
+	SET(HAVE_FAST_64BIT 1)	# FFMPEG
+ ENDIF (ARCH_X86_64)
+	
 MESSAGE(STATUS "<End of CPU and OS Check>")
 MESSAGE(STATUS "<******************************>")
 #

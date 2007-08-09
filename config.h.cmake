@@ -15,12 +15,8 @@
 #define PACKAGE   "avidemux"
 #define ADMLOCALE "${ADM_LOCALE}"
 
-/* If we need to explictely link to iconv */
-#cmakedefine NEEED_LIBICONV
-
 /* BSD OS specific ifdef */
 #cmakedefine ADM_BSD_FAMILY
-
 
 #cmakedefine HAVE_AUDIO
 
@@ -276,6 +272,10 @@
 
 /* Define to 1 if you have the <faad.h> header file. */
 #cmakedefine HAVE_FAAD_H
+
+/* FFMPEG */
+#cmakedefine HAVE_FAST_UNALIGNED
+#cmakedefine HAVE_FAST_64BIT
 
 /* "FontConfig detected" */
 #cmakedefine HAVE_FONTCONFIG
