@@ -67,7 +67,8 @@ ADM_guiResize.cpp \
  ADM_vidHue.cpp \
  ADM_vidSRT.cpp \
  ADM_vidSRTload.cpp \
- ADM_vidSRTRender.cpp
+ ADM_vidSRTRender.cpp \
+ ADM_vidCrop.cpp       
 			
 
 

@@ -11,7 +11,6 @@ libADM_video_a_SOURCES = \
  ADM_vidPartial.cpp \
  ADM_vidFont.cpp \
  ADM_vidContrast.cpp \
- ADM_vidCrop.cpp \
  ADM_vidNull.cpp \
 	ADM_vidClean.cpp \
  ADM_genvideo.cpp \
@@ -81,7 +80,7 @@ ADM_vidCommonFilter.h  ADM_vidMPLResize.cpp  ADM_vidVobsub.cpp \
 ADM_vidContrast.cpp  ADM_vidMPdelogo.cpp \
 ADM_vidContrast.h  ADM_vidMPdelogo.h \
 ADM_vobsubinfo.cpp \
-ADM_vidCrop.cpp  ADM_vobsubinfo.h \
+ADM_vobsubinfo.h \
 swscale_internal.h \
 ADM_vidTdeint_util.txt mmx_macros.h
 

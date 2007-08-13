@@ -13,7 +13,6 @@ ADM_vidContrast.cpp
 ADM_vidFont.cpp
 ADM_vidVobsub.cpp
 ADM_vidAsharp.cpp       
-ADM_vidCrop.cpp       
 ADM_vidVobSubRender.cpp
 ADM_interlaced.cpp       
 ADM_vidCached.cpp       
