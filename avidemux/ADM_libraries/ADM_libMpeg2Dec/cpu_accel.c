@@ -29,7 +29,7 @@
 #include "attributes.h"
 #include "mpeg2_internal.h"
 
-
+#include "admmangle.h"
 typedef void (*sighandler_t)(int); // MEANX RETSIGTYPE
  
 #ifdef ACCEL_DETECT
@@ -39,47 +39,14 @@ static inline uint32_t arch_accel (void)
     uint32_t eax, ebx, ecx, edx;
     int AMD;
     uint32_t caps;
+#define cpuid(index,eax,ebx,ecx,edx)\
+    __asm __volatile ("mov %%"REG_b", %%"REG_S"\n\t"\
+         "cpuid\n\t"\
+         "xchg %%"REG_b", %%"REG_S\
+         : "=a" (eax), "=S" (ebx),\
+           "=c" (ecx), "=d" (edx)\
+         : "0" (index));
 
-#if !defined(PIC) && !defined(__PIC__)
-#define cpuid(op,eax,ebx,ecx,edx)	\
-    __asm__ ("cpuid"			\
-	     : "=a" (eax),		\
-	       "=b" (ebx),		\
-	       "=c" (ecx),		\
-	       "=d" (edx)		\
-	     : "a" (op)			\
-	     : "cc")
-#else	/* PIC version : save ebx */
-#define cpuid(op,eax,ebx,ecx,edx)	\
-    __asm__ ("push %%ebx\n\t"		\
-	     "cpuid\n\t"		\
-	     "movl %%ebx,%1\n\t"	\
-	     "pop %%ebx"		\
-	     : "=a" (eax),		\
-	       "=r" (ebx),		\
-	       "=c" (ecx),		\
-	       "=d" (edx)		\
-	     : "a" (op)			\
-	     : "cc")
-#endif
-
-    __asm__ ("pushf\n\t"
-	     "pushf\n\t"
-	     "pop %0\n\t"
-	     "movl %0,%1\n\t"
-	     "xorl $0x200000,%0\n\t"
-	     "push %0\n\t"
-	     "popf\n\t"
-	     "pushf\n\t"
-	     "pop %0\n\t"
-	     "popf"
-	     : "=r" (eax),
-	       "=r" (ebx)
-	     :
-	     : "cc");
-
-    if (eax == ebx)		/* no cpuid */
-	return 0;
 
     cpuid (0x00000000, eax, ebx, ecx, edx);
     if (!eax)			/* vendor string only */
