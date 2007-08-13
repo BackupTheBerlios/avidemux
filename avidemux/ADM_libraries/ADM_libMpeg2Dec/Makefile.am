@@ -18,4 +18,4 @@ cpu_accel.c   idct.c       idct_mmx.c      motion_comp_altivec.c  mpeg2_internal
 
 #ugly trick to enable MMX
 #INCLUDES = $(all_includes) $(LMPG_OPT)
-INCLUDES = $(all_includes)  $(ALTIVEC_SWITCH)
+INCLUDES = $(all_includes)  $(ALTIVEC_SWITCH) -I../ADM_utilities
