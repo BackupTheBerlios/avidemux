@@ -32,7 +32,7 @@
 #include "ADM_encoder/ADM_vidEncode.hxx"
 //#include "ADM_video/ADM_vidFont.h"
 class ADMfont;
-#include "ADM_video/ADM_vidSRT.h"
+#include "ADM_videoFilter/ADM_vidSRT.h"
 #include "ADM_colorspace/colorspace.h"
 /*****************************************************************/
 extern int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b);

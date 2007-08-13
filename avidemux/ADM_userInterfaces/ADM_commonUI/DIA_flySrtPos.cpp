@@ -26,7 +26,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 class ADMfont;
 //#include "ADM_video/ADM_vidFont.h"
-#include "ADM_video/ADM_vidSRT.h"
+#include "ADM_videoFilter/ADM_vidSRT.h"
 
 #include "DIA_flyDialog.h"
 #include "DIA_flySrtPos.h"

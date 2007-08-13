@@ -37,7 +37,7 @@
 #include "ADM_assert.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flyDialogQt4.h"
-#include "ADM_video/ADM_vidHue.h"
+#include "ADM_videoFilter/ADM_vidHue.h"
 #include "DIA_flyHue.h"
 
 //

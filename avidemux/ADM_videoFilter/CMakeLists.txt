@@ -25,5 +25,12 @@ ADM_vidChromaShift.cpp
 ADM_vidAnimated.cpp
 ADM_vidDvbSub.cpp
 ADM_vidLogo.cpp
+ADM_vidHue.cpp
+ADM_vidSRT.cpp
+ADM_vidSRTload.cpp
+ADM_vidSRTRender.cpp
 )
 ADD_LIBRARY(ADM_videoFilter STATIC ${ADM_videoFilter_SRCS})
+if(FT_FOUND)
+add_definitions(${FT_CFLAGS})
+endif(FT_FOUND)

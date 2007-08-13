@@ -38,7 +38,7 @@
 
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidHue.h"
+#include "ADM_videoFilter/ADM_vidHue.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flyHue.h"
 

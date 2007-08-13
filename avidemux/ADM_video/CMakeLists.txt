@@ -14,20 +14,16 @@ ADM_vidFont.cpp
 ADM_vidVobsub.cpp
 ADM_vidAsharp.cpp       
 ADM_vidCrop.cpp       
-ADM_vidHue.cpp               
 ADM_vidVobSubRender.cpp
 ADM_interlaced.cpp       
 ADM_vidCached.cpp       
 ADM_vidDelta.cpp      
 ADM_vidMPdelogo.cpp      
-ADM_vidSRT.cpp        
 ADM_vobsubinfo.cpp
 ADM_vidEq2.cpp             
-ADM_vidSRTload.cpp
 ADM_vidClean.cpp        
 ADM_vidEqualizer.cpp  
 ADM_vidNull.cpp          
-ADM_vidSRTRender.cpp
 )
 ADD_LIBRARY(ADM_video STATIC ${ADM_video_SRCS})
 if(FT_FOUND)

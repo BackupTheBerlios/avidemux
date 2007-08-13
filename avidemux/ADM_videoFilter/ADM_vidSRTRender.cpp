@@ -26,10 +26,9 @@
 
 #ifdef USE_FREETYPE
 
-#include "fourcc.h"
-#include "avio.hxx"
+#include "default.h"
+#include "ADM_osSupport/ADM_misc.h"
 
-#include "avi_vars.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 
@@ -37,7 +36,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 
 #include "ADM_video/ADM_vidFont.h"
-#include "ADM_video/ADM_vidSRT.h"
+#include "ADM_videoFilter/ADM_vidSRT.h"
 #include <ADM_assert.h>
 
 #include "ADM_osSupport/ADM_debugID.h"

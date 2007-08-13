@@ -43,7 +43,7 @@
 
 //#include "ADM_video/ADM_vidFont.h"
 class ADMfont;
-#include "ADM_video/ADM_vidSRT.h"
+#include "ADM_videoFilter/ADM_vidSRT.h"
 
 #include "ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
