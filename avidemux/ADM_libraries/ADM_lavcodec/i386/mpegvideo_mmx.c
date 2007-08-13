@@ -731,7 +731,6 @@ void MPV_common_init_mmx(MpegEncContext *s)
         if(dct_algo==FF_DCT_AUTO || dct_algo==FF_DCT_MMX){
 #ifdef HAVE_SSSE3
             if(mm_flags & MM_SSSE3){
-				av_log(s->avctx, AV_LOG_INFO, "We're using SSSE3!!!\n");
                 s->dct_quantize= dct_quantize_SSSE3;
             } else
 #endif
