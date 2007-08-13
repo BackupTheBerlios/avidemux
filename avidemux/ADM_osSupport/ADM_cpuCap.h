@@ -25,7 +25,9 @@ typedef enum
         ADM_CPU_3DNOW  =1<<3,
         ADM_CPU_SSE    =1<<4,
         ADM_CPU_SSE2   =1<<5,
-        ADM_CPU_ALTIVEC=1<<6,
+		ADM_CPU_SSE3   =1<<6,
+		ADM_CPU_SSSE3  =1<<7,
+        ADM_CPU_ALTIVEC=1<<8,
 } ADM_CPU_CAPS;
 
 class CpuCaps

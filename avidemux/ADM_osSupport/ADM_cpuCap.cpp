@@ -24,18 +24,20 @@ extern "C"
 
   void 	CpuCaps::init( void)
 {
-	printf("Checking cpu capabilities\n");
+	printf("Checking CPU capabilities\n");
 int probed=0;
 #if defined( ARCH_X86)  || defined(ARCH_X86_64)
 	probed=mm_support();
-#define CHECK(x) if(probed & MM_##x) { CpuCaps::myCpuCaps|=ADM_CPU_##x;printf("\tCpu has "#x"\n");}
+#define CHECK(x) if(probed & MM_##x) { CpuCaps::myCpuCaps|=ADM_CPU_##x;printf("\t\t"#x"\n");}
 	CHECK(MMX);
 	CHECK(3DNOW);
 	CHECK(MMXEXT);
 	CHECK(SSE);
-	CHECK(SSE2);	
+	CHECK(SSE2);
+	CHECK(SSE3);
+	CHECK(SSSE3);
 #endif	
-	printf("End of cpu capabilities check\n");
+	printf("End of CPU capabilities check\n");
 }
 /*
         Returns # of threads to use,  0 means multithreading disabled

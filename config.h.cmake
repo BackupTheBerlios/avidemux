@@ -133,6 +133,7 @@
 /* FFMPEG */
 #cmakedefine HAVE_FAST_UNALIGNED
 #cmakedefine HAVE_FAST_64BIT
+#cmakedefine HAVE_SSSE3
 
 /* FontConfig detected */
 #cmakedefine HAVE_FONTCONFIG

@@ -1417,6 +1417,14 @@ AC_DEFINE(CONFIG_MOV_MUXER,1,[CONFIG_MUXERS])
 AC_DEFINE(HAVE_THREADS,1,[HAVE_THREADS])
 AC_DEFINE(ENABLE_THREADS,1,[ENABLE_THREADS])
 
+AC_ARG_ENABLE([ssse3],
+	[AC_HELP_STRING([--disable-ssse3], [disable SSSE3 extensions [default=no]])],
+	[disable_ssse3=${enableval}], [disable_ssse3=no])
+
+if test "x$disable_ssse3" = "xno"; then
+	AC_DEFINE(HAVE_SSSE3, 1, [use SSSE3 extensions with libavcodec])
+fi
+
 dnl ________________ libmpeg2 _________________
 AC_DEFINE(ACCEL_DETECT,1,[MPEG2DEC])
 
