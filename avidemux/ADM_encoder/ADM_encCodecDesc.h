@@ -172,8 +172,8 @@ COMPRES_PARAMS ffmpegHUFF = {
   4,
   1500,
   700,
-  0,
   1000, // AVG
+  ADM_ENC_CAP_CQ,
   ADM_EXTRA_PARAM,
   &ffmpeg4Extra,
   sizeof (ffmpeg4Extra),
@@ -188,8 +188,8 @@ COMPRES_PARAMS ffmpegFFV1 = {
   4,
   1500,
   700,
-  0,
   1000, // AVG
+  ADM_ENC_CAP_CQ,
   ADM_EXTRA_PARAM,
   &ffmpeg4Extra,
   sizeof (ffmpeg4Extra),
