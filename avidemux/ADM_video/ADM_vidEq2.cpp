@@ -16,7 +16,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#include "config.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -24,12 +24,8 @@
 #include <string.h>
 #include <ADM_assert.h>
 
-#include "config.h"
-#include "fourcc.h"
-#include "avio.hxx"
-#include "config.h"
-#include "avi_vars.h"
-#ifdef HAVE_ENCODER
+
+#include "default.h"
 
 
 #include "ADM_toolkit/toolkit.hxx"
@@ -130,37 +126,6 @@ void ADMVideoEq2::update(void)
 {
    update_lut(&settings,_param);      
 }
-void update_lut(Eq2Settings *settings,Eq2_Param *_param)
-{
-     memset(settings,0,sizeof(settings));
-
-    settings->param[0].lut_clean=0;
-    settings->param[1].lut_clean=0;
-    settings->param[2].lut_clean=0;
-    settings->contrast=_param->contrast;
-    settings->param[0].c=_param->contrast;  
-    settings->brightness=_param->brightness;
-    settings->param[0].b=_param->brightness;;
-    settings->saturation=_param->saturation;
-    settings->param[1].c=_param->saturation;
-    settings->param[2].c=_param->saturation;
-    
-    
-    settings->ggamma=_param->ggamma;
-    settings->bgamma=_param->bgamma;
-    settings->rgamma=_param->rgamma;
-    settings->gamma=_param->gamma;
-    settings->param[0].g=settings->gamma*settings->ggamma;
-    settings->param[1].g=sqrt(settings->bgamma/settings->ggamma);
-    settings->param[2].g=sqrt(settings->rgamma/settings->ggamma);
-    settings->param[0].w=settings->param[1].w=settings->param[2].w=
-    settings->gamma_weight=_param->gamma_weight;   
-
-
-    create_lut(&(settings->param[0]));
-    create_lut(&(settings->param[1]));
-    create_lut(&(settings->param[2])); 
-}          
 ADMVideoEq2::~ADMVideoEq2()
 {
   delete _param;
@@ -226,6 +191,39 @@ uint8_t ADMVideoEq2::getFrameNumberNoAlloc(uint32_t frame,
   return 1;
 }
 
+void update_lut(Eq2Settings *settings,Eq2_Param *_param)
+{
+     memset(settings,0,sizeof(settings));
+
+    settings->param[0].lut_clean=0;
+    settings->param[1].lut_clean=0;
+    settings->param[2].lut_clean=0;
+    settings->contrast=_param->contrast;
+    settings->param[0].c=_param->contrast;  
+    settings->brightness=_param->brightness;
+    settings->param[0].b=_param->brightness;;
+    settings->saturation=_param->saturation;
+    settings->param[1].c=_param->saturation;
+    settings->param[2].c=_param->saturation;
+    
+    
+    settings->ggamma=_param->ggamma;
+    settings->bgamma=_param->bgamma;
+    settings->rgamma=_param->rgamma;
+    settings->gamma=_param->gamma;
+    if(settings->ggamma<0.1) settings->ggamma=0.1;
+    //printf("GGamma:%f\n",settings->ggamma);
+    settings->param[0].g=settings->gamma*settings->ggamma;
+    settings->param[1].g=sqrt(settings->bgamma/settings->ggamma);
+    settings->param[2].g=sqrt(settings->rgamma/settings->ggamma);
+    settings->param[0].w=settings->param[1].w=settings->param[2].w=
+    settings->gamma_weight=_param->gamma_weight;   
+
+
+    create_lut(&(settings->param[0]));
+    create_lut(&(settings->param[1]));
+    create_lut(&(settings->param[2])); 
+}          
 
 void create_lut (oneSetting *par)
 {
@@ -388,4 +386,4 @@ void apply_lut (oneSetting *par, unsigned char *dst, unsigned char *src,
     dst += dstride;
   }
 }  
-#endif
+

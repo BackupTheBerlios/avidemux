@@ -1,13 +1,10 @@
-/**/
 /***************************************************************************
-                          DIA_hue
-                             -------------------
+                           Fly-Ui for hue & sat
 
-                           Ui for hue & sat
-
-    begin                : 08 Apr 2005
-    copyright            : (C) 2004/5 by mean
+    copyright            : (C) 2004/5/7 by mean
     email                : fixounet@free.fr
+    
+    
  ***************************************************************************/
 
 /***************************************************************************
@@ -29,7 +26,6 @@
 #include <math.h>
 
 #include "default.h"
-#include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_toolkit_gtk/ADM_gladeSupport.h"
 
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
@@ -39,88 +35,49 @@
 #include "ADM_video/ADM_genvideo.hxx"
 
 #include "ADM_video/ADM_vidEq2.h"
-#include "prototype.h"
+#include "DIA_flyDialog.h"
+#include "DIA_flyEq2.h"
+
 #include "ADM_assert.h"
-
-#include "ADM_osSupport/ADM_cpuCap.h"
-
-extern "C" {
-#include "ADM_libraries/ADM_lavcodec/avcodec.h"
-}
 
 static GtkWidget*create_dialog1 (void);
 static float getAdj(GtkWidget *widget);
 static void setAdj(GtkWidget *widget,float val);
 
-static ADMImage *imgsrc,*imgdst,*imgdisplay;
 static GtkWidget *dialog=NULL;
-static uint32_t w,h,zoomW,zoomH;
-static uint32_t *rgbbuffer=NULL;
-static AVDMGenericVideoStream *incoming;
-static Eq2_Param myEq2;
-static ADMImageResizer *resizer=NULL;
 
 static void             update ( void);
 static gboolean         draw (void );
 static void             eq2_changed( void);
+static void 			frame_changed( void );
 
-static void frame_changed( void );
-static Eq2Settings mySettings;
-static ColYuvRgb    *rgbConv=NULL;
+static int lock=0;
+static flyEq2 *myCrop=NULL;
 
-extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
-extern void UI_centreCanvasWindow(GtkWindow *window, GtkWidget *canvas, int newCanvasWidth, int newCanvasHeight);
-
-/************************************************************************/
+/**
+ * 		\fn DIA_getEQ2Param
+ * 		\brief flyDialogGtk handling the mplayer EQ2 user Interface dialog.
+ */
 uint8_t DIA_getEQ2Param(Eq2_Param *param, AVDMGenericVideoStream *in)
 {
 uint8_t r=0;
-
-        uint32_t l,f;
-        uint32_t max=in->getInfo()->nb_frames;
-        
-        incoming=in;
+uint32_t w,h;
         // Allocate space for green-ised video
         w=in->getInfo()->width;
         h=in->getInfo()->height;
 
-        imgdst=new ADMImage(w,h);
-        imgsrc=new ADMImage(w,h);
-        imgdisplay=new ADMImage(w,h);
-
-        if(curframe<max) max=curframe;
-        
-        ADM_assert(in->getFrameNumberNoAlloc(max, &l, imgsrc,&f));
-
-        memcpy(YPLANE(imgdisplay),YPLANE(imgsrc),w*h);
-        memcpy(UPLANE(imgdisplay),UPLANE(imgsrc),(w*h)>>2);
-        memcpy(VPLANE(imgdisplay),VPLANE(imgsrc),(w*h)>>2);
-        
-        rgbConv=new ColYuvRgb(w,h);
-        rgbConv->reset(w,h);
-
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
-
-        memcpy(&myEq2,param,sizeof(myEq2));
-
-        // upload
-#undef SET
-#undef GET
-#define SET(x,y)        setAdj(WID(hscale##x),myEq2.y)
-#define GET(x,y)        myEq2.y=getAdj(WID(hscale##x))
-
-        SET(Contrast,contrast);
-        SET(Brightness,brightness);
-        SET(Saturation,saturation);
-
-        SET(Gamma,gamma);        
-        SET(GammaWeight,gamma_weight);
-        SET(GammaR,rgamma);
-        SET(GammaG,ggamma);
-        SET(GammaB,bgamma);
-
-        gtk_signal_connect(GTK_OBJECT(WID(hscale1)), "value_changed",GTK_SIGNAL_FUNC(frame_changed),   NULL);
+        gtk_widget_show(dialog);	
+        
+        myCrop=new flyEq2( w, h,in,WID(drawingarea1),WID(hscale1));
+        memcpy(&(myCrop->param),param,sizeof(Eq2_Param));
+        myCrop->upload();
+        
+        int ret=0;
+        int response;
+        //-----------------------
+        gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event", GTK_SIGNAL_FUNC(draw),   NULL);
 #define HCONECT(x)  gtk_signal_connect(GTK_OBJECT(WID(hscale##x)), "value_changed",GTK_SIGNAL_FUNC(eq2_changed),   NULL);
 
         HCONECT(Brightness);
@@ -132,164 +89,80 @@ uint8_t r=0;
         HCONECT(GammaR);
         HCONECT(GammaG);
         HCONECT(GammaB);
-        
-		float zoom = UI_calcZoomToFitScreen(GTK_WINDOW(dialog), WID(drawingarea1), w, h);
+        gtk_signal_connect(GTK_OBJECT(WID(hscale1)), "value_changed",GTK_SIGNAL_FUNC(frame_changed),   NULL);
+        myCrop->sliderChanged();
+        myCrop->update();
+        //-----------------------
+        response=gtk_dialog_run(GTK_DIALOG(dialog));
 
-		zoomW = w * zoom;
-		zoomH = h * zoom;
-		rgbbuffer=new uint32_t[zoomW*zoomH];
-
-		gtk_widget_set_usize(WID(drawingarea1), zoomW, zoomH);
-
-		if (zoom < 1)
-		{
-			UI_centreCanvasWindow((GtkWindow*)dialog, WID(drawingarea1), zoomW, zoomH);
-			resizer = new ADMImageResizer(w, h, zoomW, zoomH, PIX_FMT_YUV420P, PIX_FMT_RGB32);
-		}
-
-        gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event", GTK_SIGNAL_FUNC(draw),   NULL);
-        update();
-        // run
-        if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
+        if(response==GTK_RESPONSE_OK)
         {
-                // download
-               memcpy(param,&myEq2,sizeof(myEq2));
-                r=1;
+            myCrop->download();
+            memcpy(param,&(myCrop->param),sizeof(Eq2_Param));
+            ret=1;
         }
-        
         gtk_unregister_dialog(dialog);
         gtk_widget_destroy(dialog);
-
-        delete imgdst;
-        delete imgsrc;
-        delete imgdisplay;
-        delete [] rgbbuffer;
-        delete rgbConv;
-
-		if (resizer)
-		{
-			delete resizer;
-			resizer=NULL;
-		}
-
-        rgbbuffer=NULL;
-        imgdst=NULL;
-        imgsrc=NULL;
-        dialog=NULL;
-        imgdisplay=NULL;
-        return r;
+        delete myCrop;
+        myCrop=NULL;
+        return ret;
 
 }
+/**************************************/
+#undef SET
+#undef GET
+#define SET(x,y)        setAdj(WID(hscale##x),param.y)
+#define GET(x,y)        param.y=getAdj(WID(hscale##x))
+
+
+uint8_t flyEq2::upload(void)
+{
+  lock++;
+  SET(Contrast,contrast);
+  SET(Brightness,brightness);
+  SET(Saturation,saturation);
+
+  SET(Gamma,gamma);        
+  SET(GammaWeight,gamma_weight);
+  SET(GammaR,rgamma);
+  SET(GammaG,ggamma);
+  SET(GammaB,bgamma);
+  
+  lock--;
+  return 1;
+}
+uint8_t flyEq2::download (void)
+{
+
+  GET(Contrast,contrast);
+  GET(Brightness,brightness);
+  GET(Saturation,saturation);
+
+  GET(Gamma,gamma);        
+  GET(GammaWeight,gamma_weight);
+  GET(GammaR,rgamma);
+  GET(GammaG,ggamma);
+  GET(GammaB,bgamma);
+
+ return 1;
+}
+
 /**********************/
 void frame_changed( void )
 {
-uint32_t new_frame,max,l,f;
-double   percent;
-GtkWidget *wid; 
-GtkAdjustment *adj;
-        
-        max=incoming->getInfo()->nb_frames;
-        wid=WID(hscale1);
-        adj=gtk_range_get_adjustment (GTK_RANGE(wid));
-        new_frame=0;
-        
-        percent=(double)GTK_ADJUSTMENT(adj)->value;
-        percent*=max;
-        percent/=100.;
-        new_frame=(uint32_t)floor(percent);
-        
-        if(new_frame>=max) new_frame=max-1;
-        
-        ADM_assert(incoming->getFrameNumberNoAlloc(new_frame, &l, imgsrc,&f));
-        memcpy(YPLANE(imgdisplay),YPLANE(imgsrc),w*h);
-        memcpy(UPLANE(imgdisplay),UPLANE(imgsrc),(w*h)>>2);
-        memcpy(VPLANE(imgdisplay),VPLANE(imgsrc),(w*h)>>2);
-        update();
-        draw();
-
-}
-void download (void)
-{
-                GET(Contrast,contrast);
-                GET(Brightness,brightness);
-                GET(Saturation,saturation);
-
-                GET(Gamma,gamma);        
-                GET(GammaWeight,gamma_weight);
-                GET(GammaR,rgamma);
-                GET(GammaG,ggamma);
-                GET(GammaB,bgamma);
+          myCrop->sliderChanged();
 }
 void eq2_changed( void)
 {
-    download();
-    update();
-    draw();
+    if(lock) return;
+    myCrop->update();
 }
 gboolean draw (void)
 {
-	GUI_RGBDisplay((uint8_t *)rgbbuffer, zoomW, zoomH, WID(drawingarea1));
-
+    myCrop->display();
 	return true;
 }
-void update(void )
-{
-uint8_t *src,*dst;
-uint32_t stride;
-
-        update_lut(&mySettings,&myEq2);
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
-        if(CpuCaps::hasMMX())
-        {
-                affine_1d_MMX(&(mySettings.param[0]),YPLANE(imgdisplay),YPLANE(imgsrc),w,h);
-                affine_1d_MMX(&(mySettings.param[2]),UPLANE(imgdisplay),UPLANE(imgsrc),w>>1,h>>1);
-                affine_1d_MMX(&(mySettings.param[1]),VPLANE(imgdisplay),VPLANE(imgsrc),w>>1,h>>1);       
-        }
-        else
-#endif
-        {
-                apply_lut(&(mySettings.param[0]),YPLANE(imgdisplay),YPLANE(imgsrc),w,h);
-                apply_lut(&(mySettings.param[2]),UPLANE(imgdisplay),UPLANE(imgsrc),w>>1,h>>1);
-                apply_lut(&(mySettings.param[1]),VPLANE(imgdisplay),VPLANE(imgsrc),w>>1,h>>1);       
-        }
-
-        // copy Y half
-    dst=YPLANE(imgdisplay);
-    src=YPLANE(imgsrc);
-    stride=w;
-    for(uint32_t y=0;y<h;y++)   // We do both u & v!
-    {
-        memcpy(dst,src,stride>>1);
-        dst+=stride;
-        src+=stride;
-    }
-        // U
-    dst=UPLANE(imgdisplay);
-    src=UPLANE(imgsrc);
-    stride=w>>1;
-    for(uint32_t y=0;y<h>>1;y++)   // We do both u & v!
-    {
-        memcpy(dst,src,stride>>1);
-        dst+=stride;
-        src+=stride;
-    }
-        // V
-    dst=VPLANE(imgdisplay);
-    src=VPLANE(imgsrc);
-    stride=w>>1;
-    for(uint32_t y=0;y<h>>1;y++)   // We do both u & v!
-    {
-        memcpy(dst,src,stride>>1);
-        dst+=stride;
-        src+=stride;
-    }
-
-	if (resizer)
-		resizer->resize(imgdisplay->data, (uint8_t*)rgbbuffer);
-	else
-		rgbConv->scale(imgdisplay->data, (uint8_t*)rgbbuffer);
-}
-
+/****************************/
 //**
 float getAdj(GtkWidget *widget)
 {
