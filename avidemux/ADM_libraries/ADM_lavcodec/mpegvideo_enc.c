@@ -1899,7 +1899,7 @@ static int sse_mb(MpegEncContext *s){
                +sse(s, s->new_picture.data[2] + s->mb_x*8  + s->mb_y*s->uvlinesize*8,s->dest[2], w>>1, h>>1, s->uvlinesize);
 }
 
-static int attribute_align_arg pre_estimate_motion_thread(AVCodecContext *c, void *arg){
+static int pre_estimate_motion_thread(AVCodecContext *c, void *arg){
     MpegEncContext *s= arg;
 
 
@@ -1918,7 +1918,7 @@ static int attribute_align_arg pre_estimate_motion_thread(AVCodecContext *c, voi
     return 0;
 }
 
-static int estimate_motion_thread(AVCodecContext *c, void *arg){
+static int attribute_align_arg estimate_motion_thread(AVCodecContext *c, void *arg){
     MpegEncContext *s= arg;
 
     ff_check_alignment();

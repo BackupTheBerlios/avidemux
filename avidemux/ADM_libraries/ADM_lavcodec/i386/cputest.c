@@ -81,7 +81,6 @@ int mm_support(void)
         cpuid(1, eax, ebx, ecx, std_caps);
         if (std_caps & (1<<23))
             rval |= FF_MM_MMX;
-#ifndef ADM_WIN32
         if (std_caps & (1<<25))
             rval |= FF_MM_MMXEXT | FF_MM_SSE;
         if (std_caps & (1<<26))
@@ -90,7 +89,6 @@ int mm_support(void)
             rval |= FF_MM_SSE3;
         if (ecx & 0x00000200 )
             rval |= FF_MM_SSSE3;
-#endif
     }
 
     cpuid(0x80000000, max_ext_level, ebx, ecx, edx);

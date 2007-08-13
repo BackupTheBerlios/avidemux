@@ -30,6 +30,7 @@
 #include "vp3dsp_mmx.h"
 #include "vp3dsp_sse2.h"
 #include "h263.h"
+#include "config.h"
 
 //#undef NDEBUG
 //#include <assert.h>
@@ -3643,6 +3644,7 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
         }
         if(mm_flags & MM_3DNOWEXT)
             c->vector_fmul_reverse = vector_fmul_reverse_3dnow2;
+#ifndef ADM_WIN32	// GRUNTSTER
         if(mm_flags & MM_SSE){
             c->vorbis_inverse_coupling = vorbis_inverse_coupling_sse;
             c->vector_fmul = vector_fmul_sse;
@@ -3650,6 +3652,7 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             c->vector_fmul_reverse = vector_fmul_reverse_sse;
             c->vector_fmul_add_add = vector_fmul_add_add_sse;
         }
+#endif
         if(mm_flags & MM_3DNOW)
             c->vector_fmul_add_add = vector_fmul_add_add_3dnow; // faster than sse
     }
