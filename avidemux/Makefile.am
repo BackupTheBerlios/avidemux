@@ -103,7 +103,6 @@ ADM_filter/filter_saveload.o 				\
 ./ADM_libraries/ADM_smjs/libADM_smjs.a			\
 ./ADM_videoFilter/libADM_videoFilter.a			\
 ./ADM_video/libADM_video.a				\
-./ADM_colorspace/libADM_colorspace.a			\
 ./ADM_audiodevice/libADM_audiodevice.a			\
 ./ADM_outputs/oplug_mp4/liboplug_mp4.a			\
 ./ADM_outputs/oplug_mpeg/liboplug_mpeg.a		\
@@ -142,6 +141,7 @@ ADM_filter/filter_saveload.o 				\
 
 adm_postlib= \
 ./ADM_libraries/ADM_utilities/libADM_library.a		\
+./ADM_colorspace/libADM_colorspace.a			\
 ./ADM_osSupport/libADM_ossupport.a			\
 ./ADM_libraries/ADM_libswscale/libswscale.a		\
 $(libmpeg2enc_Altivec) \
