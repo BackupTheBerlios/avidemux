@@ -152,9 +152,9 @@ public:
 static uint32_t lumaDiff(ADMImage *src1,ADMImage *src2,uint32_t noise);
 };
 void drawString(ADMImage *dst, int x, int y, const char *s) ;
-#define YPLANE(x) (x->data)
-#define UPLANE(x) (x->data+(x->_width*x->_height))
-#define VPLANE(x) (x->data+(5*(x->_width*x->_height)>>2))
+#define YPLANE(x) ((x)->data)
+#define UPLANE(x) ((x)->data+((x)->_width*(x)->_height))
+#define VPLANE(x) ((x)->data+(5*((x)->_width*(x)->_height)>>2))
 
 //
 //  Simple image resizer
