@@ -17,7 +17,6 @@
  #ifndef __VIDEO_FILTERS__
  #define  __VIDEO_FILTERS__
 
- #define MAX_FILTER 80
 #include "ADM_script/adm_scanner.h"
 typedef enum
 {
@@ -101,6 +100,8 @@ typedef enum
                 VF_DVBSUB,
                 VF_LOGO,
                 VF_DUMMY,
+                VF_COUNT,
+                MAX_FILTER = VF_COUNT - 1,
                 VF_EXTERNAL_START=0xF0000000
           }VF_FILTERS;
 
@@ -108,19 +109,46 @@ typedef AVDMGenericVideoStream *(ADM_createT) (AVDMGenericVideoStream *in, CONFc
 typedef AVDMGenericVideoStream *(ADM_create_from_scriptT) (AVDMGenericVideoStream *in, int n,Arg *args);
 
          
-   typedef struct
+   struct FILTER_ENTRY
    {
         const char        *name;
         ADM_createT       *create;
-        void              *destroy( AVDMGenericVideoStream *old); /* Maybe needed ...*/
+        void              (*destroy)( AVDMGenericVideoStream *old); /* Maybe needed ...*/
         VF_FILTERS        tag;
         uint8_t           viewable;
         char              *filtername;
         char              *description;
         ADM_create_from_scriptT *create_from_script;
-   }FILTER_ENTRY;
+
+       FILTER_ENTRY (const char * name, ADM_createT * create, VF_FILTERS tag,
+                     uint8_t viewable, char * filtername,
+                     char * description = 0,
+                     ADM_create_from_scriptT * create_from_script = 0)
+           : name (name),
+             create (create),
+             destroy (0),
+             tag (tag),
+             viewable (viewable),
+             filtername (filtername),
+             description (description),
+             create_from_script (create_from_script)
+       {
+       }
+
+       FILTER_ENTRY ()
+           : name (0),
+             create (0),
+             destroy (0),
+             tag (VF_INVALID),
+             viewable (0),
+             filtername (0),
+             description (0),
+             create_from_script (0)
+       {
+       }
+   };
  	
- typedef struct
+   typedef struct
    {
           VF_FILTERS              tag;
           AVDMGenericVideoStream *filter;
@@ -133,6 +161,13 @@ typedef AVDMGenericVideoStream *(ADM_create_from_scriptT) (AVDMGenericVideoStrea
             const char  *param[25];
    }FILTER_PARAM;
    
+#include <vector>
+extern std::vector <FILTER_ENTRY> allfilters;
+inline size_t nb_video_filter ()
+{
+    return allfilters.size();
+}
+
 AVDMGenericVideoStream *getLastVideoFilter( uint32_t frameStart, uint32_t nbFrame);
 AVDMGenericVideoStream *getLastVideoFilter( void );
 AVDMGenericVideoStream *getFirstVideoFilter( uint32_t frameStart, uint32_t nbFrame);

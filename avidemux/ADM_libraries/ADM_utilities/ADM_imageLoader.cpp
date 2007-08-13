@@ -64,51 +64,33 @@ static uint32_t read32(FILE *fd)
 		
 }
 
-/*
+/**
 		\fn 	createImageFromFile
 		\brief 	Create and returns an ADMImage from a file, only YV12 jpg supported ATM
 
 */
 ADMImage *createImageFromFile(const char *filename)
 {
-	    uint32_t *fcc;
-	    uint8_t fcc_tab[4];
-	    FILE *fd;
-
-	    // 1- identity the file type
-	    //
-	    fcc = (uint32_t *) fcc_tab;
-	    fd = fopen(filename, "rb");
-	    if (!fd) 
-	    {
-	    	printf("[imageLoader] Cannot open that file!\n");
-	    	return NULL;
-	    }
-	    fread(fcc_tab, 4, 1, fd);
-	    fcc = (uint32_t *) fcc_tab;
-	    fclose(fd);
-	    if (fcc_tab[0] == 0xff && fcc_tab[1] == 0xd8) 
-	    {
-		   	return createImageFromFile_jpeg(filename);
-		} 
-	    if (fourCC::check(*fcc, (uint8_t *) "RIFF")) 
-	    {
-	    	printf("[imageLoader] It looks like BMP (RIFF)...\n");
-	    	return createImageFromFile_Bmp(filename);
-	     }
-	    if (fcc_tab[0] == 'B' && fcc_tab[1] == 'M') 
-	    {
-	    	printf("[imageLoader] It looks like BMP2 (BM)...\n");
-	    	return createImageFromFile_Bmp2(filename);
-
-	    	} 
-	    if (fcc_tab[1] == 'P' && fcc_tab[2] == 'N' && fcc_tab[3] == 'G') 
-	    {
-	    	printf("[imageLoader] It looks like PNG...\n");
-	    	return createImageFromFile_png(filename);	    	
-	    }
-	    printf("[imageLoader] Unrecognized file!\n");
-	    return NULL;
+	uint32_t w,h;
+	switch(ADM_identidyImageFile(filename,&w,&h))
+	{
+		case  ADM_IMAGE_UNKNOWN: 
+					printf("[imageLoader] Trouble identifying /loading %s\n",filename);
+					return NULL;
+		case ADM_IMAGE_JPG:
+					return createImageFromFile_jpeg(filename);
+					break;
+		case ADM_IMAGE_PNG:
+					return createImageFromFile_png(filename);
+					break;
+		case ADM_IMAGE_BMP2:
+					return createImageFromFile_Bmp2(filename);
+					break;
+		default:
+				ADM_assert(0);
+	
+	}
+	ADM_assert(0);
 }
 /**
  * 	\fn createImageFromFile_jpeg
@@ -367,5 +349,107 @@ ADMImage *createImageFromFile_png(const char *filename)
     	delete [] data;
     	return image;		
 }
+/**
+ * 		\fn ADM_identidyImageFile
+ * 		\brief Identidy image type, returns type and width/height
+ */
+ADM_IMAGE_TYPE ADM_identidyImageFile(const char *filename,uint32_t *w,uint32_t *h)
+{
+			uint32_t *fcc;
+		    uint8_t fcc_tab[4];
+		    FILE *fd;
+		    uint32_t off,tag,count,size;
+		    BITMAPHEADER bmph;
 
+		    // 1- identity the file type
+		    //
+		    fcc = (uint32_t *) fcc_tab;
+		    fd = fopen(filename, "rb");
+		    if (!fd) 
+		    {
+		    	printf("[imageIdentify] Cannot open that file!\n");
+		    	return ADM_IMAGE_UNKNOWN;
+		    }
+		    fread(fcc_tab, 4, 1, fd);
+		    fcc = (uint32_t *) fcc_tab;
+		    // 2- JPEG ?
+		    if (fcc_tab[0] == 0xff && fcc_tab[1] == 0xd8) 
+		    {
+		    			// JPEG
+		    	  			fseek(fd, 0, SEEK_SET);
+		    			    read16(fd);	// skip jpeg ffd8
+		    			    count=0;
+		    			    while (count < 10 && tag != 0xFFC0) 
+		    			    {
+
+		    			    	tag = read16(fd);
+		    			    	if ((tag >> 8) != 0xff) 
+		    			    	{
+		    			    		printf("[imageIdentify]invalid jpeg tag found (%x)\n", tag);
+		    			    	}
+		    			    	if (tag == 0xFFC0) 
+		    			    	{
+		    			    		read16(fd);	// size
+		    			    		read8(fd);	// precision
+		    			    		*h = read16(fd);
+		    			    		*w = read16(fd);
+		    		                if(*w&1) *w++;
+		    		                if(*h&1) *h++;
+		    			    	} 
+		    			    	else 
+		    			    	{
+		    			    		off = read16(fd);
+		    			    		if (off < 2) 
+		    			    		{
+		    			    			printf("[imageIdentify]Offset too short!\n");
+		    			    		    fclose(fd);
+		    			    		    return ADM_IMAGE_UNKNOWN;
+		    			    		}
+		    			    		fseek(fd, off - 2, SEEK_CUR);
+		    			    	}
+		    				count++;
+		    			    }
+		    			    fclose(fd);
+		    			    if(count>=10) return ADM_IMAGE_UNKNOWN;
+		    			    return ADM_IMAGE_JPG;
+		    }
+		    // PNG ?
+		    if (fcc_tab[1] == 'P' && fcc_tab[2] == 'N' && fcc_tab[3] == 'G') 
+			    {
+		     	    fseek(fd, 0, SEEK_SET);
+		     	    read32(fd);
+		     	    read32(fd);
+		     	    read32(fd);
+		     	    read32(fd);
+		     	    *w=read32(fd);
+		     	    *h=read32(fd);	
+		     	    fclose(fd);
+		     	    return ADM_IMAGE_PNG;
+			    }
+		    // BMP2?
+		    if (fcc_tab[0] == 'B' && fcc_tab[1] == 'M') 
+		    {
+		    	  
+		     	    fseek(fd, 10, SEEK_SET);
+		     	    fread(fcc_tab, 4, 1, fd);
+		     	    // size, width height follow as int32 
+		     	    fread(&bmph, sizeof(bmph), 1, fd);
+		     #ifdef ADM_BIG_ENDIAN
+		     	    Endian_BitMapInfo(&bmph);
+		     #endif
+		     	    if (bmph.compressionScheme != 0) 
+		     	    {
+		     	    	printf("[imageIdentify] BMP2:Cannot handle compressed bmp\n");
+		     	    	fclose(fd);
+		     	    	return ADM_IMAGE_UNKNOWN;
+		     	    }
+		     	    *w = bmph.width;
+		     	    *h = bmph.height;
+	     	    	fclose(fd);
+	     	    	return ADM_IMAGE_BMP2;
+		    }
+		    // Unknown filetype...
+		    fclose(fd);
+		    return ADM_IMAGE_UNKNOWN;
+}
 //EOF

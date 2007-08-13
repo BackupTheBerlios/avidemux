@@ -38,9 +38,8 @@
 #include "ADM_osSupport/ADM_quota.h"
 //
 // exported vars
-uint32_t nb_video_filter=0;
+std::vector <FILTER_ENTRY> allfilters;
 uint32_t nb_active_filter=0;
-FILTER_ENTRY allfilters[MAX_FILTER];
 FILTER  videofilters[MAX_FILTER];
 
 static uint32_t lastStart=0, lastNb=0;
@@ -82,7 +81,7 @@ void filterListAll( void )
 {
 char *name;
 	printf("\nVideo filters\n");
-	for(uint32_t i=0;i<nb_video_filter;i++)
+	for(uint32_t i=0;i<nb_video_filter();i++)
 	{
 		name=allfilters[ i].filtername;
 		if(allfilters[ i].viewable)
@@ -97,7 +96,7 @@ VF_FILTERS filterGetTagFromName(char *inname)
 {
 char *name;
 	VF_FILTERS filter=VF_DUMMY;
-	for(uint32_t i=0;i<nb_video_filter;i++)
+	for(uint32_t i=0;i<nb_video_filter();i++)
 	{
 		name=allfilters[ i].filtername;
 		if(allfilters[ i].viewable)
@@ -118,13 +117,8 @@ void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable
 		,AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *)
 		,char *filtername)
 {
-        ADM_assert(nb_video_filter<(MAX_FILTER-1));
-        allfilters[ nb_video_filter].name=name;
-        allfilters[ nb_video_filter].create=create;
-        allfilters[ nb_video_filter].tag=tag;
-        allfilters[ nb_video_filter].viewable=viewable;
-	allfilters[ nb_video_filter].filtername=filtername;
-        nb_video_filter ++;
+//        printf ("*nb_video_filter() = %d, max %d, name = %s\n", nb_video_filter(), (MAX_FILTER-1), name);
+        allfilters.push_back (FILTER_ENTRY (name, create, tag, viewable, filtername));
 
         if(viewable==1)
 	{
@@ -135,15 +129,9 @@ void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
 		,AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *)
 		,char *filtername,AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args),char *desc)
 {
-        ADM_assert(nb_video_filter<(MAX_FILTER-1));
-        allfilters[ nb_video_filter].name=name;
-        allfilters[ nb_video_filter].create=create;
-        allfilters[ nb_video_filter].tag=tag;
-        allfilters[ nb_video_filter].viewable=viewable;
-	allfilters[ nb_video_filter].filtername=filtername;
-	allfilters[ nb_video_filter].create_from_script=create_from_script;
-        allfilters[ nb_video_filter].description=desc;
-        nb_video_filter ++;
+//    printf ("nb_video_filter = %d, max %d, name = %s\n", nb_video_filter, (MAX_FILTER-1), name);
+        allfilters.push_back (FILTER_ENTRY (name, create, tag, viewable,
+                                            filtername, desc, create_from_script));
 
         if(viewable==1)
 	{
@@ -157,8 +145,7 @@ The reference is 0 in that case !
 ************************************************************************************************/
 AVDMGenericVideoStream *getLastVideoFilter(void)
 {
-extern ADM_Composer *video_body;
-aviInfo info;
+    aviInfo info;
 
 	video_body->getVideoInfo(&info);
 
@@ -182,7 +169,6 @@ aviInfo info;
 */
 AVDMGenericVideoStream *getLastVideoFilter( uint32_t start, uint32_t nb)
 {
-extern ADM_Composer *video_body;
   // sanity check
   	lastNb=nb;
 	lastStart=start;
@@ -199,7 +185,6 @@ extern ADM_Composer *video_body;
 /********* Returns the first video filters starting from frame xx with nb frames ***************/
 AVDMGenericVideoStream *getFirstVideoFilter( uint32_t start, uint32_t nbFrame)
 {
-extern ADM_Composer *video_body;
   // sanity check
   	lastNb=nbFrame;
 	lastStart=start;
@@ -214,7 +199,6 @@ AVDMGenericVideoStream *getFirstCurrentVideoFilter( void)
 }
 AVDMGenericVideoStream *getFirstVideoFilter( void)
 {
-extern ADM_Composer *video_body;
   // sanity check
   aviInfo info;
 
@@ -276,7 +260,7 @@ AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, A
                         if(tag>=VF_EXTERNAL_START)
                         {
                           // start from the end, it is an external filter 
-                          for(uint32_t i=nb_video_filter-1;i>=0;i--)
+                          for(uint32_t i=nb_video_filter()-1;i>=0;i--)
                           {
                               if(tag==allfilters[i].tag)
                                 {
@@ -287,7 +271,7 @@ AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, A
                         } // else search forward
                         else
                         {
-                          for(unsigned int i=0;i<nb_video_filter;i++)
+                          for(unsigned int i=0;i<nb_video_filter();i++)
                                   {
                                           if(tag==allfilters[i].tag)
                                                   {
@@ -307,7 +291,7 @@ const char  *filterGetNameFromTag(VF_FILTERS tag)
 {
 
                         ADM_assert(tag!=VF_INVALID);
-                        for(unsigned int i=0;i<nb_video_filter;i++)
+                        for(unsigned int i=0;i<nb_video_filter();i++)
                                 {
                                         if(tag==allfilters[i].tag)
                                                 {
@@ -392,7 +376,7 @@ uint8_t 	filterAddScript(VF_FILTERS tag,uint32_t n,Arg *args)
 
 	video_body->getVideoInfo(&info);
 
-	for(unsigned int i=0;i<nb_video_filter;i++)
+	for(unsigned int i=0;i<nb_video_filter();i++)
 	{
 		if(tag==allfilters[i].tag)
 		{
@@ -428,7 +412,7 @@ void filterSaveScriptJS(FILE *f)
                 {
                         VF_FILTERS tag=videofilters[i].tag;
                         qfprintf(f,"app.video.addFilter(");
-                        for(unsigned int j=0;j<nb_video_filter;j++)
+                        for(unsigned int j=0;j<nb_video_filter();j++)
                                 {
                                         if(tag==allfilters[j].tag)
                                         {       

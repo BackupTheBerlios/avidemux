@@ -51,8 +51,6 @@ extern AVDMGenericVideoStream *filterCreateFromTag (VF_FILTERS tag,
 						    in);
 extern const char  *filterGetNameFromTag(VF_FILTERS tag);
 //___________________________________________
-extern FILTER_ENTRY allfilters[MAX_FILTER];
-extern uint32_t nb_video_filter;
 extern FILTER videofilters[MAX_FILTER];
 extern uint32_t nb_active_filter;
 extern ADM_Composer *video_body;
@@ -435,7 +433,7 @@ createFilterDialog (void)
     char *str=NULL;
     GtkTreeIter iter;
     int current_tree=0;
-    for (uint32_t i = 0; i < nb_video_filter; i++)
+    for (uint32_t i = 0; i < nb_video_filter(); i++)
     {
         if (allfilters[i].viewable==1)
         {

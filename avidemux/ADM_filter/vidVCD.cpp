@@ -46,8 +46,6 @@
 #include "prefs.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_resizeWiz.h"
 //___________________________________________
-extern FILTER_ENTRY allfilters[MAX_FILTER];
-extern uint32_t nb_video_filter;
 extern FILTER videofilters[MAX_FILTER];
 extern uint32_t nb_active_filter;
 extern ADM_Composer *video_body;

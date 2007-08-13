@@ -62,8 +62,6 @@ static int max=0;
 #define EXTERNAL_FILTER_BASE  2000
 #define ACTIVE_FILTER_BASE    3000
 /******************************************************/
-extern FILTER_ENTRY allfilters[MAX_FILTER];
-extern uint32_t nb_video_filter;
 extern FILTER videofilters[MAX_FILTER];
 extern uint32_t nb_active_filter;
 extern const char  *filterGetNameFromTag(VF_FILTERS tag);
@@ -441,7 +439,7 @@ void filtermainWindow::setupFilters(void)
   
   max=0;
   
-  for (uint32_t i = 0; i < nb_video_filter; i++)
+  for (uint32_t i = 0; i < nb_video_filter(); i++)
     {
       if (allfilters[i].viewable==1)
         {
