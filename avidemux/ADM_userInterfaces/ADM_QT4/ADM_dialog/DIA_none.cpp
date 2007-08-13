@@ -48,7 +48,6 @@
 #include "ADM_video/ADM_vidVobSub.h"
 #include "ADM_videoFilter/ADM_vidChromaShift_param.h"
 #include "ADM_video/ADM_vidMPdelogo.h"
-#include "ADM_video/ADM_vidEq2.h"
 #include "ADM_video/ADM_vidContrast.h"
 //#include "ADM_video/ADM_vidFont.h"
 class ADMfont;
@@ -77,7 +76,6 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 #endif
 int     DIA_coloryuv(COLOR_YUV_PARAM *param){return 0;}
 uint8_t DIA_cnr2(CNR2Param *param){return 0;}
-uint8_t DIA_getEQ2Param(Eq2_Param *param, AVDMGenericVideoStream *in){return 0;}
 uint8_t DIA_getEqualizer(EqualizerParam *param, ADMImage *image){return 0;}
 uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in){return 0;}
 uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in){return 0;}

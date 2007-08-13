@@ -8,6 +8,7 @@ SET(${ADM_LIB}_Q
 asharp
 chromashift
 contrast
+eq2
 crop
 encoding
 hue
