@@ -75,6 +75,7 @@ class Ui_eq2Window : public QDialog
         myCrop->_cookie=&ui;
         myCrop->upload();
         myCrop->sliderChanged();
+        myCrop->update();
 
 
         connect( ui.horizontalSlider,SIGNAL(valueChanged(int)),this,SLOT(sliderUpdate(int)));
@@ -115,12 +116,13 @@ void Ui_eq2Window::valueChanged( int f )
   lock--;
 }
 
-#define sliderSet(x,y) w->horizontalSlider##x->setValue((int)(param.y*10));
-#define sliderGet(x,y) param.y=w->horizontalSlider##x->value()/10.;
+#define sliderSet(x,y) w->horizontalSlider##x->setValue((int)(param.y*100));
+#define sliderGet(x,y) param.y=w->horizontalSlider##x->value()/100.;
 //************************
 uint8_t flyEq2::upload(void)
 {
 Ui_DialogEq2 *w=(Ui_DialogEq2 *)_cookie;
+
 
         sliderSet(Contrast,contrast);
         sliderSet(Brightness,brightness);
@@ -131,7 +133,8 @@ Ui_DialogEq2 *w=(Ui_DialogEq2 *)_cookie;
         sliderSet(Blue,bgamma);
 
         sliderSet(Initial,gamma);
-        sliderSet(Weight,gamma);
+        sliderSet(Weight,gamma_weight);
+        
        return 1;
 }
 uint8_t flyEq2::download(void)
@@ -147,7 +150,7 @@ Ui_DialogEq2 *w=(Ui_DialogEq2 *)_cookie;
         sliderGet(Blue,bgamma);
 
         sliderGet(Initial,gamma);
-        sliderGet(Weight,gamma);
+        sliderGet(Weight,gamma_weight);
 
 return 1;
 }

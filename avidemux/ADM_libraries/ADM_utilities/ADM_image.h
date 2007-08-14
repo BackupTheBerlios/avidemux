@@ -144,7 +144,7 @@ public:
         uint8_t copyTo(ADMImage *target, uint32_t x, uint32_t y);
         uint8_t copyToAlpha(ADMImage *target, uint32_t x, uint32_t y,uint32_t alpha);
         uint8_t pack(uint8_t invertChroma);     /// Transfer data from planes to regular packed space
-        
+        uint8_t copyLeftSideTo(ADMImage *dest);
         /* Some utilitarian functions */
         uint8_t  saveAsBmp(const char *filename);
         uint8_t  saveAsJpg(const char *filename);

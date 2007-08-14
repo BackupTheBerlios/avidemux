@@ -73,11 +73,13 @@ uint32_t w,h;
         myCrop=new flyEq2( w, h,in,WID(drawingarea1),WID(hscale1));
         memcpy(&(myCrop->param),param,sizeof(Eq2_Param));
         myCrop->upload();
+        myCrop->sliderChanged();
+        myCrop->update();
         
         int ret=0;
         int response;
         //-----------------------
-        gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event", GTK_SIGNAL_FUNC(draw),   NULL);
+        
 #define HCONECT(x)  gtk_signal_connect(GTK_OBJECT(WID(hscale##x)), "value_changed",GTK_SIGNAL_FUNC(eq2_changed),   NULL);
 
         HCONECT(Brightness);
@@ -89,9 +91,8 @@ uint32_t w,h;
         HCONECT(GammaR);
         HCONECT(GammaG);
         HCONECT(GammaB);
+        gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event", GTK_SIGNAL_FUNC(draw),   NULL);
         gtk_signal_connect(GTK_OBJECT(WID(hscale1)), "value_changed",GTK_SIGNAL_FUNC(frame_changed),   NULL);
-        myCrop->sliderChanged();
-        myCrop->update();
         //-----------------------
         response=gtk_dialog_run(GTK_DIALOG(dialog));
 
@@ -111,8 +112,8 @@ uint32_t w,h;
 /**************************************/
 #undef SET
 #undef GET
-#define SET(x,y)        setAdj(WID(hscale##x),param.y)
-#define GET(x,y)        param.y=getAdj(WID(hscale##x))
+#define SET(x,y)        gtk_range_set_value (GTK_RANGE(WID(hscale##x)),(gdouble)param.y)
+#define GET(x,y)        param.y= (float)gtk_range_get_value (GTK_RANGE(WID(hscale##x)))
 
 
 uint8_t flyEq2::upload(void)
@@ -162,19 +163,6 @@ gboolean draw (void)
     myCrop->display();
 	return true;
 }
-/****************************/
-//**
-float getAdj(GtkWidget *widget)
-{
-GtkAdjustment *adj;        
-        adj=gtk_range_get_adjustment (GTK_RANGE(widget));
-        return (float)adj->value;
-}
-void setAdj(GtkWidget *widget,float val)
-{
- gtk_range_set_value (GTK_RANGE(widget),(gdouble)val);
-}
-
 //**
 
 GtkWidget*

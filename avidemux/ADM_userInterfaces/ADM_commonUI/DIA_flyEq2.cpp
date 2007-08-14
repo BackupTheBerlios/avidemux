@@ -41,63 +41,43 @@ uint8_t flyEq2::process(void)
 
 {
 	Eq2Settings mySettings;
-	uint8_t *src,*dst;
-	uint32_t stride;
+
 #if 0
 	printf("Contrast   :%f\n",param.contrast);
 	printf("brightness :%f\n",param.brightness);
 	printf("saturation :%f\n",param.saturation);
+	
+	printf("gamma_weight :%f\n",param.gamma_weight);
+	printf("gamma :%f\n",param.gamma);
+	
+	
+	
 	printf("rgamma :%f\n",param.rgamma);
 	printf("bgamma :%f\n",param.bgamma);
 	printf("ggamma :%f\n",param.ggamma);
+	printf("******************\n");
 #endif	
 	
 	        update_lut(&mySettings,&param);
+	        
+typedef void lutMeType(oneSetting *par, unsigned char *dst, unsigned char *src, unsigned int w, unsigned int h);
+
+			lutMeType *lutMe=apply_lut;
+			
+
 #if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 	        if(CpuCaps::hasMMX())
 	        {
-	                affine_1d_MMX(&(mySettings.param[0]),YPLANE(_yuvBufferOut),YPLANE(_yuvBuffer),_w,_h);
-	                affine_1d_MMX(&(mySettings.param[2]),UPLANE(_yuvBufferOut),UPLANE(_yuvBuffer),_w>>1,_h>>1);
-	                affine_1d_MMX(&(mySettings.param[1]),VPLANE(_yuvBufferOut),VPLANE(_yuvBuffer),_w>>1,_h>>1);       
+	        		lutMe=affine_1d_MMX;
 	        }
-	        else
 #endif	
-	        {
-	        	apply_lut(&(mySettings.param[0]),YPLANE(_yuvBufferOut),YPLANE(_yuvBuffer),_w,_h);
-	        	apply_lut(&(mySettings.param[2]),UPLANE(_yuvBufferOut),UPLANE(_yuvBuffer),_w>>1,_h>>1);
-	        	apply_lut(&(mySettings.param[1]),VPLANE(_yuvBufferOut),VPLANE(_yuvBuffer),_w>>1,_h>>1);       
-	        }
-#if 1
-	    // copy Y half
-	    dst=YPLANE(_yuvBufferOut);
-	    src=YPLANE(_yuvBuffer);
-	    stride=_w;
-	    for(uint32_t y=0;y<_h;y++)   // We do both u & v!
-	    {
-	        memcpy(dst,src,stride>>1);
-	        dst+=stride;
-	        src+=stride;
-	    }
-	        // U
-	    dst=UPLANE(_yuvBufferOut);
-	    src=UPLANE(_yuvBuffer);
-	    stride=_w>>1;
-	    uint32_t h2=_h>>1;
-	    for(uint32_t y=0;y<h2;y++)   // We do both u & v!
-	    {
-	        memcpy(dst,src,stride>>1);
-	        dst+=stride;
-	        src+=stride;
-	    }
-	        // V
-	    dst=VPLANE(_yuvBufferOut);
-	    src=VPLANE(_yuvBuffer);
-	    for(uint32_t y=0;y<h2;y++)   // We do both u & v!
-	    {
-	        memcpy(dst,src,stride>>1);
-	        dst+=stride;
-	        src+=stride;
-	    }
+	        lutMe(&(mySettings.param[0]),YPLANE(_yuvBufferOut),YPLANE(_yuvBuffer),_w,_h);
+	        lutMe(&(mySettings.param[2]),UPLANE(_yuvBufferOut),UPLANE(_yuvBuffer),_w>>1,_h>>1);
+	        lutMe(&(mySettings.param[1]),VPLANE(_yuvBufferOut),VPLANE(_yuvBuffer),_w>>1,_h>>1);       
+
+	        	
+	        	#if 1
+	        _yuvBuffer->copyLeftSideTo(_yuvBufferOut);
 #endif
 		return 1;
 }

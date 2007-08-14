@@ -514,4 +514,48 @@ uint8_t  ADMImage::saveAsJpg(const char *filename)
   return 1;
   
 }
+ /**
+  *		\fn  copyLeftSideTo
+  * 	\brief Copy half the image (left part) to dest
+  * 	@param dest : Image to copy to 
+  */
+ uint8_t ADMImage::copyLeftSideTo(ADMImage *dest)
+ {
+		uint8_t *src,*dst;
+		uint32_t stride;
+ 
+			ADM_assert(_width==dest->_width);
+			ADM_assert(_height==dest->_height);
+		
+	 		dst=YPLANE(dest);
+		    src=YPLANE(this);
+		    stride=_width;
+		    for(uint32_t y=0;y<_height;y++)   // We do both u & v!
+		    {
+		        memcpy(dst,src,stride>>1);
+		        dst+=stride;
+		        src+=stride;
+		    }
+		        // U
+		    dst=UPLANE(dest);
+		    src=UPLANE(this);
+		    stride=_width>>1;
+		    uint32_t h2=_height>>1;
+		    for(uint32_t y=0;y<h2;y++)   // We do both u & v!
+		    {
+		        memcpy(dst,src,stride>>1);
+		        dst+=stride;
+		        src+=stride;
+		    }
+		        // V
+		    dst=VPLANE(dest);
+		    src=VPLANE(this);
+		    for(uint32_t y=0;y<h2;y++)   // We do both u & v!
+		    {
+		        memcpy(dst,src,stride>>1);
+		        dst+=stride;
+		        src+=stride;
+		    }
+		    return 1;
+ }
 //EOF
