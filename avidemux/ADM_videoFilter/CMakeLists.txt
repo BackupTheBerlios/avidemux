@@ -30,6 +30,7 @@ ADM_vidSRT.cpp
 ADM_vidSRTload.cpp
 ADM_vidSRTRender.cpp
 ADM_vidCrop.cpp       
+ADM_vidEq2.cpp       
 )
 ADD_LIBRARY(ADM_videoFilter STATIC ${ADM_videoFilter_SRCS})
 if(FT_FOUND)

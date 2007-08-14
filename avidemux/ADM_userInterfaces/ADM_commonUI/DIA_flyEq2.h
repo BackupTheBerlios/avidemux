@@ -14,7 +14,7 @@
  ***************************************************************************/
 #ifndef FLY_EQ2_H
 #define FLY_EQ2_H
-#include "ADM_video/ADM_vidEq2.h"
+#include "ADM_videoFilter/ADM_vidEq2.h"
 class flyEq2 : public ADM_flyDialog
 {
   

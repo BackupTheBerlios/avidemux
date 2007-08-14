@@ -27,11 +27,11 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_assert.h"
-#include "ADM_video/ADM_vidEq2.h"
+#include "ADM_videoFilter/ADM_vidEq2.h"
 
 #include "DIA_flyDialog.h"
 #include "DIA_flyDialogQt4.h"
-#include "ADM_video/ADM_vidEq2.h"
+#include "ADM_videoFilter/ADM_vidEq2.h"
 #include "DIA_flyEq2.h"
 
 //

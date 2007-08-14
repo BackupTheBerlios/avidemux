@@ -19,7 +19,6 @@ ADM_vidCached.cpp
 ADM_vidDelta.cpp      
 ADM_vidMPdelogo.cpp      
 ADM_vobsubinfo.cpp
-ADM_vidEq2.cpp             
 ADM_vidClean.cpp        
 ADM_vidEqualizer.cpp  
 ADM_vidNull.cpp          

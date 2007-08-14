@@ -26,7 +26,6 @@ libADM_video_a_SOURCES = \
  ADM_vidVobsub.cpp \
  ADM_vobsubinfo.cpp \
  ADM_vidVobSubRender.cpp \
- ADM_vidEq2.cpp \
  ADM_vidAsharp.cpp \
  ADM_vidCNR2.cpp \
   ADM_vidDelta.cpp \
@@ -47,8 +46,8 @@ ADM_vidPartial.h \
 ADM_vidDelta.cpp  ADM_vidPartial_param.h \
 ADM_guiResize.cpp   ADM_vidRaw.cpp \
 ADM_interlaced.cpp  \
-ADM_interlaced.h ADM_vidEq2.cpp  ADM_vidResize.cpp \
-ADM_vidEq2.h  ADM_vidResize25.cpp \
+ADM_interlaced.h ADM_vidResize.cpp \
+ADM_vidResize25.cpp \
 ADM_vidEqualizer.cpp  \
 ADM_mpdetc.cpp ADM_vidEqualizer.h   \
 ADM_mpdetc.h  \
@@ -89,5 +88,4 @@ INCLUDES = $(all_includes) -I../ADM_libraries -I../ADM_libraries/ADM_utilities -
 			 $(FREETYPE_CFLAGS) $(ALTIVEC_SWITCH) -I../ADM_userInterfaces/ADM_commonUI -I../ADM_inputs
 noinst_HEADERS = ADM_mpdetc.h \
   ADM_cache.h \
-ADM_vidEqualizer.h ADM_vobsubinfo.h ADM_vidVobSub.h \
-ADM_vidEq2.h 
+ADM_vidEqualizer.h ADM_vobsubinfo.h ADM_vidVobSub.h 
