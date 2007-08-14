@@ -118,7 +118,7 @@ int             language=0;
         memset(sub->lines,0,sizeof(vobSubLine)*nb_lines);
         printf("Rebuilding %d lines of subs\n",nb_lines);
         
-        while(line<nb_lines)
+        while(line<nb_lines && !feof(file))
         {
                 fgets(str,1023,file); 
                 if(!strncmp(str,"palette:",7))
@@ -139,9 +139,15 @@ int             language=0;
                                 {
                                   int  l;
                                   char s[50];
+                                  s[0]=0;
+                                  l=999;
                                   sscanf(str,"id: %s index: %d",s,&l);
                                   printf("Found lang : %s index %d while searching %d\n",s,l,index);
-                                  if(l==index) language=1;
+                                  if(l==index)
+                                  {
+                                	  language=1;
+                                	  printf("Match\n");
+                                  }
                                   else language=0;                                                                              
                                 
                                 }
@@ -193,6 +199,8 @@ int lang;
                 fgets(str,1023,f);
                 if(!strncmp(str,"id:",3))
                 {
+                  s[0]=0;
+                  lang=9999;
                   sscanf(str,"id: %s index: %d",s,&lang);
                   if(lang==index) match=1;
                   else match=0;
