@@ -95,8 +95,10 @@ char     *globalGlyphName=NULL;
     DOME(4,dring);
      
         // Alsa
+#ifdef ALSA_SUPPORT
         if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &alsaDevice) != RC_OK )
                 alsaDevice = ADM_strdup("plughw:0,0");
+#endif
         // autovbr
         prefs->get(FEATURE_AUTO_BUILDMAP,&autovbr);
         // autoindex
@@ -141,10 +143,12 @@ char     *globalGlyphName=NULL;
                 lavcodec_mpeg=0;
         // Open DML (Gmv)
         if(!prefs->get(FEATURE_USE_ODML, &use_odml))
-          use_odml=0;                
-        // Master or PCM for audio
+          use_odml=0;
+#if defined(ALSA_SUPPORT) || defined (OSS_SUPPORT)
+		// Master or PCM for audio
         if(!prefs->get(FEATURE_AUDIOBAR_USES_MASTER, &useMaster))
                 useMaster=0;
+#endif
         // Autoindex files
         if(!prefs->get(FEATURE_TRYAUTOIDX, &useAutoIndex))
                 useAutoIndex=0;
@@ -223,12 +227,12 @@ char     *globalGlyphName=NULL;
         diaElemMenu menuMessage(&msglevel,_("_Message level:"), sizeof(msgEntries)/sizeof(diaMenuEntry),msgEntries,"");
         
         
-        
+#if defined(ALSA_SUPPORT) || defined (OSS_SUPPORT)
         diaMenuEntry volumeEntries[]={
                              {0,       _("PCM"),NULL}
                              ,{1,      _("Master"),NULL}};
         diaElemMenu menuVolume(&useMaster,_("_Volume control:"), sizeof(volumeEntries)/sizeof(diaMenuEntry),volumeEntries,"");
-        
+#endif
         
         
          diaMenuEntry mixerEntries[]={
@@ -270,9 +274,10 @@ char     *globalGlyphName=NULL;
         MKADID(DUMMY)
 };
         diaElemMenu menuAudio(&newdevice,_("_Audio output:"), sizeof(audioEntries)/sizeof(diaMenuEntry),audioEntries,"");
-        
-        diaElemText entryAlsaDevice(&alsaDevice,_("ALSA _device:"),NULL);
+                
 #ifdef ALSA_SUPPORT
+		diaElemText entryAlsaDevice(&alsaDevice,_("ALSA _device:"),NULL);
+
           int z,m;
           m=sizeof(audioEntries)/sizeof(diaMenuEntry);
           for(z=0;z<m;z++)
@@ -326,8 +331,16 @@ char     *globalGlyphName=NULL;
         diaElemTabs tabOutput(_("Output"),4,(diaElem **)diaOutput);
         
         /* Fourth Tab : audio */
+#if defined(ALSA_SUPPORT)
         diaElem *diaAudio[]={&menuMixer,&menuVolume,&menuAudio,&entryAlsaDevice};
         diaElemTabs tabAudio(_("Audio"),4,(diaElem **)diaAudio);
+#elif defined(OSS_SUPPORT)
+        diaElem *diaAudio[]={&menuMixer,&menuVolume,&menuAudio};
+        diaElemTabs tabAudio(_("Audio"),3,(diaElem **)diaAudio);
+#else
+        diaElem *diaAudio[]={&menuMixer,&menuAudio};
+        diaElemTabs tabAudio(_("Audio"),2,(diaElem **)diaAudio);
+#endif
         
         /* Fifth Tab : video */
         
@@ -372,12 +385,14 @@ char     *globalGlyphName=NULL;
                 // autoindex
                 prefs->set(FEATURE_AUTO_REBUILDINDEX,autoindex);
                 // Alsa
+#ifdef ALSA_SUPPORT
                 if(alsaDevice)
                 {
                    prefs->set(DEVICE_AUDIO_ALSA_DEVICE, alsaDevice);
                    ADM_dealloc(alsaDevice);
                    alsaDevice=NULL;
                 }
+#endif
                 // Device
                 if(olddevice!=newdevice)
                 {
@@ -385,8 +400,10 @@ char     *globalGlyphName=NULL;
                 }
                 // Downmixing (default)
                 prefs->set(DOWNMIXING_PROLOGIC,downmix);
+#if defined(ALSA_SUPPORT) || defined (OSS_SUPPORT)
                 // Master or PCM
                 prefs->set(FEATURE_AUDIOBAR_USES_MASTER, useMaster);
+#endif
                 // allow non std audio fq for dvd
                 prefs->set(FEATURE_MPEG_NO_LIMIT, mpeg_no_limit);
                 // Video render
@@ -429,7 +446,6 @@ char     *globalGlyphName=NULL;
 			#endif
 	}
 
-	ADM_dealloc(alsaDevice);
 	ADM_dealloc(filterPath);
 	ADM_dealloc(globalGlyphName);
 
