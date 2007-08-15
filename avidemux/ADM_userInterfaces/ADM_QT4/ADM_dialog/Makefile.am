@@ -9,7 +9,7 @@ AQ_contrast.cpp AQ_hue.cpp \
 AQ_srt.cpp \
 AT_index_pg.cpp DIA_x264.cpp \
 AQ_vobsub.cpp \
-AQ_eq2.cpp
+AQ_eq2.cpp \
 DIA_srt.cpp
 
 INCLUDES = $(all_includes)  $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@ADM_SUBVERSION@ \
