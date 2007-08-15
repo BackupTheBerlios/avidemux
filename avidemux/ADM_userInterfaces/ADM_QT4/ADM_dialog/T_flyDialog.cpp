@@ -26,9 +26,12 @@
 void ADM_flyDialog::postInit()
 {
 	QWidget *graphicsView = ((ADM_QCanvas*)_canvas)->parentWidget();
-
+	QSlider  *slider=(QSlider *)_slider;
+	
 	graphicsView->setMinimumSize(_w, _h);
 	graphicsView->resize(_w, _h);
+	uint32_t nbFrames=_in->getInfo()->nb_frames; 
+	slider->setMaximum(nbFrames);
 }
 
 float ADM_flyDialog::calcZoomFactor(void) {return 1;}
