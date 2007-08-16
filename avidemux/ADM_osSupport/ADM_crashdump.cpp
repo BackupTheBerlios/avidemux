@@ -1,7 +1,7 @@
 /***************************************************************************
   Try to display interesting crash dump
 
-    copyright            : (C) 2007 by mean, (C) 2007 Grunster
+    copyright            : (C) 2007 by mean, (C) 2007 Gruntster
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -87,6 +87,8 @@ static void dumpFrame(void* processId, void* frameAddr)
 			printf("<unknown>");
 
 		printf("+0x%X) [0x%08X]\n", (uint32_t)frameAddr - (uint32_t)moduleAddr, frameAddr);
+
+		fflush(stdout);
 	}
 }
 	
@@ -195,6 +197,8 @@ static void dumpBackTrace(void* processId)
 
 void ADM_backTrack(int lineno, const char *file)
 {	
+	fflush(stderr);
+	fflush(stdout);
 	saveCrashProject();
 
 	GUI_Error_HIG(_("Fatal Error"),_("A fatal error has occurred.\n\nClick OK to generate debug information. This may take a few minutes to complete."));
@@ -212,6 +216,8 @@ void ADM_backTrack(int lineno, const char *file)
 
 EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, void* pEstablisherFrame, struct _CONTEXT* pContextRecord, void* pDispatcherContext)
 {
+	fflush(stderr);
+	fflush(stdout);
 	static int running=0;
 
 	if(running)
@@ -228,6 +234,7 @@ EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, 
 	SymInitialize(currentProcessId, NULL, TRUE);
 
 	dumpExceptionInfo(currentProcessId, pExceptionRec, pContextRecord);
+	fflush(stdout);
 	dumpBackTrace(currentProcessId);
 
 	SymCleanup(currentProcessId);
