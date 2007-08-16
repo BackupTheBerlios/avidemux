@@ -47,6 +47,7 @@ int main(void)
     DECLARE_DECODER (RV20, rv20);
     DECLARE_DECODER (DVBSUB, dvbsub);
     DECLARE_DECODER (FLV, flv);
+	DECLARE_DECODER (SNOW, snow);
 
 #undef DECLARE_DECODER
 #define DECLARE_DECODER(a,b); printf("#define ENABLE_"#a"_DECODER 0\n"); 
@@ -134,7 +135,6 @@ int main(void)
     DECLARE_DECODER (RAWVIDEO, rawvideo);
     DECLARE_DECODER (ROQ, roq);
     DECLARE_DECODER (SGI, sgi);
-    DECLARE_DECODER (SNOW, snow);
     DECLARE_DECODER (SVQ1, svq1);
     DECLARE_DECODER (TARGA, targa);
     DECLARE_DECODER (TIFF, tiff);
