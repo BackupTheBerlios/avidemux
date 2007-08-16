@@ -21,6 +21,7 @@ FAC_notch.cpp \
 FAC_frame.cpp \
 FAC_hex.cpp \
 FAC_button.cpp \
-DIA_color.cpp
+DIA_color.cpp \
+FAC_threadCount.cpp
 
 

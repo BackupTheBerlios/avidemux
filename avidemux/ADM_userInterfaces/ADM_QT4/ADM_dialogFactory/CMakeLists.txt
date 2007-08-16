@@ -11,6 +11,7 @@ button
 filesel        
 menu
 toggle
+threadCount
 )
 
 SET(${ADM_LIB}_SRCS

@@ -38,6 +38,7 @@ typedef enum
   ELEM_TOGGLE_INT,
   ELEM_BUTTON,
   ELEM_SLIDER,
+  ELEM_THREAD_COUNT,
   ELEM_MAX=ELEM_TOGGLE
 }elemEnum;
 typedef void ADM_FAC_CALLBACK(void *cookie);
@@ -412,6 +413,16 @@ public:
   void finalize(void);
 };
 /**********************************************/
+class diaElemThreadCount : public diaElem
+{
+
+public:
+  
+  diaElemThreadCount(uint32_t *value, const char *title, const char *tip = NULL);
+  virtual ~diaElemThreadCount() ;
+  void setMe(void *dialog, void *opaque, uint32_t line);
+  void getMe(void);
+};
 /*********************************************/
 uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems);
 uint8_t diaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs);

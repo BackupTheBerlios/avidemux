@@ -3,7 +3,7 @@
                              -------------------
 
 	Encoder for ffmpeg
-	Rever-enginereed from mplayer & transcode
+	Reverse enginereed from mplayer & transcode
 		
 
     begin                : Tue Sep 10 2002
@@ -20,29 +20,25 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-#define __STDC_CONSTANT_MACROS // Lavcodec crap
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <string.h>
-#include <math.h>
-
 
 #ifdef USE_FFMPEG
+
+#define __STDC_CONSTANT_MACROS // Lavcodec crap
+#define WIN32_CLASH
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <pthread.h>
+
 #include "ADM_lavcodec.h"
-
 #include "avi_vars.h"
-#include "prototype.h"
-
-
-#include "ADM_colorspace/colorspace.h"
-//#include "ADM_codecs/ADM_divxEncode.h"
-
 #include "ADM_toolkit/toolkit.hxx"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "ADM_codecs/ADM_ffmpeg.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+#include "prefs.h"
+
 //#define TEST_NOB 1
 
 static char LogName[500];
@@ -57,7 +53,7 @@ if(!codec) {GUI_Alert(_("Internal error opening codec"#x));ADM_assert(0);} \
 /*****************************************/
 uint8_t ffmpegEncoder::stopEncoder(void)
 {
-    printf("[lavcodec] stopEncoder (%x)\n",_context);
+    printf("[lavc] stopEncoder (%x)\n",_context);
     if (_init)
     {
         _init = 0;
@@ -96,7 +92,7 @@ void ffmpegEncoder::postAmble (ADMBitstream * out, uint32_t sz)
 ffmpegEncoder::ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id):encoder (width,
 	 height)
 {
-  printf ("\n Build : %d \n", LIBAVCODEC_BUILD);
+  printf ("Build: %d\n", LIBAVCODEC_BUILD);
 
   _id = id;
   _swap = 0;
@@ -130,10 +126,10 @@ uint8_t   ffmpegEncoder::encode(ADMImage *in,ADMBitstream *out)
 /*****************************************/
 ffmpegEncoder::~ffmpegEncoder ()
 {
-  printf ("[codec] FF base encoder destroying..\n");
+  printf ("[lavc] encoder destroying..\n");
   if (_isMT)
     {
-      printf ("[codec] killing threads\n");
+      printf ("[lavc] killing threads\n");
       avcodec_thread_free (_context);
       _isMT = 0;
     }
@@ -207,7 +203,7 @@ ffmpegEncoder::gopMpeg1 (void)
     {
       if (FRAME_FILM == identMovieType (rate))
 	{
-	  printf ("\nPulldown activated...\n");
+	  printf ("Pulldown activated...\n");
 	  _context->flags2 |= CODEC_FLAG2_32_PULLDOWN;
 	}
     }
@@ -216,7 +212,7 @@ ffmpegEncoder::gopMpeg1 (void)
 #else
   _context->max_b_frames = 2;
 #endif
-  printf ("\n Using 2 b frames \n");
+  printf ("Using 2 b frames\n");
   if (_id == FF_MPEG2)
     {
       _context->mpeg_quant = 1;	//1; // Should be mpeg quant 
@@ -361,30 +357,36 @@ ffmpegEncoder::initContext (void)
 
   if (res < 0)
     {
-      printf ("\n Problem opening ffmpeg codec\n");
+      printf ("[lavc] Problem opening codec\n");
       return 0;
     }
   return 1;
 
 }
-void
-ffmpegEncoder::encoderMT (void)
+
+void ffmpegEncoder::encoderMT (void)
 {
-  uint32_t nbThread = 0;
+  uint32_t threads = 0;
 
-  nbThread = ADM_useNbThreads ();
-  if (nbThread )
-    {
-      printf ("[codec]Enabling MT encoder with %u threads\n", nbThread);
-      if (0 > avcodec_thread_init (_context, nbThread))
-	{
-	  printf ("[codec]Failed!!\n");
-	  return;
-	}
-      _isMT = 1;
-    }
+  prefs->get(FEATURE_THREADING_LAVC, &threads);
 
+  if (threads == 0)
+	  threads = pthread_num_processors_np();
+
+  if (threads == 1)
+	  threads = 0;
+
+  if (threads)
+  {
+      printf ("[lavc] Enabling MT encoder with %u threads\n", threads);
+
+      if (avcodec_thread_init (_context, threads) == -1)
+	      printf ("[lavc] Failed!!\n");
+	  else
+          _isMT = 1;
+  }
 }
+
 /*
 		Set user selected matrices.
 
@@ -402,7 +404,7 @@ ffmpegEncoder::setGopSize (uint32_t size)
 {
 
   _context->gop_size = size;
-  printf ("\n Gop size is now %d\n", _context->gop_size);
+  printf ("Gop size is now %d\n", _context->gop_size);
   return 1;
 
 }
@@ -468,14 +470,14 @@ uint8_t ffmpegEncoderCQ::encode (ADMImage * in, ADMBitstream * out)
     {
       if (!_statfile)
 	{
-	  printf ("FFmpeg using %s as log file\n", LogName);
+	  printf ("[lavc] using %s as log file\n", LogName);
 	  _statfile = fopen (LogName, "wb");
 	}
 
       if (!_statfile)
 	{
 	  printf
-	    ("\n FF codec : cannot open log file for writing ! (%s)\n",
+	    ("[lavc] cannot open log file for writing! (%s)\n",
 	     LogName);
 	  return 0;
 	}
@@ -540,7 +542,7 @@ ffmpegEncoderVBR::init (uint32_t val, uint32_t fps1000)
   uint32_t statSize;
   FILE *_statfile;
 
-  printf ("\n initializing FFmpeg in VBR mode \n");
+  printf ("[lavc] initializing in VBR mode\n");
   _qual = val;
   mplayer_init ();
 
@@ -555,7 +557,7 @@ ffmpegEncoderVBR::init (uint32_t val, uint32_t fps1000)
   _statfile = fopen (LogName, "rb");
   if (!_statfile)
     {
-      printf ("\n internal file does not exists ?\n");
+      printf ("internal file does not exists ?\n");
       return 0;
     }
 
@@ -601,7 +603,7 @@ uint8_t
 ffmpegEncoderVBRExternal::init (uint32_t val, uint32_t fps1000)
 {
 
-  printf ("\n initializing FFmpeg in VBRExternal  mode \n");
+  printf ("[lavc] initializing in VBRExternal mode\n");
   _qual = val;
   mplayer_init ();
 
@@ -641,7 +643,7 @@ ffmpegEncoder::mplayer_init (void)
 
   if (!_settingsPresence)
     {
-      printf ("\n using FFmpeg default encode settings \n");
+      printf ("[lavc] using default encode settings \n");
       _context->qmin = 2;
       _context->qmax = 31;
       _context->max_b_frames = 0;
@@ -826,7 +828,7 @@ ffmpegEncoder::getExtraData (uint32_t * l, uint8_t ** d)
 {
   *d = (uint8_t *) _context->extradata;
   *l = _context->extradata_size;
-  printf ("\n We got some extra data  : %lu \n", *l);
+  printf ("We got some extra data: %lu\n", *l);
   if (*l)
     return 1;
 

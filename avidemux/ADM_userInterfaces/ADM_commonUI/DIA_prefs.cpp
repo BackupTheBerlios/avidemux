@@ -48,8 +48,6 @@ uint8_t DIA_Preferences(void);
 */
 uint8_t DIA_Preferences(void)
 {
-uint8_t ret=0;
-
 uint32_t olddevice,newdevice;
 
 uint32_t	lavcodec_mpeg=0;
@@ -61,7 +59,7 @@ uint32_t useMaster=0;
 uint32_t useAutoIndex=0;
 uint32_t useSwap=0;
 uint32_t useNuv=0;
-uint32_t mthreads=0;
+uint32_t lavcThreads=0,x264Threads=0,xvidThreads=0;
 uint32_t encodePriority=2;
 uint32_t indexPriority=2;
 uint32_t playbackPriority=0;
@@ -137,8 +135,10 @@ char     *globalGlyphName=NULL;
         if(!prefs->get(FEATURE_MPEG_NO_LIMIT,&mpeg_no_limit)) mpeg_no_limit=0;
 
         // Multithreads
-        if(!prefs->get(FEATURE_MULTI_THREAD, &mthreads))
-                mthreads=0;
+        prefs->get(FEATURE_THREADING_LAVC, &lavcThreads);
+        prefs->get(FEATURE_THREADING_X264, &x264Threads);
+        prefs->get(FEATURE_THREADING_XVID, &xvidThreads);
+
 		// Encoding priority
 		if(!prefs->get(PRIORITY_ENCODING, &encodePriority))
                 encodePriority=2;
@@ -197,13 +197,11 @@ char     *globalGlyphName=NULL;
         diaElemToggle togAutoVbr(&autovbr,_("Automatically _build VBR map"));
         diaElemToggle togAutoIndex(&autoindex,_("Automatically _rebuild index"));
         diaElemToggle togAutoUnpack(&autounpack,_("Automatically remove _packed bitstream"));
-                       
-        diaElemUInteger multiThread(&mthreads,_("_Number of threads:"),0,10);
 
 
         
-        diaElemToggle capsToggleAll(&capsAll,_("Enable all Simd"));
-        diaElemFrame      frameSimd(_("Simd"));
+        diaElemToggle capsToggleAll(&capsAll,_("Enable all SIMD"));
+        diaElemFrame      frameSimd(_("SIMD"));
         frameSimd.swallow(&capsToggleAll);
         
 #define CAPS_TOGGLE(x) diaElemToggle       capsToggle##x(&(caps##x),_("Enable "#x));\
@@ -219,8 +217,15 @@ char     *globalGlyphName=NULL;
         CAPS_TOGGLE(SSE3);
         CAPS_TOGGLE(SSSE3);        
       
+		diaElemThreadCount lavcThreadCount(&lavcThreads, _("_lavc threads:"));
+		diaElemThreadCount x264ThreadCount(&x264Threads, _("_x264 threads:"));
+		diaElemThreadCount xvidThreadCount(&xvidThreads, _("X_vid threads:"));
 
-        
+		diaElemFrame frameThread(_("Multi-threading"));
+		frameThread.swallow(&lavcThreadCount);
+		frameThread.swallow(&x264ThreadCount);
+		frameThread.swallow(&xvidThreadCount);
+
 		diaMenuEntry priorityEntries[] = {
                              {0,       _("High"),NULL}
                              ,{1,      _("Above normal"),NULL}
@@ -231,6 +236,11 @@ char     *globalGlyphName=NULL;
 		diaElemMenu menuEncodePriority(&encodePriority,_("_Encoding priority:"), sizeof(priorityEntries)/sizeof(diaMenuEntry), priorityEntries,"");
 		diaElemMenu menuIndexPriority(&indexPriority,_("_Indexing/unpacking priority:"), sizeof(priorityEntries)/sizeof(diaMenuEntry), priorityEntries,"");
 		diaElemMenu menuPlaybackPriority(&playbackPriority,_("_Playback priority:"), sizeof(priorityEntries)/sizeof(diaMenuEntry), priorityEntries,"");
+
+		diaElemFrame framePriority(_("Prioritisation"));
+		framePriority.swallow(&menuEncodePriority);
+		framePriority.swallow(&menuIndexPriority);
+		framePriority.swallow(&menuPlaybackPriority);
 
         diaElemUInteger autoSplit(&autosplit,_("_Split MPEG files every (MB):"),10,4096);
         
@@ -378,28 +388,27 @@ char     *globalGlyphName=NULL;
 #endif
         
         /* Fifth Tab : video */
-        
         diaElem *diaVideo[]={&menuVideoMode,&framePP};
         diaElemTabs tabVideo(_("Video"),2,(diaElem **)diaVideo);
         
-        /* Sixth Tab : mthread */
-        diaElem *diaCpu[]={&multiThread, &frameSimd,&menuEncodePriority, &menuIndexPriority, &menuPlaybackPriority};
-        
-        
-        
-        diaElemTabs tabCpu(_("CPU"),4,(diaElem **)diaCpu);
-        
-        /* 7th Tab : Global Glyph */
+        /* CPU tab */
+		diaElem *diaCpu[]={&frameSimd};
+		diaElemTabs tabCpu(_("CPU"),1,(diaElem **)diaCpu);
+
+        /* Threading tab */
+		diaElem *diaThreading[]={&frameThread, &framePriority};
+		diaElemTabs tabThreading(_("Threading"),2,(diaElem **)diaThreading);
+
+        /* Global Glyph tab */
         diaElem *diaGlyph[]={&menuGlobaGlyh,&entryGLyphPath};
         diaElemTabs tabGlyph(_("Global Glyphset"),2,(diaElem **)diaGlyph);
-        
-        
-        /* 8th Tab : Xfilter */
+
+        /* Xfilter tab */
         diaElem *diaXFilter[]={&loadEx,&entryFilterPath};
         diaElemTabs tabXfilter(_("External Filters"),2,(diaElem **)diaXFilter);
                                     
 // SET
-        diaElemTabs *tabs[]={&tabUser,&tabAuto,&tabInput,&tabOutput,&tabAudio,&tabVideo,&tabCpu,&tabGlyph,&tabXfilter};
+        diaElemTabs *tabs[]={&tabUser,&tabAuto,&tabInput,&tabOutput,&tabAudio,&tabVideo,&tabCpu,&tabThreading,&tabGlyph,&tabXfilter};
         if( diaFactoryRunTabs(_("Preferences"),9,tabs))
 	{
         	
@@ -422,12 +431,11 @@ char     *globalGlyphName=NULL;
         	    	CPU_CAPS(SSSE3);
         		}
         		prefs->set(FEATURE_CPU_CAPS,CpuCaps::myCpuMask);
+
         		// Glyphs
                prefs->set(FEATURE_GLOBAL_GLYPH_ACTIVE,useGlobalGlyph);
                prefs->set(FEATURE_GLOBAL_GLYPH_NAME,globalGlyphName);
 
-          
-		ret=1;
                 // Postproc
                 #undef DOME
                 #define DOME(x,y) if(y) pp_type |=x;
@@ -475,8 +483,10 @@ char     *globalGlyphName=NULL;
                 prefs->set(SETTINGS_MPEGSPLIT, autosplit);
                 
                 // number of threads
-                if(mthreads<2) mthreads=0;
-                prefs->set(FEATURE_MULTI_THREAD, mthreads);
+                prefs->set(FEATURE_THREADING_LAVC, lavcThreads);
+				prefs->set(FEATURE_THREADING_X264, x264Threads);
+				prefs->set(FEATURE_THREADING_XVID, xvidThreads);
+
 				// Encoding priority
 				prefs->set(PRIORITY_ENCODING, encodePriority);
 				// Indexing / unpacking priority

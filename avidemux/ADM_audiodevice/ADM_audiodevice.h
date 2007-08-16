@@ -12,7 +12,7 @@
 #ifndef ADM_AUDIODEVICE_H
 #define ADM_AUDIODEVICE_H
 
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 void dither16(float *start, uint32_t nb, uint8_t channels);
 
@@ -34,7 +34,7 @@ class dummyAudioDevice : public audioDevice
 		  public:
                                         dummyAudioDevice(void) {};
                         virtual uint8_t init(uint8_t channels, uint32_t fq)
-                                {printf("\n Null audio device"); UNUSED_ARG(fq); UNUSED_ARG(channels); return 1;}
+                                {printf("Null audio device\n"); UNUSED_ARG(fq); UNUSED_ARG(channels); return 1;}
                         virtual uint8_t play(uint32_t len, float *data)
                                 {UNUSED_ARG(len); UNUSED_ARG(data); return 1;}
                         virtual uint8_t stop(void) {return 1;}

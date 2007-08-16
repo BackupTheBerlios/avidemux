@@ -55,19 +55,17 @@ static ADM_x264Param    admParam;
 //**********************************************************
 uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
 {
+  x264_t *xhandle = NULL;
 
-  x264_t *
-    xhandle = NULL;
-
-  printf ("Opening X264 for %lu x %lu\n", _w, _h);
+  printf ("[x264] Opening x264 for %lu x %lu\n", _w, _h);
 
   param.i_threads = zparam->nbThreads;
   param.i_width = _w;
   param.i_height = _h;
   param.i_csp = X264_CSP_I420;
 
-#define MKPARAM(x,y) {param.x = zparam->y;printf(#x" = %d\n",param.x);}
-#define MKPARAMF(x,y) {param.x = (float)zparam->y / 100; printf(#x" = %.2f\n",param.x);}
+#define MKPARAM(x,y) {param.x = zparam->y;printf("[x264] "#x" = %d\n",param.x);}
+#define MKPARAMF(x,y) {param.x = (float)zparam->y / 100; printf("[x264] "#x" = %.2f\n",param.x);}
 
   if (zparam->AR_AsInput) {
     param.vui.i_sar_width = video_body->getPARWidth();
@@ -82,7 +80,7 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   if(zparam->idc)
   {
     MKPARAM(i_level_idc,idc);
-    printf("***Forcing level =%d\n",param.i_level_idc);
+    printf("[x264] *** Forcing level = %d\n",param.i_level_idc);
   }
   // KeyframeBoost ?
   // BframeReduction ?
@@ -139,7 +137,7 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   MKPARAM(analyse.b_mixed_references,MixedRefs);
   MKPARAM(analyse.i_noise_reduction,NoiseReduction);
   
-#define MES(x,y) if(zparam->x) {param.analyse.inter |=X264_ANALYSE_##y;printf(#x" is on\n");}
+#define MES(x,y) if(zparam->x) {param.analyse.inter |=X264_ANALYSE_##y;printf("[x264] "#x" is on\n");}
   param.analyse.inter=0;
   MES(  _8x8P,  PSUB16x16);
   MES(  _8x8B,  BSUB16x16);
@@ -154,27 +152,30 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
         float       f_vbv_buffer_init;
 
   */
-  printf("VBV_max_br         :%d\n", param.rc.i_vbv_max_bitrate);
-  printf("vbv_buffer_size    :%d\n", param.rc.i_vbv_buffer_size);
-  printf("f_vbv_buffer_init  :%f\n", param.rc.f_vbv_buffer_init);
+  printf("[x264] VBV_max_br = %d\n", param.rc.i_vbv_max_bitrate);
+  printf("[x264] vbv_buffer_size = %d\n", param.rc.i_vbv_buffer_size);
+  printf("[x264] f_vbv_buffer_init = %f\n", param.rc.f_vbv_buffer_init);
   
   if(zparam->globalHeader)
       param.b_repeat_headers=0;
   else
       param.b_repeat_headers=1;
+
   xhandle = x264_encoder_open (&param);
   if (!xhandle)
     return 0;
 
   _handle = (void *) xhandle;
   _pic = (void *) new    x264_picture_t;
-  printf ("X264 init ok (atom mode : %d)\n", zparam->globalHeader);
+  printf ("[x264] init ok (atom mode: %d)\n", zparam->globalHeader);
+
   if (param.i_threads > 1)
-    printf ("X264 using %d threads\n", param.i_threads);
+    printf ("[x264] using %d threads\n", param.i_threads);
+  else if (param.i_threads == 0)
+    printf ("[x264] using threads\n");
+
   if (zparam->globalHeader)
-  {
     return createHeader ();
-  }
   else
     return 1;
 
@@ -243,7 +244,7 @@ uint8_t X264Encoder::encode (ADMImage * in, ADMBitstream * out)
   PICS->i_pts = curFrame++;
   if (x264_encoder_encode (HANDLE, &nal, &nbNal, PICS, &pic_out) < 0)
     {
-      printf ("Error encoding with x264\n");
+      printf ("[x264] Error encoding\n");
       return 0;
     }
 
@@ -298,7 +299,7 @@ uint8_t X264Encoder::encode (ADMImage * in, ADMBitstream * out)
       out->flags = AVI_B_FRAME;
       break;
     default:
-      printf ("X264 :Unknown image type:%d\n", pic_out.i_type);
+      printf ("[x264] Unknown image type: %d\n", pic_out.i_type);
       //ADM_assert(0);
 
     }
@@ -311,7 +312,7 @@ uint8_t X264Encoder::encode (ADMImage * in, ADMBitstream * out)
 uint8_t
   X264EncoderCQ::init (uint32_t val, uint32_t fps1000, ADM_x264Param * zparam)
 {
-  printf ("X264 CQ\n");
+  printf ("[x264] CQ\n");
   memset (&param, 0, sizeof (param));
   x264_param_default (&param);
   memcpy(&admParam,zparam,sizeof(admParam));
@@ -332,7 +333,7 @@ X264EncoderCQ::~X264EncoderCQ ()
 uint8_t
   X264EncoderAQ::init (uint32_t val, uint32_t fps1000, ADM_x264Param * zparam)
 {
-  printf ("X264 AQ\n");
+  printf ("[x264] AQ\n");
   memset (&param, 0, sizeof (param));
   x264_param_default (&param);
   memcpy(&admParam,zparam,sizeof(admParam));
@@ -358,7 +359,7 @@ uint8_t
   X264EncoderCBR::init (uint32_t val, uint32_t fps1000,
 			ADM_x264Param * zparam)
 {
-  printf ("X264 pass CBR\n");
+  printf ("[x264] pass CBR\n");
   memset (&param, 0, sizeof (param));
   x264_param_default (&param);
   memcpy(&admParam,zparam,sizeof(admParam));
@@ -381,7 +382,7 @@ uint8_t
   X264EncoderPass1::init (uint32_t val, uint32_t fps1000,
 			  ADM_x264Param * zparam)
 {
-  printf ("X264 pass 1\n");
+  printf ("[x264] pass 1\n");
   memset (&param, 0, sizeof (param));
   x264_param_default (&param);
   memcpy(&admParam,zparam,sizeof(admParam));
@@ -411,7 +412,7 @@ uint8_t
     param.rc.psz_stat_out = "/tmp/x264_log.tmp";
   else
     param.rc.psz_stat_out = zparam->logfile;
-  printf ("x264 codec using %s as statfile\n", param.rc.psz_stat_out);
+  printf ("[x264] codec using %s as statfile\n", param.rc.psz_stat_out);
   return preamble (fps1000, &admParam);
 }
 X264EncoderPass1::~X264EncoderPass1 ()
@@ -424,7 +425,7 @@ uint8_t
 			  ADM_x264Param * zparam)
 {
     val=val/1000; // bps->kdps
-  printf ("X264 pass 2, using bitrate of %u\n",val);
+  printf ("[x264] pass 2, using bitrate of %u\n",val);
   memset (&param, 0, sizeof (param));
   x264_param_default (&param);
   
@@ -447,7 +448,7 @@ uint8_t
     param.rc.psz_stat_in = "/tmp/x264_log.tmp";
   else
     param.rc.psz_stat_in = zparam->logfile;
-  printf ("x264 codec using %s as statfile\n", param.rc.psz_stat_in);
+  printf ("[x264] using %s as statfile\n", param.rc.psz_stat_in);
 
   return preamble (fps1000, &admParam);
 }
@@ -535,10 +536,10 @@ uint8_t X264Encoder::createHeader (void)
 
   if (x264_encoder_headers (HANDLE, &nal, &nal_count))
     {
-      printf ("X264 : Cannot create header\n");
+      printf ("[x264] Cannot create header\n");
       return 0;
     }
-  printf ("Nb nal :%d\n", nal_count);
+  printf ("[x264] Nb nal: %d\n", nal_count);
 
   // Now encode them
   for (int i = 0; i < nal_count; i++)
@@ -553,12 +554,12 @@ uint8_t X264Encoder::createHeader (void)
 	}
       else
 	{
-	  printf ("?? type :%d in nal %d\n", nal[i].i_type, i);
+	  printf ("[x264] ?? type %d in nal %d\n", nal[i].i_type, i);
 	  sz = x264_nal_encode (buffer, &len, 0, &nal[i]);
 	}
       if (sz <= 0)
 	{
-	  printf ("X264 : Cannot encode nal  header %d\n", i);
+	  printf ("[x264] Cannot encode nal header %d\n", i);
 	  return 0;
 	}
     }
@@ -566,7 +567,7 @@ uint8_t X264Encoder::createHeader (void)
   // Check we have everything we want
   if (!picParamLen || !seqParamLen)
     {
-      printf ("X264 : Seqparam or PicParam not found\n");
+      printf ("[x264] Seqparam or PicParam not found\n");
       return 0;
     }
 

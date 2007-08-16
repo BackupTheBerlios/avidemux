@@ -413,4 +413,10 @@ void diaElemSlider::enable(uint32_t onoff)
 {
 }
 
+
+diaElemThreadCount::diaElemThreadCount(uint32_t *value, const char *title, const char *tip) : diaElem(ELEM_THREAD_COUNT) {}
+diaElemThreadCount::~diaElemThreadCount() {}
+void diaElemThreadCount::setMe(void *dialog, void *opaque, uint32_t line) {}
+void diaElemThreadCount::getMe(void) {}
+
 //EOF

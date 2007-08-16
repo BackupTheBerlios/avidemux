@@ -126,7 +126,9 @@ static opt_def opt_defs [] = {
 	{"feature.use_systray",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.reuse_2pass_log",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.audiobar_uses_master",		UINT,	"0",	NULL,	"0",	"1"	},
-	{"feature.multi_thread",		UINT,	"0",	NULL,	"0",	"4"	},
+	{"feature.threading.lavc",		UINT,	"0",	NULL,	"0",	"32"	},
+	{"feature.threading.x264",		UINT,	"0",	NULL,	"0",	"32"	},
+	{"feature.threading.xvid",		UINT,	"0",	NULL,	"0",	"32"	},
 	{"feature.cpu_caps",		UINT,	"4294967295",NULL,	"0",	"4294967295"},
 	{"feature.mpeg_no_limit",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.auto_buildmap",		UINT,	"0",	NULL,	"0",	"1"	},
@@ -143,7 +145,7 @@ static opt_def opt_defs [] = {
 	{"priority.playback",		UINT,	"0",	NULL,	"0",	"4"	}
 };
 
-int num_opts = 79;
+int num_opts = 81;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2

@@ -38,8 +38,7 @@
 
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encx264.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
-
+#include "prefs.h"
 
 #define aprintf printf
 
@@ -47,6 +46,7 @@
 /*_________________________________________________*/
 EncoderX264::EncoderX264 (COMPRES_PARAMS * codecconfig)
 {
+	uint32_t threads = 0;
 
   _codec = NULL;
   strcpy (_logname, "");
@@ -55,7 +55,10 @@ EncoderX264::EncoderX264 (COMPRES_PARAMS * codecconfig)
   memcpy (&_param, codecconfig, sizeof (_param));
   ADM_assert (codecconfig->extraSettingsLen == sizeof (_codecParam));
   memcpy (&_codecParam, (codecconfig->extraSettings), sizeof (_codecParam));
-  _codecParam.nbThreads = ADM_useNbThreads ();
+
+  prefs->get(FEATURE_THREADING_X264, &threads);
+
+  _codecParam.nbThreads = threads;
   _logfile = NULL;
 
 };
@@ -70,7 +73,7 @@ EncoderX264::hasExtraHeaderData (uint32_t * l, uint8_t ** data)
 {
   uint8_t r = 0;
   r = _codec->getExtraData (l, data);
-  printf ("x264 has %d extra bytes\n", *l);
+  printf ("[x264] has %d extra bytes\n", *l);
   return r;
 
 }
@@ -93,35 +96,35 @@ EncoderX264::configure (AVDMGenericVideoStream * instream)
     {
 
     case COMPRESS_CQ:
-      printf ("\n X264 cq mode: %ld", _param.qz);
+      printf ("\n[x264] cq mode: %ld", _param.qz);
       _state = enc_CQ;
       _codec = new X264EncoderCQ (_w, _h);
 
       if (!_codec->init (_param.qz, info->fps1000, &_codecParam))
 	{
-	  printf ("Error initi X264 CQ mode\n");
+	  printf ("[x264] Error init CQ mode\n");
 	  return 0;
 	}
       break;
     case COMPRESS_AQ:
-      printf ("\n X264 AQ mode: %ld", _param.qz);
+      printf ("\n[x264] AQ mode: %ld", _param.qz);
       _state = enc_CQ;
       _codec = new X264EncoderAQ (_w, _h);
 
       if (!_codec->init (_param.qz, info->fps1000, &_codecParam))
 	{
-	  printf ("Error initi X264 AQ mode\n");
+	  printf ("[x264] Error init AQ mode\n");
 	  return 0;
 	}
       break;
     case COMPRESS_CBR:
-      printf ("\n X264 cbr mode: %lu", _param.bitrate);
+      printf ("\n[x264] CBR mode: %lu", _param.bitrate);
       _state = enc_CBR;
 
       _codec = new X264EncoderCBR (_w, _h);
       if (!_codec->init (_param.bitrate, info->fps1000, &_codecParam))
 	{
-	  printf ("Error initi X264 CBR mode\n");
+	  printf ("[x264] Error init CBR mode\n");
 	  return 0;
 	}
       break;
@@ -140,7 +143,7 @@ EncoderX264::configure (AVDMGenericVideoStream * instream)
     }
 
 
-  printf ("\n X264 Encoder ready , w: %lu h:%lu mode:%d", _w, _h, _state);
+  printf ("\n[x264] Encoder ready, w: %lu h: %lu mode: %d", _w, _h, _state);
   return 1;
 
 }
@@ -155,7 +158,7 @@ EncoderX264::startPass1 (void)
   info = _in->getInfo ();
   if (!_codec->init (_param.bitrate, info->fps1000, &(_codecParam)))
     {
-      printf ("Error initi Xvid4 pass1 mode\n");
+      printf ("[x264] Error init pass 1 mode\n");
       return 0;
     }
   return 1;
@@ -180,7 +183,7 @@ EncoderX264::setLogFile (const char *lofile, uint32_t nbframe)
 {
   // strcpy (_logname, lofile);
   _logfile = ADM_strdup (lofile);
-  printf ("Enc X264, using %s as logfile\n", _logfile);
+  printf ("[x264] using %s as logfile\n", _logfile);
   _frametogo = nbframe;
   _totalframe = nbframe;
   return 1;
@@ -199,7 +202,7 @@ uint8_t
 
   if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
     {
-      printf ("\n Error : Cannot read incoming frame !");
+      printf ("\n[x264] Error: Cannot read incoming frame!");
       return 0;
     }
 
@@ -238,17 +241,15 @@ uint8_t EncoderX264::stop (void)
   return 1;
 
 }
+
 uint32_t ADM_computeBitrate(uint32_t fps1000, uint32_t nbFrame, uint32_t sizeInMB);
+
 uint8_t EncoderX264::startPass2 (void)
 {
-  
   uint32_t    bitrate;
 
   ADM_assert (_state == enc_Pass1);
-  printf ("\n Starting pass 2 (%dx%d)\n", _w, _h);
-
-
-  
+  printf ("\n[x264] Starting pass 2 (%d x %d)\n", _w, _h);
 
   if(_param.mode==COMPRESS_2PASS)
   {
@@ -268,14 +269,14 @@ uint8_t EncoderX264::startPass2 (void)
 	_codec;
       _codec = NULL;
     }
-  printf ("\n X264 dual size: %lu MB\n", _param.finalsize);
+  printf ("\n[x264] dual size: %lu MB\n", _param.finalsize);
 
   _codec = new X264EncoderPass2 (_w, _h);
   // strcpy(encparam.logName,_logname);
   //printf("Using %s as stat file, average bitrate %d kbps\n",_logname,finalSize/1000);
   if (!_codec->init (bitrate, _fps1000, &_codecParam))
     {
-      printf ("Error initializing x264 pass1 mode\n");
+      printf ("[x264] Error initializing x264 pass 2 mode\n");
       return 0;
     }
   _frametogo = 0;

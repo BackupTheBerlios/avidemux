@@ -22,28 +22,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
+#include <pthread.h>
 
-
-#include <ADM_assert.h>
-
+#include "ADM_assert.h"
+#include "prefs.h"
 #include "ADM_lavcodec.h"
 #include "ADM_utilities/default.h"
 
-#include "ADM_colorspace/colorspace.h"
-
 #include "ADM_codecs/ADM_codec.h"
-
 #include "ADM_codecs/ADM_ffmp43.h"
-//#include "ADM_gui/GUI_MPP.h"
-
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME  MODULE_CODEC
 #include "ADM_osSupport/ADM_debug.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
-
 #include "ADM_video/ADM_videoInfoExtractor.h"
 //****************************
 #define WRAP_Open(x) \
@@ -55,13 +47,13 @@ if(!codec) {GUI_Alert(_("Internal error finding codec"#x));ADM_assert(0);} \
   _context->error_concealment=3; \
   if (avcodec_open(_context, codec) < 0)  \
                       { \
-                                        printf(" Decoder init: Lavcodec :"#x" video decoder failed!\n"); \
+                                        printf("[lavc] Decoder init: "#x" video decoder failed!\n"); \
                                         GUI_Alert("Internal error opening "#x); \
                                         ADM_assert(0); \
                                 } \
                                 else \
                                 { \
-                                        printf(" Decoder init: lavcodec "#x" video decoder initialized!\n"); \
+                                        printf("[lavc] Decoder init: "#x" video decoder initialized!\n"); \
                                 } \
 }
 //****************************
@@ -116,19 +108,25 @@ uint8_t decoderFF::clonePic (AVFrame * src, ADMImage * out)
 void
 decoderFF::decoderMultiThread (void)
 {
-  uint32_t nbThread = 0;
+  uint32_t threads = 0;
 
-  nbThread = ADM_useNbThreads ();
-  if (nbThread)
-    {
-      printf ("[codec]Enabling MT decoder with %u threads\n", nbThread);
-      if (0 > avcodec_thread_init (_context, nbThread))
-	{
-	  printf ("[codec]Failed!!\n");
-	  return;
-	}
-      _usingMT = 1;
-    }
+  prefs->get(FEATURE_THREADING_LAVC, &threads);
+
+  if (threads == 0)
+	  threads = pthread_num_processors_np();
+
+  if (threads == 1)
+	  threads = 0;
+
+  if (threads)
+  {
+      printf ("[lavc] Enabling MT decoder with %u threads\n", threads);
+
+      if (avcodec_thread_init (_context, threads) == -1)
+	      printf ("[lavc] Failed!!\n");
+	  else
+          _usingMT = 1;
+  }
 }
 uint8_t decoderFF::getPARWidth (void)
 {
@@ -218,7 +216,7 @@ decoderFF::decoderFF (uint32_t w, uint32_t h):decoders (w, h)
   _showMv = 0;
 #define FF_SHOW		(FF_DEBUG_VIS_MV_P_FOR+	FF_DEBUG_VIS_MV_B_FOR+FF_DEBUG_VIS_MV_B_BACK)
 //#define FF_SHOW               (FF_DEBUG_VIS_MV_P_FOR)
-  printf ("FFMpeg build : %d\n", LIBAVCODEC_BUILD);
+  printf ("[lavc] Build: %d\n", LIBAVCODEC_BUILD);
   _context->debug_mv |= FF_SHOW;
   _context->debug |= FF_DEBUG_VIS_MB_TYPE + FF_DEBUG_VIS_QP;
 }
@@ -229,7 +227,7 @@ decoderFF::~decoderFF ()
 {
   if (_usingMT)
     {
-      printf ("[decoder] Killing decoding threads\n");
+      printf ("[lavc] Killing decoding threads\n");
       avcodec_thread_free (_context);
       _usingMT = 0;
     }
@@ -237,7 +235,7 @@ decoderFF::~decoderFF ()
   avcodec_close (_context);
   ADM_dealloc (_context);
   delete[]_internalBuffer;
-  printf ("FF base destroyed\n");
+  printf ("[lavc] Destroyed\n");
 }
 
 //-------------------------------
@@ -248,7 +246,7 @@ uint32_t decoderFF::frameType (void)
 
   AVFrame *
     target;
-#define SET(x) {flag=x;aprintf(" Frame is %s\n",#x);}
+#define SET(x) {flag=x;aprintf("Frame is %s\n",#x);}
 
 
   target = &_frame;
@@ -257,7 +255,7 @@ uint32_t decoderFF::frameType (void)
     case FF_B_TYPE:
       SET (AVI_B_FRAME);
       if (target->key_frame)
-	aprintf ("\n But keyframe is  set\n");
+	aprintf ("\n But keyframe is set\n");
       break;
 
     case FF_I_TYPE:
@@ -277,7 +275,7 @@ uint32_t decoderFF::frameType (void)
     case FF_P_TYPE:
       SET (AVI_P_FRAME);
       if (target->key_frame)
-	aprintf ("\n But keyframe is  set\n");
+	aprintf ("\n But keyframe is set\n");
       break;
     default:
 //                              printf("\n OOops XXX frame ?\n");
@@ -291,13 +289,13 @@ uint8_t decoderFF::decodeHeaderOnly (void)
     _context->hurry_up = 4;
   else
     _context->hurry_up = 5;
-  printf ("\n FFmpeg: Hurry up\n");
+  printf ("\n[lavc] Hurry up\n");
   return 1;
 }
 uint8_t decoderFF::decodeFull (void)
 {
   _context->hurry_up = 0;
-  printf ("\n FFmpeg: full decoding\n");
+  printf ("\n[lavc] full decoding\n");
   return 1;
 }
 
@@ -326,7 +324,7 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
   if (in->dataLength == 0 && !_allowNull)	// Null frame, silently skipped
     {
       
-      printf ("\n ff4: null frame\n");
+      printf ("\n[lavc] null frame\n");
       {
 	// search the last image
 	if (_context->coded_frame && _context->coded_frame->data)
@@ -345,8 +343,8 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
   out->_qStride = 0;		//Default = no quant
   if (0 > ret && !_context->hurry_up)
     {
-      printf ("\n error in FFMP43/mpeg4!\n");
-      printf ("Err: %d, size :%d\n", ret, in->dataLength);
+      printf ("\n[lavc] error in FFMP43/mpeg4!\n");
+      printf ("[lavc] Err: %d, size :%d\n", ret, in->dataLength);
       return 0;
     }
   if (!got_picture && !_context->hurry_up)
@@ -356,7 +354,7 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
       // it is meant to mean frame skipped but very dubious
       if (in->dataLength <= 8 && codecId == CODEC_ID_MPEG4)
 	{
-	  printf ("Probably pseudo black frame...\n");
+	  printf ("[lavc] Probably pseudo black frame...\n");
 	  out->_Qp = 2;
 	  out->flags = 0;	// assume P ?
 
@@ -378,12 +376,12 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
 	    {
 	      out->_noPicture = 1;
 	    }
-	  printf ("\n ignoring got pict ==0\n");
+	  printf ("\n[lavc] ignoring got pict ==0\n");
 	  return 1;
 
 	}
-      printf ("Err: %d, size :%d\n", ret, in->dataLength);
-      printf ("\n error in FFMP43/mpeg4!: got picture \n");
+      printf ("[lavc] Err: %d, size: %d\n", ret, in->dataLength);
+      printf ("\n[lavc] error in FFMP43/mpeg4!: got picture\n");
       //GUI_Alert("Please retry with misc->Turbo off");
       //return 1;
       return 0;
@@ -420,14 +418,14 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
       out->_colorspace = ADM_COLOR_BGR555;
       break;
     default:
-      printf ("\n Unhandled colorspace:%d\n", _context->pix_fmt);
+      printf ("\n[lavc] Unhandled colorspace: %d\n", _context->pix_fmt);
       return 0;
     }
     clonePic (&_frame, out);
     #if 0
-    printf("Frame bitstream order : %u, display order %u Incoming :%u outgoing :%u\n",_frame.coded_picture_number,_frame.display_picture_number,
+    printf("[lavc] Frame bitstream order: %u, display order %u Incoming: %u outgoing: %u\n",_frame.coded_picture_number,_frame.display_picture_number,
          in->demuxerFrameNo,out->demuxerFrameno);
-    printf("in flags :%x out flags :%x\n",in->flags, out->flags);
+    printf("[lavc] in flags: %x out flags: %x\n",in->flags, out->flags);
  #endif 
   return 1;
 }
@@ -448,14 +446,14 @@ decoderFFMpeg4VopPacked::decoderFFMpeg4VopPacked (uint32_t w, uint32_t h):decode
   _allowNull = 1;
   decoderMultiThread ();
   WRAP_Open (CODEC_ID_MPEG4);
-  printf("Non low delay mpeg4 decoder initialized\n");
+  printf("[lavc] Non low delay mpeg4 decoder initialized\n");
 }
 decoderFFMpeg4::decoderFFMpeg4 (uint32_t w, uint32_t h, uint32_t fcc,uint32_t l, uint8_t * d):decoderFF (w,
 	   h)
 {
 // force low delay as avidemux don't handle B-frames
   LOWDELAY();
-  printf ("Using %d bytes of extradata for MPEG4 decoder\n", l);
+  printf ("[lavc] Using %d bytes of extradata for MPEG4 decoder\n", l);
   
   _refCopy = 1;			// YUV420 only
   _context->extradata = (uint8_t *) d;
@@ -518,7 +516,7 @@ decoderFF_ffhuff::decoderFF_ffhuff (uint32_t w, uint32_t h, uint32_t l, uint8_t 
 {
   _context->extradata = (uint8_t *) d;
   _context->extradata_size = (int) l;
-  printf ("FFhuff: We have :%d bytes of extra data\n", l);
+  printf ("[lavc] FFhuff: We have %d bytes of extra data\n", l);
   WRAP_Open (CODEC_ID_FFVHUFF);
 
 }
@@ -531,7 +529,7 @@ decoderFFH264::decoderFFH264 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d, u
   _context->extradata_size = (int) l;
   if(lowdelay)
     LOWDELAY();
-  printf ("Initializing lavcodec H264 decoder with %d extradata\n", l);
+  printf ("[lavc] Initializing H264 decoder with %d extradata\n", l);
   WRAP_Open (CODEC_ID_H264);
 
 }
@@ -676,7 +674,7 @@ uint8_t decoderFFSubs::uncompress (ADMCompressedImage * in, AVSubtitle * out)
                             in->data, in->dataLength); 
      if(ret<0) 
      {
-        printf("[FFSUB] Error %d\n",ret);
+        printf("[lavc] FFSUB Error %d\n",ret);
         return 0; 
      }
      return 1;
@@ -712,6 +710,6 @@ void adm_lavLogCallback(void  *instance, int level, const char* fmt, va_list lis
     char buf[256];
   
     vsnprintf(buf, sizeof(buf), fmt, list);
-    printf("[LAV] %s\n",buf);
+    printf("[lavc] %s\n",buf);
 }
 // EOF

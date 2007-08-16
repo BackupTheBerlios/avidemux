@@ -80,7 +80,7 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
   
   
   /* Add text -> encoding mode */
-  label2 = gtk_label_new_with_mnemonic ("_Bitrate (kb/s):");
+  label2 = gtk_label_new_with_mnemonic (_("_Bitrate (kb/s):"));
   gtk_misc_set_alignment (GTK_MISC (label2), 0.0, 0.5);
   gtk_widget_show(label2);
   /* put entry in hbox */

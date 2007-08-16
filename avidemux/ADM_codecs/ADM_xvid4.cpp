@@ -31,8 +31,8 @@
 #include "ADM_codecs/ADM_xvid4param.h"
 #include "ADM_codecs/ADM_xvid4.h"
 #include "xvid.h"
-#include <ADM_assert.h>
-#include "ADM_osSupport/ADM_cpuCap.h"
+#include "ADM_assert.h"
+#include "prefs.h"
 
 #include "ADM_editor/ADM_edit.hxx"
 extern ADM_Composer *video_body;
@@ -92,7 +92,7 @@ uint8_t xvid4Encoder::encode(ADMImage * in,ADMBitstream * out)
                        &xvid_enc_stats);
     if (ret < 0)
     {
-        printf ("Error calling xvid4 %d\n", ret);
+        printf ("[xvid] Error calling xvid4 %d\n", ret);
         return 0;
 
     }
@@ -100,7 +100,7 @@ uint8_t xvid4Encoder::encode(ADMImage * in,ADMBitstream * out)
 
     out->len = ret;
     if (!ret)
-        printf ("Skipped\n");
+        printf ("[xvid] Skipped\n");
     return 1;
 
 }
@@ -116,17 +116,16 @@ xvid4_init (void)
   MMSET (xvid_gbl_init2);
   MMSET (xvid_gbl_info);
 
-  printf ("Initializing global xvid 4\n");
+  printf ("[xvid] Initializing global Xvid 4\n");
   xvid_gbl_init2.version = XVID_VERSION;
   xvid_global (NULL, XVID_GBL_INIT, &xvid_gbl_init2, NULL);
   xvid_gbl_info.version = XVID_VERSION;
   xvid_global (NULL, XVID_GBL_INFO, &xvid_gbl_info, NULL);
+
   if (xvid_gbl_info.build)
-    {
-      printf ("\txvid build:%s\n", xvid_gbl_info.build);
-    }
-  printf ("\txvid thread:%d\n", xvid_gbl_info.num_threads);
-  printf ("\txvid SIMD supported:(%x)\n", xvid_gbl_info.cpu_flags);
+      printf ("[xvid] Build: %s\n", xvid_gbl_info.build);
+
+  printf ("[xvid] SIMD supported: (%x)\n", xvid_gbl_info.cpu_flags);
 #define CPUF(x) if(xvid_gbl_info.cpu_flags  & XVID_CPU_##x) printf("\t\t"#x"\n");
 #if defined( ARCH_X86)  || defined(ARCH_X86_64)
   CPUF (MMX);
@@ -157,13 +156,20 @@ uint8_t
 void
 xvid4Encoder::createUpdate (void)
 {
-  uint32_t nbThread = 0;
-  xvid_enc_create.num_threads = 0;
-  if (nbThread = ADM_useNbThreads ())
-    {
-      printf ("Xvid4 : using %u threads..\n", nbThread);
-      xvid_enc_create.num_threads = nbThread;
-    }
+  uint32_t threads = 0;
+
+  prefs->get(FEATURE_THREADING_XVID, &threads);
+
+  if (threads == 0)
+	  xvid_enc_create.num_threads = xvid_gbl_info.num_threads;
+  else if (threads > 1)
+	  xvid_enc_create.num_threads = threads;
+  else
+      xvid_enc_create.num_threads = 0;
+
+  if (xvid_enc_create.num_threads)
+      printf ("[xvid] using %u threads\n", xvid_enc_create.num_threads);
+
   xvid_enc_create.max_bframes = _param.bframes;
   xvid_enc_create.max_key_interval = _param.max_key_interval;
   xvid_enc_create.bquant_ratio = _param.bquant_ratio;
@@ -182,9 +188,9 @@ xvid4Encoder::createUpdate (void)
     }
 
   preAmble (NULL);
-#define C_VOP(x) if(xvid_enc_frame.vop_flags& XVID_VOP_##x) printf("Vop :"#x" is set\n");
-#define C_VOL(x) if(xvid_enc_frame.vol_flags& XVID_VOL_##x) printf("Vol :"#x" is set\n");
-#define C_ME(x) if(xvid_enc_frame.motion& XVID_ME_##x) printf("ME :"#x" is set\n");
+#define C_VOP(x) if(xvid_enc_frame.vop_flags& XVID_VOP_##x) printf("[xvid] Vop: "#x" is set\n");
+#define C_VOL(x) if(xvid_enc_frame.vol_flags& XVID_VOL_##x) printf("[xvid] Vol: "#x" is set\n");
+#define C_ME(x) if(xvid_enc_frame.motion& XVID_ME_##x) printf("[xvid] ME: "#x" is set\n");
 
   C_VOP (DEBUG);
   C_VOP (CHROMAOPT);
@@ -234,15 +240,15 @@ xvid4Encoder::createUpdate (void)
 void
 xvid4Encoder::dump (void)
 {
-  printf ("Xvid4 codec configuration:\n");
+  printf ("[xvid] Configuration:\n");
   if (_param.mpegQuantizer)
-    printf ("\tMPEGQUANT\n");
+    printf ("\t\tMPEGQUANT\n");
   if (_param.interlaced)
-    printf ("\tINTERLACED\n");
+    printf ("\t\tINTERLACED\n");
 
 
 #define ST(x,y) \
-	if(_param.x) printf("\t"#y"\n");
+	if(_param.x) printf("\t\t"#y"\n");
 
 
   ST (inter4mv, INTER4V);
@@ -262,7 +268,7 @@ xvid4Encoder::stopEncoder (void)
   if (_handle)
     {
       xvid_encore (_handle, XVID_ENC_DESTROY, NULL, NULL);
-      printf ("Destroying xvid codec\n");
+      printf ("[xvid] Destroying\n");
       _handle = NULL;
     }
   return 1;
@@ -383,13 +389,13 @@ xvid4Encoder::preAmble (uint8_t * in)
   if(_param.useCustomIntra) 
   {
   if(!xvid_enc_frame.quant_intra_matrix)  
-      printf("[Xvid4]Using custom intra matrix\n");
+      printf("[xvid] Using custom intra matrix\n");
       xvid_enc_frame.quant_intra_matrix=_param.intraMatrix;
   }
   if(_param.useCustomInter)
   {
     if(!xvid_enc_frame.quant_inter_matrix)
-      printf("[Xvid4]Using custom inter matrix\n");
+      printf("[xvid] Using custom inter matrix\n");
      xvid_enc_frame.quant_inter_matrix=_param.interMatrix;
   }
   return 1;
@@ -422,7 +428,7 @@ uint8_t
   xvid4EncoderCQ::init (uint32_t q, uint32_t fps1000, xvid4EncParam * param)
 {
   int xerr;
-  printf ("Using Xvid 4 codec with CQ mode = %lu (%dx%d)\n", q, _w, _h);
+  printf ("[xvid] CQ mode = %lu (%d x %d)\n", q, _w, _h);
   _q = q;
   _fps1000 = fps1000;
   memcpy (&_param, param, sizeof (_param));
@@ -456,14 +462,14 @@ uint8_t
   xerr = xvid_encore (NULL, XVID_ENC_CREATE, &xvid_enc_create, NULL);
   if (xerr < 0)
     {
-      printf ("Xvid-4 init error :%d\n", xerr);
+      printf ("[xvid] init error: %d\n", xerr);
       return 0;
 
     }
 
   _handle = xvid_enc_create.handle;
 
-  printf ("Xvid-4 CQ init Ok\n");
+  printf ("[xvid] CQ init Ok\n");
 
   return 1;
 }
@@ -489,7 +495,7 @@ uint8_t
 				 xvid4EncParam * param)
 {
   int xerr;
-  printf ("Using Xvid 4 codec with CQ mode = %lu (%dx%d)\n", q, _w, _h);
+  printf ("[xvid] CQ mode = %lu (%d x %d)\n", q, _w, _h);
   _q = q;
   _fps1000 = fps1000;
   memcpy (&_param, param, sizeof (_param));
@@ -522,14 +528,14 @@ uint8_t
   xerr = xvid_encore (NULL, XVID_ENC_CREATE, &xvid_enc_create, NULL);
   if (xerr < 0)
     {
-      printf ("Xvid-4 init error :%d\n", xerr);
+      printf ("[xvid] init error: %d\n", xerr);
       return 0;
 
     }
 
   _handle = xvid_enc_create.handle;
 
-  printf ("Xvid-4 CQ init Ok\n");
+  printf ("[xvid] CQ init Ok\n");
 
   return 1;
 }
@@ -565,7 +571,7 @@ uint8_t
   xvid4EncoderCBR::init (uint32_t br, uint32_t fps1000, xvid4EncParam * param)
 {
   int xerr;
-  printf ("Using Xvid 4 codec with CBR mode = %lu kbps\n", br);
+  printf ("[xvid] CBR mode = %lu kbps\n", br);
   _bitrate = br;
   _fps1000 = fps1000;
   memcpy (&_param, param, sizeof (_param));
@@ -599,14 +605,14 @@ uint8_t
   xerr = xvid_encore (NULL, XVID_ENC_CREATE, &xvid_enc_create, NULL);
   if (xerr < 0)
     {
-      printf ("Xvid-4 init error :%d\n", xerr);
+      printf ("[xvid] Init error: %d\n", xerr);
       return 0;
 
     }
 
   _handle = xvid_enc_create.handle;
 
-  printf ("Xvid-4 CBR init Ok\n");
+  printf ("[xvid] CBR init Ok\n");
 
   return 1;
 }
@@ -628,7 +634,7 @@ uint8_t
 			   xvid4EncParam * param)
 {
   int xerr;
-  printf ("Using Xvid 4 codec pass 1 of 2 (log: %s)\n",
+  printf ("[xvid] Pass 1 of 2 (log: %s)\n",
 	  (char *) param->logName);
 
   _fps1000 = fps1000;
@@ -664,14 +670,14 @@ uint8_t
   xerr = xvid_encore (NULL, XVID_ENC_CREATE, &xvid_enc_create, NULL);
   if (xerr < 0)
     {
-      printf ("Xvid-4 init error :%d\n", xerr);
+      printf ("[xvid] Init error: %d\n", xerr);
       return 0;
 
     }
 
   _handle = xvid_enc_create.handle;
 
-  printf ("Xvid-4 Pass1 init Ok\n");
+  printf ("[xvid] Pass 1 init Ok\n");
 
   return 1;
 }
@@ -689,7 +695,7 @@ uint8_t
 {
   int xerr;
   printf
-    ("Using Xvid 4 codec with 2pass  mode pass 2 of 2, average bitrate = %lu\n",
+    ("[xvid] Pass 2 of 2, average bitrate = %lu\n",
      br);
   _bitrate = br;
   _fps1000 = fps1000;
@@ -714,7 +720,7 @@ uint8_t
   pass2.filename = (char *) _param.logName;
 
   pass2.bitrate = br;		// Average bitrate
-#define CPY(x) pass2.x=_param.x;printf(#x"=%d\n",pass2.x);
+#define CPY(x) pass2.x=_param.x;printf("[xvid] "#x"=%d\n",pass2.x);
 
   CPY (keyframe_boost);
   CPY (curve_compression_high);
@@ -740,14 +746,14 @@ uint8_t
   xerr = xvid_encore (NULL, XVID_ENC_CREATE, &xvid_enc_create, NULL);
   if (xerr < 0)
     {
-      printf ("Xvid-4 init error :%d\n", xerr);
+      printf ("[xvid] Init error: %d\n", xerr);
       return 0;
 
     }
 
   _handle = xvid_enc_create.handle;
 
-  printf ("Xvid-4 init Ok\n");
+  printf ("[xvid] Init Ok\n");
 
   return 1;
 }
