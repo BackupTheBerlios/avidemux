@@ -191,8 +191,7 @@ char     *globalGlyphName=NULL;
         diaElemToggle openDml(&use_odml,_("Create _OpenDML files"));
         diaElemToggle autoIndex(&useAutoIndex,_("Automatically _index MPEG files"));
         diaElemToggle autoSwap(&useSwap,_("Automatically _swap A and B if A>B"));
-        diaElemToggle nuvAudio(&useNuv,_("_Disable NUV audio sync"));
-        diaElemToggle loadEx(&activeXfilter,_("_Load external filters"));
+        diaElemToggle nuvAudio(&useNuv,_("_Disable NUV audio sync"));        
         
         diaElemToggle togAutoVbr(&autovbr,_("Automatically _build VBR map"));
         diaElemToggle togAutoIndex(&autoindex,_("Automatically _rebuild index"));
@@ -351,31 +350,30 @@ char     *globalGlyphName=NULL;
                filterPath = ADM_strdup("c:\\");
 #endif
         diaElemDirSelect  entryFilterPath(&filterPath,_("_Filter directory:"),"");
-        /*********************************/
-        diaMenuEntry globalGlyhEntries[]={
-                             {0,       _("No"),NULL}
-                             ,{1,      _("Yes"),NULL}};
-        diaElemMenu  menuGlobaGlyh(&useGlobalGlyph,_("Use _Global GlyphSet:"), sizeof(globalGlyhEntries)/sizeof(diaMenuEntry),globalGlyhEntries,"");
-        diaElemFile  entryGLyphPath(0,&globalGlyphName,_("Gl_yphSet:"),"");
-        menuGlobaGlyh.link(&(globalGlyhEntries[1]),1,&entryGLyphPath);
-        /**********************************************************************/
-        /* First Tab : user interface */
+		diaElemToggle loadEx(&activeXfilter,_("_Load external filters"));
+		loadEx.link(1, &entryFilterPath);
+
+		diaElemToggle togGlobalGlyph(&useGlobalGlyph, _("Use _Global GlyphSet"));
+		diaElemFile  entryGLyphPath(0,&globalGlyphName,_("Gl_yphSet:"),"");
+		togGlobalGlyph.link(1, &entryGLyphPath);
+
+        /* User Interface */
         diaElem *diaUser[]={&useSysTray,&menuMessage};
         diaElemTabs tabUser(_("User Interface"),2,diaUser);
         
-         /* First Tab bis: user interface : Auto*/
+         /* Automation */
         diaElem *diaAuto[]={&autoSwap,&togAutoVbr,&togAutoIndex,&togAutoUnpack,&autoIndex,};
         diaElemTabs tabAuto(_("Automation"),5,diaAuto);
         
-        /* Second Tab : input */
+        /* Input */
         diaElem *diaInput[]={&nuvAudio,&useLavcodec};
         diaElemTabs tabInput(_("Input"),2,(diaElem **)diaInput);
         
-        /* Third Tab : output */
+        /* Output */
         diaElem *diaOutput[]={&autoSplit,&openDml,&allowAnyMpeg,&togTagMp3};
         diaElemTabs tabOutput(_("Output"),4,(diaElem **)diaOutput);
         
-        /* Fourth Tab : audio */
+        /* Audio */
 #if defined(ALSA_SUPPORT)
         diaElem *diaAudio[]={&menuMixer,&menuVolume,&menuAudio,&entryAlsaDevice};
         diaElemTabs tabAudio(_("Audio"),4,(diaElem **)diaAudio);
@@ -387,7 +385,7 @@ char     *globalGlyphName=NULL;
         diaElemTabs tabAudio(_("Audio"),2,(diaElem **)diaAudio);
 #endif
         
-        /* Fifth Tab : video */
+        /* Video */
         diaElem *diaVideo[]={&menuVideoMode,&framePP};
         diaElemTabs tabVideo(_("Video"),2,(diaElem **)diaVideo);
         
@@ -400,8 +398,8 @@ char     *globalGlyphName=NULL;
 		diaElemTabs tabThreading(_("Threading"),2,(diaElem **)diaThreading);
 
         /* Global Glyph tab */
-        diaElem *diaGlyph[]={&menuGlobaGlyh,&entryGLyphPath};
-        diaElemTabs tabGlyph(_("Global Glyphset"),2,(diaElem **)diaGlyph);
+        diaElem *diaGlyph[]={&togGlobalGlyph,&entryGLyphPath};
+        diaElemTabs tabGlyph(_("Global GlyphSet"),2,(diaElem **)diaGlyph);
 
         /* Xfilter tab */
         diaElem *diaXFilter[]={&loadEx,&entryFilterPath};
@@ -409,7 +407,7 @@ char     *globalGlyphName=NULL;
                                     
 // SET
         diaElemTabs *tabs[]={&tabUser,&tabAuto,&tabInput,&tabOutput,&tabAudio,&tabVideo,&tabCpu,&tabThreading,&tabGlyph,&tabXfilter};
-        if( diaFactoryRunTabs(_("Preferences"),9,tabs))
+        if( diaFactoryRunTabs(_("Preferences"),10,tabs))
 	{
         	
         	// cpu caps
@@ -504,6 +502,8 @@ char     *globalGlyphName=NULL;
                 // Use tray while encoding
                 prefs->set(FEATURE_USE_SYSTRAY,useTray);
                 // Filter directory
+				prefs->set(FILTERS_AUTOLOAD_ACTIVE, activeXfilter);
+
                 if(filterPath)
                   prefs->set(FILTERS_AUTOLOAD_PATH, filterPath);
                 // Alternate mp3 tag (haali)
