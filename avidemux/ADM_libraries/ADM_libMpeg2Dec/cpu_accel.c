@@ -22,58 +22,33 @@
  */
 
 #include "config.h"
-
+#include <stdio.h>
 #include <inttypes.h>
 
 #include "mpeg2.h"
 #include "attributes.h"
 #include "mpeg2_internal.h"
 
-#include "admmangle.h"
 typedef void (*sighandler_t)(int); // MEANX RETSIGTYPE
  
+
+extern int ADM_mpeg2dec_mm_support(void); // MEANX
+
 #ifdef ACCEL_DETECT
 #ifdef ARCH_X86
 static inline uint32_t arch_accel (void)
 {
-    uint32_t eax, ebx, ecx, edx;
-    int AMD;
-    uint32_t caps;
-#define cpuid(index,eax,ebx,ecx,edx)\
-    __asm __volatile ("mov %%"REG_b", %%"REG_S"\n\t"\
-         "cpuid\n\t"\
-         "xchg %%"REG_b", %%"REG_S\
-         : "=a" (eax), "=S" (ebx),\
-           "=c" (ecx), "=d" (edx)\
-         : "0" (index));
+   
+    static uint32_t caps;
+    static int done=0;
 
-
-    cpuid (0x00000000, eax, ebx, ecx, edx);
-    if (!eax)			/* vendor string only */
-	return 0;
-
-    AMD = (ebx == 0x68747541) && (ecx == 0x444d4163) && (edx == 0x69746e65);
-
-    cpuid (0x00000001, eax, ebx, ecx, edx);
-    if (! (edx & 0x00800000))	/* no MMX */
-	return 0;
-
-    caps = MPEG2_ACCEL_X86_MMX;
-    if (edx & 0x02000000)	/* SSE - identical to AMD MMX extensions */
-	caps = MPEG2_ACCEL_X86_MMX | MPEG2_ACCEL_X86_MMXEXT;
-
-    cpuid (0x80000000, eax, ebx, ecx, edx);
-    if (eax < 0x80000001)	/* no extended capabilities */
-	return caps;
-
-    cpuid (0x80000001, eax, ebx, ecx, edx);
-
-    if (edx & 0x80000000)
-	caps |= MPEG2_ACCEL_X86_3DNOW;
-
-    if (AMD && (edx & 0x00400000))	/* AMD MMX extensions */
-	caps |= MPEG2_ACCEL_X86_MMXEXT;
-
+#define CHECK_CAPS(y) if (caps & MPEG2_ACCEL_X86_##y ) printf("[LibMpeg2Dec] "#y" supported\n");
+    
+    if(!done)
+    {
+    	caps=ADM_mpeg2dec_mm_support();
+    	done=1;
+    }
     return caps;
 }
 #endif /* ARCH_X86 */
@@ -185,9 +160,9 @@ uint32_t mpeg2_detect_accel (void)
 #ifdef ACCEL_DETECT
 #if defined (ARCH_X86) || defined (ARCH_PPC) || defined (ARCH_ALPHA) || defined (ARCH_SPARC)
     accel = arch_accel ();
-#define PRT(x) if(accel & x) printf("Mpeg2dec accel :"#x"\n");
+#define PRT(x) if(accel & x) printf("[libMpeg2dec] accel :"#x"\n");
 #ifdef ARCH_X86
-	printf("Mpeg2dec: X86 CPU accel in use:\n");
+	printf("[libMpeg2dec] X86 CPU accel in use:\n");
 	PRT(MPEG2_ACCEL_X86_MMX);
 	PRT(MPEG2_ACCEL_X86_3DNOW);
 	PRT(MPEG2_ACCEL_X86_MMXEXT);

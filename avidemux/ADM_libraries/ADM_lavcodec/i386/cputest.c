@@ -42,10 +42,14 @@
          : "=a" (eax), "=S" (ebx),\
            "=c" (ecx), "=d" (edx)\
          : "0" (index));
-
+/* MEANX */
+extern int ADM_lavcodec_mm_support(void);
+/*/MEANX */
 /* Function to test if multimedia instructions are supported...  */
 int mm_support(void)
 {
+		return ADM_lavcodec_mm_support();
+#if 0 // MEANX : We use the function in ADM_cpuCaps which is about the same
     int rval = 0;
     int eax, ebx, ecx, edx;
     int max_std_level, max_ext_level, std_caps=0, ext_caps=0;
@@ -117,6 +121,7 @@ int mm_support(void)
         (rval&FF_MM_3DNOWEXT) ? "3DNowExt ":"");
 #endif
     return rval;
+#endif // #if 0
 }
 
 #ifdef TEST

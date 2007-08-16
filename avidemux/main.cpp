@@ -104,7 +104,8 @@ bool SpidermonkeyInit(void);
 void SpidermonkeyDestroy(void);
 
 extern pthread_mutex_t g_pSpiderMonkeyMutex;
-int CpuCaps::myCpuCaps=0;
+uint32_t CpuCaps::myCpuCaps=0;
+uint32_t CpuCaps::myCpuMask=0xffffffff;
 
 int main(int argc, char *argv[])
 {
@@ -206,7 +207,8 @@ printf("\n");
 	printf("Initialising prefs\n");
 	initPrefs();
 	prefs->load();
-
+    CpuCaps::init();
+    
 	register_Encoders();
 
 #ifdef USE_SDL
@@ -227,7 +229,6 @@ printf("\n");
 #endif
 
     initFileSelector();
-    CpuCaps::init();
     ADM_InitMemcpy();
 
 	// Load .avidemuxrc

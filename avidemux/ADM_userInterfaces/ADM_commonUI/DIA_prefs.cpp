@@ -79,6 +79,7 @@ uint32_t alternate_mp3_tag=1;
 uint32_t pp_type=3;
 uint32_t pp_value=5;
 uint32_t hzd,vzd,dring;
+uint32_t capsMMX,capsMMXEXT,caps3DNOW,caps3DNOWEXT,capsSSE,capsSSE2,capsSSE3,capsSSSE3,capsAll;
 
 uint32_t useGlobalGlyph=0;
 char     *globalGlyphName=NULL;
@@ -94,6 +95,19 @@ char     *globalGlyphName=NULL;
     DOME(2,vzd);
     DOME(4,dring);
      
+// Cpu caps
+#define CPU_CAPS(x)    	if(CpuCaps::myCpuMask & ADM_CPU_##x) caps##x=1; else caps##x=0;
+    
+    	if(CpuCaps::myCpuMask==ADM_CPU_ALL) capsAll=1; else capsAll=0;
+    	CPU_CAPS(MMX);
+    	CPU_CAPS(MMXEXT);
+    	CPU_CAPS(3DNOW);
+    	CPU_CAPS(3DNOWEXT);
+    	CPU_CAPS(SSE);
+    	CPU_CAPS(SSE2);
+    	CPU_CAPS(SSE3);
+    	CPU_CAPS(SSSE3);
+    
         // Alsa
 #ifdef ALSA_SUPPORT
         if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &alsaDevice) != RC_OK )
@@ -186,6 +200,27 @@ char     *globalGlyphName=NULL;
                        
         diaElemUInteger multiThread(&mthreads,_("_Number of threads:"),0,10);
 
+
+        
+        diaElemToggle capsToggleAll(&capsAll,_("Enable all Simd"));
+        diaElemFrame      frameSimd(_("Simd"));
+        frameSimd.swallow(&capsToggleAll);
+        
+#define CAPS_TOGGLE(x) diaElemToggle       capsToggle##x(&(caps##x),_("Enable "#x));\
+						capsToggleAll.link(0,&(capsToggle##x));  frameSimd.swallow(   &(capsToggle##x));      
+						  
+
+        CAPS_TOGGLE(MMX);
+        CAPS_TOGGLE(MMXEXT);
+        CAPS_TOGGLE(3DNOW);
+        CAPS_TOGGLE(3DNOWEXT);
+        CAPS_TOGGLE(SSE);
+        CAPS_TOGGLE(SSE2);
+        CAPS_TOGGLE(SSE3);
+        CAPS_TOGGLE(SSSE3);        
+      
+
+        
 		diaMenuEntry priorityEntries[] = {
                              {0,       _("High"),NULL}
                              ,{1,      _("Above normal"),NULL}
@@ -348,7 +383,10 @@ char     *globalGlyphName=NULL;
         diaElemTabs tabVideo(_("Video"),2,(diaElem **)diaVideo);
         
         /* Sixth Tab : mthread */
-        diaElem *diaCpu[]={&multiThread, &menuEncodePriority, &menuIndexPriority, &menuPlaybackPriority};
+        diaElem *diaCpu[]={&multiThread, &frameSimd,&menuEncodePriority, &menuIndexPriority, &menuPlaybackPriority};
+        
+        
+        
         diaElemTabs tabCpu(_("CPU"),4,(diaElem **)diaCpu);
         
         /* 7th Tab : Global Glyph */
@@ -364,8 +402,29 @@ char     *globalGlyphName=NULL;
         diaElemTabs *tabs[]={&tabUser,&tabAuto,&tabInput,&tabOutput,&tabAudio,&tabVideo,&tabCpu,&tabGlyph,&tabXfilter};
         if( diaFactoryRunTabs(_("Preferences"),9,tabs))
 	{
+        	
+        	// cpu caps
+        		if(capsAll)
+        		{
+        			CpuCaps::myCpuMask=ADM_CPU_ALL;
+        		}else
+        		{
+        			CpuCaps::myCpuMask=0;
+#undef CPU_CAPS
+#define CPU_CAPS(x)    	if(caps##x) CpuCaps::myCpuMask|= ADM_CPU_##x;        	    	
+        	    	CPU_CAPS(MMX);
+        	    	CPU_CAPS(MMXEXT);
+        	    	CPU_CAPS(3DNOW);
+        	    	CPU_CAPS(3DNOWEXT);
+        	    	CPU_CAPS(SSE);
+        	    	CPU_CAPS(SSE2);
+        	    	CPU_CAPS(SSE3);
+        	    	CPU_CAPS(SSSE3);
+        		}
+        		prefs->set(FEATURE_CPU_CAPS,CpuCaps::myCpuMask);
+        		// Glyphs
                prefs->set(FEATURE_GLOBAL_GLYPH_ACTIVE,useGlobalGlyph);
-                prefs->set(FEATURE_GLOBAL_GLYPH_NAME,globalGlyphName);
+               prefs->set(FEATURE_GLOBAL_GLYPH_NAME,globalGlyphName);
 
           
 		ret=1;
