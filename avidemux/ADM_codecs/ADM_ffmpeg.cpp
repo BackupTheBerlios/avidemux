@@ -24,13 +24,11 @@
 #ifdef USE_FFMPEG
 
 #define __STDC_CONSTANT_MACROS // Lavcodec crap
-#define WIN32_CLASH
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <pthread.h>
 
 #include "ADM_lavcodec.h"
 #include "avi_vars.h"
@@ -41,6 +39,7 @@
 
 //#define TEST_NOB 1
 
+extern int ADM_cpu_num_processors(void);
 static char LogName[500];
 
 #define WRAP_Open(x) \
@@ -371,7 +370,7 @@ void ffmpegEncoder::encoderMT (void)
   prefs->get(FEATURE_THREADING_LAVC, &threads);
 
   if (threads == 0)
-	  threads = pthread_num_processors_np();
+	  threads = ADM_cpu_num_processors();
 
   if (threads == 1)
 	  threads = 0;

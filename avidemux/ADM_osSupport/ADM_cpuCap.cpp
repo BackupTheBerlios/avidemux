@@ -11,6 +11,14 @@
 //
 #include "config.h"
 #include <stdio.h>
+
+#if defined(ADM_WIN32)
+#include <pthread.h>
+#elif !defined(__APPLE__)
+#include <string.h>
+#include <sched.h>
+#endif
+
 #include "default.h"
 #include "admmangle.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
@@ -169,3 +177,24 @@ int rval=0;
 }
 // EOF
 
+// Stolen from x264
+int ADM_cpu_num_processors(void)
+{
+#if defined(ADM_WIN32)
+    return pthread_num_processors_np();
+#elif !defined(__APPLE__)
+    unsigned int bit;
+    int np;
+
+    cpu_set_t p_aff;
+    memset( &p_aff, 0, sizeof(p_aff) );
+    sched_getaffinity( 0, sizeof(p_aff), &p_aff );
+
+    for( np = 0, bit = 0; bit < sizeof(p_aff); bit++ )
+        np += (((uint8_t *)&p_aff)[bit / 8] >> (bit % 8)) & 1;
+
+    return np;
+#else
+    return 1;
+#endif
+}
