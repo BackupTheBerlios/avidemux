@@ -200,8 +200,7 @@ buttonCallBack_S buttonCallback[]=
 	{"boxCurFrame"			,"activate"		,ACT_JumpToFrame},
 	//{"boxCurTime"			,"editing_done"		,ACT_TimeChanged},
 
-        {"CheckButtonTimeshift"         ,"toggled"             ,ACT_TimeShift},
-        {"spinbuttonTimeShift"          ,"value_changed"       ,ACT_TimeShift}
+        {"CheckButtonTimeshift"         ,"toggled"             ,ACT_TimeShift}
        // {"spinbuttonTimeShift"          ,"editing_done"       ,ACT_TimeShift}
   
 };
@@ -342,6 +341,10 @@ uint8_t  bindGUI( void )
         // Jog
         gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"jogg")), "value_changed",   
                       GTK_SIGNAL_FUNC(jogChange),                   (void *) NULL);  
+
+		// Time Shift
+		gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"spinbuttonTimeShift")), "value_changed",   
+                      GTK_SIGNAL_FUNC(guiCallback), (void *) ACT_TimeShift);  
 
 
 		       
