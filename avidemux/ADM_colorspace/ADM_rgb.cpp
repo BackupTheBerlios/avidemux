@@ -6,6 +6,8 @@
     begin                : Thu Apr 16 2003
     copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
+    
+ 16 08 2007 : Removed the manual RGB<->BGR, newer swscale can output directly in the correct mode   
  ***************************************************************************/
 
 /***************************************************************************
@@ -98,6 +100,7 @@ void COL_init(void)
     CLEANUP();
     FLAGS();
     PixelFormat fmt=TARGET_COLORSPACE;
+    if(_inverted) fmt=ALTERNATE_COLORSPACE;
     if(!ww || !hh) return 0;   
 	 _context=(void *)sws_getContext(
                       ww,hh,
@@ -180,7 +183,7 @@ uint8_t r,g,b,a;
 			ddst[1]=ddst[2]=0;
 
 			sws_scale((SwsContext *)_context,srd,ssrc,0,h,dst,ddst);
-
+#if 0
         if(_inverted)
         {
                 uint8_t r,g,b,a;
@@ -188,6 +191,7 @@ uint8_t r,g,b,a;
                 int pel=h*w;
                 ADM_RGBA2BGRA(ptr,pel);
         }
+#endif
 #if  defined( ADM_BIG_ENDIAN)
         uint8_t r,g,b,a;
         uint8_t *ptr=target;
@@ -241,7 +245,7 @@ uint8_t r,g,b,a;
     ddst[1]=ddst[2]=0;
 
     sws_scale((SwsContext *)_context,srd,ssrc,0,th,dst,ddst);
-
+#if 0
     if(_inverted)
     {
             uint8_t r,g,b,a;
@@ -253,6 +257,7 @@ uint8_t r,g,b,a;
               ADM_RGBA2BGRA(ptr,tw);
             }
      }
+#endif
 #if  defined( ADM_BIG_ENDIAN)
         uint8_t r,g,b,a;
         uint8_t *ptr=target;
