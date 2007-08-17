@@ -227,7 +227,7 @@ int nw;
         case ACT_ViewSide: UI_toogleSide();return;
         case ACT_DVB_Ocr:
         		DIA_ocrDvb();
-        		break;
+        		return;
       case ACT_Ocr:
                 DIA_ocrGen(); //
                 return;
