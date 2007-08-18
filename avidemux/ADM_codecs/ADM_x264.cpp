@@ -214,6 +214,11 @@ uint8_t X264Encoder::stopEncoder (void)
       delete[]extraData;
       extraData = NULL;
     }
+  if(_seiUserData)
+  {
+	  delete [] _seiUserData;
+	  _seiUserData=NULL;
+  }
 }
 X264Encoder::~X264Encoder ()
 {
@@ -256,18 +261,15 @@ uint8_t X264Encoder::encode (ADMImage * in, ADMBitstream * out)
     {
       sizemax = 0xfffffff;;
       if (!param.b_repeat_headers)
-	size += 4;
-      thisnal =
-	x264_nal_encode (dout + size, &sizemax, param.b_repeat_headers,
-			 &nal[i]);
+    	  size += 4;
+      thisnal =	x264_nal_encode (dout + size, &sizemax, param.b_repeat_headers, &nal[i]);
       if (!param.b_repeat_headers)
-	{			// Need to put size (assuming nal_size=4)
-	  dout[size + 0 - 4] = (thisnal >> 24) & 0xff;
-	  dout[size + 1 - 4] = (thisnal >> 16) & 0xff;
-	  dout[size + 2 - 4] = (thisnal >> 8) & 0xff;
-	  dout[size + 3 - 4] = (thisnal >> 0) & 0xff;
-
-	}
+      {			// Need to put size (assuming nal_size=4)
+    	  dout[size + 0 - 4] = (thisnal >> 24) & 0xff;
+    	  dout[size + 1 - 4] = (thisnal >> 16) & 0xff;
+    	  dout[size + 2 - 4] = (thisnal >> 8) & 0xff;
+    	  dout[size + 3 - 4] = (thisnal >> 0) & 0xff;
+      }
       size += thisnal;
     }
 
@@ -286,6 +288,23 @@ uint8_t X264Encoder::encode (ADMImage * in, ADMBitstream * out)
     {
     case X264_TYPE_IDR:
       out->flags = AVI_KEY_FRAME;
+      /* First frame ?*/
+      if(!param.b_repeat_headers && _seiUserData && !pic_out.i_pts)
+      {
+    	  // Put our SEI front...
+    	  // first a temp location...
+    	  uint8_t tmpBuffer[size];
+    	  memcpy(tmpBuffer,out->data,size);
+    	  // Put back out SEI and add Size
+    	  dout[0]=(_seiUserDataLen>>24)&0xff;
+    	  dout[1]=(_seiUserDataLen>>16)&0xff;
+    	  dout[2]=(_seiUserDataLen>>8)&0xff;
+    	  dout[3]=(_seiUserDataLen>>0)&0xff;
+    	  memcpy(dout+4,_seiUserData,_seiUserDataLen);
+    	  memcpy(dout+4+_seiUserDataLen,tmpBuffer,size);
+    	  size+=4+_seiUserDataLen;
+    	  out->len = size; // update total size
+      }
       break;
     case X264_TYPE_I:
       out->flags = AVI_P_FRAME;
@@ -301,7 +320,6 @@ uint8_t X264Encoder::encode (ADMImage * in, ADMBitstream * out)
     default:
       printf ("[x264] Unknown image type: %d\n", pic_out.i_type);
       //ADM_assert(0);
-
     }
     
     //
@@ -506,7 +524,7 @@ X264EncoderPass2::~X264EncoderPass2 ()
 
         Try to create the avcC atom and set it as extraData
 _______________________________________________________________*/
-
+#define H264_NAL_TYPE_SEI       0x6
 #define H264_NAL_TYPE_SEQ_PARAM 0x7
 #define H264_NAL_TYPE_PIC_PARAM 0x8
 
@@ -518,14 +536,11 @@ uint8_t X264Encoder::createHeader (void)
     nal_count;
   uint32_t
     offset = 0;;
-  uint8_t
-    buffer[MAX_HEADER_X264];
-  uint8_t
-    picParam[MAX_HEADER_X264];
-  uint8_t
-    seqParam[MAX_HEADER_X264];
-  int
-    picParamLen = 0, seqParamLen = 0, len;
+  uint8_t    buffer[MAX_HEADER_X264];
+  uint8_t    picParam[MAX_HEADER_X264];
+  uint8_t    seqParam[MAX_HEADER_X264];
+  uint8_t    sei[MAX_HEADER_X264];
+  int	     picParamLen = 0, seqParamLen = 0,seiParamLen=0, len;
   int
     sz;
 
@@ -533,8 +548,9 @@ uint8_t X264Encoder::createHeader (void)
   extraData = new uint8_t[MAX_HEADER_X264];
   extraSize = 0;
 
-
-  if (x264_encoder_headers (HANDLE, &nal, &nal_count))
+  x264_t *x264=(x264_t *)_handle;
+  //x264->i_frame=0; // force write_sei_params
+  if (x264_encoder_headers (x264, &nal, &nal_count))
     {
       printf ("[x264] Cannot create header\n");
       return 0;
@@ -544,20 +560,22 @@ uint8_t X264Encoder::createHeader (void)
   // Now encode them
   for (int i = 0; i < nal_count; i++)
     {
-      if (nal[i].i_type == H264_NAL_TYPE_SEQ_PARAM)
-	{
-	  sz = x264_nal_encode (seqParam, &seqParamLen, 0, &nal[i]);
-	}
-      else if (nal[i].i_type == H264_NAL_TYPE_PIC_PARAM)
-	{
-	  sz = x264_nal_encode (picParam, &picParamLen, 0, &nal[i]);
-	}
-      else
-	{
-	  printf ("[x264] ?? type %d in nal %d\n", nal[i].i_type, i);
-	  sz = x264_nal_encode (buffer, &len, 0, &nal[i]);
-	}
-      if (sz <= 0)
+	  switch(nal[i].i_type)
+	  {
+	  case H264_NAL_TYPE_SEQ_PARAM:
+		  	sz = x264_nal_encode (seqParam, &seqParamLen, 0, &nal[i]);
+		  	break;
+	  case H264_NAL_TYPE_PIC_PARAM:
+		  	sz = x264_nal_encode (picParam, &picParamLen, 0, &nal[i]);
+		  	break;
+	  case H264_NAL_TYPE_SEI:
+		  	sz = x264_nal_encode (sei, &seiParamLen, 0, &nal[i]);
+		  	break;
+	  default:
+		  printf ("[x264] ?? type %d in nal %d\n", nal[i].i_type, i);
+		  sz = x264_nal_encode (buffer, &len, 0, &nal[i]);
+	 }
+    if (sz <= 0)
 	{
 	  printf ("[x264] Cannot encode nal header %d\n", i);
 	  return 0;
@@ -588,24 +606,26 @@ uint8_t X264Encoder::createHeader (void)
 
   extraData[offset] = seqParamLen >> 8;
   extraData[offset + 1] = seqParamLen & 0xff;
-
   offset += 2;
-
   memcpy (extraData + offset, seqParam, seqParamLen);
   offset += seqParamLen;
 
+  
   extraData[offset] = 1;	// numOfPictureParameterSets
   offset++;
-
   extraData[offset] = (picParamLen) >> 8;
   extraData[offset + 1] = (picParamLen) & 0xff;
-
   offset += 2;
-
-
   memcpy (extraData + offset, picParam, picParamLen);
   offset += picParamLen;
 
+  // Where x264 stores all its header, save it for later use
+  if(seiParamLen) 
+  {
+	  	_seiUserDataLen=seiParamLen;
+	  	_seiUserData=new uint8_t[_seiUserDataLen];
+	  	memcpy(_seiUserData,sei,_seiUserDataLen);
+  }
 
   extraSize = offset;
 

@@ -17,6 +17,8 @@ class X264Encoder:public encoder
 protected:uint32_t _inited;
   void *_handle;
   void *_pic;
+  uint8_t 	*_seiUserData;
+  uint32_t  _seiUserDataLen; // X264 user data
   uint8_t preamble (uint32_t fps1000, ADM_x264Param * param);
   ADM_x264Param _param;
   uint8_t *extraData;
@@ -34,6 +36,9 @@ public:  X264Encoder (uint32_t width, uint32_t height):encoder (width,
     extraSize = 0;
     ptsFrame = 0;
     curFrame = 0;
+    _seiUserDataLen=0;
+    _seiUserData=NULL;
+    
   };
   ~X264Encoder ();
 
