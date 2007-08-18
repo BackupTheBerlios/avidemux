@@ -70,8 +70,11 @@ uint8_t
         out->_colorspace = (ADM_colorspace)( ADM_COLOR_BGR32A| ADM_COLOR_BACKWARD);
       out->_planeStride[0] = 4 * _w;
     }
-/*        else if(len==2*xx)
-                        color->changeColorSpace(ADM_COLOR_RGB16);*/
+        else if(in->dataLength==2*xx) // RGB16
+        {
+        				out->_colorspace =(ADM_colorspace)(ADM_COLOR_RGB16 |ADM_COLOR_BACKWARD );
+                        out->_planeStride[0] = 2 * _w;
+        }
   else
     return 0;
 

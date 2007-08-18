@@ -581,7 +581,7 @@ uint8_t COL_Generic2YV12::transform(uint8_t **planes, uint32_t *strides,uint8_t 
         dst[2]=target+((page*5)>>2);
         ddst[0]=w;
         ddst[1]=ddst[2]=w>>1;
-        if(_backward && (_colorspace==ADM_COLOR_BGR24 || _colorspace==ADM_COLOR_BGR32A || _colorspace==ADM_COLOR_RGB32A || 
+        if(_backward && (_colorspace==ADM_COLOR_BGR24 ||_colorspace==ADM_COLOR_RGB16 ||  _colorspace==ADM_COLOR_BGR32A || _colorspace==ADM_COLOR_RGB32A || 
                     _colorspace==ADM_COLOR_RGB24))
         {
                 ssrc[0]=-mul*w;
