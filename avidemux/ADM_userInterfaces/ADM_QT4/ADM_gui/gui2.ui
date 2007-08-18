@@ -1358,16 +1358,6 @@
      <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuAuto" >
-    <property name="title" >
-     <string>A&amp;uto</string>
-    </property>
-    <addaction name="actionVCD" />
-    <addaction name="actionSVCD" />
-    <addaction name="actionDVD" />
-    <addaction name="actionPSP" />
-    <addaction name="actionPSP_H264" />
-   </widget>
    <widget class="QMenu" name="menuHelp" >
     <property name="title" >
      <string>&amp;Help</string>
@@ -1385,31 +1375,6 @@
     <addaction name="actionFilters" />
     <addaction name="actionFrame_rate" />
    </widget>
-   <widget class="QMenu" name="menuView" >
-    <property name="title" >
-     <string>&amp;View</string>
-    </property>
-    <addaction name="actionZoom_1_4" />
-    <addaction name="actionZoom_1_2" />
-    <addaction name="actionZoom_1_1" />
-    <addaction name="actionZoom_2_1" />
-   </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <addaction name="actionReset_Edits" />
-    <addaction name="separator" />
-    <addaction name="actionCut" />
-    <addaction name="actionCopy" />
-    <addaction name="actionPaste" />
-    <addaction name="actionDelete" />
-    <addaction name="separator" />
-    <addaction name="actionSet_marker_A" />
-    <addaction name="actionSet_marker_B" />
-    <addaction name="separator" />
-    <addaction name="actionPreferences" />
-   </widget>
    <widget class="QMenu" name="menuAudio" >
     <property name="title" >
      <string>&amp;Audio</string>
@@ -1421,45 +1386,10 @@
     <addaction name="actionSave_2" />
     <addaction name="actionFilters_2" />
    </widget>
-   <widget class="QMenu" name="menuTools" >
-    <property name="title" >
-     <string>&amp;Tools</string>
-    </property>
-    <addaction name="actionCalculator" />
-    <addaction name="separator" />
-    <addaction name="actionRebuild_I_B_Frames" />
-    <addaction name="actionBitrate_histogram" />
-    <addaction name="actionScan_for_black_frames" />
-    <addaction name="separator" />
-    <addaction name="actionVob_to_vobsub" />
-    <addaction name="actionOCR" />
-    <addaction name="actionOCR_DVB_T_TS_files" />
-    <addaction name="actionGlyphs_Edit" />
-   </widget>
    <widget class="QMenu" name="menuCustom" >
     <property name="title" >
      <string>&amp;Custom</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuGo" >
-    <property name="title" >
-     <string>&amp;Go</string>
-    </property>
-    <addaction name="actionPlay_Stop" />
-    <addaction name="actionPrevious_Frame" />
-    <addaction name="actionNext_Frame" />
-    <addaction name="actionPrevious_intra_frame" />
-    <addaction name="actionNext_intra_frame" />
-    <addaction name="actionPrevious_black_frame" />
-    <addaction name="actionNext_blak_frame" />
-    <addaction name="actionFirst_Frame" />
-    <addaction name="actionLast_Frame" />
-    <addaction name="separator" />
-    <addaction name="actionGo_to_Marker_A" />
-    <addaction name="actionGo_to_Marker_B" />
-    <addaction name="separator" />
-    <addaction name="actionJump_to_Frame" />
-    <addaction name="actionJump_to_Time" />
    </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
@@ -1500,6 +1430,88 @@
     <addaction name="actionConnect_to_AvsProxy" />
     <addaction name="separator" />
     <addaction name="actionQuit" />
+   </widget>
+   <widget class="QMenu" name="menuAuto" >
+    <property name="title" >
+     <string>A&amp;uto</string>
+    </property>
+    <addaction name="actionVCD" />
+    <addaction name="actionSVCD" />
+    <addaction name="actionDVD" />
+    <addaction name="actionPSP" />
+    <addaction name="actionPSP_H264" />
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionCalculator" />
+    <addaction name="separator" />
+    <addaction name="actionRebuild_I_B_Frames" />
+    <addaction name="actionBitrate_histogram" />
+    <addaction name="actionScan_for_black_frames" />
+    <addaction name="separator" />
+    <addaction name="actionVob_to_vobsub" />
+    <addaction name="actionOCR" />
+    <addaction name="actionOCR_DVB_T_TS_files" />
+    <addaction name="actionGlyphs_Edit" />
+   </widget>
+   <widget class="QMenu" name="menuGo" >
+    <property name="title" >
+     <string>&amp;Go</string>
+    </property>
+    <addaction name="actionPlay" />
+    <addaction name="actionPrevious_Frame" />
+    <addaction name="actionNext_Frame" />
+    <addaction name="actionPrevious_intra_frame" />
+    <addaction name="actionNext_intra_frame" />
+    <addaction name="actionPrevious_black_frame" />
+    <addaction name="actionNext_blak_frame" />
+    <addaction name="actionFirst_Frame" />
+    <addaction name="actionLast_Frame" />
+    <addaction name="separator" />
+    <addaction name="actionGo_to_Marker_A" />
+    <addaction name="actionGo_to_Marker_B" />
+    <addaction name="separator" />
+    <addaction name="actionJump_to_Frame" />
+    <addaction name="actionJump_to_Time" />
+   </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionReset_Edits" />
+    <addaction name="separator" />
+    <addaction name="actionCut" />
+    <addaction name="actionCopy" />
+    <addaction name="actionPaste" />
+    <addaction name="actionDelete" />
+    <addaction name="separator" />
+    <addaction name="actionSet_marker_A" />
+    <addaction name="actionSet_marker_B" />
+    <addaction name="separator" />
+    <addaction name="actionPreferences" />
+   </widget>
+   <widget class="QMenu" name="menuView" >
+    <property name="title" >
+     <string>&amp;View</string>
+    </property>
+    <widget class="QMenu" name="menu_Preview" >
+     <property name="title" >
+      <string>&amp;Preview Mode</string>
+     </property>
+     <addaction name="actionPreviewInput" />
+     <addaction name="actionPreviewOutput" />
+     <addaction name="actionPreviewSide" />
+     <addaction name="actionPreviewTop" />
+     <addaction name="actionPreviewSeparate" />
+    </widget>
+    <addaction name="actionZoom_1_4" />
+    <addaction name="actionZoom_1_2" />
+    <addaction name="actionZoom_1_1" />
+    <addaction name="actionZoom_2_1" />
+    <addaction name="separator" />
+    <addaction name="menu_Preview" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -1741,6 +1753,9 @@
    </property>
   </action>
   <action name="actionZoom_1_4" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
    <property name="text" >
     <string>&amp;Zoom 1:4</string>
    </property>
@@ -1749,6 +1764,9 @@
    </property>
   </action>
   <action name="actionZoom_1_2" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
    <property name="text" >
     <string>Z&amp;oom 1:2</string>
    </property>
@@ -1757,6 +1775,12 @@
    </property>
   </action>
   <action name="actionZoom_1_1" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>true</bool>
+   </property>
    <property name="text" >
     <string>Zoom &amp;1:1</string>
    </property>
@@ -1765,6 +1789,9 @@
    </property>
   </action>
   <action name="actionZoom_2_1" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
    <property name="text" >
     <string>Zoom &amp;2:1</string>
    </property>
@@ -1942,7 +1969,13 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/player_stop.png</iconset>
    </property>
    <property name="text" >
-    <string>&amp;Play/Stop</string>
+    <string>Stop</string>
+   </property>
+   <property name="iconText" >
+    <string>Stop</string>
+   </property>
+   <property name="toolTip" >
+    <string>Stop</string>
    </property>
    <property name="shortcut" >
     <string>P</string>
@@ -2131,7 +2164,16 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/player_play.png</iconset>
    </property>
    <property name="text" >
-    <string>Play</string>
+    <string>&amp;Play/Stop</string>
+   </property>
+   <property name="iconText" >
+    <string>Play/Stop</string>
+   </property>
+   <property name="toolTip" >
+    <string>Play/Stop</string>
+   </property>
+   <property name="shortcut" >
+    <string>P</string>
    </property>
   </action>
   <action name="actionRecent0" >
@@ -2264,7 +2306,7 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/preview_input.png</iconset>
    </property>
    <property name="text" >
-    <string>Input</string>
+    <string>&amp;Input</string>
    </property>
   </action>
   <action name="actionPreviewOutput" >
@@ -2275,7 +2317,7 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/preview_output.png</iconset>
    </property>
    <property name="text" >
-    <string>Output</string>
+    <string>&amp;Output</string>
    </property>
   </action>
   <action name="actionPreviewSide" >
@@ -2286,7 +2328,7 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/preview_side.png</iconset>
    </property>
    <property name="text" >
-    <string>Side</string>
+    <string>Si&amp;de</string>
    </property>
   </action>
   <action name="actionPreviewTop" >
@@ -2297,7 +2339,7 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/preview_top.png</iconset>
    </property>
    <property name="text" >
-    <string>Top</string>
+    <string>&amp;Top</string>
    </property>
   </action>
   <action name="actionPreviewSeparate" >
@@ -2308,7 +2350,32 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/preview_separate.png</iconset>
    </property>
    <property name="text" >
-    <string>Separate</string>
+    <string>&amp;Separate</string>
+   </property>
+  </action>
+  <action name="action_Input" >
+   <property name="text" >
+    <string>&amp;Input</string>
+   </property>
+  </action>
+  <action name="action_Output" >
+   <property name="text" >
+    <string>&amp;Output</string>
+   </property>
+  </action>
+  <action name="actionSi_de" >
+   <property name="text" >
+    <string>Si&amp;de</string>
+   </property>
+  </action>
+  <action name="action_Top" >
+   <property name="text" >
+    <string>&amp;Top</string>
+   </property>
+  </action>
+  <action name="action_Separate" >
+   <property name="text" >
+    <string>&amp;Separate</string>
    </property>
   </action>
  </widget>

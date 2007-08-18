@@ -188,6 +188,14 @@ MainWindow::MainWindow() : QMainWindow()
 	groupPreviewModes->addAction(ui.actionPreviewSeparate);
 	connect(groupPreviewModes, SIGNAL(triggered(QAction*)), this, SLOT(previewModeChanged(QAction*)));
 
+	// Zoom modes
+	QActionGroup *groupZoomModes = new QActionGroup(this);
+
+	groupZoomModes->addAction(ui.actionZoom_1_4);
+	groupZoomModes->addAction(ui.actionZoom_1_2);
+	groupZoomModes->addAction(ui.actionZoom_1_1);
+	groupZoomModes->addAction(ui.actionZoom_2_1);
+
 	/*
 	Connect our button to buttonPressed
 	*/
