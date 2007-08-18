@@ -70,25 +70,25 @@ extern uint8_t AVDM_setVolume(int volume);
 #include "ui_gui2.h"
 
 #define WIDGET(x)  (((MainWindow *)QuiMainWindows)->ui.x)
-    
+
 #define CONNECT(object,zzz) connect( (ui.object),SIGNAL(triggered()),this,SLOT(buttonPressed()));
 #define CONNECT_TB(object,zzz) connect( (ui.object),SIGNAL(clicked(bool)),this,SLOT(toolButtonPressed(bool)));
 #define DECLARE_VAR(object,signal_name) {#object,signal_name},
-             
+
 #include "translation_table.h"    
 /*
     Declare the table converting widget name to our internal signal           
 */
 typedef struct adm_qt4_translation
 {
-  const char *name;
-  Action     action; 
+	const char *name;
+	Action     action; 
 };
 const adm_qt4_translation myTranslationTable[]=
 {
 #define PROCESS DECLARE_VAR
-     LIST_OF_OBJECTS
-     LIST_OF_BUTTONS
+	LIST_OF_OBJECTS
+	LIST_OF_BUTTONS
 #undef PROCESS
 };
 static Action searchTranslationTable(const char *name);
@@ -97,177 +97,166 @@ static Action searchTranslationTable(const char *name);
     Declare the class that will be our main window
 
 */
- class MainWindow : public QMainWindow
- {
-     Q_OBJECT
+class MainWindow : public QMainWindow
+{
+	Q_OBJECT
 
- public:
-     MainWindow();
-     Ui_MainWindow ui;
- public slots:
-     void timeChanged(int);
-     void buttonPressed(void);
-     void custom(void);
-     void toolButtonPressed(bool z);
-     void comboChanged(int z)
-     {
-        const char *source=qPrintable(sender()->objectName());
+public:
+	MainWindow();
+	Ui_MainWindow ui;
 
-        if(!strcmp(source,"comboBoxVideo"))  
-        {
-          bool b=FALSE;;
-          if(ui.comboBoxVideo->currentIndex())
-          {
-             b=TRUE;
-          }
-          ui.pushButtonVideoConf->setEnabled(b);
-          ui.pushButtonVideoFilter->setEnabled(b);
-          HandleAction (ACT_VideoCodecChanged) ;
-        }
-        else 
-          if(!strcmp(source,"comboBoxAudio"))  
-        {
-          bool b=FALSE;
-          if(ui.comboBoxAudio->currentIndex())
-          {
-             b=TRUE;
-          }
-          ui.pushButtonAudioConf->setEnabled(b);
-          ui.pushButtonAudioFilter->setEnabled(b);
-          HandleAction (ACT_AudioCodecChanged) ;
-        }else
-        if(!strcmp(source,"comboBoxPreview"))  
-        {
-          HandleAction (ACT_PreviewChanged) ;
-        }
-        
+public slots:
+	void timeChanged(int);
+	void buttonPressed(void);
+	void custom(void);
+	void toolButtonPressed(bool z);
+	void comboChanged(int z)
+	{
+		const char *source=qPrintable(sender()->objectName());
 
-        printf("From +: %s\n",source);
-     }
-      void sliderMoved(int u) 
-        {
-          if(!_upd_in_progres)
-          {
-            HandleAction (ACT_Scale) ;
-          }
-        }
-      void volumeChange( int u )
-      {
-      #ifdef HAVE_AUDIO
-      
-      if(_upd_in_progres) return;
-       _upd_in_progres++;
-       int vol;
-              vol=ui.horizontalSlider_2->value();
-              AVDM_setVolume( vol);
-       _upd_in_progres--;
-      #endif
-      }
- private slots:
-   
+		if(!strcmp(source,"comboBoxVideo"))  
+		{
+			bool b=FALSE;
+			if(ui.comboBoxVideo->currentIndex())
+			{
+				b=TRUE;
+			}
+			ui.pushButtonVideoConf->setEnabled(b);
+			ui.pushButtonVideoFilter->setEnabled(b);
+			HandleAction (ACT_VideoCodecChanged) ;
+		}
+		else if(!strcmp(source,"comboBoxAudio"))  
+		{
+			bool b=FALSE;
+			if(ui.comboBoxAudio->currentIndex())
+			{
+				b=TRUE;
+			}
+			ui.pushButtonAudioConf->setEnabled(b);
+			ui.pushButtonAudioFilter->setEnabled(b);
+			HandleAction (ACT_AudioCodecChanged) ;
+		}
+		else
+			printf("From +: %s\n",source);
+	}
 
- private:
-     
- };
+	void sliderMoved(int u) 
+	{
+		if(!_upd_in_progres)
+			HandleAction (ACT_Scale) ;
+	}
+
+	void volumeChange( int u )
+	{
+#ifdef HAVE_AUDIO
+		if(_upd_in_progres) return;
+
+		_upd_in_progres++;
+
+		int vol = ui.horizontalSlider_2->value();
+
+		AVDM_setVolume(vol);
+		_upd_in_progres--;
+#endif
+	}
+
+	void previewModeChanged(QAction *action)
+	{
+		HandleAction(ACT_PreviewChanged);
+	}
+
+private slots:
+
+private:
+
+};
 
 
-MainWindow::MainWindow()     : QMainWindow()
- {
-     ui.setupUi(this);
-     /*
-        Connect our button to buttonPressed
-     */
+MainWindow::MainWindow() : QMainWindow()
+{
+	ui.setupUi(this);
+
+	this->setStatusBar(0);
+
+	// Preview modes
+	QActionGroup *groupPreviewModes = new QActionGroup(this);
+
+	groupPreviewModes->addAction(ui.actionPreviewInput);
+	groupPreviewModes->addAction(ui.actionPreviewOutput);
+	groupPreviewModes->addAction(ui.actionPreviewSide);
+	groupPreviewModes->addAction(ui.actionPreviewTop);
+	groupPreviewModes->addAction(ui.actionPreviewSeparate);
+	connect(groupPreviewModes, SIGNAL(triggered(QAction*)), this, SLOT(previewModeChanged(QAction*)));
+
+	/*
+	Connect our button to buttonPressed
+	*/
 #define PROCESS CONNECT
-     LIST_OF_OBJECTS
+	LIST_OF_OBJECTS
 #undef PROCESS
 #define PROCESS CONNECT_TB
-     LIST_OF_BUTTONS
+	LIST_OF_BUTTONS
 #undef PROCESS
-     // ComboBox
-         
-         
-         
-         //ACT_VideoCodecChanged
-         connect( ui.comboBoxVideo,SIGNAL(activated(int)),this,SLOT(comboChanged(int)));
-         connect( ui.comboBoxAudio,SIGNAL(activated(int)),this,SLOT(comboChanged(int)));
-         connect( ui.comboBoxPreview,SIGNAL(activated(int)),this,SLOT(comboChanged(int)));
-     // Slider
-          slider=ui.horizontalSlider;
-          slider->setMinimum(0);
-          slider->setMaximum(1000);
-          connect( slider,SIGNAL(valueChanged(int)),this,SLOT(sliderMoved(int)));
-          // Volume slider
-          QSlider *volSlider=ui.horizontalSlider_2;
-          
-          volSlider->setMinimum(0);
-          volSlider->setMaximum(100);
-          connect( volSlider,SIGNAL(valueChanged(int)),this,SLOT(volumeChange(int)));
-          // Add a second toolbar
-          QToolBar *toolBarMove;
-            toolBarMove = new QToolBar(this);
-            toolBarMove->setObjectName(QString::fromUtf8("toolBarMove"));
-            toolBarMove->setOrientation(Qt::Horizontal);
-            this->addToolBar(static_cast<Qt::ToolBarArea>(4), toolBarMove);
-          // And actions to it
-#define ADD(x) toolBarMove->addAction(ui.x)
-            ADD(actionPlay);
-            ADD(actionPlay_Stop);
-            ADD(actionPrevious_Frame);
-            ADD(actionNext_Frame);
-            ADD(actionPrevious_intra_frame);
-            ADD(actionNext_intra_frame);
-            ADD(actionSet_marker_A);
-            ADD(actionSet_marker_B);
-            ADD(actionPrevious_black_frame);
-            ADD(actionNext_blak_frame);
-            ADD(actionFirst_Frame);
-            ADD(actionLast_Frame);
-            ADD(actionGo_to_Marker_A);
-            ADD(actionGo_to_Marker_B);
-            //** Add shortcuts **//
-            QKeySequence seqFilter("CTRL+Alt+F");
-            ui.actionFilters->setShortcut(seqFilter);
-            // default state
-            bool b=0;
-          ui.pushButtonVideoConf->setEnabled(b);
-          ui.pushButtonVideoFilter->setEnabled(b);
-          ui.pushButtonAudioConf->setEnabled(b);
-          ui.pushButtonAudioFilter->setEnabled(b);
-          /* Time Shift */
-  connect(ui.checkBox_TimeShift,SIGNAL(stateChanged(int)),this,SLOT(timeChanged(int)));
-  connect(ui.spinBox_TimeValue,SIGNAL(valueChanged(int)),this,SLOT(timeChanged(int)));
-          
-          
-          
-          /* Build the custom menu */
-          GUI_initCustom();
-          for(int i=0;i<ADM_nbCustom;i++)
-          {
-            customActions[i]=new QAction(customNames[i],NULL);
-            ui.menuCustom->addAction(customActions[i]);
-            connect(customActions[i], SIGNAL(triggered()), this, SLOT(custom()));
-          }
-          printf("Menu built\n");
- }
- /**
-    \fn     custom
-    \brief  Invoked when one of the custom script has been called
- */
+
+	//ACT_VideoCodecChanged
+	connect( ui.comboBoxVideo,SIGNAL(activated(int)),this,SLOT(comboChanged(int)));
+	connect( ui.comboBoxAudio,SIGNAL(activated(int)),this,SLOT(comboChanged(int)));
+
+	// Slider
+	slider=ui.horizontalSlider;
+	slider->setMinimum(0);
+	slider->setMaximum(1000);
+	connect( slider,SIGNAL(valueChanged(int)),this,SLOT(sliderMoved(int)));
+
+	// Volume slider
+	QSlider *volSlider=ui.horizontalSlider_2;
+	volSlider->setMinimum(0);
+	volSlider->setMaximum(100);
+	connect( volSlider,SIGNAL(valueChanged(int)),this,SLOT(volumeChange(int)));
+
+	//** Add shortcuts **//
+	QKeySequence seqFilter("CTRL+Alt+F");
+	ui.actionFilters->setShortcut(seqFilter);
+	// default state
+	bool b=0;
+	ui.pushButtonVideoConf->setEnabled(b);
+	ui.pushButtonVideoFilter->setEnabled(b);
+	ui.pushButtonAudioConf->setEnabled(b);
+	ui.pushButtonAudioFilter->setEnabled(b);
+
+	/* Time Shift */
+	connect(ui.checkBox_TimeShift,SIGNAL(stateChanged(int)),this,SLOT(timeChanged(int)));
+	connect(ui.spinBox_TimeValue,SIGNAL(valueChanged(int)),this,SLOT(timeChanged(int)));
+
+	/* Build the custom menu */
+	GUI_initCustom();
+	for(int i=0;i<ADM_nbCustom;i++)
+	{
+		customActions[i]=new QAction(customNames[i],NULL);
+		ui.menuCustom->addAction(customActions[i]);
+		connect(customActions[i], SIGNAL(triggered()), this, SLOT(custom()));
+	}
+	printf("Menu built\n");
+}
+/**
+\fn     custom
+\brief  Invoked when one of the custom script has been called
+*/
 void MainWindow::custom(void)
 {
-    printf("[CUSTOM] Invoked\n");
-    QObject *ptr=sender();
-    if(!ptr) return;
-    for(int i=0;i<ADM_nbCustom;i++)
-    {
-      if(customActions[i]==ptr)
-      {
-        printf("[Custom] %u/%u scrips\n",i,ADM_nbCustom);
-        HandleAction( (Action)(ACT_CUSTOM_BASE+i));
-        return; 
-      }
-    }
-    printf("[Custom] Not found\n");
+	printf("[Custom] Invoked\n");
+	QObject *ptr=sender();
+	if(!ptr) return;
+	for(int i=0;i<ADM_nbCustom;i++)
+	{
+		if(customActions[i]==ptr)
+		{
+			printf("[Custom] %u/%u scripts\n",i,ADM_nbCustom);
+			HandleAction( (Action)(ACT_CUSTOM_BASE+i));
+			return; 
+		}
+	}
+	printf("[Custom] Not found\n");
 }
 /**
     Get the custom entry 
@@ -275,8 +264,8 @@ void MainWindow::custom(void)
 */
 const char * GUI_getCustomScript(uint32_t nb)
 {
-    ADM_assert(nb<ADM_nbCustom);
-    return customNames[nb];
+	ADM_assert(nb<ADM_nbCustom);
+	return customNames[nb];
 
 }
 /**
@@ -285,39 +274,39 @@ const char * GUI_getCustomScript(uint32_t nb)
 */
 void MainWindow::timeChanged(int)
 {
-   HandleAction (ACT_TimeShift) ;
+	HandleAction (ACT_TimeShift) ;
 }
- /*
+/*
       We receive a button press event
- */
- void MainWindow::buttonPressed(void)
- {
-    // Receveid a key press Event, look into table..
-   const char *source=qPrintable(sender()->objectName());
+*/
+void MainWindow::buttonPressed(void)
+{
+	// Receveid a key press Event, look into table..
+	const char *source=qPrintable(sender()->objectName());
 
-    printf("Button From : %s\n",source);
-    Action action=searchTranslationTable(source);
-    if(action!=ACT_DUMMY)
-    {
-      HandleAction (action) ;
-    }
+	printf("Button From: %s\n",source);
+	Action action=searchTranslationTable(source);
 
- }
-  void MainWindow::toolButtonPressed(bool i)
-  {
-     buttonPressed();
-  }
+	if(action!=ACT_DUMMY)
+		HandleAction (action);
+
+}
+void MainWindow::toolButtonPressed(bool i)
+{
+	buttonPressed();
+}
 //*********************************************
 //***** Hook to core                ***********
 //*********************************************
 extern int global_argc;
 extern char **global_argv;
 extern void UI_QT4VideoWidget(QFrame *frame);
+
 int UI_Init(int nargc,char **nargv)
 {
-  global_argc=nargc;
-  global_argv=nargv;
-  return 0;
+	global_argc=nargc;
+	global_argv=nargv;
+	return 0;
 }
 QWidget *QuiMainWindows=NULL;
 QGraphicsView *drawWindow=NULL;
@@ -327,21 +316,48 @@ uint8_t UI_updateRecentMenu( void );
     \fn UI_getCurrentPreview(void)
     \brief Read previewmode from comboxbox 
 */
-
-int    UI_getCurrentPreview(void)
+int UI_getCurrentPreview(void)
 {
-  return WIDGET(comboBoxPreview)->currentIndex(); 
+	int index;
+
+	if (WIDGET(actionPreviewOutput)->isChecked())
+		index = 1;
+	else if (WIDGET(actionPreviewSide)->isChecked())
+		index = 2;
+	else if (WIDGET(actionPreviewTop)->isChecked())
+		index = 3;
+	else if (WIDGET(actionPreviewSeparate)->isChecked())
+		index = 4;
+	else
+		index = 0;
+
+	return index;
 }
+
 /**
     \fn UI_setCurrentPreview(int ne)
     \brief Update comboxbox with previewmode
 */
-
-void   UI_setCurrentPreview(int ne)
+void UI_setCurrentPreview(int ne)
 {
-    WIDGET(comboBoxPreview)->setCurrentIndex(ne); 
+	switch (ne)
+	{
+		case 1:
+			WIDGET(actionPreviewOutput)->setChecked(true);
+			break;
+		case 2:
+			WIDGET(actionPreviewSide)->setChecked(true);
+			break;
+		case 3:
+			WIDGET(actionPreviewTop)->setChecked(true);
+			break;
+		case 4:
+			WIDGET(actionPreviewSeparate)->setChecked(true);
+			break;
+		default:
+			WIDGET(actionPreviewInput)->setChecked(true);
+	}
 }
-
 
 /**
     \fn UI_RunApp(void)
@@ -349,32 +365,31 @@ void   UI_setCurrentPreview(int ne)
 */
 int UI_RunApp(void)
 {
-Q_INIT_RESOURCE(avidemux);
-Q_INIT_RESOURCE(filter);
-   QApplication a( global_argc, global_argv );
-   MainWindow * mw = new MainWindow();
-    
-    a.connect( &a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()) );
-    
+	Q_INIT_RESOURCE(avidemux);
+	Q_INIT_RESOURCE(filter);
+	QApplication a( global_argc, global_argv );
+	MainWindow * mw = new MainWindow();
+
+	a.connect( &a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()) );
+
 	uint32_t w, h;
 
-	UI_getPhysicalScreenSize(&w,&h); //gtk_widget_get_parent_window (guiRootWindow));
-    printf("The screen seems to be %u x %u px\n",w,h);
+	UI_getPhysicalScreenSize(&w,&h);
+	printf("The screen seems to be %u x %u px\n",w,h);
 
-    mw->show();
-    
-    QuiMainWindows=(QWidget*)mw;
-   
-    UI_QT4VideoWidget(mw->ui.frame_video);  // Add the widget that will handle video display
-    UI_updateRecentMenu(  );
-    setupMenus();
-    checkCrashFile();
-    
-   if (global_argc >= 2)
-    {
-     automation();
-    }
-    return a.exec();
+	mw->show();
+
+	QuiMainWindows=(QWidget*)mw;
+
+	UI_QT4VideoWidget(mw->ui.frame_video);  // Add the widget that will handle video display
+	UI_updateRecentMenu(  );
+	setupMenus();
+	checkCrashFile();
+
+	if (global_argc >= 2)
+		automation();
+
+	return a.exec();
 }
 /**
     \fn searchTranslationTable(const char *name))
@@ -382,15 +397,15 @@ Q_INIT_RESOURCE(filter);
 */
 Action searchTranslationTable(const char *name)
 {
-  for(int i=0;i< SIZEOF_MY_TRANSLATION;i++)
-  {
-    if(!strcmp(name, myTranslationTable[i].name))
-    {
-      return  myTranslationTable[i].action;
-    }
-  }
-  printf("WARNING : Signal not found in translation table : %s\n",name);
-  return ACT_DUMMY;
+	for(int i=0;i< SIZEOF_MY_TRANSLATION;i++)
+	{
+		if(!strcmp(name, myTranslationTable[i].name))
+		{
+			return  myTranslationTable[i].action;
+		}
+	}
+	printf("WARNING: Signal not found in translation table %s\n",name);
+	return ACT_DUMMY;
 }
 /**
     \fn     UI_updateRecentMenu( void )
@@ -398,30 +413,30 @@ Action searchTranslationTable(const char *name)
 */
 uint8_t UI_updateRecentMenu( void )
 {
-const char **names;
-uint32_t nb_item=0;
-QAction *actions[4]={WIDGET(actionRecent0),WIDGET(actionRecent1),WIDGET(actionRecent2),WIDGET(actionRecent3)};
-        names=prefs->get_lastfiles();
-        
-        // hide them all
-        for(int i=0;i<4;i++) actions[i]->setVisible(0);
-        // Redraw..
-        for( nb_item=0;nb_item<4;nb_item++)
-        {
-                if(!names[nb_item]) 
-                {
-                   return 1;
-                }
-                else
-                {
-                    //actions[nb_item]->setVisible(1);
-                    // Replace widget ?
-                    actions[nb_item]->setText(names[nb_item]);
-                    actions[nb_item]->setVisible(1);
-                }
-                // Update name
-        }
-        return 1;
+	const char **names;
+	uint32_t nb_item=0;
+	QAction *actions[4]={WIDGET(actionRecent0),WIDGET(actionRecent1),WIDGET(actionRecent2),WIDGET(actionRecent3)};
+	names=prefs->get_lastfiles();
+
+	// hide them all
+	for(int i=0;i<4;i++) actions[i]->setVisible(0);
+	// Redraw..
+	for( nb_item=0;nb_item<4;nb_item++)
+	{
+		if(!names[nb_item]) 
+		{
+			return 1;
+		}
+		else
+		{
+			//actions[nb_item]->setVisible(1);
+			// Replace widget ?
+			actions[nb_item]->setText(names[nb_item]);
+			actions[nb_item]->setVisible(1);
+		}
+		// Update name
+	}
+	return 1;
 }
 /** 
   \fn    setupMenus(void)
@@ -429,62 +444,62 @@ QAction *actions[4]={WIDGET(actionRecent0),WIDGET(actionRecent1),WIDGET(actionRe
 */
 void setupMenus(void)
 {
-        uint32_t nbVid;
-        const char *name;
+	uint32_t nbVid;
+	const char *name;
 
-                nbVid=encoderGetNbEncoder();
-                printf("Found %d video encoder\n",nbVid);
-                for(uint32_t i=1;i<nbVid;i++)
-                {
-                        name=encoderGetIndexedName(i);
-                        WIDGET(comboBoxVideo)->addItem(name);
-                }
+	nbVid=encoderGetNbEncoder();
+	printf("Found %d video encoder\n",nbVid);
+	for(uint32_t i=1;i<nbVid;i++)
+	{
+		name=encoderGetIndexedName(i);
+		WIDGET(comboBoxVideo)->addItem(name);
+	}
 
-        // And A codec
-        
-        uint32_t nbAud;
+	// And A codec
 
-                nbAud=audioFilterGetNbEncoder();
-                printf("Found %d audio encoder\n",nbAud);		       
-                for(uint32_t i=1;i<nbAud;i++)
-                {
-                        name=audioFilterGetIndexedName(i);
-                        WIDGET(comboBoxAudio)->addItem(name);
-                }
-      /*   Fill in output format window */
-        uint32_t nbFormat;
+	uint32_t nbAud;
 
-                nbFormat=sizeof(ADM_allOutputFormat)/sizeof(ADM_FORMAT_DESC);
-                printf("Found %d Format \n",nbFormat);
-                for(uint32_t i=0;i<nbFormat;i++)
-                {
-                       WIDGET(comboBoxFormat)->addItem(_(ADM_allOutputFormat[i].text));	
-                }
-        
+	nbAud=audioFilterGetNbEncoder();
+	printf("Found %d audio encoder\n",nbAud);		       
+	for(uint32_t i=1;i<nbAud;i++)
+	{
+		name=audioFilterGetIndexedName(i);
+		WIDGET(comboBoxAudio)->addItem(name);
+	}
+	/*   Fill in output format window */
+	uint32_t nbFormat;
+
+	nbFormat=sizeof(ADM_allOutputFormat)/sizeof(ADM_FORMAT_DESC);
+	printf("Found %d Format \n",nbFormat);
+	for(uint32_t i=0;i<nbFormat;i++)
+	{
+		WIDGET(comboBoxFormat)->addItem(_(ADM_allOutputFormat[i].text));	
+	}
+
 }
 /*
     Return % of scale (between 0 and 1)
 */
 double 	UI_readScale( void )
 {
-  double v;
-  if(!slider) v=0;
-  v= (double)(slider->value());
-  v/=10;
-  printf("GetScale\n");
-  return v;
+	double v;
+	if(!slider) v=0;
+	v= (double)(slider->value());
+	v/=10;
+	printf("GetScale\n");
+	return v;
 }
 void UI_setScale( double val )
 {
-if(_upd_in_progres) return;
- _upd_in_progres++;
-   slider->setValue( (int)val*10);
- _upd_in_progres--;
-   
+	if(_upd_in_progres) return;
+	_upd_in_progres++;
+	slider->setValue( (int)val*10);
+	_upd_in_progres--;
+
 }
 void UI_purge( void )
 {
- QCoreApplication::processEvents ();
+	QCoreApplication::processEvents ();
 }
 
 
@@ -496,12 +511,12 @@ void UI_purge( void )
 */
 void UI_setTitle(char *name)
 {
-      char title[1024];
+	char title[1024];
 
-      strcpy(title,"Avidemux 2 ");
-      strncat(title,name,200);
+	strcpy(title,"Avidemux 2 ");
+	strncat(title,name,200);
 
-      QuiMainWindows->setWindowTitle( title);
+	QuiMainWindows->setWindowTitle( title);
 }
 /**
     \fn     UI_setFrameType( uint32_t frametype,uint32_t qp)
@@ -510,18 +525,18 @@ void UI_setTitle(char *name)
 
 void UI_setFrameType( uint32_t frametype,uint32_t qp)
 {
-char string[100];
-char	c='?';
-      switch(frametype)
-      {
-              case AVI_KEY_FRAME: c='I';break;
-              case AVI_B_FRAME: c='B';break;
-              case 0: c='P';break;
-              default:c='?';break;
-      
-      }
-      sprintf(string,_("Frame:%c(%02d)"),c,qp);
-      WIDGET(label_8)->setText(string);	
+	char string[100];
+	char	c='?';
+	switch(frametype)
+	{
+	case AVI_KEY_FRAME: c='I';break;
+	case AVI_B_FRAME: c='B';break;
+	case 0: c='P';break;
+	default:c='?';break;
+
+	}
+	sprintf(string,_("%c (%02d)"),c,qp);
+	WIDGET(label_8)->setText(string);	
 
 }
 /**
@@ -531,10 +546,10 @@ char	c='?';
 
 void UI_updateFrameCount(uint32_t curFrame)
 {
-    char string[30];
-        sprintf(string,"%lu",curFrame);
+	char string[30];
+	sprintf(string,"%lu",curFrame);
 	WIDGET(lineEdit)->setText(string);
-    
+
 }
 /**
     \fn      UI_setFrameCount(uint32_t curFrame,uint32_t total)
@@ -543,14 +558,14 @@ void UI_updateFrameCount(uint32_t curFrame)
 
 void UI_setFrameCount(uint32_t curFrame,uint32_t total)
 {
-    char text[80]; 
-    if(total) total--; // We display from 0 to X  
-    
-    UI_updateFrameCount(curFrame);
-    
-    sprintf(text, "/ %lu ", total);
-    WIDGET(label_2)->setText(text);
-    
+	char text[80]; 
+	if(total) total--; // We display from 0 to X  
+
+	UI_updateFrameCount(curFrame);
+
+	sprintf(text, "/ %lu ", total);
+	WIDGET(label_2)->setText(text);
+
 }
 /**
     \fn     UI_updateTimeCount(uint32_t curFrame,uint32_t fps)
@@ -559,12 +574,12 @@ void UI_setFrameCount(uint32_t curFrame,uint32_t total)
 
 void UI_updateTimeCount(uint32_t curFrame,uint32_t fps)
 {
- char text[80];   
- uint16_t mm,hh,ss,ms;
+	char text[80];   
+	uint16_t mm,hh,ss,ms;
 
-      frame2time(curFrame,fps, &hh, &mm, &ss, &ms);
-      sprintf(text, "%02d:%02d:%02d.%03d", hh, mm, ss, ms);
-      WIDGET(lineEdit_2)->setText(text);
+	frame2time(curFrame,fps, &hh, &mm, &ss, &ms);
+	sprintf(text, "%02d:%02d:%02d.%03d", hh, mm, ss, ms);
+	WIDGET(lineEdit_2)->setText(text);
 
 }
 /**
@@ -574,15 +589,15 @@ void UI_updateTimeCount(uint32_t curFrame,uint32_t fps)
 
 void UI_setTimeCount(uint32_t curFrame,uint32_t total, uint32_t fps)
 {
- char text[80];   
- uint16_t mm,hh,ss,ms;
+	char text[80];   
+	uint16_t mm,hh,ss,ms;
 
-        UI_updateTimeCount(curFrame,fps);
-      frame2time(total,fps, &hh, &mm, &ss, &ms);
-      sprintf(text, "/%02d:%02d:%02d.%03d", hh, mm, ss, ms);
-      WIDGET(label_7)->setText(text);
+	UI_updateTimeCount(curFrame,fps);
+	frame2time(total,fps, &hh, &mm, &ss, &ms);
+	sprintf(text, "/ %02d:%02d:%02d.%03d", hh, mm, ss, ms);
+	WIDGET(label_7)->setText(text);
 #ifdef CUSTOM_SLIDER
-      slider->setNbFrames(total);
+	slider->setNbFrames(total);
 #endif
 }
 /**
@@ -590,17 +605,19 @@ void UI_setTimeCount(uint32_t curFrame,uint32_t total, uint32_t fps)
     \brief  Display frame # for marker A & B
 */
 
-void UI_setMarkers(uint32_t a, uint32_t b )
+void UI_setMarkers(uint32_t a, uint32_t b)
 {
- char text[80];
-      snprintf(text,79,"%lu",a);
-      WIDGET(label_9)->setText(text);
-      snprintf(text,79,"%lu",b);
-      WIDGET(label_10)->setText(text);
-      //
+	char text[80];
+
+	snprintf(text,79,"%06lu",a);
+	WIDGET(pushButtonJumpToMarkerA)->setText(text);
+
+	snprintf(text,79,"%06lu",b);
+	WIDGET(pushButtonJumpToMarkerB)->setText(text);
+	//
 #ifdef CUSTOM_SLIDER
-      slider->setA(a);
-      slider->setB(b);
+	slider->setA(a);
+	slider->setB(b);
 #endif
 }
 /**
@@ -610,9 +627,9 @@ void UI_setMarkers(uint32_t a, uint32_t b )
 
 int 	UI_getCurrentVCodec(void)
 {
-  int i=WIDGET(comboBoxVideo)->currentIndex();
-  if(i<0) i=0;
-  return i; 
+	int i=WIDGET(comboBoxVideo)->currentIndex();
+	if(i<0) i=0;
+	return i; 
 }
 /**
     \fn     UI_setVideoCodec( int i)
@@ -621,11 +638,11 @@ int 	UI_getCurrentVCodec(void)
 
 void UI_setVideoCodec( int i)
 {
-  int b=!!i;
-    WIDGET(comboBoxVideo)->setCurrentIndex(i);
-    
-     WIDGET(pushButtonVideoConf)->setEnabled(b);
-     WIDGET(pushButtonVideoFilter)->setEnabled(b);
+	int b=!!i;
+	WIDGET(comboBoxVideo)->setCurrentIndex(i);
+
+	WIDGET(pushButtonVideoConf)->setEnabled(b);
+	WIDGET(pushButtonVideoFilter)->setEnabled(b);
 }
 /**
     \fn     UI_getCurrentACodec(void)
@@ -634,9 +651,9 @@ void UI_setVideoCodec( int i)
 
 int 	UI_getCurrentACodec(void)
 {
-   int i=WIDGET(comboBoxAudio)->currentIndex();
-  if(i<0) i=0;
-  return i; 
+	int i=WIDGET(comboBoxAudio)->currentIndex();
+	if(i<0) i=0;
+	return i; 
 }
 /**
     \fn     UI_setAudioCodec( int i)
@@ -645,9 +662,9 @@ int 	UI_getCurrentACodec(void)
 
 void UI_setAudioCodec( int i)
 { int b=!!i;
-   WIDGET(comboBoxAudio)->setCurrentIndex(i);
-    WIDGET(pushButtonAudioConf)->setEnabled(b);
-    WIDGET(pushButtonAudioFilter)->setEnabled(b);
+WIDGET(comboBoxAudio)->setCurrentIndex(i);
+WIDGET(pushButtonAudioConf)->setEnabled(b);
+WIDGET(pushButtonAudioFilter)->setEnabled(b);
 }
 /**
     \fn     UI_GetCurrentFormat(void)
@@ -656,9 +673,9 @@ void UI_setAudioCodec( int i)
 
 ADM_OUT_FORMAT 	UI_GetCurrentFormat( void )
 {
-    int i=WIDGET(comboBoxFormat)->currentIndex();
-  if(i<0) i=0;
-  return (ADM_OUT_FORMAT)i; 
+	int i=WIDGET(comboBoxFormat)->currentIndex();
+	if(i<0) i=0;
+	return (ADM_OUT_FORMAT)i; 
 }
 /**
     \fn     UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
@@ -666,37 +683,32 @@ ADM_OUT_FORMAT 	UI_GetCurrentFormat( void )
 */
 uint8_t 	UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
 {
-    WIDGET(comboBoxFormat)->setCurrentIndex((int)fmt);
+	WIDGET(comboBoxFormat)->setCurrentIndex((int)fmt);
 }
-uint8_t UI_sliderResize(uint32_t w)
-{
-  printf("sliderResize %u\n",w);
-  slider->resize(w,w);
-  return 1; 
-}
+
 /**
       \fn GUI_initCustom
       \brief Initialize custom menu
 */
 void GUI_initCustom(void )
 {
-  char *customdir=ADM_getCustomDir();
-  if(!customdir) 
-  {
-      printf("No custom dir...\n");
-      return;
-  }
-  /* Collect the name */
-   if(! buildDirectoryContent(&ADM_nbCustom,customdir, customNames,ADM_MAC_CUSTOM_SCRIPT,".js"))
-    {
-      printf("Failed to build custom dir content");
-      return;
-    }
-  if(!ADM_nbCustom)
-  {
-      printf("No custom script\n");
-  }
-  printf("Found %u custom scripts, adding them\n",ADM_nbCustom);
+	char *customdir=ADM_getCustomDir();
+	if(!customdir) 
+	{
+		printf("No custom dir...\n");
+		return;
+	}
+	/* Collect the name */
+	if(! buildDirectoryContent(&ADM_nbCustom,customdir, customNames,ADM_MAC_CUSTOM_SCRIPT,".js"))
+	{
+		printf("Failed to build custom dir content");
+		return;
+	}
+	if(!ADM_nbCustom)
+	{
+		printf("No custom script\n");
+	}
+	printf("Found %u custom scripts, adding them\n",ADM_nbCustom);
 }
 /**
       \fn UI_getTimeShift
@@ -704,12 +716,12 @@ void GUI_initCustom(void )
 */
 uint8_t UI_getTimeShift(int *onoff,int *value)
 {
-  if(WIDGET(checkBox_TimeShift)->checkState()==Qt::Checked)
-        *onoff=1;
-  else
-        *onoff=0;
-  *value=WIDGET(spinBox_TimeValue)->value();
-  return 1;
+	if(WIDGET(checkBox_TimeShift)->checkState()==Qt::Checked)
+		*onoff=1;
+	else
+		*onoff=0;
+	*value=WIDGET(spinBox_TimeValue)->value();
+	return 1;
 }
 /**
       \fn UI_setTimeShift
@@ -718,12 +730,12 @@ uint8_t UI_getTimeShift(int *onoff,int *value)
 
 uint8_t UI_setTimeShift(int onoff,int value)
 {
-  if(onoff)
-    WIDGET(checkBox_TimeShift)->setCheckState(Qt::Checked);
-  else
-    WIDGET(checkBox_TimeShift)->setCheckState(Qt::Unchecked);
-  WIDGET(spinBox_TimeValue)->setValue(value);
-  return 1;
+	if(onoff)
+		WIDGET(checkBox_TimeShift)->setCheckState(Qt::Checked);
+	else
+		WIDGET(checkBox_TimeShift)->setCheckState(Qt::Unchecked);
+	WIDGET(spinBox_TimeValue)->setValue(value);
+	return 1;
 }
 
 //********************************************

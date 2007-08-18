@@ -26,8 +26,6 @@ PROCESS(actionZoom_1_1,ACT_ZOOM_1_1) \
 PROCESS(actionZoom_2_1,ACT_ZOOM_2_1) \
 PROCESS(actionDecoder_options,ACT_DecoderOption) \
 PROCESS(actionPostprocessing,ACT_SetPostProcessing) \
-PROCESS(actionPreview,ACT_PreviewToggle) \
-PROCESS(actionDisplay_output,ACT_OuputToggle) \
 PROCESS(actionFrame_rate,ACT_ChangeFPS) \
 PROCESS(actionEncoder,ACT_SelectEncoder) \
 PROCESS(actionFilters,ACT_VideoParameter) \
@@ -72,16 +70,27 @@ PROCESS(actionAdd_to_joblist,ACT_ADD_JOB) \
 PROCESS(actionShow_Joblist,ACT_HANDLE_JOB)  
 
 #if 0
-// PROCESS(actionZoom_4_1,ACT_ZOOM_4_1) \
+PROCESS(actionZoom_4_1,ACT_ZOOM_4_1) \
 PROCESS(actionMain_toolbar,ACT_SaveCurrentWork) \
-PROCESS(actionA_V_toolbar,ACT_DUMMY) \
-
-
+PROCESS(actionA_V_toolbar,ACT_DUMMY)
 #endif
+
 #define LIST_OF_BUTTONS     \
-PROCESS(pushButtonVideoConf ,ACT_VideoCodec)  \
-PROCESS(pushButtonVideoFilter , ACT_VideoParameter  ) \
-PROCESS(pushButtonAudioConf ,ACT_AudioCodec ) \
-PROCESS(pushButtonAudioFilter ,ACT_AudioFilters ) 
-
-
+PROCESS(pushButtonVideoConf, ACT_VideoCodec)  \
+PROCESS(pushButtonVideoFilter, ACT_VideoParameter) \
+PROCESS(pushButtonAudioConf, ACT_AudioCodec) \
+PROCESS(pushButtonAudioFilter, ACT_AudioFilters) \
+PROCESS(toolButtonPlay, ACT_PlayAvi) \
+PROCESS(toolButtonStop, ACT_StopAvi) \
+PROCESS(toolButtonPreviousFrame, ACT_PreviousFrame) \
+PROCESS(toolButtonNextFrame, ACT_NextFrame) \
+PROCESS(toolButtonPreviousIntraFrame, ACT_PreviousKFrame) \
+PROCESS(toolButtonNextIntraFrame, ACT_NextKFrame) \
+PROCESS(toolButtonSetMarkerA, ACT_MarkA) \
+PROCESS(toolButtonSetMarkerB, ACT_MarkB) \
+PROCESS(toolButtonPreviousBlackFrame, ACT_PrevBlackFrame) \
+PROCESS(toolButtonNextBlackFrame, ACT_NextBlackFrame) \
+PROCESS(toolButtonFirstFrame, ACT_Begin) \
+PROCESS(toolButtonLastFrame, ACT_End) \
+PROCESS(pushButtonJumpToMarkerA, ACT_GotoMarkA) \
+PROCESS(pushButtonJumpToMarkerB, ACT_GotoMarkB)

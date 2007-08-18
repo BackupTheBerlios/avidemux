@@ -54,7 +54,6 @@ static uint8_t *lastImage=NULL;
 extern QWidget *QuiMainWindows;
  ColYuvRgb rgbConverter(640,480,1);
 extern void UI_purge( void );
-extern uint8_t UI_sliderResize(uint32_t w);;
 
 void DIA_previewInit(uint32_t width, uint32_t height) {}
 uint8_t DIA_previewUpdate(uint8_t *data) {return 1;}
@@ -124,8 +123,7 @@ void UI_QT4VideoWidget(QFrame *host)
 {
    videoWindow=new ADM_Qvideo(host);
    hostFrame=host;
-   hostFrame->resize(320,200);
-   videoWindow->resize(320,200);
+   videoWindow->resize(hostFrame->size());
    videoWindow->show();
    
 }
@@ -147,8 +145,6 @@ void UI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr)
     
 }
 
-#define ADM_RSZ(a,x,y) {a->setMinimumSize(x,y); a->resize(x,y);}
-#define ADM_RSZ_MAX(a,x,y) {a->setMinimumSize(x,y); a->setMaximumSize(x,y); a->resize(x,y);}
 /**
       \brief Resize the window
 */
@@ -157,12 +153,6 @@ void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
 	if(displayW == w && displayH == h && rgbDataBuffer)
 		return;
 
-	QMainWindow *mainWindow = (QMainWindow*)hostFrame->parentWidget()->parentWidget();
-	QWidget *centralWidget = hostFrame->parentWidget();
-
-	uint32_t totalW = w + hostFrame->x();
-	uint32_t totalH = (mainWindow->height() - centralWidget->height()) + hostFrame->y() + h;
-
 	if(rgbDataBuffer)
 		delete[] rgbDataBuffer;
 
@@ -170,14 +160,18 @@ void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
 	displayW = w;
 	displayH = h;
 
-	// Resize host window
-	ADM_RSZ(QuiMainWindows, totalW, totalH);
+	hostFrame->setMinimumSize(displayW, displayH);
+	videoWindow->setMinimumSize(displayW, displayH);	
 
-	// And resize child windows
-	ADM_RSZ_MAX(hostFrame, displayW, displayH);
-	ADM_RSZ_MAX(videoWindow, displayW, displayH);
+	hostFrame->resize(displayW, displayH);
+	videoWindow->resize(displayW, displayH);
 
-	UI_sliderResize(w);
+	UI_purge();
+
+	// Resize only works every second time so both calls are necessary - don't know why ???
+	QuiMainWindows->resize(1, 1);
+	UI_purge();	
+	QuiMainWindows->resize(1, 1);
 	UI_purge();
 
 	printf("[RDR] Resizing to %u x %u\n", displayW, displayH);
