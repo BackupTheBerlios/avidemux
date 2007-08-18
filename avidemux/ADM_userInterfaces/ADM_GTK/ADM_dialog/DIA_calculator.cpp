@@ -388,7 +388,7 @@ create_Calculator (void)
   GtkWidget *label15;
   GtkWidget *labelBitrate;
   GtkWidget *labelBPP;
-  GtkWidget *label8;
+  
   GtkWidget *dialog_action_area1;
   GtkWidget *doit;
   GtkWidget *button1;
@@ -796,7 +796,7 @@ create_Calculator (void)
   GLADE_HOOKUP_OBJECT (Calculator, label15, "label15");
   GLADE_HOOKUP_OBJECT (Calculator, labelBitrate, "labelBitrate");
   GLADE_HOOKUP_OBJECT (Calculator, labelBPP, "labelBPP");
-  GLADE_HOOKUP_OBJECT (Calculator, label8, "label8");
+  
   GLADE_HOOKUP_OBJECT_NO_REF (Calculator, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (Calculator, doit, "doit");
   GLADE_HOOKUP_OBJECT (Calculator, button1, "button1");
