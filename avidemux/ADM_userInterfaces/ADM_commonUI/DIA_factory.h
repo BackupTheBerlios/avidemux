@@ -39,7 +39,8 @@ typedef enum
   ELEM_BUTTON,
   ELEM_SLIDER,
   ELEM_THREAD_COUNT,
-  ELEM_MAX=ELEM_TOGGLE
+  ELEM_COUNT,
+  ELEM_MAX=ELEM_COUNT-1
 }elemEnum;
 typedef void ADM_FAC_CALLBACK(void *cookie);
 /*********************************************/
@@ -90,18 +91,23 @@ class diaElemButton : public diaElem
   void      enable(uint32_t onoff) ;
 };
 /************************************/
-class diaElemSlider : public diaElem
+template <class T>
+class diaElemGenericSlider : public diaElem
 {
   protected:
     
-    uint32_t _min,_max;
+    T min,max,incr;
 public:
-            diaElemSlider(uint32_t *value,const char *toggleTitle, uint32_t min,uint32_t max,const char *tip=NULL);
-  virtual   ~diaElemSlider() ;
+    diaElemGenericSlider(T *value,const char *toggleTitle, T min,T max,T incr = 1, const char *tip=NULL);
+  virtual   ~diaElemGenericSlider() ;
   void      setMe(void *dialog, void *opaque,uint32_t line);
   void      getMe(void);
   void      enable(uint32_t onoff) ;
 };
+typedef diaElemGenericSlider <int32_t> diaElemSlider;
+/* Same but unsigned */
+typedef diaElemGenericSlider <uint32_t> diaElemUSlider;
+
 /*********************************************/
 class diaElemToggle : public diaElem
 {

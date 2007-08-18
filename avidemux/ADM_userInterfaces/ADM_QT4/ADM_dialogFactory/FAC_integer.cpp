@@ -1,6 +1,6 @@
 /***************************************************************************
-  FAC_toggle.cpp
-  Handle dialog factory element : Toggle
+  FAC_integer.cpp
+  Handle dialog factory element : Integer
   (C) 2006 Mean Fixounet@free.fr 
 ***************************************************************************/
 
@@ -144,47 +144,31 @@ void diaElemUInteger::enable(uint32_t onoff)
     box->setDisabled(1);
 }
 //********************************************
-#if 0
-class diaElemSlider : public diaElem
-{
-  protected:
-    
-    uint32_t _min,_max;
-public:
-            diaElemSlider(uint32_t *value,const char *toggleTitle, uint32_t min,uint32_t max,const char *tip=NULL);
-  virtual   ~diaElemSlider() ;
-  void      setMe(void *dialog, void *opaque,uint32_t line);
-  void      getMe(void);
-  void      enable(uint32_t onoff) ;
-};
-#endif
-#include "../ADM_gui/ADM_qslider.h"
-
-#define ADM_TEST_ADM_SLIDER
-#ifdef ADM_TEST_ADM_SLIDER
-#define MYSLIDERTYPE  ADM_QSlider
-#else
 #define MYSLIDERTYPE  QSlider
-#endif
-             
-diaElemSlider::diaElemSlider(uint32_t *value,const char *toggleTitle, uint32_t min,uint32_t max,const char *tip)
+
+
+template <class T>
+diaElemGenericSlider<T>::diaElemGenericSlider(T *value,const char *toggleTitle, T min,T max,T incr,const char *tip)
   : diaElem(ELEM_SLIDER)
 {
   param=(void *)value;
   paramTitle=shortkey(toggleTitle);
-  this->_min=min;
-  this->_max=max;
+  this->min=min;
+  this->max=max;
+  this->incr=incr;
   this->tip=tip;
   
  }
  
 
-diaElemSlider::~diaElemSlider()
+template <class T>
+diaElemGenericSlider<T>::~diaElemGenericSlider()
 { 
   if(paramTitle)
     delete paramTitle;
 }
-void diaElemSlider::setMe(void *dialog, void *opaque,uint32_t line)
+template <class T>
+void diaElemGenericSlider<T>::setMe(void *dialog, void *opaque,uint32_t line)
 {
   MYSLIDERTYPE *box=new MYSLIDERTYPE((QWidget *)dialog);
   box->setOrientation ( Qt::Horizontal );
@@ -192,13 +176,13 @@ void diaElemSlider::setMe(void *dialog, void *opaque,uint32_t line)
   QGridLayout *layout=(QGridLayout*) opaque;
  myWidget=(void *)box; 
    
- box->setMinimum(_min);
- box->setMaximum(_max);
- box->setValue(*(uint32_t *)param);
+ box->setMinimum(min);
+ box->setMaximum(max);
+ box->setValue(*(T *)param);
 #ifdef ADM_TEST_ADM_SLIDER
-  box->setNbFrames(_max); 
-  box->setA(_max/3);
-  box->setB((_max*2)/3);
+  box->setNbFrames(max); 
+  box->setA(max/3);
+  box->setB((max*2)/3);
 #endif
  box->show();
  
@@ -207,17 +191,18 @@ void diaElemSlider::setMe(void *dialog, void *opaque,uint32_t line)
  layout->addWidget(text,line,0);
  layout->addWidget(box,line,1);
 }
-void diaElemSlider::getMe(void)
+template <class T>
+void diaElemGenericSlider<T>::getMe(void)
 {
-  uint32_t val;
  MYSLIDERTYPE *box=(MYSLIDERTYPE *)myWidget;
- val=box->value();
- if(val<_min) val=_min;
- if(val>_max) val=_max;
- *(uint32_t *)param=val;
+ T val=box->value();
+ if(val<min) val=min;
+ if(val>max) val=max;
+ *(T *)param=val;
 }
 
-void diaElemSlider::enable(uint32_t onoff) 
+template <class T>
+void diaElemGenericSlider<T>::enable(uint32_t onoff) 
 {
   MYSLIDERTYPE *box=(MYSLIDERTYPE *)myWidget;
   ADM_assert(box);
@@ -226,5 +211,9 @@ void diaElemSlider::enable(uint32_t onoff)
   else
     box->setDisabled(1);
 }
+
+template class diaElemGenericSlider <int32_t>;
+template class diaElemGenericSlider <uint32_t>;
+
 //EOF
 

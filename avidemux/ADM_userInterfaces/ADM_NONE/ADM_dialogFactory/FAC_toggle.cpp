@@ -392,28 +392,41 @@ void   diaElemButton::enable(uint32_t onoff)
 
 }
 //***
-diaElemSlider::diaElemSlider(uint32_t *value,const char *toggleTitle, uint32_t min,uint32_t max,const char *tip)
-  : diaElem(ELEM_SLIDER)
-{
+ 
+ template <class T>
+ diaElemGenericSlider<T>::diaElemGenericSlider(T *value,const char *toggleTitle, T min,T max,T incr,const char *tip)
+     : diaElem(ELEM_SLIDER),
+       min (min),
+       max (max),
+       incr (incr)
+  {
  }
+  
+ template <class T>
+ diaElemGenericSlider<T>::~diaElemGenericSlider()
+  {
+  }
+ 
+ template <class T>
+ void diaElemGenericSlider<T>::setMe(void *dialog, void *opaque,uint32_t line)
+  {
+  }
+ 
+ template <class T>
+ void diaElemGenericSlider<T>::getMe(void)
+  {
+  }
+  
+ template <class T>
+ void diaElemGenericSlider<T>::enable(uint32_t onoff) 
+  {
+  }
+  
+ template class diaElemGenericSlider <int32_t>;
+ template class diaElemGenericSlider <uint32_t>;
  
 
-diaElemSlider::~diaElemSlider()
-{
-}
-void diaElemSlider::setMe(void *dialog, void *opaque,uint32_t line)
-{
-}
-void diaElemSlider::getMe(void)
-{
-
-}
-
-void diaElemSlider::enable(uint32_t onoff) 
-{
-}
-
-
+//***
 diaElemThreadCount::diaElemThreadCount(uint32_t *value, const char *title, const char *tip) : diaElem(ELEM_THREAD_COUNT) {}
 diaElemThreadCount::~diaElemThreadCount() {}
 void diaElemThreadCount::setMe(void *dialog, void *opaque, uint32_t line) {}

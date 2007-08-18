@@ -47,7 +47,6 @@ diaElemInteger::~diaElemInteger()
 void diaElemInteger::setMe(void *dialog, void *opaque,uint32_t line)
 {
   GtkWidget *widget;
-  GtkObject *adj;
   GtkWidget *label;
   
   label = gtk_label_new_with_mnemonic (paramTitle);
@@ -118,7 +117,6 @@ diaElemUInteger::~diaElemUInteger()
 void diaElemUInteger::setMe(void *dialog, void *opaque,uint32_t line)
 {
   GtkWidget *widget;
-  GtkObject *adj;
   GtkWidget *label;
   
   label = gtk_label_new_with_mnemonic (paramTitle);
@@ -172,25 +170,79 @@ void diaElemUInteger::enable(uint32_t onoff)
 }
 
 //****************************************************
-diaElemSlider::diaElemSlider(uint32_t *value,const char *toggleTitle, uint32_t min,uint32_t max,const char *tip)
-  : diaElem(ELEM_SLIDER)
+template <class T>
+diaElemGenericSlider<T>::diaElemGenericSlider(T *value,const char *toggleTitle, T min,T max,T incr,const char *tip)
+    : diaElem(ELEM_SLIDER),
+      min (min),
+      max (max),
+      incr (incr)
 {
- }
- 
-
-diaElemSlider::~diaElemSlider()
-{
-}
-void diaElemSlider::setMe(void *dialog, void *opaque,uint32_t line)
-{
-}
-void diaElemSlider::getMe(void)
-{
-
+    param = (void *)value;
+    paramTitle = toggleTitle;
+    this->tip = tip;
+    size = 2;
 }
 
-void diaElemSlider::enable(uint32_t onoff) 
+template <class T>
+diaElemGenericSlider<T>::~diaElemGenericSlider()
 {
 }
+
+template <class T>
+void diaElemGenericSlider<T>::setMe(void *dialog, void *opaque,uint32_t line)
+{
+  GtkWidget *label = gtk_label_new_with_mnemonic (paramTitle);
+  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+  gtk_widget_show(label);
+  
+  gtk_table_attach (GTK_TABLE (opaque), label, 0, 2, line, line+1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  
+  T val=*(T *)param;
+  GtkWidget *widget
+      = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (val, min, max, incr, incr, 0)));
+  gtk_scale_set_value_pos (GTK_SCALE (widget), GTK_POS_LEFT);
+  gtk_scale_set_digits (GTK_SCALE (widget), 0);
+  
+  gtk_widget_show (widget);
+  
+  gtk_table_attach (GTK_TABLE (opaque), widget, 0, 2, line+1, line+2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  
+  gtk_label_set_mnemonic_widget (GTK_LABEL(label), widget);
+  
+  myWidget=(void *)widget;
+  if(readOnly)
+    gtk_widget_set_sensitive(widget,0);
+   if(tip)
+   {
+     GtkTooltips *tooltips= gtk_tooltips_new ();
+      gtk_tooltips_set_tip (tooltips, widget, tip, NULL);
+   }
+}
+
+template <class T>
+void diaElemGenericSlider<T>::getMe(void)
+{
+  GtkWidget *widget=(GtkWidget *)myWidget;
+  T *val=(T *)param;
+  ADM_assert(widget);
+  GtkAdjustment *adj = gtk_range_get_adjustment (GTK_RANGE(widget));
+  *val = (T)GTK_ADJUSTMENT(adj)->value;
+  if(*val<min) *val=min;
+  if(*val>max) *val=max;
+}
+
+template <class T>
+void diaElemGenericSlider<T>::enable(uint32_t onoff)
+{
+  GtkWidget *widget=(GtkWidget *)myWidget;
+  gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);
+}
+
+template class diaElemGenericSlider <int32_t>;
+template class diaElemGenericSlider <uint32_t>;
 
 //EOF

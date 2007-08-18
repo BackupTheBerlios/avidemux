@@ -667,7 +667,7 @@ JSBool facButton(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 }
 JSBool facSlider(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
-  uint32_t val=4;
+  int32_t val=4;
       diaElemSlider slide(&val,"foo", 0,10);
       
       diaElem *elems[]={&slide   };
