@@ -27,7 +27,7 @@
 #include "ADM_video/ADM_cache.h"
 #include "ADM_filter/video_filters.h"
 
-#include "ADM_vidCNR2_param.h"
+//#include "ADM_vidCNR2_param.h"
 
 //#define SUBST 1
 

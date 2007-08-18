@@ -37,7 +37,7 @@
 #include "ADM_assert.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flyDialogQt4.h"
-#include "ADM_video/ADM_vidASharp_param.h"
+#include "ADM_videoFilter/ADM_vidASharp_param.h"
 #include "DIA_flyAsharp.h"
 
 //

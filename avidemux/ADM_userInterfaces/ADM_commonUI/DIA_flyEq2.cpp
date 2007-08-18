@@ -23,7 +23,7 @@
 
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidContrast.h"
+#include "ADM_videoFilter/ADM_vidContrast.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flyEq2.h"
 #include "ADM_osSupport/ADM_cpuCap.h"

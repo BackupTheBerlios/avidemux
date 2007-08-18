@@ -69,6 +69,10 @@ ADM_guiResize.cpp \
  ADM_vidSRTload.cpp \
  ADM_vidSRTRender.cpp \
  ADM_vidEq2.cpp \
+ ADM_vidAsharp.cpp \
+ ADM_vidContrast.cpp \
+ ADM_vidDelta.cpp  \
+ ADM_vidUnblend.cpp        \
  ADM_vidCrop.cpp       
 			
 

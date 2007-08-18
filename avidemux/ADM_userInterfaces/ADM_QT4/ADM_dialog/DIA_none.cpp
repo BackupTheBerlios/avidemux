@@ -34,7 +34,7 @@
 
 
 #include "ADM_videoFilter/ADM_vidAnimated_param.h"
-#include "ADM_video/ADM_vidASharp_param.h"
+#include "ADM_videoFilter/ADM_vidASharp_param.h"
 #include "ADM_audiofilter/audiofilter_normalize_param.h"
 #include "ADM_video/ADM_vidCNR2_param.h"
 #include "ADM_video/ADM_vidColorYuv_param.h"
@@ -48,7 +48,7 @@
 #include "ADM_video/ADM_vidVobSub.h"
 #include "ADM_videoFilter/ADM_vidChromaShift_param.h"
 #include "ADM_video/ADM_vidMPdelogo.h"
-#include "ADM_video/ADM_vidContrast.h"
+#include "ADM_videoFilter/ADM_vidContrast.h"
 //#include "ADM_video/ADM_vidFont.h"
 class ADMfont;
 #include "ADM_videoFilter/ADM_vidSRT.h"

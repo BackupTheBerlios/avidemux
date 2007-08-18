@@ -7,16 +7,12 @@ ADM_confCouples.cpp
 ADM_vidColorYuv.cpp   
 ADM_vidFieldUtil.cpp     
 ADM_vidRaw.cpp        
-ADM_vidUnblend.cpp
 ADM_genvideo.cpp         
-ADM_vidContrast.cpp   
 ADM_vidFont.cpp
 ADM_vidVobsub.cpp
-ADM_vidAsharp.cpp       
 ADM_vidVobSubRender.cpp
 ADM_interlaced.cpp       
 ADM_vidCached.cpp       
-ADM_vidDelta.cpp      
 ADM_vidMPdelogo.cpp      
 ADM_vobsubinfo.cpp
 ADM_vidClean.cpp        
