@@ -1358,63 +1358,9 @@
      <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
-     <string>File</string>
-    </property>
-    <widget class="QMenu" name="menuSave" >
-     <property name="title" >
-      <string>Save</string>
-     </property>
-     <addaction name="actionSave_video" />
-     <addaction name="actionSave_BMP" />
-     <addaction name="actionSave_jpeg" />
-    </widget>
-    <widget class="QMenu" name="menuRecent_Files" >
-     <property name="title" >
-      <string>Recent Files</string>
-     </property>
-     <addaction name="actionRecent0" />
-     <addaction name="actionRecent1" />
-     <addaction name="actionRecent2" />
-     <addaction name="actionRecent3" />
-    </widget>
-    <addaction name="actionOpen" />
-    <addaction name="menuRecent_Files" />
-    <addaction name="actionAppend" />
-    <addaction name="menuSave" />
-    <addaction name="separator" />
-    <addaction name="actionProperties" />
-    <addaction name="separator" />
-    <addaction name="actionLoad_run_project" />
-    <addaction name="actionSave_project" />
-    <addaction name="actionSave_project_as" />
-    <addaction name="separator" />
-    <addaction name="actionConnect_to_AvsProxy" />
-    <addaction name="separator" />
-    <addaction name="actionAdd_to_joblist" />
-    <addaction name="actionShow_Joblist" />
-    <addaction name="actionQuit" />
-    <addaction name="separator" />
-   </widget>
-   <widget class="QMenu" name="menuTools" >
-    <property name="title" >
-     <string>Tools</string>
-    </property>
-    <addaction name="actionCalculator" />
-    <addaction name="separator" />
-    <addaction name="actionRebuild_I_B_Frames" />
-    <addaction name="actionBitrate_histogram" />
-    <addaction name="actionScan_for_black_frames" />
-    <addaction name="separator" />
-    <addaction name="actionVob_to_vobsub" />
-    <addaction name="actionOCR" />
-    <addaction name="actionOCR_DVB_T_TS_files" />
-    <addaction name="actionGlyphs_Edit" />
-   </widget>
    <widget class="QMenu" name="menuAuto" >
     <property name="title" >
-     <string>Auto</string>
+     <string>A&amp;uto</string>
     </property>
     <addaction name="actionVCD" />
     <addaction name="actionSVCD" />
@@ -1422,39 +1368,26 @@
     <addaction name="actionPSP" />
     <addaction name="actionPSP_H264" />
    </widget>
-   <widget class="QMenu" name="menuGo" >
-    <property name="title" >
-     <string>Go</string>
-    </property>
-    <addaction name="actionPlay_Stop" />
-    <addaction name="actionPrevious_Frame" />
-    <addaction name="actionNext_Frame" />
-    <addaction name="actionPrevious_intra_frame" />
-    <addaction name="actionNext_intra_frame" />
-    <addaction name="actionPrevious_black_frame" />
-    <addaction name="actionNext_blak_frame" />
-    <addaction name="actionFirst_Frame" />
-    <addaction name="actionLast_Frame" />
-    <addaction name="actionGo_to_Marker_A" />
-    <addaction name="actionGo_to_Marker_B" />
-    <addaction name="actionJump_to_Frame" />
-    <addaction name="actionJump_to_Time" />
-   </widget>
-   <widget class="QMenu" name="menuCustom" >
-    <property name="title" >
-     <string>Custom</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuHelp" >
     <property name="title" >
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="actionShow_built_in_support" />
     <addaction name="actionAbout_avidemux" />
    </widget>
+   <widget class="QMenu" name="menuVideo" >
+    <property name="title" >
+     <string>Vi&amp;deo</string>
+    </property>
+    <addaction name="actionDecoder_options" />
+    <addaction name="actionPostprocessing" />
+    <addaction name="separator" />
+    <addaction name="actionFilters" />
+    <addaction name="actionFrame_rate" />
+   </widget>
    <widget class="QMenu" name="menuView" >
     <property name="title" >
-     <string>View</string>
+     <string>&amp;View</string>
     </property>
     <addaction name="actionZoom_1_4" />
     <addaction name="actionZoom_1_2" />
@@ -1463,7 +1396,7 @@
    </widget>
    <widget class="QMenu" name="menuEdit" >
     <property name="title" >
-     <string>Edit</string>
+     <string>&amp;Edit</string>
     </property>
     <addaction name="actionReset_Edits" />
     <addaction name="separator" />
@@ -1477,25 +1410,96 @@
     <addaction name="separator" />
     <addaction name="actionPreferences" />
    </widget>
-   <widget class="QMenu" name="menuVideo" >
-    <property name="title" >
-     <string>Video</string>
-    </property>
-    <addaction name="actionDecoder_options" />
-    <addaction name="actionPostprocessing" />
-    <addaction name="separator" />
-    <addaction name="actionFilters" />
-    <addaction name="actionFrame_rate" />
-   </widget>
    <widget class="QMenu" name="menuAudio" >
     <property name="title" >
-     <string>Audio</string>
+     <string>&amp;Audio</string>
     </property>
     <addaction name="actionMain_Track" />
     <addaction name="actionSecondary_Track" />
     <addaction name="actionBuild_VBR_time_map" />
+    <addaction name="separator" />
     <addaction name="actionSave_2" />
     <addaction name="actionFilters_2" />
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionCalculator" />
+    <addaction name="separator" />
+    <addaction name="actionRebuild_I_B_Frames" />
+    <addaction name="actionBitrate_histogram" />
+    <addaction name="actionScan_for_black_frames" />
+    <addaction name="separator" />
+    <addaction name="actionVob_to_vobsub" />
+    <addaction name="actionOCR" />
+    <addaction name="actionOCR_DVB_T_TS_files" />
+    <addaction name="actionGlyphs_Edit" />
+   </widget>
+   <widget class="QMenu" name="menuCustom" >
+    <property name="title" >
+     <string>&amp;Custom</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuGo" >
+    <property name="title" >
+     <string>&amp;Go</string>
+    </property>
+    <addaction name="actionPlay_Stop" />
+    <addaction name="actionPrevious_Frame" />
+    <addaction name="actionNext_Frame" />
+    <addaction name="actionPrevious_intra_frame" />
+    <addaction name="actionNext_intra_frame" />
+    <addaction name="actionPrevious_black_frame" />
+    <addaction name="actionNext_blak_frame" />
+    <addaction name="actionFirst_Frame" />
+    <addaction name="actionLast_Frame" />
+    <addaction name="separator" />
+    <addaction name="actionGo_to_Marker_A" />
+    <addaction name="actionGo_to_Marker_B" />
+    <addaction name="separator" />
+    <addaction name="actionJump_to_Frame" />
+    <addaction name="actionJump_to_Time" />
+   </widget>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menuRecent_Files" >
+     <property name="title" >
+      <string>&amp;Recent Files</string>
+     </property>
+     <addaction name="actionRecent0" />
+     <addaction name="actionRecent1" />
+     <addaction name="actionRecent2" />
+     <addaction name="actionRecent3" />
+    </widget>
+    <widget class="QMenu" name="menuSave" >
+     <property name="title" >
+      <string>&amp;Save</string>
+     </property>
+     <addaction name="actionSave_video" />
+     <addaction name="separator" />
+     <addaction name="actionSave_BMP" />
+     <addaction name="actionSave_jpeg" />
+    </widget>
+    <addaction name="actionOpen" />
+    <addaction name="menuRecent_Files" />
+    <addaction name="actionAppend" />
+    <addaction name="menuSave" />
+    <addaction name="separator" />
+    <addaction name="actionProperties" />
+    <addaction name="separator" />
+    <addaction name="actionLoad_run_project" />
+    <addaction name="actionSave_project" />
+    <addaction name="actionSave_project_as" />
+    <addaction name="separator" />
+    <addaction name="actionAdd_to_joblist" />
+    <addaction name="actionShow_Joblist" />
+    <addaction name="separator" />
+    <addaction name="actionConnect_to_AvsProxy" />
+    <addaction name="separator" />
+    <addaction name="actionQuit" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -1544,36 +1548,54 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/fileopen.png</iconset>
    </property>
    <property name="text" >
-    <string>Open</string>
+    <string>&amp;Open...</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionAppend" >
    <property name="text" >
-    <string>Append</string>
+    <string>&amp;Append...</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Alt+A</string>
    </property>
   </action>
   <action name="actionQuit" >
    <property name="text" >
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
   </action>
   <action name="actionCut" >
    <property name="text" >
-    <string>Cut</string>
+    <string>Cu&amp;t</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+X</string>
    </property>
   </action>
   <action name="actionCopy" >
    <property name="text" >
-    <string>Copy</string>
+    <string>&amp;Copy</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+C</string>
    </property>
   </action>
   <action name="actionPaste" >
    <property name="text" >
-    <string>Paste</string>
+    <string>&amp;Paste</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+V</string>
    </property>
   </action>
   <action name="actionDelete" >
    <property name="text" >
+    <string>&amp;Delete</string>
+   </property>
+   <property name="shortcut" >
     <string>Delete</string>
    </property>
   </action>
@@ -1582,7 +1604,16 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/markA.png</iconset>
    </property>
    <property name="text" >
-    <string>Set marker A</string>
+    <string>Set Marker A</string>
+   </property>
+   <property name="iconText" >
+    <string>Set Marker A</string>
+   </property>
+   <property name="toolTip" >
+    <string>Set Marker A</string>
+   </property>
+   <property name="shortcut" >
+    <string>[</string>
    </property>
   </action>
   <action name="actionSet_marker_B" >
@@ -1590,12 +1621,21 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/markB.png</iconset>
    </property>
    <property name="text" >
-    <string>Set marker B</string>
+    <string>Set Marker B</string>
+   </property>
+   <property name="iconText" >
+    <string>Set Marker B</string>
+   </property>
+   <property name="toolTip" >
+    <string>Set Marker B</string>
+   </property>
+   <property name="shortcut" >
+    <string>]</string>
    </property>
   </action>
   <action name="actionPreferences" >
    <property name="text" >
-    <string>Preferences</string>
+    <string>Pre&amp;ferences...</string>
    </property>
   </action>
   <action name="actionProperties" >
@@ -1603,7 +1643,10 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/info.png</iconset>
    </property>
    <property name="text" >
-    <string>Information</string>
+    <string>&amp;Information...</string>
+   </property>
+   <property name="shortcut" >
+    <string>Alt+Return</string>
    </property>
   </action>
   <action name="actionSave_video" >
@@ -1611,17 +1654,35 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/filesave.png</iconset>
    </property>
    <property name="text" >
-    <string>Save video</string>
+    <string>Save &amp;Video...</string>
+   </property>
+   <property name="iconText" >
+    <string>Save Video</string>
+   </property>
+   <property name="toolTip" >
+    <string>Save Video</string>
    </property>
   </action>
   <action name="actionSave_BMP" >
    <property name="text" >
-    <string>Save BMP</string>
+    <string>Save &amp;BMP Image...</string>
+   </property>
+   <property name="iconText" >
+    <string>Save BMP Image</string>
+   </property>
+   <property name="toolTip" >
+    <string>Save BMP Image</string>
    </property>
   </action>
   <action name="actionSave_jpeg" >
    <property name="text" >
-    <string>Save jpeg</string>
+    <string>Save &amp;JPEG Image...</string>
+   </property>
+   <property name="iconText" >
+    <string>Save JPEG Image</string>
+   </property>
+   <property name="toolTip" >
+    <string>Save JPEG Image</string>
    </property>
   </action>
   <action name="actionLoad_run_project" >
@@ -1629,7 +1690,13 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/project_open.png</iconset>
    </property>
    <property name="text" >
-    <string>Load/run project</string>
+    <string>&amp;Load/Run Project...</string>
+   </property>
+   <property name="iconText" >
+    <string>Load/Run Project</string>
+   </property>
+   <property name="toolTip" >
+    <string>Load/Run Project</string>
    </property>
   </action>
   <action name="actionSave_project" >
@@ -1637,7 +1704,16 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/filesave.png</iconset>
    </property>
    <property name="text" >
-    <string>Save project</string>
+    <string>Save &amp;Project</string>
+   </property>
+   <property name="iconText" >
+    <string>Save Project</string>
+   </property>
+   <property name="toolTip" >
+    <string>Save Project</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionSave_project_as" >
@@ -1645,7 +1721,13 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/filesaveas.png</iconset>
    </property>
    <property name="text" >
-    <string>Save project as</string>
+    <string>Save P&amp;roject As...</string>
+   </property>
+   <property name="iconText" >
+    <string>Save Project As</string>
+   </property>
+   <property name="toolTip" >
+    <string>Save Project As</string>
    </property>
   </action>
   <action name="actionMain_toolbar" >
@@ -1660,22 +1742,34 @@
   </action>
   <action name="actionZoom_1_4" >
    <property name="text" >
-    <string>Zoom 1:4</string>
+    <string>&amp;Zoom 1:4</string>
+   </property>
+   <property name="shortcut" >
+    <string>Shift+Ctrl+4</string>
    </property>
   </action>
   <action name="actionZoom_1_2" >
    <property name="text" >
-    <string>Zoom 1:2</string>
+    <string>Z&amp;oom 1:2</string>
+   </property>
+   <property name="shortcut" >
+    <string>Shift+Ctrl+2</string>
    </property>
   </action>
   <action name="actionZoom_1_1" >
    <property name="text" >
-    <string>Zoom 1:1</string>
+    <string>Zoom &amp;1:1</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Alt+1</string>
    </property>
   </action>
   <action name="actionZoom_2_1" >
    <property name="text" >
-    <string>Zoom 2:1</string>
+    <string>Zoom &amp;2:1</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Alt+2</string>
    </property>
   </action>
   <action name="actionZoom_4_1" >
@@ -1685,17 +1779,35 @@
   </action>
   <action name="actionDecoder_options" >
    <property name="text" >
-    <string>Decoder options</string>
+    <string>&amp;Decoder Options...</string>
+   </property>
+   <property name="iconText" >
+    <string>Decoder Options</string>
+   </property>
+   <property name="toolTip" >
+    <string>Decoder Options</string>
+   </property>
+   <property name="shortcut" >
+    <string>F3</string>
    </property>
   </action>
   <action name="actionPostprocessing" >
    <property name="text" >
-    <string>Postprocessing</string>
+    <string>&amp;Postprocessing...</string>
+   </property>
+   <property name="shortcut" >
+    <string>F4</string>
    </property>
   </action>
   <action name="actionFrame_rate" >
    <property name="text" >
-    <string>Frame rate</string>
+    <string>&amp;Frame Rate...</string>
+   </property>
+   <property name="iconText" >
+    <string>Frame Rate</string>
+   </property>
+   <property name="toolTip" >
+    <string>Frame Rate</string>
    </property>
   </action>
   <action name="actionEncoder" >
@@ -1705,30 +1817,39 @@
   </action>
   <action name="actionFilters" >
    <property name="text" >
-    <string>Filters</string>
+    <string>Fil&amp;ters...</string>
    </property>
    <property name="shortcut" >
-    <string/>
+    <string>Ctrl+Alt+F</string>
    </property>
   </action>
   <action name="actionMain_Track" >
    <property name="text" >
-    <string>Main Track</string>
+    <string>&amp;Main Track...</string>
    </property>
   </action>
   <action name="actionSecondary_Track" >
    <property name="text" >
-    <string>Secondary Track</string>
+    <string>&amp;Secondary Track...</string>
    </property>
   </action>
   <action name="actionBuild_VBR_time_map" >
    <property name="text" >
-    <string>Build VBR time map</string>
+    <string>Build VBR Time Map</string>
+   </property>
+   <property name="iconText" >
+    <string>Build VBR Time Map</string>
+   </property>
+   <property name="toolTip" >
+    <string>Build VBR Time Map</string>
    </property>
   </action>
   <action name="actionSave_2" >
    <property name="text" >
-    <string>Save</string>
+    <string>S&amp;ave...</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Alt+S</string>
    </property>
   </action>
   <action name="actionEncoder_2" >
@@ -1738,7 +1859,7 @@
   </action>
   <action name="actionFilters_2" >
    <property name="text" >
-    <string>Filters</string>
+    <string>&amp;Filters</string>
    </property>
    <property name="iconText" >
     <string>Filters</string>
@@ -1755,32 +1876,65 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/calc.png</iconset>
    </property>
    <property name="text" >
-    <string>Calculator</string>
+    <string>&amp;Calculator...</string>
+   </property>
+   <property name="shortcut" >
+    <string>F7</string>
    </property>
   </action>
   <action name="actionRebuild_I_B_Frames" >
    <property name="text" >
-    <string>Rebuild I&amp;B Frames</string>
+    <string>&amp;Rebuild I &amp;&amp; B Frames</string>
+   </property>
+   <property name="iconText" >
+    <string>Rebuild I &amp; B Frames</string>
+   </property>
+   <property name="toolTip" >
+    <string>Rebuild I &amp; B Frames</string>
    </property>
   </action>
   <action name="actionBitrate_histogram" >
    <property name="text" >
-    <string>Bitrate histogram</string>
+    <string>&amp;Bitrate Histogram...</string>
+   </property>
+   <property name="iconText" >
+    <string>Bitrate Histogram</string>
+   </property>
+   <property name="toolTip" >
+    <string>Bitrate Histogram</string>
    </property>
   </action>
   <action name="actionScan_for_black_frames" >
    <property name="text" >
-    <string>Scan for black frames</string>
+    <string>&amp;Scan for Black Frames...</string>
+   </property>
+   <property name="iconText" >
+    <string>Scan for Black Frames</string>
+   </property>
+   <property name="toolTip" >
+    <string>Scan for Black Frames</string>
    </property>
   </action>
   <action name="actionVob_to_vobsub" >
    <property name="text" >
-    <string>Vob to vobsub</string>
+    <string>&amp;VOB -> VobSub...</string>
+   </property>
+   <property name="iconText" >
+    <string>VOB -> VobSub</string>
+   </property>
+   <property name="toolTip" >
+    <string>VOB -> VobSub</string>
    </property>
   </action>
   <action name="actionOCR" >
    <property name="text" >
-    <string>OCR (Vobsub Files)</string>
+    <string>&amp;OCR (VobSub -> srt)...</string>
+   </property>
+   <property name="iconText" >
+    <string>OCR (VobSub -> srt)</string>
+   </property>
+   <property name="toolTip" >
+    <string>OCR (VobSub -> srt)</string>
    </property>
   </action>
   <action name="actionPlay_Stop" >
@@ -1788,7 +1942,10 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/player_stop.png</iconset>
    </property>
    <property name="text" >
-    <string>Play/Stop</string>
+    <string>&amp;Play/Stop</string>
+   </property>
+   <property name="shortcut" >
+    <string>P</string>
    </property>
   </action>
   <action name="actionPrevious_Frame" >
@@ -1796,7 +1953,10 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/back.png</iconset>
    </property>
    <property name="text" >
-    <string>Previous Frame</string>
+    <string>P&amp;revious Frame</string>
+   </property>
+   <property name="shortcut" >
+    <string>4</string>
    </property>
   </action>
   <action name="actionNext_Frame" >
@@ -1804,7 +1964,10 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/forward.png</iconset>
    </property>
    <property name="text" >
-    <string>Next Frame</string>
+    <string>&amp;Next Frame</string>
+   </property>
+   <property name="shortcut" >
+    <string>6</string>
    </property>
   </action>
   <action name="actionPrevious_intra_frame" >
@@ -1812,7 +1975,16 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/player_rew.png</iconset>
    </property>
    <property name="text" >
-    <string>Previous intra frame</string>
+    <string>Pr&amp;evious Intra Frame</string>
+   </property>
+   <property name="iconText" >
+    <string>Previous Intra Frame</string>
+   </property>
+   <property name="toolTip" >
+    <string>Previous Intra Frame</string>
+   </property>
+   <property name="shortcut" >
+    <string>2</string>
    </property>
   </action>
   <action name="actionNext_intra_frame" >
@@ -1820,7 +1992,16 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/player_fwd.png</iconset>
    </property>
    <property name="text" >
-    <string>Next intra frame</string>
+    <string>Next &amp;Intra Frame</string>
+   </property>
+   <property name="iconText" >
+    <string>Next Intra Frame</string>
+   </property>
+   <property name="toolTip" >
+    <string>Next Intra Frame</string>
+   </property>
+   <property name="shortcut" >
+    <string>8</string>
    </property>
   </action>
   <action name="actionPrevious_black_frame" >
@@ -1828,7 +2009,13 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/prev_black.png</iconset>
    </property>
    <property name="text" >
-    <string>Previous black frame</string>
+    <string>Previou&amp;s Black Frame</string>
+   </property>
+   <property name="iconText" >
+    <string>Previous Black Frame</string>
+   </property>
+   <property name="toolTip" >
+    <string>Previous Black Frame</string>
    </property>
   </action>
   <action name="actionNext_blak_frame" >
@@ -1836,7 +2023,13 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/next_black.png</iconset>
    </property>
    <property name="text" >
-    <string>Next blak frame</string>
+    <string>Ne&amp;xt Black Frame</string>
+   </property>
+   <property name="iconText" >
+    <string>Next Black Frame</string>
+   </property>
+   <property name="toolTip" >
+    <string>Next Black Frame</string>
    </property>
   </action>
   <action name="actionFirst_Frame" >
@@ -1844,7 +2037,10 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/player_start.png</iconset>
    </property>
    <property name="text" >
-    <string>First Frame</string>
+    <string>&amp;First Frame</string>
+   </property>
+   <property name="shortcut" >
+    <string>Home</string>
    </property>
   </action>
   <action name="actionLast_Frame" >
@@ -1852,7 +2048,10 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/player_end.png</iconset>
    </property>
    <property name="text" >
-    <string>Last Frame</string>
+    <string>&amp;Last Frame</string>
+   </property>
+   <property name="shortcut" >
+    <string>End</string>
    </property>
   </action>
   <action name="actionGo_to_Marker_A" >
@@ -1860,7 +2059,16 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/gotoA.png</iconset>
    </property>
    <property name="text" >
-    <string>Go to Marker A</string>
+    <string>Jump to Marker &amp;A</string>
+   </property>
+   <property name="iconText" >
+    <string>Jump to Marker A</string>
+   </property>
+   <property name="toolTip" >
+    <string>Jump to Marker A</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+[</string>
    </property>
   </action>
   <action name="actionGo_to_Marker_B" >
@@ -1868,27 +2076,54 @@
     <iconset resource="avidemux.qrc" >:/new/prefix1/pics/gotoB.png</iconset>
    </property>
    <property name="text" >
-    <string>Go to Marker B</string>
+    <string>Jump to Marker &amp;B</string>
+   </property>
+   <property name="iconText" >
+    <string>Jump to Marker B</string>
+   </property>
+   <property name="toolTip" >
+    <string>Jump to Marker B</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+]</string>
    </property>
   </action>
   <action name="actionJump_to_Frame" >
    <property name="text" >
-    <string>Jump to Frame</string>
+    <string>Jump to Fra&amp;me...</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+F</string>
    </property>
   </action>
   <action name="actionJump_to_Time" >
    <property name="text" >
-    <string>Jump to Time</string>
+    <string>Jump to &amp;Time...</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+T</string>
    </property>
   </action>
   <action name="actionShow_built_in_support" >
    <property name="text" >
-    <string>Show built-in support</string>
+    <string>&amp;Built-in Support...</string>
+   </property>
+   <property name="iconText" >
+    <string>Built-in Support</string>
+   </property>
+   <property name="toolTip" >
+    <string>Built-in Support</string>
    </property>
   </action>
   <action name="actionAbout_avidemux" >
    <property name="text" >
-    <string>About avidemux</string>
+    <string>&amp;About Avidemux...</string>
+   </property>
+   <property name="iconText" >
+    <string>About Avidemux</string>
+   </property>
+   <property name="toolTip" >
+    <string>About Avidemux</string>
    </property>
   </action>
   <action name="actionPlay" >
@@ -1921,47 +2156,74 @@
   </action>
   <action name="actionVCD" >
    <property name="text" >
-    <string>VCD</string>
+    <string>&amp;VCD</string>
    </property>
   </action>
   <action name="actionSVCD" >
    <property name="text" >
-    <string>SVCD</string>
+    <string>&amp;SVCD</string>
    </property>
   </action>
   <action name="actionDVD" >
    <property name="text" >
-    <string>DVD</string>
+    <string>&amp;DVD</string>
    </property>
   </action>
   <action name="actionPSP" >
    <property name="text" >
-    <string>PSP</string>
+    <string>&amp;PSP</string>
    </property>
   </action>
   <action name="actionPSP_H264" >
    <property name="text" >
-    <string>PSP (H264)</string>
+    <string>PSP (&amp;H.264)</string>
+   </property>
+   <property name="iconText" >
+    <string>PSP (H.264)</string>
+   </property>
+   <property name="toolTip" >
+    <string>PSP (H.264)</string>
    </property>
   </action>
   <action name="actionAdd_to_joblist" >
    <property name="text" >
-    <string>Add to joblist</string>
+    <string>Add to &amp;Joblist...</string>
+   </property>
+   <property name="iconText" >
+    <string>Add to Joblist</string>
+   </property>
+   <property name="toolTip" >
+    <string>Add to Joblist</string>
    </property>
   </action>
   <action name="actionShow_Joblist" >
    <property name="text" >
-    <string>Show Joblist</string>
+    <string>View &amp;Joblist...</string>
+   </property>
+   <property name="iconText" >
+    <string>View Joblist</string>
+   </property>
+   <property name="toolTip" >
+    <string>View Joblist</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+J</string>
    </property>
   </action>
   <action name="actionConnect_to_AvsProxy" >
    <property name="text" >
-    <string>Connect to AvsProxy</string>
+    <string>Co&amp;nnect to avsproxy</string>
+   </property>
+   <property name="iconText" >
+    <string>Connect to avsproxy</string>
+   </property>
+   <property name="toolTip" >
+    <string>Connect to avsproxy</string>
    </property>
   </action>
   <action name="actionReset_Edits" >
    <property name="text" >
-    <string>Reset Edits</string>
+    <string>&amp;Reset Edits</string>
    </property>
   </action>
   <action name="actionSave" >
@@ -1971,12 +2233,24 @@
   </action>
   <action name="actionOCR_DVB_T_TS_files" >
    <property name="text" >
-    <string>OCR (DVB-T TS files)</string>
+    <string>OCR (&amp;TS -> srt)...</string>
+   </property>
+   <property name="iconText" >
+    <string>OCR (TS -> srt)</string>
+   </property>
+   <property name="toolTip" >
+    <string>OCR (TS -> srt)</string>
    </property>
   </action>
   <action name="actionGlyphs_Edit" >
    <property name="text" >
-    <string>Glyphs Edit</string>
+    <string>Edit &amp;Glyphs...</string>
+   </property>
+   <property name="iconText" >
+    <string>Edit Glyphs</string>
+   </property>
+   <property name="toolTip" >
+    <string>Edit Glyphs</string>
    </property>
   </action>
   <action name="actionPreviewInput" >

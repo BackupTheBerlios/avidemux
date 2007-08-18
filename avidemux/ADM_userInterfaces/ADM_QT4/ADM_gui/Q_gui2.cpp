@@ -214,9 +214,6 @@ MainWindow::MainWindow() : QMainWindow()
 	volSlider->setMaximum(100);
 	connect( volSlider,SIGNAL(valueChanged(int)),this,SLOT(volumeChange(int)));
 
-	//** Add shortcuts **//
-	QKeySequence seqFilter("CTRL+Alt+F");
-	ui.actionFilters->setShortcut(seqFilter);
 	// default state
 	bool b=0;
 	ui.pushButtonVideoConf->setEnabled(b);
