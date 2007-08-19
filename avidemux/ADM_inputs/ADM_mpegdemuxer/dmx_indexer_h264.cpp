@@ -47,6 +47,9 @@
 #include "ADM_osSupport/ADM_debug.h"
 
 #include "dmx_indexer_internal.h"
+
+#include "ADM_infoExtractor/ADM_h264_tag.h"
+#undef aprintf
 #define aprintf printf
 static const char Type[5]={'X','I','P','B','P'};
 
@@ -84,13 +87,7 @@ void dmx_videoIndexerH264::cleanup(void)
       \brief main indexing loop for mpeg2 payload
 */
 
-#define NAL_NON_IDR       1
-#define NAL_IDR           5
-#define NAL_SEI           6
-#define NAL_SPS           7
-#define NAL_PPS           8
-#define NAL_AU_DELIMITER  9
-#define NAL_FILLER        12
+
 // 12 : Filler
 uint8_t   dmx_videoIndexerH264::run  (void)
 {

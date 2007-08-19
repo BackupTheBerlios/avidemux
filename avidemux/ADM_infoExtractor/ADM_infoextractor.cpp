@@ -41,6 +41,9 @@ extern "C"
 #include "ADM_lavcodec/bitstream.h"
 #include "ADM_lavcodec/golomb.h"
 }
+
+#include "ADM_infoExtractor/ADM_h264_tag.h"
+
 static void refineH264FrameType(uint8_t *head,uint8_t *tail,uint32_t *flags);
 /*
     Extract width & height from vol header passed as arg
@@ -415,8 +418,6 @@ uint8_t extractH264FrameType(uint32_t nalSize,uint8_t *buffer,uint32_t len,uint3
 {
   uint8_t *head=buffer, *tail=buffer+len;
   uint8_t stream;
-#define NAL_NON_IDR       1
-#define NAL_IDR           5
   
   uint32_t val,hnt;  
   
