@@ -335,8 +335,6 @@ uint32_t rd;
 		//	several
 		//--------------------------------------------------
 		// and audio track
-		uint32_t audioTrack=0xff;	
-		uint32_t audioTrackNumber=0;
 		if(_mainaviheader.dwStreams>=2)
 		{
 			// which one is the audio track, is there several ?
@@ -358,8 +356,7 @@ uint32_t rd;
                                         fseeko(_fd,_Tracks[run].strh.offset,SEEK_SET);
                                         if(_Tracks[run].strh.size != sizeof(_audiostream))
                                         {
-                                                printf("Mmm(2) we have a bogey here, size mismatch : %u \n"
-                                                        ,_Tracks[audioTrack].strh.size);
+                                                printf("Mmm(2) we have a bogey here, size mismatch : %u \n",_Tracks[run].strh.size);
                                                 printf("expected %d\n",sizeof(_audiostream));
                                                 if(_Tracks[run].strh.size<sizeof(_audiostream)-8)
                                                 {
@@ -384,7 +381,7 @@ uint32_t rd;
                                         if(extra<0)
                                         {	
                                                 printf("WavHeader is not big enough (%lu/%lu)!\n",
-                                                _Tracks[audioTrack].strf.size,sizeof(WAVHeader));
+                                                _Tracks[run].strf.size,sizeof(WAVHeader));
                                                 return 0;
                                         }
                                         fread(track->wavHeader,sizeof(WAVHeader),1,_fd);				
