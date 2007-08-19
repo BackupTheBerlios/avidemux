@@ -25,7 +25,7 @@ typedef struct vobSubParam
         int32_t         subShift;
 }vobSubParam;
 //************************************
-#include "ADM_video/ADM_vidVobSubBitmap.h"
+#include "ADM_videoFilter/ADM_vidVobSubBitmap.h"
 //************************************
 class  ADMVideoVobSub:public AVDMGenericVideoStream
  {

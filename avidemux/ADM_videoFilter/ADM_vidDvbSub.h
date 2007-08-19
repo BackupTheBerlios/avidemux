@@ -20,7 +20,7 @@
 #include "ADM_inputs/ADM_mpegdemuxer/dmx_demuxerTS.h"
 
 #include "ADM_codecs/ADM_ffmp43.h"
-#include "ADM_video/ADM_vidVobSubBitmap.h"
+#include "ADM_videoFilter/ADM_vidVobSubBitmap.h"
 
 
 #define READ_BUFFER_SIZE (64*1024)

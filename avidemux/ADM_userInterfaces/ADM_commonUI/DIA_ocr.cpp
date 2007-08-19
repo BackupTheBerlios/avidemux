@@ -37,8 +37,8 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 
-#include "ADM_video/ADM_vobsubinfo.h"
-#include "ADM_video/ADM_vidVobSub.h"
+#include "ADM_videoFilter/ADM_vobsubinfo.h"
+#include "ADM_videoFilter/ADM_vidVobSub.h"
 #include "ADM_ocr/ADM_ocr.h"
 #include "ADM_osSupport/ADM_misc.h"
 #include "ADM_toolkit/toolkit.hxx"

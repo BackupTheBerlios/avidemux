@@ -62,9 +62,9 @@
 
 #include "ADM_colorspace/colorspace.h"
 
-#include "ADM_video/ADM_vobsubinfo.h"
+#include "ADM_videoFilter/ADM_vobsubinfo.h"
 
-#include "ADM_video/ADM_vidVobSub.h"
+#include "ADM_videoFilter/ADM_vidVobSub.h"
 #include "ADM_leftturn.h"
 #include "DIA_enter.h"
 

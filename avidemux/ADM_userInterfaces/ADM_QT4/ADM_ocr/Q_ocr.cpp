@@ -30,8 +30,8 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_colorspace/ADM_rgb.h"
 
-#include "ADM_video/ADM_vobsubinfo.h"
-#include "ADM_video/ADM_vidVobSub.h"
+#include "ADM_videoFilter/ADM_vobsubinfo.h"
+#include "ADM_videoFilter/ADM_vidVobSub.h"
 
 #include "ADM_assert.h"
 #include "ADM_ocr/ADM_ocr.h"

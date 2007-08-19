@@ -35,8 +35,13 @@ ADM_vidContrast.cpp
 ADM_vidDelta.cpp 
 ADM_vidUnblend.cpp 
 ADM_vidAsharp.cpp
+ADM_vidVobsub.cpp
+ADM_vidVobSubRender.cpp
+ADM_vobsubinfo.cpp
+
 )
 ADD_LIBRARY(ADM_videoFilter STATIC ${ADM_videoFilter_SRCS})
 if(FT_FOUND)
 add_definitions(${FT_CFLAGS})
 endif(FT_FOUND)
+include_directories(../ADM_inputs)

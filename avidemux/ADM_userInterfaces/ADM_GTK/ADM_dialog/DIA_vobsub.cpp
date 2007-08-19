@@ -43,8 +43,8 @@
 
 
 
-#include "ADM_video/ADM_vobsubinfo.h"
-#include "ADM_video/ADM_vidVobSub.h"
+#include "ADM_videoFilter/ADM_vobsubinfo.h"
+#include "ADM_videoFilter/ADM_vidVobSub.h"
 
 #define MAX_INDECES ADM_MAX_LANGUAGE
 

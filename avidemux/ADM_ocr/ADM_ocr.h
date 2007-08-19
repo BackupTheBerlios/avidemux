@@ -16,8 +16,8 @@
  ***************************************************************************/
 #ifndef ADM_OCR_H
 #define ADM_OCR_H
-#include "ADM_video/ADM_vobsubinfo.h"
-#include "ADM_video/ADM_vidVobSub.h"
+#include "ADM_videoFilter/ADM_vobsubinfo.h"
+#include "ADM_videoFilter/ADM_vidVobSub.h"
 #include "ADM_ocr/adm_glyph.h"
 typedef enum
 {

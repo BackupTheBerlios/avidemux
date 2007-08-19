@@ -73,6 +73,9 @@ ADM_guiResize.cpp \
  ADM_vidContrast.cpp \
  ADM_vidDelta.cpp  \
  ADM_vidUnblend.cpp        \
+ ADM_vidVobsub.cpp \
+ ADM_vidVobSubRender.cpp \
+ ADM_vobsubinfo.cpp \
  ADM_vidCrop.cpp       
 			
 
