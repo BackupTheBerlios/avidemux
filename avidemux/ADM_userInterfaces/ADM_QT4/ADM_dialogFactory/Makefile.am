@@ -6,7 +6,7 @@ libADM_dialogFactory_a_METASOURCES = AUTO
 libADM_dialogFactory_a_SOURCES = AT_dialogFactory.cpp AT_toggle.cpp FAC_integer.cpp AT_menu.cpp FAC_float.cpp \
 AT_filesel.cpp AT_bitrate.cpp AT_threadCount.cpp \
 AT_button.cpp \
-FAC_bar.cpp FAC_readOnlyText.cpp FAC_notch.cpp FAC_frame.cpp FAC_hex.cpp
+FAC_bar.cpp FAC_readOnlyText.cpp FAC_notch.cpp FAC_frame.cpp FAC_hex.cpp FAC_matrix.cpp
 
 
 INCLUDES = $(all_includes)  $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@ADM_SUBVERSION@ \

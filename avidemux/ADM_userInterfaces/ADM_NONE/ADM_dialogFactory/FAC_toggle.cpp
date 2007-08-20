@@ -424,7 +424,31 @@ void   diaElemButton::enable(uint32_t onoff)
   
  template class diaElemGenericSlider <int32_t>;
  template class diaElemGenericSlider <uint32_t>;
- 
+//****
+
+
+
+ diaElemMatrix::diaElemMatrix(uint8_t *trix,const char *toggleTitle, uint32_t trixSize,const char *tip)
+   : diaElem(ELEM_MATRIX)
+ {
+ }
+
+ diaElemMatrix::~diaElemMatrix()
+ {
+ }
+ void diaElemMatrix::setMe(void *dialog, void *opaque,uint32_t line)
+ {
+
+ }
+ void diaElemMatrix::getMe(void)
+ {
+   
+ }
+ void diaElemMatrix::enable(uint32_t onoff)
+ {
+ }
+
+
 
 //***
 diaElemThreadCount::diaElemThreadCount(uint32_t *value, const char *title, const char *tip) : diaElem(ELEM_THREAD_COUNT) {}

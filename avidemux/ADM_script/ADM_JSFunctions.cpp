@@ -81,6 +81,7 @@ JSBool facFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 JSBool facHex(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facDirSel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facButton(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facSlider(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool crashTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool assertTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
@@ -116,6 +117,7 @@ static JSFunctionSpec adm_functions[] = {
   {"dialogFactoryHex",       facHex,        0},
   {"dialogFactoryButton",       facButton,        0},
   {"dialogFactorySlider",       facSlider,        0},
+  {"dialogFactoryMatrix",       facMatrix,        0},
   {"crashTest",               crashTest,        0},
   {"assertTest",               assertTest,        0},
   {0}
@@ -785,6 +787,34 @@ JSBool facHex(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     
   }else
     *rval = BOOLEAN_TO_JSVAL(0);
+  
+  return JS_TRUE;
+      
+      
+}
+JSBool facMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+    
+      uint8_t data[16];
+      for(int i=0;i<100;i++) data[i]=i;
+      
+      diaElemMatrix Matrix(data,"Matrix",4);
+      
+      
+         diaElem *elems[]={&Matrix   };
+  if(diaFactoryRun("Test Matrix",1,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  
+  for(int x=0;x<4*4;x++)
+  {
+	  if(x && !(x&3)) printf("\n");
+	  printf("%02x ",data[x]);
+	  
+  }
   
   return JS_TRUE;
       

@@ -39,6 +39,7 @@ typedef enum
   ELEM_BUTTON,
   ELEM_SLIDER,
   ELEM_THREAD_COUNT,
+  ELEM_MATRIX,
   ELEM_COUNT,
   ELEM_MAX=ELEM_COUNT-1
 }elemEnum;
@@ -86,6 +87,21 @@ class diaElemButton : public diaElem
     ADM_FAC_CALLBACK *_callBack;
             diaElemButton(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void *cookie,const char *tip=NULL);
   virtual   ~diaElemButton() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      enable(uint32_t onoff) ;
+};
+
+/*********************************************/
+
+class diaElemMatrix : public diaElem
+{
+  protected:
+  public:
+    uint8_t *_matrix;
+    uint32_t _matrixSize;
+    		diaElemMatrix(uint8_t *trix,const char *toggleTitle, uint32_t trixSize,const char *tip=NULL);
+  virtual   ~diaElemMatrix() ;
   void      setMe(void *dialog, void *opaque,uint32_t line);
   void      getMe(void);
   void      enable(uint32_t onoff) ;
