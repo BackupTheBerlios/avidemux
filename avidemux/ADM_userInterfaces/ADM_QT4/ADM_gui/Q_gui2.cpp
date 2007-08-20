@@ -12,7 +12,7 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-#define CUSTOM_SLIDER
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -20,21 +20,14 @@
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
 #include <QtGui/QFrame>
 #include <QtGui/QGraphicsView>
-#include <QtGui/QHBoxLayout>
 #include <QtGui/QMainWindow>
-#include <QtGui/QMenu>
-#include <QtGui/QMenuBar>
 #include <QtGui/QSlider>
-#include <QtGui/QSpacerItem>
 #include <QtGui/QStatusBar>
-#include <QtGui/QToolButton>
-#include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
-#include <ADM_qslider.h>
 
+#include "ADM_qslider.h"
 #include "default.h"
 #include "ADM_osSupport/ADM_misc.h"
 #include "ADM_codecs/ADM_codec.h"
@@ -53,11 +46,7 @@ extern const char* audioFilterGetIndexedName(uint32_t i);
 extern void checkCrashFile(void);
 static void setupMenus(void);
 static void GUI_initCustom(void);
-#ifdef CUSTOM_SLIDER
 static ADM_QSlider *slider=NULL;
-#else
-static QSlider *slider=NULL;
-#endif
 static int _upd_in_progres=0;
 /* Ugly game with macro so that buttons emit their name ...*/
 static char     *customNames[ADM_MAC_CUSTOM_SCRIPT];
@@ -491,7 +480,6 @@ double 	UI_readScale( void )
 	if(!slider) v=0;
 	v= (double)(slider->value());
 	v/=10;
-	printf("GetScale\n");
 	return v;
 }
 void UI_setScale( double val )
@@ -601,9 +589,7 @@ void UI_setTimeCount(uint32_t curFrame,uint32_t total, uint32_t fps)
 	frame2time(total,fps, &hh, &mm, &ss, &ms);
 	sprintf(text, "/ %02d:%02d:%02d.%03d", hh, mm, ss, ms);
 	WIDGET(label_7)->setText(text);
-#ifdef CUSTOM_SLIDER
-	slider->setNbFrames(total);
-#endif
+	slider->setFrameCount(total);
 }
 /**
     \fn     UI_setMarkers(uint32_t a, uint32_t b )
@@ -619,11 +605,9 @@ void UI_setMarkers(uint32_t a, uint32_t b)
 
 	snprintf(text,79,"%06lu",b);
 	WIDGET(pushButtonJumpToMarkerB)->setText(text);
-	//
-#ifdef CUSTOM_SLIDER
-	slider->setA(a);
-	slider->setB(b);
-#endif
+
+	slider->setMarkerA(a);
+	slider->setMarkerB(b);
 }
 /**
     \fn     UI_getCurrentVCodec(void)
