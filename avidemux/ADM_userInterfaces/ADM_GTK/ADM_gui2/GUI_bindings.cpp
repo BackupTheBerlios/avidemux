@@ -12,23 +12,18 @@
  *   it under the terms of the GNU General Public License as published by  *
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
- * GtkObject *sliderAdjustment=NULL;
- *sliderAdjustment=gtk_adjustment_new (52.1, 0, 99.99, 0.01, 0, 0);
- *sliderNavigate = gtk_hscale_new (GTK_ADJUSTMENT (sliderAdjustment));
  ***************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#  include <config.h>
-
-
 #include <string.h>
+#include <math.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include <../ADM_assert.h>
-
-#include "math.h"
+#include "../ADM_assert.h"
 #include "default.h"
 #include "ADM_commonUI/GUI_render.h"
 #include "../gui_action.hxx"
@@ -45,7 +40,6 @@
 #include "../ADM_toolkit/filesel.h"
 #include "../ADM_editor/ADM_Video.h"
 #include "../ADM_osSupport/ADM_misc.h"
-#include "../ADM_editor/ADM_outputfmt.h"
 #include "../prefs.h"
 #include "../ADM_toolkit_gtk/gtkmarkscale.h"
 #include "../ADM_toolkit_gtk/jogshuttle.h"
@@ -59,7 +53,6 @@ void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm,
 	   uint16_t * ss, uint16_t * ms);
 
 static GtkWidget *guiRootWindow=NULL;
-
 static GtkWidget *guiDrawingArea=NULL;
 static GtkWidget *guiSlider=NULL;
 
@@ -74,13 +67,16 @@ static GtkWidget *guiAudioToggle=NULL;
 static GtkWidget *guiVideoToggle=NULL;
 static GdkCursor *guiCursorBusy=NULL;
 static GdkCursor *guiCursorNormal=NULL;
-static gint	  guiCursorEvtMask=0;
+
+static  GtkAdjustment *sliderAdjustment;
+
+static int keyPressHandlerId=0;
+
+//static gint	  guiCursorEvtMask=0;
 static gint       jogChange( void );
 static void volumeChange( void );
 static char     *customNames[ADM_MAC_CUSTOM_SCRIPT];
 static uint32_t ADM_nbCustom=0;
-// heek !
-static  GtkAdjustment *sliderAdjustment;
 // Needed for DND
 extern void A_openAvi (char *name);
 extern void A_appendAvi (char *name);
@@ -145,7 +141,8 @@ static gboolean destroyCallback(GtkWidget * widget,	  GdkEvent * event, gpointer
 static gboolean  on_drawingarea1_expose_event(GtkWidget * widget,  GdkEventExpose * event, gpointer user_data);
 // Currentframe taking/loosing focus
 static int  UI_grabFocus( void);
-static int  UI_looseFocus( void);
+static int  UI_loseFocus( void);
+static void UI_focusAfterActivate(GtkMenuItem * menuitem, gpointer user_data);
 static void GUI_initCursor( void );
  void UI_BusyCursor( void );
  void UI_NormalCursor( void );
@@ -153,6 +150,7 @@ static void GUI_initCursor( void );
 gboolean SliderIsShifted = FALSE;
 gboolean UI_SliderPressed(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 gboolean UI_SliderReleased(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+gboolean UI_returnFocus(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 // Global
 GtkAccelGroup *accel_group;
 //
@@ -164,10 +162,7 @@ typedef struct buttonCallBack_S
 	const char *signal;
 	Action action;
 
-}buttonCallBack_S;
-
-
-
+} buttonCallBack_S;
 
 buttonCallBack_S buttonCallback[]=
 {
@@ -196,12 +191,10 @@ buttonCallBack_S buttonCallback[]=
 	{"buttonGotoB"			,"clicked"		,ACT_GotoMarkB},	
 	{"toolbuttonCalc"		,"clicked"		,ACT_Bitrate},	
 
-	//{"boxCurFrame"			,"editing_done"		,ACT_JumpToFrame},
-	{"boxCurFrame"			,"activate"		,ACT_JumpToFrame},
+	//{"boxCurFrame"			,"activate"		,ACT_JumpToFrame},
 	//{"boxCurTime"			,"editing_done"		,ACT_TimeChanged},
-
-        {"CheckButtonTimeshift"         ,"toggled"             ,ACT_TimeShift}
-       // {"spinbuttonTimeShift"          ,"editing_done"       ,ACT_TimeShift}
+    {"CheckButtonTimeshift"         ,"toggled"             ,ACT_TimeShift}
+    // {"spinbuttonTimeShift"          ,"editing_done"       ,ACT_TimeShift}
   
 };
 
@@ -216,6 +209,7 @@ uint32_t w,h;
 		guiRootWindow=create_mainWindow();
 		
 		if(!guiRootWindow) return 0;
+
 		gtk_register_dialog(guiRootWindow);
 					
 		// and seek global sub entity
@@ -289,6 +283,7 @@ uint8_t  bindGUI( void )
 	
 	ADM_LOOKUP(guiCurTime,boxCurTime);
 	ADM_LOOKUP(guiTotalTime,labelTotalTime);
+
 #if 0
 	ADM_LOOKUP(guiPreviewToggle,toggletoolbuttonPreview);
 	ADM_LOOKUP(guiOutputToggle,toggletoolbuttonOutput);
@@ -313,42 +308,34 @@ uint8_t  bindGUI( void )
 	
 	
 //	now add callbacks
-	
-	gtk_signal_connect(GTK_OBJECT(guiSlider), "button_press_event",
-                       GTK_SIGNAL_FUNC(UI_SliderPressed),
-                       NULL);
+	 gtk_widget_add_events(guiRootWindow, GDK_BUTTON_PRESS_MASK);
+	 gtk_signal_connect(GTK_OBJECT(guiRootWindow), "button_press_event", GTK_SIGNAL_FUNC(UI_returnFocus), NULL);
 
-	gtk_signal_connect(GTK_OBJECT(guiSlider), "button_release_event",
-                       GTK_SIGNAL_FUNC(UI_SliderReleased),
-                       NULL);
-#define ADD_SIGNAL(a,b,c)  gtk_signal_connect(GTK_OBJECT(a),b, \
-		       GTK_SIGNAL_FUNC(guiCallback), (void *) c);
-				       
-      	ADD_SIGNAL(guiSlider,"value_changed",ACT_Scale);
-	
-	// We need to know when the current frame box has the focus to cancel
-	// shortcuts
-	
-	gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"boxCurFrame")), "focus_in_event", 
-                      GTK_SIGNAL_FUNC(UI_grabFocus),                   (void *) NULL);	   
-	gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"boxCurFrame")), "focus_out_event", 	
-                      GTK_SIGNAL_FUNC(UI_looseFocus),                   (void *) NULL);	 
+	gtk_signal_connect(GTK_OBJECT(guiSlider), "button_press_event", GTK_SIGNAL_FUNC(UI_SliderPressed), NULL);
+	gtk_signal_connect(GTK_OBJECT(guiSlider), "button_release_event", GTK_SIGNAL_FUNC(UI_SliderReleased), NULL);
 
-        // Volume
-         gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"hscalVolume")), "value_changed",   
-                      GTK_SIGNAL_FUNC(volumeChange),                   (void *) NULL);  
+	// Current Frame	
+	gtk_signal_connect(GTK_OBJECT(guiCurFrame), "focus_in_event", GTK_SIGNAL_FUNC(UI_grabFocus), (void *) NULL);
+	gtk_signal_connect(GTK_OBJECT(guiCurFrame), "focus_out_event", GTK_SIGNAL_FUNC(UI_loseFocus), (void *) NULL);
+	gtk_signal_connect(GTK_OBJECT(guiCurFrame), "activate", GTK_SIGNAL_FUNC(UI_focusAfterActivate), (void *) ACT_JumpToFrame);
 
-        // Jog
-        gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"jogg")), "value_changed",   
-                      GTK_SIGNAL_FUNC(jogChange),                   (void *) NULL);  
+    // Volume
+    gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"hscalVolume")), "value_changed", GTK_SIGNAL_FUNC(volumeChange), (void *) NULL);
 
-		// Time Shift
-		gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"spinbuttonTimeShift")), "value_changed",   
-                      GTK_SIGNAL_FUNC(guiCallback), (void *) ACT_TimeShift);  
+    // Jog
+    gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"jogg")), "value_changed", GTK_SIGNAL_FUNC(jogChange), (void *) NULL);
 
+	// Time Shift
+	gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"spinbuttonTimeShift")), "focus_in_event", GTK_SIGNAL_FUNC(UI_grabFocus), (void *) NULL);
+	gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"spinbuttonTimeShift")), "focus_out_event", GTK_SIGNAL_FUNC(UI_loseFocus), (void *) NULL);
+	gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"spinbuttonTimeShift")), "activate", GTK_SIGNAL_FUNC(UI_focusAfterActivate), (void *) ACT_TimeShift);
 
-		       
-// Callbacks for buttons
+#define ADD_SIGNAL(a,b,c)  gtk_signal_connect(GTK_OBJECT(a), b, GTK_SIGNAL_FUNC(guiCallback), (void *) c);
+
+   	ADD_SIGNAL(guiSlider,"value_changed",ACT_Scale);
+	ADD_SIGNAL(lookup_widget(guiRootWindow,"spinbuttonTimeShift"),"value_changed",ACT_TimeShift);
+
+	// Callbacks for buttons
 		uint32_t nb=sizeof(buttonCallback)/sizeof(buttonCallBack_S); 
 		GtkWidget *bt;
 		
@@ -362,7 +349,7 @@ uint8_t  bindGUI( void )
 				ADM_assert(0);
 			}
 			ADD_SIGNAL(bt,buttonCallback[i].signal,buttonCallback[i].action);
-			GTK_WIDGET_UNSET_FLAGS (bt, GTK_CAN_FOCUS);			
+			GTK_WIDGET_UNSET_FLAGS (bt, GTK_CAN_FOCUS);
 		}
 
 	GTK_WIDGET_SET_FLAGS (lookup_widget(guiRootWindow,"boxCurFrame"), GTK_CAN_FOCUS);
@@ -692,47 +679,83 @@ gboolean destroyCallback(GtkWidget * widget,
 }
 int UI_grabFocus( void)
 {
-//	printf("Grabbing focus\n");
 #define RM(x,y)   gtk_widget_remove_accelerator (lookup_widget(guiRootWindow,#x), accel_group, \
                               y, (GdkModifierType) 0  );
-	RM(buttonNextFrame,GDK_KP_6);
-	RM(buttonPrevFrame,GDK_KP_4);
-	RM(buttonNextKFrame,GDK_KP_8);
-	RM(buttonPrevKFrame,GDK_KP_2);
-	RM(delete1,GDK_Delete);
 #define RMCTRL(x,y)   gtk_widget_remove_accelerator (lookup_widget(guiRootWindow,#x), accel_group, \
                               y, (GdkModifierType) GDK_CONTROL_MASK  );	
+
+	RM(next_frame1, GDK_KP_6);
+	RM(previous_frame1, GDK_KP_4);
+	RM(next_intra_frame1, GDK_KP_8);
+	RM(previous_intra_frame1, GDK_KP_2);
+
+	RM(buttonNextFrame, GDK_KP_6);
+	RM(buttonPrevFrame, GDK_KP_4);
+	RM(buttonNextKFrame, GDK_KP_8);
+	RM(buttonPrevKFrame, GDK_KP_2);
+
+	RM(delete1, GDK_Delete);
+
 	RMCTRL(paste1,GDK_V);
 	RMCTRL(copy1,GDK_C);
 	RMCTRL(cut1,GDK_X);
+
+	UI_arrow_disabled();
+
 	return FALSE;
 	
 }
-int UI_looseFocus( void)
+int UI_loseFocus( void)
 {
 #define ADD(x,y)  gtk_widget_add_accelerator (lookup_widget(guiRootWindow,#x), "clicked", accel_group, \
-                              y, (GdkModifierType) 0, \
-                              GTK_ACCEL_VISIBLE);
-//	printf("Dropping focus\n");			      
-	ADD(buttonNextFrame,GDK_KP_6);
-	ADD(buttonPrevFrame,GDK_KP_4);
-	ADD(buttonNextKFrame,GDK_KP_8);
-	ADD(buttonPrevKFrame,GDK_KP_2);
-	
-	gtk_widget_add_accelerator (lookup_widget(guiRootWindow,"delete1"), "activate", accel_group, \
-                              GDK_Delete, (GdkModifierType) 0, \
-                              GTK_ACCEL_VISIBLE);	
-	
+                              y, (GdkModifierType) 0, GTK_ACCEL_VISIBLE);
+#define ADD_ACT(x,y)  gtk_widget_add_accelerator (lookup_widget(guiRootWindow,#x), "activate", accel_group, \
+                              y, (GdkModifierType) 0, GTK_ACCEL_VISIBLE);
 #define ADDCTRL(x,y) gtk_widget_add_accelerator (lookup_widget(guiRootWindow,#x), "activate", accel_group, \
-                              y, (GdkModifierType) GDK_CONTROL_MASK, \
-                              GTK_ACCEL_VISIBLE);
+                              y, (GdkModifierType) GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+
+	ADD_ACT(next_frame1, GDK_KP_6);
+	ADD_ACT(previous_frame1, GDK_KP_4);
+	ADD_ACT(next_intra_frame1, GDK_KP_8);
+	ADD_ACT(previous_intra_frame1, GDK_KP_2);
+	ADD_ACT(delete1, GDK_Delete);
+
+	ADD(buttonNextFrame, GDK_KP_6);
+	ADD(buttonPrevFrame, GDK_KP_4);
+	ADD(buttonNextKFrame, GDK_KP_8);
+	ADD(buttonPrevKFrame, GDK_KP_2);
 	
 	ADDCTRL(paste1,GDK_V);
 	ADDCTRL(copy1,GDK_C);
 	ADDCTRL(cut1,GDK_X);
+
+	UI_arrow_enabled();
 	
 	return FALSE;
 }
+
+void UI_focusAfterActivate(GtkMenuItem * menuitem, gpointer user_data)
+{
+	// return focus to window once Enter has been pressed
+	UNUSED_ARG(menuitem);
+    Action act;
+    uint32_t aint;
+    if(update_ui) return; // no event sent
+
+    aint = (long int) user_data;
+    act = (Action) aint;
+
+	HandleAction(act);
+
+	gtk_widget_grab_focus(lookup_widget(guiRootWindow, "menuBar"));
+}
+
+gboolean UI_returnFocus(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+	gtk_widget_grab_focus(lookup_widget(guiRootWindow, "menuBar"));
+	return FALSE;
+}
+
 void UI_setMarkers(uint32_t a, uint32_t b )
 {
 char string[500];
@@ -1086,16 +1109,14 @@ static Action recent[4]={ACT_RECENT0,ACT_RECENT1,ACT_RECENT2,ACT_RECENT3};
 // Override arrow keys to quickly navigate
 uint8_t UI_arrow_enabled(void)
 {
-  g_signal_connect(GTK_OBJECT(guiRootWindow), "key_press_event",
-                       GTK_SIGNAL_FUNC(UI_on_key_press),
-                       NULL);
-   
-
+	keyPressHandlerId = g_signal_connect(GTK_OBJECT(guiRootWindow), "key_press_event", GTK_SIGNAL_FUNC(UI_on_key_press), NULL);
 }
+
 uint8_t UI_arrow_disabled(void)
 {
-
+	g_signal_handler_disconnect(GTK_OBJECT(guiRootWindow), keyPressHandlerId);
 }
+
 gboolean UI_SliderPressed(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
 	if(event->state&GDK_SHIFT_MASK) SliderIsShifted=TRUE;
