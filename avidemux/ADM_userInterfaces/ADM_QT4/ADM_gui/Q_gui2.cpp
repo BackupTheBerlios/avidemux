@@ -202,7 +202,7 @@ MainWindow::MainWindow() : QMainWindow()
 	// Slider
 	slider=ui.horizontalSlider;
 	slider->setMinimum(0);
-	slider->setMaximum(1000);
+	slider->setMaximum(1000000000);
 	connect( slider,SIGNAL(valueChanged(int)),this,SLOT(sliderMoved(int)));
 
 	// Volume slider
@@ -479,14 +479,14 @@ double 	UI_readScale( void )
 	double v;
 	if(!slider) v=0;
 	v= (double)(slider->value());
-	v/=10;
+	v/=10000000;
 	return v;
 }
 void UI_setScale( double val )
 {
 	if(_upd_in_progres) return;
 	_upd_in_progres++;
-	slider->setValue( (int)val*10);
+	slider->setValue( (int)(val * 10000000));
 	_upd_in_progres--;
 
 }
@@ -504,10 +504,10 @@ void UI_purge( void )
 */
 void UI_setTitle(char *name)
 {
-	char title[1024];
+    char title[300];
 
-	strcpy(title,"Avidemux 2 ");
-	strncat(title,name,200);
+    strncpy(title,name,200);
+    strncat(title," - Avidemux", 11);
 
 	QuiMainWindows->setWindowTitle( title);
 }
