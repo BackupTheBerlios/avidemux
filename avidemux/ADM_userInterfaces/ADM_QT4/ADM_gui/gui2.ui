@@ -1386,11 +1386,6 @@
     <addaction name="actionSave_2" />
     <addaction name="actionFilters_2" />
    </widget>
-   <widget class="QMenu" name="menuCustom" >
-    <property name="title" >
-     <string>&amp;Custom</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
      <string>&amp;File</string>
@@ -1456,26 +1451,6 @@
     <addaction name="actionOCR_DVB_T_TS_files" />
     <addaction name="actionGlyphs_Edit" />
    </widget>
-   <widget class="QMenu" name="menuGo" >
-    <property name="title" >
-     <string>&amp;Go</string>
-    </property>
-    <addaction name="actionPlay" />
-    <addaction name="actionPrevious_Frame" />
-    <addaction name="actionNext_Frame" />
-    <addaction name="actionPrevious_intra_frame" />
-    <addaction name="actionNext_intra_frame" />
-    <addaction name="actionPrevious_black_frame" />
-    <addaction name="actionNext_blak_frame" />
-    <addaction name="actionFirst_Frame" />
-    <addaction name="actionLast_Frame" />
-    <addaction name="separator" />
-    <addaction name="actionGo_to_Marker_A" />
-    <addaction name="actionGo_to_Marker_B" />
-    <addaction name="separator" />
-    <addaction name="actionJump_to_Frame" />
-    <addaction name="actionJump_to_Time" />
-   </widget>
    <widget class="QMenu" name="menuEdit" >
     <property name="title" >
      <string>&amp;Edit</string>
@@ -1512,6 +1487,31 @@
     <addaction name="actionZoom_2_1" />
     <addaction name="separator" />
     <addaction name="menu_Preview" />
+   </widget>
+   <widget class="QMenu" name="menuCustom" >
+    <property name="title" >
+     <string>&amp;Custom</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuGo" >
+    <property name="title" >
+     <string>&amp;Go</string>
+    </property>
+    <addaction name="actionPlay" />
+    <addaction name="actionPrevious_Frame" />
+    <addaction name="actionNext_Frame" />
+    <addaction name="actionPrevious_intra_frame" />
+    <addaction name="actionNext_intra_frame" />
+    <addaction name="actionPrevious_black_frame" />
+    <addaction name="actionNext_blak_frame" />
+    <addaction name="actionFirst_Frame" />
+    <addaction name="actionLast_Frame" />
+    <addaction name="separator" />
+    <addaction name="actionGo_to_Marker_A" />
+    <addaction name="actionGo_to_Marker_B" />
+    <addaction name="separator" />
+    <addaction name="actionJump_to_Frame" />
+    <addaction name="actionJump_to_Time" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -1608,7 +1608,7 @@
     <string>&amp;Delete</string>
    </property>
    <property name="shortcut" >
-    <string>Delete</string>
+    <string>Del</string>
    </property>
   </action>
   <action name="actionSet_marker_A" >
@@ -1760,7 +1760,7 @@
     <string>&amp;Zoom 1:4</string>
    </property>
    <property name="shortcut" >
-    <string>Shift+Ctrl+4</string>
+    <string>Ctrl+Shift+4</string>
    </property>
   </action>
   <action name="actionZoom_1_2" >
@@ -1771,7 +1771,7 @@
     <string>Z&amp;oom 1:2</string>
    </property>
    <property name="shortcut" >
-    <string>Shift+Ctrl+2</string>
+    <string>Ctrl+Shift+2</string>
    </property>
   </action>
   <action name="actionZoom_1_1" >
@@ -1989,7 +1989,7 @@
     <string>P&amp;revious Frame</string>
    </property>
    <property name="shortcut" >
-    <string>4</string>
+    <string>Left</string>
    </property>
   </action>
   <action name="actionNext_Frame" >
@@ -2000,7 +2000,7 @@
     <string>&amp;Next Frame</string>
    </property>
    <property name="shortcut" >
-    <string>6</string>
+    <string>Right</string>
    </property>
   </action>
   <action name="actionPrevious_intra_frame" >
@@ -2017,7 +2017,7 @@
     <string>Previous Intra Frame</string>
    </property>
    <property name="shortcut" >
-    <string>2</string>
+    <string>Down</string>
    </property>
   </action>
   <action name="actionNext_intra_frame" >
@@ -2034,7 +2034,7 @@
     <string>Next Intra Frame</string>
    </property>
    <property name="shortcut" >
-    <string>8</string>
+    <string>Up</string>
    </property>
   </action>
   <action name="actionPrevious_black_frame" >
