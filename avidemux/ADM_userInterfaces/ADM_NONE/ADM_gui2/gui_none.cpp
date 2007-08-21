@@ -55,6 +55,8 @@ void UI_setAProcessToggleStatus( uint8_t status )
 void UI_setVProcessToggleStatus( uint8_t status )
 {}
 //**************************************************
+void UI_refreshCustomMenu(void) {}
+
 int    UI_getCurrentPreview(void)
 {
   return 0; 

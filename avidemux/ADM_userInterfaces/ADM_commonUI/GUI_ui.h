@@ -46,5 +46,7 @@ uint8_t UI_updateRecentMenu( void );
 
 uint8_t UI_arrow_enabled(void);
 uint8_t UI_arrow_disabled(void);
+
+void UI_refreshCustomMenu(void);
 #endif
 // EOF

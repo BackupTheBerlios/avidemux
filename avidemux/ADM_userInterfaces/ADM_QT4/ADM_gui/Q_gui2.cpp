@@ -46,7 +46,6 @@ extern uint32_t audioFilterGetNbEncoder(void);
 extern const char* audioFilterGetIndexedName(uint32_t i);
 extern void checkCrashFile(void);
 static void setupMenus(void);
-static void GUI_initCustom(void);
 
 int SliderIsShifted=0;
 static int shiftKeyHeld=0;
@@ -97,6 +96,7 @@ class MainWindow : public QMainWindow
 public:
 	MainWindow();
 	Ui_MainWindow ui;
+	void buildCustomMenu(void);
 
 public slots:
 	void timeChanged(int);
@@ -250,14 +250,7 @@ MainWindow::MainWindow() : QMainWindow()
 	connect(ui.spinBox_TimeValue,SIGNAL(valueChanged(int)),this,SLOT(timeChanged(int)));
 
 	/* Build the custom menu */
-	GUI_initCustom();
-	for(int i=0;i<ADM_nbCustom;i++)
-	{
-		customActions[i]=new QAction(customNames[i],NULL);
-		ui.menuCustom->addAction(customActions[i]);
-		connect(customActions[i], SIGNAL(triggered()), this, SLOT(custom()));
-	}
-	printf("Menu built\n");
+	buildCustomMenu();
 
 	this->installEventFilter(this);
 	slider->installEventFilter(this);
@@ -393,6 +386,53 @@ void MainWindow::nextIntraFrame(void)
 		HandleAction(ACT_NextKFrame);
 }
 
+void MainWindow::buildCustomMenu(void)
+{
+	if (ADM_nbCustom)
+	{
+		for(int i = 0; i < ADM_nbCustom; i++)
+		{
+			disconnect(customActions[i], SIGNAL(triggered()), this, SLOT(custom()));
+			delete customActions[i];
+			customActions[i] = NULL;
+		}
+
+		ui.menuCustom->clear();
+		ADM_nbCustom = 0;
+	}
+
+	char *customdir = ADM_getCustomDir();
+
+	if (!customdir)
+	{
+		printf("No custom dir...\n");
+		return;
+	}
+
+	/* Collect the name */
+	if (! buildDirectoryContent(&ADM_nbCustom, customdir, customNames, ADM_MAC_CUSTOM_SCRIPT,".js"))
+	{
+		printf("Failed to build custom dir content");
+		return;
+	}
+
+	if(ADM_nbCustom)
+	{
+		printf("Found %u custom script(s), adding them\n", ADM_nbCustom);
+
+		for(int i=0; i < ADM_nbCustom; i++)
+		{
+			customActions[i] = new QAction(GetFileName(customNames[i]), NULL);
+			ui.menuCustom->addAction(customActions[i]);
+			connect(customActions[i], SIGNAL(triggered()), this, SLOT(custom()));
+		}
+	}
+	else
+		printf("No custom scripts\n");
+
+	printf("Custom menu built\n");
+}
+
 //*********************************************
 //***** Hook to core                ***********
 //*********************************************
@@ -409,6 +449,11 @@ int UI_Init(int nargc,char **nargv)
 QWidget *QuiMainWindows=NULL;
 QGraphicsView *drawWindow=NULL;
 uint8_t UI_updateRecentMenu( void );
+
+void UI_refreshCustomMenu(void)
+{
+	((MainWindow*)QuiMainWindows)->buildCustomMenu();
+}
 
 /**
     \fn UI_getCurrentPreview(void)
@@ -780,30 +825,6 @@ uint8_t 	UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
 	WIDGET(comboBoxFormat)->setCurrentIndex((int)fmt);
 }
 
-/**
-      \fn GUI_initCustom
-      \brief Initialize custom menu
-*/
-void GUI_initCustom(void )
-{
-	char *customdir=ADM_getCustomDir();
-	if(!customdir) 
-	{
-		printf("No custom dir...\n");
-		return;
-	}
-	/* Collect the name */
-	if(! buildDirectoryContent(&ADM_nbCustom,customdir, customNames,ADM_MAC_CUSTOM_SCRIPT,".js"))
-	{
-		printf("Failed to build custom dir content");
-		return;
-	}
-	if(!ADM_nbCustom)
-	{
-		printf("No custom script\n");
-	}
-	printf("Found %u custom scripts, adding them\n",ADM_nbCustom);
-}
 /**
       \fn UI_getTimeShift
       \brief get state (on/off) and value for time Shift

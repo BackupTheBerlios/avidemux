@@ -921,6 +921,8 @@ int enable;
 
 }
 
+void UI_refreshCustomMenu(void) {}
+
 int  UI_getCurrentPreview(void)
  {
        

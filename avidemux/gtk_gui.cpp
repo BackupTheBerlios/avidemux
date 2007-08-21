@@ -457,6 +457,7 @@ int nw;
 
     case ACT_SaveWork:
       GUI_FileSelWrite (_("Select Workbench to Save"), A_saveWorkbench);
+	  UI_refreshCustomMenu();
       break;
     case ACT_ADD_JOB:
         A_addJob();
@@ -468,6 +469,7 @@ int nw;
          ADM_dealloc(tmp);
       }else{
         GUI_FileSelWrite (_("Select Workbench to Save"), A_saveWorkbench);
+		UI_refreshCustomMenu();
       }
       break;
         case ACT_JumpToFrame: 
