@@ -1018,12 +1018,6 @@ void  updateLoaded ()
   curframe = 0;
   getFirstVideoFilter(); // reinit first filter
 
-
-  //frameStart = 0;
-  //frameEnd = avifileinfo->nb_frames - 1;
-  video_body->getMarkers(&frameStart,&frameEnd);
-  UI_setMarkers (frameStart, frameEnd);
-
   // now get audio information if exists
   wavinfo = video_body->getAudioInfo ();	//wavinfo); // will be null if no audio
   if (!wavinfo)
@@ -1047,11 +1041,14 @@ void  updateLoaded ()
 
   // Init renderer
     admPreview::setMainDimension(avifileinfo->width, avifileinfo->height);
-  curframe = 0;
-  
+  curframe = 0;  
 
   // Draw first frame
-  rebuild_status_bar (); 
+  rebuild_status_bar();
+
+  video_body->getMarkers(&frameStart,&frameEnd);
+  UI_setMarkers (frameStart, frameEnd);
+
   getFirstVideoFilter(); // Rebuild filter if needed
   
   /* Zoom out if needed */

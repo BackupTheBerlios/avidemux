@@ -12,6 +12,7 @@ public:
 
 	void setMarkerA(uint32_t frameIndex);
 	void setMarkerB(uint32_t frameIndex);
+	void setMarkers(uint32_t frameIndexA, uint32_t frameIndexB);
 	void setFrameCount(uint32_t count);
 };
 

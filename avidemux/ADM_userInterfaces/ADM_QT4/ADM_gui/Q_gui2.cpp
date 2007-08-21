@@ -103,6 +103,7 @@ public slots:
 	void buttonPressed(void);
 	void custom(void);
 	void toolButtonPressed(bool z);
+
 	void comboChanged(int z)
 	{
 		const char *source=qPrintable(sender()->objectName());
@@ -168,8 +169,12 @@ public slots:
 		HandleAction(ACT_PreviewChanged);
 	}
 
+	void previousIntraFrame(void);
+	void nextIntraFrame(void);
+
 protected:
 	bool eventFilter(QObject* watched, QEvent* event);
+	void mousePressEvent(QMouseEvent* event);
 
 private slots:
 
@@ -211,6 +216,9 @@ MainWindow::MainWindow() : QMainWindow()
 #define PROCESS CONNECT_TB
 	LIST_OF_BUTTONS
 #undef PROCESS
+
+	connect(ui.actionPrevious_intra_frame, SIGNAL(triggered()), this, SLOT(previousIntraFrame()));
+	connect(ui.actionNext_intra_frame, SIGNAL(triggered()), this, SLOT(nextIntraFrame()));
 
 	//ACT_VideoCodecChanged
 	connect( ui.comboBoxVideo,SIGNAL(activated(int)),this,SLOT(comboChanged(int)));
@@ -345,10 +353,13 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 				case Qt::Key_Down:
 					HandleAction(ACT_PreviousKFrame);
 					return true;
+				case Qt::Key_Shift:
+					shiftKeyHeld = 1;
+					break;
 			}
 		}
-		else if (keyEvent->key() == Qt::Key_Shift)
-			shiftKeyHeld = 1;
+		else if (keyEvent->key() == Qt::Key_Return)
+			this->setFocus(Qt::OtherFocusReason);
 	}
 	else if (event->type() == QEvent::KeyRelease)
 	{
@@ -359,6 +370,27 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 	}
 
 	return QObject::eventFilter(watched, event);
+}
+
+void MainWindow::mousePressEvent(QMouseEvent* event)
+{
+	this->setFocus(Qt::OtherFocusReason);
+}
+
+void MainWindow::previousIntraFrame(void)
+{
+	if (ui.spinBox_TimeValue->hasFocus())
+		ui.spinBox_TimeValue->stepDown();
+	else
+		HandleAction(ACT_PreviousKFrame);
+}
+
+void MainWindow::nextIntraFrame(void)
+{
+	if (ui.spinBox_TimeValue->hasFocus())
+		ui.spinBox_TimeValue->stepUp();
+	else
+		HandleAction(ACT_NextKFrame);
 }
 
 //*********************************************
@@ -632,11 +664,11 @@ void UI_setFrameCount(uint32_t curFrame,uint32_t total)
 	WIDGET(label_2)->setText(text);
 
 }
+
 /**
     \fn     UI_updateTimeCount(uint32_t curFrame,uint32_t fps)
     \brief  Display the time corresponding to current frame according to fps (fps1000)
 */
-
 void UI_updateTimeCount(uint32_t curFrame,uint32_t fps)
 {
 	char text[80];   
@@ -645,29 +677,31 @@ void UI_updateTimeCount(uint32_t curFrame,uint32_t fps)
 	frame2time(curFrame,fps, &hh, &mm, &ss, &ms);
 	sprintf(text, "%02d:%02d:%02d.%03d", hh, mm, ss, ms);
 	WIDGET(lineEdit_2)->setText(text);
-
 }
+
 /**
     \fn     UI_updateTimeCount(uint32_t curFrame,uint32_t fps)
     \brief  Display the time corresponding to current frame according to fps (fps1000) and total duration
 */
-
 void UI_setTimeCount(uint32_t curFrame,uint32_t total, uint32_t fps)
 {
 	char text[80];   
 	uint16_t mm,hh,ss,ms;
 
+	if(total) total--; // We display from 0 to X
+
 	UI_updateTimeCount(curFrame,fps);
 	frame2time(total,fps, &hh, &mm, &ss, &ms);
 	sprintf(text, "/ %02d:%02d:%02d.%03d", hh, mm, ss, ms);
 	WIDGET(label_7)->setText(text);
+
 	slider->setFrameCount(total);
 }
+
 /**
     \fn     UI_setMarkers(uint32_t a, uint32_t b )
     \brief  Display frame # for marker A & B
 */
-
 void UI_setMarkers(uint32_t a, uint32_t b)
 {
 	char text[80];
@@ -678,14 +712,13 @@ void UI_setMarkers(uint32_t a, uint32_t b)
 	snprintf(text,79,"%06lu",b);
 	WIDGET(pushButtonJumpToMarkerB)->setText(text);
 
-	slider->setMarkerA(a);
-	slider->setMarkerB(b);
+	slider->setMarkers(a, b);
 }
+
 /**
     \fn     UI_getCurrentVCodec(void)
     \brief  Returns the current selected video code in menu, i.e its number (0 being the first)
 */
-
 int 	UI_getCurrentVCodec(void)
 {
 	int i=WIDGET(comboBoxVideo)->currentIndex();

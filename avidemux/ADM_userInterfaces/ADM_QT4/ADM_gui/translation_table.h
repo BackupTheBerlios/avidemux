@@ -44,8 +44,6 @@ PROCESS(actionOCR,ACT_Ocr) \
 PROCESS(actionPlay_Stop,ACT_StopAvi) \
 PROCESS(actionPrevious_Frame,ACT_PreviousFrame) \
 PROCESS(actionNext_Frame,ACT_NextFrame) \
-PROCESS(actionPrevious_intra_frame,ACT_PreviousKFrame) \
-PROCESS(actionNext_intra_frame,ACT_NextKFrame) \
 PROCESS(actionPrevious_black_frame,ACT_PrevBlackFrame) \
 PROCESS(actionNext_blak_frame,ACT_NextBlackFrame) \
 PROCESS(actionFirst_Frame,ACT_Begin) \
@@ -70,6 +68,8 @@ PROCESS(actionAdd_to_joblist,ACT_ADD_JOB) \
 PROCESS(actionShow_Joblist,ACT_HANDLE_JOB)  
 
 #if 0
+PROCESS(actionPrevious_intra_frame,ACT_PreviousKFrame) \
+PROCESS(actionNext_intra_frame,ACT_NextKFrame) \
 PROCESS(actionZoom_4_1,ACT_ZOOM_4_1) \
 PROCESS(actionMain_toolbar,ACT_SaveCurrentWork) \
 PROCESS(actionA_V_toolbar,ACT_DUMMY)
