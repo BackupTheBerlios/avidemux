@@ -60,11 +60,8 @@ class ADMfont;
 #include "ADM_audiofilter/audioencoder.h"
 #include "ADM_lavcodec.h"
 #include "ADM_codecs/ADM_ffmpegConfig.h"
-
 #include "DIA_resizeWiz.h"
-    
 #include "ADM_assert.h"
-int SliderIsShifted=0;
 
 //******************************
 

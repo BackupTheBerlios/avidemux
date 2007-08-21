@@ -26,6 +26,7 @@
 #include <QtGui/QSlider>
 #include <QtGui/QStatusBar>
 #include <QtGui/QWidget>
+#include <QtGui/QKeyEvent>
 
 #include "ADM_qslider.h"
 #include "default.h"
@@ -46,6 +47,9 @@ extern const char* audioFilterGetIndexedName(uint32_t i);
 extern void checkCrashFile(void);
 static void setupMenus(void);
 static void GUI_initCustom(void);
+
+int SliderIsShifted=0;
+static int shiftKeyHeld=0;
 static ADM_QSlider *slider=NULL;
 static int _upd_in_progres=0;
 /* Ugly game with macro so that buttons emit their name ...*/
@@ -129,10 +133,20 @@ public slots:
 			printf("From +: %s\n",source);
 	}
 
-	void sliderMoved(int u) 
+	void sliderValueChanged(int u) 
 	{
 		if(!_upd_in_progres)
 			HandleAction (ACT_Scale) ;
+	}
+
+	void sliderMoved(int value)
+	{
+		SliderIsShifted = shiftKeyHeld;
+	}
+
+	void sliderReleased(void)
+	{
+		SliderIsShifted = 0;
 	}
 
 	void volumeChange( int u )
@@ -153,6 +167,9 @@ public slots:
 	{
 		HandleAction(ACT_PreviewChanged);
 	}
+
+protected:
+	bool eventFilter(QObject* watched, QEvent* event);
 
 private slots:
 
@@ -203,7 +220,9 @@ MainWindow::MainWindow() : QMainWindow()
 	slider=ui.horizontalSlider;
 	slider->setMinimum(0);
 	slider->setMaximum(1000000000);
-	connect( slider,SIGNAL(valueChanged(int)),this,SLOT(sliderMoved(int)));
+	connect( slider,SIGNAL(valueChanged(int)),this,SLOT(sliderValueChanged(int)));
+	connect( slider,SIGNAL(sliderMoved(int)),this,SLOT(sliderMoved(int)));
+	connect( slider,SIGNAL(sliderReleased()),this,SLOT(sliderReleased()));
 
 	// Volume slider
 	QSlider *volSlider=ui.horizontalSlider_2;
@@ -231,6 +250,9 @@ MainWindow::MainWindow() : QMainWindow()
 		connect(customActions[i], SIGNAL(triggered()), this, SLOT(custom()));
 	}
 	printf("Menu built\n");
+
+	this->installEventFilter(this);
+	slider->installEventFilter(this);
 }
 /**
 \fn     custom
@@ -278,7 +300,6 @@ void MainWindow::buttonPressed(void)
 	// Receveid a key press Event, look into table..
 	const char *source=qPrintable(sender()->objectName());
 
-	printf("Button From: %s\n",source);
 	Action action=searchTranslationTable(source);
 
 	if(action!=ACT_DUMMY)
@@ -289,6 +310,57 @@ void MainWindow::toolButtonPressed(bool i)
 {
 	buttonPressed();
 }
+
+bool MainWindow::eventFilter(QObject* watched, QEvent* event)
+{
+	if (event->type() == QEvent::KeyPress)
+	{
+		QKeyEvent *keyEvent = (QKeyEvent*)event;
+
+		if (watched == slider)
+		{
+			switch (keyEvent->key())
+			{
+				case Qt::Key_Left:
+					if (keyEvent->modifiers() == Qt::ShiftModifier)
+						HandleAction(ACT_Back25Frames);
+					else if (keyEvent->modifiers() == Qt::ControlModifier)
+						HandleAction(ACT_Back50Frames);
+					else
+						HandleAction(ACT_PreviousFrame);
+
+					return true;
+				case Qt::Key_Right:
+					if (keyEvent->modifiers() == Qt::ShiftModifier)
+						HandleAction(ACT_Forward25Frames);
+					else if (keyEvent->modifiers() == Qt::ControlModifier)
+						HandleAction(ACT_Forward50Frames);
+					else
+						HandleAction(ACT_NextFrame);
+
+					return true;
+				case Qt::Key_Up:
+					HandleAction(ACT_NextKFrame);
+					return true;
+				case Qt::Key_Down:
+					HandleAction(ACT_PreviousKFrame);
+					return true;
+			}
+		}
+		else if (keyEvent->key() == Qt::Key_Shift)
+			shiftKeyHeld = 1;
+	}
+	else if (event->type() == QEvent::KeyRelease)
+	{
+		QKeyEvent *keyEvent = (QKeyEvent*)event;
+
+		if (keyEvent->key() == Qt::Key_Shift)
+			shiftKeyHeld = 0;
+	}
+
+	return QObject::eventFilter(watched, event);
+}
+
 //*********************************************
 //***** Hook to core                ***********
 //*********************************************
@@ -442,7 +514,7 @@ void setupMenus(void)
 	const char *name;
 
 	nbVid=encoderGetNbEncoder();
-	printf("Found %d video encoder\n",nbVid);
+	printf("Found %d video encoder(s)\n",nbVid);
 	for(uint32_t i=1;i<nbVid;i++)
 	{
 		name=encoderGetIndexedName(i);
@@ -454,7 +526,7 @@ void setupMenus(void)
 	uint32_t nbAud;
 
 	nbAud=audioFilterGetNbEncoder();
-	printf("Found %d audio encoder\n",nbAud);		       
+	printf("Found %d audio encoder(s)\n",nbAud);		       
 	for(uint32_t i=1;i<nbAud;i++)
 	{
 		name=audioFilterGetIndexedName(i);
@@ -464,7 +536,7 @@ void setupMenus(void)
 	uint32_t nbFormat;
 
 	nbFormat=sizeof(ADM_allOutputFormat)/sizeof(ADM_FORMAT_DESC);
-	printf("Found %d Format \n",nbFormat);
+	printf("Found %d format(s)\n",nbFormat);
 	for(uint32_t i=0;i<nbFormat;i++)
 	{
 		WIDGET(comboBoxFormat)->addItem(_(ADM_allOutputFormat[i].text));	
