@@ -911,6 +911,9 @@
               <height>0</height>
              </size>
             </property>
+            <property name="text" >
+             <string>0</string>
+            </property>
             <property name="maxLength" >
              <number>8</number>
             </property>
@@ -918,7 +921,7 @@
              <enum>QLineEdit::Normal</enum>
             </property>
             <property name="cursorPosition" >
-             <number>0</number>
+             <number>1</number>
             </property>
            </widget>
           </item>
@@ -994,6 +997,9 @@
               <width>84</width>
               <height>16777215</height>
              </size>
+            </property>
+            <property name="text" >
+             <string>00:00:00.000</string>
             </property>
             <property name="maxLength" >
              <number>12</number>

@@ -27,6 +27,7 @@
 #include <QtGui/QStatusBar>
 #include <QtGui/QWidget>
 #include <QtGui/QKeyEvent>
+#include <QtGui/QValidator>
 
 #include "ADM_qslider.h"
 #include "default.h"
@@ -51,10 +52,13 @@ int SliderIsShifted=0;
 static int shiftKeyHeld=0;
 static ADM_QSlider *slider=NULL;
 static int _upd_in_progres=0;
-/* Ugly game with macro so that buttons emit their name ...*/
 static char     *customNames[ADM_MAC_CUSTOM_SCRIPT];
 static QAction  *customActions[ADM_MAC_CUSTOM_SCRIPT];
 static uint32_t ADM_nbCustom=0;
+static int currentFps = 0;
+static int frameCount = 0;
+static int currentFrame = 0;
+
 #ifdef HAVE_AUDIO
 extern uint8_t AVDM_setVolume(int volume);
 #endif
@@ -85,6 +89,11 @@ const adm_qt4_translation myTranslationTable[]=
 };
 static Action searchTranslationTable(const char *name);
 #define SIZEOF_MY_TRANSLATION sizeof(myTranslationTable)/sizeof(adm_qt4_translation)
+
+int UI_readCurTime(uint16_t &hh, uint16_t &mm, uint16_t &ss, uint16_t &ms);
+void UI_updateFrameCount(uint32_t curFrame);
+void UI_updateTimeCount(uint32_t curFrame,uint32_t fps);
+
 /*
     Declare the class that will be our main window
 
@@ -137,7 +146,7 @@ public slots:
 	void sliderValueChanged(int u) 
 	{
 		if(!_upd_in_progres)
-			HandleAction (ACT_Scale) ;
+			HandleAction(ACT_Scale);
 	}
 
 	void sliderMoved(int value)
@@ -171,6 +180,25 @@ public slots:
 
 	void previousIntraFrame(void);
 	void nextIntraFrame(void);
+
+	void timeChangeFinished(void)
+	{
+		this->setFocus(Qt::OtherFocusReason);
+	}
+
+	void currentFrameChanged(void)
+	{
+		HandleAction(ACT_JumpToFrame);
+
+		this->setFocus(Qt::OtherFocusReason);
+	}
+
+	void currentTimeChanged(void)
+	{
+		HandleAction(ACT_JumpToTime);
+
+		this->setFocus(Qt::OtherFocusReason);
+	}
 
 protected:
 	bool eventFilter(QObject* watched, QEvent* event);
@@ -248,12 +276,29 @@ MainWindow::MainWindow() : QMainWindow()
 	/* Time Shift */
 	connect(ui.checkBox_TimeShift,SIGNAL(stateChanged(int)),this,SLOT(timeChanged(int)));
 	connect(ui.spinBox_TimeValue,SIGNAL(valueChanged(int)),this,SLOT(timeChanged(int)));
+	connect(ui.spinBox_TimeValue, SIGNAL(editingFinished()), this, SLOT(timeChangeFinished()));
+
+	connect(ui.lineEdit, SIGNAL(editingFinished()), this, SLOT(currentFrameChanged()));
+
+	QIntValidator *frameValidator = new QIntValidator(0, 0x7FFFFFFF, this);
+	ui.lineEdit->setValidator(frameValidator);
+
+	connect(ui.lineEdit, SIGNAL(editingFinished()), this, SLOT(currentFrameChanged()));
+
+	QRegExp timeRegExp("^[0-9]{2}:[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}$");
+	QRegExpValidator *timeValidator = new QRegExpValidator(timeRegExp, this);
+	ui.lineEdit_2->setValidator(timeValidator);
+	ui.lineEdit_2->setInputMask("99:99:99.999");
+
+	connect(ui.lineEdit_2, SIGNAL(editingFinished()), this, SLOT(currentTimeChanged()));
 
 	/* Build the custom menu */
 	buildCustomMenu();
 
 	this->installEventFilter(this);
 	slider->installEventFilter(this);
+	ui.lineEdit->installEventFilter(this);
+	ui.lineEdit_2->installEventFilter(this);
 }
 /**
 \fn     custom
@@ -314,52 +359,71 @@ void MainWindow::toolButtonPressed(bool i)
 
 bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 {
-	if (event->type() == QEvent::KeyPress)
-	{
-		QKeyEvent *keyEvent = (QKeyEvent*)event;
+	QKeyEvent *keyEvent;
 
-		if (watched == slider)
-		{
-			switch (keyEvent->key())
+	switch (event->type())
+	{
+		case QEvent::KeyPress:
+			keyEvent = (QKeyEvent*)event;
+
+			if (watched == slider)
 			{
-				case Qt::Key_Left:
-					if (keyEvent->modifiers() == Qt::ShiftModifier)
-						HandleAction(ACT_Back25Frames);
-					else if (keyEvent->modifiers() == Qt::ControlModifier)
-						HandleAction(ACT_Back50Frames);
-					else
-						HandleAction(ACT_PreviousFrame);
+				switch (keyEvent->key())
+				{
+					case Qt::Key_Left:
+						if (keyEvent->modifiers() == Qt::ShiftModifier)
+							HandleAction(ACT_Back25Frames);
+						else if (keyEvent->modifiers() == Qt::ControlModifier)
+							HandleAction(ACT_Back50Frames);
+						else
+							HandleAction(ACT_PreviousFrame);
 
-					return true;
-				case Qt::Key_Right:
-					if (keyEvent->modifiers() == Qt::ShiftModifier)
-						HandleAction(ACT_Forward25Frames);
-					else if (keyEvent->modifiers() == Qt::ControlModifier)
-						HandleAction(ACT_Forward50Frames);
-					else
-						HandleAction(ACT_NextFrame);
+						return true;
+					case Qt::Key_Right:
+						if (keyEvent->modifiers() == Qt::ShiftModifier)
+							HandleAction(ACT_Forward25Frames);
+						else if (keyEvent->modifiers() == Qt::ControlModifier)
+							HandleAction(ACT_Forward50Frames);
+						else
+							HandleAction(ACT_NextFrame);
 
-					return true;
-				case Qt::Key_Up:
-					HandleAction(ACT_NextKFrame);
-					return true;
-				case Qt::Key_Down:
-					HandleAction(ACT_PreviousKFrame);
-					return true;
-				case Qt::Key_Shift:
-					shiftKeyHeld = 1;
-					break;
+						return true;
+					case Qt::Key_Up:
+						HandleAction(ACT_NextKFrame);
+						return true;
+					case Qt::Key_Down:
+						HandleAction(ACT_PreviousKFrame);
+						return true;
+					case Qt::Key_Shift:
+						shiftKeyHeld = 1;
+						break;
+				}
 			}
-		}
-		else if (keyEvent->key() == Qt::Key_Return)
-			this->setFocus(Qt::OtherFocusReason);
-	}
-	else if (event->type() == QEvent::KeyRelease)
-	{
-		QKeyEvent *keyEvent = (QKeyEvent*)event;
 
-		if (keyEvent->key() == Qt::Key_Shift)
-			shiftKeyHeld = 0;
+			break;
+		case QEvent::KeyRelease:
+			keyEvent = (QKeyEvent*)event;
+
+			if (keyEvent->key() == Qt::Key_Shift)
+				shiftKeyHeld = 0;
+
+			break;
+		case QEvent::FocusOut:
+			if (watched == ui.lineEdit)
+			{
+				QString temp(ui.lineEdit->text());
+				int pos = 0;
+
+				if (ui.lineEdit->validator()->validate(temp, pos) != QValidator::Acceptable)
+					UI_updateFrameCount(currentFrame);
+			}
+			else if (watched == ui.lineEdit_2)
+			{
+				uint16_t hh, mm, ss, ms;
+
+				if (!UI_readCurTime(hh, mm, ss, ms))
+					UI_updateTimeCount(currentFrame, currentFps);
+			}
 	}
 
 	return QObject::eventFilter(watched, event);
@@ -637,8 +701,40 @@ void UI_setScale( double val )
 	_upd_in_progres++;
 	slider->setValue( (int)(val * 10000000));
 	_upd_in_progres--;
-
 }
+
+uint32_t UI_readCurFrame(void)
+{
+	bool ok;
+	
+	return WIDGET(lineEdit)->text().toUInt(&ok);
+}
+
+int UI_readCurTime(uint16_t &hh, uint16_t &mm, uint16_t &ss, uint16_t &ms)
+{
+	int success = 0;
+
+	QString timeText = WIDGET(lineEdit_2)->text();
+	int pos;
+
+	if (WIDGET(lineEdit_2)->validator()->validate(timeText, pos) == QValidator::Acceptable)
+	{
+		uint32_t frame;
+
+		hh = (uint16_t)timeText.left(2).toUInt();
+		mm = (uint16_t)timeText.mid(3, 2).toUInt();
+		ss = (uint16_t)timeText.mid(6, 2).toUInt();
+		ms = (uint16_t)timeText.right(3).toUInt();
+
+		time2frame(&frame, currentFps, hh, mm, ss, ms);
+
+		if (frame <= frameCount)
+			success = 1;
+	}
+
+	return success;
+}
+
 void UI_purge( void )
 {
 	QCoreApplication::processEvents ();
@@ -681,33 +777,36 @@ void UI_setFrameType( uint32_t frametype,uint32_t qp)
 	WIDGET(label_8)->setText(string);	
 
 }
+
 /**
     \fn     UI_updateFrameCount(uint32_t curFrame)
     \brief  Display the current displayed frame #
 */
-
 void UI_updateFrameCount(uint32_t curFrame)
 {
 	char string[30];
 	sprintf(string,"%lu",curFrame);
 	WIDGET(lineEdit)->setText(string);
 
+	currentFrame = curFrame;
 }
+
 /**
     \fn      UI_setFrameCount(uint32_t curFrame,uint32_t total)
     \brief  Display the current displayed frame # and total frame #
 */
-
 void UI_setFrameCount(uint32_t curFrame,uint32_t total)
 {
 	char text[80]; 
-	if(total) total--; // We display from 0 to X  
+	if (total) total--; // We display from 0 to X  
 
 	UI_updateFrameCount(curFrame);
 
-	sprintf(text, "/ %lu ", total);
+	sprintf(text, "/ %lu", total);
 	WIDGET(label_2)->setText(text);
 
+	((QIntValidator*)(WIDGET(lineEdit)->validator()))->setTop(total);
+	frameCount = total;
 }
 
 /**
@@ -741,6 +840,8 @@ void UI_setTimeCount(uint32_t curFrame,uint32_t total, uint32_t fps)
 	WIDGET(label_7)->setText(text);
 
 	slider->setFrameCount(total);
+
+	currentFps = fps;	
 }
 
 /**

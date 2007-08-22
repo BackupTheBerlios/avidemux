@@ -46,7 +46,7 @@ extern int filterLoadXml(char *docname,uint8_t silent);
 extern int A_delete(uint32_t start, uint32_t end);
 
 extern uint8_t A_ListAllBlackFrames( char *file );
-extern uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss);
+extern uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss,uint32_t ms);
 extern uint8_t addFile(char *name);
 
 uint8_t A_setContainer(const char *cont);
@@ -484,7 +484,7 @@ JSBool ADM_JSAvidemux::GoToTime(JSContext *cx, JSObject *obj, uintN argc,
 	if(JSVAL_IS_INT(argv[0]) == false || JSVAL_IS_INT(argv[1]) == false || JSVAL_IS_INT(argv[2]) == false)
 		return JS_FALSE;
         enterLock();
-	*rval = INT_TO_JSVAL(A_jumpToTime(JSVAL_TO_INT(argv[0]),JSVAL_TO_INT(argv[1]),JSVAL_TO_INT(argv[2])));
+	*rval = INT_TO_JSVAL(A_jumpToTime(JSVAL_TO_INT(argv[0]),JSVAL_TO_INT(argv[1]),JSVAL_TO_INT(argv[2]), 0));
 	leaveLock();
 	return JS_TRUE;
 }// end GoToTime

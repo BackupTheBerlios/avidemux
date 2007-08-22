@@ -833,6 +833,12 @@ int i;
 	return  (uint32_t)i;
 	 
 }
+
+int UI_readCurTime(uint16_t &hh, uint16_t &mm, uint16_t &ss, uint16_t &ms)
+{
+	return 0;
+}
+
 /**
 		in=0 -> arts1
 		in=1 -> alsa

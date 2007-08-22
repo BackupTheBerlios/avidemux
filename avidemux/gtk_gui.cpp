@@ -133,7 +133,7 @@ static void	A_setPostproc( void );
 extern uint8_t ogmSave(const char  *name);
 //
 static uint8_t A_pass(char *name);
-uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss);
+uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss,uint32_t ms);
 //__________
 extern uint8_t DIA_gotoTime(uint16_t *hh, uint16_t *mm, uint16_t *ss);
 extern uint8_t GUI_getFrame(uint32_t frameno,  uint32_t *flags);
@@ -448,13 +448,6 @@ int nw;
                         GUI_FileSelWrite (_("Select OGM File to Write"), (SELFILE_CB *)ogmSave);
     			break;
 				
-    case ACT_FrameChanged:
-    			printf("FrameChanged\n");
-			break;
-  	case ACT_TimeChanged:
-			printf("TimeChanged\n");
-      			break;			
-
     case ACT_SaveWork:
       GUI_FileSelWrite (_("Select Workbench to Save"), A_saveWorkbench);
 	  UI_refreshCustomMenu();
@@ -474,7 +467,6 @@ int nw;
       break;
         case ACT_JumpToFrame: 
                 // read value	
-                printf("Jump!\n");	 
                 nf=UI_readCurFrame();
                 if(nf>0 && nf< avifileinfo->nb_frames)
                 {
@@ -482,13 +474,21 @@ int nw;
                 }
                 UI_JumpDone();
                 break;
+	case ACT_JumpToTime:
+		{
+			uint16_t hh, mm, ss, ms;
+
+			if (UI_readCurTime(hh, mm, ss, ms))
+				A_jumpToTime(hh, mm, ss, ms);
+		}
+		break;
     case ACT_GotoTime:
                 {
                         uint16_t mm,hh,ss,ms;
                              frame2time(curframe,avifileinfo->fps1000,&hh,&mm,&ss,&ms);
                              if(DIA_gotoTime(&hh,&mm,&ss))
                                 {
-                                        A_jumpToTime(hh,mm,ss);
+                                        A_jumpToTime(hh,mm,ss, 0);
                                 }
                 }
                 break;
@@ -1940,10 +1940,10 @@ uint32_t count;
 }
 extern int DIA_getMPParams( uint32_t *pplevel, uint32_t *ppstrength,uint32_t *swap);
 //
-uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss)
+uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss,uint32_t ms)
 {
 uint32_t frame;
-        time2frame(&frame,avifileinfo->fps1000,hh,mm,ss,0);
+        time2frame(&frame,avifileinfo->fps1000,hh,mm,ss,ms);
         if(frame>=avifileinfo->nb_frames)
         {
                 printf("Frame is out of bound\n");

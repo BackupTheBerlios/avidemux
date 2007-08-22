@@ -82,11 +82,6 @@ typedef enum
   ACT_AudioSourceAC3,
   ACT_AudioSourceNone,
 
- 
-
-  ACT_FrameChanged,
-  ACT_TimeChanged,
-
   ACT_MarkA,
   ACT_MarkB,
   ACT_GotoMarkA,
@@ -158,6 +153,7 @@ ACT_Pref,
 
 ACT_Requant,
 ACT_JumpToFrame,
+ACT_JumpToTime,
 ACT_RunScript,
 ACT_AudioCodecChanged,
 ACT_VideoCodecChanged,
