@@ -311,6 +311,8 @@ MainWindow::MainWindow() : QMainWindow()
 	slider->installEventFilter(this);
 	ui.lineEdit->installEventFilter(this);
 	ui.lineEdit_2->installEventFilter(this);
+
+	this->setFocus(Qt::OtherFocusReason);
 }
 /**
 \fn     custom
@@ -410,6 +412,11 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 						shiftKeyHeld = 1;
 						break;
 				}
+			}
+			else if (keyEvent->key() == Qt::Key_Space)
+			{
+				HandleAction(ACT_PlayAvi);
+				return true;
 			}
 
 			break;

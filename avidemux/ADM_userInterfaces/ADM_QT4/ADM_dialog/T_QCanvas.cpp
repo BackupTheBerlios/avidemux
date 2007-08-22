@@ -67,10 +67,8 @@ ADM_QCanvas::~ADM_QCanvas()
 void ADM_QCanvas::paintEvent(QPaintEvent *ev)
 {
     if(!dataBuffer)
-    {
-      printf("Nothing to draw\n");
       return ;
-    }
+
     QImage image(dataBuffer,_w,_h,QImage::Format_RGB32);
       QPainter painter(this);
       painter.drawImage(QPoint(0,0),image);

@@ -98,10 +98,8 @@ class  ADM_Qvideo : public QWidget
         void paintEvent(QPaintEvent *ev)
         {
           if(!displayW || !displayH || !rgbDataBuffer || accelRender)
-          {
-            printf("Nothing to draw\n");
             return ;
-          }
+
           if(accelRender) 
           {
             if(lastImage)

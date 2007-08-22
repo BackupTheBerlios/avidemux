@@ -107,7 +107,7 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 	char SDL_windowhack[32];
     int winid=(int)window->window;
 
-    sprintf(SDL_windowhack,"[SDL] SDL_WINDOWID=%ld",winid);
+    sprintf(SDL_windowhack,"SDL_WINDOWID=%ld",winid);
     putenv(SDL_windowhack);
 #endif
 
