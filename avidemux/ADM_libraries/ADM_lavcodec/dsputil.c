@@ -3838,7 +3838,7 @@ int ff_check_alignment(void){
     return 0;
 }
 
-void attribute_align_arg dsputil_init(DSPContext* c, AVCodecContext *avctx)
+void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 {
     int i;
 
