@@ -162,7 +162,8 @@ public slots:
 	void volumeChange( int u )
 	{
 #ifdef HAVE_AUDIO
-		if(_upd_in_progres) return;
+		if (_upd_in_progres || !ui.toolButtonAudioToggle->isChecked())
+			return;
 
 		_upd_in_progres++;
 
@@ -170,6 +171,16 @@ public slots:
 
 		AVDM_setVolume(vol);
 		_upd_in_progres--;
+#endif
+	}
+
+	void audioToggled(bool checked)
+	{
+#ifdef HAVE_AUDIO
+		if (checked)
+			AVDM_setVolume(ui.horizontalSlider_2->value());
+		else
+			AVDM_setVolume(0);
 #endif
 	}
 
@@ -264,7 +275,8 @@ MainWindow::MainWindow() : QMainWindow()
 	QSlider *volSlider=ui.horizontalSlider_2;
 	volSlider->setMinimum(0);
 	volSlider->setMaximum(100);
-	connect( volSlider,SIGNAL(valueChanged(int)),this,SLOT(volumeChange(int)));
+	connect(volSlider,SIGNAL(valueChanged(int)),this,SLOT(volumeChange(int)));
+	connect(ui.toolButtonAudioToggle,SIGNAL(clicked(bool)),this,SLOT(audioToggled(bool)));
 
 	// default state
 	bool b=0;
