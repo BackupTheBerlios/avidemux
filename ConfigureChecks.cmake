@@ -90,8 +90,8 @@ else(NO_NLS)
         MESSAGE(STATUS "Does not work, with    ${outputWithLibintl}")
       endif(WITH_LIBINTL)
   endif(WITHOUT_LIBINTL)
-endif(HAVE_LIBINTL_H)
 endif(NO_NLS)
+endif(HAVE_LIBINTL_H)
 ########################################
 # Locale
 ########################################
