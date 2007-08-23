@@ -161,13 +161,6 @@ typedef AVDMGenericVideoStream *(ADM_create_from_scriptT) (AVDMGenericVideoStrea
             const char  *param[25];
    }FILTER_PARAM;
    
-#include <vector>
-extern std::vector <FILTER_ENTRY> allfilters;
-inline size_t nb_video_filter ()
-{
-    return allfilters.size();
-}
-
 AVDMGenericVideoStream *getLastVideoFilter( uint32_t frameStart, uint32_t nbFrame);
 AVDMGenericVideoStream *getLastVideoFilter( void );
 AVDMGenericVideoStream *getFirstVideoFilter( uint32_t frameStart, uint32_t nbFrame);

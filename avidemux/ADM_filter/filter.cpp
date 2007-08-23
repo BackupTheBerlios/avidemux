@@ -18,8 +18,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
-#include <ADM_assert.h>
+#include <vector>
+
+#include "ADM_assert.h"
 #include "config.h"
 #include "fourcc.h"
 #include "avio.hxx"
@@ -81,7 +82,7 @@ void filterListAll( void )
 {
 char *name;
 	printf("\nVideo filters\n");
-	for(uint32_t i=0;i<nb_video_filter();i++)
+	for(uint32_t i=0;i<allfilters.size();i++)
 	{
 		name=allfilters[ i].filtername;
 		if(allfilters[ i].viewable)
@@ -96,7 +97,7 @@ VF_FILTERS filterGetTagFromName(char *inname)
 {
 char *name;
 	VF_FILTERS filter=VF_DUMMY;
-	for(uint32_t i=0;i<nb_video_filter();i++)
+	for(uint32_t i=0;i<allfilters.size();i++)
 	{
 		name=allfilters[ i].filtername;
 		if(allfilters[ i].viewable)
@@ -122,7 +123,7 @@ void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable
 
         if(viewable==1)
 	{
-        	aprintf("\nRegistered filter %lu: %s",nb_video_filter,name);
+        	aprintf("\nRegistered filter %lu: %s",allfilters.size(),name);
 	}
 }
 void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
@@ -135,7 +136,7 @@ void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
 
         if(viewable==1)
 	{
-        	aprintf("\nRegistered filter %lu: %s",nb_video_filter,name);
+        	aprintf("\nRegistered filter %lu: %s",allfilters.size(),name);
 	}
 
 
@@ -260,7 +261,7 @@ AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, A
                         if(tag>=VF_EXTERNAL_START)
                         {
                           // start from the end, it is an external filter 
-                          for(uint32_t i=nb_video_filter()-1;i>=0;i--)
+                          for(uint32_t i=allfilters.size()-1;i>=0;i--)
                           {
                               if(tag==allfilters[i].tag)
                                 {
@@ -271,7 +272,7 @@ AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, A
                         } // else search forward
                         else
                         {
-                          for(unsigned int i=0;i<nb_video_filter();i++)
+                          for(unsigned int i=0;i<allfilters.size();i++)
                                   {
                                           if(tag==allfilters[i].tag)
                                                   {
@@ -291,7 +292,7 @@ const char  *filterGetNameFromTag(VF_FILTERS tag)
 {
 
                         ADM_assert(tag!=VF_INVALID);
-                        for(unsigned int i=0;i<nb_video_filter();i++)
+                        for(unsigned int i=0;i<allfilters.size();i++)
                                 {
                                         if(tag==allfilters[i].tag)
                                                 {
@@ -376,7 +377,7 @@ uint8_t 	filterAddScript(VF_FILTERS tag,uint32_t n,Arg *args)
 
 	video_body->getVideoInfo(&info);
 
-	for(unsigned int i=0;i<nb_video_filter();i++)
+	for(unsigned int i=0;i<allfilters.size();i++)
 	{
 		if(tag==allfilters[i].tag)
 		{
@@ -412,7 +413,7 @@ void filterSaveScriptJS(FILE *f)
                 {
                         VF_FILTERS tag=videofilters[i].tag;
                         qfprintf(f,"app.video.addFilter(");
-                        for(unsigned int j=0;j<nb_video_filter();j++)
+                        for(unsigned int j=0;j<allfilters.size();j++)
                                 {
                                         if(tag==allfilters[j].tag)
                                         {       

@@ -28,7 +28,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
+#include <vector>
 
 #define Ui_Dialog Ui_mainFilterDialog
 #include "ui_mainfilter.h"
@@ -64,6 +64,8 @@ static int max=0;
 /******************************************************/
 extern FILTER videofilters[MAX_FILTER];
 extern uint32_t nb_active_filter;
+extern std::vector <FILTER_ENTRY> allfilters;
+
 extern const char  *filterGetNameFromTag(VF_FILTERS tag);
 extern ADM_Composer *video_body;
 extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *conf, AVDMGenericVideoStream *in) ;
@@ -439,7 +441,7 @@ void filtermainWindow::setupFilters(void)
   
   max=0;
   
-  for (uint32_t i = 0; i < nb_video_filter(); i++)
+  for (uint32_t i = 0; i < allfilters.size(); i++)
     {
       if (allfilters[i].viewable==1)
         {

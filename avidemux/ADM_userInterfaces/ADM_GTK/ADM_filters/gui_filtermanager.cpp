@@ -7,9 +7,11 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-//#include "prototype.h"
+
+#include <vector>
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
+
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include <ADM_assert.h>
@@ -53,6 +55,8 @@ extern const char  *filterGetNameFromTag(VF_FILTERS tag);
 //___________________________________________
 extern FILTER videofilters[MAX_FILTER];
 extern uint32_t nb_active_filter;
+extern std::vector <FILTER_ENTRY> allfilters;
+
 extern ADM_Composer *video_body;
 //___________________________________________
 static gulong row_inserted_id;
@@ -433,7 +437,7 @@ createFilterDialog (void)
     char *str=NULL;
     GtkTreeIter iter;
     int current_tree=0;
-    for (uint32_t i = 0; i < nb_video_filter(); i++)
+    for (uint32_t i = 0; i < allfilters.size(); i++)
     {
         if (allfilters[i].viewable==1)
         {
