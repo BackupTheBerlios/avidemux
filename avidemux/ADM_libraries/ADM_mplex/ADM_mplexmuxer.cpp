@@ -106,6 +106,8 @@ mplexMuxer::mplexMuxer( void )
         _restamp=0;
 	cond_slaveThread_problem = new admCond(&mutex_slaveThread_problem);
 	kind_of_slaveThread_problem = 0;
+
+	mjpeg_default_handler_verbosity(1);
 }
 //___________________________________________________________________________
 mplexMuxer::~mplexMuxer()
