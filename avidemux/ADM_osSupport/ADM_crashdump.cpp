@@ -176,8 +176,13 @@ static void dumpExceptionInfo(void* processId, struct _EXCEPTION_RECORD* pExcept
 	fflush(stdout);
 }
 
-static void dumpBackTrace(void* processId)
+extern "C"
 {
+void dumpBackTrace(void* processId)
+{
+	if (!processId)
+		processId = GetCurrentProcess();
+
 	const int maxAddrCount = 32;
 
 	printf("\n*********** BACKTRACE **************\n");
@@ -193,6 +198,7 @@ static void dumpBackTrace(void* processId)
     }
 
 	printf("*********** BACKTRACE **************\n\n");
+}
 }
 
 void ADM_backTrack(int lineno, const char *file)
@@ -410,6 +416,7 @@ void saveCrashProject(void)
   strcat(where,name);
   printf("Saving crash file to %s\n",where);
   video_body->saveAsScript (where, NULL);
+  delete[] where;
 }
 /**
     \fn checkCrashFile
