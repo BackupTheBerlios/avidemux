@@ -113,7 +113,7 @@ void diaElemFile::getMe(void)
 {
   GtkWidget **widget=(GtkWidget **)myWidget;
   char **name=(char **)param;
-  if(*name) delete [] *name;
+  if(*name) delete *name;
   *name=NULL;
   *name =ADM_strdup(gtk_entry_get_text (GTK_ENTRY (widget[0])));
 }
@@ -238,7 +238,7 @@ void diaElemDirSelect::getMe(void)
 GtkWidget **wid=(GtkWidget **)myWidget;
   GtkWidget *widget=wid[0];
   char **name=(char **)param;
-  if(*name) delete [] *name;
+  if(*name) delete *name;
   *name=NULL;
   *name =ADM_strdup(gtk_entry_get_text (GTK_ENTRY (widget)));
 }

@@ -935,7 +935,7 @@ int preferences::set_lastfile(const char* file){
 	PRT_LAFI("=> LASTFILES_",3,opt_defs[LASTFILES_FILE3].current_val);
 	PRT_LAFI("=> LASTFILES_",4,opt_defs[LASTFILES_FILE4].current_val);
 #endif
-	ADM_dealloc(internal_file);
+	delete[] internal_file;
 	return RC_OK;
 }
 

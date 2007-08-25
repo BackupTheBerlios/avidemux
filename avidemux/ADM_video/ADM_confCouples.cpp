@@ -50,8 +50,8 @@ CONFcouple::~CONFcouple()
 {
 	for(uint32_t i=0;i<nb;i++)
 		{
-			if(name[i]) delete [] name[i];
-			if(value[i]) delete [] value[i];
+			if(name[i]) delete name[i];
+			if(value[i]) delete value[i];
 		}
 		delete [] name;
 		delete [] value;

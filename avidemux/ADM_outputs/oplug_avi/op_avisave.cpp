@@ -140,8 +140,8 @@ GenericAviSave::GenericAviSave ()
 GenericAviSave::~GenericAviSave ()
 {
   cleanupAudio();
-  delete vbuffer;
-  delete[]abuffer;
+  delete[] vbuffer;
+  delete[] abuffer;
   _incoming=NULL;
   ADM_assert(!_file);
 }

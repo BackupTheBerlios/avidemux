@@ -924,7 +924,7 @@ int A_openAvi2 (char *name, uint8_t mode)
 
   if (res!=ADM_OK)			// an error occured
     {
-	ADM_dealloc(longname);
+		delete[] longname;
     	if(ADM_IGN==res) 
 	{
 		return 0;
@@ -992,7 +992,7 @@ int A_openAvi2 (char *name, uint8_t mode)
 	UI_setTitle(longname+i);
     }
 	g_free(name_utf8);
-	ADM_dealloc(longname);
+	delete[] longname;
 	return 1;
 }
 

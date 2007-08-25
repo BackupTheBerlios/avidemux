@@ -234,7 +234,7 @@ ADM_Composer::~ADM_Composer ()
 
 	if(_segments)
 	{
-		delete _segments;
+		delete[] _segments;
 		_segments=NULL;
 	}
 

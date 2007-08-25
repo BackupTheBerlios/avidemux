@@ -45,7 +45,7 @@ EditorCache::~EditorCache(void)
 	{
 		delete _elem[i].image;
 	}
-	delete _elem;
+	delete[] _elem;
 
 }
 ADMImage 	*EditorCache::getImage(uint32_t no)

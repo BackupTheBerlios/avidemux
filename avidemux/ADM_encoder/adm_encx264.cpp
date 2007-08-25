@@ -235,7 +235,7 @@ uint8_t EncoderX264::stop (void)
       _codec;
   _codec = NULL;
   if (_logfile)
-    delete[]_logfile;
+    delete _logfile;
 
 
   return 1;

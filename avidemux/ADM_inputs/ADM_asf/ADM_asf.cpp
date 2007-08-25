@@ -80,7 +80,7 @@ uint8_t asfHeader::close(void)
   }
   if(myName)
   {
-    delete [] myName;
+    delete myName;
     myName=NULL; 
   }
   if(_extraData)

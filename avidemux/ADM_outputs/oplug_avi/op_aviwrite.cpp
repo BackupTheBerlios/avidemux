@@ -860,7 +860,7 @@ uint8_t aviWrite::setStreamInfo (ADMFile * fo,
 
   alist->End ();
   delete alist;
-  delete buf;
+  delete[] buf;
   return 1;
 
 
