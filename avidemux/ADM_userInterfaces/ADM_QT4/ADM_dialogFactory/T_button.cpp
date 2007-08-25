@@ -83,7 +83,7 @@ diaElemButton:: diaElemButton(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void
 
 diaElemButton::~diaElemButton()
 {
-  
+	delete paramTitle;
 }
 
 void diaElemButton::setMe(void *dialog, void *opaque,uint32_t line)

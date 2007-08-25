@@ -234,6 +234,9 @@ uint32_t w,h;
 void destroyGUI(void)
 {
 	renderDestroy();
+
+	for(int i=0;i<ADM_nbCustom;i++)
+		delete(customNames[i]);
 }
 
 /**

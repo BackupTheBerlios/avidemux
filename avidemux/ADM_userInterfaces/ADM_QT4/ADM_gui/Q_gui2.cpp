@@ -104,8 +104,10 @@ class MainWindow : public QMainWindow
 
 public:
 	MainWindow();
-	Ui_MainWindow ui;
+	virtual ~MainWindow();	
 	void buildCustomMenu(void);
+	
+	Ui_MainWindow ui;
 
 public slots:
 	void timeChanged(int);
@@ -212,6 +214,7 @@ public slots:
 	}
 
 protected:
+	void clearCustomMenu(void);
 	bool eventFilter(QObject* watched, QEvent* event);
 	void mousePressEvent(QMouseEvent* event);
 
@@ -469,7 +472,7 @@ void MainWindow::nextIntraFrame(void)
 		HandleAction(ACT_NextKFrame);
 }
 
-void MainWindow::buildCustomMenu(void)
+void MainWindow::clearCustomMenu(void)
 {
 	if (ADM_nbCustom)
 	{
@@ -477,12 +480,17 @@ void MainWindow::buildCustomMenu(void)
 		{
 			disconnect(customActions[i], SIGNAL(triggered()), this, SLOT(custom()));
 			delete customActions[i];
-			customActions[i] = NULL;
+			delete customNames[i];
 		}
 
 		ui.menuCustom->clear();
 		ADM_nbCustom = 0;
 	}
+}
+
+void MainWindow::buildCustomMenu(void)
+{
+	clearCustomMenu();
 
 	char *customdir = ADM_getCustomDir();
 
@@ -514,6 +522,11 @@ void MainWindow::buildCustomMenu(void)
 		printf("No custom scripts\n");
 
 	printf("Custom menu built\n");
+}
+
+MainWindow::~MainWindow()
+{
+	clearCustomMenu();
 }
 
 //*********************************************
