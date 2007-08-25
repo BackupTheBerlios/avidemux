@@ -72,7 +72,9 @@ uint32_t retry=50;
       ms10=_wavheader->frequency/100;
       
       
-     
+     if (_audioMap)
+		 delete[] _audioMap;
+
      _audioMap=new ST_point[100*3600*4]; // 4 hours / 6 Megs
 
      

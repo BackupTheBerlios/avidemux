@@ -63,6 +63,12 @@ AVDMGenericAudioStream::~AVDMGenericAudioStream()
 	_codec=NULL;
 	}
 
+	if (_audioMap)
+	{
+		delete[] _audioMap;
+		_audioMap = NULL;
+	}
+
 }
 uint8_t AVDMGenericAudioStream::isPaketizable( void)
 {
