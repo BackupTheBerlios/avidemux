@@ -101,7 +101,11 @@ void COL_init(void)
     FLAGS();
     PixelFormat fmt=TARGET_COLORSPACE;
     if(_inverted) fmt=ALTERNATE_COLORSPACE;
-    if(!ww || !hh) return 0;   
+    if(!ww || !hh) return 0;
+
+	if (_context)
+		sws_freeContext((SwsContext *)_context);
+
 	 _context=(void *)sws_getContext(
                       ww,hh,
                       PIX_FMT_YUV420P ,
@@ -281,6 +285,10 @@ uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
 	CLEANUP();
     FLAGS();
    if(!ww || !hh) return 0;
+
+	if (_context)
+		sws_freeContext((SwsContext *)_context);
+
 	 _context=(void *)sws_getContext(
 				    		ww,hh,
 						PIX_FMT_YUV420P ,
@@ -340,6 +348,10 @@ uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
                 case ADM_COLOR_RGB16:c=PIX_FMT_RGB565;break;
                 default: ADM_assert(0);
     }
+
+	if (_context)
+		sws_freeContext((SwsContext *)_context);
+
          _context=(void *)sws_getContext(
 				    		ww,hh,
 						c ,

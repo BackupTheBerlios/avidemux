@@ -49,9 +49,9 @@ extern void xvid4_init(void);
 #endif
 
 extern uint8_t filterDynLoad(const char *path);
-typedef void *FCT_VOID(void *);
-uint8_t lavformat_init(void);
-extern void     ADM_lavInit();
+
+extern void  ADM_lavInit();
+extern void  ADM_lavDestroy();
 extern "C" {
      extern uint8_t     ADM_InitMemcpy(void);
 };
@@ -298,6 +298,7 @@ void onexit( void )
     destroyPrefs();
     filterCleanUp();
 	destroyLibWrappers();
+	ADM_lavDestroy();
 
 #ifdef USE_SDL
 	quitSdl();
