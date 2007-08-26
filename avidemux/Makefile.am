@@ -109,6 +109,7 @@ ADM_filter/filter_saveload.o 				\
 ./ADM_outputs/oplug_mpegFF/liboplug_mpegFF.a		\
 ./ADM_outputs/oplug_ogm/liboplug_ogm.a			\
 ./ADM_outputs/oplug_avi/liboplug_avi.a			\
+./ADM_outputs/oplug_flv/liboplug_flv.a			\
 ./ADM_encoder/libADM_encoder.a				\
 ./ADM_codecs/libADM_codecs.a				\
 ./ADM_requant/libADM_requant.a				\
