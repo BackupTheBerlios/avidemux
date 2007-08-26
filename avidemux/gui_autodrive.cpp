@@ -57,6 +57,43 @@ uint8_t A_autoDrive(Action action)
 #define PSP_AUDIO_FQ 24000        
         switch(action)
         {
+        		case ACT_AUTO_FLV:
+        			// Check audio is mp3 @ 44.1/22.05/11.025 kHz MP3
+        			if(currentaudiostream)
+        			{
+        				fq=currentaudiostream->getInfo()->frequency;
+        				if(currentaudiostream->getInfo()->encoding==WAV_MP3 && (fq==44100 || fq==22050 || fq==11025))
+        						{
+        	                		audioCodecSetcodec(AUDIOENC_COPY);
+        						}
+        				else
+        				{
+#ifdef HAVE_LIBMP3LAME
+        					audioCodecSetcodec(AUDIOENC_MP3);
+        					audioFilter_SetBitrate(128);
+        					// set fq
+        					
+#else
+        					 GUI_Error_HIG(_("Codec Error"),
+        					        _( "You don't have LAME!.\nIt is needed to create FLV  video."));
+#endif
+        					 if(fq==44100 || fq==22050 || fq==11025)
+        					         						{}
+        					 else
+        					 {
+        						 audioFilterResample(22050);
+        					 }
+        					 
+        				}
+        			}
+        			// Now video
+        			 if(!videoCodecSelectByName("FLV1")) 
+                    {
+                      GUI_Error_HIG(_("Codec Error"),_( "Cannot select FLV1  codec."));
+                        return 0;
+                    }
+        			break;
+        			
                 case ACT_AUTO_PSP:
                 case ACT_AUTO_PSP_H264:
                     // Resize
@@ -225,6 +262,9 @@ uint8_t A_autoDrive(Action action)
           case ACT_AUTO_PSP_H264:
               UI_SetCurrentFormat(ADM_PSP);
               break;
+          case ACT_AUTO_FLV:
+        	  UI_SetCurrentFormat(ADM_FLV);
+        	  break;
           default:
               UI_SetCurrentFormat(ADM_PS);
         }

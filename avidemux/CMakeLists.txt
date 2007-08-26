@@ -118,6 +118,7 @@ oplug_mp4
 oplug_mpeg
 oplug_mpegFF
 oplug_ogm
+oplug_flv
 )
 
 FOREACH(_current ${ADM_outputs})

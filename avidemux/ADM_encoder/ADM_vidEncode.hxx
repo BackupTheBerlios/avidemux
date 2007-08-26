@@ -44,6 +44,7 @@ typedef enum
   CodecYV12,
   CodecRequant,
   CodecDV,
+  CodecFLV1,
   CodecDummy
 }SelectCodecType;
 

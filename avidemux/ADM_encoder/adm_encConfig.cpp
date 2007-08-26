@@ -697,6 +697,9 @@ getVideoEncoder (uint32_t w, uint32_t h, uint32_t globalHeaderFlag)
     case CodecHuff:
       e = new EncoderFFMPEGHuff (&ffmpegHUFF);
       break;
+    case CodecFLV1:
+       e = new EncoderFFMPEGFLV1 (&ffmpegFLV1);
+       break;
     case CodecFFV1:
       e = new EncoderFFMPEGFFV1 (&ffmpegFFV1);
       break;

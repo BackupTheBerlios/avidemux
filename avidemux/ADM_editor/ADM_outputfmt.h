@@ -23,6 +23,7 @@ typedef enum
 	ADM_MP4,
 	ADM_OGM,
 	ADM_PSP,
+	ADM_FLV,
 	ADM_FORMAT_MAX,
 	ADM_FMT_DUMMY=ADM_FORMAT_MAX
 }ADM_OUT_FORMAT;
@@ -45,6 +46,7 @@ const ADM_FORMAT_DESC ADM_allOutputFormat[]=
   {ADM_MP4,_("MP4")},
   {ADM_OGM,_("OGM")},
   {ADM_PSP,_("PSP")},
+  {ADM_FLV,_("FLV")}
 };
 
 #endif

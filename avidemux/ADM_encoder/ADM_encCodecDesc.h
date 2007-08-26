@@ -130,7 +130,22 @@ COMPRES_PARAMS ffmpegDV = {
   sizeof (ffmpeg4Extra),
   NULL
 };
-
+COMPRES_PARAMS ffmpegFLV1 = {
+  CodecFLV1,
+  "FLV1 (lavc)",
+  "FLV1",
+  "FLV1",
+  COMPRESS_CQ,
+  4,
+  1500,
+  700,
+  1000, // AVG
+  ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ ,
+  ADM_EXTRA_PARAM,
+  &ffmpeg4Extra,
+  sizeof (ffmpeg4Extra),
+  NULL
+};
 COMPRES_PARAMS ffmpegSnow = {
   CodecSnow,
   "Snow (lavc)",
@@ -749,7 +764,8 @@ COMPRES_PARAMS *AllVideoCodec[] = {
   &ffmpegFFV1,
   &yv12codec,
   &ffmpegH263Codec,
-  &MjpegCodec,  
+  &MjpegCodec,
+  &ffmpegFLV1,
   &DUMMYONE
 };
 #endif

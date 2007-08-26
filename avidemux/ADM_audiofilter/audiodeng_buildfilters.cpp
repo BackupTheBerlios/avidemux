@@ -432,4 +432,34 @@ void audioSetResample(uint32_t fq)
 	audioResampleMode=RESAMPLING_CUSTOM;
 	audioFreq=fq;
 }
+/**
+ * 	\fn getAudioOuputTag
+ *  \brief Return the encoding of the currently selected codec
+ *  Must be called only in process mode, else it is meaningless.
+ */
+uint32_t audioFilter_getOuputCodec(void)
+{
+	
+	for(uint32_t i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
+		{
+			if(activeAudioEncoder==myCodecList[i].codec)
+			{
+				return myCodecList[i].wavTag;
+			}
+		
+		}
+	ADM_assert(0);
+	return WAV_PCM;
+}
+/**
+ * 	\fn getAudioOuputFrequency
+ *  \brief Return the encoding of the currently selected codec
+ */
+uint32_t audioFilter_getOuputFrequency(uint32_t inputFrequency)
+{
+	if(activeAudioEncoder==AUDIOENC_COPY) return inputFrequency;
+	if(audioResampleMode == RESAMPLING_NONE) return inputFrequency;
+	return audioFreq;
+}
+//EOF
 

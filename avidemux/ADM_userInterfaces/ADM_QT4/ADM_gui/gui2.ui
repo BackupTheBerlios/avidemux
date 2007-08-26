@@ -1,15 +1,13 @@
 <ui version="4.0" >
  <author>mean</author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>680</width>
-    <height>537</height>
+    <width>828</width>
+    <height>589</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -1360,8 +1358,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>680</width>
-     <height>23</height>
+     <width>828</width>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -1431,16 +1429,6 @@
     <addaction name="actionConnect_to_AvsProxy" />
     <addaction name="separator" />
     <addaction name="actionQuit" />
-   </widget>
-   <widget class="QMenu" name="menuAuto" >
-    <property name="title" >
-     <string>A&amp;uto</string>
-    </property>
-    <addaction name="actionVCD" />
-    <addaction name="actionSVCD" />
-    <addaction name="actionDVD" />
-    <addaction name="actionPSP" />
-    <addaction name="actionPSP_H264" />
    </widget>
    <widget class="QMenu" name="menuTools" >
     <property name="title" >
@@ -1518,6 +1506,17 @@
     <addaction name="separator" />
     <addaction name="actionJump_to_Frame" />
     <addaction name="actionJump_to_Time" />
+   </widget>
+   <widget class="QMenu" name="menuAuto" >
+    <property name="title" >
+     <string>A&amp;uto</string>
+    </property>
+    <addaction name="actionVCD" />
+    <addaction name="actionSVCD" />
+    <addaction name="actionDVD" />
+    <addaction name="actionPSP" />
+    <addaction name="actionPSP_H264" />
+    <addaction name="actionFLV" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -2384,15 +2383,17 @@
     <string>&amp;Separate</string>
    </property>
   </action>
+  <action name="actionFLV" >
+   <property name="text" >
+    <string>FLV</string>
+   </property>
+  </action>
  </widget>
- <pixmapfunction></pixmapfunction>
  <customwidgets>
   <customwidget>
    <class>ADM_QSlider</class>
    <extends>QSlider</extends>
    <header>ADM_qslider.h</header>
-   <container>0</container>
-   <pixmap></pixmap>
   </customwidget>
  </customwidgets>
  <resources>

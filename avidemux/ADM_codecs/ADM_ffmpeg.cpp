@@ -21,7 +21,7 @@
  ***************************************************************************/
 #include "config.h"
 
-#ifdef USE_FFMPEG
+
 
 #define __STDC_CONSTANT_MACROS // Lavcodec crap
 
@@ -327,6 +327,9 @@ ffmpegEncoder::initContext (void)
       break;
     case FF_H263P:
       WRAP_Open (CODEC_ID_H263P);
+      break;
+    case FF_FLV1:
+      WRAP_Open (CODEC_ID_FLV1);
       break;
     case FF_HUFF:
       WRAP_Open (CODEC_ID_HUFFYUV);
@@ -894,4 +897,4 @@ ffmpegEncoderFFMjpeg::encode (ADMImage * in, ADMBitstream * out)
   _frame.quality = (int) floor (FF_QP2LAMBDA * _qual + 0.5);
   return ffmpegEncoder::encode(in,out);
 }
-#endif
+

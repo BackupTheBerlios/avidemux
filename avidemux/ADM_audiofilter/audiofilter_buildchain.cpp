@@ -502,5 +502,3 @@ void audioFilter_SetBitrate( int i)
 }
 
 
-
-

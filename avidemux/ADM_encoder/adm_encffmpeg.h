@@ -298,5 +298,46 @@ public:
   virtual uint8_t hasExtraHeaderData (uint32_t * l, uint8_t ** data);
 
 };
+class EncoderFFMPEGFLV1:public EncoderFFMPEG
+{
 
+protected:
+
+
+public:
+	EncoderFFMPEGFLV1 (COMPRES_PARAMS * config);
+  ~EncoderFFMPEGFLV1 ()
+  {
+    stop ();
+  };				// can be called twice if needed ..
+  virtual uint8_t isDualPass (void)
+  {
+    return 0;
+  };
+  virtual uint8_t configure (AVDMGenericVideoStream * instream);
+  virtual uint8_t setLogFile (const char *p, uint32_t fr)
+  {
+    UNUSED_ARG (p);
+    UNUSED_ARG (fr);
+    return 1;
+  };
+  virtual uint8_t startPass2 (void)
+  {
+    return 1;
+  };
+  virtual uint8_t startPass1 (void)
+  {
+    return 1;
+  };
+  virtual const char *getDisplayName (void)
+  {
+    return "FFMPEG FLV1";
+  }
+  virtual const char *getFCCHandler (void)
+  {
+    return "FLV1";
+  }
+  virtual uint8_t hasExtraHeaderData (uint32_t * l, uint8_t ** data);
+
+};
 #endif

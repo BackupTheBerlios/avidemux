@@ -45,6 +45,7 @@
 #include "oplug_avi/op_avisave.h"
 #include "oplug_avi/op_savecopy.h"
 #include "oplug_mp4/oplug_mp4.h"
+#include "oplug_flv/oplug_flv.h"
 #include "ADM_encoder/adm_encoder.h"
 
 #include "oplug_avi/op_saveprocess.h"
@@ -170,8 +171,12 @@ int ret=0;
 					printf(" AVI family\n");
 					switch(UI_GetCurrentFormat())
 					{
-                                                case ADM_MP4:
-                                                case ADM_PSP:
+						case ADM_FLV:
+                            			ret=oplug_flv(name);
+                            			break;
+                        case ADM_MP4:
+                        case ADM_PSP:
+                        
                                                     ret=oplug_mp4(name,UI_GetCurrentFormat());
                                                     break;
 						case ADM_AVI:

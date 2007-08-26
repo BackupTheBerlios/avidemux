@@ -26,7 +26,7 @@
 
 
 
-#ifdef USE_FFMPEG
+
 #include "ADM_lavcodec.h"
 
 
@@ -269,6 +269,49 @@ EncoderFFMPEGDV::configure (AVDMGenericVideoStream * instream)
 
 
 }
+//********************* FLV1 **********************************************
+EncoderFFMPEGFLV1::EncoderFFMPEGFLV1 (COMPRES_PARAMS * config):
+EncoderFFMPEG (FF_FLV1, config)
+{
+  _id = FF_FLV1;
+  _frametogo = 0;
+
+
+}
+uint8_t
+EncoderFFMPEGFLV1::hasExtraHeaderData (uint32_t * l, uint8_t ** data)
+{
+  *l = 0;
+  *data = NULL;
+  return 0;
+
+}
+uint8_t
+EncoderFFMPEGFLV1::configure (AVDMGenericVideoStream * instream)
+{
+  ADM_assert (instream);
+  ADV_Info *info;
+
+
+
+  info = instream->getInfo ();
+  _fps = info->fps1000;
+  _w = info->width;
+  _h = info->height;
+  
+  _vbuffer = new ADMImage (_w, _h);
+  ADM_assert (_vbuffer);
+  _in = instream;
+
+ 
+  _codec = new ffmpegEncoderCQ (_w, _h, _id);
+  _codec->init (_param.qz, _fps, 0);
+  _state=enc_CQ;
+  return 1;
+
+
+
+}
 
 //************************* SNOW **************************
 // return codec name as seen in avi header
@@ -299,6 +342,9 @@ EncoderFFMPEG::getCodecName (void)
       break;
     case FF_SNOW:
       return "SNOW";
+      break;
+    case FF_FLV1:
+      return "FLV1";
       break;
 
     default:
@@ -532,4 +578,4 @@ uint8_t EncoderFFMPEG::startPass2 (void)
 }
 //-----------------------ffmpegEncoderHuff
 
-#endif
+

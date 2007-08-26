@@ -109,26 +109,29 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	_fps1000=info->fps1000;
 	switch(_type)
 	{
-                case MUXER_TS:
-                        fmt=guess_format("mpegts", NULL, NULL);
-                        break;
-		case MUXER_DVD:
-			fmt = guess_format("dvd", NULL, NULL);
-			break;
-		case MUXER_VCD:
-			fmt = guess_format("vcd", NULL, NULL);
-			break;
-		case MUXER_SVCD:
-			fmt = guess_format("svcd", NULL, NULL);
-			break;
-                case MUXER_MP4:
-                        fmt = guess_format("mp4", NULL, NULL);
-                        break;
-                case MUXER_PSP:
-                        fmt = guess_format("psp", NULL, NULL);
-                        break;                        
-		default:
-			fmt=NULL;
+	case MUXER_TS:
+		fmt=guess_format("mpegts", NULL, NULL);
+		break;
+	case MUXER_DVD:
+		fmt = guess_format("dvd", NULL, NULL);
+		break;
+	case MUXER_VCD:
+		fmt = guess_format("vcd", NULL, NULL);
+		break;
+	case MUXER_SVCD:
+		fmt = guess_format("svcd", NULL, NULL);
+		break;
+	case MUXER_MP4:
+		fmt = guess_format("mp4", NULL, NULL);
+		break;
+	case MUXER_PSP:
+		fmt = guess_format("psp", NULL, NULL);
+		break;
+	case MUXER_FLV:
+		fmt = guess_format("flv", NULL, NULL);
+		break;          
+	default:
+		fmt=NULL;
 	}
 	if (!fmt) 
 	{
@@ -156,6 +159,26 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	c = video_st->codec;
 	switch(_type)
 	{
+				case MUXER_FLV:
+					 c->codec=new AVCodec;
+					 memset(c->codec,0,sizeof(AVCodec));
+					 if(fourCC::check(info->fcc,(uint8_t *)"FLV1"))
+					 {
+						 c->codec_id=CODEC_ID_FLV1;
+					 	 c->codec->name=ADM_strdup("FLV1");
+					 }else
+					 {
+						 if(fourCC::check(info->fcc,(uint8_t *)"VP6F"))
+						 			{
+							 		 c->codec_id=CODEC_ID_VP6F;
+					 				 c->codec->name=ADM_strdup("VP6F");
+						 			}
+						 else
+							 ADM_assert(0);
+					 
+					 }
+					 
+					 break;
                 case MUXER_MP4:
                 case MUXER_PSP:
                         strcpy(oc->title,"Avidemux");
@@ -286,7 +309,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 			c->frame_rate_base = 1001;	
 			break;
 */
-                        if(_type==MUXER_MP4 || _type==MUXER_PSP)
+                        if(_type==MUXER_MP4 || _type==MUXER_PSP || _type==MUXER_FLV)
                         {
                                  c->time_base= fps24; //(AVRational){1001,24000};
                                 break;
@@ -298,7 +321,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 			break;
 		default:
                       {
-                            if(_type==MUXER_MP4 || _type==MUXER_PSP)
+                            if(_type==MUXER_MP4 || _type==MUXER_PSP || _type==MUXER_FLV)
                             {
                                     c->time_base=fpsfree;// (AVRational){1000,_fps1000};
                                     break;
@@ -381,6 +404,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 //----------------------
 	switch(_type)
 	{
+				case MUXER_FLV:
                 case MUXER_PSP:
                 case MUXER_MP4:
                         oc->mux_rate=10080*1000; // Needed ?
@@ -449,11 +473,18 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
 
             timeInUs=(int64_t)sample2time_us(sample);
             /* Rescale to ?? */
-            f=timeInUs;
-            f/=1000000.; // In ms seconds 
-            f*=_audioFq;
-            
-            f=floor(f+0.4);
+            if(_type==MUXER_FLV) /* The FLV muxer expects packets dated in ms, there is something i did not get... WTF */
+            {
+            			f=timeInUs/1000;
+            			f=floor(f+0.4);
+            }
+            else
+            {
+            	f=timeInUs;
+            	f/=1000000.; // In ms seconds 
+            	f*=_audioFq;
+            	f=floor(f+0.4);
+            }
             pkt.dts=pkt.pts=(int)(f);
 
             //printf("F:%f Q:%u D=%u\n",f,pkt.pts,timeInUs-_lastAudioDts);
@@ -516,7 +547,7 @@ double p,d;
             av_init_packet(&pkt);
 	    
         p=bitstream->ptsFrame+1;      // Pts           // Time p/fps1000=out/den  out=p*den*1000/fps1000
-	p=(p*1000*1000*1000);
+        p=(p*1000*1000*1000);
         p=p/_fps1000;                  // in us
 	
         d=bitstream->dtsFrame;		// dts
@@ -536,9 +567,14 @@ double p,d;
         d=bitstream->dtsFrame;
         RESCALE(d);
         
-	pkt.dts=(int64_t)floor(d);
-	pkt.pts=(int64_t)floor(p);
-        
+        if(_type==MUXER_FLV) /* The FLV muxer expects packets dated in ms, there is something i did not get... WTF */
+        {
+        			p=p*1000/_fps1000;
+        			d=d*1000/_fps1000;
+        }
+    	pkt.dts=(int64_t)floor(d);
+    	pkt.pts=(int64_t)floor(p);
+
        // printf("Lavformat : Pts :%u dts:%u",displayframe,frameno);
 	aprintf("Lavformat : Pts :%llu dts:%llu",pkt.pts,pkt.dts);
 	pkt.stream_index=0;
@@ -546,7 +582,7 @@ double p,d;
         pkt.data= bitstream->data;
         pkt.size= bitstream->len;
 	// Look if it is a gop start or seq start
-        if(_type==MUXER_MP4 || _type==MUXER_PSP)
+        if(_type==MUXER_MP4 || _type==MUXER_PSP || _type==MUXER_FLV)
         {
             if(bitstream->flags & AVI_KEY_FRAME) 
                         pkt.flags |= PKT_FLAG_KEY;
@@ -609,11 +645,13 @@ extern "C"
 {
      extern  int        mpegps_init(void );
      extern  int        movenc_init(void );
+     extern  int        flvenc_init(void );
 };
 extern URLProtocol file_protocol ;
 uint8_t lavformat_init(void)
 {
                 movenc_init();
+                flvenc_init();
                 register_protocol(&file_protocol);
 }
 extern "C"

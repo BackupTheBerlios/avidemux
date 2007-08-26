@@ -17,13 +17,14 @@
 typedef enum
 {
         MUXER_NONE=0,
-	MUXER_DVD,
-	MUXER_VCD,
-	MUXER_SVCD,
+        MUXER_DVD,
+		MUXER_VCD,
+		MUXER_SVCD,
         MUXER_TS,
         MUXER_MP4,
         MUXER_PSP,
-	MUXER_DUMMY
+        MUXER_FLV,
+        MUXER_DUMMY
 }ADM_MUXER_TYPE;
 
 
