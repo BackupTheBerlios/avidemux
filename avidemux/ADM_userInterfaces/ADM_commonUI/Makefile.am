@@ -14,7 +14,8 @@ DIA_lavDecoder.cpp  DIA_srt.cpp \
 DIA_animated.cpp \
 DIA_ocr.cpp \
 DIA_tsSub.cpp \
-DIA_flyEq2.cpp
+DIA_flyEq2.cpp \
+DIA_flv1.cpp
 
 commonObjs:=$(subst .cpp,.o,$(libADM_CommonUI_a_SOURCES))
 

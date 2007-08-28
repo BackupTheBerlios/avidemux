@@ -453,6 +453,7 @@ DIA_encoding  *encoding;
          //**********************************************************
 
       bitstream.data=_outbuffer;
+      bitstream.bufferSize=_page;
       for(uint32_t i=0;i<total;i++)
       {
        	// get frame

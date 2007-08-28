@@ -65,7 +65,7 @@ uint8_t ffmpegEncoder::stopEncoder(void)
 /*****************************************/
 ffmpegEncoderCQ::~ffmpegEncoderCQ ()
   {
-    printf("Deleting ffmpegCQencoder\n");
+    printf("[LAVCODEC]Deleting ffmpegCQencoder\n");
     //stopEncoder ();
     if (_statfile)
       {
@@ -91,7 +91,7 @@ void ffmpegEncoder::postAmble (ADMBitstream * out, uint32_t sz)
 ffmpegEncoder::ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id):encoder (width,
 	 height)
 {
-  printf ("Build: %d\n", LIBAVCODEC_BUILD);
+  printf ("[LAVCODEC]Build: %d\n", LIBAVCODEC_BUILD);
 
   _id = id;
   _swap = 0;
@@ -126,7 +126,7 @@ uint8_t   ffmpegEncoder::encode(ADMImage *in,ADMBitstream *out)
 ffmpegEncoder::~ffmpegEncoder ()
 {
   printf ("[lavc] encoder destroying..\n");
-  if (_isMT)
+  if (_isMT && _context)
     {
       printf ("[lavc] killing threads\n");
       avcodec_thread_free (_context);
@@ -202,7 +202,7 @@ ffmpegEncoder::gopMpeg1 (void)
     {
       if (FRAME_FILM == identMovieType (rate))
 	{
-	  printf ("Pulldown activated...\n");
+	  printf ("[LAVCODEC]Pulldown activated...\n");
 	  _context->flags2 |= CODEC_FLAG2_32_PULLDOWN;
 	}
     }
@@ -211,7 +211,7 @@ ffmpegEncoder::gopMpeg1 (void)
 #else
   _context->max_b_frames = 2;
 #endif
-  printf ("Using 2 b frames\n");
+  printf ("[LAVCODEC]Using 2 b frames\n");
   if (_id == FF_MPEG2)
     {
       _context->mpeg_quant = 1;	//1; // Should be mpeg quant 
@@ -224,7 +224,7 @@ ffmpegEncoder::gopMpeg1 (void)
     {
       if (_settings.widescreen)
 	{
-          printf("WideScreen\n");
+          printf("[LAVCODEC]WideScreen\n");
 	  _context->sample_aspect_ratio.num = 16;
 	  _context->sample_aspect_ratio.den = 9;
 	}
@@ -277,17 +277,19 @@ ffmpegEncoder::gopMpeg1 (void)
 
   //
   //_context->dsp_mask= FF_MM_FORCE;
-  printf ("Mpeg12 settings:\n____________\n");
-  printf ("FF Max rate   (header) : %lu kbps\n",
+  printf ("[LAVCODEC]Mpeg12 settings:\n____________\n");
+  printf ("[LAVCODEC]FF Max rate   (header) : %lu kbps\n",
 	  (_context->rc_max_rate_header) / 1000);
-  printf ("FF Buffer Size(header) : %lu bits / %lu kB\n",
+  printf ("[LAVCODEC]FF Buffer Size(header) : %lu bits / %lu kB\n",
 	  (_context->rc_buffer_size_header),
 	  _context->rc_buffer_size_header / (8 * 1024));
-  printf ("FF Max rate   (rc) : %lu kbps\n", (_context->rc_max_rate) / 1000);
-  printf ("FF Buffer Size(rc) : %lu bits / %lu kB\n",
+  printf ("[LAVCODEC]FF Max rate   (rc) : %lu kbps\n", (_context->rc_max_rate) / 1000);
+  printf ("[LAVCODEC]FF Buffer Size(rc) : %lu bits / %lu kB\n",
 	  (_context->rc_buffer_size), _context->rc_buffer_size / (8 * 1024));
 
-  printf ("FF GOP Size    : %lu\n", _context->gop_size);
+  printf ("[LAVCODEC]FF GOP Size    : %lu\n", _context->gop_size);
+  printf ("[LAVCODEC]FF Bitrate    : %lu (kb/s)\n", _context->bit_rate/1000);
+  
   return 1;
 }
 
@@ -406,7 +408,7 @@ ffmpegEncoder::setGopSize (uint32_t size)
 {
 
   _context->gop_size = size;
-  printf ("Gop size is now %d\n", _context->gop_size);
+  printf ("[LAVCODEC]Gop size is now %d\n", _context->gop_size);
   return 1;
 
 }
@@ -431,7 +433,7 @@ ffmpegEncoder::setConfig (FFcodecSetting * set)
 uint8_t
 ffmpegEncoderCQ::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
 {
-
+  printf ("[LAVCODEC] Using Q=%u\n",val); 
   mplayer_init ();
   _qual = val;
   _vbr = vbr;
@@ -513,9 +515,12 @@ uint8_t ffmpegEncoderCBR::init (uint32_t val, uint32_t fps1000)
   {
   1000, fps1000};
 
-  _context->bit_rate = _br;
+  if(_id==FF_MPEG2 || _id==FF_MPEG1)
+	  _context->bit_rate = _br;
+  else
+	  _context->bit_rate = _br*1000;
 
-  printf ("--> br: %lu", _br);
+  printf ("[LAVCODEC] Using  bitrate in context :%lu kbps",_context->bit_rate/1000);
 
   return initContext ();
 
@@ -663,7 +668,7 @@ ffmpegEncoder::mplayer_init (void)
     }
   else
     {
-      if (_id == FF_MPEG1 || _id == FF_MPEG2)
+      if (_id == FF_MPEG1 || _id == FF_MPEG2 || _id == FF_FLV1)
 	{
 	  _context->gop_size = _settings.gop_size;
 	}
@@ -671,8 +676,8 @@ ffmpegEncoder::mplayer_init (void)
 	{
 	  _context->gop_size = 250;
 	}
-#define SETX(x) _context->x=_settings.x; printf(#x" : %d\n",_settings.x);
-#define SETX_COND(x) if(_settings.is_##x) {_context->x=_settings.x; printf(#x" : %d\n",_settings.x);} else\
+#define SETX(x) _context->x=_settings.x; printf("[LAVCODEC]"#x" : %d\n",_settings.x);
+#define SETX_COND(x) if(_settings.is_##x) {_context->x=_settings.x; printf("[LAVCODEC]"#x" : %d\n",_settings.x);} else\
 		{ printf(#x" is not activated\n");}
       SETX (me_method);
       SETX (qmin);
@@ -686,9 +691,9 @@ ffmpegEncoder::mplayer_init (void)
 #undef SETX
 #undef SETX_COND
 
-#define SETX(x)  _context->x=_settings.x; printf(#x" : %f\n",_settings.x);
-#define SETX_COND(x)  if(_settings.is_##x) {_context->x=_settings.x; printf(#x" : %f\n",_settings.x);} else  \
-									{printf(#x" No activated\n");}
+#define SETX(x)  _context->x=_settings.x; printf("[LAVCODEC]"#x" : %f\n",_settings.x);
+#define SETX_COND(x)  if(_settings.is_##x) {_context->x=_settings.x; printf("[LAVCODEC]"#x" : %f\n",_settings.x);} else  \
+									{printf("[LAVCODEC]"#x" No activated\n");}
       SETX_COND (lumi_masking);
       SETX_COND (dark_masking);
       SETX (qcompress);
@@ -699,7 +704,7 @@ ffmpegEncoder::mplayer_init (void)
 #undef SETX
 #undef SETX_COND
 
-#define SETX(x) if(_settings.x){ _context->flags|=CODEC_FLAG##x;printf(#x" is set\n");}
+#define SETX(x) if(_settings.x){ _context->flags|=CODEC_FLAG##x;printf("[LAVCODEC]"#x" is set\n");}
       SETX (_GMC);
 
 
@@ -729,7 +734,7 @@ ffmpegEncoder::mplayer_init (void)
 	{
 	  _context->sample_aspect_ratio.num = 16;
 	  _context->sample_aspect_ratio.den = 9;
-	  printf ("16/9 aspect ratio is set.\n");
+	  printf ("[LAVCODEC]16/9 aspect ratio is set.\n");
 
 	}
 #undef SETX
@@ -830,7 +835,7 @@ ffmpegEncoder::getExtraData (uint32_t * l, uint8_t ** d)
 {
   *d = (uint8_t *) _context->extradata;
   *l = _context->extradata_size;
-  printf ("We got some extra data: %lu\n", *l);
+  printf ("[LAVCODEC]We got some extra data: %lu\n", *l);
   if (*l)
     return 1;
 
@@ -856,7 +861,7 @@ ffmpegEncoderFFV1::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
   _context->bit_rate = 0;
   _context->bit_rate_tolerance = 1024 * 8 * 1000;
   _context->gop_size = 250;
-  printf ("FFV1 codec initializing...\n");
+  printf ("[LAVCODEC]FFV1 codec initializing...\n");
   return initContext ();
 }
 
@@ -885,7 +890,7 @@ uint8_t
   _context->bit_rate = 0;
   _context->bit_rate_tolerance = 1024 * 8 * 1000;
   _context->gop_size = 250;
-  printf ("FF Mjpeg codec initializing %d %% -> q =%d...\n", val, _qual);
+  printf ("[LAVCODEC]FF Mjpeg codec initializing %d %% -> q =%d...\n", val, _qual);
   return initContext ();
 }
 

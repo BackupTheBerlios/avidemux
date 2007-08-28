@@ -304,8 +304,9 @@ EncoderFFMPEGFLV1::configure (AVDMGenericVideoStream * instream)
   _in = instream;
 
  
-  _codec = new ffmpegEncoderCQ (_w, _h, _id);
-  _codec->init (_param.qz, _fps, 0);
+  _codec = new ffmpegEncoderCBR (_w, _h, _id);
+  _codec->setConfig (&_settings);
+  _codec->init (_param.bitrate, _fps, 0);
   _state=enc_CQ;
   return 1;
 

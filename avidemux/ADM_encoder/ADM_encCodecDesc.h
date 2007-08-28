@@ -2,6 +2,7 @@
 #define ADM_CODEC_CONFIG_
 
 uint8_t DIA_DVDffParam (COMPRES_PARAMS * incoming);
+uint8_t DIA_flv1Param(COMPRES_PARAMS *incoming);
 #define REQUANT_AS_CODE
 #include "ADM_vidEncode.hxx"
 // Yv12
@@ -51,6 +52,45 @@ FFcodecSetting ffmpeg4Extra = {
   0,				// max bitrate
   0,				// default matrix
   0,				// no gop size
+  NULL,
+  NULL,
+  0,				// interlaced
+  0,				// WLA: bottom-field-first
+  0,				// wide screen
+  2,				// mb eval = distortion
+  8000,				// vratetol 8Meg
+  0,				// is temporal
+  0.0,				// temporal masking
+  0,				// is spatial
+  0.0,				// spatial masking
+  0,				// NAQ
+  0				// DUMMY 
+};
+FFcodecSetting ffmpeg4Extra_FLV1 = {
+  ME_EPZS,			//     ME
+  0,				//          GMC     
+  0,				// 4MV
+  0,				//           _QPEL;   
+  0,				//           _TREILLIS_QUANT
+  2,				//           qmin;
+  31,				//          qmax;
+  3,				//           max_qdiff;
+  0,				//           max_b_frames;
+  0,				//          mpeg_quant;
+  1,				//
+  -2,				//                 luma_elim_threshold;
+  1,				//
+  -5,				// chroma_elim_threshold;
+  0.05,				//lumi_masking;
+  1,				// is lumi
+  0.01,				//dark_masking; 
+  1,				// is dark
+  0.5,				// qcompress amount of qscale change between easy & hard scenes (0.0-1.0
+  0.5,				// qblur;    amount of qscale smoothing over time (0.0-1.0) 
+  0,				// min bitrate in kB/S
+  0,				// max bitrate
+  0,				// default matrix
+  100,				// no gop size
   NULL,
   NULL,
   0,				// interlaced
@@ -135,16 +175,16 @@ COMPRES_PARAMS ffmpegFLV1 = {
   "FLV1 (lavc)",
   "FLV1",
   "FLV1",
-  COMPRESS_CQ,
+  COMPRESS_CBR,
   4,
   1500,
   700,
   1000, // AVG
-  ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ ,
+  ADM_ENC_CAP_CBR,
   ADM_EXTRA_PARAM,
-  &ffmpeg4Extra,
+  &ffmpeg4Extra_FLV1,
   sizeof (ffmpeg4Extra),
-  NULL
+  &DIA_flv1Param
 };
 COMPRES_PARAMS ffmpegSnow = {
   CodecSnow,
