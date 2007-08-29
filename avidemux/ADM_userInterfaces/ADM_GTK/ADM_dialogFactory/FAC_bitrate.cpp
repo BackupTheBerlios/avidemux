@@ -28,7 +28,33 @@
 #include "ADM_assert.h"
 
 static void cb_mod(void *w,void *p);
-
+/**
+ * 	\fn 	readPullDown
+ * \brief 	Convert the raw read of the combox into the actual compression mode
+ */
+static COMPRESSION_MODE readPulldown(COMPRES_PARAMS *copy,int rank)
+{
+	int index=0;
+	COMPRESSION_MODE mode=COMPRESS_MAX;
+	
+#undef LOOKUP
+#define LOOKUP(A,B) \
+  if(copy->capabilities & ADM_ENC_CAP_##A) \
+  { \
+	  if(rank==index) mode=COMPRESS_##B; \
+	  index++; \
+  } 
+  
+  LOOKUP(CBR,CBR);
+  LOOKUP(CQ,CQ);
+  LOOKUP(SAME,SAME);
+  LOOKUP(AQ,AQ);
+  LOOKUP(2PASS,2PASS);
+  LOOKUP(2PASS_BR,2PASS_BITRATE);
+  
+	ADM_assert(mode!=COMPRESS_MAX);
+	return mode;
+}
 
  diaElemBitrate::diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip)
   : diaElem(ELEM_BITRATE)
@@ -93,10 +119,23 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_widget_show (combo);
   
   gtk_label_set_mnemonic_widget (GTK_LABEL(label1), combo);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Single pass - bitrate"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Single pass - constant quality"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Two pass - video size"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Two pass - average bitrate"));
+  if((copy.capabilities & ADM_ENC_CAP_CBR)) 
+	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Single pass - bitrate"));
+  if((copy.capabilities & ADM_ENC_CAP_CQ))
+	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Single pass - constant quality"));
+  if((copy.capabilities & ADM_ENC_CAP_SAME))
+	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Single pass - same qz as input"));
+  if((copy.capabilities & ADM_ENC_CAP_AQ))
+	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Single pass - Average quantizer"));
+
+  if((copy.capabilities & ADM_ENC_CAP_2PASS))
+	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Two pass - video size"));
+  if((copy.capabilities & ADM_ENC_CAP_2PASS_BR))
+	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Two pass - average bitrate"));
+  
+  /**/
+  
+   
   
   PUT_ARRAY(1,0,combo);
   
@@ -124,18 +163,25 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
   w[2]=combo;
   w[3]=spin;
   myWidget=(void *)w;
-  int i=0;
-  switch(copy.mode)
-  {
-    case  COMPRESS_CQ: i=1;break;
-    case  COMPRESS_CBR:i=0;break;
-    case  COMPRESS_2PASS:i=2;break;
-    case  COMPRESS_SAME:i=4;break;
-    case  COMPRESS_2PASS_BITRATE:i=3;break;
-    default: ADM_assert(0);
-  }
-  gtk_combo_box_set_active(GTK_COMBO_BOX(combo),i);
+  
+  int index=0,set=-1;
+#undef LOOKUP
+#define LOOKUP(A,B) \
+  if(copy.capabilities & ADM_ENC_CAP_##A) \
+  { \
+	  if(copy.mode==COMPRESS_##B) set=index; \
+	  index++; \
+  } \
+  
+  LOOKUP(CBR,CBR);
+  LOOKUP(CQ,CQ);
+  LOOKUP(SAME,SAME);
+  LOOKUP(AQ,AQ);
+  LOOKUP(2PASS,2PASS);
+  LOOKUP(2PASS_BR,2PASS_BITRATE);
+  if(set!=-1) gtk_combo_box_set_active(GTK_COMBO_BOX(combo),set);
 }
+
 
 
 void diaElemBitrate::getMe(void)
@@ -147,40 +193,51 @@ void diaElemBitrate::getMe(void)
   GtkComboBox *combo=(GtkComboBox *)w[2];
   GtkSpinButton *spin=(GtkSpinButton*)w[3];
   GtkLabel *label=(GtkLabel*)w[1];
+
   int rank=gtk_combo_box_get_active(GTK_COMBO_BOX(combo));
+  COMPRESSION_MODE mode=readPulldown(&copy,rank);
+    
+  
 #undef P
 #undef M
 #undef S
 #define P(x) 
 #define M(x,y)
 #define S(x)   x=(uint32_t)gtk_spin_button_get_value  (GTK_SPIN_BUTTON(spin))
-  switch(rank)
+  switch(mode)
   {
-    case 0: //CBR
+    case COMPRESS_CBR: //CBR
           P(_Bitrate (kb/s):);
           M(0,20000);
           S(copy.bitrate);
           copy.mode=COMPRESS_CBR;
-          break; 
-    case 1:// CQ
+          break;
+    case COMPRESS_AQ:// CQ
+          P(_Quantizer:);
+          M(2,31);
+          S(copy.qz);
+          copy.mode=COMPRESS_AQ;
+          break;
+
+    case COMPRESS_CQ:// CQ
           P(_Quantizer:);
           M(2,31);
           S(copy.qz);
           copy.mode=COMPRESS_CQ;
           break;
-    case 2 : // 2pass Filesize
+    case  COMPRESS_2PASS: // 2pass Filesize
           P(_Video size (MB):);
           M(1,8000);
           S(copy.finalsize);
           copy.mode=COMPRESS_2PASS;
           break;
-    case 3 : // 2pass Avg
+    case COMPRESS_2PASS_BITRATE : // 2pass Avg
           P(_Average bitrate (kb/s):);
           M(0,20000);
           S(copy.avg_bitrate);
           copy.mode=COMPRESS_2PASS_BITRATE;
           break;
-    case 4 : // Same Qz as input
+    case COMPRESS_SAME : // Same Qz as input
           P(-);
           M(0,0);
           copy.mode=COMPRESS_SAME;
@@ -197,35 +254,42 @@ void diaElemBitrate::updateMe(void)
   GtkSpinButton *spin=(GtkSpinButton*)w[3];
   GtkLabel *label=(GtkLabel*)w[1];
   int rank=gtk_combo_box_get_active(GTK_COMBO_BOX(combo));
+  COMPRESSION_MODE mode=readPulldown(&copy,rank);
+  
 //#undef P
 #undef M
 #undef S
 //#define P(x) gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_(#x));
 #define M(x,y) gtk_spin_button_set_range  (GTK_SPIN_BUTTON(spin),x,y)
 #define S(x)   gtk_spin_button_set_value  (GTK_SPIN_BUTTON(spin),x)
-  switch(rank)
+  switch(mode)
   {
-    case 0: //CBR
+    case COMPRESS_CBR: //CBR
           gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("_Bitrate (kb/s):"));
           M(0,20000);
           S(copy.bitrate);
           break; 
-    case 1:// CQ
+    case COMPRESS_CQ:// CQ
           gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("_Quantizer:"));
           M(2,maxQ);
           S(copy.qz);
           break;
-    case 2 : // 2pass Filesize
+    case COMPRESS_AQ:// CQ
+              gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("A_vg Quantizer:"));
+              M(2,64);
+              S(copy.qz);
+              break;
+    case COMPRESS_2PASS : // 2pass Filesize
           gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("_Video size (MB):"));
           M(1,8000);
           S(copy.finalsize);
           break;
-    case 3 : // 2pass Avg
+    case COMPRESS_2PASS_BITRATE : // 2pass Avg
           gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("_Average bitrate (kb/s):"));
           M(0,20000);
           S(copy.avg_bitrate);
           break;
-    case 4 : // Same Qz as input
+    case COMPRESS_SAME : // Same Qz as input
           gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("-"));
           M(0,0);
           break;

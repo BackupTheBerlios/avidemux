@@ -55,16 +55,19 @@ class  ADM_Qbitrate : public QWidget
           
            compress=p;
            combo=new QComboBox(z);
+           
            maxQ=mq;
-#define add(x) combo->addItem(_(#x))
+           int index=0,set=-1;
+#define add(x,z,y) if(compress->capabilities & ADM_ENC_CAP_##x) {combo->addItem(_(#y));\
+						if(p->mode==COMPRESS_##z) set=index;\
+						index++;}
   
-  add(Constant Bitrate);
-  add(Constant Quality);
-  add(Two pass-filesize);
-  add(Two pass-Avg bitrate);
-  add(Same Quantizer as input);
-  // FIXME UGLY!
-  if(maxQ==51) add(Average Quantizer);
+  add(CBR,CBR,Constant Bitrate);
+  add(CQ,CQ,Constant Quality);
+  add(SAME,SAME,Same Quantizer as input);
+  add(AQ,AQ,Average Quantizer);
+  add(2PASS,2PASS,Two pass-filesize);
+  add(2PASS_BR,2PASS_BITRATE,Two pass-Avg bitrate);
   
            combo->show();
            
@@ -84,19 +87,13 @@ class  ADM_Qbitrate : public QWidget
           
           layout->addWidget(text2,line+1,0);
           layout->addWidget(box,line+1,1);
-          int i;
-          switch(compress-> mode)
+       
+       
+          if(set!=-1) 
           {
-            case  COMPRESS_CQ: i=1;break;
-            case  COMPRESS_CBR:i=0;break;
-            case  COMPRESS_2PASS:i=2;break;
-            case  COMPRESS_SAME:i=4;break;
-            case  COMPRESS_AQ:i=5;break;
-            case  COMPRESS_2PASS_BITRATE:i=3;break;
-            default: ADM_assert(0);
+        	  	combo->setCurrentIndex(set);
+        	  	comboChanged(set);
           }
-          combo->setCurrentIndex(i);
-          comboChanged(i);        
           QObject::connect(combo, SIGNAL(currentIndexChanged(int )), this, SLOT(comboChanged(int )));
           
           
@@ -104,18 +101,48 @@ class  ADM_Qbitrate : public QWidget
         virtual ~ADM_Qbitrate() ;
         void readBack(void);
 };
+
+/**
+ * 	\fn 	readPullDown
+ * \brief 	Convert the raw read of the combox into the actual compression mode
+ */
+static COMPRESSION_MODE readPulldown(COMPRES_PARAMS *copy,int rank)
+{
+	int index=0;
+	COMPRESSION_MODE mode=COMPRESS_MAX;
+	
+#undef LOOKUP
+#define LOOKUP(A,B) \
+  if(copy->capabilities & ADM_ENC_CAP_##A) \
+  { \
+	  if(rank==index) mode=COMPRESS_##B; \
+	  index++; \
+  } 
+  
+  LOOKUP(CBR,CBR);
+  LOOKUP(CQ,CQ);
+  LOOKUP(SAME,SAME);
+  LOOKUP(AQ,AQ);
+  LOOKUP(2PASS,2PASS);
+  LOOKUP(2PASS_BR,2PASS_BITRATE);
+  
+	ADM_assert(mode!=COMPRESS_MAX);
+	return mode;
+}
+
 void ADM_Qbitrate::readBack(void)
 {
 #define Mx(x) compress->mode=x
 #define Vx(x) compress->x=box->value();
-  switch(combo->currentIndex())
+	COMPRESSION_MODE mode=readPulldown(compress,combo->currentIndex());
+  switch(mode)
   {
-    case 0: Mx(COMPRESS_CBR);Vx(bitrate);break;
-    case 1: Mx(COMPRESS_CQ);Vx(qz);break;
-    case 2: Mx(COMPRESS_2PASS);Vx(finalsize);break;
-    case 3: Mx(COMPRESS_2PASS_BITRATE);Vx(bitrate);break;
-    case 4: Mx(COMPRESS_SAME);break;
-    case 5: Mx(COMPRESS_AQ);break;
+    case COMPRESS_CBR: Mx(COMPRESS_CBR);Vx(bitrate);break;
+    case COMPRESS_CQ: Mx(COMPRESS_CQ);Vx(qz);break;
+    case COMPRESS_2PASS: Mx(COMPRESS_2PASS);Vx(finalsize);break;
+    case COMPRESS_2PASS_BITRATE: Mx(COMPRESS_2PASS_BITRATE);Vx(avg_bitrate);break;
+    case COMPRESS_SAME: Mx(COMPRESS_SAME);break;
+    case COMPRESS_AQ: Mx(COMPRESS_AQ);break;
     default :
           ADM_assert(0);
   }
@@ -123,36 +150,37 @@ void ADM_Qbitrate::readBack(void)
 void ADM_Qbitrate::comboChanged(int i)
 {
   printf("Changed\n"); 
-  #define P(x) text2->setText(_(#x))
+ #define P(x) text2->setText(_(#x))
 #define M(x,y) box->setMinimum  (x);box->setMaximum  (y);
 #define S(x)   box->setValue(x);
-  switch(i)
+  COMPRESSION_MODE mode=readPulldown(compress,i);
+    switch(mode)
   {
-    case 0: //CBR
+    case COMPRESS_CBR: //CBR
           P(Bitrate (kb/s));
           M(0,20000);
           S(compress->bitrate);
           break; 
-    case 1:// CQ
+    case COMPRESS_CQ:// CQ
           P(Quantizer);
           M(2,maxQ);
           S(compress->qz);
           break;
-    case 2 : // 2pass Filesize
+    case COMPRESS_2PASS : // 2pass Filesize
           P(FileSize (MB));
           M(1,8000);
           S(compress->finalsize);
           break;
-    case 3 : // 2pass Avg
+    case COMPRESS_2PASS_BITRATE : // 2pass Avg
           P(Average Br (kb/s));
           M(0,20000);
           S(compress->avg_bitrate);
           break;
-    case 4 : // Same Qz as input
+    case COMPRESS_SAME : // Same Qz as input
           P(-);
           M(0,0);
           break;
-    case 5 : // AQ
+    case COMPRESS_AQ : // AQ
           P(Quantizer);
           M(2,maxQ);
           S(compress->qz);
