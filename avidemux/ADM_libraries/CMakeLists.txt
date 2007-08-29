@@ -18,3 +18,7 @@ subdirs (PREORDER ADM_libpostproc)
 if(USE_FREETYPE)
 subdirs (PREORDER ADM_libass)
 endif(USE_FREETYPE)
+
+if (ADM_DEBUG AND FIND_LEAKS)
+subdirs (PREORDER ADM_nvwa)
+endif (ADM_DEBUG AND FIND_LEAKS)

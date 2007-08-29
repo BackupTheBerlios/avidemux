@@ -300,3 +300,6 @@
 
 /* Big endian CPU - SPARC or PowerPC */
 #cmakedefine WORDS_BIGENDIAN
+
+/* use Nvwa memory leak detector */
+#cmakedefine FIND_LEAKS

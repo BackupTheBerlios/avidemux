@@ -29,8 +29,7 @@
 #include <math.h>
 
 #include "default.h"
-
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "ADM_osSupport/ADM_threads.h"
 
@@ -38,10 +37,17 @@
 #undef malloc
 #undef free
 
-
 static uint32_t ADM_consumed=0;
 static admMutex memAccess("MemAccess");
 static int doMemStat=0;
+
+#if defined(ADM_DEBUG) && defined(FIND_LEAKS)
+#define _DEBUG_NEW_CALLER_ADDRESS __builtin_return_address(0)
+extern void* operator new(size_t size, const char* file, int line);
+extern void operator delete(void* pointer, const char* file, int line) throw();
+extern size_t getSizeFromPointer(void* ptr);
+#endif
+
 extern "C" {
 
 void *av_malloc(unsigned int size);
@@ -68,6 +74,8 @@ void ADM_memStat( void )
 	printf("\tMemory consumed :%lu (MB)\n",ADM_consumed>>20);
 
 }
+
+#if !defined(ADM_DEBUG) || !defined(FIND_LEAKS)
 /**
     \fn ADM_calloc(size_t nbElm,size_t elSize);
     \brief Replacement for system Calloc using our memory management
@@ -253,4 +261,113 @@ char *ADM_strdup(const char *in)
 	
 
 }
+#else
+
+void *ADM_alloc(size_t size)
+{
+	return operator new(size, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0);
+}
+
+void *ADM_calloc(size_t nbElm,size_t elSize)
+{
+  void *out = operator new(nbElm*elSize, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0);
+
+  memset(out,0,nbElm*elSize);
+  return out;
+}
+
+char *ADM_strdup(const char *in)
+{
+    if(!in) return NULL;
+
+	int size = strlen(in) + 1;
+	char *out = (char *)(operator new(size, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0));
+
+	memcpy(out, in, size);
+
+	return out;
+}
+
+void ADM_dezalloc(void *ptr)
+{
+	operator delete(ptr, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0);
+}
+
+void *ADM_realloc(void *ptr, size_t newsize)
+{
+	void *nalloc;
+    
+    if(!ptr)
+		return operator new(newsize, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0);
+
+    if(!newsize) 
+    {    
+		operator delete(ptr, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0);
+		return NULL;
+    }
+
+	uint32_t size = getSizeFromPointer(ptr);
+
+	if (size >= newsize)
+		return ptr;
+
+	nalloc = operator new(newsize, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0);
+	memcpy(nalloc,ptr,getSizeFromPointer(ptr));
+	operator delete(ptr, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0);
+
+	return nalloc;
+}
+
+extern "C"
+{
+void *av_malloc(unsigned int size)
+{
+	return operator new(size, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0);
+}
+void av_freep(void *arg)
+{
+    void **ptr= (void**)arg;
+    av_free(*ptr);
+    *ptr = NULL;
+}
+
+void *av_mallocz(unsigned int size)
+{
+    void *ptr;
+
+	ptr = operator new(size, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0);
+
+    if (ptr)
+        memset(ptr, 0, size);
+    return ptr;
+}
+}
+
+char *av_strdup(const char *s)
+{
+    char *ptr;
+    int len;
+    len = strlen(s) + 1;
+	ptr = (char *)operator new(len, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0);
+
+    if (ptr)
+        memcpy(ptr, s, len);
+
+    return ptr;
+}
+
+void *av_realloc(void *ptr, unsigned int newsize)
+{
+	if(!ptr)
+		return operator new(newsize, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0);
+	else
+		return ADM_realloc(ptr,newsize);
+}
+
+void av_free(void *ptr)
+{
+	if(ptr)
+		operator delete(ptr, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0);
+}
+#endif
 // EOF
