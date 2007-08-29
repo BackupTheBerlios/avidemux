@@ -107,8 +107,17 @@ extern pthread_mutex_t g_pSpiderMonkeyMutex;
 uint32_t CpuCaps::myCpuCaps=0;
 uint32_t CpuCaps::myCpuMask=0xffffffff;
 
+#if defined(ADM_DEBUG) && defined(FIND_LEAKS)
+extern const char* new_progname;
+extern int check_leaks();
+#endif
+
 int main(int argc, char *argv[])
 {
+#if defined(ADM_DEBUG) && defined(FIND_LEAKS)
+	new_progname = argv[0];
+#endif
+
 #ifndef ADM_WIN32
 	// thx smurf uk :)
     installSigHandler();
@@ -315,4 +324,8 @@ void onexit( void )
     ADM_memStat();
     ADM_memStatEnd();
     printf("\nGoodbye...\n\n");
+
+#if defined(ADM_DEBUG) && defined(FIND_LEAKS)
+	check_leaks();
+#endif
 }
