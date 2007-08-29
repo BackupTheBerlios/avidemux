@@ -249,10 +249,12 @@ uint8_t    MP4Header::open(char *name)
         {
           printf("Cannot find needed atom\n");
           fclose(_fd);
-          return 0; 
+		  delete atom;
+          return 0;
         }
         
-        
+        delete atom;
+
 	      _isvideopresent=1;
 	      _isaudiopresent=0;
     	     

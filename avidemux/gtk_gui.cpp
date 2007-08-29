@@ -1226,7 +1226,7 @@ A_saveAudio (char *name)
   
   fclose (out);
   delete work;
-  delete buffer;
+  delete[] buffer;
   printf ("\n wanted %llu samples, goto %llu samples, written %u bytes\n", tgt_sample,cur_sample, written);
 
 
