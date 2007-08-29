@@ -109,15 +109,16 @@ diaMenuEntry meAP[]={
       diaElemUInteger  intAreaCombing(PX(cthresh),_("Area com_bing threshold:"),0,255);
       diaElemUInteger  intCombed(PX(MI),_("Combe_d threshold:"),0,255);
       diaElemInteger   intArtefact(PX(AP),_("Artefact _protection threshold:"),-1,255);
+      diaElemToggle    intDebug(PX(debug),_("Debug:"));
 
          diaElem *diaRC[]={&menuFieldOrder,&menuInterpolaye,&menuType,&menuMnt,&menuLink,&menuAP,
                             &toggleUseChroma,&toggleTryWeave,&toggleDenoise,&toggleSharp,&toggleEvaluteAll,
-                            &intMotionLuma,&intMotionChroma,&intAreaCombing,&intCombed,&intArtefact
+                            &intMotionLuma,&intMotionChroma,&intAreaCombing,&intCombed,&intArtefact,&intDebug
                   };
 
         
          
-        if( diaFactoryRun(_("TDeint"),16,diaRC))
+        if( diaFactoryRun(_("TDeint"),17,diaRC))
 	{
            param->order=(int)order-1;
            param->field=(int)field-1;

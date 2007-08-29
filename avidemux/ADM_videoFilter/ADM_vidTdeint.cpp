@@ -61,7 +61,9 @@
 #define MIN(a,b) a<b ? a : b
 #define MAX(a,b) b<a ? a : b
 #define child_GetParity(x) 0 //FIXME!!
-#define OutputDebugString printf
+
+#define OutputDebugString(img,y,text) drawString(img, 0, y, text)
+
 
 #include "ADM_vidTDeint_param.h"
 #define PRM(x) x
@@ -367,6 +369,7 @@ mthreshCS=mthreshC;
         mthreshLS = mthreshL; 
         mthreshCS = mthreshC;
         typeS = type;
+#if 0
         if (debug)
         {
                 sprintf(buf,"TDeint:  %s (%s) by tritical\n", "B4", "08 2005");
@@ -375,6 +378,7 @@ mthreshCS=mthreshC;
                                 mode == 1 ? "bob - double rate" : mode == -2 ? "upsize - ELA" : "upsize - ELA-2");
                 OutputDebugString(buf);
         }
+#endif
 }
 //____________________________________________________________________
 vidTDeint::~vidTDeint ()
@@ -511,8 +515,8 @@ uint8_t vidTDeint::getFrameNumberNoAlloc (uint32_t n,
 				{
 					if (debug)
 					{
-						sprintf(buf,"TDeint:  frame %d:  not deinterlacing\n", n);
-						OutputDebugString(buf);
+						sprintf(buf,"TD fr %d:  not deinterlacing\n", n);
+						OutputDebugString(data,0,buf);
 					}
 					data->duplicate(src);
 					vidCache->unlockAll();
@@ -531,8 +535,8 @@ uint8_t vidTDeint::getFrameNumberNoAlloc (uint32_t n,
 		{
 			if (debug)
 			{
-				sprintf(buf,"TDeint:  frame %d:  not deinterlacing\n", n);
-				OutputDebugString(buf);
+				sprintf(buf,"TD fr %d:  not deinterlacing\n", n);
+				OutputDebugString(data,0,buf);
 			}
 			data->duplicate(src);
 			vidCache->unlockAll();
@@ -544,8 +548,8 @@ uint8_t vidTDeint::getFrameNumberNoAlloc (uint32_t n,
 	{
 		if (debug)
 		{
-			sprintf(buf,"TDeint:  frame %d:  not deinterlacing (HINTS)\n", n);
-			OutputDebugString(buf);
+			sprintf(buf,"TD fr %d:  not deinterlacing (HINTS)\n", n);
+			OutputDebugString(data,0,buf);
 		}
 		data->duplicate(src);
 			vidCache->unlockAll();
@@ -558,8 +562,8 @@ uint8_t vidTDeint::getFrameNumberNoAlloc (uint32_t n,
 		{
 			if (debug)
 			{
-				sprintf(buf,"TDeint:  frame %d:  not deinterlacing (full = false)\n", n);
-				OutputDebugString(buf);
+				sprintf(buf,"TD fr %d:  not deinterlacing (full = false)\n", n);
+				OutputDebugString(data,0,buf);
 			}
 			data->duplicate(src);
 			vidCache->unlockAll();
@@ -588,8 +592,10 @@ uint8_t vidTDeint::getFrameNumberNoAlloc (uint32_t n,
 		subtractFieldsYV12(prv, src, nxt);
 		if (debug)
 		{
-			sprintf(buf, "TDeint:  frame %d:  accumP = %u  accumN = %u\n", n, accumP, accumN);
-			OutputDebugString(buf);
+			sprintf(buf, "TD fr %d:  accumP = %u  ", n, accumP);
+			OutputDebugString(data,2,buf);
+			sprintf(buf, "accumN = %u\n", accumN);
+			OutputDebugString(data,3,buf);
 		}
 	}
 	if (tryWeave && (mode != 0 || full || found || (field^PRM(order) && accumP > accumN) || 
@@ -600,10 +606,10 @@ uint8_t vidTDeint::getFrameNumberNoAlloc (uint32_t n,
 		{
 			if (debug)
 			{
-				sprintf(buf,"TDeint:  frame %d:  weaved with %s (tryWeave)\n", n, 
+				sprintf(buf,"TD  fr %d:  weaved with %s (tryWeave)\n", n, 
 					field^PRM(order) ? (accumP <= accumN ? "CURR" : "NEXT") : 
 					(accumN <= accumP ? "CURR" : "PREV"));
-				OutputDebugString(buf);
+				OutputDebugString(data,2,buf);
 			}
 			if (hintField >= 0 && !fieldOVR) field = hintField;
 			vidCache->unlockAll();
@@ -631,12 +637,13 @@ uint8_t vidTDeint::getFrameNumberNoAlloc (uint32_t n,
 	if (!(passHint&0xFFFFFF00)) vidTDeint::putHint(dst, passHint, field);
 	if (debug)
 	{
-		sprintf(buf,"TDeint:  frame %d:  field = %s  order = %s\n", n, 
+		sprintf(buf,"TD  fr %d:  field = %s  order = %s\n", n, 
 			field == 1 ? "bottom" : "top", PRM(order) == 1 ? "tff" : "bff");
-		OutputDebugString(buf);
-		sprintf(buf,"TDeint:  frame %d:  mthreshL = %d  mthreshC = %d  type = %d\n", n, 
-			mthreshL, mthreshC, type);
-		OutputDebugString(buf);
+		OutputDebugString(data,3,buf);
+		sprintf(buf,"TD  fr %d:  mthreshL = %d  \n",n,mthreshL);
+		OutputDebugString(data,4,buf);
+		sprintf(buf,"mthreshC = %d  type = %d\n", mthreshC, type);
+		OutputDebugString(data,5,buf);
 	}
 	if (hintField >= 0 && !fieldOVR) field = hintField;
 	vidCache->unlockAll();
