@@ -340,7 +340,7 @@ int trans[MAXPARAM];
 		{
 			if(!strncasecmp(param->param[i],args[j].arg.string,l))
 			{
-				if(strlen(args[j].arg.string)>l+1 && args[j].arg.string[l]=='=')
+				if(strlen(args[j].arg.string)>l && args[j].arg.string[l]=='=')
 				{
 					found=j;
 					trans[i]=j;
