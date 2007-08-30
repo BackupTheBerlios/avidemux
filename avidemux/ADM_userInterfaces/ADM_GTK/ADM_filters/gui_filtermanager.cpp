@@ -517,10 +517,44 @@ updateFilterList (void)
     {
         gtk_list_store_append (stores[0], &iter);
         fil=videofilters[i].tag;
+         const char * name = filterGetNameFromTag(fil);
+         const char * conf = videofilters[i].filter->printConf ();
+         int namelen = strlen (name);
+         while (*conf == ' ')
+             ++conf;
+         if (strncasecmp (name, conf, namelen) == 0)
+         {
+             conf += namelen;
+             while (*conf == ' ' || *conf == ':')
+                 ++conf;
+         }
+         const char * smallstart = "";
+         const char * smallend = "";
+         const char * namesmallstart = "";
+         const char * namesmallend = "";
+         int conflen = strlen (conf);
+         if (conflen > 120)
+         {
+             smallstart = "<small>";
+             smallend = "</small>";
+             if (conflen > 180)
+             {
+                 namesmallstart = smallstart;
+                 namesmallend = smallend;
+             }
+         }
+
         str = g_strconcat("<span  weight=\"bold\">",
-                            filterGetNameFromTag(fil),
+                            namesmallstart,
+                            name,
+                            namesmallend,
                             "</span>\n",
-                            "<span size=\"smaller\">", videofilters[i].filter->printConf (), "</span>",  NULL);
+                             "<span size=\"smaller\">",
+                             smallstart,
+                             conf,
+                             smallend,
+                             "</span>",  NULL);
+
         gtk_list_store_set (stores[0], &iter,
                             0, str,
                             1, videofilters[i].tag,
