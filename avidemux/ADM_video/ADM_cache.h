@@ -9,6 +9,10 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+
+#ifndef __ADM_CACHE__
+#define __ADM_CACHE__
+
 typedef struct vidCacheEntry
 {
 		uint32_t 	frameNum;
@@ -41,3 +45,4 @@ class VideoCache
 		uint8_t unlock(ADMImage  *frame);
 		uint8_t purge(void);
 };
+#endif
