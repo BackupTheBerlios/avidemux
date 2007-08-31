@@ -167,6 +167,7 @@ AVDMGenericVideoStream *filter; 			\
 
 
 #define GET(x) ADM_assert(couples->getCouple((char *)#x,&(_param->x)))
+#define GET2(x,t) (assert(couples->getCouple((char *)#x,&(t))),(_param->x)=(t))
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
 
 #define MPLAYER_RESIZE_PREFFERED

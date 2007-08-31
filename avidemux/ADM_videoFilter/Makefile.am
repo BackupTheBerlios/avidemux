@@ -76,7 +76,11 @@ ADM_guiResize.cpp \
  ADM_vidVobsub.cpp \
  ADM_vidVobSubRender.cpp \
  ADM_vobsubinfo.cpp \
- ADM_vidCrop.cpp       
+ ADM_vidCrop.cpp \
+ ADM_vidComputeAverage.cpp \
+ ADM_vidSwissArmyKnife.cpp \
+ ADM_vidThreshold.cpp \
+ ADM_vidParticle.cpp       
 			
 
 

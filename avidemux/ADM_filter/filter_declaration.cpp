@@ -158,6 +158,7 @@ printf(  "*********************\n");
 
         //*********************
  registerFilter("-------- Deblender ---------",VF_INVALID,2,NULL,NULL);
+//	registerFilter("---- Video Analysis Tools ----",VF_INVALID,2,NULL,NULL);
 
         REGISTERX("blendremover","Blend remover","Remove blend between previous and next picture.",VF_BLENDREMOVAL,1,blendremove_create,blendremove_script);
         REGISTERX("hardivtcremove","Hard pulldown removal","Remove IVTC that has been analog captured or resized.",VF_HARDIVTC,1,hardivtc_create,hardivtc_script);
@@ -168,6 +169,10 @@ printf(  "*********************\n");
         REGISTERX("animatedmenu","Animated Menu",
             "Create a video made of 6 mini windows, very useful to do DVD menus.",
             VF_ANIMATED,1,animated_create,animated_script);
+	REGISTERX("computeaverage","Compute Average","Compute average luma value for each pixel throughout all frames, and save to file",VF_COMPUTEAVERAGE,1,computeaverage_create,computeaverage_script);
+	REGISTERX("swissarmyknife","Swiss Army Knife","Apply operation like P'=P*A, P-A, P+A, etc. using a convolution, rolling average, image from file, or constant",VF_SWISSARMYKNIFE,1,swissarmyknife_create,swissarmyknife_script);
+	REGISTERX("threshold","Threshold","Force too-bright/too-dim pixels to 0 and the rest to 255 or vice-versa",VF_THRESHOLD,1,threshold_create,threshold_script);
+	REGISTERX("particlelist","Particle List","Identify 'particles' (groups of pixels)",VF_PARTICLELIST,1,particle_create,particle_script);
 
 // Does not work
 //        REGISTERX("unblend","Unblend by Bach",VF_UNBLEND,1,unblend_create,unblend_script);
