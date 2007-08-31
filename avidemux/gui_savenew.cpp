@@ -58,6 +58,7 @@
 
 static uint8_t  A_SaveAudioNVideo(const char *name);
  extern int A_SaveUnpackedVop(const char *name);
+ extern uint8_t oplug_dummy(const char *name);
  extern int A_SavePackedVop(const char *name);
  extern uint8_t ogmSave(const char *name);
  extern uint8_t ADM_saveRaw(const char *name);
@@ -171,6 +172,9 @@ int ret=0;
 					printf(" AVI family\n");
 					switch(UI_GetCurrentFormat())
 					{
+						case ADM_DUMMY:
+					                            			ret=oplug_dummy(name);
+					                            			break;
 						case ADM_FLV:
                             			ret=oplug_flv(name);
                             			break;

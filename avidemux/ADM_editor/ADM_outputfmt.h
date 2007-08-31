@@ -24,6 +24,7 @@ typedef enum
 	ADM_OGM,
 	ADM_PSP,
 	ADM_FLV,
+	ADM_DUMMY,
 	ADM_FORMAT_MAX,
 	ADM_FMT_DUMMY=ADM_FORMAT_MAX
 }ADM_OUT_FORMAT;
@@ -33,7 +34,9 @@ typedef struct
   ADM_OUT_FORMAT format;
   const char *text;
 }ADM_FORMAT_DESC;
-
+/**
+ * 	This is used to fill-in the menus in GUIs
+ */
 const ADM_FORMAT_DESC ADM_allOutputFormat[]=
 {
   {ADM_AVI,_("AVI")},
@@ -46,7 +49,8 @@ const ADM_FORMAT_DESC ADM_allOutputFormat[]=
   {ADM_MP4,_("MP4")},
   {ADM_OGM,_("OGM")},
   {ADM_PSP,_("PSP")},
-  {ADM_FLV,_("FLV")}
+  {ADM_FLV,_("FLV")},
+  {ADM_DUMMY,_("DUMMY")}
 };
 
 #endif
