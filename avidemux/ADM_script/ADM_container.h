@@ -28,7 +28,7 @@ const ADM_CONTAINER container[]=
   MK_CONT(MP4),
   MK_CONT(PSP),
   MK_CONT(FLV),
-  MK_CONT(FMT_DUMMY)  
+  MK_CONT(DUMMY)  
 };
 #define NB_CONT (sizeof(container)/sizeof(ADM_CONTAINER))
 #endif
