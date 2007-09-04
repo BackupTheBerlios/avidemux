@@ -12,6 +12,7 @@ filesel
 menu
 toggle
 threadCount
+slider
 )
 
 SET(${ADM_LIB}_SRCS

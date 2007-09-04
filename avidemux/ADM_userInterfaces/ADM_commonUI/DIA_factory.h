@@ -44,6 +44,9 @@ typedef enum
   ELEM_MAX=ELEM_COUNT-1
 }elemEnum;
 typedef void ADM_FAC_CALLBACK(void *cookie);
+
+#define ELEM_TYPE_FLOAT float
+
 /*********************************************/
 class diaElem
 {
@@ -107,22 +110,26 @@ class diaElemMatrix : public diaElem
   void      enable(uint32_t onoff) ;
 };
 /************************************/
-template <class T>
+template <typename T>
 class diaElemGenericSlider : public diaElem
 {
   protected:
     
     T min,max,incr;
+    uint32_t digits;
 public:
     diaElemGenericSlider(T *value,const char *toggleTitle, T min,T max,T incr = 1, const char *tip=NULL);
   virtual   ~diaElemGenericSlider() ;
   void      setMe(void *dialog, void *opaque,uint32_t line);
   void      getMe(void);
   void      enable(uint32_t onoff) ;
+  void      setDigits(uint32_t digits) { this->digits = digits; }
 };
 typedef diaElemGenericSlider <int32_t> diaElemSlider;
 /* Same but unsigned */
 typedef diaElemGenericSlider <uint32_t> diaElemUSlider;
+/* Same but float */
+typedef diaElemGenericSlider <ELEM_TYPE_FLOAT> diaElemFSlider;
 
 /*********************************************/
 class diaElemToggle : public diaElem
@@ -208,7 +215,6 @@ public:
 };
 
 /*********************************************/
-#define ELEM_TYPE_FLOAT float
 class diaElemFloat : public diaElem
 {
 
@@ -322,9 +328,12 @@ public:
 class diaElemFile : public diaElem
 {
 
+protected:
+    const char * defaultSuffix;
 public:
   
-  diaElemFile(uint32_t writeMode,char **filename,const char *toggleTitle,const char *tip=NULL);
+  diaElemFile(uint32_t writeMode,char **filename,const char *toggleTitle,
+              const char *defaultSuffix = 0,const char *tip=NULL);
   virtual ~diaElemFile() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);

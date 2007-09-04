@@ -164,7 +164,8 @@ void diaElemMenu::finalize(void)
 { 
 }
 //*****************
-diaElemFile::diaElemFile(uint32_t write,char **filename,const char *toggleTitle,const char *tip)
+diaElemFile::diaElemFile(uint32_t write,char **filename,const char *toggleTitle,
+                         const char *defaultSuffix, const char *tip)
   : diaElem(ELEM_FILE_READ)
 {
  
@@ -393,37 +394,35 @@ void   diaElemButton::enable(uint32_t onoff)
 }
 //***
  
- template <class T>
+ template <typename T>
  diaElemGenericSlider<T>::diaElemGenericSlider(T *value,const char *toggleTitle, T min,T max,T incr,const char *tip)
-     : diaElem(ELEM_SLIDER),
-       min (min),
-       max (max),
-       incr (incr)
+     : diaElem(ELEM_SLIDER)
   {
  }
   
- template <class T>
+ template <typename T>
  diaElemGenericSlider<T>::~diaElemGenericSlider()
   {
   }
  
- template <class T>
+ template <typename T>
  void diaElemGenericSlider<T>::setMe(void *dialog, void *opaque,uint32_t line)
   {
   }
  
- template <class T>
+ template <typename T>
  void diaElemGenericSlider<T>::getMe(void)
   {
   }
   
- template <class T>
+ template <typename T>
  void diaElemGenericSlider<T>::enable(uint32_t onoff) 
   {
   }
   
  template class diaElemGenericSlider <int32_t>;
  template class diaElemGenericSlider <uint32_t>;
+ template class diaElemGenericSlider <ELEM_TYPE_FLOAT>;
 //****
 
 

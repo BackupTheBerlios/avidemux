@@ -191,7 +191,8 @@ uint8_t ADMVideoComputeAverage::configure(AVDMGenericVideoStream *in)
          _("_End Frame (last frame # to include), -1 = last:"),
          -1000000, 0x7fffffff);
     diaElemFile output_file
-        (1, const_cast<char **>(&(_param->output_file)), _("_Output File:"));
+        (1, const_cast<char **>(&(_param->output_file)),
+         _("_Output File:"), "avg");
     diaElemSlider bias
         (&(_param->bias),
          _("_Bias (only for display; use 0 for "

@@ -1,6 +1,6 @@
 /***************************************************************************
-  FAC_toggle.cpp
-  Handle dialog factory element : Toggle
+  FAC_integer.cpp
+  Handle dialog factory elements : Integer, Slider, and variations thereupon
   (C) 2006 Mean Fixounet@free.fr 
 ***************************************************************************/
 
@@ -170,12 +170,37 @@ void diaElemUInteger::enable(uint32_t onoff)
 }
 
 //****************************************************
-template <class T>
+
+template <typename T>
+static
+uint32_t diaElemSliderDigitsDefault (T incr)
+{
+    return 0; // used for int types; a specialization overrides this for float
+}
+
+template <>  // specialization of above...
+uint32_t diaElemSliderDigitsDefault (ELEM_TYPE_FLOAT incr) // ...for float
+{
+    char tmp [32];
+    uint32_t digits = 3;
+    sprintf (tmp, "%.*f", digits, incr);
+    const char * cptr = tmp + strlen (tmp);
+    while (*--cptr == '0')
+        --digits;
+
+    if (digits < 1)
+        return 1;
+    else
+        return digits;
+}
+
+template <typename T>
 diaElemGenericSlider<T>::diaElemGenericSlider(T *value,const char *toggleTitle, T min,T max,T incr,const char *tip)
     : diaElem(ELEM_SLIDER),
       min (min),
       max (max),
-      incr (incr)
+      incr (incr),
+      digits (diaElemSliderDigitsDefault (incr))
 {
     param = (void *)value;
     paramTitle = toggleTitle;
@@ -183,12 +208,12 @@ diaElemGenericSlider<T>::diaElemGenericSlider(T *value,const char *toggleTitle, 
     size = 2;
 }
 
-template <class T>
+template <typename T>
 diaElemGenericSlider<T>::~diaElemGenericSlider()
 {
 }
 
-template <class T>
+template <typename T>
 void diaElemGenericSlider<T>::setMe(void *dialog, void *opaque,uint32_t line)
 {
   GtkWidget *label = gtk_label_new_with_mnemonic (paramTitle);
@@ -200,30 +225,45 @@ void diaElemGenericSlider<T>::setMe(void *dialog, void *opaque,uint32_t line)
                     (GtkAttachOptions) (0), 0, 0);
   
   T val=*(T *)param;
-  GtkWidget *widget
-      = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (val, min, max, incr, incr, 0)));
-  gtk_scale_set_value_pos (GTK_SCALE (widget), GTK_POS_LEFT);
-  gtk_scale_set_digits (GTK_SCALE (widget), 0);
+
+  GtkAdjustment * adj = (GtkAdjustment *) gtk_adjustment_new (val, min, max, incr, incr, 0);
+
+  GtkWidget *spinner = gtk_spin_button_new (adj, 1, 0);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON(spinner), TRUE);
+  gtk_spin_button_set_digits  (GTK_SPIN_BUTTON(spinner), digits);
   
-  gtk_widget_show (widget);
+  GtkWidget *slider = gtk_hscale_new (adj);
+  gtk_scale_set_draw_value (GTK_SCALE (slider), FALSE);
+  gtk_scale_set_digits (GTK_SCALE (slider), digits);
   
-  gtk_table_attach (GTK_TABLE (opaque), widget, 0, 2, line+1, line+2,
+  GtkWidget *hbox = gtk_hbox_new (FALSE, 5);
+  gtk_box_pack_start (GTK_BOX (hbox), slider, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, FALSE, 0);
+
+  gtk_table_attach (GTK_TABLE (opaque), hbox, 0, 2, line+1, line+2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   
-  gtk_label_set_mnemonic_widget (GTK_LABEL(label), widget);
+  gtk_label_set_mnemonic_widget (GTK_LABEL(label), hbox);
+  gtk_widget_show (hbox);
+  gtk_widget_show (spinner);
+  gtk_widget_show (slider);
   
-  myWidget=(void *)widget;
+  myWidget=(void *)slider;
   if(readOnly)
-    gtk_widget_set_sensitive(widget,0);
-   if(tip)
-   {
-     GtkTooltips *tooltips= gtk_tooltips_new ();
-      gtk_tooltips_set_tip (tooltips, widget, tip, NULL);
-   }
+  {
+    gtk_widget_set_sensitive(spinner,0);
+    gtk_widget_set_sensitive(slider,0);
+  }
+  if(tip)
+  {
+      GtkTooltips *tooltips= gtk_tooltips_new ();
+      gtk_tooltips_set_tip (tooltips, spinner, tip, NULL);
+      gtk_tooltips_set_tip (tooltips, slider, tip, NULL);
+  }
 }
 
-template <class T>
+template <typename T>
 void diaElemGenericSlider<T>::getMe(void)
 {
   GtkWidget *widget=(GtkWidget *)myWidget;
@@ -235,7 +275,7 @@ void diaElemGenericSlider<T>::getMe(void)
   if(*val>max) *val=max;
 }
 
-template <class T>
+template <typename T>
 void diaElemGenericSlider<T>::enable(uint32_t onoff)
 {
   GtkWidget *widget=(GtkWidget *)myWidget;
@@ -244,5 +284,6 @@ void diaElemGenericSlider<T>::enable(uint32_t onoff)
 
 template class diaElemGenericSlider <int32_t>;
 template class diaElemGenericSlider <uint32_t>;
+template class diaElemGenericSlider <ELEM_TYPE_FLOAT>;
 
 //EOF

@@ -22,6 +22,7 @@ typedef struct THRESHOLD_PARAM
 
     uint32_t min;
     uint32_t max;
+    uint32_t in_range_is_white;
     uint32_t debug;
 
 } THRESHOLD_PARAM;
@@ -32,6 +33,7 @@ class  ADMVideoThreshold:public AVDMGenericVideoStream
  protected:
     	
      THRESHOLD_PARAM *  _param;
+     uint8_t lookup_table [256];
 
  public:
  		
@@ -46,6 +48,6 @@ class  ADMVideoThreshold:public AVDMGenericVideoStream
      virtual uint8_t 	configure( AVDMGenericVideoStream *instream);
      virtual char 		   *printConf(void);
      virtual uint8_t 	getCoupledConf( CONFcouple **couples);
-							
+     void computeLookupTable();
  };
 #endif

@@ -81,33 +81,15 @@ DIR *dir=NULL;
         setFilter(dialog);
         gtk_register_dialog(dialog);
 //	gtk_transient(dialog);
-	if(source)
+	if (source && *source)
 	{
-		dupe=PathCanonize(source);
-		PathStripName(dupe);
-		if( (dir=opendir(dupe)) )
-			{
-				closedir(dir);
-				gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog),(gchar *)source);
-			}
-		delete [] dupe;
-	
+		gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog),(gchar *)source);
 	}
 	else	//use pref
 	{
 		if( prefs->get(LASTDIR_READ,(ADM_filename **)&tmpname))
 		{
-			
-	
-			dupe=PathCanonize(tmpname);
-			PathStripName(dupe);
-
-			if( (dir=opendir(dupe)) )
-			{
-				closedir(dir);
-				gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog),(gchar *)dupe);
-			}
-			delete [] dupe;
+			gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),(gchar *)tmpname);
 		}
 	}
 	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_ACCEPT)
@@ -160,7 +142,7 @@ gchar last;
 char *dupe=NULL,*tmpname=NULL;
 DIR *dir=NULL;
 	
-	dialog = gtk_file_chooser_dialog_new ("Open File",
+	dialog = gtk_file_chooser_dialog_new ("Write to File",
                                       NULL,
                                       GTK_FILE_CHOOSER_ACTION_SAVE,
                                       GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -171,16 +153,29 @@ DIR *dir=NULL;
         setFilter(dialog);
         gtk_register_dialog(dialog);
 //	gtk_transient(dialog);
-	if(source)
+	if (source && *source)
 	{
-		dupe=PathCanonize(source);
-		PathStripName(dupe);
-		if( (dir=opendir(dupe)) )
-			{
-				closedir(dir);
-				gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog),(gchar *)source);
-			}
-		delete [] dupe;
+#if 0
+// well, this is what they say to do, but then you can't easily edit the
+// name...
+
+                // the following sequence is per GTK docs for gtk_file_chooser_set_filename()
+                if (access (source, W_OK) == 0) // if file exists
+                {
+                    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog),(gchar *)source);
+                    // printf ("FileSel_SelectWrite: existing %s\n", source);
+                }
+                else // new file
+#endif
+                {
+                    dupe=PathCanonize(source);
+                    PathStripName(dupe);
+                    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),(gchar *)dupe);
+                    gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog),
+                                                      (gchar *)(source + strlen(dupe)));
+                    // printf ("FileSel_SelectWrite: folder %s, name %s\n", dupe, source + strlen(dupe));
+                    delete [] dupe;
+                }
 	
 	}
 	else	//use pref
@@ -188,14 +183,12 @@ DIR *dir=NULL;
 		if( prefs->get(LASTDIR_WRITE,(ADM_filename **)&tmpname))
 		{
 			
-	
 			dupe=PathCanonize(tmpname);
-			PathStripName(dupe);
 
 			if( (dir=opendir(dupe)) )
 			{
 				closedir(dir);
-				gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog),(gchar *)dupe);
+				gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),(gchar *)tmpname);
 			}
 			delete [] dupe;
 		}

@@ -40,7 +40,7 @@
 
 // #define THRESHOLD_HISTO 1
 
-static FILTER_PARAM thresholdParam={3,{"min", "max", "debug"}};
+static FILTER_PARAM thresholdParam={4,{"min", "max", "in_range_is_white", "debug"}};
 
 SCRIPT_CREATE(threshold_script,ADMVideoThreshold,thresholdParam);
 
@@ -60,13 +60,54 @@ ADMVideoThreshold::ADMVideoThreshold(AVDMGenericVideoStream *in,CONFcouple *coup
     {
         GET(min);
         GET(max);
+        GET(in_range_is_white);
         GET(debug);
     }
     else
     {
         _param->min = 100;
         _param->max = 200;
+        _param->in_range_is_white = 1;
         _param->debug = 0;
+    }
+
+    computeLookupTable();
+}
+
+void ADMVideoThreshold::computeLookupTable ()
+{
+    if (_param->min > _param->max)
+    {
+        uint32_t tmp = _param->min;
+        _param->min = _param->max;
+        _param->max = tmp;
+        _param->in_range_is_white = !_param->in_range_is_white;
+    }
+
+    uint32_t min = _param->min;
+    uint32_t max = _param->max;
+    ADM_assert (min <= max);
+
+    uint8_t in_range_value;
+    uint8_t out_of_range_value;
+
+    if (_param->in_range_is_white)
+    {
+        in_range_value = 255;
+        out_of_range_value = 0;
+    }
+    else
+    {
+        in_range_value = 0;
+        out_of_range_value = 255;
+    }
+
+    for (uint32_t i = 0; i <= 255; i++)
+    {
+        if (i < min || i > max)
+            lookup_table [i] = out_of_range_value;
+        else
+            lookup_table [i] = in_range_value;
     }
 }
 
@@ -74,11 +115,12 @@ uint8_t	ADMVideoThreshold::getCoupledConf( CONFcouple **couples)
 {
 
     ADM_assert(_param);
-    *couples=new CONFcouple(3);
+    *couples = new CONFcouple(thresholdParam.nb);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
     CSET(min);
     CSET(max);
+    CSET(in_range_is_white);
     CSET(debug);
 
     return 1;
@@ -89,13 +131,30 @@ uint8_t ADMVideoThreshold::configure(AVDMGenericVideoStream *in)
 {
     UNUSED_ARG(in);
 
-    diaElemUSlider minslide(&(_param->min), _("Mi_nimum value to be non-zero in output:"), 0, 255);
-    diaElemUSlider maxslide(&(_param->max), _("Ma_ximum value to be non-zero in output:"), 0, 255);
+    diaElemUSlider minslide(&(_param->min), _("Mi_nimum value to be in-range:"), 0, 255);
+    diaElemUSlider maxslide(&(_param->max), _("Ma_ximum value to be in-range:"), 0, 255);
+
+    diaMenuEntry tInRangeIsWhite [] = {
+        { 1, _("In-range values go white, out-of-range go black"), NULL },
+        { 0, _("In-range values go black, out-of-range go white"), NULL },
+    };
+
+    diaElemMenu in_range_is_white
+        (&(_param->in_range_is_white),
+         _("Output values:"),
+         sizeof (tInRangeIsWhite) / sizeof (diaMenuEntry), tInRangeIsWhite);
+
     diaElemUInteger debug(&(_param->debug), _("_Debugging settings (bits):"),
                           0, 0x7fffffff);
-    diaElem * elems[] = { &minslide, &maxslide, &debug };
+    diaElem * elems[] = { &minslide, &maxslide, &in_range_is_white, &debug };
 
     uint8_t ret = diaFactoryRun("Threshold", sizeof (elems) / sizeof (diaElem *), elems);
+
+    if (ret) // 0 = cancel
+    {
+        computeLookupTable();
+    }
+
     return ret;
 }
 
@@ -107,15 +166,22 @@ ADMVideoThreshold::~ADMVideoThreshold()
     _uncompressed=NULL;
 }
 
-char	*ADMVideoThreshold::printConf( void) 
+char *ADMVideoThreshold::printConf (void) 
 {
-    static char conf[100];
+    const int CONF_LEN = 100;
+    static char conf[CONF_LEN];
+    char * cptr = conf;
+    cptr += snprintf (conf, CONF_LEN, "Threshold: In-range values (%u - %u) "
+                      "go %s, others %s",
+                      _param->min, _param->max,
+                      _param->in_range_is_white ? "white" : "black",
+                      _param->in_range_is_white ? "black" : "white");
+    if (_param->debug)
+        snprintf (cptr, CONF_LEN - (cptr - conf), "; debug=0x%x", _param->debug);
 
-    sprintf(conf,"Threshold: Min = %3u  Max = %3u  Debug=0x%06x",
-            _param->min, _param->max, _param->debug);
     return conf;
-	
 }
+
 uint8_t ADMVideoThreshold::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
           			ADMImage *data,uint32_t *flags)
 {
@@ -152,25 +218,6 @@ uint8_t ADMVideoThreshold::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
     memset (histo_after, 0, 256 * sizeof (uint32_t));
 #endif
 
-    uint32_t min = _param->min;
-    uint32_t max = _param->max;
-
-    uint8_t in_range_value;
-    uint8_t out_of_range_value;
-    if (min <= max)
-    {
-        in_range_value = 255;
-        out_of_range_value = 0;
-    }
-    else
-    {
-        in_range_value = 0;
-        out_of_range_value = 255;
-        uint32_t tmp = min;
-        min = max;
-        max = tmp;
-    }
-
 #ifdef DUMP_FRAME_DATA
     FILE * fp = fopen ("/tmp/framedump.new.out", "a");
     ADM_assert(fp);
@@ -188,10 +235,7 @@ uint8_t ADMVideoThreshold::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
         fprintf (fp, "%x\n", curr);
 #endif
 
-        if (curr < min || curr > max)
-            *--destp = out_of_range_value;
-        else
-            *--destp = in_range_value;
+        *--destp = lookup_table [curr];
 
 #ifdef THRESHOLD_HISTO
         histo_after [*destp]++;

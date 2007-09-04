@@ -1,6 +1,6 @@
 /***************************************************************************
-  FAC_toggle.cpp
-  Handle dialog factory element : Toggle
+  FAC_filesel.cpp
+  Handle dialog factory element : Filesel
   (C) 2006 Mean Fixounet@free.fr 
 ***************************************************************************/
 
@@ -29,6 +29,7 @@
 #include <QDialogButtonBox>
 
 #include "default.h"
+#include "prefs.h"
 #include "ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
 #include "ADM_toolkit/filesel.h"
@@ -62,6 +63,28 @@ class  ADM_Qfilesel : public QWidget
                 r=FileSel_SelectRead(_("Select File to Read"),buffer,MAX_SEL,txt);
                 break;
             case ADM_FILEMODE_WRITE:
+                if (defaultSuffix)
+                {
+                    const char * lastfilename;
+                    if (prefs->get(LASTFILES_FILE1,(ADM_filename **)&lastfilename))
+                    {
+                        strcpy (buffer, lastfilename);
+                        char * cptr = buffer + strlen (buffer);
+                        while (cptr > buffer)
+                        {
+                            if (*cptr == '.')
+                            {
+                                strcpy (cptr + 1, defaultSuffix);
+                                txt = buffer;
+                                printf ("Default output filename is %s based on "
+                                        "%s + %s\n",
+                                        txt, lastfilename, defaultSuffix);
+                                break;
+                            }
+                            --cptr;
+                        }
+                    }
+                }
                 r=FileSel_SelectWrite(_("Select File to Write"),buffer,MAX_SEL,txt);
                 break;
 
@@ -80,8 +103,11 @@ class  ADM_Qfilesel : public QWidget
         QDialogButtonBox *button;
         QLabel *text;
         ADM_fileMode fileMode;
+        const char * defaultSuffix;
             
-        ADM_Qfilesel(QWidget *z,const char *title,char *entry,QGridLayout *layout,int line, ADM_fileMode mode) : QWidget(z) 
+        ADM_Qfilesel(QWidget *z,const char *title,char *entry,QGridLayout *layout,int line, ADM_fileMode mode, const char * defaultSuffix)
+            : QWidget(z),
+              defaultSuffix (defaultSuffix)
         {
           
           fileMode=mode;
@@ -113,8 +139,10 @@ class  ADM_Qfilesel : public QWidget
 };
 
 
-diaElemFile::diaElemFile(uint32_t writemode,char **filename,const char *toggleTitle,const char *tip)
-  : diaElem(ELEM_FILE_READ)
+diaElemFile::diaElemFile(uint32_t writemode,char **filename,const char *toggleTitle,
+                         const char *defaultSuffix,const char *tip)
+  : diaElem(ELEM_FILE_READ),
+    defaultSuffix (defaultSuffix)
 {
   param=(void *)filename;
   paramTitle=shortkey(toggleTitle);
@@ -132,9 +160,9 @@ void diaElemFile::setMe(void *dialog, void *opaque,uint32_t line)
  QGridLayout *layout=(QGridLayout*) opaque;
  ADM_Qfilesel *fs;
   if(_write)
-      fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,ADM_FILEMODE_WRITE);
+      fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,ADM_FILEMODE_WRITE, defaultSuffix);
   else
-      fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,ADM_FILEMODE_READ);
+      fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,ADM_FILEMODE_READ, 0);
   myWidget=(void *)fs; 
 }
 void diaElemFile::getMe(void)
@@ -168,7 +196,7 @@ void diaElemDirSelect::setMe(void *dialog, void *opaque,uint32_t line)
 {
  QGridLayout *layout=(QGridLayout*) opaque;
   
-  ADM_Qfilesel *fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,ADM_FILEMODE_DIR);
+  ADM_Qfilesel *fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,ADM_FILEMODE_DIR, 0);
   myWidget=(void *)fs; 
 }
 void diaElemDirSelect::getMe(void) 

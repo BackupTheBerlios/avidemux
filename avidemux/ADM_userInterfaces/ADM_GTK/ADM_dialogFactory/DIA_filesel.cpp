@@ -30,9 +30,13 @@
 static void fileRead(void *w,void *p);
 static void dirSel(void *w,void *p);
 
+#include "prefs.h"
 
-diaElemFile::diaElemFile(uint32_t writemode,char **filename,const char *toggleTitle,const char *tip)
-  : diaElem(ELEM_FILE_READ)
+diaElemFile::diaElemFile(uint32_t writemode,char **filename,const char *toggleTitle,
+                         const char * defaultSuffix,const char *tip)
+  : diaElem(ELEM_FILE_READ),
+    defaultSuffix (defaultSuffix)
+
 {
   param=(void *)filename;
   paramTitle=toggleTitle;
@@ -128,8 +132,37 @@ void diaElemFile::changeFile(void)
   const char *txt;
   txt =gtk_entry_get_text (GTK_ENTRY (widget));
   
-  if(_write) t=FileSel_SelectWrite(paramTitle,buffer,MAX_SEL,txt);
-      else t= t=FileSel_SelectRead(paramTitle,buffer,MAX_SEL,txt);
+  if(_write)
+  {
+      char newname [1024];
+      if (!*txt && defaultSuffix)
+      {
+          const char * lastfilename;
+          if (prefs->get(LASTFILES_FILE1,(ADM_filename **)&lastfilename))
+          {
+              strcpy (newname, lastfilename);
+              char * cptr = newname + strlen (newname);
+              while (cptr > newname)
+              {
+                  if (*cptr == '.')
+                  {
+                      strcpy (cptr + 1, defaultSuffix);
+                      txt = newname;
+                      printf ("Default output filename is %s based on "
+                              "%s + %s\n",
+                              txt, lastfilename, defaultSuffix);
+                      break;
+                  }
+                  --cptr;
+              }
+          }
+      }
+      t = FileSel_SelectWrite(paramTitle,buffer,MAX_SEL,txt);
+  }
+  else
+  {
+      t = FileSel_SelectRead(paramTitle,buffer,MAX_SEL,txt);
+  }
   if(t)
   {
     char **name=(char **)param;

@@ -156,7 +156,8 @@ uint8_t ADMVideoParticle::configure(AVDMGenericVideoStream *in)
          sizeof (tOutputFmt) / sizeof (diaMenuEntry), tOutputFmt);
 
     diaElemFile output_file
-        (1, const_cast<char **>(&(_param->output_file)), _("_Output File:"));
+        (1, const_cast<char **>(&(_param->output_file)),
+         _("_Output File:"), "pts");
 
     diaElemUInteger camera_number
         (&(_param->camera_number), _("_Camera number:"), 1, 0x7fffffff);
