@@ -66,7 +66,7 @@ uint8_t sdlAccelRender::end( void)
         }
         if(sdl_display)
         {
-        SDL_UnlockSurface(sdl_display);
+        		SDL_UnlockSurface(sdl_display);
                 SDL_FreeSurface(sdl_display);
         }
         if(sdl_running)
@@ -75,8 +75,8 @@ uint8_t sdlAccelRender::end( void)
         }
         if(decoded)
         {
-        delete [] decoded;
-        decoded=NULL;	
+		        delete [] decoded;
+		        decoded=NULL;	
         }
         sdl_running=0;
         sdl_overlay=NULL;
@@ -134,7 +134,7 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 	putenv(origin);
 #endif
 
-    sdl_display= SDL_SetVideoMode( w, h,  bpp, flags );
+    sdl_display= SDL_SetVideoMode( w*2, h*2,  bpp, flags );
 
     if (!sdl_display)
     {
@@ -251,38 +251,48 @@ int page=w*h;
 //	printf("SDL: new pitch :%d\n",pitch);
         if(useYV12)
         {
-        if(pitch==w)
-            memcpy(sdl_overlay->pixels[0],ptr,w*h);
-        else
-            interleave(sdl_overlay->pixels[0],ptr,w,pitch,h);
-            
-        pitch=sdl_overlay->pitches[1];
-        if(pitch==(w>>1))
-            memcpy(sdl_overlay->pixels[1],ptr+page,(w*h)>>2);
-        else
-            interleave(sdl_overlay->pixels[1],ptr+page,w>>1,pitch,h>>1);
-      
-        pitch=sdl_overlay->pitches[2];
-        if(pitch==(w>>1))
-            memcpy(sdl_overlay->pixels[2],ptr+(page*5)/4,(w*h)>>2);
-        else
-            interleave(sdl_overlay->pixels[2],ptr+(page*5)/4,w>>1,pitch,h>>1);  	
+	        if(pitch==w)
+	            memcpy(sdl_overlay->pixels[0],ptr,w*h);
+	        else
+	            interleave(sdl_overlay->pixels[0],ptr,w,pitch,h);
+	            
+	        pitch=sdl_overlay->pitches[1];
+	        if(pitch==(w>>1))
+	            memcpy(sdl_overlay->pixels[1],ptr+page,(w*h)>>2);
+	        else
+	            interleave(sdl_overlay->pixels[1],ptr+page,w>>1,pitch,h>>1);
+	      
+	        pitch=sdl_overlay->pitches[2];
+	        if(pitch==(w>>1))
+	            memcpy(sdl_overlay->pixels[2],ptr+(page*5)/4,(w*h)>>2);
+	        else
+	            interleave(sdl_overlay->pixels[2],ptr+(page*5)/4,w>>1,pitch,h>>1);  	
         }else
         {
-        color->reset(w,h);
-        if(pitch==2*w)
-        {
-            color->scale(ptr,sdl_overlay->pixels[0]);
-        }
-        else
-        {
-            color->scale(ptr,decoded);
-            interleave(sdl_overlay->pixels[0],decoded,2*w,pitch,h);
-        }
-    }	
-        
-        disp.w=w;
-        disp.h=h;
+	        color->reset(w,h);
+	        if(pitch==2*w)
+	        {
+	            color->scale(ptr,sdl_overlay->pixels[0]);
+	        }
+	        else
+	        {
+	            color->scale(ptr,decoded);
+	            interleave(sdl_overlay->pixels[0],decoded,2*w,pitch,h);
+	        }
+        }	
+        uint32_t factor=4;
+               switch(zoom)
+               {
+                   case ZOOM_1_4: factor=1;break;
+                   case ZOOM_1_2: factor=2;break;
+                   case ZOOM_1_1: factor=4;break;
+                   case ZOOM_2:   factor=8;break;
+                   case ZOOM_4:   factor=16;break;
+                   default : ADM_assert(0);
+                 
+               }
+        disp.w=(w*factor)/4;
+        disp.h=(h*factor)/4;
         disp.x=0;
         disp.y=0;
         

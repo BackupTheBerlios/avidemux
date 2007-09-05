@@ -28,6 +28,7 @@ class sdlAccelRender: public AccelRender
               virtual	uint8_t init( GUI_WindowInfo * window, uint32_t w, uint32_t h);
               virtual	uint8_t end(void);
               virtual   uint8_t display(uint8_t *ptr, uint32_t w, uint32_t h,renderZoom zoom);
+              			uint8_t hasHwZoom(void) {return 1;}
 };
 
 void initSdl(void);
