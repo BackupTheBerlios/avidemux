@@ -180,6 +180,7 @@ int ret=0;
                             			break;
                         case ADM_MP4:
                         case ADM_PSP:
+                        case ADM_MATROSKA:
                         
                                                     ret=oplug_mp4(name,UI_GetCurrentFormat());
                                                     break;

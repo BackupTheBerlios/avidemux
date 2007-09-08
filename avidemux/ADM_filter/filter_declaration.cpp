@@ -177,7 +177,7 @@ printf(  "*********************\n");
 // Does not work
 //        REGISTERX("unblend","Unblend by Bach",VF_UNBLEND,1,unblend_create,unblend_script);
         
-        REGISTER("","Partial","",VF_PARTIAL,0,partial_create);
+        REGISTERX("partial","Partial","",VF_PARTIAL,0,partial_create,partial_script);
 //	REGISTER("","Remove Salt",VF_SALT,0,salt_create);
  printf("\n");
 }		

@@ -30,7 +30,7 @@ SET(${ADM_LIB}_SRCS
                 wma.c
                 dvbsub_parser.c
                 dvbsubdec.c
-                dvbsub.c
+                dvbsub.c xiph.c
 )
 # ADD x86 ones
 

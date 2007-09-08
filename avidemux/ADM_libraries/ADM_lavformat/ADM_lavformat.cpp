@@ -130,12 +130,17 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	case MUXER_FLV:
 		fmt = guess_format("flv", NULL, NULL);
 		break;          
+	case MUXER_MATROSKA:
+		fmt = guess_format("matroska", NULL, NULL);
+		break;          
+
 	default:
 		fmt=NULL;
 	}
 	if (!fmt) 
 	{
         	printf("Lav:Cannot guess format\n");
+                ADM_assert(0);
 		return 0;
 	}
 	oc = av_alloc_format_context();
@@ -179,6 +184,32 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 					 }
 					 
 					 break;
+                case MUXER_MATROSKA:
+                        strcpy(oc->title,"Avidemux");
+                        strcpy(oc->author,"Avidemux");
+                        c->sample_aspect_ratio.num=1;
+                        c->sample_aspect_ratio.den=1;
+                        if(isMpeg4Compatible(info->fcc))
+                        {
+                                c->codec_id = CODEC_ID_MPEG4;
+                                c->has_b_frames=1; // in doubt...
+                        }else
+                        {
+                                if(isH264Compatible(info->fcc))
+                                {
+                                        c->has_b_frames=1; // in doubt...
+                                        c->codec_id = CODEC_ID_H264;
+                                        c->codec=new AVCodec;
+                                        memset(c->codec,0,sizeof(AVCodec));
+                                        c->codec->name=ADM_strdup("H264");
+                                }
+                        }
+                        if(videoExtraDataSize)
+                        {
+                                c->extradata=videoExtraData;
+                                c->extradata_size= videoExtraDataSize;
+                        }
+                        break;
                 case MUXER_MP4:
                 case MUXER_PSP:
                         strcpy(oc->title,"Avidemux");
@@ -321,7 +352,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 			break;
 		default:
                       {
-                            if(_type==MUXER_MP4 || _type==MUXER_PSP || _type==MUXER_FLV)
+                            if(_type==MUXER_MP4 || _type==MUXER_PSP || _type==MUXER_FLV || _type==MUXER_MATROSKA)
                             {
                                     c->time_base=fpsfree;// (AVRational){1000,_fps1000};
                                     break;
@@ -407,6 +438,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 				case MUXER_FLV:
                 case MUXER_PSP:
                 case MUXER_MP4:
+                case MUXER_MATROSKA:
                         oc->mux_rate=10080*1000; // Needed ?
                         break;
 
@@ -473,7 +505,7 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
 
             timeInUs=(int64_t)sample2time_us(sample);
             /* Rescale to ?? */
-            if(_type==MUXER_FLV) /* The FLV muxer expects packets dated in ms, there is something i did not get... WTF */
+            if(_type==MUXER_FLV || _type==MUXER_MATROSKA) /* The FLV muxer expects packets dated in ms, there is something i did not get... WTF */
             {
             			f=timeInUs/1000;
             			f=floor(f+0.4);
@@ -567,7 +599,7 @@ double p,d;
         d=bitstream->dtsFrame;
         RESCALE(d);
         
-        if(_type==MUXER_FLV) /* The FLV muxer expects packets dated in ms, there is something i did not get... WTF */
+        if(_type==MUXER_FLV || _type==MUXER_MATROSKA) /* The FLV muxer expects packets dated in ms, there is something i did not get... WTF */
         {
         			p=p*1000/_fps1000;
         			d=d*1000/_fps1000;
@@ -646,12 +678,14 @@ extern "C"
      extern  int        mpegps_init(void );
      extern  int        movenc_init(void );
      extern  int        flvenc_init(void );
+     extern  int        matroskaenc_init(void );
 };
 extern URLProtocol file_protocol ;
 uint8_t lavformat_init(void)
 {
                 movenc_init();
                 flvenc_init();
+                matroskaenc_init();
                 register_protocol(&file_protocol);
 }
 extern "C"

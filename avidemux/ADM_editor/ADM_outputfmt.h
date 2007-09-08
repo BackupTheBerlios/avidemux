@@ -24,9 +24,9 @@ typedef enum
 	ADM_OGM,
 	ADM_PSP,
 	ADM_FLV,
+        ADM_MATROSKA,
 	ADM_DUMMY,
 	ADM_FORMAT_MAX,
-	ADM_FMT_DUMMY=ADM_FORMAT_MAX
 }ADM_OUT_FORMAT;
 
 typedef struct 
@@ -50,6 +50,7 @@ const ADM_FORMAT_DESC ADM_allOutputFormat[]=
   {ADM_OGM,_("OGM")},
   {ADM_PSP,_("PSP")},
   {ADM_FLV,_("FLV")},
+  {ADM_MATROSKA,_("MKV")},
   {ADM_DUMMY,_("DUMMY")}
 };
 

@@ -77,6 +77,7 @@
 #cmakedefine CONFIG_MJPEG_DECODER
 #cmakedefine CONFIG_MJPEG_ENCODER
 #cmakedefine CONFIG_MOV_MUXER
+#cmakedefine CONFIG_MATROSKA_MUXER
 #cmakedefine CONFIG_MP2_ENCODER
 #cmakedefine CONFIG_MP4_MUXER
 #cmakedefine CONFIG_MPEG1VIDEO_DECODER

@@ -150,7 +150,7 @@ public:
 #define CREATOR(x,clss)  return new clss(in,x);
 #define BUILD_CREATE(name,clss) AVDMGenericVideoStream *name(AVDMGenericVideoStream *in, CONFcouple *conf) \
 {		CREATOR(conf,clss); }
-
+#define VARIABLE_PARAMS 0xff
 #define SCRIPT_CREATE(name,clss,tmplate) \
 AVDMGenericVideoStream *name (AVDMGenericVideoStream *in, int n,Arg *args); \
 AVDMGenericVideoStream *name (AVDMGenericVideoStream *in, int n,Arg *args) \

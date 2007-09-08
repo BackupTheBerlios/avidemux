@@ -147,6 +147,8 @@ typedef struct InternalBuffer{
     uint8_t *base[4];
     uint8_t *data[4];
     int linesize[4];
+    int width, height;
+    enum PixelFormat pix_fmt;
 }InternalBuffer;
 
 #define INTERNAL_BUFFER_SIZE 32
@@ -251,6 +253,13 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
     picture_number= &(((InternalBuffer*)s->internal_buffer)[INTERNAL_BUFFER_SIZE-1]).last_pic_num; //FIXME ugly hack
     (*picture_number)++;
 
+    if(buf->base[0] && (buf->width != w || buf->height != h || buf->pix_fmt != s->pix_fmt)){
+        for(i=0; i<4; i++){
+            av_freep(&buf->base[i]);
+            buf->data[i]= NULL;
+        }
+    }
+
     if(buf->base[0]){
         pic->age= *picture_number - buf->last_pic_num;
         buf->last_pic_num= *picture_number;
@@ -306,6 +315,9 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
             else
                 buf->data[i] = buf->base[i] + ALIGN((buf->linesize[i]*EDGE_WIDTH>>v_shift) + (EDGE_WIDTH>>h_shift), STRIDE_ALIGN);
         }
+        buf->width  = s->width;
+        buf->height = s->height;
+        buf->pix_fmt= s->pix_fmt;
         pic->age= 256*256*256*64;
     }
     pic->type= FF_BUFFER_TYPE_INTERNAL;
@@ -741,6 +753,7 @@ static const AVOption options[]={
 {"timecode_frame_start", "GOP timecode frame start number, in non drop frame format", OFFSET(timecode_frame_start), FF_OPT_TYPE_INT, 0, 0, INT_MAX, V|E},
 {"drop_frame_timecode", NULL, 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_DROP_FRAME_TIMECODE, INT_MIN, INT_MAX, V|E, "flags2"},
 {"non_linear_q", "use non linear quantizer", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_NON_LINEAR_QUANT, INT_MIN, INT_MAX, V|E, "flags2"},
+// MEANX {"request_channels", "set desired number of audio channels", OFFSET(request_channels), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, A|D},
 {NULL},
 };
 
@@ -759,6 +772,7 @@ void avcodec_get_context_defaults2(AVCodecContext *s, enum CodecType codec_type)
 
     s->av_class= &av_codec_context_class;
 
+    s->codec_type = codec_type;
     if(codec_type == CODEC_TYPE_AUDIO)
         flags= AV_OPT_FLAG_AUDIO_PARAM;
     else if(codec_type == CODEC_TYPE_VIDEO)
@@ -831,8 +845,10 @@ int attribute_align_arg avcodec_open(AVCodecContext *avctx, AVCodec *codec)
 
     if (codec->priv_data_size > 0) {
         avctx->priv_data = av_mallocz(codec->priv_data_size);
-        if (!avctx->priv_data)
+        if (!avctx->priv_data) {
+            ret = AVERROR(ENOMEM);
             goto end;
+        }
     } else {
         avctx->priv_data = NULL;
     }
@@ -844,6 +860,7 @@ int attribute_align_arg avcodec_open(AVCodecContext *avctx, AVCodec *codec)
 
     if((avctx->coded_width||avctx->coded_height) && avcodec_check_dimensions(avctx,avctx->coded_width,avctx->coded_height)){
         av_freep(&avctx->priv_data);
+        ret = AVERROR(EINVAL);
         goto end;
     }
 
@@ -938,7 +955,7 @@ int attribute_align_arg avcodec_decode_audio2(AVCodecContext *avctx, int16_t *sa
 
     if((avctx->codec->capabilities & CODEC_CAP_DELAY) || buf_size){
         //FIXME remove the check below _after_ ensuring that all audio check that the available space is enough
-#if 0 // MEANX SILENCE!
+#if 0 // MEANX : Silence
         if(*frame_size_ptr < AVCODEC_MAX_AUDIO_FRAME_SIZE){
             av_log(avctx, AV_LOG_ERROR, "buffer smaller than AVCODEC_MAX_AUDIO_FRAME_SIZE\n");
             return -1;
@@ -1221,9 +1238,9 @@ static void init_crcs(void){
     av_crc8005    = av_mallocz_static(sizeof(AVCRC) * 257);
     av_crc07      = av_mallocz_static(sizeof(AVCRC) * 257);
 #endif
-    av_crc_init(av_crc04C11DB7, 0, 32, 0x04c11db7, sizeof(AVCRC)*257);
-    av_crc_init(av_crc8005    , 0, 16, 0x8005    , sizeof(AVCRC)*257);
-    av_crc_init(av_crc07      , 0,  8, 0x07      , sizeof(AVCRC)*257);
+    av_crc_init(av_crc04C11DB7, 0, 32, AV_CRC_32_IEEE, sizeof(AVCRC)*257);
+    av_crc_init(av_crc8005    , 0, 16, AV_CRC_16     , sizeof(AVCRC)*257);
+    av_crc_init(av_crc07      , 0,  8, AV_CRC_8_ATM  , sizeof(AVCRC)*257);
 }
 
 void avcodec_init(void)
@@ -1308,6 +1325,22 @@ int av_get_bits_per_sample(enum CodecID codec_id){
     }
 }
 
+int av_get_bits_per_sample_format(enum SampleFormat sample_fmt) {
+    switch (sample_fmt) {
+    case SAMPLE_FMT_U8:
+        return 8;
+    case SAMPLE_FMT_S16:
+        return 16;
+    case SAMPLE_FMT_S24:
+        return 24;
+    case SAMPLE_FMT_S32:
+    case SAMPLE_FMT_FLT:
+        return 32;
+    default:
+        return 0;
+    }
+}
+
 #if !defined(HAVE_THREADS)
 int avcodec_thread_init(AVCodecContext *s, int thread_count){
     return -1;
@@ -1347,7 +1380,7 @@ int av_tempfile(char *prefix, char **filename) {
         return -1;
     }
 #if !defined(HAVE_MKSTEMP)
-    fd = open(*filename, O_RDWR | /* MEANX ??O_BINARY |*/ O_CREAT, 0444);
+    fd = open(*filename, O_RDWR /* MEANX | O_BINARY*/ | O_CREAT, 0444);
 #else
     snprintf(*filename, len, "/tmp/%sXXXXXX", prefix);
     fd = mkstemp(*filename);

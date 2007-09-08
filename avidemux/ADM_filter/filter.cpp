@@ -100,7 +100,7 @@ char *name;
 	for(uint32_t i=0;i<allfilters.size();i++)
 	{
 		name=allfilters[ i].filtername;
-		if(allfilters[ i].viewable)
+		if(allfilters[ i].viewable || allfilters[i].tag==VF_PARTIAL)
 		{
 			if(name)
 			{
@@ -323,55 +323,106 @@ CONFcouple *filterBuildCouple(FILTER_PARAM *param,uint32_t nb,Arg *args)
 {
 int found,l;
 int trans[MAXPARAM];
-	if(nb!=param->nb)
+	if(param->nb>VARIABLE_PARAMS)
 	{
-		printf("# of parameters mismatch\n");
-		return NULL;
-	}
-	// For each param check we are ok
-	// the generic form is name=value
-	// name should be the same as in the param array
-	for(int i=0;i<nb;i++)
-	{
-		l=strlen(param->param[i]);
-		ADM_assert(l);
-		found=-1;
-		for(int j=0;j<nb;j++)
-		{
-			if(!strncasecmp(param->param[i],args[j].arg.string,l))
-			{
-				if(strlen(args[j].arg.string)>l && args[j].arg.string[l]=='=')
+		// Variable # of parameters
+		// We check we have at least what is required by the template
+		for(int i=0;i<(param->nb-VARIABLE_PARAMS);i++)
 				{
-					found=j;
-					trans[i]=j;
-					break;
+					l=strlen(param->param[i]);
+					ADM_assert(l);
+					found=-1;
+					for(int j=0;j<nb;j++)
+					{
+						if(!strncasecmp(param->param[i],args[j].arg.string,l))
+						{
+							if(strlen(args[j].arg.string)>l && args[j].arg.string[l]=='=')
+							{
+								found=j;
+								break;
+							}
+						}
+					}
+					if(found==-1)
+					{	
+						printf("Param : %s not found or incorrect\n",param->param[i]);
+						 return NULL;
+					}
+				}
+				// if we get here, it means we found each param, time to build the couples
+				CONFcouple *couple;
+				couple=new CONFcouple(nb);
+				for(int i=0;i<nb;i++)
+				{
+					char *copy=ADM_strdup(args[i].arg.string);
+					// Search "="
+					char *where=strstr(copy,"=");
+					if(!where) ADM_assert(0);
+					*where=0;
+					if(!couple->setCouple(copy,where+1))
+						{
+							printf("Set couple failed\n");
+							delete couple;
+							return NULL;
+						}
+					ADM_dealloc(copy);
+				}
+				return couple;
+	}
+	//********************* Constant # of parameters #################
+	else
+	{
+		if(nb!=param->nb )
+		{
+			printf("# of parameters mismatch: expected %d, got %d\n",nb,param->nb);
+			return NULL;
+		}
+		// For each param check we are ok
+		// the generic form is name=value
+		// name should be the same as in the param array
+		for(int i=0;i<nb;i++)
+		{
+			l=strlen(param->param[i]);
+			ADM_assert(l);
+			found=-1;
+			for(int j=0;j<nb;j++)
+			{
+				if(!strncasecmp(param->param[i],args[j].arg.string,l))
+				{
+					if(strlen(args[j].arg.string)>l && args[j].arg.string[l]=='=')
+					{
+						found=j;
+						trans[i]=j;
+						break;
+					}
 				}
 			}
-		}
-		if(found==-1)
-		{	
-			printf("Param : %s not found or incorrect\n",param->param[i]);
-			 return NULL;
-		}
-	}
-	// if we get here, it means we found each param, time to build the couples
-	CONFcouple *couple;
-	couple=new CONFcouple(nb);
-	for(int i=0;i<nb;i++)
-	{
-		l=strlen(param->param[i]);
-		if(!couple->setCouple(param->param[i],args[ trans[i]].arg.string+l+1))
-			{
-				printf("Set couple failed\n");
-				delete couple;
-				return NULL;
+			if(found==-1)
+			{	
+				printf("Param : %s not found or incorrect\n",param->param[i]);
+				 return NULL;
 			}
+		}
+		// if we get here, it means we found each param, time to build the couples
+		CONFcouple *couple;
+		couple=new CONFcouple(nb);
+		for(int i=0;i<nb;i++)
+		{
+			l=strlen(param->param[i]);
+			if(!couple->setCouple(param->param[i],args[ trans[i]].arg.string+l+1))
+				{
+					printf("Set couple failed\n");
+					delete couple;
+					return NULL;
+				}
+		}
+		return couple;
 	}
-	return couple;
+	
 }
 uint8_t 	filterAddScript(VF_FILTERS tag,uint32_t n,Arg *args)
 {
-	// 1- searc filter
+	// 1- search filter
 	int found=-1;
 	aviInfo info;
 
@@ -403,7 +454,7 @@ uint8_t 	filterAddScript(VF_FILTERS tag,uint32_t n,Arg *args)
 			return 1;
 		}
 	}
-	printf("Tag not found\n");
+	printf("Tag not found:%d\n",tag);
 	return 0;
 }
 

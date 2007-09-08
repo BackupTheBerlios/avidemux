@@ -125,10 +125,14 @@ PacketQueue   *pq;//("MP4 audioQ",50,2*1024*1024);
 uint32_t    totalAudioSize=0;
 uint32_t sent=0;
 
-           if(type==ADM_PSP)
-               muxerType=MUXER_PSP;
-           else
-               muxerType=MUXER_MP4;
+           switch(type)
+           {
+             case ADM_PSP:muxerType=MUXER_PSP;break;
+             case ADM_MP4:muxerType=MUXER_MP4;break;
+             case ADM_MATROSKA:muxerType=MUXER_MATROSKA;break;
+             default:
+                ADM_assert(0);
+           }
         // Setup video
         
         if(videoProcessMode())
