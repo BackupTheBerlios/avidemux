@@ -251,8 +251,7 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
       		return 1;
 
     }
-    if(fourCC::check(R32(magic[2]),(uint8_t *)"matr") &&
-       fourCC::check(R32(magic[3]),(uint8_t *)"oska") )
+    if(magic[0]==R32(0xA3DF451A)) //x1a45DFA3 ))
     {
       printf (" \n Matroska file detected..\n");
       *type = Matroska_FileType;
