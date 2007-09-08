@@ -41,7 +41,13 @@
 
 extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, AVDMGenericVideoStream *in);
 
+
+static FILTER_PARAM partialParam={VARIABLE_PARAMS+3,{"_start","_end","_tag"}};
+
+
+SCRIPT_CREATE(partial_script,ADMVideoPartial,partialParam);
 BUILD_CREATE(partial_create,ADMVideoPartial);
+
 //___________________________________________________
 char 						*ADMVideoPartial::printConf(void)
 {
