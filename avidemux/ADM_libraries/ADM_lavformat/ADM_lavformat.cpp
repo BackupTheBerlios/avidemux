@@ -340,7 +340,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 			c->frame_rate_base = 1001;	
 			break;
 */
-                        if(_type==MUXER_MP4 || _type==MUXER_PSP || _type==MUXER_FLV)
+                        if(_type==MUXER_MP4 || _type==MUXER_PSP || _type==MUXER_FLV || _type==MUXER_MATROSKA)
                         {
                                  c->time_base= fps24; //(AVRational){1001,24000};
                                 break;
