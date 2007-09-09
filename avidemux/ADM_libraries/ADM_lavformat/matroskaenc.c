@@ -537,7 +537,23 @@ static int mkv_write_tracks(AVFormatContext *s)
         put_ebml_uint (pb, MATROSKA_ID_TRACKNUMBER     , i + 1);
         put_ebml_uint (pb, MATROSKA_ID_TRACKUID        , i + 1);
         put_ebml_uint (pb, MATROSKA_ID_TRACKFLAGLACING , 0);    // no lacing (yet)
-
+/**  MEANX : Add a default duration for video **/
+        if(codec->codec_type==CODEC_TYPE_VIDEO)
+        {
+          if(codec->time_base.den && codec->time_base.num)
+          {
+            int num=codec->time_base.num;
+            int den=codec->time_base.den;
+            unsigned int default_duration;
+            float period=num;
+                  period/=den;
+                  period*=1000*1000*1000; // in ns
+                  default_duration=(unsigned int)floor(period);
+                  put_ebml_uint (pb, MATROSKA_ID_TRACKDEFAULTDURATION ,default_duration);
+          }
+        }
+        
+/**  MEANX : Add a default duration for video **/
         if (st->language[0])
             put_ebml_string(pb, MATROSKA_ID_TRACKLANGUAGE, st->language);
         else

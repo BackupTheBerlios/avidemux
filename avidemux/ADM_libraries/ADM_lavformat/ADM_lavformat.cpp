@@ -61,6 +61,8 @@ static    double audio_pts, video_pts;
 static uint32_t one;
 uint64_t  _curDTS;
 
+static uint8_t ADM_4cc_to_lavcodec(const char *fcc, CodecID *outlavid);
+static uint8_t ADM_WaveTag_to_lavcodec(uint32_t tag, CodecID *outlavid);
 // convert in in us to out in 90Khz tick
 int64_t adm_90k( double in)
 {
@@ -202,6 +204,15 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                                         c->codec=new AVCodec;
                                         memset(c->codec,0,sizeof(AVCodec));
                                         c->codec->name=ADM_strdup("H264");
+                                }
+                                else
+                                {
+                                   if(!ADM_4cc_to_lavcodec((const char *)&(info->fcc),&(c->codec_id)))
+                                   {
+                                      printf("[lavFormat] Cannot map  this\n");
+                                      return 0;
+                                   }
+                                  
                                 }
                         }
                         if(videoExtraDataSize)
@@ -359,7 +370,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                             }
                             else
                             {
-                              GUI_Error_HIG(_("Incompatible frame rate"), NULL);
+                                GUI_Error_HIG(_("Incompatible frame rate"), NULL);
                                 return 0;
                             }
                             }
@@ -414,6 +425,12 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                                   c->codec_id = CODEC_ID_AAC;
                                   break;
                   default:
+                          if(_type==MUXER_MATROSKA)
+                          {
+                           if(ADM_WaveTag_to_lavcodec(audioheader->encoding, &(c->codec_id)))
+                             break;
+                          }
+                            
                           printf("Cant mux that ! audio\n"); 
                           printf("Cant mux that ! audio\n");
                           c->codec_id = CODEC_ID_MP2;
@@ -701,6 +718,77 @@ int ADM_useAlternateTagging(void)
   return v;
 } 
 }
+
+typedef struct
+{
+  const char *name;
+  int    id;
+}lavFCC_t;
+
+lavFCC_t lavFCC[]=
+{
+  {"DIV3",CODEC_ID_MSMPEG4V3},
+  {"FLV1",CODEC_ID_FLV1},
+  {"MPEG",CODEC_ID_MPEG2VIDEO},
+  {"DUMMY",0Xffff}
+};
+/**
+    \fn ADM_4cc_to_lavcodec
+    \brief Convert avi fourcc to lavcodec id (video)
+
+*/
+uint8_t ADM_4cc_to_lavcodec(const char *fcc, CodecID *outlavid)
+{
+    uint32_t nb=sizeof( lavFCC)/sizeof(lavFCC_t);
+    nb--;
+    for(int i=0;i<nb;i++)
+    {
+      if(!strncmp(lavFCC[i].name,fcc,4))
+      {
+        *outlavid=(CodecID)lavFCC[i].id;
+        return 1; 
+      }
+      
+    }
+    return 0;
+  
+}
+//*****************
+typedef struct
+{
+  uint32_t tag;
+  int    id;
+}lavWaveTag_t;
+
+lavWaveTag_t lavWaveTag[]=
+{
+  {WAV_AC3,CODEC_ID_AC3},
+  {WAV_OGG,CODEC_ID_VORBIS},
+  {WAV_AAC,CODEC_ID_AAC},
+  {0xdead,0Xffff} // DUMMY
+};
+/**
+    \fn ADM_WaveTag_to_lavcodec
+    \brief Convert ADM audio codec id to lavcodec id (video)
+
+*/
+uint8_t ADM_WaveTag_to_lavcodec(uint32_t tag, CodecID *outlavid)
+{
+    uint32_t nb=sizeof( lavWaveTag)/sizeof(lavWaveTag_t);
+    nb--;
+    for(int i=0;i<nb;i++)
+    {
+      if(lavWaveTag[i].tag==tag)
+      {
+        *outlavid=(CodecID)lavFCC[i].id;
+        return 1; 
+      }
+      
+    }
+    return 0;
+  
+}
+
 //___________________________________________________________________________
 //EOF
 
