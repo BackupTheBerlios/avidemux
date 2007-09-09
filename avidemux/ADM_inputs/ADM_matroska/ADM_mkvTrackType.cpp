@@ -50,6 +50,7 @@ MKVCC mkvCC[]=
   {"A_VORBIS",0,WAV_OGG,""},
   
   // Video
+  {"V_MPEG4/MS/V3",1,0,"DIV3"}, // MS MPEG4 (Divx3)
   {"V_MPEG4/ISO/AVC",1,0,"AVC1"}, //H264
   {"V_MS/VFW/FOURCC",1,0,"VFWX"}, // Divx 2.
   {"V_MPEG4/ISO/ASP",1,0,"DIVX"},
