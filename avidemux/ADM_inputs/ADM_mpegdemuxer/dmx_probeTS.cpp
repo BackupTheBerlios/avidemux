@@ -51,6 +51,8 @@
 #define MIN_DETECT (10*1024) // Need this to say the stream is present
 #define MAX_NB_PMT 50
 
+//#define PROBE_TS_VERBOSE
+
 //****************************************************************************************
 typedef struct MPEG_PMT
 {
@@ -541,7 +543,7 @@ uint8_t dmx_probePMT(dmx_demuxerTS *demuxer, uint32_t pmtId,MPEG_TRACK *pmts,uin
   
   fileParser *parser;
   uint32_t curSection,maxSection;
-  uint32_t left,toScan,programInfo;
+  uint32_t left=0,toScan,programInfo=0;
   
       printf("Searching for PMT, pid=0x%x\n",pmtId);
       demuxer->changePid(pmtId,pmtId); // change pid as setPos will seek for them
@@ -549,7 +551,9 @@ uint8_t dmx_probePMT(dmx_demuxerTS *demuxer, uint32_t pmtId,MPEG_TRACK *pmts,uin
       parser=demuxer->getParser();
       if(dmx_searchAndSkipHeader(pmtId,demuxer,&curSection, &maxSection,&left,&toScan))
       {
-               aprintf("[PMT]PCR for it    :x%x\n",parser->read16i()&0x1FFF);
+          uint16_t alpha;
+               alpha=parser->read16i();
+               aprintf("[PMT]PCR for it    :x%x\n",alpha&0x1FFF);
                programInfo=parser->read16i() & 0x0FFF;
                aprintf("[PMT]Program Info  :%d\n",programInfo);
                if( (programInfo+2 > left) || (programInfo+2>toScan))
