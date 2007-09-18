@@ -428,7 +428,16 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                           if(_type==MUXER_MATROSKA)
                           {
                            if(ADM_WaveTag_to_lavcodec(audioheader->encoding, &(c->codec_id)))
+                           {
+                             if(audioextraData)
+                             {
+                                  c->extradata=audioextraData;
+                                  c->extradata_size= audioextraSize;
+                             }
+                             // Put a dummy time increment
+                              c->time_base= fps25;
                              break;
+                           }
                           }
                             
                           printf("Cant mux that ! audio\n"); 
@@ -780,7 +789,7 @@ uint8_t ADM_WaveTag_to_lavcodec(uint32_t tag, CodecID *outlavid)
     {
       if(lavWaveTag[i].tag==tag)
       {
-        *outlavid=(CodecID)lavFCC[i].id;
+        *outlavid=(CodecID)lavWaveTag[i].id;
         return 1; 
       }
       
