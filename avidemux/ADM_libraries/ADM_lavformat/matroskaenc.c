@@ -388,6 +388,7 @@ static offset_t mkv_write_cues(ByteIOContext *pb, mkv_cues *cues, int num_tracks
 
 static int put_xiph_codecpriv(AVFormatContext *s, ByteIOContext *pb, AVCodecContext *codec)
 {
+#if 0 // MEANX avidemux does thing differently
     uint8_t *header_start[3];
     int header_len[3];
     int first_header_size;
@@ -412,6 +413,28 @@ static int put_xiph_codecpriv(AVFormatContext *s, ByteIOContext *pb, AVCodecCont
         put_buffer(pb, header_start[j], header_len[j]);
 
     return 0;
+#else
+      // Not endian safe....
+      uint32_t packetLen[3],*ptr=(uint32_t *)codec->extradata;
+      uint8_t *data[3],i,j;
+      if( 3*4+ptr[0]+ptr[1]+ptr[2]!=codec->extradata_size)
+      {
+        av_log(s, AV_LOG_ERROR, "Broken avidemux xiph header.\n");
+        return -1;
+      }
+      data[0]=codec->extradata+3*4;
+      data[1]=data[0]+ptr[0];
+      data[2]=data[1]+ptr[1];
+      put_byte(pb, 2);                    // number packets - 1
+      for (j = 0; j < 2; j++) 
+      {
+          put_xiph_size(pb, ptr[j]);
+      }
+      for (j = 0; j < 3; j++)
+        put_buffer(pb, data[j], ptr[j]);
+      
+      return 0; // /MEANX
+#endif
 }
 
 #define FLAC_STREAMINFO_SIZE 34

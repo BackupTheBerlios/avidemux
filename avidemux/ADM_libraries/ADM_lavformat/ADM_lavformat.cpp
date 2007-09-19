@@ -503,7 +503,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 		return 0;
         }
 
-	av_write_header(oc);
+	ADM_assert(av_write_header(oc)>=0);
 	dump_format(oc, 0, filename, 1);
 
 
