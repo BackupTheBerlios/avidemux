@@ -152,6 +152,8 @@ SectionGroup "User interfaces" SecGrpUI
         File ..\..\..\avidemux_2.4_build\libpango-1.0-0.dll
         File ..\..\..\avidemux_2.4_build\libpangocairo-1.0-0.dll
         File ..\..\..\avidemux_2.4_build\libpangowin32-1.0-0.dll
+        File ..\..\..\avidemux_2.4_build\jpeg62.dll
+        File ..\..\..\avidemux_2.4_build\libtiff3.dll
         WriteRegStr HKLM "${REGKEY}\Components" GTK+ 1
     SectionEnd
     
@@ -560,6 +562,8 @@ Section /o un.Catalan UnSecLangCatalan
 SectionEnd
 
 Section /o un.GTK+ UnSecUiGtk
+    Delete /REBOOTOK $INSTDIR\jpeg62.dll
+    Delete /REBOOTOK $INSTDIR\libtiff3.dll
     Delete /REBOOTOK $INSTDIR\libpangowin32-1.0-0.dll
     Delete /REBOOTOK $INSTDIR\libpangocairo-1.0-0.dll
     Delete /REBOOTOK $INSTDIR\libpango-1.0-0.dll
