@@ -219,13 +219,11 @@
 /* use Aften AC3 encoder */
 #cmakedefine USE_AFTEN
 
-/* Use Aften 0.05 or earlier */
-#cmakedefine USE_AFTEN_05
-
-/* Use Aften 0.06 */
-#cmakedefine USE_AFTEN_06
-/*               */
+/* Use Aften 0.07 */
 #cmakedefine USE_AFTEN_07
+
+/* Use Aften 0.08 */
+#cmakedefine USE_AFTEN_08
 
 /* AltiVec for mpeg2enc */
 #cmakedefine USE_ALTIVEC

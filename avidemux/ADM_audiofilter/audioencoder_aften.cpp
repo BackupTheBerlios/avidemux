@@ -35,7 +35,7 @@ extern "C"
 {
 #if defined(USE_AFTEN_06)
 	#include "aften.h"
-#else	// Aften 0.05 & 0.07
+#else	// Aften 0.05 & 0.07 onwards
 	#include "aften/aften.h"
 #endif
 };
@@ -51,8 +51,11 @@ AUDMEncoder_Aften::AUDMEncoder_Aften(AUDMAudioFilter * instream)  :AUDMEncoder  
   memset(_handle,0,sizeof(AftenContext));
   aften_set_defaults(_HANDLE);
   _wavheader->encoding=WAV_AC3;
-#ifdef USE_AFTEN_07
+#if defined(USE_AFTEN_05) || defined(USE_AFTEN_06)
+#elif defined(USE_AFTEN_07)
   _HANDLE->params.n_threads=1; // MThread collides with avidemux multithreading
+#else
+  _HANDLE->system.n_threads=1;
 #endif
 };
 
@@ -142,9 +145,9 @@ _again:
         ADM_assert(tmptail>=tmphead);
 
 #ifdef USE_AFTEN_05
-		aften_remap_wav_to_a52(ptr, 256*6, _wavheader->channels, A52_SAMPLE_FMT_FLT, (_HANDLE->acmod), (_HANDLE->lfe));
+		aften_remap_wav_to_a52(ptr, 256*6, _wavheader->channels, A52_SAMPLE_FMT_FLT, _HANDLE->acmod, _HANDLE->lfe);
 #else
-		aften_remap_wav_to_a52(ptr, 256*6, _wavheader->channels, A52_SAMPLE_FMT_FLT, (_HANDLE->acmod));
+		aften_remap_wav_to_a52(ptr, 256*6, _wavheader->channels, A52_SAMPLE_FMT_FLT, _HANDLE->acmod);
 #endif
 
         r=aften_encode_frame(_HANDLE, dest,(void *)ptr);

@@ -217,21 +217,38 @@ endif(NOT WIN32)
 # Aften
 ########################################
 if(WIN32)
-SET(CMAKE_REQUIRED_FLAGS "-lm -lpthreadGC2")
+	SET(CMAKE_REQUIRED_FLAGS "-lm -lpthreadGC2")
 else(WIN32)
-SET(CMAKE_REQUIRED_FLAGS "-lm -lpthread")
+	SET(CMAKE_REQUIRED_FLAGS "-lm -lpthread")
 endif(WIN32)
 
 ADM_CHECK_HL(Aften aften/aften.h  aften aften_encode_init USE_AFTEN)
+
 if(USE_AFTEN)
-# TODO! Check aften version 5/6/7!
-SET(USE_AFTEN_07 1)
+	TRY_RUN(AFTEN_TEST_RUN_RESULT
+		AFTEN_TEST_COMPILE_RESULT
+		${CMAKE_BINARY_DIR}
+		"${CMAKE_SOURCE_DIR}/cmake_compile_check/aften_check.cpp"
+		CMAKE_FLAGS
+		-DLINK_LIBRARIES:STRING=-laften
+		OUTPUT_VARIABLE AFTEN_OUTPUT)
+
+	if(AFTEN_TEST_RUN_RESULT EQUAL 8)
+		MESSAGE(STATUS "Aften Version: 0.0.8")
+		SET(USE_AFTEN_08 1)
+	elseif(AFTEN_TEST_RUN_RESULT EQUAL 7)
+		MESSAGE(STATUS "Aften Version: 0.07")
+		SET(USE_AFTEN_07 1)
+	endif(AFTEN_TEST_RUN_RESULT EQUAL 8)
 endif(USE_AFTEN)
+
 SET(CMAKE_REQUIRED_FLAGS "")
+
 ########################################
 # SRC
 ########################################
 ADM_CHECK_HL(libsamplerate samplerate.h samplerate src_get_version USE_SRC)
+
 ########################################
 # ICONV
 ########################################
