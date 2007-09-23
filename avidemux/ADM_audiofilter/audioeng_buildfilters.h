@@ -34,6 +34,7 @@ void audioFilter_configureFilters( void );
 
 void audioCodecConfigure( void );
 void audioCodecSelect( void );
+void audioFilter_MP3DisableReservoir(int onoff);
 uint32_t audioFilter_getOuputCodec(void);
 uint32_t audioFilter_getOuputFrequency(uint32_t inputFrequency);
 typedef enum 

@@ -41,7 +41,8 @@ LAME_encoderParam lameParam=
 {
   ADM_LAME_PRESET_CBR,
   ADM_STEREO,
-  2
+  2,
+  0 /* Reservoir enable by default */
 };
 #ifdef HAVE_LIBMP3LAME
 extern int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor);

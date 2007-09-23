@@ -91,6 +91,7 @@ uint8_t AUDMEncoder_Lame::init(ADM_audioEncoderDescriptor *config)
     ret = lame_set_out_samplerate(MYFLAGS, frequence);
 
     ret = lame_set_quality(MYFLAGS, 2);
+    
     if (_wavheader->channels == 2)
       {
         switch (lameConf->mode)
@@ -116,26 +117,28 @@ uint8_t AUDMEncoder_Lame::init(ADM_audioEncoderDescriptor *config)
         ret = lame_set_brate(MYFLAGS, config->bitrate);
         ret = lame_set_mode(MYFLAGS, mmode);	// 0 stereo 1 jstero
         ret = lame_set_quality(MYFLAGS, lameConf->quality);	// 0 stereo 1 jstero
+        ret = lame_set_disable_reservoir(MYFLAGS,lameConf->disableReservoir);
         printf("[Lame]Using quality of %d\n",lame_get_quality(MYFLAGS));
         ret = lame_init_params(MYFLAGS);
     if (ret == -1)
 	return 0;
     // update bitrate in header
     _wavheader->byterate = (config->bitrate >> 3) * 1000;
-   
+#define BLOCK_SIZE 1152
     // configure CBR/ABR/...
     _preset=lameConf->preset;
     switch(_preset)
     {
     	default:
-    	case ADM_LAME_PRESET_CBR: break;
+    	case ADM_LAME_PRESET_CBR: 
+          break;
 	case ADM_LAME_PRESET_ABR:
 	  
           lame_set_preset( MYFLAGS, config->bitrate);
-	  _wavheader->blockalign=1152;
+	  _wavheader->blockalign=BLOCK_SIZE;
 	 break;
 	case ADM_LAME_PRESET_EXTREME: 
-	  _wavheader->blockalign=1152;
+	  _wavheader->blockalign=BLOCK_SIZE;
           lame_set_preset( MYFLAGS, EXTREME);	
 	break;
     
@@ -144,7 +147,7 @@ uint8_t AUDMEncoder_Lame::init(ADM_audioEncoderDescriptor *config)
 
     lame_print_config(MYFLAGS);
     lame_print_internals(MYFLAGS);
-    _chunk=1152*_wavheader->channels;
+    _chunk=BLOCK_SIZE*_wavheader->channels;
     return 1;
 }
 uint8_t	AUDMEncoder_Lame::isVBR(void )
@@ -158,7 +161,7 @@ uint8_t	AUDMEncoder_Lame::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samp
 {
   int32_t nbout;
   
-        *samples = 1152; //FIXME
+        *samples = BLOCK_SIZE; //FIXME
         *len = 0;
 
         if(!refillBuffer(_chunk ))
@@ -187,6 +190,8 @@ uint8_t	AUDMEncoder_Lame::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samp
           return 0;
         }
         *len=nbout;
+        if(!*len) *samples=0;
+        //printf("Audio packet : size %u, sample %u\n",*len,*samples);
         return 1;
 }
 /**
@@ -244,10 +249,11 @@ int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor)
     
     
     diaElemUInteger quality(PX(quality),_("_Quality:"),0,9);
+    diaElemToggle reservoir(PX(disableReservoir),_("_Disable reservoir:"));
   
-      diaElem *elems[]={&menuMode,&Mode,&quality,&bitrate};
+      diaElem *elems[]={&menuMode,&Mode,&quality,&bitrate,&reservoir};
     
-  if( diaFactoryRun("LAME Configuration",4,elems))
+  if( diaFactoryRun("LAME Configuration",5,elems))
   {
     lameParam->mode=(ADM_mode)mmode; 
     lameParam->preset=(ADM_LAME_PRESET)ppreset;

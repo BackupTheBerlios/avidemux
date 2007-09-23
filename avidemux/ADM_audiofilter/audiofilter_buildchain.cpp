@@ -443,6 +443,22 @@ void deleteAudioFilter(AVDMGenericAudioStream *in)
     currentaudiostream->endDecompress();
 
 }
+/**
+    \fn     audioFilter_MP3DisableReservoir
+    \brief  Set/unset the disable reservoir bit, usefull for strict mp3 frame boundaries(FLV)
+
+*/
+void audioFilter_MP3DisableReservoir(int onoff)
+{
+      if(activeAudioEncoder!=AUDIOENC_MP3) return;
+      ADM_audioEncoderDescriptor *desc=getAudioDescriptor( activeAudioEncoder);
+      ADM_assert(desc);
+      LAME_encoderParam *param=(LAME_encoderParam *)desc->param;
+      ADM_assert(param);
+      param->disableReservoir=onoff;
+  
+}
+
 /**********************************************/
 ADM_audioEncoderDescriptor *getAudioDescriptor( AUDIOENCODER encoder)
 {

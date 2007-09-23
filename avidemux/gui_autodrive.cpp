@@ -71,6 +71,7 @@ uint8_t A_autoDrive(Action action)
 #ifdef HAVE_LIBMP3LAME
         					audioCodecSetcodec(AUDIOENC_MP3);
         					audioFilter_SetBitrate(128);
+                                                audioFilter_MP3DisableReservoir(1);
         					// set fq
         					
 #else

@@ -405,7 +405,6 @@ void audioPrintCurrentCodec(void)
 	audioPrintCurrentCodec();
 
 }
-
 void audioCodecSelect( void )
 {
 	DIA_audioCodec( &activeAudioEncoder );

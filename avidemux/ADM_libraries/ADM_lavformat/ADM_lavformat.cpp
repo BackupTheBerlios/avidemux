@@ -525,6 +525,8 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
         double f;
         int64_t timeInUs;
 
+            //printf("Audio paclet : size %u, sample %u\n",len,sample);
+        
            if(!audio_st) return 0;
            if(!len) return 1;
             av_init_packet(&pkt);
