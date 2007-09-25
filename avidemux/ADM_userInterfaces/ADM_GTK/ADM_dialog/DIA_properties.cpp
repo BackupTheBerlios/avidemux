@@ -44,7 +44,7 @@ void DIA_properties( void )
  GtkWidget *dialog;
  uint8_t gmc, qpel,vop;
  uint32_t info=0;
- char *yesno[2]={_("No"),_("Yes")};
+ const char *yesno[2]={_("No"),_("Yes")};
  uint32_t war,har;
 
     if (playing)

@@ -79,7 +79,6 @@ audioDevice *device=NULL;
 static AUDIO_DEVICE  currentDevice=DEVICE_DUMMY;
 static AUDIO_DEVICE ADM_audioByName(const char *name);
 static const char *ADM_audioById(AUDIO_DEVICE id);
-extern void DIA_getAudioDevice(AUDIO_DEVICE *id);
 
 void AVDM_audioSave( void )
 {

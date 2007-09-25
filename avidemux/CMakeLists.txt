@@ -6,34 +6,37 @@
 ##########################################################
 
 INCLUDE(Po)
-
-SET(adm_EXE_SRCS ADM_preview.cpp  gtk_gui.cpp  gui_autodrive.cpp  GUI_jobs.cpp  gui_navigate.cpp  guiplay.cpp  gui_savenew.cpp  main.cpp )
-
+SET(adm_EXE_SRCS ADM_preview.cpp  gtk_gui.cpp  gui_autodrive.cpp  GUI_jobs.cpp  gui_navigate.cpp  guiplay.cpp  gui_savenew.cpp  main.cpp)
 COMPILE_PO_FILES(${CMAKE_SOURCE_DIR}/po adm_EXE_SRCS)
 
 include_directories(ADM_userInterfaces/ADM_commonUI ADM_outputs)
+add_definitions(${GLIB_CFLAGS})
 
-# Small macro...
+########################################################
+# Macros
+########################################################
 MACRO (add_libs_all_targets _libName)
-  TARGET_LINK_LIBRARIES(avidemux2_cli ${_libName})
-  if(GTK_FOUND)
-  TARGET_LINK_LIBRARIES(avidemux2_gtk ${_libName})
-  endif(GTK_FOUND)
-  if(QT4_FOUND)
-  TARGET_LINK_LIBRARIES(avidemux2_qt4 ${_libName})
-  endif(QT4_FOUND)
+	TARGET_LINK_LIBRARIES(avidemux2_cli ${_libName})
+  
+	if(GTK_FOUND)
+		TARGET_LINK_LIBRARIES(avidemux2_gtk ${_libName})
+	endif(GTK_FOUND)
+	
+	if(QT4_FOUND)
+		TARGET_LINK_LIBRARIES(avidemux2_qt4 ${_libName})
+	endif(QT4_FOUND)
 ENDMACRO (add_libs_all_targets _libName)
 
 MACRO (add_link_flags _target _flg)
-   GET_TARGET_PROPERTY(_flags ${_target} LINK_FLAGS)
+	GET_TARGET_PROPERTY(_flags ${_target} LINK_FLAGS)
 
-   if (_flags)
-      set(_flags "${_flags} ${_flg}")
-   else (_flags)
-      set(_flags "${_flg}")
-   endif (_flags)
+	if (_flags)
+		set(_flags "${_flags} ${_flg}")
+	else (_flags)
+		set(_flags "${_flg}")
+	endif (_flags)
 
-   SET_TARGET_PROPERTIES(${_target} PROPERTIES LINK_FLAGS "${_flags}")
+	SET_TARGET_PROPERTIES(${_target} PROPERTIES LINK_FLAGS "${_flags}")
 ENDMACRO (add_link_flags)
 
 MACRO (add_ldflags_all_targets _libName)
@@ -47,23 +50,35 @@ MACRO (add_ldflags_all_targets _libName)
 		add_link_flags(avidemux2_qt4 ${_libName})
 	endif(QT4_FOUND)
 ENDMACRO (add_ldflags_all_targets _libName)
-##/ Small macro...
 
 MACRO (add_compile_flags _target _flg)
-   GET_SOURCE_FILE_PROPERTY(_flags ${_target} COMPILE_FLAGS)
+	GET_SOURCE_FILE_PROPERTY(_flags ${_target} COMPILE_FLAGS)
 
-   if (_flags)
-      set(_flags "${_flags} ${_flg}")
-   else (_flags)
-      set(_flags "${_flg}")
-   endif (_flags)
+	if (_flags)
+		set(_flags "${_flags} ${_flg}")
+	else (_flags)
+		set(_flags "${_flg}")
+	endif (_flags)
    
-   SET_SOURCE_FILES_PROPERTIES(${_target} PROPERTIES COMPILE_FLAGS "${_flags}")   
+	SET_SOURCE_FILES_PROPERTIES(${_target} PROPERTIES COMPILE_FLAGS "${_flags}")   
 ENDMACRO (add_compile_flags)
 
-#
+########################################################
+# Our exectuables
+########################################################
+ADD_EXECUTABLE(avidemux2_cli ${adm_EXE_SRCS})
+
+if(GTK_FOUND)
+	ADD_EXECUTABLE(avidemux2_gtk ${adm_EXE_SRCS})
+endif(GTK_FOUND)
+
+if(QT4_FOUND)
+	ADD_EXECUTABLE(avidemux2_qt4 ${adm_EXE_SRCS})
+endif(QT4_FOUND)
+
+########################################################
 # Normal subdirs, compile and link what is inside....
-#
+########################################################
 SET(ADM_SUBDIR 
 ADM_filter
 ADM_audiofilter 
@@ -79,39 +94,26 @@ ADM_ocr
 ADM_colorspace 
 )
 
+FOREACH(_current ${ADM_SUBDIR})
+	ADD_SUBDIRECTORY(${_current})
+	add_libs_all_targets(${_current})
+ENDFOREACH(_current ${ADM_SUBDIR})
 
-########################################################
-# Our exectuables
-########################################################
-ADD_EXECUTABLE(avidemux2_cli ${adm_EXE_SRCS} )
-if(GTK_FOUND)
-ADD_EXECUTABLE(avidemux2_gtk ${adm_EXE_SRCS} )
-endif(GTK_FOUND)
-if(QT4_FOUND)
-ADD_EXECUTABLE(avidemux2_qt4 ${adm_EXE_SRCS} )
-endif(QT4_FOUND)
-
-
-add_definitions(${GLIB_CFLAGS})
 ###########################################
 # Build Regular Subdirs
 ###########################################
-FOREACH(_current ${ADM_SUBDIR})
-subdirs (PREORDER ${_current})
-add_libs_all_targets(${_current})
-ENDFOREACH(_current ${ADM_SUBDIR})
-# build trail
-subdirs (PREORDER ADM_osSupport)
-subdirs (PREORDER ADM_encoder)
-subdirs (PREORDER ADM_toolkit)
-subdirs (PREORDER ADM_codecs)
-subdirs (PREORDER ADM_requant)
-subdirs (PREORDER ADM_infoExtractor)
+ADD_SUBDIRECTORY(ADM_osSupport)
+ADD_SUBDIRECTORY(ADM_encoder)
+ADD_SUBDIRECTORY(ADM_toolkit)
+ADD_SUBDIRECTORY(ADM_codecs)
+ADD_SUBDIRECTORY(ADM_requant)
+ADD_SUBDIRECTORY(ADM_infoExtractor)
+
 ###########################################
 # Construct ADM_outputs
 ###########################################
-subdirs (PREORDER ADM_outputs)
-LINK_DIRECTORIES(ADM_outputs)
+ADD_SUBDIRECTORY(ADM_outputs)
+
 SET(ADM_outputs
 oplug_avi
 oplug_mp4
@@ -123,13 +125,14 @@ oplug_dummy
 )
 
 FOREACH(_current ${ADM_outputs})
-add_libs_all_targets(${_current})
+	add_libs_all_targets(${_current})
 ENDFOREACH(_current ${ADM_outputs})
+
 ###########################################
 # Construct ADM_inputs
 ###########################################
-subdirs (PREORDER ADM_inputs)
-LINK_DIRECTORIES(ADM_inputs)
+ADD_SUBDIRECTORY(ADM_inputs)
+
 SET(ADM_inputs
 ADM_asf
 ADM_avsproxy
@@ -146,14 +149,12 @@ ADM_amv
 )
 
 FOREACH(_current ${ADM_inputs})
-add_libs_all_targets(${_current})
+	add_libs_all_targets(${_current})
 ENDFOREACH(_current ${ADM_inputs})
 
 #########################################
 # Tails
 #########################################
-
-
 add_libs_all_targets(ADM_toolkit)
 add_libs_all_targets(ADM_osSupport)
 add_libs_all_targets(ADM_encoder)
@@ -164,10 +165,9 @@ add_libs_all_targets(ADM_infoExtractor)
 ###########################################
 # Construct ADM_libraries
 ###########################################
-subdirs (PREORDER ADM_libraries)
-LINK_DIRECTORIES(ADM_libraries)
-SET(ADM_LIBRARIES
+ADD_SUBDIRECTORY(ADM_libraries)
 
+SET(ADM_LIBRARIES
 ADM_lavformat
 ADM_lavcodec
 ADM_lavutil
@@ -182,70 +182,69 @@ ADM_libwrapper
 ADM_lvemux
 ADM_smjs
 ADM_utilities
-ADM_colorspace 
 ADM_xvidratectl
 ADM_libpostproc
+ADM_colorspace
 )
+
 if(USE_FREETYPE)
-SET(ADM_LIBRARIES ${ADM_LIBRARIES}  ADM_libass)
+	SET(ADM_LIBRARIES ${ADM_LIBRARIES} ADM_libass)
 ENDIF(USE_FREETYPE)
 
 if (ADM_DEBUG AND FIND_LEAKS)
-SET(ADM_LIBRARIES ${ADM_LIBRARIES} ADM_nvwa)
+	SET(ADM_LIBRARIES ${ADM_LIBRARIES} ADM_nvwa)
 ENDIF (ADM_DEBUG AND FIND_LEAKS)
 
 FOREACH(_current ${ADM_LIBRARIES})
-add_libs_all_targets(${_current})
+	add_libs_all_targets(${_current})
 ENDFOREACH(_current ${ADM_SUBDIR})
 
 ###########################################
 # Construct ADM_userInterface
 ###########################################
-subdirs (PREORDER ADM_userInterfaces)
+ADD_SUBDIRECTORY(ADM_userInterfaces)
 
-LINK_DIRECTORIES(ADM_userInterfaces)
-LINK_DIRECTORIES(ADM_userInterfaces/ADM_NONE)
-
-
-TARGET_LINK_LIBRARIES(avidemux2_cli ADM_commonUI )
-TARGET_LINK_LIBRARIES(avidemux2_cli ADM_ocr )
-TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogNone )
-TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogFactoryNone )
-TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogFiltersNone )
-TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogGuiNone )
+TARGET_LINK_LIBRARIES(avidemux2_cli ADM_UI_None)
+TARGET_LINK_LIBRARIES(avidemux2_cli ADM_commonUI)
+TARGET_LINK_LIBRARIES(avidemux2_cli ADM_ocr)
+TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogNone)
+TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogFactoryNone)
+TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogFiltersNone)
+TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogGuiNone)
 
 if(GTK_FOUND)
-TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_commonUI )
-TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_ocr )
-TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_ocrGtk )
-TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_dialogGtk )
-TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_filtersGtk )
-TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_dialogFactoryGtk )
-TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_gui2Gtk )
-TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_toolkitGtk )
-TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_commonUI )
+	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_UI_GTK)
+	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_commonUI)
+	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_ocr)
+	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_ocrGtk)
+	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_dialogGtk)
+	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_filtersGtk)
+	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_dialogFactoryGtk)
+	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_gui2Gtk)
+	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_toolkitGtk)
+	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_commonUI)
 endif(GTK_FOUND)
 
 if(QT4_FOUND)
-TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_commonUI )
-TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_ocr )
-TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_ocrQt4 )
-TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_dialogQt4 )
-TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_dialogFactoryQt4 )
-TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_guiQt4 )
-TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_filtersQt4 )
-TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_commonUI )
+	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_UI_QT4)
+	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_commonUI)
+	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_ocr)
+	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_ocrQt4)
+	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_dialogQt4)
+	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_dialogFactoryQt4)
+	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_guiQt4)
+	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_filtersQt4)
+	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_commonUI)
 endif(QT4_FOUND)
+
+add_libs_all_targets(ADM_utilities)
 
 ###########################################
 # Add external libs
 ###########################################
-TARGET_LINK_LIBRARIES(avidemux2_cli ${GLIB_LDFLAGS} )
-LINK_DIRECTORIES(avidemux2_cli ${GLIB_LIB}  )
-
 # ARTS
 if(USE_ARTS)
-add_libs_all_targets( ${ARTS_LDFLAGS})
+	add_libs_all_targets(${ARTS_LDFLAGS})
 endif(USE_ARTS)
 
 # libAMRNB
@@ -260,183 +259,192 @@ endif(USE_LIBDCA AND NOT USE_LATE_BINDING)
 
 # xvid
 if(USE_XVID_4)
-add_libs_all_targets(xvidcore)
+	add_libs_all_targets(xvidcore)
 endif(USE_XVID_4)
 
 #alsa
 if(ALSA_FOUND)
-add_libs_all_targets( ${ASOUND_LIBRARY} )
+	add_libs_all_targets(${ASOUND_LIBRARY})
 endif(ALSA_FOUND)
+
 #fontconfig
 if(USE_FONTCONFIG)
-add_libs_all_targets(fontconfig)
+	add_libs_all_targets(fontconfig)
 endif(USE_FONTCONFIG)
-##########################
-# XVideo 
-##########################
+
+#XVideo 
 if(USE_XV)
-       TARGET_LINK_LIBRARIES(avidemux2_cli Xext)
-       TARGET_LINK_LIBRARIES(avidemux2_cli X11)
-       TARGET_LINK_LIBRARIES(avidemux2_cli Xv)
-       TARGET_LINK_LIBRARIES(avidemux2_cli m)
-       if(GTK_FOUND)
-               TARGET_LINK_LIBRARIES(avidemux2_gtk Xext)
-               TARGET_LINK_LIBRARIES(avidemux2_gtk X11)
-               TARGET_LINK_LIBRARIES(avidemux2_gtk Xv)
-               TARGET_LINK_LIBRARIES(avidemux2_gtk m)
-       endif(GTK_FOUND)
-       if(QT4_FOUND AND NOT CMAKE_OSX_SYSROOT)
-               TARGET_LINK_LIBRARIES(avidemux2_qt4 Xext)
-               TARGET_LINK_LIBRARIES(avidemux2_qt4 X11 )
-               TARGET_LINK_LIBRARIES(avidemux2_qt4 Xv )
-               TARGET_LINK_LIBRARIES(avidemux2_qt4 m)
-       endif(QT4_FOUND AND NOT CMAKE_OSX_SYSROOT)
+	TARGET_LINK_LIBRARIES(avidemux2_cli Xext)
+	TARGET_LINK_LIBRARIES(avidemux2_cli X11)
+	TARGET_LINK_LIBRARIES(avidemux2_cli Xv)
+	TARGET_LINK_LIBRARIES(avidemux2_cli m)
+	
+	if(GTK_FOUND)
+		TARGET_LINK_LIBRARIES(avidemux2_gtk Xext)
+		TARGET_LINK_LIBRARIES(avidemux2_gtk X11)
+		TARGET_LINK_LIBRARIES(avidemux2_gtk Xv)
+		TARGET_LINK_LIBRARIES(avidemux2_gtk m)
+	endif(GTK_FOUND)
+	
+	if(QT4_FOUND AND NOT CMAKE_OSX_SYSROOT)
+		TARGET_LINK_LIBRARIES(avidemux2_qt4 Xext)
+		TARGET_LINK_LIBRARIES(avidemux2_qt4 X11)
+		TARGET_LINK_LIBRARIES(avidemux2_qt4 Xv)
+		TARGET_LINK_LIBRARIES(avidemux2_qt4 m)
+	endif(QT4_FOUND AND NOT CMAKE_OSX_SYSROOT)
 endif(USE_XV)
 
 # Lame
 if(HAVE_LIBMP3LAME)
-add_libs_all_targets(mp3lame )
+	add_libs_all_targets(mp3lame)
 endif(HAVE_LIBMP3LAME)
 
 # SDL
 if(USE_SDL)
-add_libs_all_targets(${SDL_LDFLAGS} )
+	add_libs_all_targets(${SDL_LDFLAGS})
 endif(USE_SDL)
 
 # ESD
 if(USE_ESD)
-add_libs_all_targets(esd )
+	add_libs_all_targets(esd)
 endif(USE_ESD)
 
 # JACK
 if(USE_JACK)
-add_libs_all_targets(jack )
+	add_libs_all_targets(jack)
 endif(USE_JACK)
-
 
 # x264
 if(USE_X264)
-add_libs_all_targets(x264 )
+	add_libs_all_targets(x264)
 endif(USE_X264)
 
 # png
 if(USE_PNG)
-add_libs_all_targets(png )
+	add_libs_all_targets(png)
 endif(USE_PNG)
 
 # Vorbis
 if(USE_VORBIS)
-add_libs_all_targets(vorbis )
-add_libs_all_targets(vorbisenc )
+	add_libs_all_targets(vorbis)
+	add_libs_all_targets(vorbisenc)
 endif(USE_VORBIS)
 
 #faac
 if(USE_FAAC)
-add_libs_all_targets(faac)
+	add_libs_all_targets(faac)
 endif(USE_FAAC)
 
 #aften
 if(USE_AFTEN)
-add_libs_all_targets(aften)
+	add_libs_all_targets(aften)
 endif(USE_AFTEN)
-
 
 #faad
 if(USE_FAAD)
-add_libs_all_targets(faad)
+	add_libs_all_targets(faad)
 endif(USE_FAAD)
 
 #freetype
 if(USE_FREETYPE)
-add_libs_all_targets(${FT_LDFLAGS})
+	add_libs_all_targets(${FT_LDFLAGS})
 endif(USE_FREETYPE)
 
 #gettext
 if(ADM_GETTEXT_LIB)
-add_libs_all_targets(${ADM_GETTEXT_LIB})
+	TARGET_LINK_LIBRARIES(avidemux2_cli ${ADM_GETTEXT_LIB})
+
+	if(GTK_FOUND)
+		TARGET_LINK_LIBRARIES(avidemux2_gtk ${ADM_GETTEXT_LIB})
+	endif(GTK_FOUND)
 endif(ADM_GETTEXT_LIB)
 
 #iconv
 if(NEEED_LIBICONV)
-add_libs_all_targets(iconv)
+	add_libs_all_targets(iconv)
 endif(NEEED_LIBICONV)
 
 #libsamplerate
 if(USE_SRC)
-add_libs_all_targets(samplerate)
+	add_libs_all_targets(samplerate)
 endif(USE_SRC)
 
 # Xml2
-add_libs_all_targets(xml2 )
+add_libs_all_targets(xml2)
+
 ###########################################
 # Specific
 ###########################################
+TARGET_LINK_LIBRARIES(avidemux2_cli ${GLIB_LDFLAGS})
+LINK_DIRECTORIES(avidemux2_cli ${GLIB_LIB})
+
 if(GTK_FOUND)
-TARGET_LINK_LIBRARIES(avidemux2_gtk ${GLIB_LDFLAGS} )
-LINK_DIRECTORIES(avidemux2_gtk ${GLIB_LIB}  )
-TARGET_LINK_LIBRARIES(avidemux2_gtk ${GTK_LDFLAGS} )
-TARGET_LINK_LIBRARIES(avidemux2_gtk ${GTHREAD_LDFLAGS} ) # FIXME
+	TARGET_LINK_LIBRARIES(avidemux2_gtk ${GLIB_LDFLAGS})
+	LINK_DIRECTORIES(avidemux2_gtk ${GLIB_LIB})
+	TARGET_LINK_LIBRARIES(avidemux2_gtk ${GTK_LDFLAGS})
+	TARGET_LINK_LIBRARIES(avidemux2_gtk ${GTHREAD_LDFLAGS}) # FIXME
 endif(GTK_FOUND)
 
 if(QT4_FOUND)
-TARGET_LINK_LIBRARIES(avidemux2_qt4 ${GLIB_LDFLAGS} )
-LINK_DIRECTORIES(avidemux2_qt4 ${GLIB_LIB}  )
-TARGET_LINK_LIBRARIES(avidemux2_qt4 ${QT_QTGUI_LIBRARY} ) # FIXME
-TARGET_LINK_LIBRARIES(avidemux2_qt4 ${QT_QTCORE_LIBRARY} ) # FIXME
+	TARGET_LINK_LIBRARIES(avidemux2_qt4 ${GLIB_LDFLAGS})
+	LINK_DIRECTORIES(avidemux2_qt4 ${GLIB_LIB})
+	TARGET_LINK_LIBRARIES(avidemux2_qt4 ${QT_QTGUI_LIBRARY}) # FIXME
+	TARGET_LINK_LIBRARIES(avidemux2_qt4 ${QT_QTCORE_LIBRARY}) # FIXME
 endif(QT4_FOUND)
-
 
 ########################
 # Win32
 ########################
 IF(WIN32)
-add_libs_all_targets(z)
-add_libs_all_targets(ADM_osSupport)
-add_libs_all_targets(pthreadGC2)
-add_libs_all_targets(winmm)
-add_libs_all_targets(wsock32)
-add_libs_all_targets(imagehlp)
+	add_libs_all_targets(z)
+	add_libs_all_targets(ADM_osSupport)
+	add_libs_all_targets(pthreadGC2)
+	add_libs_all_targets(winmm)
+	add_libs_all_targets(wsock32)
+	add_libs_all_targets(imagehlp)
 
-add_ldflags_all_targets( "-mms-bitfield -mno-cygwin -mwinmm -mwindows ${CMAKE_SOURCE_DIR}/avidemux/xpm/adm.o -Wl,--export-all-symbols")
+	add_ldflags_all_targets("-mms-bitfield -mno-cygwin -mwinmm -mwindows ${CMAKE_SOURCE_DIR}/avidemux/xpm/adm.o -Wl,--export-all-symbols")
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-add_ldflags_all_targets("-Wl,-s")
-endif(CMAKE_BUILD_TYPE STREQUAL "Release")
+	if(CMAKE_BUILD_TYPE STREQUAL "Release")
+		add_ldflags_all_targets("-Wl,-s")
+	endif(CMAKE_BUILD_TYPE STREQUAL "Release")
 
-if(USE_SDL)
-add_definitions(${SDL_CFLAGS})
-endif(USE_SDL)
+	if(USE_SDL)
+		add_definitions(${SDL_CFLAGS})
+	endif(USE_SDL)
 ENDIF(WIN32)
+
 ########################
 # MacOsX
 ########################
 if(CMAKE_OSX_SYSROOT)
-add_libs_all_targets(z)
-add_libs_all_targets( "-framework CoreServices  -framework CoreAudio   -framework AudioUnit")
-if(GTK_FOUND)
-LINK_DIRECTORIES(avidemux2_gtk /usr/X11R6/lib )
-endif(GTK_FOUND)
-
+	add_libs_all_targets(z)
+	add_libs_all_targets("-framework CoreServices -framework CoreAudio -framework AudioUnit")
+	
+	if(GTK_FOUND)
+		LINK_DIRECTORIES(avidemux2_gtk /usr/X11R6/lib)
+	endif(GTK_FOUND)
 endif(CMAKE_OSX_SYSROOT)
+
 ########################
 # all
 ########################
-SDLify(main.cpp )
+SDLify(main.cpp)
 add_compile_flags(main.cpp "-DADM_SUBVERSION=${ADM_SUBVERSION}")
+
 ###############
 # INSTALL
 ###############
 SET(ADM_EXES avidemux2_cli)
+
 if(GTK_FOUND)
-  SET(ADM_EXES ${ADM_EXES} avidemux2_gtk)
+	SET(ADM_EXES ${ADM_EXES} avidemux2_gtk)
 endif(GTK_FOUND)
+
 if(QT4_FOUND)
-  SET(ADM_EXES ${ADM_EXES} avidemux2_qt4)
+	SET(ADM_EXES ${ADM_EXES} avidemux2_qt4)
 endif(QT4_FOUND)
 
-INSTALL(TARGETS ${ADM_EXES}
-            RUNTIME DESTINATION bin
-            LIBRARY DESTINATION lib)
-# /EOF
+INSTALL(TARGETS ${ADM_EXES} RUNTIME DESTINATION bin LIBRARY DESTINATION lib)
 
-
+# EOF

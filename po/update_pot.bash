@@ -1,6 +1,12 @@
 #!/bin/bash
 cd .. 
-find ./avidemux -iname '*.cpp' -o -iname '*.h' > po/POTFILES.in
+echo "Finding HEADERS..."
+find ./avidemux -iname '*.h' -not -iwholename '*ADM_QT4*' > po/POTFILES.in
+
+echo "Finding SOURCES..."
+find ./avidemux -iname '*.cpp' -not -iwholename '*ADM_QT4*' >> po/POTFILES.in
+
 cd po
-xgettext --keyword=_ --debug --from-code=utf-8 -C -D .. -p . -f POTFILES.in -o avidemux.pot
+echo "Generating pot file..."
+xgettext --keyword=QT_TR_NOOP --debug --from-code=utf-8 -C -D .. -p . -f POTFILES.in -o avidemux.pot
 echo "DONE."

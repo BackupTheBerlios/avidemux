@@ -25,6 +25,7 @@ user_interface_gtk = \
 		./ADM_toolkit/libADM_toolkit.a				\
 		./ADM_ocr/libADM_ocr.a	\
 		./ADM_userInterfaces/ADM_commonUI/libmergedCommonUI.o  \
+		./ADM_userInterfaces/ADM_GTK/libADM_UI_GTK.a    \
 		./ADM_userInterfaces/ADM_GTK/ADM_ocr/libADM_ocrGtk.a	\
 		./ADM_userInterfaces/ADM_GTK/ADM_filters/libADM_filtersGtk.a \
 		./ADM_userInterfaces/ADM_GTK/ADM_dialog/libADM_dialogGtk.a	\
@@ -34,6 +35,7 @@ user_interface_gtk = \
 		
 user_interface_cli = \
 		./ADM_toolkit/libADM_toolkit.a				\
+		./ADM_userInterfaces/ADM_NONE/libADM_UI_None.a    \
 		./ADM_userInterfaces/ADM_NONE/ADM_gui2/libADM_gui2.a	\
 		./ADM_userInterfaces/ADM_NONE/ADM_dialog/libADM_dialog.a	\
 		./ADM_userInterfaces/ADM_NONE/ADM_dialogFactory/libADM_dialogFactory.a	\
@@ -44,16 +46,18 @@ user_interface_cli = \
 		
 		
 user_interface_qt4 = \
-			./ADM_ocr/libADM_ocr.a	\
+			./ADM_ocr/libADM_ocr.a	\			
+			./ADM_userInterfaces/ADM_QT4/libADM_UI_QT4.a   \
 			./ADM_userInterfaces/ADM_QT4/ADM_gui/libADM_gui2.a	\
 			./ADM_userInterfaces/ADM_QT4/ADM_dialog/libADM_dialog.a	\
 			./ADM_userInterfaces/ADM_QT4/ADM_dialog/AQ_srt.o	\
 			./ADM_userInterfaces/ADM_QT4/ADM_dialogFactory/libADM_dialogFactory.a	\
 			./ADM_userInterfaces/ADM_commonUI/libADM_CommonUI.a	\
+			./ADM_userInterfaces/ADM_QT4/ADM_ocr/libADM_ocrQt4.a   \
 			./ADM_userInterfaces/ADM_QT4/ADM_dialogFactory/libADM_dialogFactory.a	\
 			./ADM_userInterfaces/ADM_QT4/ADM_gui/libADM_gui2.a	\
 			./ADM_userInterfaces/ADM_QT4/ADM_filters/libADM_filters.a \
-			./ADM_toolkit/libADM_toolkit.a				
+			./ADM_toolkit/libADM_toolkit.a
 
 adm_src =   guiplay.cpp  \
 	gui_savenew.cpp  gui_navigate.cpp gtk_gui.cpp   \

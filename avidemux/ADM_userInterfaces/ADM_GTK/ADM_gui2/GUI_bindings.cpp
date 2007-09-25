@@ -580,7 +580,7 @@ int32_t UI_readJog(void)
         
 }
 
-void UI_setTitle(char *name)
+void UI_setTitle(const char *name)
 {
         char title[1024];
 
@@ -1144,8 +1144,12 @@ extern char **global_argv;
 typedef gboolean GCALL       (void *);
 extern int automation(void );
 extern uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h);
+extern void initTranslator(void);
+
 int UI_Init(int argc, char **argv)
 {
+	initTranslator();
+
   uint32_t w,h;
     if(!g_thread_supported())
         g_thread_init(NULL);

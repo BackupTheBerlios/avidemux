@@ -86,7 +86,7 @@ void 	UI_setFrameType( uint32_t frametype,uint32_t qp)
 {}
 void 	UI_setMarkers(uint32_t a, uint32_t b )
 {}
-void 	UI_setTitle(char *name)
+void 	UI_setTitle(const char *name)
 {}
 
 

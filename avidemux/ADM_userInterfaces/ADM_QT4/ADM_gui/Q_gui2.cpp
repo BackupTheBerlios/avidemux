@@ -38,6 +38,9 @@
 #include "ADM_toolkit/filesel.h"
 #include "prefs.h"
 
+extern int global_argc;
+extern char **global_argv;
+
 extern uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h);
 extern int automation(void );
 extern void HandleAction(Action a);
@@ -46,9 +49,13 @@ extern const char *encoderGetIndexedName (uint32_t i);
 extern uint32_t audioFilterGetNbEncoder(void);
 extern const char* audioFilterGetIndexedName(uint32_t i);
 extern void checkCrashFile(void);
-static void setupMenus(void);
+extern void UI_QT4VideoWidget(QFrame *frame);
+extern void loadTranslator(void);
+extern void initTranslator(void);
+extern void destroyTranslator(void);
 
 int SliderIsShifted=0;
+static void setupMenus(void);
 static int shiftKeyHeld=0;
 static ADM_QSlider *slider=NULL;
 static int _upd_in_progres=0;
@@ -529,17 +536,13 @@ MainWindow::~MainWindow()
 	clearCustomMenu();
 }
 
-//*********************************************
-//***** Hook to core                ***********
-//*********************************************
-extern int global_argc;
-extern char **global_argv;
-extern void UI_QT4VideoWidget(QFrame *frame);
-
 int UI_Init(int nargc,char **nargv)
 {
+	initTranslator();
+
 	global_argc=nargc;
 	global_argv=nargv;
+
 	return 0;
 }
 QWidget *QuiMainWindows=NULL;
@@ -606,29 +609,33 @@ int UI_RunApp(void)
 {
 	Q_INIT_RESOURCE(avidemux);
 	Q_INIT_RESOURCE(filter);
-	QApplication a( global_argc, global_argv );
-	MainWindow * mw = new MainWindow();
 
-	a.connect( &a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()) );
+	QApplication a(global_argc, global_argv);
+	a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));
+
+	loadTranslator();
 
 	uint32_t w, h;
 
 	UI_getPhysicalScreenSize(&w,&h);
 	printf("The screen seems to be %u x %u px\n",w,h);
 
+	MainWindow *mw = new MainWindow();
 	mw->show();
 
-	QuiMainWindows=(QWidget*)mw;
+	QuiMainWindows = (QWidget*)mw;
 
 	UI_QT4VideoWidget(mw->ui.frame_video);  // Add the widget that will handle video display
-	UI_updateRecentMenu(  );
+	UI_updateRecentMenu();
 	setupMenus();
 	checkCrashFile();
 
 	if (global_argc >= 2)
 		automation();
 
-	return a.exec();
+	a.exec();
+
+	destroyTranslator();
 }
 /**
     \fn searchTranslationTable(const char *name))
@@ -779,7 +786,7 @@ void UI_purge( void )
     \fn UI_setTitle(char *name)
     \brief Set the main window title, usually name if the file being edited
 */
-void UI_setTitle(char *name)
+void UI_setTitle(const char *name)
 {
     char title[300];
 

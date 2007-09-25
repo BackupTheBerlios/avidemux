@@ -124,7 +124,7 @@ void     DIA_previewInit(uint32_t width, uint32_t height);
 uint8_t  DIA_previewUpdate(uint8_t *data);
 void 	 DIA_previewEnd(void);
 uint8_t  DIA_previewStillAlive(void);
-uint8_t	 DIA_filterPreview(char *captionText, AVDMGenericVideoStream *videoStream, uint32_t frame);
+uint8_t	 DIA_filterPreview(const char *captionText, AVDMGenericVideoStream *videoStream, uint32_t frame);
 
  // Pseudo class used to register filters automagically
  // Does not work atm

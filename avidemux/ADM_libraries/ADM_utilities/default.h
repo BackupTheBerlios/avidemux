@@ -69,32 +69,28 @@ typedef unsigned char ADM_filename ;
 #define ADM_OK 	1
 #define ADM_IGN 2
 
-// For win32, useless else
-#ifdef __cplusplus
-uint64_t ftello_adm(FILE *f);
-int fseeko_adm(FILE *f,fpos_t off,int whence);
-#endif
 /*
  * Standard gettext macros.
  */
 #ifdef HAVE_GETTEXT
 #  include <libintl.h>
 #  undef _
-#  define _(String) dgettext (PACKAGE, String)
-#  ifdef gettext_noop
-#    define N_(String) gettext_noop (String)
-#  else
-#    define N_(String) (String)
-#  endif
 #else
 #  define textdomain(String) (String)
 #  define gettext(String) (String)
 #  define dgettext(Domain,Message) (Message)
 #  define dcgettext(Domain,Message,Type) (Message)
 #  define bindtextdomain(Domain,Directory) (Domain)
-#  define _(String) (String)
-#  define N_(String) (String)
 #endif
+
+extern const char* translate(const char *__domainname, const char *__msgid);
+#define _(String) translate (PACKAGE, String)
+
+#ifdef QT_TR_NOOP
+#undef QT_TR_NOOP
+#endif
+
+#define QT_TR_NOOP(String) translate (PACKAGE, String)
 
 #if (defined( HAVE_LIBESD) && defined(HAVE_ESD_H)) || \
  defined(OSS_SUPPORT) || defined (USE_ARTS) || \

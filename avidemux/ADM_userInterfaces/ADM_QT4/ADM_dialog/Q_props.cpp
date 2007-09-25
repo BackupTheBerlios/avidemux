@@ -23,7 +23,7 @@
 #include "avidemutils.h"
 #include "avi_vars.h"
 #include "ADM_osSupport/ADM_misc.h"
-static char *yesno[2]={_("No"),_("Yes")};
+static const char *yesno[2]={_("No"),_("Yes")};
 extern const char *getStrFromAudioCodec( uint32_t codec);
  class propWindow : public QDialog
  {

@@ -22,10 +22,6 @@
 #include <stdlib.h>
 #include <glib.h>
 
-#ifdef HAVE_GETTEXT
-#include <libintl.h>
-#include <locale.h>
-#endif
 #include "default.h"
 
 #ifdef ADM_WIN32
@@ -176,37 +172,6 @@ printf("\n");
 
 #if defined(__USE_LARGEFILE) && defined(__USE_LARGEFILE64)
 	printf("\nLarge file available: %d offset\n", __USE_FILE_OFFSET64);
-#endif
-
-#ifdef HAVE_GETTEXT
-	char *local=setlocale (LC_ALL, "");
-
-#ifndef ADM_WIN32
-	bindtextdomain ("avidemux", ADMLOCALE);
-#else
-	bindtextdomain ("avidemux", "./share/locale");
-#endif
-
-	bind_textdomain_codeset ("avidemux", "UTF-8");
-  
-	if(local)
-		printf("\n[Locale] setlocale %s\n",local);
-
-	local=textdomain(NULL);
-	textdomain ("avidemux");
-
-	if(local)
-	    printf("[Locale] Textdomain was %s\n",local);
-
-	local=textdomain(NULL);
-
-	if(local)
-		printf("[Locale] Textdomain is now %s\n",local);
-
-#ifndef ADM_WIN32
-	printf("[Locale] Files for %s appear to be in %s\n","avidemux", ADMLOCALE);
-#endif
-	printf("[Locale] Test: %s\n\n",dgettext("avidemux","_File"));
 #endif
 
    // Start counting memory

@@ -42,7 +42,7 @@ static void seekablePreview_frame_changed(void);
 /* =================================
             Filter Preview
    ================================= */
-uint8_t DIA_filterPreview(char *captionText, AVDMGenericVideoStream *videoStream, uint32_t frame)
+uint8_t DIA_filterPreview(const char *captionText, AVDMGenericVideoStream *videoStream, uint32_t frame)
 {
 	ADM_assert(frame <= videoStream->getInfo()->nb_frames);
 
