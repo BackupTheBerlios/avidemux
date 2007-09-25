@@ -1,6 +1,7 @@
 SET(ADM_LIB ADM_UI_GTK)
 SET(${ADM_LIB}_SRCS ui_support.cpp)
 ADD_LIBRARY(${ADM_LIB} STATIC ${${ADM_LIB}_SRCS})
+ADD_definitions(${GTK_CFLAGS})
 
 add_subdirectory(ADM_dialog)
 add_subdirectory(ADM_dialogFactory)

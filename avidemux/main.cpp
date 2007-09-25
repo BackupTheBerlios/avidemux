@@ -80,6 +80,7 @@ extern void AUDMEncoder_initDither(void);
 extern void ADM_memStat( void );
 extern void ADM_memStatInit( void );
 extern void ADM_memStatEnd( void );
+extern void getUIDescription(char*);
 
 #ifdef ADM_WIN32
 extern EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, void* pEstablisherFrame, struct _CONTEXT* pContextRecord, void* pDispatcherContext);
@@ -159,15 +160,17 @@ int main(int argc, char *argv[])
 	printf(" (PowerPC)");
 #endif
 
-printf("\n");
+	printf("\n");
+
+	char uiDesc[15];
+	getUIDescription(uiDesc);
+	printf("User Interface: %s\n", uiDesc);
 
 #ifdef ADM_WIN32
 	char version[250];
 
 	if (getWindowsVersion(version))
-	{
 		printf("Operating System: %s\n", version);
-	}
 #endif
 
 #if defined(__USE_LARGEFILE) && defined(__USE_LARGEFILE64)
@@ -178,7 +181,7 @@ printf("\n");
 	ADM_memStatInit();
 	ADM_intFloatInit();
 
-	printf("Initialising prefs\n");
+	printf("\nInitialising prefs\n");
 	initPrefs();
 	prefs->load();
     CpuCaps::init();

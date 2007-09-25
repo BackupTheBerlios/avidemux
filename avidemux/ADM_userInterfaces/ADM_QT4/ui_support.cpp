@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 
 #include <QApplication>
@@ -65,4 +66,9 @@ void destroyTranslator(void)
 	}
 
 	memset(translatedMessage, 0, MAX_MESSAGE_COUNT * sizeof(char*));
+}
+
+void getUIDescription(char* desc)
+{
+	sprintf(desc, "Qt4 (%s)", qVersion());
 }

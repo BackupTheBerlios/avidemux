@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "config.h"
 
 #ifdef HAVE_GETTEXT
@@ -22,3 +23,8 @@ const char* translate(const char *__domainname, const char *__msgid)
 	return __msgid;
 }
 #endif
+
+void getUIDescription(char* desc)
+{
+	sprintf(desc, "CLI");
+}
