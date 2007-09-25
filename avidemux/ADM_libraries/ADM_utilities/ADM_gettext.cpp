@@ -1,7 +1,9 @@
 #include "config.h"
 
 #ifdef HAVE_GETTEXT
+#include <stdio.h>
 #include <libintl.h>
+#include <locale.h>
 
 void initGetText(void)
 {

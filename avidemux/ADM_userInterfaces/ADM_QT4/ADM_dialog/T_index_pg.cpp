@@ -139,7 +139,7 @@ DIA_progressIndexing *pf;
         UNUSED_ARG(user_data);
 
         pf=(Ui_indexingDialog *)user_data;
-        if(!GUI_Confirmation_HIG(_("Continue indexing"),_("Abort Requested"),_("Do you want to abort indexing ?")))
+        if(!GUI_Confirmation_HIG(QT_TR_NOOP("Continue indexing"),QT_TR_NOOP("Abort Requested"),QT_TR_NOOP("Do you want to abort indexing ?")))
         {
          //       pf->abortRequest();
                 abted=1;
@@ -195,7 +195,7 @@ uint8_t       DIA_progressIndexing::update(uint32_t done,uint32_t total, uint32_
         dialog->setTime(string);
         
 
-        sprintf(string,_("# Images :%0lu"),nbImage);
+        sprintf(string,QT_TR_NOOP("# Images :%0lu"),nbImage);
         dialog->setImage(string);
 
         f=done;
@@ -213,7 +213,7 @@ uint8_t       DIA_progressIndexing::update(uint32_t done,uint32_t total, uint32_
         if(tim>tom) return 1;
         tom=tom-tim;
         ms2time(tom,&zhh,&zmm,&zss);
-        sprintf(string,_("Time Left :%02d:%02d:%02d"),zhh,zmm,zss);
+        sprintf(string,QT_TR_NOOP("Time Left :%02d:%02d:%02d"),zhh,zmm,zss);
         dialog->setETA(string);
         UI_purge();
         }

@@ -69,7 +69,7 @@ uint8_t DIA_contrast(AVDMGenericVideoStream *in,CONTRAST_PARAM *param)
 
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
-        gtk_window_set_title (GTK_WINDOW (dialog), _("ASHARP"));
+        gtk_window_set_title (GTK_WINDOW (dialog), QT_TR_NOOP("ASHARP"));
         gtk_widget_show(dialog);	
         
           // and value changed
@@ -191,7 +191,7 @@ create_dialog1 (void)
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Contrast"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Contrast"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -209,7 +209,7 @@ create_dialog1 (void)
   gtk_widget_show (vbox3);
   gtk_box_pack_start (GTK_BOX (hbox1), vbox3, TRUE, TRUE, 0);
 
-  label1 = gtk_label_new (_("Contrast"));
+  label1 = gtk_label_new (QT_TR_NOOP("Contrast"));
   gtk_widget_show (label1);
   gtk_box_pack_start (GTK_BOX (vbox3), label1, FALSE, FALSE, 0);
 
@@ -218,7 +218,7 @@ create_dialog1 (void)
   gtk_box_pack_start (GTK_BOX (vbox3), hscaleContrast, FALSE, TRUE, 0);
   gtk_scale_set_value_pos (GTK_SCALE (hscaleContrast), GTK_POS_LEFT);
 
-  label2 = gtk_label_new (_("Brightness"));
+  label2 = gtk_label_new (QT_TR_NOOP("Brightness"));
   gtk_widget_show (label2);
   gtk_box_pack_start (GTK_BOX (vbox3), label2, FALSE, FALSE, 0);
 
@@ -232,15 +232,15 @@ create_dialog1 (void)
   gtk_widget_show (vbox2);
   gtk_box_pack_start (GTK_BOX (hbox1), vbox2, TRUE, TRUE, 0);
 
-  checkLuma = gtk_check_button_new_with_mnemonic (_("Luma"));
+  checkLuma = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("Luma"));
   gtk_widget_show (checkLuma);
   gtk_box_pack_start (GTK_BOX (vbox2), checkLuma, FALSE, FALSE, 0);
 
-  checkbuttonU = gtk_check_button_new_with_mnemonic (_("Chroma U"));
+  checkbuttonU = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("Chroma U"));
   gtk_widget_show (checkbuttonU);
   gtk_box_pack_start (GTK_BOX (vbox2), checkbuttonU, FALSE, FALSE, 0);
 
-  checkbuttonV = gtk_check_button_new_with_mnemonic (_("Chroma v"));
+  checkbuttonV = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("Chroma v"));
   gtk_widget_show (checkbuttonV);
   gtk_box_pack_start (GTK_BOX (vbox2), checkbuttonV, FALSE, FALSE, 0);
 

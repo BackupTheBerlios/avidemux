@@ -207,7 +207,7 @@ void ADM_backTrack(int lineno, const char *file)
 	fflush(stdout);
 	saveCrashProject();
 
-	GUI_Error_HIG(_("Fatal Error"),_("A fatal error has occurred.\n\nClick OK to generate debug information. This may take a few minutes to complete."));
+	GUI_Error_HIG(QT_TR_NOOP("Fatal Error"),QT_TR_NOOP("A fatal error has occurred.\n\nClick OK to generate debug information. This may take a few minutes to complete."));
 
 	void* currentProcessId = GetCurrentProcess();
 
@@ -233,7 +233,7 @@ EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, 
 
 	saveCrashProject();
 
-	GUI_Error_HIG(_("Fatal Error"),_("A fatal error has occurred.\n\nClick OK to generate debug information. This may take a few minutes to complete."));
+	GUI_Error_HIG(QT_TR_NOOP("Fatal Error"),QT_TR_NOOP("A fatal error has occurred.\n\nClick OK to generate debug information. This may take a few minutes to complete."));
 
 	void* currentProcessId = GetCurrentProcess();
 
@@ -434,8 +434,8 @@ void checkCrashFile(void)
   strcat(where,name);
   if(ADM_fileExist(where))
   {
-    if(GUI_Confirmation_HIG(_("Load it"),_("Crash file"),
-       _("I have detected a crash file. \nDo you want to load it  ?\n(It will be deleted in all cases, you should save it if you want to keep it)")))
+    if(GUI_Confirmation_HIG(QT_TR_NOOP("Load it"),QT_TR_NOOP("Crash file"),
+       QT_TR_NOOP("I have detected a crash file. \nDo you want to load it  ?\n(It will be deleted in all cases, you should save it if you want to keep it)")))
     {
        A_parseECMAScript(where);
     }

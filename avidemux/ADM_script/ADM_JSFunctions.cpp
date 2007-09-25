@@ -235,7 +235,7 @@ JSBool dirSelect(JSContext *cx, JSObject *obj, uintN argc,
         // default return value
         if(argc != 0)
                 return JS_FALSE;
-        if(!FileSel_SelectDir(_("Select a directory"),name,1023, NULL))
+        if(!FileSel_SelectDir(QT_TR_NOOP("Select a directory"),name,1023, NULL))
          return JS_FALSE;
         *rval=STRING_TO_JSVAL(JS_NewStringCopyZ(cx,name));
         return JS_TRUE;
@@ -501,7 +501,7 @@ JSBool pathOnly(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 JSBool facInt(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
   uint32_t tog=0;
-   diaElemUInteger blend(&tog,_("Uinteger"),0,255);
+   diaElemUInteger blend(&tog,QT_TR_NOOP("Uinteger"),0,255);
     diaElem *elems[]={&blend   };
     
   if(diaFactoryRun("Test uinteger",1,elems))
@@ -516,7 +516,7 @@ JSBool facInt(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 JSBool facFloat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
   ELEM_TYPE_FLOAT tog=0;
-   diaElemFloat blend(&tog,_("Float"),0,255);
+   diaElemFloat blend(&tog,QT_TR_NOOP("Float"),0,255);
     diaElem *elems[]={&blend   };
     
   if(diaFactoryRun("Test float",1,elems))
@@ -534,7 +534,7 @@ JSBool facToggle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 {
   uint32_t tog=0;
   uint32_t test=0;
-   diaElemToggle blend(&tog,_("Toggle"));
+   diaElemToggle blend(&tog,QT_TR_NOOP("Toggle"));
     diaElemUInteger     bt(&test,"Entry",0,10);
     diaElemUInteger     bt2(&test,"Entry",0,10);
     diaElem *elems[]={&blend,&bt,&bt2   };
@@ -555,12 +555,12 @@ JSBool facMenu(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
    uint32_t tog=0;
    
     diaMenuEntry menu[]={
-                             {2,   _("No Strategy"),NULL},
-                             {4,     _("3:2 Pulldown"),NULL},
-                             {6,     _("Pal/Secam"),NULL},
-                             {7,  _("NTSC converted from PAL"),NULL}
+                             {2,   QT_TR_NOOP("No Strategy"),NULL},
+                             {4,     QT_TR_NOOP("3:2 Pulldown"),NULL},
+                             {6,     QT_TR_NOOP("Pal/Secam"),NULL},
+                             {7,  QT_TR_NOOP("NTSC converted from PAL"),NULL}
                           };
-   diaElemMenu blend(&tog,_("menu"),4,menu);
+   diaElemMenu blend(&tog,QT_TR_NOOP("menu"),4,menu);
     diaElem *elems[]={&blend   };
     
   if(diaFactoryRun("Test Menu",1,elems))

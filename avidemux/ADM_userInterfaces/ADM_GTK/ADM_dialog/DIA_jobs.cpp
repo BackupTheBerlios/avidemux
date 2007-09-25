@@ -22,7 +22,7 @@ static GtkWidget       *create_dialog1 (void);
 static void             updateStatus(void);
 static int              getSelection(GtkWidget *dialog);
 extern bool parseECMAScript(const char *name);
-static const char *StringStatus[]={_("Ready"),_("Succeeded"),_("Failed"),_("Deleted"),_("Running")};
+static const char *StringStatus[]={QT_TR_NOOP("Ready"),QT_TR_NOOP("Succeeded"),QT_TR_NOOP("Failed"),QT_TR_NOOP("Deleted"),QT_TR_NOOP("Running")};
 
 
 typedef enum 
@@ -95,16 +95,16 @@ GtkCellRenderer *renderer;
         // Add columns
 
         renderer = gtk_cell_renderer_text_new ();
-        column = gtk_tree_view_column_new_with_attributes (_("  Job Name  "), renderer,
+        column = gtk_tree_view_column_new_with_attributes (QT_TR_NOOP("  Job Name  "), renderer,
                                                       "markup", (GdkModifierType) 0,
                                                       NULL);
         gtk_tree_view_append_column (GTK_TREE_VIEW (WID(treeview1)), column);
 
-        column2 = gtk_tree_view_column_new_with_attributes (_("Started at"), renderer,
+        column2 = gtk_tree_view_column_new_with_attributes (QT_TR_NOOP("Started at"), renderer,
                                                       "markup", (GdkModifierType) 1,
                                                       NULL);
         gtk_tree_view_append_column (GTK_TREE_VIEW (WID(treeview1)), column2);
-        column3 = gtk_tree_view_column_new_with_attributes (_("Finished at"), renderer,
+        column3 = gtk_tree_view_column_new_with_attributes (QT_TR_NOOP("Finished at"), renderer,
             "markup", (GdkModifierType) 2,
             NULL);
         gtk_tree_view_append_column (GTK_TREE_VIEW (WID(treeview1)), column3);
@@ -131,7 +131,7 @@ GtkCellRenderer *renderer;
                         case GTK_RESPONSE_DELETE_EVENT:
                                          running=0;break;
                         case COMMAND_DELETE_ALL:
-                                        if(GUI_Confirmation_HIG(_("Sure!"),_("Delete ALL jobs"),_("Are you sure you want to delete all jobs ?")))
+                                        if(GUI_Confirmation_HIG(QT_TR_NOOP("Sure!"),QT_TR_NOOP("Delete ALL jobs"),QT_TR_NOOP("Are you sure you want to delete all jobs ?")))
                                         {
                                                 for(int i=0;i<jobs.nb;i++) jobs.status[i].status=STATUS_DELETED;
                                         }
@@ -169,7 +169,7 @@ GtkCellRenderer *renderer;
                         case COMMAND_DELETE: 
                                         sel=getSelection(jobs.dialog);
                                         if(sel>=jobs.nb) break;
-                                        if(GUI_Confirmation_HIG(_("Sure!"),_("Delete job"),_("Are you sure you want to delete %s job ?"),GetFileName(jobs.name[sel])))
+                                        if(GUI_Confirmation_HIG(QT_TR_NOOP("Sure!"),QT_TR_NOOP("Delete job"),QT_TR_NOOP("Are you sure you want to delete %s job ?"),GetFileName(jobs.name[sel])))
                                         {
                                                 jobs.status[sel].status=STATUS_DELETED;
                                         }
@@ -178,7 +178,7 @@ GtkCellRenderer *renderer;
                         
                         default:
                                 printf("Event:%d\n",event); 
-                                GUI_Alert(_("Unknown event"));break;
+                                GUI_Alert(QT_TR_NOOP("Unknown event"));break;
                 }
                 
         }
@@ -219,7 +219,7 @@ char str1[200],str2[200],str3[200];
         {
                 sprintf(str1,"<span weight=\"heavy\"> %s </span>\n" 
                "<span size=\"smaller\" style=\"oblique\" > %s </span> "
-                ,GetFileName(jobs.name[i]),_(StringStatus[jobs.status[i].status]));
+                ,GetFileName(jobs.name[i]),QT_TR_NOOP(StringStatus[jobs.status[i].status]));
 
                 date=&(jobs.status[i].startDate);
                 sprintf(str2,"%02d:%02d:%02d",date->hours,
@@ -258,7 +258,7 @@ create_dialog1 (void)
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Jobs"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Jobs"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -284,22 +284,22 @@ create_dialog1 (void)
   gtk_box_pack_start (GTK_BOX (hbox1), vbuttonbox1, FALSE, FALSE, 0);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (vbuttonbox1), GTK_BUTTONBOX_START);
 
-  buttonDeleteAll = gtk_button_new_with_mnemonic (_("Delete All Jobs"));
+  buttonDeleteAll = gtk_button_new_with_mnemonic (QT_TR_NOOP("Delete All Jobs"));
   gtk_widget_show (buttonDeleteAll);
   gtk_container_add (GTK_CONTAINER (vbuttonbox1), buttonDeleteAll);
   GTK_WIDGET_SET_FLAGS (buttonDeleteAll, GTK_CAN_DEFAULT);
 
-  buttonDelete = gtk_button_new_with_mnemonic (_("Delete Job"));
+  buttonDelete = gtk_button_new_with_mnemonic (QT_TR_NOOP("Delete Job"));
   gtk_widget_show (buttonDelete);
   gtk_container_add (GTK_CONTAINER (vbuttonbox1), buttonDelete);
   GTK_WIDGET_SET_FLAGS (buttonDelete, GTK_CAN_DEFAULT);
 
-  buttonRunAll = gtk_button_new_with_mnemonic (_("Run all jobs"));
+  buttonRunAll = gtk_button_new_with_mnemonic (QT_TR_NOOP("Run all jobs"));
   gtk_widget_show (buttonRunAll);
   gtk_container_add (GTK_CONTAINER (vbuttonbox1), buttonRunAll);
   GTK_WIDGET_SET_FLAGS (buttonRunAll, GTK_CAN_DEFAULT);
 
-  buttonRun = gtk_button_new_with_mnemonic (_("Run Job"));
+  buttonRun = gtk_button_new_with_mnemonic (QT_TR_NOOP("Run Job"));
   gtk_widget_show (buttonRun);
   gtk_container_add (GTK_CONTAINER (vbuttonbox1), buttonRun);
   GTK_WIDGET_SET_FLAGS (buttonRun, GTK_CAN_DEFAULT);

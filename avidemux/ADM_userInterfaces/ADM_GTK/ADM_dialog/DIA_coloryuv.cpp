@@ -152,7 +152,7 @@ GtkWidget*
     GtkWidget *okbutton1;
 
     dialog1 = gtk_dialog_new ();
-    gtk_window_set_title (GTK_WINDOW (dialog1), _("ColorYuv (From avisynth)"));
+    gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("ColorYuv (From avisynth)"));
     gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
     dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -176,49 +176,49 @@ GtkWidget*
     gtk_widget_show (table1);
     gtk_container_add (GTK_CONTAINER (alignment1), table1);
 
-    label2 = gtk_label_new (_("Contrast"));
+    label2 = gtk_label_new (QT_TR_NOOP("Contrast"));
     gtk_widget_show (label2);
     gtk_table_attach (GTK_TABLE (table1), label2, 1, 2, 0, 1,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
 
-    label3 = gtk_label_new (_("Brightness"));
+    label3 = gtk_label_new (QT_TR_NOOP("Brightness"));
     gtk_widget_show (label3);
     gtk_table_attach (GTK_TABLE (table1), label3, 2, 3, 0, 1,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
 
-    label4 = gtk_label_new (_("Gamma"));
+    label4 = gtk_label_new (QT_TR_NOOP("Gamma"));
     gtk_widget_show (label4);
     gtk_table_attach (GTK_TABLE (table1), label4, 3, 4, 0, 1,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
 
-    label5 = gtk_label_new (_("Gain"));
+    label5 = gtk_label_new (QT_TR_NOOP("Gain"));
     gtk_widget_show (label5);
     gtk_table_attach (GTK_TABLE (table1), label5, 4, 5, 0, 1,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
 
-    label6 = gtk_label_new (_("Luma Y"));
+    label6 = gtk_label_new (QT_TR_NOOP("Luma Y"));
     gtk_widget_show (label6);
     gtk_table_attach (GTK_TABLE (table1), label6, 0, 1, 1, 2,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
 
-    label7 = gtk_label_new (_("Chroma U"));
+    label7 = gtk_label_new (QT_TR_NOOP("Chroma U"));
     gtk_widget_show (label7);
     gtk_table_attach (GTK_TABLE (table1), label7, 0, 1, 2, 3,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label7), 0, 0.5);
 
-    label8 = gtk_label_new (_("Chroma V"));
+    label8 = gtk_label_new (QT_TR_NOOP("Chroma V"));
     gtk_widget_show (label8);
     gtk_table_attach (GTK_TABLE (table1), label8, 0, 1, 3, 4,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -321,7 +321,7 @@ GtkWidget*
                       (GtkAttachOptions) (0), 0, 0);
     gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton24), TRUE);
 
-    Color_Correction = gtk_label_new (_("<b>Color Correction Matrix</b>"));
+    Color_Correction = gtk_label_new (QT_TR_NOOP("<b>Color Correction Matrix</b>"));
     gtk_widget_show (Color_Correction);
     gtk_frame_set_label_widget (GTK_FRAME (frame1), Color_Correction);
     gtk_label_set_use_markup (GTK_LABEL (Color_Correction), TRUE);
@@ -344,21 +344,21 @@ GtkWidget*
     gtk_widget_show (table2);
     gtk_box_pack_start (GTK_BOX (hbox1), table2, TRUE, TRUE, 0);
 
-    label10 = gtk_label_new (_("Matrix"));
+    label10 = gtk_label_new (QT_TR_NOOP("Matrix"));
     gtk_widget_show (label10);
     gtk_table_attach (GTK_TABLE (table2), label10, 0, 1, 0, 1,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
 
-    label11 = gtk_label_new (_("Opt"));
+    label11 = gtk_label_new (QT_TR_NOOP("Opt"));
     gtk_widget_show (label11);
     gtk_table_attach (GTK_TABLE (table2), label11, 0, 1, 1, 2,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label11), 0, 0.5);
 
-    label12 = gtk_label_new (_("Level"));
+    label12 = gtk_label_new (QT_TR_NOOP("Level"));
     gtk_widget_show (label12);
     gtk_table_attach (GTK_TABLE (table2), label12, 0, 1, 2, 3,
                       (GtkAttachOptions) (GTK_FILL),
@@ -370,50 +370,50 @@ GtkWidget*
     gtk_table_attach (GTK_TABLE (table2), comboboxMatrix, 1, 2, 0, 1,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                       (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxMatrix), _("None"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxMatrix), _("Rec.709"));
+    gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxMatrix), QT_TR_NOOP("None"));
+    gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxMatrix), QT_TR_NOOP("Rec.709"));
 
     combobox2 = gtk_combo_box_new_text ();
     gtk_widget_show (combobox2);
     gtk_table_attach (GTK_TABLE (table2), combobox2, 1, 2, 1, 2,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (combobox2), _("None"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (combobox2), _("Coring"));
+    gtk_combo_box_append_text (GTK_COMBO_BOX (combobox2), QT_TR_NOOP("None"));
+    gtk_combo_box_append_text (GTK_COMBO_BOX (combobox2), QT_TR_NOOP("Coring"));
 
     combobox3 = gtk_combo_box_new_text ();
     gtk_widget_show (combobox3);
     gtk_table_attach (GTK_TABLE (table2), combobox3, 1, 2, 2, 3,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (combobox3), _("None"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (combobox3), _("TV->PC"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (combobox3), _("PC->TV"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (combobox3), _("PC->TV.Y"));
+    gtk_combo_box_append_text (GTK_COMBO_BOX (combobox3), QT_TR_NOOP("None"));
+    gtk_combo_box_append_text (GTK_COMBO_BOX (combobox3), QT_TR_NOOP("TV->PC"));
+    gtk_combo_box_append_text (GTK_COMBO_BOX (combobox3), QT_TR_NOOP("PC->TV"));
+    gtk_combo_box_append_text (GTK_COMBO_BOX (combobox3), QT_TR_NOOP("PC->TV.Y"));
 
     vbox2 = gtk_vbox_new (FALSE, 0);
     gtk_widget_show (vbox2);
     gtk_box_pack_start (GTK_BOX (hbox1), vbox2, TRUE, TRUE, 0);
 
-    label13 = gtk_label_new (_("<b>Matrix Warning :</b>\nall above values are normalized to 256!"));
+    label13 = gtk_label_new (QT_TR_NOOP("<b>Matrix Warning :</b>\nall above values are normalized to 256!"));
     gtk_widget_show (label13);
     gtk_box_pack_start (GTK_BOX (vbox2), label13, FALSE, FALSE, 0);
     gtk_label_set_use_markup (GTK_LABEL (label13), TRUE);
     gtk_label_set_justify (GTK_LABEL (label13), GTK_JUSTIFY_CENTER);
 
-    checkbuttonAutoGain = gtk_check_button_new_with_mnemonic (_("AutoGain"));
+    checkbuttonAutoGain = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("AutoGain"));
     gtk_widget_show (checkbuttonAutoGain);
     gtk_box_pack_start (GTK_BOX (vbox2), checkbuttonAutoGain, FALSE, FALSE, 0);
 
-    checkbuttonAnalyze = gtk_check_button_new_with_mnemonic (_("Display Stats"));
+    checkbuttonAnalyze = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("Display Stats"));
     gtk_widget_show (checkbuttonAnalyze);
     gtk_box_pack_start (GTK_BOX (vbox2), checkbuttonAnalyze, FALSE, FALSE, 0);
 
-    checkbuttonAutoWhite = gtk_check_button_new_with_mnemonic (_("AutoWhite"));
+    checkbuttonAutoWhite = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("AutoWhite"));
     gtk_widget_show (checkbuttonAutoWhite);
     gtk_box_pack_start (GTK_BOX (vbox2), checkbuttonAutoWhite, FALSE, FALSE, 0);
 
-    label9 = gtk_label_new (_("<b>frame2</b>"));
+    label9 = gtk_label_new (QT_TR_NOOP("<b>frame2</b>"));
     gtk_widget_show (label9);
     gtk_frame_set_label_widget (GTK_FRAME (Settings), label9);
     gtk_label_set_use_markup (GTK_LABEL (label9), TRUE);

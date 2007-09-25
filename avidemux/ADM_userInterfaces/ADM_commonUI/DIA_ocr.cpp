@@ -89,9 +89,9 @@ uint8_t DIA_ocrGen(void)
   }
 _again:  
   // Fist build a dialogFactory to get input and output files
-  diaElemButton   selectIdx(_("Select idx file:"), cb_idx,&subparam,NULL);
-  diaElemFile     selectGlyph(1,&glyphFileName,_("Use glyphset (optional):"),NULL);  
-  diaElemFile     selectSrt(1,&srtFileName,_("Output SRT file"),NULL);
+  diaElemButton   selectIdx(QT_TR_NOOP("Select idx file:"), cb_idx,&subparam,NULL);
+  diaElemFile     selectGlyph(1,&glyphFileName,QT_TR_NOOP("Use glyphset (optional):"),NULL);  
+  diaElemFile     selectSrt(1,&srtFileName,QT_TR_NOOP("Output SRT file"),NULL);
   
   diaElem *elems[]={&selectIdx,&selectSrt,&selectGlyph};
   
@@ -102,7 +102,7 @@ _again:
      n--; // Remove glyph from dialog
    }
   
-        if( !diaFactoryRun(_("Select input and ouput files"),n,elems))
+        if( !diaFactoryRun(QT_TR_NOOP("Select input and ouput files"),n,elems))
         {
           cleanupSub(&source);
           if(srtFileName )ADM_dezalloc(srtFileName);
@@ -112,19 +112,19 @@ _again:
         }
         if(!ADM_fileExist(subparam.subname))
         {
-          GUI_Error_HIG(_("File error"),_("The idx/sub file does not exist."));
+          GUI_Error_HIG(QT_TR_NOOP("File error"),QT_TR_NOOP("The idx/sub file does not exist."));
           goto _again; 
         }
         if(!srtFileName || !*srtFileName)
         {
-          GUI_Error_HIG(_("File error"),_("Please Select a valid output SRT file."));
+          GUI_Error_HIG(QT_TR_NOOP("File error"),QT_TR_NOOP("Please Select a valid output SRT file."));
           goto _again; 
         }
          if(glyphFileName && *glyphFileName)
          {
            if(!ADM_fileExist(glyphFileName))
             {
-              GUI_Error_HIG(_("File error"),_("The idx/sub file does not exist."));
+              GUI_Error_HIG(QT_TR_NOOP("File error"),QT_TR_NOOP("The idx/sub file does not exist."));
               goto _again; 
             }
             // Purge previous glyph set if any
@@ -133,7 +133,7 @@ _again:
             printf("[OCR] Loading glyphset :<%s>\n",glyphFileName);
             if(!loadGlyph(glyphFileName,&head,&nb))
             {
-              GUI_Error_HIG(_("File error"),_("Cannot load the glyphset file."));
+              GUI_Error_HIG(QT_TR_NOOP("File error"),QT_TR_NOOP("Cannot load the glyphset file."));
               goto _again;               
             }
             printf("[GLYPH] Found %u glyph\n");
@@ -153,9 +153,9 @@ _again:
         {
             char *save=NULL;
             uint32_t nb=1;
-              diaElemFile     selectSave(1,&save,_("Glyphset filename"),NULL);
+              diaElemFile     selectSave(1,&save,QT_TR_NOOP("Glyphset filename"),NULL);
               diaElem *elems2[]={&selectSave};
-            if( diaFactoryRun(_("Save Glyph"),1,elems2))
+            if( diaFactoryRun(QT_TR_NOOP("Save Glyph"),1,elems2))
             {
               saveGlyph(save,&head,nb);
             }
@@ -205,10 +205,10 @@ uint8_t DIA_ocrDvb(void)
   }
 _againX:  
   // Fist build a dialogFactory to get input and output files
-  diaElemFile     selectTs(1,&tsFileName,_("Input TS:"),NULL);
-  diaElemUInteger selectPid(&pid,_("Subtitle PID:"),0,255);
-  diaElemFile     selectGlyph(1,&glyphFileName,_("Use glyphset (optional):"),NULL);  
-  diaElemFile     selectSrt(1,&srtFileName,_("Output SRT file"),NULL);
+  diaElemFile     selectTs(1,&tsFileName,QT_TR_NOOP("Input TS:"),NULL);
+  diaElemUInteger selectPid(&pid,QT_TR_NOOP("Subtitle PID:"),0,255);
+  diaElemFile     selectGlyph(1,&glyphFileName,QT_TR_NOOP("Use glyphset (optional):"),NULL);  
+  diaElemFile     selectSrt(1,&srtFileName,QT_TR_NOOP("Output SRT file"),NULL);
   
   diaElem *elems[]={&selectTs,&selectPid,&selectSrt,&selectGlyph};
   
@@ -219,7 +219,7 @@ _againX:
      n--; // Remove glyph from dialog
    }
   
-        if( !diaFactoryRun(_("Select input and ouput files"),n,elems))
+        if( !diaFactoryRun(QT_TR_NOOP("Select input and ouput files"),n,elems))
         {
           cleanupSub(&source);
           if(srtFileName )ADM_dezalloc(srtFileName);
@@ -230,20 +230,20 @@ _againX:
         // TS file exists ?
         if(!ADM_fileExist(tsFileName))
         {
-        	  GUI_Error_HIG(_("File error"),_("Please Select a valid TS file."));
+        	  GUI_Error_HIG(QT_TR_NOOP("File error"),QT_TR_NOOP("Please Select a valid TS file."));
         	  goto _againX;
         }
        
         if(!srtFileName || !*srtFileName)
         {
-          GUI_Error_HIG(_("File error"),_("Please Select a valid output SRT file."));
+          GUI_Error_HIG(QT_TR_NOOP("File error"),QT_TR_NOOP("Please Select a valid output SRT file."));
           goto _againX; 
         }
          if(glyphFileName && *glyphFileName)
          {
            if(!ADM_fileExist(glyphFileName))
             {
-              GUI_Error_HIG(_("File error"),_("The idx/sub file does not exist."));
+              GUI_Error_HIG(QT_TR_NOOP("File error"),QT_TR_NOOP("The idx/sub file does not exist."));
               goto _againX; 
             }
             // Purge previous glyph set if any
@@ -252,7 +252,7 @@ _againX:
             printf("[OCR] Loading glyphset :<%s>\n",glyphFileName);
             if(!loadGlyph(glyphFileName,&head,&nb))
             {
-              GUI_Error_HIG(_("File error"),_("Cannot load the glyphset file."));
+              GUI_Error_HIG(QT_TR_NOOP("File error"),QT_TR_NOOP("Cannot load the glyphset file."));
               goto _againX;               
             }
             printf("[GLYPH] Found %u glyph\n");
@@ -273,9 +273,9 @@ _againX:
         {
             char *save=NULL;
             uint32_t nb=1;
-              diaElemFile     selectSave(1,&save,_("Glyphset filename"),NULL);
+              diaElemFile     selectSave(1,&save,QT_TR_NOOP("Glyphset filename"),NULL);
               diaElem *elems2[]={&selectSave};
-            if( diaFactoryRun(_("Save Glyph"),1,elems2))
+            if( diaFactoryRun(QT_TR_NOOP("Save Glyph"),1,elems2))
             {
               saveGlyph(save,&head,nb);
             }

@@ -84,12 +84,12 @@ uint8_t vidHardPDRemoval::configure (AVDMGenericVideoStream * in)
     
 #define PX(x) &(_param->x)
         
-    diaElemUInteger   thresh(PX(threshold),_("_Threshold:"),0,99,
-        _("If value is smaller than threshold it is considered valid."
+    diaElemUInteger   thresh(PX(threshold),QT_TR_NOOP("_Threshold:"),0,99,
+        QT_TR_NOOP("If value is smaller than threshold it is considered valid."
             " Smaller value might mean more false positive"));
-    diaElemUInteger   noise(PX(noise),_("_Noise:"),0,99,_("If pixels are closer than noise, they are considered to be the same"));
-    diaElemUInteger   identical(PX(identical),_("_Identical:"),0,99,_("If metric is less than identical, images are considered identical"));
-    diaElemToggle     show(PX(show),_("_Show metrics"),_("Show metric in image (debug)"));
+    diaElemUInteger   noise(PX(noise),QT_TR_NOOP("_Noise:"),0,99,QT_TR_NOOP("If pixels are closer than noise, they are considered to be the same"));
+    diaElemUInteger   identical(PX(identical),QT_TR_NOOP("_Identical:"),0,99,QT_TR_NOOP("If metric is less than identical, images are considered identical"));
+    diaElemToggle     show(PX(show),QT_TR_NOOP("_Show metrics"),QT_TR_NOOP("Show metric in image (debug)"));
     
        diaElem *elems[]={&thresh,&noise,&identical,&show};
   

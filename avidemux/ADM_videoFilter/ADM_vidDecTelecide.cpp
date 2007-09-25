@@ -80,47 +80,47 @@ uint8_t Telecide::configure(AVDMGenericVideoStream *in)
     ELEM_TYPE_FLOAT gthresh=(ELEM_TYPE_FLOAT)_param->gthresh;
 
          diaMenuEntry tStrategy[]={
-                             {GUIDE_NONE,   _("No strategy"),NULL},
-                             {GUIDE_32,     _("3:2 pulldown"),NULL},
-                             {GUIDE_22,     _("PAL/SECAM"),NULL},
-                             {GUIDE_32322,  _("NTSC converted from PAL"),NULL}
+                             {GUIDE_NONE,   QT_TR_NOOP("No strategy"),NULL},
+                             {GUIDE_32,     QT_TR_NOOP("3:2 pulldown"),NULL},
+                             {GUIDE_22,     QT_TR_NOOP("PAL/SECAM"),NULL},
+                             {GUIDE_32322,  QT_TR_NOOP("NTSC converted from PAL"),NULL}
                           };
                           
           diaMenuEntry tField[]={
-                             {1,_("Top"),NULL},
-                             {0,_("Bottom"),NULL}
+                             {1,QT_TR_NOOP("Top"),NULL},
+                             {0,QT_TR_NOOP("Bottom"),NULL}
           };
           
           diaMenuEntry tBackward[]={
-                             {NO_BACK,_("Never"),NULL},
-                             {BACK_ON_COMBED,_("If still combed"),NULL},
-                             {ALWAYS_BACK,_("Always"),NULL}
+                             {NO_BACK,QT_TR_NOOP("Never"),NULL},
+                             {BACK_ON_COMBED,QT_TR_NOOP("If still combed"),NULL},
+                             {ALWAYS_BACK,QT_TR_NOOP("Always"),NULL}
           };
           
           diaMenuEntry tPostproc[]={
-                             {POST_NONE,      _("None"),NULL},
-                             {POST_METRICS,   _("None but compute"),NULL},
-                             {POST_FULL,      _("Postproc on best match"),NULL},
-                             {POST_FULL_MAP,  _("Postproc and show zones (debug)"),NULL},
-                             {POST_FULL_NOMATCH,_("Process image (not fields)"),NULL},
-                             {POST_FULL_NOMATCH_MAP,_("Process image (not fields), debug"),NULL}
+                             {POST_NONE,      QT_TR_NOOP("None"),NULL},
+                             {POST_METRICS,   QT_TR_NOOP("None but compute"),NULL},
+                             {POST_FULL,      QT_TR_NOOP("Postproc on best match"),NULL},
+                             {POST_FULL_MAP,  QT_TR_NOOP("Postproc and show zones (debug)"),NULL},
+                             {POST_FULL_NOMATCH,QT_TR_NOOP("Process image (not fields)"),NULL},
+                             {POST_FULL_NOMATCH_MAP,QT_TR_NOOP("Process image (not fields), debug"),NULL}
           };
                              
           
-    diaElemMenu menuMode(PX(guide),   _("_Strategy:"), SZT(tStrategy),tStrategy);
-    diaElemMenu menuField(PX(order),  _("_Field order:"), SZT(tField),tField);
-    diaElemMenu menuPost(PX(post),    _("_Postprocessing:"), SZT(tPostproc),tPostproc);
-    diaElemMenu menuBackward(PX(back),_("_Try backward:"), SZT(tBackward),tBackward);
+    diaElemMenu menuMode(PX(guide),   QT_TR_NOOP("_Strategy:"), SZT(tStrategy),tStrategy);
+    diaElemMenu menuField(PX(order),  QT_TR_NOOP("_Field order:"), SZT(tField),tField);
+    diaElemMenu menuPost(PX(post),    QT_TR_NOOP("_Postprocessing:"), SZT(tPostproc),tPostproc);
+    diaElemMenu menuBackward(PX(back),QT_TR_NOOP("_Try backward:"), SZT(tBackward),tBackward);
     
-    diaElemFloat direct(&dthresh,_("_Direct threshold:"),0,200. );
-    diaElemFloat backward(&bthresh,_("_Backward threshold:"),0,200. );
-    diaElemFloat noise(&gthresh,_("_Noise threshold:"),0,200. );
-    diaElemFloat post(&vthresh,_("Postp_rocessing threshold:"),0,200. );
+    diaElemFloat direct(&dthresh,QT_TR_NOOP("_Direct threshold:"),0,200. );
+    diaElemFloat backward(&bthresh,QT_TR_NOOP("_Backward threshold:"),0,200. );
+    diaElemFloat noise(&gthresh,QT_TR_NOOP("_Noise threshold:"),0,200. );
+    diaElemFloat post(&vthresh,QT_TR_NOOP("Postp_rocessing threshold:"),0,200. );
     
-    diaElemToggle chroma(PX(chroma),_("_Use chroma to decide"));
-    diaElemToggle show(PX(show),_("Sho_w info"));
-    diaElemToggle debug(PX(debug),_("Debu_g"));
-    diaElemToggle blend(PX(blend),_("Bl_end"));
+    diaElemToggle chroma(PX(chroma),QT_TR_NOOP("_Use chroma to decide"));
+    diaElemToggle show(PX(show),QT_TR_NOOP("Sho_w info"));
+    diaElemToggle debug(PX(debug),QT_TR_NOOP("Debu_g"));
+    diaElemToggle blend(PX(blend),QT_TR_NOOP("Bl_end"));
     
     
     

@@ -86,7 +86,7 @@ int ret=0;
         {
                 if(UI_GetCurrentFormat()==ADM_AVI_DUAL)
                 {
-                  GUI_Error_HIG(_("Dual audio can only be used in copy mode"),_( "Select Copy as the video codec."));
+                  GUI_Error_HIG(QT_TR_NOOP("Dual audio can only be used in copy mode"),QT_TR_NOOP( "Select Copy as the video codec."));
                         return 0;
                 }
         }
@@ -204,7 +204,7 @@ int ret=0;
 								ret=A_SaveUnpackedVop(name);
 								break;
 						default:
-                                                  GUI_Error_HIG(_("Incompatible output format"), NULL);
+                                                  GUI_Error_HIG(QT_TR_NOOP("Incompatible output format"), NULL);
 					}
 					break;
 		case CodecFamilyMpeg:
@@ -220,7 +220,7 @@ int ret=0;
 						          ret=mpeg_passthrough(name,UI_GetCurrentFormat());
                                                           break;
                                                   default:
-                                                    GUI_Error_HIG(_("Incompatible output format"), NULL);
+                                                    GUI_Error_HIG(QT_TR_NOOP("Incompatible output format"), NULL);
                                                 }
                                                 break;
                                         } // THERE IS NO BREAK HERE, NOT A MISTAKE!
@@ -233,7 +233,7 @@ int ret=0;
                                 ret=oplug_mpegff(name,UI_GetCurrentFormat());;
                                 break;
                         default:
-                          GUI_Error_HIG(_("Incompatible output format"), NULL);
+                          GUI_Error_HIG(QT_TR_NOOP("Incompatible output format"), NULL);
                     }
                     break;
                 default:
@@ -251,11 +251,11 @@ uint8_t ret=0;
 
 		if(! secondaudiostream)
 		{
-                  GUI_Error_HIG(_("There is no second track"), _("Select a second audio track in the Audio menu."));
+                  GUI_Error_HIG(QT_TR_NOOP("There is no second track"), QT_TR_NOOP("Select a second audio track in the Audio menu."));
 				  	return 0;
 		}
 		if(!inname)
-                  GUI_FileSelWrite(_("Select dual audio AVI to write"), (char**)& name);
+                  GUI_FileSelWrite(QT_TR_NOOP("Select dual audio AVI to write"), (char**)& name);
 		else
 			name=inname;
 			
@@ -277,7 +277,7 @@ int ret;
 	video_body->getVideoInfo(&info);
 	if( !isMpeg4Compatible(  info.fcc))
 	{
-          GUI_Error_HIG(_("This cannot have packed VOP"),_( "It is not MPEG-4 video. File will not be saved."));
+          GUI_Error_HIG(QT_TR_NOOP("This cannot have packed VOP"),QT_TR_NOOP( "It is not MPEG-4 video. File will not be saved."));
 		return 0;
         }
 	//
@@ -295,7 +295,7 @@ int ret;
 	video_body->getVideoInfo(&info);
 	if( !isMpeg4Compatible(  info.fcc))
 	{
-          GUI_Error_HIG(_("This cannot have packed VOP"),_( "It is not MPEG-4 video. File will not be saved."));
+          GUI_Error_HIG(QT_TR_NOOP("This cannot have packed VOP"),QT_TR_NOOP( "It is not MPEG-4 video. File will not be saved."));
 		return 0;
         }
 	//
@@ -341,7 +341,7 @@ uint8_t  A_SaveAudioNVideo(const char *name)
                   }
                   else
                   {
-                    if(GUI_Question(_("You may need smart copy.\n Enable it ?")))
+                    if(GUI_Question(QT_TR_NOOP("You may need smart copy.\n Enable it ?")))
                     {
                         value=4;
                         if( ! GUI_getIntegerValue(&value, 2, 31, "_Q factor (set 4):"))

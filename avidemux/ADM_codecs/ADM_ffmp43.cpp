@@ -42,7 +42,7 @@ extern int ADM_cpu_num_processors(void);
 #define WRAP_Open(x) \
 {\
 AVCodec *codec=avcodec_find_decoder(x);\
-if(!codec) {GUI_Alert(_("Internal error finding codec"#x));ADM_assert(0);} \
+if(!codec) {GUI_Alert(QT_TR_NOOP("Internal error finding codec"#x));ADM_assert(0);} \
   codecId=x; \
   _context->workaround_bugs=FF_BUG_AUTODETECT; \
   _context->error_concealment=3; \

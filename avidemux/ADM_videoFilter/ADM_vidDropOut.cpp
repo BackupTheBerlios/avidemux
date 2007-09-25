@@ -60,7 +60,7 @@ uint8_t ADMVideoDropOut::configure(AVDMGenericVideoStream *instream)
 {
 	_in=instream;
         
-         diaElemUInteger chroma(_param,_("DropOut Threshold"),1,255);    
+         diaElemUInteger chroma(_param,QT_TR_NOOP("DropOut Threshold"),1,255);    
          diaElem *elems[]={&chroma};
   
     return diaFactoryRun("Drop Out",sizeof(elems)/sizeof(diaElem *),elems);

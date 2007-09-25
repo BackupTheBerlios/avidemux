@@ -59,64 +59,64 @@ int DIA_getAudioFilter(GAINparam *gain,
   vGainValue/=10.;
   //**********************************
        
-   diaElemToggle    eDRC(&vDRC,_("_Dynamic range compression"));
+   diaElemToggle    eDRC(&vDRC,QT_TR_NOOP("_Dynamic range compression"));
    
-   diaElemToggleInt eTimeShift(&vTshift,_("_Time shift (ms):"),&vTshiftValue,_("Time shift value (ms)"),-1000*100,1000*100);
+   diaElemToggleInt eTimeShift(&vTshift,QT_TR_NOOP("_Time shift (ms):"),&vTshiftValue,QT_TR_NOOP("Time shift value (ms)"),-1000*100,1000*100);
    
-//    diaElemToggle    eTimeShift(&vTshift,_("Enable _time shift"));
-//    diaElemInteger  eShift(&vTshiftValue,_("Time shift _value (ms):"),-10000,10000);
+//    diaElemToggle    eTimeShift(&vTshift,QT_TR_NOOP("Enable _time shift"));
+//    diaElemInteger  eShift(&vTshiftValue,QT_TR_NOOP("Time shift _value (ms):"),-10000,10000);
 //    
 //    eTimeShift.link(1,&eShift);
 //   
     //**********************************
-   diaElemToggleUint eResample(&vDownsample,_("R_esampling (Hz):"),&vFreq,_("Resampling frequency (Hz)"),6000,64000);
-    //diaElemToggle      eResample(&vDownsample,_("R_esampling (Hz)"));
-    //diaElemUInteger  eResampleValue(&vFreq,_("_Resampling frequency (Hz):"),6000,64000);
+   diaElemToggleUint eResample(&vDownsample,QT_TR_NOOP("R_esampling (Hz):"),&vFreq,QT_TR_NOOP("Resampling frequency (Hz)"),6000,64000);
+    //diaElemToggle      eResample(&vDownsample,QT_TR_NOOP("R_esampling (Hz)"));
+    //diaElemUInteger  eResampleValue(&vFreq,QT_TR_NOOP("_Resampling frequency (Hz):"),6000,64000);
   
 //    eResample.link(1,&eResampleValue);
     
     //**********************************
     diaMenuEntry menuFPS[]={
-  {FILMCONV_NONE,     _("None")},
-  {FILMCONV_FILM2PAL, _("Film to PAL")},
-  {FILMCONV_PAL2FILM, _("PAL to Film")}
+  {FILMCONV_NONE,     QT_TR_NOOP("None")},
+  {FILMCONV_FILM2PAL, QT_TR_NOOP("Film to PAL")},
+  {FILMCONV_PAL2FILM, QT_TR_NOOP("PAL to Film")}
     };
   
-   diaElemMenu      eFPS(&vFilm,_("_Frame rate change:"),3,menuFPS);
+   diaElemMenu      eFPS(&vFilm,QT_TR_NOOP("_Frame rate change:"),3,menuFPS);
 
    //**********************************
     diaMenuEntry menuGain[]={
-  {ADM_NO_GAIN,       _("None")},
-  {ADM_GAIN_AUTOMATIC,_("Automatic (max -3 dB)")},
-  {ADM_GAIN_MANUAL,   _("Manual")}};
+  {ADM_NO_GAIN,       QT_TR_NOOP("None")},
+  {ADM_GAIN_AUTOMATIC,QT_TR_NOOP("Automatic (max -3 dB)")},
+  {ADM_GAIN_MANUAL,   QT_TR_NOOP("Manual")}};
   
-   diaElemMenu      eGain(&vGainMode,_("_Gain mode:"),3,menuGain);
+   diaElemMenu      eGain(&vGainMode,QT_TR_NOOP("_Gain mode:"),3,menuGain);
    
-    diaElemFloat  eGainValue(&vGainValue,_("G_ain value:"),-10,10);
+    diaElemFloat  eGainValue(&vGainValue,QT_TR_NOOP("G_ain value:"),-10,10);
      eGain.link(&(menuGain[2]),1,&eGainValue);
-   diaElemFrame frameGain(_("Gain"));   
+   diaElemFrame frameGain(QT_TR_NOOP("Gain"));   
     frameGain.swallow(&eGain);
     frameGain.swallow(&eGainValue);
   //********************************
     diaMenuEntry menuMixer[]={
-  {CHANNEL_INVALID,     _("No change")},
-  {CHANNEL_MONO,        _("Mono")},
-  {CHANNEL_STEREO,      _("Stereo")},
-  {CHANNEL_2F_1R,       _("Stereo+surround")},
-  {CHANNEL_3F,          _("Stereo+center")},
-  {CHANNEL_3F_1R,           _("Stereo+center+surround")},
-  {CHANNEL_2F_2R,           _("Stereo front+stereo rear")},
-  {CHANNEL_3F_2R,           _("5 channels")},
-  {CHANNEL_3F_2R_LFE,       _("5.1")},
-  {CHANNEL_DOLBY_PROLOGIC,  _("Dolby Pro Logic")},
-  {CHANNEL_DOLBY_PROLOGIC2, _("Dolby Pro Logic II")}
+  {CHANNEL_INVALID,     QT_TR_NOOP("No change")},
+  {CHANNEL_MONO,        QT_TR_NOOP("Mono")},
+  {CHANNEL_STEREO,      QT_TR_NOOP("Stereo")},
+  {CHANNEL_2F_1R,       QT_TR_NOOP("Stereo+surround")},
+  {CHANNEL_3F,          QT_TR_NOOP("Stereo+center")},
+  {CHANNEL_3F_1R,           QT_TR_NOOP("Stereo+center+surround")},
+  {CHANNEL_2F_2R,           QT_TR_NOOP("Stereo front+stereo rear")},
+  {CHANNEL_3F_2R,           QT_TR_NOOP("5 channels")},
+  {CHANNEL_3F_2R_LFE,       QT_TR_NOOP("5.1")},
+  {CHANNEL_DOLBY_PROLOGIC,  QT_TR_NOOP("Dolby Pro Logic")},
+  {CHANNEL_DOLBY_PROLOGIC2, QT_TR_NOOP("Dolby Pro Logic II")}
     };
 
- diaElemMenu      eMixer(&vChan,_("_Mixer:"),11,menuMixer);
+ diaElemMenu      eMixer(&vChan,QT_TR_NOOP("_Mixer:"),11,menuMixer);
  
  /************************************/
  diaElem *elems[]={&eFPS, &eMixer, &eTimeShift,  &eResample, &eDRC, &frameGain};
-  if( diaFactoryRun(_("Audio Filters"),6,elems))
+  if( diaFactoryRun(QT_TR_NOOP("Audio Filters"),6,elems))
     {
         *drc=vDRC;
         *tshifted=vTshift;

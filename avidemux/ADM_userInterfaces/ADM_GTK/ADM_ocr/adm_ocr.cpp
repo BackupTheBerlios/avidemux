@@ -178,7 +178,7 @@ ReplyType glyphToText(admGlyph *glyph,admGlyph *head,char *decodedString)
                     return ReplySkipAll;
                     break;
                 case GTK_RESPONSE_CLOSE:
-                  if(GUI_Question(_("Sure ?"))) return ReplyClose;
+                  if(GUI_Question(QT_TR_NOOP("Sure ?"))) return ReplyClose;
                     break; // Abort
                     
                 }

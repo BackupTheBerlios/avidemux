@@ -72,11 +72,11 @@ void diaElemThreadCount::setMe(void *dialog, void *opaque, uint32_t line)
 	hbox1 = gtk_hbox_new (FALSE, 20);
 	gtk_widget_show (hbox1);
 
-	radiobutton1 = gtk_radio_button_new_with_mnemonic (NULL, _("Disable"));
+	radiobutton1 = gtk_radio_button_new_with_mnemonic (NULL, QT_TR_NOOP("Disable"));
 	gtk_widget_show (radiobutton1);
 	gtk_box_pack_start (GTK_BOX (hbox1), radiobutton1, FALSE, FALSE, 0);
 
-	radiobutton2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radiobutton1), _("Auto-detect"));
+	radiobutton2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radiobutton1), QT_TR_NOOP("Auto-detect"));
 	gtk_widget_show (radiobutton2);
 	gtk_box_pack_start (GTK_BOX (hbox1), radiobutton2, FALSE, FALSE, 0);
 
@@ -84,7 +84,7 @@ void diaElemThreadCount::setMe(void *dialog, void *opaque, uint32_t line)
 	gtk_widget_show (hbox2);
 	gtk_box_pack_start (GTK_BOX (hbox1), hbox2, FALSE, FALSE, 0);
 
-	radiobutton3 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radiobutton1), _("Custom"));
+	radiobutton3 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radiobutton1), QT_TR_NOOP("Custom"));
 	gtk_widget_show (radiobutton3);
 	gtk_box_pack_start (GTK_BOX (hbox2), radiobutton3, TRUE, TRUE, 0);
 

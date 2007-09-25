@@ -65,7 +65,7 @@ uint32_t shortTotal,shortCur,highFCC;
 	_audioIdx=new odmlIndex[MAXX];
 	shortTotal=(_fileSize)>>20;
 	
-	DIA_working *working=new DIA_working(_("Indexing"));
+	DIA_working *working=new DIA_working(QT_TR_NOOP("Indexing"));
 	
 	// 
 	while(pos<_fileSize-20 && achunk<MAXX-1 && vchunk < MAXX-1 && !end)

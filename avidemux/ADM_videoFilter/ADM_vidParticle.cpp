@@ -126,43 +126,43 @@ uint8_t ADMVideoParticle::configure(AVDMGenericVideoStream *in)
 
     diaElemUInteger min_area
         (&(_param->min_area),
-         _("Mi_nimum area for a particle to be detected:"), 1, 0x7fffffff);
+         QT_TR_NOOP("Mi_nimum area for a particle to be detected:"), 1, 0x7fffffff);
     diaElemUInteger max_area
         (&(_param->max_area),
-         _("Ma_ximum area for a particle to be detected:"), 1, 0x7fffffff);
+         QT_TR_NOOP("Ma_ximum area for a particle to be detected:"), 1, 0x7fffffff);
 
     diaElemUInteger left_crop
         (&(_param->left_crop),
-         _("_Left side crop (ignore particles in):"), 0, 0x7fffffff);
+         QT_TR_NOOP("_Left side crop (ignore particles in):"), 0, 0x7fffffff);
     diaElemUInteger right_crop
         (&(_param->right_crop),
-         _("_Right side crop (ignore particles in):"), 0, 0x7fffffff);
+         QT_TR_NOOP("_Right side crop (ignore particles in):"), 0, 0x7fffffff);
     diaElemUInteger top_crop
         (&(_param->top_crop),
-         _("_Top crop (ignore particles in):"), 0, 0x7fffffff);
+         QT_TR_NOOP("_Top crop (ignore particles in):"), 0, 0x7fffffff);
     diaElemUInteger bottom_crop
         (&(_param->bottom_crop),
-         _("_Bottom crop (ignore particles in):"), 0, 0x7fffffff);
+         QT_TR_NOOP("_Bottom crop (ignore particles in):"), 0, 0x7fffffff);
 
     diaMenuEntry tOutputFmt [] = {
         { OUTPUTFMT_FORMAT_NEW,
-          _("New format, preferred, good for Tracker3D"), NULL },
+          QT_TR_NOOP("New format, preferred, good for Tracker3D"), NULL },
         { OUTPUTFMT_FORMAT_OLD,
-          _("Old format that Tracker3D can't read directly"), NULL },
+          QT_TR_NOOP("Old format that Tracker3D can't read directly"), NULL },
     };
 
     diaElemMenu output_format
-        (&(_param->output_format), _("_Output Format:"),
+        (&(_param->output_format), QT_TR_NOOP("_Output Format:"),
          sizeof (tOutputFmt) / sizeof (diaMenuEntry), tOutputFmt);
 
     diaElemFile output_file
         (1, const_cast<char **>(&(_param->output_file)),
-         _("_Output File:"), "pts");
+         QT_TR_NOOP("_Output File:"), "pts");
 
     diaElemUInteger camera_number
-        (&(_param->camera_number), _("_Camera number:"), 1, 0x7fffffff);
+        (&(_param->camera_number), QT_TR_NOOP("_Camera number:"), 1, 0x7fffffff);
 
-    diaElemUInteger debug(&(_param->debug), _("_Debugging settings (bits):"),
+    diaElemUInteger debug(&(_param->debug), QT_TR_NOOP("_Debugging settings (bits):"),
                           0, 0x7fffffff);
 
     diaElem * elems[] = { &min_area, &max_area, &left_crop, &right_crop,

@@ -23,7 +23,7 @@
 #include "avidemutils.h"
 #include "avi_vars.h"
 #include "ADM_osSupport/ADM_misc.h"
-static const char *yesno[2]={_("No"),_("Yes")};
+static const char *yesno[2]={QT_TR_NOOP("No"),QT_TR_NOOP("Yes")};
 extern const char *getStrFromAudioCodec( uint32_t codec);
  class propWindow : public QDialog
  {
@@ -66,23 +66,23 @@ propWindow::propWindow()     : QDialog()
 #define FILLTEXT4(a,b,c,d) {snprintf(text,79,b,c,d);ui.a->setText(text);}
 #define FILLTEXT5(a,b,c,d,e) {snprintf(text,79,b,c,d,e);ui.a->setText(text);}
         
-        FILLTEXT4(labeImageSize,_("%lu x %lu"), avifileinfo->width,avifileinfo->height);
-        FILLTEXT(labelFrameRate, _("%2.3f fps"), (float) avifileinfo->fps1000 / 1000.F);
-        FILLTEXT(labelNbOfFrames,_("%ld frames"), avifileinfo->nb_frames);
+        FILLTEXT4(labeImageSize,QT_TR_NOOP("%lu x %lu"), avifileinfo->width,avifileinfo->height);
+        FILLTEXT(labelFrameRate, QT_TR_NOOP("%2.3f fps"), (float) avifileinfo->fps1000 / 1000.F);
+        FILLTEXT(labelNbOfFrames,QT_TR_NOOP("%ld frames"), avifileinfo->nb_frames);
         FILLTEXT(label4CC, "%s",      fourCC::tostring(avifileinfo->fcc));
         if (avifileinfo->nb_frames)
           {
                 frame2time(avifileinfo->nb_frames, avifileinfo->fps1000,
                           &hh, &mm, &ss, &ms);
-                snprintf(text,79, _("%02d:%02d:%02d.%03d"), hh, mm, ss, ms);
+                snprintf(text,79, QT_TR_NOOP("%02d:%02d:%02d.%03d"), hh, mm, ss, ms);
                 ui.labelVideoDuration->setText(text);
           }
         war=video_body->getPARWidth();
         har=video_body->getPARHeight();
         getAspectRatioFromAR(war,har, &s);
-        FILLTEXT5(LabelAspectRatio,_("%s (%u:%u)"), s,war,har);
+        FILLTEXT5(LabelAspectRatio,QT_TR_NOOP("%s (%u:%u)"), s,war,har);
 #define SET_YES(a,b) ui.a->setText(yesno[b])
-#define FILL_(q) ui.q->setText(text);
+#define FILLQT_TR_NOOP(q) ui.q->setText(text);
         SET_YES(LabelPackedBitstream,vop);
         SET_YES(LabelQuarterPixel,qpel);
         SET_YES(LabelGMC,gmc);
@@ -95,22 +95,22 @@ propWindow::propWindow()     : QDialog()
               switch (wavinfo->channels)
                 {
                 case 1:
-                    sprintf(text, _("Mono"));
+                    sprintf(text, QT_TR_NOOP("Mono"));
                     break;
                 case 2:
-                    sprintf(text, _("Stereo"));
+                    sprintf(text, QT_TR_NOOP("Stereo"));
                     break;
                 default:
                     sprintf(text, "%d",wavinfo->channels);
                     break;
                 }
 
-                FILL_(labelChannels);
-                FILLTEXT(labelFrequency, _("%lu Hz"), wavinfo->frequency);
-                FILLTEXT4(labelBitrate, _("%lu Bps / %lu kbps"), wavinfo->byterate,wavinfo->byterate * 8 / 1000);
+                FILLQT_TR_NOOP(labelChannels);
+                FILLTEXT(labelFrequency, QT_TR_NOOP("%lu Hz"), wavinfo->frequency);
+                FILLTEXT4(labelBitrate, QT_TR_NOOP("%lu Bps / %lu kbps"), wavinfo->byterate,wavinfo->byterate * 8 / 1000);
                 
                 sprintf(text, "%s", getStrFromAudioCodec(wavinfo->encoding));
-                FILL_(labelACodec);
+                FILLQT_TR_NOOP(labelACodec);
 
                 // Duration in seconds too
                 if(currentaudiostream && wavinfo->byterate>1)
@@ -122,11 +122,11 @@ propWindow::propWindow()     : QDialog()
                         du/=wavinfo->byterate;
                         ms2time((uint32_t)floor(du), &hh, &mm, &ss, &ms);
 
-						sprintf(text, _("%02d:%02d:%02d.%03d"), hh, mm, ss, ms);
-						FILL_(labelAudioDuration);
+						sprintf(text, QT_TR_NOOP("%02d:%02d:%02d.%03d"), hh, mm, ss, ms);
+						FILLQT_TR_NOOP(labelAudioDuration);
 
-						sprintf(text, _("%.2f MB"), l / 1048576.F);
-						FILL_(labelFileSize);
+						sprintf(text, QT_TR_NOOP("%.2f MB"), l / 1048576.F);
+						FILLQT_TR_NOOP(labelFileSize);
                 }
 
                 SET_YES(labelVBR,currentaudiostream->isVBR());

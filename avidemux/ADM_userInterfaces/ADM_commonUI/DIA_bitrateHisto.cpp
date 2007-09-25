@@ -56,7 +56,7 @@ uint32_t maxBFrame=0;
 	max=0;
 	if(!(frameEnd>frameStart) || abs(frameStart-frameEnd)<5)
 	{
-          GUI_Error_HIG(_("No data"), NULL);
+          GUI_Error_HIG(QT_TR_NOOP("No data"), NULL);
 		return ;
 	}
 
@@ -125,7 +125,7 @@ uint32_t maxBFrame=0;
 
 	if(!max)
 	{
-          GUI_Error_HIG(_("No data"), NULL);
+          GUI_Error_HIG(QT_TR_NOOP("No data"), NULL);
 		return ;
 	}
 	nb_frame=frameEnd-frameStart;
@@ -229,7 +229,7 @@ uint32_t maxBFrame=0;
             P(10),P(11),P(12),P(13),P(14),P(15),P(16),P(17),P(18),P(19)
           };
     
-        diaFactoryRun(_("Bitrate Histogram"),20+6,elems);
+        diaFactoryRun(QT_TR_NOOP("Bitrate Histogram"),20+6,elems);
         
         
         for(int i=0;i<20;i++)

@@ -234,7 +234,7 @@ GtkWidget *create_dialog1 (void)
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Xvid Encoder"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Xvid Encoder"));
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -247,7 +247,7 @@ GtkWidget *create_dialog1 (void)
   gtk_widget_show (table1);
   gtk_container_add (GTK_CONTAINER (notebook1), table1);
 
-  radioCQ = gtk_radio_button_new_with_mnemonic (NULL, _("Constant Quantizer"));
+  radioCQ = gtk_radio_button_new_with_mnemonic (NULL, QT_TR_NOOP("Constant Quantizer"));
   gtk_widget_show (radioCQ);
   gtk_table_attach (GTK_TABLE (table1), radioCQ, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -255,7 +255,7 @@ GtkWidget *create_dialog1 (void)
   gtk_radio_button_set_group (GTK_RADIO_BUTTON (radioCQ), radioCQ_group);
   radioCQ_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radioCQ));
 
-  radioCBR = gtk_radio_button_new_with_mnemonic (NULL, _("Constant Bitrate (kbps)"));
+  radioCBR = gtk_radio_button_new_with_mnemonic (NULL, QT_TR_NOOP("Constant Bitrate (kbps)"));
   gtk_widget_show (radioCBR);
   gtk_table_attach (GTK_TABLE (table1), radioCBR, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -263,7 +263,7 @@ GtkWidget *create_dialog1 (void)
   gtk_radio_button_set_group (GTK_RADIO_BUTTON (radioCBR), radioCQ_group);
   radioCQ_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radioCBR));
 
-  radio2Pass = gtk_radio_button_new_with_mnemonic (NULL, _("Dual pass (MBytes)"));
+  radio2Pass = gtk_radio_button_new_with_mnemonic (NULL, QT_TR_NOOP("Dual pass (MBytes)"));
   gtk_widget_show (radio2Pass);
   gtk_table_attach (GTK_TABLE (table1), radio2Pass, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -289,7 +289,7 @@ GtkWidget *create_dialog1 (void)
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  label1 = gtk_label_new (_("Basic"));
+  label1 = gtk_label_new (QT_TR_NOOP("Basic"));
   gtk_widget_show (label1);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 0), label1);
   gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
@@ -298,7 +298,7 @@ GtkWidget *create_dialog1 (void)
   gtk_widget_show (table2);
   gtk_container_add (GTK_CONTAINER (notebook1), table2);
 
-  label5 = gtk_label_new (_("Motion Search"));
+  label5 = gtk_label_new (QT_TR_NOOP("Motion Search"));
   gtk_widget_show (label5);
   gtk_table_attach (GTK_TABLE (table2), label5, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -306,7 +306,7 @@ GtkWidget *create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
 
-  label6 = gtk_label_new (_("Quantization"));
+  label6 = gtk_label_new (QT_TR_NOOP("Quantization"));
   gtk_widget_show (label6);
   gtk_table_attach (GTK_TABLE (table2), label6, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -314,7 +314,7 @@ GtkWidget *create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label6), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
 
-  label7 = gtk_label_new (_("Max I frame interval "));
+  label7 = gtk_label_new (QT_TR_NOOP("Max I frame interval "));
   gtk_widget_show (label7);
   gtk_table_attach (GTK_TABLE (table2), label7, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -330,7 +330,7 @@ GtkWidget *create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonMaxIFrame), TRUE);
 
-  label8 = gtk_label_new (_("Min I frame interval"));
+  label8 = gtk_label_new (QT_TR_NOOP("Min I frame interval"));
   gtk_widget_show (label8);
   gtk_table_attach (GTK_TABLE (table2), label8, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
@@ -354,31 +354,31 @@ GtkWidget *create_dialog1 (void)
 
   menu4 = gtk_menu_new ();
 
-  _0___none1 = gtk_menu_item_new_with_mnemonic (_("0 - None"));
+  _0___none1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("0 - None"));
   gtk_widget_show (_0___none1);
   gtk_container_add (GTK_CONTAINER (menu4), _0___none1);
 
-  _1__very_low1 = gtk_menu_item_new_with_mnemonic (_("1- Very low"));
+  _1__very_low1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("1- Very low"));
   gtk_widget_show (_1__very_low1);
   gtk_container_add (GTK_CONTAINER (menu4), _1__very_low1);
 
-  _2__low1 = gtk_menu_item_new_with_mnemonic (_("2- Low"));
+  _2__low1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("2- Low"));
   gtk_widget_show (_2__low1);
   gtk_container_add (GTK_CONTAINER (menu4), _2__low1);
 
-  _3__medium1 = gtk_menu_item_new_with_mnemonic (_("3- Medium"));
+  _3__medium1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("3- Medium"));
   gtk_widget_show (_3__medium1);
   gtk_container_add (GTK_CONTAINER (menu4), _3__medium1);
 
-  _4__high1 = gtk_menu_item_new_with_mnemonic (_("4- High"));
+  _4__high1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("4- High"));
   gtk_widget_show (_4__high1);
   gtk_container_add (GTK_CONTAINER (menu4), _4__high1);
 
-  _5__very_high1 = gtk_menu_item_new_with_mnemonic (_("5- Very High"));
+  _5__very_high1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("5- Very High"));
   gtk_widget_show (_5__very_high1);
   gtk_container_add (GTK_CONTAINER (menu4), _5__very_high1);
 
-  _6__ultra_high1 = gtk_menu_item_new_with_mnemonic (_("6- Ultra High"));
+  _6__ultra_high1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("6- Ultra High"));
   gtk_widget_show (_6__ultra_high1);
   gtk_container_add (GTK_CONTAINER (menu4), _6__ultra_high1);
 
@@ -392,19 +392,19 @@ GtkWidget *create_dialog1 (void)
 
   menu5 = gtk_menu_new ();
 
- h263_quantizer1 = gtk_menu_item_new_with_mnemonic (_("H263 Quantizer"));
+ h263_quantizer1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("H263 Quantizer"));
   gtk_widget_show (h263_quantizer1);
   gtk_container_add (GTK_CONTAINER (menu5), h263_quantizer1);
 
 
-  mpeg_quantizer1 = gtk_menu_item_new_with_mnemonic (_("MPEG Quantizer"));
+  mpeg_quantizer1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("MPEG Quantizer"));
   gtk_widget_show (mpeg_quantizer1);
   gtk_container_add (GTK_CONTAINER (menu5), mpeg_quantizer1);
 
 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionQzer), menu5);
 
-  label2 = gtk_label_new (_("Advanced"));
+  label2 = gtk_label_new (QT_TR_NOOP("Advanced"));
   gtk_widget_show (label2);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 1), label2);
   gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
@@ -413,7 +413,7 @@ GtkWidget *create_dialog1 (void)
   gtk_widget_show (table3);
   gtk_container_add (GTK_CONTAINER (notebook1), table3);
 
-  label9 = gtk_label_new (_("Min I Frame Qzer"));
+  label9 = gtk_label_new (QT_TR_NOOP("Min I Frame Qzer"));
   gtk_widget_show (label9);
   gtk_table_attach (GTK_TABLE (table3), label9, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -421,7 +421,7 @@ GtkWidget *create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label9), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label9), 0, 0.5);
 
-  label10 = gtk_label_new (_("Max I Frame Qzer"));
+  label10 = gtk_label_new (QT_TR_NOOP("Max I Frame Qzer"));
   gtk_widget_show (label10);
   gtk_table_attach (GTK_TABLE (table3), label10, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -429,7 +429,7 @@ GtkWidget *create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label10), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
 
-  label11 = gtk_label_new (_("Min P Frame Qzer"));
+  label11 = gtk_label_new (QT_TR_NOOP("Min P Frame Qzer"));
   gtk_widget_show (label11);
   gtk_table_attach (GTK_TABLE (table3), label11, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -437,7 +437,7 @@ GtkWidget *create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label11), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label11), 0, 0.5);
 
-  label12 = gtk_label_new (_("Max P Frame Qzer"));
+  label12 = gtk_label_new (QT_TR_NOOP("Max P Frame Qzer"));
   gtk_widget_show (label12);
   gtk_table_attach (GTK_TABLE (table3), label12, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
@@ -477,17 +477,17 @@ GtkWidget *create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinPmax), TRUE);
 
-  label3 = gtk_label_new (_("Quantizer"));
+  label3 = gtk_label_new (QT_TR_NOOP("Quantizer"));
   gtk_widget_show (label3);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 2), label3);
   gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);
 
-  label13 = gtk_label_new (_("Not Yet!"));
+  label13 = gtk_label_new (QT_TR_NOOP("Not Yet!"));
   gtk_widget_show (label13);
   gtk_container_add (GTK_CONTAINER (notebook1), label13);
   gtk_label_set_justify (GTK_LABEL (label13), GTK_JUSTIFY_LEFT);
 
-  label4 = gtk_label_new (_("B Frames"));
+  label4 = gtk_label_new (QT_TR_NOOP("B Frames"));
   gtk_widget_show (label4);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 3), label4);
   gtk_label_set_justify (GTK_LABEL (label4), GTK_JUSTIFY_LEFT);

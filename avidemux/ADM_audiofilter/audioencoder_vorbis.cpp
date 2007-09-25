@@ -268,12 +268,12 @@ int DIA_getVorbisSettings(ADM_audioEncoderDescriptor *descriptor)
     qqual=(ELEM_TYPE_FLOAT)vorbisParam->quality;
     
     diaMenuEntry channelMode[]={
-                             {ADM_VORBIS_VBR,      _("VBR"),NULL},
-                             {ADM_VORBIS_QUALITY,   _("Quality based"),NULL}};
+                             {ADM_VORBIS_VBR,      QT_TR_NOOP("VBR"),NULL},
+                             {ADM_VORBIS_QUALITY,   QT_TR_NOOP("Quality based"),NULL}};
           
-    diaElemMenu menuMode(&mmode,   _("_Mode:"), SZT(channelMode),channelMode);
+    diaElemMenu menuMode(&mmode,   QT_TR_NOOP("_Mode:"), SZT(channelMode),channelMode);
     
-#define BITRATE(x) {x,_(#x)}
+#define BITRATE(x) {x,QT_TR_NOOP(#x)}
     diaMenuEntry bitrateM[]={
                               BITRATE(56),
                               BITRATE(64),
@@ -285,9 +285,9 @@ int DIA_getVorbisSettings(ADM_audioEncoderDescriptor *descriptor)
                               BITRATE(192),
                               BITRATE(224)
                           };
-    diaElemMenu bitrate(&(descriptor->bitrate),   _("_Bitrate:"), SZT(bitrateM),bitrateM);
+    diaElemMenu bitrate(&(descriptor->bitrate),   QT_TR_NOOP("_Bitrate:"), SZT(bitrateM),bitrateM);
     
-    diaElemFloat quality(&qqual,_("_Quality:"),-1.,10.);
+    diaElemFloat quality(&qqual,QT_TR_NOOP("_Quality:"),-1.,10.);
     
     
     

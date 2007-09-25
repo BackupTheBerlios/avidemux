@@ -49,7 +49,7 @@ GtkWidget       *create_filterMain (void)
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Video Filters"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Video Filters"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -109,25 +109,25 @@ GtkWidget       *create_filterMain (void)
 
   tmp_image = gtk_image_new_from_stock ("gtk-zoom-fit", tmp_toolbar_icon_size);
   gtk_widget_show (tmp_image);
-  toolbuttonVCD = (GtkWidget*) gtk_tool_button_new (tmp_image, _("VCD res"));
+  toolbuttonVCD = (GtkWidget*) gtk_tool_button_new (tmp_image, QT_TR_NOOP("VCD res"));
   gtk_widget_show (toolbuttonVCD);
   gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonVCD);
 
   tmp_image = gtk_image_new_from_stock ("gtk-zoom-fit", tmp_toolbar_icon_size);
   gtk_widget_show (tmp_image);
-  toolbuttonSVCD = (GtkWidget*) gtk_tool_button_new (tmp_image, _("SVCD res"));
+  toolbuttonSVCD = (GtkWidget*) gtk_tool_button_new (tmp_image, QT_TR_NOOP("SVCD res"));
   gtk_widget_show (toolbuttonSVCD);
   gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonSVCD);
 
   tmp_image = gtk_image_new_from_stock ("gtk-zoom-fit", tmp_toolbar_icon_size);
   gtk_widget_show (tmp_image);
-  toolbuttonDVD = (GtkWidget*) gtk_tool_button_new (tmp_image, _("DVD res"));
+  toolbuttonDVD = (GtkWidget*) gtk_tool_button_new (tmp_image, QT_TR_NOOP("DVD res"));
   gtk_widget_show (toolbuttonDVD);
   gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonDVD);
 
   tmp_image = gtk_image_new_from_stock ("gtk-zoom-fit", tmp_toolbar_icon_size);
   gtk_widget_show (tmp_image);
-  toolbuttonHD1 = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Half D1 res"));
+  toolbuttonHD1 = (GtkWidget*) gtk_tool_button_new (tmp_image, QT_TR_NOOP("Half D1 res"));
   gtk_widget_show (toolbuttonHD1);
   gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonHD1);
 
@@ -141,19 +141,19 @@ GtkWidget       *create_filterMain (void)
 
   tmp_image = gtk_image_new_from_stock ("gtk-dnd-multiple", tmp_toolbar_icon_size);
   gtk_widget_show (tmp_image);
-  toolbuttonPartial = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Partial"));
+  toolbuttonPartial = (GtkWidget*) gtk_tool_button_new (tmp_image, QT_TR_NOOP("Partial"));
   gtk_widget_show (toolbuttonPartial);
   gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonPartial);
 
   tmp_image = gtk_image_new_from_stock ("gtk-print-preview", tmp_toolbar_icon_size);
   gtk_widget_show (tmp_image);
-  toolbuttonPreview = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Preview"));
+  toolbuttonPreview = (GtkWidget*) gtk_tool_button_new (tmp_image, QT_TR_NOOP("Preview"));
   gtk_widget_show (toolbuttonPreview);
   gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonPreview);
 
   tmp_image = gtk_image_new_from_stock ("gtk-save-as", tmp_toolbar_icon_size);
   gtk_widget_show (tmp_image);
-  toolbutton13 = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Save as script"));
+  toolbutton13 = (GtkWidget*) gtk_tool_button_new (tmp_image, QT_TR_NOOP("Save as script"));
   gtk_widget_show (toolbutton13);
   gtk_container_add (GTK_CONTAINER (toolbar1), toolbutton13);
 

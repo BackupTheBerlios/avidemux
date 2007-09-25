@@ -71,9 +71,9 @@ uint8_t ADMVideoMPD3Dlow::configure(AVDMGenericVideoStream *instream)
         OOP(chroma,param2);
         OOP(temporal,param3);
         
-    diaElemFloat   luma(PX(fluma),_("_Spatial luma strength:"),0.,100.);
-    diaElemFloat   chroma(PX(fchroma),_("S_patial chroma strength:"),0.,100.);
-    diaElemFloat   temporal(PX(ftemporal),_("_Temporal strength:"),0.,100.);
+    diaElemFloat   luma(PX(fluma),QT_TR_NOOP("_Spatial luma strength:"),0.,100.);
+    diaElemFloat   chroma(PX(fchroma),QT_TR_NOOP("S_patial chroma strength:"),0.,100.);
+    diaElemFloat   temporal(PX(ftemporal),QT_TR_NOOP("_Temporal strength:"),0.,100.);
     
        diaElem *elems[3]={&luma,&chroma,&temporal};
   

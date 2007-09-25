@@ -258,7 +258,7 @@ EncoderFFMPEGDV::configure (AVDMGenericVideoStream * instream)
 
   if(_w!=720 || _h!=576 || _fps!=25000)
   {
-    GUI_Error_HIG(_("Incompatible settings"),_("At the moment, the DV codec only accepts 720*576@25"));
+    GUI_Error_HIG(QT_TR_NOOP("Incompatible settings"),QT_TR_NOOP("At the moment, the DV codec only accepts 720*576@25"));
     return 0;
   }
   _codec = new ffmpegEncoderCQ (_w, _h, _id);

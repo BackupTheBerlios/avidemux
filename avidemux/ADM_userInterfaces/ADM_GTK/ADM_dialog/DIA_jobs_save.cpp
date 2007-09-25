@@ -46,7 +46,7 @@ char *tmp=NULL,*tmp2=NULL;
                                         
                                         int r;
                                         char *escape=NULL;
-                                                GUI_FileSelWrite(_("Select Video to Write"),&tmp);
+                                                GUI_FileSelWrite(QT_TR_NOOP("Select Video to Write"),&tmp);
                                                 if(!tmp) continue;
                                                 escape=ADM_escape((ADM_filename *)tmp);
                                                 gtk_editable_delete_text(GTK_EDITABLE(WID(entryOutputFileName)), 0,-1);
@@ -60,13 +60,13 @@ char *tmp=NULL,*tmp2=NULL;
                                            tmp=gtk_editable_get_chars(GTK_EDITABLE (WID(entryOutputFileName)), 0, -1);
                                            if(!tmp || !*tmp)
                                            {
-                                             GUI_Error_HIG(_("Invalid filename"),_("Please select or enter a valid filename."));
+                                             GUI_Error_HIG(QT_TR_NOOP("Invalid filename"),QT_TR_NOOP("Please select or enter a valid filename."));
                                                         continue;
                                             }
                                            tmp2=gtk_editable_get_chars(GTK_EDITABLE (WID(entryJobName)), 0, -1);
                                            if(!tmp2 || !*tmp2)
                                            {
-                                             GUI_Error_HIG(_("Invalid jobname"),_("Please select or enter a valid jobname."));
+                                             GUI_Error_HIG(QT_TR_NOOP("Invalid jobname"),QT_TR_NOOP("Please select or enter a valid jobname."));
                                                         continue;
                                             }
                                             *jobname=ADM_strdup(tmp2);
@@ -107,7 +107,7 @@ GtkWidget       *create_dialog1 (void)
 
   SaveJob = gtk_dialog_new ();
   gtk_container_set_border_width (GTK_CONTAINER (SaveJob), 6);
-  gtk_window_set_title (GTK_WINDOW (SaveJob), _("Save Job"));
+  gtk_window_set_title (GTK_WINDOW (SaveJob), QT_TR_NOOP("Save Job"));
   gtk_window_set_type_hint (GTK_WINDOW (SaveJob), GDK_WINDOW_TYPE_HINT_DIALOG);
   gtk_window_set_resizable (GTK_WINDOW (SaveJob), FALSE);
   gtk_dialog_set_has_separator (GTK_DIALOG (SaveJob), FALSE);
@@ -128,7 +128,7 @@ GtkWidget       *create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), buttonBrowse, 2, 3, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_tooltips_set_tip (tooltips, buttonBrowse, _("Select the output file"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonBrowse, QT_TR_NOOP("Select the output file"), NULL);
 
   alignment1 = gtk_alignment_new (0.5, 0.5, 0, 0);
   gtk_widget_show (alignment1);
@@ -142,7 +142,7 @@ GtkWidget       *create_dialog1 (void)
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, FALSE, 0);
 
-  label3 = gtk_label_new_with_mnemonic (_("_Browse..."));
+  label3 = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Browse..."));
   gtk_widget_show (label3);
   gtk_box_pack_start (GTK_BOX (hbox1), label3, FALSE, FALSE, 0);
 
@@ -151,7 +151,7 @@ GtkWidget       *create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), entryJobName, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
-  gtk_tooltips_set_tip (tooltips, entryJobName, _("Job name displayed in the job list and used as the script filename"), NULL);
+  gtk_tooltips_set_tip (tooltips, entryJobName, QT_TR_NOOP("Job name displayed in the job list and used as the script filename"), NULL);
   gtk_entry_set_max_length (GTK_ENTRY (entryJobName), 40);
   gtk_entry_set_width_chars (GTK_ENTRY (entryJobName), 40);
 
@@ -160,17 +160,17 @@ GtkWidget       *create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), entryOutputFileName, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
-  gtk_tooltips_set_tip (tooltips, entryOutputFileName, _("Filename of the audio/video output"), NULL);
+  gtk_tooltips_set_tip (tooltips, entryOutputFileName, QT_TR_NOOP("Filename of the audio/video output"), NULL);
   gtk_entry_set_width_chars (GTK_ENTRY (entryOutputFileName), 40);
 
-  label1 = gtk_label_new_with_mnemonic (_("_Job name:"));
+  label1 = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Job name:"));
   gtk_widget_show (label1);
   gtk_table_attach (GTK_TABLE (table1), label1, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label1), 0, 0.5);
 
-  label2 = gtk_label_new_with_mnemonic (_("Output _file:"));
+  label2 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Output _file:"));
   gtk_widget_show (label2);
   gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),

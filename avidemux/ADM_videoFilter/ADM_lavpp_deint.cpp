@@ -102,17 +102,17 @@ uint8_t ADMVideoLavPPDeint::configure(AVDMGenericVideoStream *in)
   _in=in;
   
   
-   diaMenuEntry menuField[6]={{PP_BM_NONE,        _("None"),NULL},
-                             {PP_BM_LINEAR_BLEND, _("Linear blend"),NULL},
-                             {PP_BM_LINEAR_INTER, _("Linear interpolate"),NULL},
-                             {PP_BM_CUBIC_INTER, _("Cubic interpolate"),NULL},
-                             {PP_BM_MEDIAN_INTER, _("Median interpolate"),NULL},
-                             {PP_BM_FFMPEG_DEINT, _("FFmpeg deint"),NULL},
+   diaMenuEntry menuField[6]={{PP_BM_NONE,        QT_TR_NOOP("None"),NULL},
+                             {PP_BM_LINEAR_BLEND, QT_TR_NOOP("Linear blend"),NULL},
+                             {PP_BM_LINEAR_INTER, QT_TR_NOOP("Linear interpolate"),NULL},
+                             {PP_BM_CUBIC_INTER, QT_TR_NOOP("Cubic interpolate"),NULL},
+                             {PP_BM_MEDIAN_INTER, QT_TR_NOOP("Median interpolate"),NULL},
+                             {PP_BM_FFMPEG_DEINT, QT_TR_NOOP("FFmpeg deint"),NULL},
                           };
   
     
-    diaElemMenu     menu1(PX(deintType),_("_Deinterlacing:"), 6,menuField);
-    diaElemToggle   autolevel(PX(autolevel),_("_Autolevel"));
+    diaElemMenu     menu1(PX(deintType),QT_TR_NOOP("_Deinterlacing:"), 6,menuField);
+    diaElemToggle   autolevel(PX(autolevel),QT_TR_NOOP("_Autolevel"));
     
     diaElem *elems[2]={&menu1,&autolevel};
   

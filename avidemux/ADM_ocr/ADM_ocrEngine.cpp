@@ -84,7 +84,7 @@ _again:
     out=fopen(labelSrt,"wb");
     if(!out)
     {
-       GUI_Error_HIG(_("Output file error"), _("Could not open \"%s\" for writing."), labelSrt);
+       GUI_Error_HIG(QT_TR_NOOP("Output file error"), QT_TR_NOOP("Could not open \"%s\" for writing."), labelSrt);
        goto endIt;
     }
     bitmapSource=ADM_buildBitmapSource(&source);
@@ -102,7 +102,7 @@ _again:
    
     if(!nbSub)
     {
-      GUI_Error_HIG(_("Problem loading sub"), NULL);
+      GUI_Error_HIG(QT_TR_NOOP("Problem loading sub"), NULL);
         delete bitmapSource;
         bitmapSource=NULL;
         goto _again;

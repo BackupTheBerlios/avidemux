@@ -120,7 +120,7 @@ create_dialog1 (void)
 
   dialog1 = gtk_dialog_new ();
   gtk_container_set_border_width (GTK_CONTAINER (dialog1), 6);
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Video Filter Manager"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Video Filter Manager"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
   gtk_dialog_set_has_separator (GTK_DIALOG (dialog1), FALSE);
 
@@ -142,7 +142,7 @@ create_dialog1 (void)
   toolbuttonOpen = (GtkWidget*) gtk_tool_button_new_from_stock ("gtk-open");
   gtk_widget_show (toolbuttonOpen);
   gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonOpen);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonOpen), tooltips, _("Open filter list [Ctrl-O]"), NULL);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonOpen), tooltips, QT_TR_NOOP("Open filter list [Ctrl-O]"), NULL);
   gtk_widget_add_accelerator (toolbuttonOpen, "clicked", accel_group,
                               GDK_O, (GdkModifierType) GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
@@ -151,7 +151,7 @@ create_dialog1 (void)
   toolbuttonSave = (GtkWidget*) gtk_tool_button_new_from_stock ("gtk-save");
   gtk_widget_show (toolbuttonSave);
   gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonSave);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonSave), tooltips, _("Save filter list [Ctrl-S]"), NULL);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonSave), tooltips, QT_TR_NOOP("Save filter list [Ctrl-S]"), NULL);
   gtk_widget_add_accelerator (toolbuttonSave, "clicked", accel_group,
                               GDK_S, (GdkModifierType) GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
@@ -159,10 +159,10 @@ create_dialog1 (void)
 
   tmp_image = gtk_image_new_from_stock ("gtk-save-as", tmp_toolbar_icon_size);
   gtk_widget_show (tmp_image);
-  toolbuttonScript = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Save Script"));
+  toolbuttonScript = (GtkWidget*) gtk_tool_button_new (tmp_image, QT_TR_NOOP("Save Script"));
   gtk_widget_show (toolbuttonScript);
   gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonScript);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonScript), tooltips, _("Save as script [Ctrl-J]"), NULL);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonScript), tooltips, QT_TR_NOOP("Save as script [Ctrl-J]"), NULL);
   gtk_widget_add_accelerator (toolbuttonScript, "clicked", accel_group,
                               GDK_J, (GdkModifierType) GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
@@ -170,10 +170,10 @@ create_dialog1 (void)
 
   tmp_image = gtk_image_new_from_stock ("gtk-cdrom", tmp_toolbar_icon_size);
   gtk_widget_show (tmp_image);
-  toolbuttonDVD = (GtkWidget*) gtk_tool_button_new (tmp_image, _("DVD Res"));
+  toolbuttonDVD = (GtkWidget*) gtk_tool_button_new (tmp_image, QT_TR_NOOP("DVD Res"));
   gtk_widget_show (toolbuttonDVD);
   gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonDVD);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonDVD), tooltips, _("DVD resolution [Ctrl-1]"), NULL);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonDVD), tooltips, QT_TR_NOOP("DVD resolution [Ctrl-1]"), NULL);
   gtk_widget_add_accelerator (toolbuttonDVD, "clicked", accel_group,
                               GDK_1, (GdkModifierType) GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
@@ -181,10 +181,10 @@ create_dialog1 (void)
 
   tmp_image = gtk_image_new_from_stock ("gtk-cdrom", tmp_toolbar_icon_size);
   gtk_widget_show (tmp_image);
-  toolbuttonHalfD1 = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Half D1 Res"));
+  toolbuttonHalfD1 = (GtkWidget*) gtk_tool_button_new (tmp_image, QT_TR_NOOP("Half D1 Res"));
   gtk_widget_show (toolbuttonHalfD1);
   gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonHalfD1);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonHalfD1), tooltips, _("Half D1 resolution [Ctrl-2]"), NULL);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonHalfD1), tooltips, QT_TR_NOOP("Half D1 resolution [Ctrl-2]"), NULL);
   gtk_widget_add_accelerator (toolbuttonHalfD1, "clicked", accel_group,
                               GDK_2, (GdkModifierType) GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
@@ -192,10 +192,10 @@ create_dialog1 (void)
 
   tmp_image = gtk_image_new_from_stock ("gtk-cdrom", tmp_toolbar_icon_size);
   gtk_widget_show (tmp_image);
-  toolbuttonSVCD = (GtkWidget*) gtk_tool_button_new (tmp_image, _("SVCD Res"));
+  toolbuttonSVCD = (GtkWidget*) gtk_tool_button_new (tmp_image, QT_TR_NOOP("SVCD Res"));
   gtk_widget_show (toolbuttonSVCD);
   gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonSVCD);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonSVCD), tooltips, _("SVCD resolution [Ctrl-3]"), NULL);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonSVCD), tooltips, QT_TR_NOOP("SVCD resolution [Ctrl-3]"), NULL);
   gtk_widget_add_accelerator (toolbuttonSVCD, "clicked", accel_group,
                               GDK_3, (GdkModifierType) GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
@@ -203,10 +203,10 @@ create_dialog1 (void)
 
   tmp_image = gtk_image_new_from_stock ("gtk-cdrom", tmp_toolbar_icon_size);
   gtk_widget_show (tmp_image);
-  toolbuttonVCD = (GtkWidget*) gtk_tool_button_new (tmp_image, _("VCD Res"));
+  toolbuttonVCD = (GtkWidget*) gtk_tool_button_new (tmp_image, QT_TR_NOOP("VCD Res"));
   gtk_widget_show (toolbuttonVCD);
   gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonVCD);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonVCD), tooltips, _("VCD resolution [Ctrl-4]"), NULL);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonVCD), tooltips, QT_TR_NOOP("VCD resolution [Ctrl-4]"), NULL);
   gtk_widget_add_accelerator (toolbuttonVCD, "clicked", accel_group,
                               GDK_4, (GdkModifierType) GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
@@ -257,7 +257,7 @@ create_dialog1 (void)
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox5), image1, FALSE, FALSE, 0);
 
-  label11 = gtk_label_new_with_mnemonic (_("Transform"));
+  label11 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Transform"));
   gtk_widget_show (label11);
   gtk_box_pack_start (GTK_BOX (hbox5), label11, FALSE, FALSE, 4);
   gtk_label_set_use_markup (GTK_LABEL (label11), TRUE);
@@ -282,7 +282,7 @@ create_dialog1 (void)
   gtk_widget_show (image2);
   gtk_box_pack_start (GTK_BOX (hbox6), image2, FALSE, FALSE, 0);
 
-  label17 = gtk_label_new_with_mnemonic (_("Interlacing"));
+  label17 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Interlacing"));
   gtk_widget_show (label17);
   gtk_box_pack_start (GTK_BOX (hbox6), label17, FALSE, FALSE, 4);
 
@@ -306,7 +306,7 @@ create_dialog1 (void)
   gtk_widget_show (image3);
   gtk_box_pack_start (GTK_BOX (hbox7), image3, FALSE, FALSE, 0);
 
-  label18 = gtk_label_new_with_mnemonic (_("Colors"));
+  label18 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Colors"));
   gtk_widget_show (label18);
   gtk_box_pack_start (GTK_BOX (hbox7), label18, FALSE, FALSE, 4);
 
@@ -330,7 +330,7 @@ create_dialog1 (void)
   gtk_widget_show (image4);
   gtk_box_pack_start (GTK_BOX (hbox8), image4, FALSE, FALSE, 0);
 
-  label19 = gtk_label_new_with_mnemonic (_("Noise"));
+  label19 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Noise"));
   gtk_widget_show (label19);
   gtk_box_pack_start (GTK_BOX (hbox8), label19, FALSE, FALSE, 4);
 
@@ -354,7 +354,7 @@ create_dialog1 (void)
   gtk_widget_show (image5);
   gtk_box_pack_start (GTK_BOX (hbox9), image5, FALSE, FALSE, 0);
 
-  label20 = gtk_label_new_with_mnemonic (_("Sharpness"));
+  label20 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Sharpness"));
   gtk_widget_show (label20);
   gtk_box_pack_start (GTK_BOX (hbox9), label20, FALSE, FALSE, 4);
 
@@ -378,7 +378,7 @@ create_dialog1 (void)
   gtk_widget_show (image6);
   gtk_box_pack_start (GTK_BOX (hbox10), image6, FALSE, FALSE, 0);
 
-  label21 = gtk_label_new_with_mnemonic (_("Subtitles"));
+  label21 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Subtitles"));
   gtk_widget_show (label21);
   gtk_box_pack_start (GTK_BOX (hbox10), label21, FALSE, FALSE, 4);
 
@@ -402,7 +402,7 @@ create_dialog1 (void)
   gtk_widget_show (image7);
   gtk_box_pack_start (GTK_BOX (hbox4), image7, FALSE, FALSE, 0);
 
-  label22 = gtk_label_new_with_mnemonic (_("Misc"));
+  label22 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Misc"));
   gtk_widget_show (label22);
   gtk_box_pack_start (GTK_BOX (hbox4), label22, FALSE, FALSE, 4);
 
@@ -413,7 +413,7 @@ create_dialog1 (void)
   gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview8), TRUE);
   gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview8), FALSE);
 
-  label28 = gtk_label_new (_("External"));
+  label28 = gtk_label_new (QT_TR_NOOP("External"));
   gtk_widget_show (label28);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 7), label28);
 
@@ -424,13 +424,13 @@ create_dialog1 (void)
   buttonAdd = gtk_button_new ();
   gtk_widget_show (buttonAdd);
   gtk_box_pack_end (GTK_BOX (hbox13), buttonAdd, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonAdd, _("Add selected filter to the Active Filters list"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonAdd, QT_TR_NOOP("Add selected filter to the Active Filters list"), NULL);
 
   image11 = gtk_image_new_from_stock ("gtk-add", GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (image11);
   gtk_container_add (GTK_CONTAINER (buttonAdd), image11);
 
-  label23 = gtk_label_new (_("<b>Available Filters</b>"));
+  label23 = gtk_label_new (QT_TR_NOOP("<b>Available Filters</b>"));
   gtk_widget_show (label23);
   gtk_frame_set_label_widget (GTK_FRAME (frame1), label23);
   gtk_label_set_use_markup (GTK_LABEL (label23), TRUE);
@@ -475,7 +475,7 @@ create_dialog1 (void)
   buttonRemove = gtk_button_new ();
   gtk_widget_show (buttonRemove);
   gtk_box_pack_end (GTK_BOX (hbox14), buttonRemove, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonRemove, _("Remove filter"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonRemove, QT_TR_NOOP("Remove filter"), NULL);
 
   image15 = gtk_image_new_from_stock ("gtk-remove", GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (image15);
@@ -484,7 +484,7 @@ create_dialog1 (void)
   buttonDown = gtk_button_new ();
   gtk_widget_show (buttonDown);
   gtk_box_pack_end (GTK_BOX (hbox14), buttonDown, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonDown, _("Move filter down"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonDown, QT_TR_NOOP("Move filter down"), NULL);
 
   image14 = gtk_image_new_from_icon_name ("gtk-go-down", GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (image14);
@@ -493,21 +493,21 @@ create_dialog1 (void)
   buttonUp = gtk_button_new ();
   gtk_widget_show (buttonUp);
   gtk_box_pack_end (GTK_BOX (hbox14), buttonUp, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonUp, _("Move filter up"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonUp, QT_TR_NOOP("Move filter up"), NULL);
 
   image13 = gtk_image_new_from_icon_name ("gtk-go-up", GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (image13);
   gtk_container_add (GTK_CONTAINER (buttonUp), image13);
 
-  buttonPartial = gtk_button_new_with_mnemonic (_("P_artial"));
+  buttonPartial = gtk_button_new_with_mnemonic (QT_TR_NOOP("P_artial"));
   gtk_widget_show (buttonPartial);
   gtk_box_pack_end (GTK_BOX (hbox14), buttonPartial, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonPartial, _("Apply the current filter only to a part of the file"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonPartial, QT_TR_NOOP("Apply the current filter only to a part of the file"), NULL);
 
   buttonProperties = gtk_button_new ();
   gtk_widget_show (buttonProperties);
   gtk_box_pack_end (GTK_BOX (hbox14), buttonProperties, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonProperties, _("Configure filter"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonProperties, QT_TR_NOOP("Configure filter"), NULL);
 
   alignment4 = gtk_alignment_new (0.5, 0.5, 0, 0);
   gtk_widget_show (alignment4);
@@ -517,11 +517,11 @@ create_dialog1 (void)
   gtk_widget_show (hbox16);
   gtk_container_add (GTK_CONTAINER (alignment4), hbox16);
 
-  label25 = gtk_label_new_with_mnemonic (_("C_onfigure"));
+  label25 = gtk_label_new_with_mnemonic (QT_TR_NOOP("C_onfigure"));
   gtk_widget_show (label25);
   gtk_box_pack_start (GTK_BOX (hbox16), label25, FALSE, FALSE, 0);
 
-  label2 = gtk_label_new (_("<b >Active Filters</b>"));
+  label2 = gtk_label_new (QT_TR_NOOP("<b >Active Filters</b>"));
   gtk_widget_show (label2);
   gtk_frame_set_label_widget (GTK_FRAME (frame2), label2);
   gtk_label_set_use_markup (GTK_LABEL (label2), TRUE);
@@ -548,7 +548,7 @@ create_dialog1 (void)
   gtk_widget_show (image17);
   gtk_box_pack_start (GTK_BOX (hbox17), image17, FALSE, FALSE, 0);
 
-  label26 = gtk_label_new_with_mnemonic (_("_Preview"));
+  label26 = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Preview"));
   gtk_widget_show (label26);
   gtk_box_pack_start (GTK_BOX (hbox17), label26, FALSE, FALSE, 0);
 

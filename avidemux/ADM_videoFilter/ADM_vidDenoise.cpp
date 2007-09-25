@@ -383,12 +383,12 @@ uint8_t ADMVideoDenoise::configure(AVDMGenericVideoStream * instream)
   
 #define PX(x) &(_param->x)
   
-    diaElemUInteger   lumaLock(PX(lumaLock),_("_Luma lock:"),0,255);
-    diaElemUInteger   chromaLock(PX(chromaLock),_("C_hroma lock:"),0,255);
-    diaElemUInteger   lumaThreshold(PX(lumaThreshold),_("L_uma threshold:"),0,255);
-    diaElemUInteger   chromaThreshold(PX(chromaThreshold),_("Ch_roma threshold:"),0,255);
+    diaElemUInteger   lumaLock(PX(lumaLock),QT_TR_NOOP("_Luma lock:"),0,255);
+    diaElemUInteger   chromaLock(PX(chromaLock),QT_TR_NOOP("C_hroma lock:"),0,255);
+    diaElemUInteger   lumaThreshold(PX(lumaThreshold),QT_TR_NOOP("L_uma threshold:"),0,255);
+    diaElemUInteger   chromaThreshold(PX(chromaThreshold),QT_TR_NOOP("Ch_roma threshold:"),0,255);
     
-    diaElemUInteger   sceneChange(PX(sceneChange),_("_Scene change:"),0,100);
+    diaElemUInteger   sceneChange(PX(sceneChange),QT_TR_NOOP("_Scene change:"),0,100);
     
     
     

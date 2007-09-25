@@ -77,7 +77,7 @@ create_dialog1 (void)
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Lame command"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Lame command"));
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -86,7 +86,7 @@ create_dialog1 (void)
   gtk_widget_show (vbox1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
 
-  label1 = gtk_label_new (_("Enter parameters (i.e. -b 192 -m s ...)"));
+  label1 = gtk_label_new (QT_TR_NOOP("Enter parameters (i.e. -b 192 -m s ...)"));
   gtk_widget_show (label1);
   gtk_box_pack_start (GTK_BOX (vbox1), label1, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);

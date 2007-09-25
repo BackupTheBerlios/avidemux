@@ -447,7 +447,7 @@ create_dialog1 (void)
   GtkWidget *dialog_action_area1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Equalizer"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Equalizer"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;

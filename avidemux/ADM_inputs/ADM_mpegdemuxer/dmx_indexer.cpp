@@ -146,7 +146,7 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
                                         delete fp;
                                         if(type==FP_APPEND)
                                         {
-                                          if(GUI_Question(_("There is several mpeg file, append them ?")))
+                                          if(GUI_Question(QT_TR_NOOP("There is several mpeg file, append them ?")))
                                                         multi=1;
                                         }
                                         dmx=new dmx_demuxerPS(nbTracks,tracks,multi);
@@ -247,7 +247,7 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
            case 3: 	qfprintf(out,"# Video Aspect Ratio : %s\n", "16:9" );break;
            default:
               printf("imageAR=%u\n",run.imageAR);
-              GUI_Error_HIG(_("Can't determine aspect ratio"),NULL);
+              GUI_Error_HIG(QT_TR_NOOP("Can't determine aspect ratio"),NULL);
 	}
 
         /* Now update......... */

@@ -363,7 +363,7 @@ static int amr_nb_decode_init(AVCodecContext * avctx)
 {
     AMRContext *s = avctx->priv_data;
     s->frameCount=0;
-    s->decState=Decoder_Interface_init_(getAmrnbWrapper());
+    s->decState=Decoder_Interface_initQT_TR_NOOP(getAmrnbWrapper());
     if(!s->decState)
     {
         av_log(avctx, AV_LOG_ERROR, "Decoder_Interface_init error\r\n");
@@ -401,7 +401,7 @@ static int amr_nb_encode_init(AVCodecContext * avctx)
     avctx->frame_size=160;
     avctx->coded_frame= avcodec_alloc_frame();
 
-    s->enstate=Encoder_Interface_init_(getAmrnbWrapper(), 0);
+    s->enstate=Encoder_Interface_initQT_TR_NOOP(getAmrnbWrapper(), 0);
     if(!s->enstate)
     {
         av_log(avctx, AV_LOG_ERROR, "Encoder_Interface_init error\n");
@@ -416,14 +416,14 @@ static int amr_nb_encode_init(AVCodecContext * avctx)
 static int amr_nb_decode_close(AVCodecContext * avctx)
 {
     AMRContext *s = avctx->priv_data;
-    Decoder_Interface_exit_(getAmrnbWrapper(), s->decState);
+    Decoder_Interface_exitQT_TR_NOOP(getAmrnbWrapper(), s->decState);
     return 0;
 }
 
 static int amr_nb_encode_close(AVCodecContext * avctx)
 {
     AMRContext *s = avctx->priv_data;
-    Encoder_Interface_exit_(getAmrnbWrapper(), s->enstate);
+    Encoder_Interface_exitQT_TR_NOOP(getAmrnbWrapper(), s->enstate);
     av_freep(&avctx->coded_frame);
     return 0;
 }
@@ -457,7 +457,7 @@ static int amr_nb_decode_frame(AVCodecContext * avctx,
     s->frameCount++;
     /* av_log(NULL,AV_LOG_DEBUG,"packet_size=%d amrData= 0x%X %X %X %X\n",packet_size,amrData[0],amrData[1],amrData[2],amrData[3]); */
     /* call decoder */
-    Decoder_Interface_Decode_(getAmrnbWrapper(), s->decState, amrData, data, 0);
+    Decoder_Interface_DecodeQT_TR_NOOP(getAmrnbWrapper(), s->decState, amrData, data, 0);
     *data_size=160*2;
 
     return packet_size;
@@ -471,7 +471,7 @@ static int amr_nb_encode_frame(AVCodecContext *avctx,
 
     s->enc_bitrate=getBitrateMode(avctx->bit_rate);
 
-    written = Encoder_Interface_Encode_(getAmrnbWrapper(), s->enstate,
+    written = Encoder_Interface_EncodeQT_TR_NOOP(getAmrnbWrapper(), s->enstate,
         s->enc_bitrate,
         data,
         frame,

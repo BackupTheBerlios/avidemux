@@ -78,7 +78,7 @@ SCRIPT_CREATE (hardivtc_script, vidHardPDRemoval, field_unblend_template);
 uint8_t vidHardPDRemoval::configure (AVDMGenericVideoStream * in)
 {
 int v,w;
-        _param->show=GUI_YesNo(_("Metrics"),_("Do you want to print metrics on screen ?" ));
+        _param->show=GUI_YesNo(QT_TR_NOOP("Metrics"),QT_TR_NOOP("Do you want to print metrics on screen ?" ));
         v=_param->threshold;
         w=_param->noise;        
         if(DIA_GetIntegerValue(&v, 2, 99,"Treshold","Treshold value (smaller = harder to match)"))

@@ -352,7 +352,7 @@ char *start;
                 _index=new dmxIndex[_nbFrames+1];
                 if(!_index)
                         {
-                          GUI_Error_HIG(_("Out of memory"), NULL);
+                          GUI_Error_HIG(QT_TR_NOOP("Out of memory"), NULL);
                                         ADM_assert(0);
                         }
                 memset(_index,0,_nbFrames*sizeof(dmxIndex));
@@ -367,7 +367,7 @@ char *start;
                 uint64_t imgrel,imgabs;
                 char *str,*needle;
                 
-                DIA_working *work=new DIA_working(_("Opening MPEG"));
+                DIA_working *work=new DIA_working(QT_TR_NOOP("Opening MPEG"));
                 while(read<_nbGop)
                 {
                         if(!fgets(string,MAX_LINE,file)) break;
@@ -536,7 +536,7 @@ char *start;
                         // switch DTS->PTS
                         if(!renumber())
                         {
-                          GUI_Error_HIG(_("MPEG renumbering error"), NULL);
+                          GUI_Error_HIG(QT_TR_NOOP("MPEG renumbering error"), NULL);
                                 return 0;
                         }
                         //Dump();

@@ -90,7 +90,7 @@ create_dialog1 (void)
   GtkWidget *label3;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Paused"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Paused"));
   gtk_window_set_resizable (GTK_WINDOW (dialog1), FALSE);
   gtk_dialog_set_has_separator (GTK_DIALOG (dialog1), FALSE);
 
@@ -106,7 +106,7 @@ create_dialog1 (void)
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, TRUE, 0);
 
-  label1 = gtk_label_new (_("<b>Encoding is paused.</b>\n\nYou can either resume or Abort it."));
+  label1 = gtk_label_new (QT_TR_NOOP("<b>Encoding is paused.</b>\n\nYou can either resume or Abort it."));
   gtk_widget_show (label1);
   gtk_box_pack_start (GTK_BOX (hbox1), label1, TRUE, FALSE, 0);
   gtk_label_set_use_markup (GTK_LABEL (label1), TRUE);
@@ -133,7 +133,7 @@ create_dialog1 (void)
   gtk_widget_show (image2);
   gtk_box_pack_start (GTK_BOX (hbox2), image2, FALSE, FALSE, 0);
 
-  label2 = gtk_label_new_with_mnemonic (_("Abort"));
+  label2 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Abort"));
   gtk_widget_show (label2);
   gtk_box_pack_start (GTK_BOX (hbox2), label2, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
@@ -155,7 +155,7 @@ create_dialog1 (void)
   gtk_widget_show (image3);
   gtk_box_pack_start (GTK_BOX (hbox3), image3, FALSE, FALSE, 0);
 
-  label3 = gtk_label_new_with_mnemonic (_("Resume"));
+  label3 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Resume"));
   gtk_widget_show (label3);
   gtk_box_pack_start (GTK_BOX (hbox3), label3, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);

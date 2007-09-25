@@ -50,7 +50,7 @@ class encodingWindow : public QDialog
 			ui.comboBoxPriority->setCurrentIndex(2);
 			connect(ui.checkBoxShutdown, SIGNAL(currentIndexChanged(int)), this, SLOT(priorityChanged(int)));
 
-			GUI_Error_HIG(_("Privileges Required"), _( "Root privileges are required to perform this operation."));
+			GUI_Error_HIG(QT_TR_NOOP("Privileges Required"), QT_TR_NOOP( "Root privileges are required to perform this operation."));
 
 			return;
 		}
@@ -68,7 +68,7 @@ class encodingWindow : public QDialog
 			ui.checkBoxShutdown->setCheckState(Qt::Unchecked);
 			connect(ui.checkBoxShutdown, SIGNAL(stateChanged(int)), this, SLOT(shutdownChanged(int)));
 
-			GUI_Error_HIG(_("Privileges Required"), _( "Root privileges are required to perform this operation."));
+			GUI_Error_HIG(QT_TR_NOOP("Privileges Required"), QT_TR_NOOP( "Root privileges are required to perform this operation."));
 		}
 	#endif
 	}
@@ -174,7 +174,7 @@ DIA_encoding::~DIA_encoding( )
 
 	if (shutdownRequired && !stopReq)
 	{
-		DIA_working *work=new DIA_working(_("Shutting down"));
+		DIA_working *work=new DIA_working(QT_TR_NOOP("Shutting down"));
 		bool performShutdown=true;
 
 		for(int i = 0; i <= 30; i++)

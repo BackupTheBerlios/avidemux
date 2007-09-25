@@ -98,8 +98,8 @@ uint8_t AVDMVideoVlad::configure( AVDMGenericVideoStream *instream)
 UNUSED_ARG(instream);
 int i,j;
 
-   diaElemUInteger luma(&(_param->ythresholdMask),_("_Luma temporal threshold:"),0,255);
-   diaElemUInteger chroma(&(_param->cthresholdMask),_("Ch_roma temporal threshold:"),0,255);
+   diaElemUInteger luma(&(_param->ythresholdMask),QT_TR_NOOP("_Luma temporal threshold:"),0,255);
+   diaElemUInteger chroma(&(_param->cthresholdMask),QT_TR_NOOP("Ch_roma temporal threshold:"),0,255);
     
     diaElem *elems[]={&luma,&chroma};
   

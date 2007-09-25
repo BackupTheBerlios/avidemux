@@ -97,7 +97,7 @@ void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line)
   }
   myWidget=(void *)s;
   //*************************
-  buttonP = gtk_button_new_with_mnemonic (_("_Previous"));
+  buttonP = gtk_button_new_with_mnemonic (QT_TR_NOOP("_Previous"));
   gtk_widget_show (buttonP);
   gtk_table_attach (GTK_TABLE (opaque), buttonP, 0, 1, line+1, line+2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -105,7 +105,7 @@ void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line)
    g_signal_connect(GTK_OBJECT(buttonP), "clicked",
                     GTK_SIGNAL_FUNC(prev), s);
    
-  buttonN = gtk_button_new_with_mnemonic (_("_Next"));
+  buttonN = gtk_button_new_with_mnemonic (QT_TR_NOOP("_Next"));
   gtk_widget_show (buttonN);
   gtk_table_attach (GTK_TABLE (opaque), buttonN, 1, 2, line+1, line+2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -131,7 +131,7 @@ void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, FALSE, 0);
 
-  label1 = gtk_label_new_with_mnemonic (_("_Previous"));
+  label1 = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Previous"));
   gtk_widget_show (label1);
   gtk_box_pack_start (GTK_BOX (hbox1), label1, FALSE, FALSE, 0);
 
@@ -161,7 +161,7 @@ void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_widget_show (image2);
   gtk_box_pack_start (GTK_BOX (hbox2), image2, FALSE, FALSE, 0);
 
-  label2 = gtk_label_new_with_mnemonic (_("_Next"));
+  label2 = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Next"));
   gtk_widget_show (label2);
   gtk_box_pack_start (GTK_BOX (hbox2), label2, FALSE, FALSE, 0);
 

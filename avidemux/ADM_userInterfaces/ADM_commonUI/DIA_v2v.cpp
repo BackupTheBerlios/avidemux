@@ -38,28 +38,28 @@ uint8_t ret=0;
 char *tmp=NULL,*tmp2=NULL,*tmp3=NULL;
 
         
-        diaElemFile eVob(0,&tmp,_("_VOB file(s):"),"");
-        diaElemFile eIfo(0,&tmp2,_("_IFO file:"),"");
-        diaElemFile eVsub(1,&tmp3,_("Vob_Sub file:"),"");
+        diaElemFile eVob(0,&tmp,QT_TR_NOOP("_VOB file(s):"),"");
+        diaElemFile eIfo(0,&tmp2,QT_TR_NOOP("_IFO file:"),"");
+        diaElemFile eVsub(1,&tmp3,QT_TR_NOOP("Vob_Sub file:"),"");
         
         while(1)
         {
            diaElem *tabs[]={&eVob,&eIfo,&eVsub};
-          if( diaFactoryRun(_("VOB to VobSub"),3,tabs))
+          if( diaFactoryRun(QT_TR_NOOP("VOB to VobSub"),3,tabs))
 	  {
               if(!ADM_fileExist(tmp))
               {
-                GUI_Error_HIG(_("The selected vobfile does not exist"), NULL); 
+                GUI_Error_HIG(QT_TR_NOOP("The selected vobfile does not exist"), NULL); 
                 continue;
               }
               if(!ADM_fileExist(tmp2))
               {
-                GUI_Error_HIG(_("The selected vobfile does not exist"), NULL); 
+                GUI_Error_HIG(QT_TR_NOOP("The selected vobfile does not exist"), NULL); 
                 continue;
               }
               if(strlen(tmp3)<3)
               {
-                 GUI_Error_HIG(_("Please select a correct VobSub path/dir"), NULL); 
+                 GUI_Error_HIG(QT_TR_NOOP("Please select a correct VobSub path/dir"), NULL); 
                  continue;
               }
                   if(*vobname) ADM_dealloc(*vobname);

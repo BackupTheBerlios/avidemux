@@ -257,90 +257,90 @@ uint8_t ADMVideoSwissArmyKnife::configure(AVDMGenericVideoStream *in)
     UNUSED_ARG(in);
 
     diaMenuEntry tTool [] = {
-        { TOOL_A,          _("P' = A"), NULL },
-        { TOOL_P,          _("P' = P"), NULL },
-        { TOOL_P_MINUS_A,  _("P' = P - A"), NULL },
-        { TOOL_A_MINUS_P,  _("P' = A - P"), NULL },
-        { TOOL_P_PLUS_A,   _("P' = P + A"), NULL },
-        { TOOL_P_TIMES_A,  _("P' = P * A"), NULL },
-        { TOOL_P_DIVBY_A,  _("P' = P / A"), NULL },
-        { TOOL_A_DIVBY_P,  _("P' = A / P"), NULL },
-        { TOOL_MIN_P_A,    _("P' = min (P, A)"), NULL },
-        { TOOL_MAX_P_A,    _("P' = max (P, A)"), NULL }
+        { TOOL_A,          QT_TR_NOOP("P' = A"), NULL },
+        { TOOL_P,          QT_TR_NOOP("P' = P"), NULL },
+        { TOOL_P_MINUS_A,  QT_TR_NOOP("P' = P - A"), NULL },
+        { TOOL_A_MINUS_P,  QT_TR_NOOP("P' = A - P"), NULL },
+        { TOOL_P_PLUS_A,   QT_TR_NOOP("P' = P + A"), NULL },
+        { TOOL_P_TIMES_A,  QT_TR_NOOP("P' = P * A"), NULL },
+        { TOOL_P_DIVBY_A,  QT_TR_NOOP("P' = P / A"), NULL },
+        { TOOL_A_DIVBY_P,  QT_TR_NOOP("P' = A / P"), NULL },
+        { TOOL_MIN_P_A,    QT_TR_NOOP("P' = min (P, A)"), NULL },
+        { TOOL_MAX_P_A,    QT_TR_NOOP("P' = max (P, A)"), NULL }
     };
 
     diaMenuEntry tInputType [] = {
         { INPUT_CUSTOM_CONVOLUTION,
-          _("A = convolve(P); Load convolution kernel from file"), NULL },
+          QT_TR_NOOP("A = convolve(P); Load convolution kernel from file"), NULL },
         { INPUT_FILE_IMAGE_FLOAT,
-          _("A = pixel from image file as float; Load image from file"), NULL },
+          QT_TR_NOOP("A = pixel from image file as float; Load image from file"), NULL },
         { INPUT_FILE_IMAGE_INTEGER,
-          _("A = pixel from image file as integer; Load image from file"), NULL },
+          QT_TR_NOOP("A = pixel from image file as integer; Load image from file"), NULL },
         { INPUT_CONSTANT_VALUE,
-          _("A = floating point constant value"), NULL },
+          QT_TR_NOOP("A = floating point constant value"), NULL },
         { INPUT_ROLLING_AVERAGE,
-          _("A = rolling average of pixel: A = A*(1-alpha)+(P*alpha)"), NULL },
+          QT_TR_NOOP("A = rolling average of pixel: A = A*(1-alpha)+(P*alpha)"), NULL },
     };
 
     diaElemMenu tool
         (&(_param->tool),
-         _("Select _Operation on each pixel P and input A:"),
+         QT_TR_NOOP("Select _Operation on each pixel P and input A:"),
          sizeof (tTool) / sizeof (diaMenuEntry), tTool);
     diaElemMenu input_type
         (&(_param->input_type),
-         _("Input _Type:"),
+         QT_TR_NOOP("Input _Type:"),
          sizeof (tInputType) / sizeof (diaMenuEntry), tInputType);
 
     diaElemFile input_file
         (0, const_cast<char **>(&(_param->input_file)),
-         _("Input _File (image or convolution kernel):"));
+         QT_TR_NOOP("Input _File (image or convolution kernel):"));
     diaElemFloat load_bias
         (&(_param->load_bias),
-         _("_Load Bias (added to each pixel\n"
+         QT_TR_NOOP("_Load Bias (added to each pixel\n"
            "in file image when loaded):"),
          -99999, +99999); // arbitrary!
     diaElemFloat load_multiplier
         (&(_param->load_multiplier),
-         _("Load _Multiplier (each pixel in\n"
+         QT_TR_NOOP("Load _Multiplier (each pixel in\n"
            "file image mult. by this when loaded):"),
          -99999, +99999); // arbitrary!
 
     diaElemFloat input_constant
         (&(_param->input_constant),
-         _("Input _Constant:"), -99999, +99999); // arbitrary!
+         QT_TR_NOOP("Input _Constant:"), -99999, +99999); // arbitrary!
 
     diaElemUInteger memory_constant_denom
         (&(_param->memory_constant_denom),
-         _("Denominator of memory constant _alpha\n"
+         QT_TR_NOOP("Denominator of memory constant _alpha\n"
            "(where A = (1-alpha)*A + alpha*curr_frame):"),
          0, 0x7fffffff);
     diaElemUInteger init_start_frame
         (&(_param->init_start_frame),
-         _("Init _Start Frame (first frame # to use for head start):"),
+         QT_TR_NOOP("Init _Start Frame (first frame # to use for head start):"),
          0, 0x7fffffff);
     diaElemUInteger init_end_frame
         (&(_param->init_end_frame),
-         _("Init _End Frame (last frame # to use for head start):"),
+         QT_TR_NOOP("Init _End Frame (last frame # to use for head start):"),
          0, 0x7fffffff);
     diaElemToggle init_by_rolling
         (&(_param->init_by_rolling),
-         _("Init By _Rolling (compute head start using a "
+         QT_TR_NOOP("Init By _Rolling (compute head start using a "
            "rolling average rather than a straight average)"));
 
     diaElemSlider bias
         (&(_param->bias),
-         _("_Bias (will be added to result):"), -256, +256);
+         QT_TR_NOOP("_Bias (will be added to result):"), -256, +256);
     diaElemSlider scale_from_min
         (&(_param->scale_from_min),
-         _("Mi_nimum value (will be scaled to 0):"), -1024, +1024);
+         QT_TR_NOOP("Mi_nimum value (will be scaled to 0):"), -1024, +1024);
     diaElemSlider scale_from_max
         (&(_param->scale_from_max),
-         _("Ma_ximum value (will be scaled to 255):"), -1024, +1024);
+         QT_TR_NOOP("Ma_ximum value (will be scaled to 255):"), -1024, +1024);
     diaElemUInteger histogram_frame_interval
         (&(_param->histogram_frame_interval),
-         _("_Histogram every N frames (0 to disable):"), 0, 0x7fffffff);
+         QT_TR_NOOP("_Histogram every N frames (0 to disable):"), 0, 0x7fffffff);
     diaElemUInteger debug
-        (&(_param->debug), _("_Debugging settings (bits):"), 0, 0x7fffffff);
+        (&(_param->debug), QT_TR_NOOP("_Debugging settings (bits):"), 0, 0x7fffffff);
 
     diaElem * elems[] = { &tool, &input_type, &input_file, &load_bias,
                           &load_multiplier, &input_constant,

@@ -70,7 +70,7 @@ GenericAviSaveProcess::setupVideo (char *name)
 	// anish
  	if(_incoming->getInfo()->width%8)
 		{
-                  if(!GUI_Question(_("Width is not a multiple of 8\n continue anyway ?")))
+                  if(!GUI_Question(QT_TR_NOOP("Width is not a multiple of 8\n continue anyway ?")))
 			return 0;
 
 		}
@@ -90,7 +90,7 @@ GenericAviSaveProcess::setupVideo (char *name)
     {
       delete 	_encode;
       _encode = NULL;
-      GUI_Error_HIG (_("Filter init failed"), NULL);
+      GUI_Error_HIG (QT_TR_NOOP("Filter init failed"), NULL);
       return 0;
     };
  
@@ -124,7 +124,7 @@ _mainaviheader.dwMicroSecPerFrame=0;
 	if((tmp=fopen(TwoPassLogFile,"rt")))
 	{
 		fclose(tmp);
-                if(GUI_Question(_("\n Reuse the existing log-file ?")))
+                if(GUI_Question(QT_TR_NOOP("\n Reuse the existing log-file ?")))
 		{
 			reuse=1;
 		}
@@ -149,7 +149,7 @@ _mainaviheader.dwMicroSecPerFrame=0;
           if (guiUpdate (cf, frametogo))
             {
             abt:
-                GUI_Error_HIG (_("Aborting"), NULL);
+                GUI_Error_HIG (QT_TR_NOOP("Aborting"), NULL);
               delete[]buffer;
               return 0;
             }

@@ -82,8 +82,8 @@ uint8_t ADMVideoResampleFPS::configure(AVDMGenericVideoStream *in)
   
   _in=in;
   
-    diaElemFloat fps(&f,_("_New frame rate:"),1,200.);
-    diaElemToggle blend(&(_param->use_linear),_("_Blend"));
+    diaElemFloat fps(&f,QT_TR_NOOP("_New frame rate:"),1,200.);
+    diaElemToggle blend(&(_param->use_linear),QT_TR_NOOP("_Blend"));
     
     diaElem *elems[2]={&fps,&blend};
   

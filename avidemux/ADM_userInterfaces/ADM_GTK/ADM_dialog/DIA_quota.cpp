@@ -87,7 +87,7 @@ create_dialog1 (const char *msg)
   GtkWidget *label3;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Filesystem full / quota exceeded"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Filesystem full / quota exceeded"));
   gtk_window_set_resizable (GTK_WINDOW (dialog1), FALSE);
   gtk_dialog_set_has_separator (GTK_DIALOG (dialog1), FALSE);
 
@@ -130,7 +130,7 @@ create_dialog1 (const char *msg)
   gtk_widget_show (image2);
   gtk_box_pack_start (GTK_BOX (hbox2), image2, FALSE, FALSE, 0);
 
-  label2 = gtk_label_new_with_mnemonic (_("Ignore"));
+  label2 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Ignore"));
   gtk_widget_show (label2);
   gtk_box_pack_start (GTK_BOX (hbox2), label2, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
@@ -152,7 +152,7 @@ create_dialog1 (const char *msg)
   gtk_widget_show (image3);
   gtk_box_pack_start (GTK_BOX (hbox3), image3, FALSE, FALSE, 0);
 
-  label3 = gtk_label_new_with_mnemonic (_("Retry"));
+  label3 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Retry"));
   gtk_widget_show (label3);
   gtk_box_pack_start (GTK_BOX (hbox3), label3, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);

@@ -95,7 +95,7 @@ uint8_t DIA_vobsub(vobSubParam *param)
               case GTK_RESPONSE_APPLY:
               {
                 char *file;
-                        GUI_FileSelRead(_("Select .idx file"),&file); 
+                        GUI_FileSelRead(QT_TR_NOOP("Select .idx file"),&file); 
                         if(file)
                         {
                           if(name) ADM_dealloc(name);
@@ -193,7 +193,7 @@ GtkWidget*
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("VobSub Settings"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("VobSub Settings"));
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -210,13 +210,13 @@ GtkWidget*
   gtk_widget_show (table1);
   gtk_container_add (GTK_CONTAINER (frame1), table1);
 
-  buttonSelect = gtk_button_new_with_mnemonic (_("Select .idx"));
+  buttonSelect = gtk_button_new_with_mnemonic (QT_TR_NOOP("Select .idx"));
   gtk_widget_show (buttonSelect);
   gtk_table_attach (GTK_TABLE (table1), buttonSelect, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  labelVobsub = gtk_label_new (_("None"));
+  labelVobsub = gtk_label_new (QT_TR_NOOP("None"));
   gtk_widget_show (labelVobsub);
   gtk_table_attach (GTK_TABLE (table1), labelVobsub, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -224,7 +224,7 @@ GtkWidget*
   gtk_label_set_justify (GTK_LABEL (labelVobsub), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (labelVobsub), 0, 0.5);
 
-  label4 = gtk_label_new (_("Select Language :"));
+  label4 = gtk_label_new (QT_TR_NOOP("Select Language :"));
   gtk_widget_show (label4);
   gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -238,7 +238,7 @@ GtkWidget*
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  label2 = gtk_label_new (_("Select Sub"));
+  label2 = gtk_label_new (QT_TR_NOOP("Select Sub"));
   gtk_widget_show (label2);
   gtk_frame_set_label_widget (GTK_FRAME (frame1), label2);
   gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
@@ -251,7 +251,7 @@ GtkWidget*
   gtk_widget_show (table2);
   gtk_container_add (GTK_CONTAINER (frame2), table2);
 
-  label6 = gtk_label_new (_("Extra Shrink Factor :"));
+  label6 = gtk_label_new (QT_TR_NOOP("Extra Shrink Factor :"));
   gtk_widget_show (label6);
   gtk_table_attach (GTK_TABLE (table2), label6, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -266,7 +266,7 @@ GtkWidget*
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  label7 = gtk_label_new (_("Shift (ms) :"));
+  label7 = gtk_label_new (QT_TR_NOOP("Shift (ms) :"));
   gtk_widget_show (label7);
   gtk_table_attach (GTK_TABLE (table2), label7, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -280,7 +280,7 @@ GtkWidget*
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  label5 = gtk_label_new (_("Extra Settings"));
+  label5 = gtk_label_new (QT_TR_NOOP("Extra Settings"));
   gtk_widget_show (label5);
   gtk_frame_set_label_widget (GTK_FRAME (frame2), label5);
   gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_LEFT);

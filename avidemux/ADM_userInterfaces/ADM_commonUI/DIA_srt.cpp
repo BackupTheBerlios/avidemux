@@ -71,7 +71,7 @@ typedef struct
 */
 uint8_t DIA_srt(AVDMGenericVideoStream *source, SUBCONF *param)
 {
-#define item(x) _(names[x].display)
+#define item(x) QT_TR_NOOP(names[x].display)
 #define Mitem(x) {x,item(x)}
 diaMenuEntry encoding[]={
   Mitem(0),
@@ -85,8 +85,8 @@ diaMenuEntry encoding[]={
 };       
 
 #define PX(x) &(param->x)
-  diaElemFile subtitle(0,(char **)PX(_subname),_("_Subtitle file:"));
-  diaElemFile font(0,(char **)PX(_fontname),_("_Font (TTF):"));
+  diaElemFile subtitle(0,(char **)PX(_subname),QT_TR_NOOP("_Subtitle file:"));
+  diaElemFile font(0,(char **)PX(_fontname),QT_TR_NOOP("_Font (TTF):"));
   int colors[3]={param->_Y_percent,param->_U_percent,param->_V_percent};
   
   uint32_t fontSize=param->_fontsize;
@@ -101,15 +101,15 @@ diaMenuEntry encoding[]={
       {
           if(!strcmp(param->_charset,names[i].name)) myEncoding=i;
       }
-      diaElemMenu      encodingM(&myEncoding,_("_Encoding:"),8,encoding);
-    //  diaElemUInteger  fontSize(PX(_fontsize),_("Font Si_Ze:"),8,120);
-      diaElemButton    color(_("S_elect C_olor"), colorCallBack,&(colors[0]));
-      diaElemButton    setBase(_("Set Size and _Position"), sizePositionCallback,&sizePos);
-      diaElemToggle    autoSplit(PX(_selfAdjustable),_("_Auto split"));
-      diaElemInteger   delay(PX(_delay),_("_Delay (ms):"),-100000,100000);
+      diaElemMenu      encodingM(&myEncoding,QT_TR_NOOP("_Encoding:"),8,encoding);
+    //  diaElemUInteger  fontSize(PX(_fontsize),QT_TR_NOOP("Font Si_Ze:"),8,120);
+      diaElemButton    color(QT_TR_NOOP("S_elect C_olor"), colorCallBack,&(colors[0]));
+      diaElemButton    setBase(QT_TR_NOOP("Set Size and _Position"), sizePositionCallback,&sizePos);
+      diaElemToggle    autoSplit(PX(_selfAdjustable),QT_TR_NOOP("_Auto split"));
+      diaElemInteger   delay(PX(_delay),QT_TR_NOOP("_Delay (ms):"),-100000,100000);
          
       diaElem *tabs[]={&subtitle,&font,&encodingM,&color,&setBase,&autoSplit,&delay};
-      if( diaFactoryRun(_("Subtitler"),7,tabs))
+      if( diaFactoryRun(QT_TR_NOOP("Subtitler"),7,tabs))
 	{
           if(param->_charset) ADM_dealloc(param->_charset);
           param->_charset=ADM_strdup(names[myEncoding].name);

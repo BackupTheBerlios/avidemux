@@ -82,7 +82,7 @@ uint32_t retry=50;
      
       DIA_working *work;
 
-      work=new DIA_working(_("Building VBR map"));
+      work=new DIA_working(QT_TR_NOOP("Building VBR map"));
 
       goTo(0);
       uint32_t Mul=2*_wavheader->channels;
@@ -93,7 +93,7 @@ uint32_t retry=50;
 				if(!work->isAlive())
 				{
 					delete work;
-					work=new DIA_working(_("Building VBR map"));
+					work=new DIA_working(QT_TR_NOOP("Building VBR map"));
 					work->update(offset,_length);
 				}
                 

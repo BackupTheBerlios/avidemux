@@ -275,7 +275,7 @@ uint8_t  buildOneTab(GtkWidget *nb,int index, diaElemTabs *tab)
   
 
   
-  label = gtk_label_new (_(tab->title));
+  label = gtk_label_new (QT_TR_NOOP(tab->title));
   gtk_widget_show (label);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (nb), gtk_notebook_get_nth_page (GTK_NOTEBOOK (nb), index), label);
 

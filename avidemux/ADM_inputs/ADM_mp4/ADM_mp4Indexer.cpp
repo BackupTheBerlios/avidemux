@@ -343,7 +343,7 @@ uint32_t i,j,cur;
 	}
 	else // there is not ssts
 	{
-          GUI_Error_HIG(_("No stts table"), NULL);
+          GUI_Error_HIG(QT_TR_NOOP("No stts table"), NULL);
 		ADM_assert(0);	
 	}
         printf("Index done\n");

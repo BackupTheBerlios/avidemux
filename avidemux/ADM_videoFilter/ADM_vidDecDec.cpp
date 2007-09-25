@@ -187,23 +187,23 @@ uint8_t Decimate::configure(AVDMGenericVideoStream *in)
     ELEM_TYPE_FLOAT t2=(ELEM_TYPE_FLOAT)_param->threshold2;
 
          diaMenuEntry tMode[]={
-                             {0, _("Discard closer"),NULL},
-                             {1, _("Replace (interpolate)"),NULL},
-                             {2, _("Discard longer dupe (animés)"),NULL},
-                             {3, _("Pulldown dupe removal"),NULL}
+                             {0, QT_TR_NOOP("Discard closer"),NULL},
+                             {1, QT_TR_NOOP("Replace (interpolate)"),NULL},
+                             {2, QT_TR_NOOP("Discard longer dupe (animés)"),NULL},
+                             {3, QT_TR_NOOP("Pulldown dupe removal"),NULL}
                           };
          diaMenuEntry tQuality[]={
-                             {0, _("Fastest (no chroma, partial luma)"),NULL},
-                             {1, _("Fast (partial luma and chroma)"),NULL},
-                             {2, _("Medium (full luma, no chroma)"),NULL},
-                             {3, _("Slow (full luma and chroma)"),NULL}
+                             {0, QT_TR_NOOP("Fastest (no chroma, partial luma)"),NULL},
+                             {1, QT_TR_NOOP("Fast (partial luma and chroma)"),NULL},
+                             {2, QT_TR_NOOP("Medium (full luma, no chroma)"),NULL},
+                             {3, QT_TR_NOOP("Slow (full luma and chroma)"),NULL}
                           };
   
     
-    diaElemMenu menuMode(PX(mode),_("_Mode:"), 4,tMode);
-    diaElemMenu menuQuality(PX(quality),_("_Quality:"), 4,tQuality);
-    diaElemFloat menuThresh1(&t1,_("_Threshold 1:"),0,100.);
-    diaElemFloat menuThresh2(&t2,_("T_hreshold 2:"),0,100.);
+    diaElemMenu menuMode(PX(mode),QT_TR_NOOP("_Mode:"), 4,tMode);
+    diaElemMenu menuQuality(PX(quality),QT_TR_NOOP("_Quality:"), 4,tQuality);
+    diaElemFloat menuThresh1(&t1,QT_TR_NOOP("_Threshold 1:"),0,100.);
+    diaElemFloat menuThresh2(&t2,QT_TR_NOOP("T_hreshold 2:"),0,100.);
     diaElemUInteger cycle(PX(cycle),"C_ycle:",2,40);
     
     diaElem *elems[]={&cycle,&menuMode,&menuQuality,&menuThresh1,&menuThresh2};

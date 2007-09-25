@@ -170,7 +170,7 @@ uint8_t saveGlyph(char *name,admGlyph *head,uint32_t nb)
   out=fopen(name,"wb");
   if(!out)
   {
-    GUI_Error_HIG(_("Could not write the file"), NULL);
+    GUI_Error_HIG(QT_TR_NOOP("Could not write the file"), NULL);
     return 0;
   }
     
@@ -218,7 +218,7 @@ uint8_t loadGlyph(char *name,admGlyph *head,uint32_t *outNb)
   out=fopen(name,"rb");
   if(!out)
   {
-    GUI_Error_HIG(_("File error"), _("Could not read \"%s\"."), name);
+    GUI_Error_HIG(QT_TR_NOOP("File error"), QT_TR_NOOP("Could not read \"%s\"."), name);
     return 0;
   }
 #define READ(x) fread(&(x),sizeof(x),1,out);

@@ -400,21 +400,21 @@ uint8_t  ADMImage::saveAsBmp(const char *filename)
         out=(uint8_t *)ADM_alloc(sz);
         if(!out)
         {
-            GUI_Error_HIG(_("Memory error"), NULL);
+            GUI_Error_HIG(QT_TR_NOOP("Memory error"), NULL);
 //            ADM_dealloc(out);
             return 0;
         }
 
         if(!COL_yv12rgbBMP(bmph.biWidth, bmph.biHeight,data, out))
         {
-              GUI_Error_HIG(_("Error converting to BMP"), NULL);
+              GUI_Error_HIG(QT_TR_NOOP("Error converting to BMP"), NULL);
               ADM_dealloc(out);
               return 0;
         }
         fd = fopen (filename, "wb");
         if (!fd)
         {
-                GUI_Error_HIG (_("Something bad happened"), NULL);
+                GUI_Error_HIG (QT_TR_NOOP("Something bad happened"), NULL);
                 ADM_dealloc(out);
                 return 0;
         }
@@ -469,7 +469,7 @@ uint8_t  ADMImage::saveAsJpg(const char *filename)
         codec->init( 95,25000);
         if(!codec->encode(this,&bitstream))
         {
-                GUI_Error_HIG(_("Cannot encode the frame"), NULL);
+                GUI_Error_HIG(QT_TR_NOOP("Cannot encode the frame"), NULL);
                 delete [] buffer;
                 delete codec;
                 return 0;
@@ -478,7 +478,7 @@ uint8_t  ADMImage::saveAsJpg(const char *filename)
         fd=fopen(filename,"wb");
         if(!fd)
         {
-                GUI_Error_HIG(_("File error"),_( "Cannot open \"%s\" for writing."), filename);
+                GUI_Error_HIG(QT_TR_NOOP("File error"),QT_TR_NOOP( "Cannot open \"%s\" for writing."), filename);
                 delete [] buffer;
                 return 0;
         }

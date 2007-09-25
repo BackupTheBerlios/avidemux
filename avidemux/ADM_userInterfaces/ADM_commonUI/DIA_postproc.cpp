@@ -37,8 +37,8 @@ int DIA_getMPParams( uint32_t *pplevel, uint32_t *ppstrength,uint32_t *swap)
 
 #define PX(x) x
         
-    diaElemUInteger   postProcStrength(PX(ppstrength),_("_Filter strength:"),0,5);
-    diaElemToggle     swapuv(PX(swap),_("_Swap U and V"));
+    diaElemUInteger   postProcStrength(PX(ppstrength),QT_TR_NOOP("_Filter strength:"),0,5);
+    diaElemToggle     swapuv(PX(swap),QT_TR_NOOP("_Swap U and V"));
     
     uint32_t hzd,vzd,dring;
     
@@ -48,9 +48,9 @@ int DIA_getMPParams( uint32_t *pplevel, uint32_t *ppstrength,uint32_t *swap)
     DOME(2,vzd);
     DOME(4,dring);
     
-     diaElemToggle     fhzd(&hzd,_("_Horizontal deblocking"));
-     diaElemToggle     fvzd(&vzd,_("_Vertical deblocking"));
-     diaElemToggle     fdring(&dring,_("_Deringing"));
+     diaElemToggle     fhzd(&hzd,QT_TR_NOOP("_Horizontal deblocking"));
+     diaElemToggle     fvzd(&vzd,QT_TR_NOOP("_Vertical deblocking"));
+     diaElemToggle     fdring(&dring,QT_TR_NOOP("_Deringing"));
     
     
     

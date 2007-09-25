@@ -135,7 +135,7 @@ GtkWidget	*create_dialogAudioCodec (void)
   int acodecNb=0;
 
   dialogAudioCodec = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialogAudioCodec), _("AudioCodec"));
+  gtk_window_set_title (GTK_WINDOW (dialogAudioCodec), QT_TR_NOOP("AudioCodec"));
 
   dialog_vbox1 = GTK_DIALOG (dialogAudioCodec)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -160,7 +160,7 @@ GtkWidget	*create_dialogAudioCodec (void)
  /***************/ 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu_CodecList), menu1);
 
-  buttonConfigure = gtk_button_new_with_mnemonic (_("Configure codec"));
+  buttonConfigure = gtk_button_new_with_mnemonic (QT_TR_NOOP("Configure codec"));
   gtk_widget_show (buttonConfigure);
   gtk_box_pack_start (GTK_BOX (vbox1), buttonConfigure, FALSE, FALSE, 0);
 

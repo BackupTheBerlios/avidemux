@@ -343,7 +343,7 @@ double fps;
 			_isaudiopresent=1;
 			if(_audioTracks[1].audioTrack!=0xff
 				&&_audioTracks[1].nbAudioPacket 
-                                                && GUI_Question(_("Take second track ?")))
+                                                && GUI_Question(QT_TR_NOOP("Take second track ?")))
 			{
                                 _currentAudioTrack=1;
 				_audio=new oggAudio( name, &_audioTracks[0],1 );
@@ -423,7 +423,7 @@ uint8_t frag, *frags;
 
 OgAudioTrack *track1,*track2;
 
-DIA_working *work=new DIA_working(_("Scanning OGM"));
+DIA_working *work=new DIA_working(QT_TR_NOOP("Scanning OGM"));
 
 	track1=&_audioTracks[0];
 	track2=&_audioTracks[1];

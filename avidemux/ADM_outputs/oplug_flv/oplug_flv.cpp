@@ -148,7 +148,7 @@ uint32_t sent=0;
            }
            if(!supported)
            {
-        	   GUI_Error_HIG(_("Unsupported video"),_("Only FLV1 and VP6 video are supported"));
+        	   GUI_Error_HIG(QT_TR_NOOP("Unsupported video"),QT_TR_NOOP("Only FLV1 and VP6 video are supported"));
         	   goto stopit;
            }
            /* Check audio, we support only mp3 right now
@@ -170,12 +170,12 @@ uint32_t sent=0;
         	   	}
         	   	if(audioCodec!=WAV_MP3 )
         	   		{
-        	   			GUI_Error_HIG(_("Unsupported audio"),_("Audio must be mp3 for flv output."));
+        	   			GUI_Error_HIG(QT_TR_NOOP("Unsupported audio"),QT_TR_NOOP("Audio must be mp3 for flv output."));
         	   			goto stopit;
         	   		}
         	   	if(fq!=44100 && fq!=22050 && fq!=11025)
         	   	{
-    	   			GUI_Error_HIG(_("Unsupported audio"),_("Frequency must be 44100, 22050 or 11025 Hz."));
+    	   			GUI_Error_HIG(QT_TR_NOOP("Unsupported audio"),QT_TR_NOOP("Frequency must be 44100, 22050 or 11025 Hz."));
     	   			goto stopit;
         	   		
         	   	}
@@ -186,7 +186,7 @@ uint32_t sent=0;
            bitstream.bufferSize=_incoming->getInfo()->width*_incoming->getInfo()->height*3;
            if (!_encode)
                 {
-                  GUI_Error_HIG ("[FLV]",_("Cannot initialize the video stream"));
+                  GUI_Error_HIG ("[FLV]",QT_TR_NOOP("Cannot initialize the video stream"));
                         goto  stopit;
                 }
 
@@ -200,7 +200,7 @@ uint32_t sent=0;
                 
                 if (!_encode->configure (_incoming))
                 {
-                      GUI_Error_HIG (_("Filter init failed"), NULL);
+                      GUI_Error_HIG (QT_TR_NOOP("Filter init failed"), NULL);
                      goto  stopit;
                 };
 
@@ -230,7 +230,7 @@ preFilling:
              if(!(err=_encode->encode ( prefill, &bitstream)))// FIXME: We should never execute it more than once
              {
                         printf("[FLV]:First frame error\n");
-                        GUI_Error_HIG (_("Error while encoding"), NULL);
+                        GUI_Error_HIG (QT_TR_NOOP("Error while encoding"), NULL);
                         goto  stopit;
               }
               sent++;
@@ -241,7 +241,7 @@ preFilling:
               }
               if(!bitstream.flags & AVI_KEY_FRAME)
               {
-                GUI_Error_HIG (_("KeyFrame error"),_( "The beginning frame is not a key frame.\nPlease move the A marker."));
+                GUI_Error_HIG (QT_TR_NOOP("KeyFrame error"),QT_TR_NOOP( "The beginning frame is not a key frame.\nPlease move the A marker."));
                   goto  stopit; 
               }
           
@@ -251,7 +251,7 @@ preFilling:
                 audio=mpt_getAudioStream();
                 if(!audio)
                 {
-                        GUI_Error_HIG ("[FLV]",_("Cannot initialize the audio stream"));
+                        GUI_Error_HIG ("[FLV]",QT_TR_NOOP("Cannot initialize the audio stream"));
                         goto  stopit;
                 }
           } 
@@ -329,7 +329,7 @@ preFilling:
                if(!r && frame<total-2)
                {
                         printf("[FLV]:Frame %u error\n",frame);
-                        GUI_Error_HIG ("FLV",_("Error while encoding"));
+                        GUI_Error_HIG ("FLV",QT_TR_NOOP("Error while encoding"));
                         goto  stopit;
                 }
                 if(!bitstream.len && skipping)

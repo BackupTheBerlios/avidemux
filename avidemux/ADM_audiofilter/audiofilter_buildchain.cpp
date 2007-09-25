@@ -319,7 +319,7 @@ AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
   }
   if(lastFilter->getInfo()->channels > descriptor->maxChannels)
   {
-    GUI_Error_HIG(_("Codec Error"),_("The number of channels is greater than what the selected audio codec can do.\n"
+    GUI_Error_HIG(QT_TR_NOOP("Codec Error"),QT_TR_NOOP("The number of channels is greater than what the selected audio codec can do.\n"
         "Either change codec or use the mixer filter to have less channels."));
     deleteAudioFilter(NULL);
     return 0; 

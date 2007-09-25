@@ -73,7 +73,7 @@ uint32_t flags;
       {
         if( !GUI_getFrame(curframe + 1,&flags))
         	{
-                  GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode next frame."));
+                  GUI_Error_HIG(QT_TR_NOOP("Decompressing error"),QT_TR_NOOP( "Cannot decode next frame."));
            	}
            else
             {
@@ -111,7 +111,7 @@ void GUI_NextKeyFrame(void)
                         curframe=f;
                         if( !GUI_getFrame(curframe,&flags))
                         {
-                          GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode keyframe."));
+                          GUI_Error_HIG(QT_TR_NOOP("Decompressing error"),QT_TR_NOOP( "Cannot decode keyframe."));
                         }
                         
                         admPreview::update( curframe) ;
@@ -234,7 +234,7 @@ void GUI_NextPrevBlackFrame(int dir)
 
    const int darkness=40;
 
-   DIA_working *work=new DIA_working(_("Seeking"));
+   DIA_working *work=new DIA_working(QT_TR_NOOP("Seeking"));
    orgFrame=curframe;
    while(1)
    {
@@ -312,7 +312,7 @@ uint8_t A_ListAllBlackFrames(char *name)
     const int darkness=40;
 
     startframe=curframe;
-    DIA_working *work=new DIA_working(_("Finding black frames"));
+    DIA_working *work=new DIA_working(QT_TR_NOOP("Finding black frames"));
     printf("\n** Listing all black frames **\n");
 
     for (f=0; f<avifileinfo->nb_frames; f++) {
@@ -387,7 +387,7 @@ uint32_t flags;
 
       if( !GUI_getFrame(frame ,&flags))
       {
-        GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode the frame."));
+        GUI_Error_HIG(QT_TR_NOOP("Decompressing error"),QT_TR_NOOP( "Cannot decode the frame."));
               return 0;
       }
 
@@ -423,7 +423,7 @@ void GUI_PreviousKeyFrame(void)
                     curframe=f;
                     if( !GUI_getFrame(curframe,&flags))
                     {
-                      GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode keyframe."));
+                      GUI_Error_HIG(QT_TR_NOOP("Decompressing error"),QT_TR_NOOP( "Cannot decode keyframe."));
                     }
                     
                     admPreview::update( curframe) ;

@@ -72,7 +72,7 @@ uint8_t scratchPad[SCRATCH_PAD_SIZE];
     mixDump((uint8_t *)_context->extradata,_context->extradata_size);
 
    AVCodec *codec=avcodec_find_decoder(_context->codec_id);
-   if(!codec) {GUI_Error_HIG(_("Internal error"), _("Cannot open WMA2 codec."));ADM_assert(0);} 
+   if(!codec) {GUI_Error_HIG(QT_TR_NOOP("Internal error"), QT_TR_NOOP("Cannot open WMA2 codec."));ADM_assert(0);} 
     if (avcodec_open(_context, codec) < 0)
     {
         printf("\n WMA decoder init failed !\n");
@@ -180,7 +180,7 @@ int nbChunk;
         printf(" Opening AMR codec\n");
 
         AVCodec *codec=avcodec_find_decoder(CODEC_ID_AMR_NB);
-        if(!codec) {GUI_Error_HIG(_("Internal error"), _("Cannot open AMR codec."));ADM_assert(0);} 
+        if(!codec) {GUI_Error_HIG(QT_TR_NOOP("Internal error"), QT_TR_NOOP("Cannot open AMR codec."));ADM_assert(0);} 
         if (avcodec_open(_context, codec) < 0)
         {
             printf("\n AMR decoder init failed !\n");

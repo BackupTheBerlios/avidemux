@@ -57,9 +57,9 @@ uint8_t ADMVideoForcedPP::configure( AVDMGenericVideoStream *instream)
         #define PX(x) &(_param->x)
   
         
-    diaElemUInteger   postProcStrength(PX(postProcStrength),_("_Filter strength:"),0,5);
-    diaElemUInteger   quant(PX(forcedQuant),_("_Quantizer:"),1,31);
-    //diaElemToggle     swapuv(PX(swapuv),_("Swap U&V"));
+    diaElemUInteger   postProcStrength(PX(postProcStrength),QT_TR_NOOP("_Filter strength:"),0,5);
+    diaElemUInteger   quant(PX(forcedQuant),QT_TR_NOOP("_Quantizer:"),1,31);
+    //diaElemToggle     swapuv(PX(swapuv),QT_TR_NOOP("Swap U&V"));
     
     uint32_t hzd,vzd,dring;
     
@@ -69,9 +69,9 @@ uint8_t ADMVideoForcedPP::configure( AVDMGenericVideoStream *instream)
     DOME(2,vzd);
     DOME(4,dring);
     
-     diaElemToggle     fhzd(&hzd,_("_Horizontal deblocking"));
-     diaElemToggle     fvzd(&vzd,_("_Vertical deblocking"));
-     diaElemToggle     fdring(&dring,_("_Deringing"));
+     diaElemToggle     fhzd(&hzd,QT_TR_NOOP("_Horizontal deblocking"));
+     diaElemToggle     fvzd(&vzd,QT_TR_NOOP("_Vertical deblocking"));
+     diaElemToggle     fdring(&dring,QT_TR_NOOP("_Deringing"));
     
     
     

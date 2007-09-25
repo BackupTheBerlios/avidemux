@@ -60,7 +60,7 @@ uint8_t ADMVideoStabilize::configure(AVDMGenericVideoStream *instream)
 int i;
 	_in=instream;
         
-         diaElemUInteger chroma(_param,_("Stabilize Threshold"),1,255);    
+         diaElemUInteger chroma(_param,QT_TR_NOOP("Stabilize Threshold"),1,255);    
          diaElem *elems[]={&chroma};
   
     return diaFactoryRun("Stabilize",sizeof(elems)/sizeof(diaElem *),elems);

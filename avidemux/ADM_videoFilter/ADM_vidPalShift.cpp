@@ -73,7 +73,7 @@ ADMVideoPalShift::ADMVideoPalShift(  AVDMGenericVideoStream *in,CONFcouple *setu
  uint8_t ADMVideoPalShift::configure( AVDMGenericVideoStream *instream) 
 {
   
-  diaElemToggle chroma(_reverse,_("_Try reverse"));
+  diaElemToggle chroma(_reverse,QT_TR_NOOP("_Try reverse"));
     
     diaElem *elems[]={&chroma};
   

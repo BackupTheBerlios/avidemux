@@ -86,19 +86,19 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
   	// First we check it is mpeg
 	if(!isMpeg12Compatible(avifileinfo->fcc))
   	{
-          GUI_Error_HIG(_("This is not MPEG compatible"), _("You can't use the Copy codec."));
+          GUI_Error_HIG(QT_TR_NOOP("This is not MPEG compatible"), QT_TR_NOOP("You can't use the Copy codec."));
 		return 0 ;
   	}
   	if(!currentaudiostream)
   	{
-          GUI_Error_HIG(_("There is no audio track"), NULL);
+          GUI_Error_HIG(QT_TR_NOOP("There is no audio track"), NULL);
 		return 0;
   	}
   
 	ADM_assert (video_body->getFlags (frameStart, &flags));
         if(!(flags&AVI_KEY_FRAME))
         {
-          GUI_Error_HIG(_("The first frame is not intra frame"), _("Use the &lt;&lt; and the &gt;&gt; buttons to move using Intra frames."));
+          GUI_Error_HIG(QT_TR_NOOP("The first frame is not intra frame"), QT_TR_NOOP("Use the &lt;&lt; and the &gt;&gt; buttons to move using Intra frames."));
                 return 0;
         }
 	
@@ -110,7 +110,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
 	// Later check if it is SVCD
 	if(!audio)
 	{
-          GUI_Error_HIG(_("Audio track is not suitable"), NULL);
+          GUI_Error_HIG(QT_TR_NOOP("Audio track is not suitable"), NULL);
 		return 0;
 	}
 	// Check
@@ -150,7 +150,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                 {
                         if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
                         {
-                          GUI_Error_HIG(_("Incompatible audio"), _("For VCD, audio must be 44.1 kHz MP2."));
+                          GUI_Error_HIG(QT_TR_NOOP("Incompatible audio"), QT_TR_NOOP("For VCD, audio must be 44.1 kHz MP2."));
                                 return 0 ;
                         }
                         mux=MUXER_VCD;
@@ -179,7 +179,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                                 if(!valid)
                                 {
                                         deleteAudioFilter(audio);
-                                       GUI_Error_HIG(("Incompatible audio"),_( "For DVD, audio must be 48 kHz MP2(stereo), AC3, DTS or LPCM (stereo)."));
+                                       GUI_Error_HIG(("Incompatible audio"),QT_TR_NOOP( "For DVD, audio must be 48 kHz MP2(stereo), AC3, DTS or LPCM (stereo)."));
                                        return 0;
                                 }
                          
@@ -349,7 +349,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
               if(!r)
               {
                 printf("TS:Frame %u error\n",frame);
-                GUI_Error_HIG (_("Error while encoding"), NULL);
+                GUI_Error_HIG (QT_TR_NOOP("Error while encoding"), NULL);
                 goto  stopit;
               }
               muxer->writeVideoPacket( &bitstream);

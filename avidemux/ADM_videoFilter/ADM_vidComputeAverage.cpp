@@ -184,29 +184,29 @@ uint8_t ADMVideoComputeAverage::configure(AVDMGenericVideoStream *in)
 
     diaElemInteger start_frame
         (&(_param->start_frame),
-         _("_Start Frame (first frame # to include in average):"),
+         QT_TR_NOOP("_Start Frame (first frame # to include in average):"),
          0, 0x7fffffff);
     diaElemInteger end_frame
         (&(_param->end_frame),
-         _("_End Frame (last frame # to include), -1 = last:"),
+         QT_TR_NOOP("_End Frame (last frame # to include), -1 = last:"),
          -1000000, 0x7fffffff);
     diaElemFile output_file
         (1, const_cast<char **>(&(_param->output_file)),
-         _("_Output File:"), "avg");
+         QT_TR_NOOP("_Output File:"), "avg");
     diaElemSlider bias
         (&(_param->bias),
-         _("_Bias (only for display; use 0 for "
+         QT_TR_NOOP("_Bias (only for display; use 0 for "
            "average, 128 for frame minus average):"), -256, +256);
     diaMenuEntry tDisplayMode [] = {
         { DISPLAYMODE_FRAME_MINUS_AVERAGE,
-          _("Current frame minus average so far"), NULL },
-        { DISPLAYMODE_AVERAGE, _("Average so far"), NULL },
+          QT_TR_NOOP("Current frame minus average so far"), NULL },
+        { DISPLAYMODE_AVERAGE, QT_TR_NOOP("Average so far"), NULL },
         { DISPLAYMODE_BLANK,
-          _("Display nothing (fast for batch processing)"), NULL },
+          QT_TR_NOOP("Display nothing (fast for batch processing)"), NULL },
     };
     diaElemMenu display_mode
         (&(_param->display_mode),
-         _("Display _Mode:"),
+         QT_TR_NOOP("Display _Mode:"),
          sizeof (tDisplayMode) / sizeof (diaMenuEntry), tDisplayMode);
     diaElem * elems[] = { &start_frame, &end_frame, &output_file,
                           &bias, &display_mode };

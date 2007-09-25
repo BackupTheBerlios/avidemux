@@ -217,21 +217,21 @@ int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor)
     mmode=lameParam->mode;
     ppreset=lameParam->preset;
     diaMenuEntry channelMode[]={
-                             {ADM_STEREO,      _("Stereo"),NULL},
-                             {ADM_JSTEREO,   _("Joint stereo"),NULL},
-                             {ADM_MONO,      _("Mono"),NULL}};
+                             {ADM_STEREO,      QT_TR_NOOP("Stereo"),NULL},
+                             {ADM_JSTEREO,   QT_TR_NOOP("Joint stereo"),NULL},
+                             {ADM_MONO,      QT_TR_NOOP("Mono"),NULL}};
           
-    diaElemMenu menuMode(&mmode,   _("C_hannel mode:"), SZT(channelMode),channelMode);
+    diaElemMenu menuMode(&mmode,   QT_TR_NOOP("C_hannel mode:"), SZT(channelMode),channelMode);
     
     diaMenuEntry encodingMode[]={
-                             {ADM_LAME_PRESET_CBR,      _("CBR"),NULL},
-                             {ADM_LAME_PRESET_ABR,   _("ABR"),NULL},
+                             {ADM_LAME_PRESET_CBR,      QT_TR_NOOP("CBR"),NULL},
+                             {ADM_LAME_PRESET_ABR,   QT_TR_NOOP("ABR"),NULL},
 #if 0
-                             {ADM_LAME_PRESET_EXTREME,      _("Extreme"),NULL}
+                             {ADM_LAME_PRESET_EXTREME,      QT_TR_NOOP("Extreme"),NULL}
 #endif
     }; 
-    diaElemMenu Mode(&ppreset,   _("Bit_rate mode:"), SZT(encodingMode),encodingMode);
-#define BITRATE(x) {x,_(#x)}
+    diaElemMenu Mode(&ppreset,   QT_TR_NOOP("Bit_rate mode:"), SZT(encodingMode),encodingMode);
+#define BITRATE(x) {x,QT_TR_NOOP(#x)}
     diaMenuEntry bitrateM[]={
                               BITRATE(56),
                               BITRATE(64),
@@ -243,13 +243,13 @@ int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor)
                               BITRATE(192),
                               BITRATE(224)
                           };
-    diaElemMenu bitrate(&(descriptor->bitrate),   _("_Bitrate:"), SZT(bitrateM),bitrateM);
+    diaElemMenu bitrate(&(descriptor->bitrate),   QT_TR_NOOP("_Bitrate:"), SZT(bitrateM),bitrateM);
     
     
     
     
-    diaElemUInteger quality(PX(quality),_("_Quality:"),0,9);
-    diaElemToggle reservoir(PX(disableReservoir),_("_Disable reservoir:"));
+    diaElemUInteger quality(PX(quality),QT_TR_NOOP("_Quality:"),0,9);
+    diaElemToggle reservoir(PX(disableReservoir),QT_TR_NOOP("_Disable reservoir:"));
   
       diaElem *elems[]={&menuMode,&Mode,&quality,&bitrate,&reservoir};
     

@@ -61,7 +61,7 @@ GtkWidget	*create_dialogList (void)
 
   dialog1 = gtk_dialog_new ();
   gtk_container_set_border_width (GTK_CONTAINER (dialog1), 6);
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Add Video Filter"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Add Video Filter"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
   gtk_dialog_set_has_separator (GTK_DIALOG (dialog1), FALSE);
 
@@ -95,7 +95,7 @@ GtkWidget	*create_dialogList (void)
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, FALSE, 0);
 
-  label17 = gtk_label_new (_("Transformation"));
+  label17 = gtk_label_new (QT_TR_NOOP("Transformation"));
   gtk_widget_show (label17);
   gtk_box_pack_start (GTK_BOX (hbox1), label17, FALSE, FALSE, 0);
 
@@ -120,7 +120,7 @@ GtkWidget	*create_dialogList (void)
   gtk_widget_show (image2);
   gtk_box_pack_start (GTK_BOX (hbox2), image2, FALSE, FALSE, 0);
 
-  label18 = gtk_label_new (_("Interlacing"));
+  label18 = gtk_label_new (QT_TR_NOOP("Interlacing"));
   gtk_widget_show (label18);
   gtk_box_pack_start (GTK_BOX (hbox2), label18, FALSE, FALSE, 0);
 
@@ -145,7 +145,7 @@ GtkWidget	*create_dialogList (void)
   gtk_widget_show (image3);
   gtk_box_pack_start (GTK_BOX (hbox3), image3, FALSE, FALSE, 0);
 
-  label19 = gtk_label_new (_("Colors"));
+  label19 = gtk_label_new (QT_TR_NOOP("Colors"));
   gtk_widget_show (label19);
   gtk_box_pack_start (GTK_BOX (hbox3), label19, FALSE, FALSE, 0);
 
@@ -170,7 +170,7 @@ GtkWidget	*create_dialogList (void)
   gtk_widget_show (image4);
   gtk_box_pack_start (GTK_BOX (hbox4), image4, FALSE, FALSE, 0);
 
-  label20 = gtk_label_new (_("Denoise"));
+  label20 = gtk_label_new (QT_TR_NOOP("Denoise"));
   gtk_widget_show (label20);
   gtk_box_pack_start (GTK_BOX (hbox4), label20, FALSE, FALSE, 0);
 
@@ -195,7 +195,7 @@ GtkWidget	*create_dialogList (void)
   gtk_widget_show (image5);
   gtk_box_pack_start (GTK_BOX (hbox5), image5, FALSE, FALSE, 0);
 
-  label21 = gtk_label_new (_("Sharpen/Blur"));
+  label21 = gtk_label_new (QT_TR_NOOP("Sharpen/Blur"));
   gtk_widget_show (label21);
   gtk_box_pack_start (GTK_BOX (hbox5), label21, FALSE, FALSE, 0);
 
@@ -220,7 +220,7 @@ GtkWidget	*create_dialogList (void)
   gtk_widget_show (image6);
   gtk_box_pack_start (GTK_BOX (hbox6), image6, FALSE, FALSE, 0);
 
-  label22 = gtk_label_new (_("Subtitles"));
+  label22 = gtk_label_new (QT_TR_NOOP("Subtitles"));
   gtk_widget_show (label22);
   gtk_box_pack_start (GTK_BOX (hbox6), label22, FALSE, FALSE, 0);
 
@@ -245,7 +245,7 @@ GtkWidget	*create_dialogList (void)
   gtk_widget_show (image7);
   gtk_box_pack_start (GTK_BOX (hbox7), image7, FALSE, FALSE, 0);
 
-  label23 = gtk_label_new (_("Miscellaneous"));
+  label23 = gtk_label_new (QT_TR_NOOP("Miscellaneous"));
   gtk_widget_show (label23);
   gtk_box_pack_start (GTK_BOX (hbox7), label23, FALSE, FALSE, 0);
 

@@ -58,35 +58,35 @@ int code;
 
 
          diaMenuEntry partitionM[] = {
-                  {0,   _("1  - Extremely Low (Fastest)")}
-                ,{1,    _("2  - Very Low")}
-                ,{3,    _("3  - Low")}
-                ,{4,    _("4  - Medium")}
-                ,{5,    _("5  - High (Default)")}
-                ,{6,    _("6  - Very High")}
-                ,{7,    _("6B - Very High (RDO on Bframes)")}
-                ,{8,    _("7 - Ultra High")}
-                ,{9,    _("7B - Ultra High (RDO on Bframes)")}};
+                  {0,   QT_TR_NOOP("1  - Extremely Low (Fastest)")}
+                ,{1,    QT_TR_NOOP("2  - Very Low")}
+                ,{3,    QT_TR_NOOP("3  - Low")}
+                ,{4,    QT_TR_NOOP("4  - Medium")}
+                ,{5,    QT_TR_NOOP("5  - High (Default)")}
+                ,{6,    QT_TR_NOOP("6  - Very High")}
+                ,{7,    QT_TR_NOOP("6B - Very High (RDO on Bframes)")}
+                ,{8,    QT_TR_NOOP("7 - Ultra High")}
+                ,{9,    QT_TR_NOOP("7B - Ultra High (RDO on Bframes)")}};
 
                             
-        diaElemMenu parition(PX(PartitionDecision),_("Partition Decision"),10,partitionM);
+        diaElemMenu parition(PX(PartitionDecision),QT_TR_NOOP("Partition Decision"),10,partitionM);
         
          diaMenuEntry meM[] = {
-                             {0,    _("Diamond search")},
-                             {1,    _("Hexagonal search")},
-                             {2,    _("Uneven multi hexagon")},
-                             {3,    _("Exhaustive search")}}
+                             {0,    QT_TR_NOOP("Diamond search")},
+                             {1,    QT_TR_NOOP("Hexagonal search")},
+                             {2,    QT_TR_NOOP("Uneven multi hexagon")},
+                             {3,    QT_TR_NOOP("Exhaustive search")}}
                              ;
-         diaElemMenu      me(PX(Method),_("VHQ Mode"),4,meM);
-         diaElemUInteger  rframe(PX(MaxRefFrames),_("Max Ref Frames"),0,15);
-         diaElemUInteger  range(PX(Range),_("Max B Frames"),0,64);
-         diaElemToggle    chromaMe(PX(ChromaME),_("Chroma ME"));
-         diaElemToggle    mixedRef(PX(MixedRefs),_("Mixed Refs"));
-         diaElemToggle    fastPSkip(PX(fastPSkip),_("Fast P Skip"));
-         diaElemToggle    dctDecimate(PX(DCTDecimate),_("DCT Decimate"));
-         diaElemToggle    interlaced(PX(interlaced),_("Interlaced"));
+         diaElemMenu      me(PX(Method),QT_TR_NOOP("VHQ Mode"),4,meM);
+         diaElemUInteger  rframe(PX(MaxRefFrames),QT_TR_NOOP("Max Ref Frames"),0,15);
+         diaElemUInteger  range(PX(Range),QT_TR_NOOP("Max B Frames"),0,64);
+         diaElemToggle    chromaMe(PX(ChromaME),QT_TR_NOOP("Chroma ME"));
+         diaElemToggle    mixedRef(PX(MixedRefs),QT_TR_NOOP("Mixed Refs"));
+         diaElemToggle    fastPSkip(PX(fastPSkip),QT_TR_NOOP("Fast P Skip"));
+         diaElemToggle    dctDecimate(PX(DCTDecimate),QT_TR_NOOP("DCT Decimate"));
+         diaElemToggle    interlaced(PX(interlaced),QT_TR_NOOP("Interlaced"));
          
-         diaElemFrame  frameMe(_("Motion Estimation"));
+         diaElemFrame  frameMe(QT_TR_NOOP("Motion Estimation"));
          frameMe.swallow(&parition);
          frameMe.swallow(&me);
          frameMe.swallow(&rframe);
@@ -103,21 +103,21 @@ int code;
          
         /* Tab3-Misc  */
            diaMenuEntry trellisM[] = {
-                  {0,   _("Disabled")}
-                ,{1,    _("Low")}
-                ,{2,    _("High")}};
+                  {0,   QT_TR_NOOP("Disabled")}
+                ,{1,    QT_TR_NOOP("Low")}
+                ,{2,    QT_TR_NOOP("High")}};
            
-          diaElemMenu trellis(PX(Trellis),_("Trellis"),3,trellisM);
-          diaElemToggle    cabac(PX(CABAC),_("CABAC"));
-          diaElemUInteger  noise(PX(NoiseReduction),_("Noise Reduction"),0,255);
-          diaElemToggle    deblock(PX(DeblockingFilter),_("Deblocking Filter"));
-          diaElemInteger  deblockStrength(PX(Strength),_("Strength"),-6,6);
-          diaElemInteger  deblockThreshold(PX(Threshold),_("Threshold"),-6,6);
+          diaElemMenu trellis(PX(Trellis),QT_TR_NOOP("Trellis"),3,trellisM);
+          diaElemToggle    cabac(PX(CABAC),QT_TR_NOOP("CABAC"));
+          diaElemUInteger  noise(PX(NoiseReduction),QT_TR_NOOP("Noise Reduction"),0,255);
+          diaElemToggle    deblock(PX(DeblockingFilter),QT_TR_NOOP("Deblocking Filter"));
+          diaElemInteger  deblockStrength(PX(Strength),QT_TR_NOOP("Strength"),-6,6);
+          diaElemInteger  deblockThreshold(PX(Threshold),QT_TR_NOOP("Threshold"),-6,6);
           deblock.link(1,&deblockStrength);
           deblock.link(1,&deblockThreshold);
           
           
-          diaElemFrame  frameMisc(_("Misc"));
+          diaElemFrame  frameMisc(QT_TR_NOOP("Misc"));
           frameMisc.swallow(&trellis);
           frameMisc.swallow(&cabac);
           frameMisc.swallow(&noise);
@@ -129,13 +129,13 @@ int code;
           diaElemTabs tabMisc("Misc",1,misc);
         /* Tab 4 Partition & frame*/
          
-             diaElemToggle    _8x8(PX(_8x8),_("8x8 Transform"));
-             diaElemToggle    _8x8P(PX(_8x8P),_("8x8P Transform"));
-             diaElemToggle    _8x8B(PX(_8x8B),_("8x8B Transform"));
-             diaElemToggle    _4x4(PX(_4x4),_("_4x4 Transform"));
-             diaElemToggle    _8x8I(PX(_8x8I),_("_8x8I Transform"));
-             diaElemToggle    _4x4I(PX(_4x4I),_("_4x4I Transform"));
-          diaElemFrame  frameTransform(_("Transform"));
+             diaElemToggle    _8x8(PX(_8x8),QT_TR_NOOP("8x8 Transform"));
+             diaElemToggle    _8x8P(PX(_8x8P),QT_TR_NOOP("8x8P Transform"));
+             diaElemToggle    _8x8B(PX(_8x8B),QT_TR_NOOP("8x8B Transform"));
+             diaElemToggle    _4x4(PX(_4x4),QT_TR_NOOP("_4x4 Transform"));
+             diaElemToggle    _8x8I(PX(_8x8I),QT_TR_NOOP("_8x8I Transform"));
+             diaElemToggle    _4x4I(PX(_4x4I),QT_TR_NOOP("_4x4I Transform"));
+          diaElemFrame  frameTransform(QT_TR_NOOP("Transform"));
            frameTransform.swallow(&_8x8);
            frameTransform.swallow(&_8x8P);
            frameTransform.swallow(&_8x8B);
@@ -143,16 +143,16 @@ int code;
            frameTransform.swallow(&_8x8I);
            frameTransform.swallow(&_4x4I);
           
-           diaElemUInteger  bframe(PX(MaxBFrame),_("Max B Frames"),0,3);
-           diaElemFrame frameB(_("B Frames"));
+           diaElemUInteger  bframe(PX(MaxBFrame),QT_TR_NOOP("Max B Frames"),0,3);
+           diaElemFrame frameB(QT_TR_NOOP("B Frames"));
            frameB.swallow(&bframe);
            
             diaElem *bfr[]={&frameTransform,&frameB};
-          diaElemTabs tabTransform(_("Transform"),2,bfr);
+          diaElemTabs tabTransform(QT_TR_NOOP("Transform"),2,bfr);
            
           /* End of tabs */
         diaElemTabs *tabs[4]={&tabMain,&tabMotion,&tabMisc,&tabTransform};
-        if( diaFactoryRunTabs(_("X264 Configuration"),4,tabs))
+        if( diaFactoryRunTabs(QT_TR_NOOP("X264 Configuration"),4,tabs))
 	{
            memcpy(config->extraSettings,&localParam,sizeof(localParam));
            return 1;

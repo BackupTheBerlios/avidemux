@@ -64,7 +64,7 @@ uint8_t ret=0;
 
         dialog=create_ChromaShift();
         gtk_register_dialog(dialog);
-        gtk_window_set_title (GTK_WINDOW (dialog), _("ASHARP"));
+        gtk_window_set_title (GTK_WINDOW (dialog), QT_TR_NOOP("ASHARP"));
         gtk_widget_show(dialog);
 	
         myCrop=new flyChromaShift( width, height,in,WID(drawingarea1),WID(hscale));
@@ -181,7 +181,7 @@ create_ChromaShift (void)
   GtkWidget *okbutton1;
 
   ChromaShift = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (ChromaShift), _("ChromaShift"));
+  gtk_window_set_title (GTK_WINDOW (ChromaShift), QT_TR_NOOP("ChromaShift"));
   gtk_window_set_type_hint (GTK_WINDOW (ChromaShift), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (ChromaShift)->vbox;
@@ -195,14 +195,14 @@ create_ChromaShift (void)
   gtk_widget_show (table1);
   gtk_box_pack_start (GTK_BOX (vbox1), table1, FALSE, FALSE, 0);
 
-  label1 = gtk_label_new (_("U Shift :"));
+  label1 = gtk_label_new (QT_TR_NOOP("U Shift :"));
   gtk_widget_show (label1);
   gtk_table_attach (GTK_TABLE (table1), label1, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label1), 0, 0.5);
 
-  label2 = gtk_label_new (_("V Shift :"));
+  label2 = gtk_label_new (QT_TR_NOOP("V Shift :"));
   gtk_widget_show (label2);
   gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -244,7 +244,7 @@ create_ChromaShift (void)
   gtk_widget_show (drawingarea1);
   gtk_container_add (GTK_CONTAINER (alignment1), drawingarea1);
 
-  label3 = gtk_label_new (_("<b>Preview</b>"));
+  label3 = gtk_label_new (QT_TR_NOOP("<b>Preview</b>"));
   gtk_widget_show (label3);
   gtk_frame_set_label_widget (GTK_FRAME (frame1), label3);
   gtk_label_set_use_markup (GTK_LABEL (label3), TRUE);

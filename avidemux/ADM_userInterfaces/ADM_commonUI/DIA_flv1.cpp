@@ -41,8 +41,8 @@ uint8_t DIA_flv1Param(COMPRES_PARAMS *incoming)
 	ADM_assert(incoming->extraSettingsLen==sizeof(FFcodecSetting));
 
                       
-         diaElemUInteger  bitrate(&(incoming->bitrate),_("_Bitrate (kb/s):"),100,9000);
-         diaElemUInteger  gop(&(conf->gop_size),_("_GOP size:"),1,250);
+         diaElemUInteger  bitrate(&(incoming->bitrate),QT_TR_NOOP("_Bitrate (kb/s):"),100,9000);
+         diaElemUInteger  gop(&(conf->gop_size),QT_TR_NOOP("_GOP size:"),1,250);
 
          diaElem *elems[2]={&bitrate,&gop};
     

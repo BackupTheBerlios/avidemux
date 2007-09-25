@@ -131,20 +131,20 @@ uint8_t ADMVideoThreshold::configure(AVDMGenericVideoStream *in)
 {
     UNUSED_ARG(in);
 
-    diaElemUSlider minslide(&(_param->min), _("Mi_nimum value to be in-range:"), 0, 255);
-    diaElemUSlider maxslide(&(_param->max), _("Ma_ximum value to be in-range:"), 0, 255);
+    diaElemUSlider minslide(&(_param->min), QT_TR_NOOP("Mi_nimum value to be in-range:"), 0, 255);
+    diaElemUSlider maxslide(&(_param->max), QT_TR_NOOP("Ma_ximum value to be in-range:"), 0, 255);
 
     diaMenuEntry tInRangeIsWhite [] = {
-        { 1, _("In-range values go white, out-of-range go black"), NULL },
-        { 0, _("In-range values go black, out-of-range go white"), NULL },
+        { 1, QT_TR_NOOP("In-range values go white, out-of-range go black"), NULL },
+        { 0, QT_TR_NOOP("In-range values go black, out-of-range go white"), NULL },
     };
 
     diaElemMenu in_range_is_white
         (&(_param->in_range_is_white),
-         _("Output values:"),
+         QT_TR_NOOP("Output values:"),
          sizeof (tInRangeIsWhite) / sizeof (diaMenuEntry), tInRangeIsWhite);
 
-    diaElemUInteger debug(&(_param->debug), _("_Debugging settings (bits):"),
+    diaElemUInteger debug(&(_param->debug), QT_TR_NOOP("_Debugging settings (bits):"),
                           0, 0x7fffffff);
     diaElem * elems[] = { &minslide, &maxslide, &in_range_is_white, &debug };
 

@@ -60,7 +60,7 @@ class  ADM_Qfilesel : public QWidget
           switch(fileMode)
           {
             case ADM_FILEMODE_READ:
-                r=FileSel_SelectRead(_("Select File to Read"),buffer,MAX_SEL,txt);
+                r=FileSel_SelectRead(QT_TR_NOOP("Select File to Read"),buffer,MAX_SEL,txt);
                 break;
             case ADM_FILEMODE_WRITE:
                 if (defaultSuffix)
@@ -85,11 +85,11 @@ class  ADM_Qfilesel : public QWidget
                         }
                     }
                 }
-                r=FileSel_SelectWrite(_("Select File to Write"),buffer,MAX_SEL,txt);
+                r=FileSel_SelectWrite(QT_TR_NOOP("Select File to Write"),buffer,MAX_SEL,txt);
                 break;
 
             case ADM_FILEMODE_DIR:
-                r=FileSel_SelectDir(_("Select Directory"),buffer,MAX_SEL,txt);
+                r=FileSel_SelectDir(QT_TR_NOOP("Select Directory"),buffer,MAX_SEL,txt);
                 break;
             default: ADM_assert(0);
           }

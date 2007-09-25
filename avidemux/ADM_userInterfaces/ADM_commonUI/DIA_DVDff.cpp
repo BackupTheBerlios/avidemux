@@ -49,18 +49,18 @@ uint8_t DIA_DVDffParam(COMPRES_PARAMS *incoming)
 	ADM_assert(incoming->extraSettingsLen==sizeof(FFcodecSetting));
 
 diaMenuEntry wideM[]={
-  {0,_("4:3")},
-  {1,_("16:9")}};
+  {0,QT_TR_NOOP("4:3")},
+  {1,QT_TR_NOOP("16:9")}};
 diaMenuEntry matrixM[]={
-  {0,_("Default")},
-  {1,_("TMPGEnc")},
-  {2,_("Anime")},
-  {3,_("KVCD")}
+  {0,QT_TR_NOOP("Default")},
+  {1,QT_TR_NOOP("TMPGEnc")},
+  {2,QT_TR_NOOP("Anime")},
+  {3,QT_TR_NOOP("KVCD")}
 };
 diaMenuEntry interM[]={
-  {0,_("Progressive")},
-  {1,_("Interlaced TFF")},
-  {2,_("Interlaced BFF")}
+  {0,QT_TR_NOOP("Progressive")},
+  {1,QT_TR_NOOP("Interlaced TFF")},
+  {2,QT_TR_NOOP("Interlaced BFF")}
 };
 diaMenuEntry vbvM[3]=
 {
@@ -71,21 +71,21 @@ diaMenuEntry vbvM[3]=
 
                       
          diaElemBitrate bitrate(incoming,NULL);
-         diaElemUInteger maxb(&(conf->maxBitrate),_("Ma_x. bitrate:"),100,9000);
-         diaElemUInteger minb(&(conf->minBitrate),_("Mi_n. bitrate:"),0,9000);
-         diaElemToggle    xvid(&(conf->use_xvid_ratecontrol),_("_Use Xvid rate control"));
+         diaElemUInteger maxb(&(conf->maxBitrate),QT_TR_NOOP("Ma_x. bitrate:"),100,9000);
+         diaElemUInteger minb(&(conf->minBitrate),QT_TR_NOOP("Mi_n. bitrate:"),0,9000);
+         diaElemToggle    xvid(&(conf->use_xvid_ratecontrol),QT_TR_NOOP("_Use Xvid rate control"));
          
-         diaElemMenu      vbv(&(conf->bufferSize),_("_Buffer size:"),3,vbvM);
+         diaElemMenu      vbv(&(conf->bufferSize),QT_TR_NOOP("_Buffer size:"),3,vbvM);
          
-         diaElemMenu      widescreen(&(conf->widescreen),_("Aspect _ratio:"),2,wideM);
-         diaElemMenu      matrix(&(conf->user_matrix),_("_Matrices:"),4,matrixM);
-         diaElemUInteger  gop(&(conf->gop_size),_("_GOP size:"),1,30);
+         diaElemMenu      widescreen(&(conf->widescreen),QT_TR_NOOP("Aspect _ratio:"),2,wideM);
+         diaElemMenu      matrix(&(conf->user_matrix),QT_TR_NOOP("_Matrices:"),4,matrixM);
+         diaElemUInteger  gop(&(conf->gop_size),QT_TR_NOOP("_GOP size:"),1,30);
          
 uint32_t inter;
           if(!conf->interlaced) inter=0;
             else if(conf->bff) inter=2;
                 else inter=1;
-         diaElemMenu      interW(&inter,_("_Interlacing:"),3,interM);
+         diaElemMenu      interW(&inter,QT_TR_NOOP("_Interlacing:"),3,interM);
   
       diaElem *elems[9]={&bitrate,&maxb,&minb,&xvid,&vbv,&widescreen,&interW,&matrix,&gop};
     

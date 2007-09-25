@@ -84,16 +84,16 @@ uint8_t ADMVideoKernelDeint::configure( AVDMGenericVideoStream *instream)
   #define PX(x) &(_param->x)
 _in=instream;
 
-   diaMenuEntry menuField[2]={{1,_("Top"),NULL},
-                             {0,_("Bottom"),NULL}
+   diaMenuEntry menuField[2]={{1,QT_TR_NOOP("Top"),NULL},
+                             {0,QT_TR_NOOP("Bottom"),NULL}
                           };
   
     
-    diaElemMenu     menu1(PX(order),_("_Field order:"), 2,menuField);
-    diaElemUInteger threshold(PX(threshold),_("_Threshold:"),0,100,_("Smaller means more deinterlacing"));
-    diaElemToggle   sharp(PX(sharp),_("_Sharp"),_("_Sharper engine:"));
-    diaElemToggle   twoway(PX(twoway),_("T_woway"),_("Extrapolate better (better not to use it)"));
-    diaElemToggle   map(PX(map),_("_Map"),_("Show interlaced areas (for test!)"));
+    diaElemMenu     menu1(PX(order),QT_TR_NOOP("_Field order:"), 2,menuField);
+    diaElemUInteger threshold(PX(threshold),QT_TR_NOOP("_Threshold:"),0,100,QT_TR_NOOP("Smaller means more deinterlacing"));
+    diaElemToggle   sharp(PX(sharp),QT_TR_NOOP("_Sharp"),QT_TR_NOOP("_Sharper engine:"));
+    diaElemToggle   twoway(PX(twoway),QT_TR_NOOP("T_woway"),QT_TR_NOOP("Extrapolate better (better not to use it)"));
+    diaElemToggle   map(PX(map),QT_TR_NOOP("_Map"),QT_TR_NOOP("Show interlaced areas (for test!)"));
     
     diaElem *elems[5]={&menu1,&threshold,&sharp,&twoway,&map};
   

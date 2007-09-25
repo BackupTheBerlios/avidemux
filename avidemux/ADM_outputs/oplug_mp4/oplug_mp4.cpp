@@ -153,7 +153,7 @@ uint32_t sent=0;
            bitstream.bufferSize=_incoming->getInfo()->width*_incoming->getInfo()->height*3;
            if (!_encode)
                 {
-                  GUI_Error_HIG (_("Cannot initialize the video stream"), NULL);
+                  GUI_Error_HIG (QT_TR_NOOP("Cannot initialize the video stream"), NULL);
                         goto  stopit;
                 }
 
@@ -171,7 +171,7 @@ uint32_t sent=0;
 
                 if (!_encode->configure (_incoming))
                 {
-                      GUI_Error_HIG (_("Filter init failed"), NULL);
+                      GUI_Error_HIG (QT_TR_NOOP("Filter init failed"), NULL);
                      goto  stopit;
                 };
 
@@ -209,7 +209,7 @@ preFilling:
              if(!(err=_encode->encode ( prefill, &bitstream)))//&len, videoBuffer, &flags,&displayFrame))
              {
                         printf("MP4:First frame error\n");
-                        GUI_Error_HIG (_("Error while encoding"), NULL);
+                        GUI_Error_HIG (QT_TR_NOOP("Error while encoding"), NULL);
                         goto  stopit;
               }
               sent++;
@@ -221,7 +221,7 @@ preFilling:
               printf("Pass 2 prefill : %u\n",prefill);
               if(!bitstream.flags & AVI_KEY_FRAME)
               {
-                GUI_Error_HIG (_("KeyFrame error"),_( "The beginning frame is not a key frame.\nPlease move the A marker."));
+                GUI_Error_HIG (QT_TR_NOOP("KeyFrame error"),QT_TR_NOOP( "The beginning frame is not a key frame.\nPlease move the A marker."));
                   goto  stopit; 
               }
            //len=bitstream.len;
@@ -248,7 +248,7 @@ preFilling:
                 audio=mpt_getAudioStream();
                 if(!audio)
                 {
-                        GUI_Error_HIG (_("Cannot initialize the audio stream"), NULL);
+                        GUI_Error_HIG (QT_TR_NOOP("Cannot initialize the audio stream"), NULL);
                         goto  stopit;
                 }
           } 
@@ -332,7 +332,7 @@ preFilling:
                if(!r && frame<total-2)
                {
                         printf("MP4:Frame %u error\n",frame);
-                        GUI_Error_HIG (_("Error while encoding"), NULL);
+                        GUI_Error_HIG (QT_TR_NOOP("Error while encoding"), NULL);
                         goto  stopit;
                 }
                 if(!bitstream.len && skipping)
@@ -396,7 +396,7 @@ uint8_t prepareDualPass(uint32_t bufferSize,uint8_t *buffer,char *TwoPassLogFile
         if((tmp=fopen(TwoPassLogFile,"rt")))
         {
                 fclose(tmp);
-                if(GUI_Question(_("\n Reuse the existing log-file ?")))
+                if(GUI_Question(QT_TR_NOOP("\n Reuse the existing log-file ?")))
                 {
                         reuse=1;
                 }
@@ -416,7 +416,7 @@ preFilling2:
              if(!_encode->encode ( prefill, &bitstream))//&len, videoBuffer, &flags,&displayFrame))
              {
                         printf("MP4:First frame error\n");
-                        GUI_Error_HIG (_("Error while encoding"), NULL);
+                        GUI_Error_HIG (QT_TR_NOOP("Error while encoding"), NULL);
                         return 0;
               }
               sent++;
@@ -432,7 +432,7 @@ preFilling2:
                         if (!encoding_gui->isAlive())
                         {
                                 abt:
-                                    GUI_Error_HIG (_("Aborting"), NULL);
+                                    GUI_Error_HIG (QT_TR_NOOP("Aborting"), NULL);
                                 return 0;
                         }
                         bitstream.cleanup(cf);

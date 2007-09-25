@@ -255,7 +255,7 @@ create_dialog1 (void)
   GtkWidget *dialog_action_area1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Crop Settings"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Crop Settings"));
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -289,7 +289,7 @@ create_dialog1 (void)
   gtk_box_pack_start (GTK_BOX (vbox1), hbuttonbox2, FALSE, TRUE, 0);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (hbuttonbox2), GTK_BUTTONBOX_START);
 
-  buttonAutocrop = gtk_button_new_with_mnemonic (_("AutoCrop"));
+  buttonAutocrop = gtk_button_new_with_mnemonic (QT_TR_NOOP("AutoCrop"));
   gtk_widget_show (buttonAutocrop);
   gtk_container_add (GTK_CONTAINER (hbuttonbox2), buttonAutocrop);
   GTK_WIDGET_SET_FLAGS (buttonAutocrop, GTK_CAN_DEFAULT);
@@ -311,7 +311,7 @@ create_dialog1 (void)
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, FALSE, 0);
 
-  label1 = gtk_label_new_with_mnemonic (_("Reset"));
+  label1 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Reset"));
   gtk_widget_show (label1);
   gtk_box_pack_start (GTK_BOX (hbox1), label1, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
@@ -320,7 +320,7 @@ create_dialog1 (void)
   gtk_widget_show (table1);
   gtk_box_pack_start (GTK_BOX (vbox1), table1, FALSE, TRUE, 0);
 
-  label2 = gtk_label_new (_("Crop Left :"));
+  label2 = gtk_label_new (QT_TR_NOOP("Crop Left :"));
   gtk_widget_show (label2);
   gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -328,7 +328,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_FILL);
   gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
 
-  label3 = gtk_label_new (_("Crop Top:"));
+  label3 = gtk_label_new (QT_TR_NOOP("Crop Top:"));
   gtk_widget_show (label3);
   gtk_table_attach (GTK_TABLE (table1), label3, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -336,7 +336,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_FILL);
   gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
 
-  label4 = gtk_label_new (_("Crop Right:"));
+  label4 = gtk_label_new (QT_TR_NOOP("Crop Right:"));
   gtk_widget_show (label4);
   gtk_table_attach (GTK_TABLE (table1), label4, 2, 3, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -344,7 +344,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label4), GTK_JUSTIFY_FILL);
   gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
 
-  label5 = gtk_label_new (_("Crop Bottom:"));
+  label5 = gtk_label_new (QT_TR_NOOP("Crop Bottom:"));
   gtk_widget_show (label5);
   gtk_table_attach (GTK_TABLE (table1), label5, 2, 3, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),

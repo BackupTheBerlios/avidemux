@@ -43,7 +43,7 @@ int DIA_defaultSettings(ADM_audioEncoderDescriptor *descriptor)
     char string[400];
     uint32_t mmode,ppreset;
 #define SZT(x) sizeof(x)/sizeof(diaMenuEntry )
-#define BITRATE(x) {x,_(#x)}
+#define BITRATE(x) {x,QT_TR_NOOP(#x)}
     diaMenuEntry bitrateM[]={
                               BITRATE(56),
                               BITRATE(64),
@@ -56,7 +56,7 @@ int DIA_defaultSettings(ADM_audioEncoderDescriptor *descriptor)
                               BITRATE(224),
                               BITRATE(384)
                           };
-    diaElemMenu bitrate(&(descriptor->bitrate),   _("_Bitrate:"), SZT(bitrateM),bitrateM);
+    diaElemMenu bitrate(&(descriptor->bitrate),   QT_TR_NOOP("_Bitrate:"), SZT(bitrateM),bitrateM);
   
       diaElem *elems[]={&bitrate};
     

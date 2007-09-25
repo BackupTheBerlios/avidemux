@@ -35,7 +35,7 @@
 uint8_t DIA_resizeWiz(RESWIZ_FORMAT *format, RESWIZ_AR *source, RESWIZ_AR *destination)
 {
 uint8_t r=0;
-#define ONELINE(x,y) {RESWIZ_##x,_(y),NULL}
+#define ONELINE(x,y) {RESWIZ_##x,QT_TR_NOOP(y),NULL}
             diaMenuEntry menuFTarget[6]={
                              ONELINE(VCD,"VCD"),
                              ONELINE(SVCD,"SVCD"),
@@ -56,9 +56,9 @@ uint8_t r=0;
     uint32_t tsource=(uint32_t )*source;
     uint32_t tdestination=(uint32_t )*destination;
                           
-    diaElemMenu     menu1(&tformat,_("_Target type:"), 6,menuFTarget);
-    diaElemMenu     menu2(&tsource,_("_Source aspect ratio:"), 3,menuFAspect);
-    diaElemMenu     menu3(&tdestination,_("_Destination aspect ratio:"), 3,menuFAspect);
+    diaElemMenu     menu1(&tformat,QT_TR_NOOP("_Target type:"), 6,menuFTarget);
+    diaElemMenu     menu2(&tsource,QT_TR_NOOP("_Source aspect ratio:"), 3,menuFAspect);
+    diaElemMenu     menu3(&tdestination,QT_TR_NOOP("_Destination aspect ratio:"), 3,menuFAspect);
     
     
     

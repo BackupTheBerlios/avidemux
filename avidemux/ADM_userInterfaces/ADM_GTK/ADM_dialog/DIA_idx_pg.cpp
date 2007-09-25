@@ -48,7 +48,7 @@ DIA_progressIndexing *pf;
         UNUSED_ARG(user_data);
 
         pf=(DIA_progressIndexing *)user_data;
-        if(!GUI_Confirmation_HIG(_("Continue indexing"),_("Abort Requested"),_("Do you want to abort indexing ?")))
+        if(!GUI_Confirmation_HIG(QT_TR_NOOP("Continue indexing"),QT_TR_NOOP("Abort Requested"),QT_TR_NOOP("Do you want to abort indexing ?")))
         {
          //       pf->abortRequest();
                 abted=1;
@@ -150,7 +150,7 @@ GtkWidget       *create_dialog1 (void)
   GtkWidget *dialog_action_area1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Indexing..."));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Indexing..."));
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -163,7 +163,7 @@ GtkWidget       *create_dialog1 (void)
   gtk_widget_show (table1);
   gtk_box_pack_start (GTK_BOX (vbox1), table1, TRUE, TRUE, 0);
 
-  label6 = gtk_label_new (_("0"));
+  label6 = gtk_label_new (QT_TR_NOOP("0"));
   gtk_widget_show (label6);
   gtk_table_attach (GTK_TABLE (table1), label6, 1, 2, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
@@ -171,7 +171,7 @@ GtkWidget       *create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label6), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
 
-  label5 = gtk_label_new (_("Time left :"));
+  label5 = gtk_label_new (QT_TR_NOOP("Time left :"));
   gtk_widget_show (label5);
   gtk_table_attach (GTK_TABLE (table1), label5, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
@@ -179,7 +179,7 @@ GtkWidget       *create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
 
-  label3 = gtk_label_new (_("Timecode :"));
+  label3 = gtk_label_new (QT_TR_NOOP("Timecode :"));
   gtk_widget_show (label3);
   gtk_table_attach (GTK_TABLE (table1), label3, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -187,7 +187,7 @@ GtkWidget       *create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
 
-  label1 = gtk_label_new (_("Nb pictures seen :"));
+  label1 = gtk_label_new (QT_TR_NOOP("Nb pictures seen :"));
   gtk_widget_show (label1);
   gtk_table_attach (GTK_TABLE (table1), label1, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -195,7 +195,7 @@ GtkWidget       *create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label1), 0, 0.5);
 
-  labelTime = gtk_label_new (_("00:00:00"));
+  labelTime = gtk_label_new (QT_TR_NOOP("00:00:00"));
   gtk_widget_show (labelTime);
   gtk_table_attach (GTK_TABLE (table1), labelTime, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -203,7 +203,7 @@ GtkWidget       *create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (labelTime), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (labelTime), 0, 0.5);
 
-  labelNbImage = gtk_label_new (_("0"));
+  labelNbImage = gtk_label_new (QT_TR_NOOP("0"));
   gtk_widget_show (labelNbImage);
   gtk_table_attach (GTK_TABLE (table1), labelNbImage, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -211,7 +211,7 @@ GtkWidget       *create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (labelNbImage), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (labelNbImage), 0, 0.5);
 
-  label7 = gtk_label_new (_("Indexing :"));
+  label7 = gtk_label_new (QT_TR_NOOP("Indexing :"));
   gtk_widget_show (label7);
   gtk_table_attach (GTK_TABLE (table1), label7, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -219,7 +219,7 @@ GtkWidget       *create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label7), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label7), 0, 0.5);
 
-  labelName = gtk_label_new (_("/dev/null"));
+  labelName = gtk_label_new (QT_TR_NOOP("/dev/null"));
   gtk_widget_show (labelName);
   gtk_table_attach (GTK_TABLE (table1), labelName, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),

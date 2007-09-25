@@ -99,7 +99,7 @@ char *ADM_getCustomDir(void)
 #endif
   if(!ADM_mkdir(customdir))
   {
-    GUI_Error_HIG(_("Oops"),_("can't create custom directory (%s)."),customdir);
+    GUI_Error_HIG(QT_TR_NOOP("Oops"),QT_TR_NOOP("can't create custom directory (%s)."),customdir);
                 return NULL;
   }
   customDirDone=1;
@@ -123,7 +123,7 @@ char *ADM_getJobDir(void)
 #endif
   if(!ADM_mkdir(jobdir))
   {
-    GUI_Error_HIG(_("Oops"),_("can't create job directory (%s)."),jobdir);
+    GUI_Error_HIG(QT_TR_NOOP("Oops"),QT_TR_NOOP("can't create job directory (%s)."),jobdir);
                 return NULL;
   }
   jobDirDone=1;
@@ -143,14 +143,14 @@ char *home;
 #if defined(ADM_WIN32)
         if( ! (home=getenv("USERPROFILE")) )
         {
-          GUI_Error_HIG(_("Oops"),_("can't determine $USERPROFILE."));
+          GUI_Error_HIG(QT_TR_NOOP("Oops"),QT_TR_NOOP("can't determine $USERPROFILE."));
                     home="c:\\";
         }
 
 #else
         if( ! (home=getenv("HOME")) )
         {
-          GUI_Error_HIG(_("Oops"),_("can't determine $HOME."));
+          GUI_Error_HIG(QT_TR_NOOP("Oops"),QT_TR_NOOP("can't determine $HOME."));
                 return NULL;
         }
 #endif
@@ -161,7 +161,7 @@ char *home;
         strcat(dirname,ADM_DIR_NAME);
         if(!ADM_mkdir(dirname))
         {
-          GUI_Error_HIG(_("Oops"),_("Cannot create the .avidemux directory"), NULL);
+          GUI_Error_HIG(QT_TR_NOOP("Oops"),QT_TR_NOOP("Cannot create the .avidemux directory"), NULL);
                         delete [] dirname;
                         return NULL;
         }

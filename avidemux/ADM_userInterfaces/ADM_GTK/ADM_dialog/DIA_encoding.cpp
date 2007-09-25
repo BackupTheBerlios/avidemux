@@ -158,7 +158,7 @@ void change_priority(void)
 		gtk_combo_box_set_active(GTK_COMBO_BOX(WID(combobox_priority)), 2);
 		gtk_signal_connect(GTK_OBJECT(WID(combobox_priority)), "changed", GTK_SIGNAL_FUNC(change_priority), NULL);
 
-		GUI_Error_HIG(_("Privileges Required"), _( "Root privileges are required to perform this operation."));
+		GUI_Error_HIG(QT_TR_NOOP("Privileges Required"), QT_TR_NOOP( "Root privileges are required to perform this operation."));
 		
 		return;
 	}
@@ -180,7 +180,7 @@ void shutdown_toggled(void)
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(WID(checkbutton_shutdown)), false);
 		gtk_signal_connect(GTK_OBJECT(WID(checkbutton_shutdown)), "toggled", GTK_SIGNAL_FUNC(shutdown_toggled), NULL);
 
-		GUI_Error_HIG(_("Privileges Required"), _( "Root privileges are required to perform this operation."));
+		GUI_Error_HIG(QT_TR_NOOP("Privileges Required"), QT_TR_NOOP( "Root privileges are required to perform this operation."));
 	}
 }
 #endif
@@ -201,7 +201,7 @@ DIA_encoding::~DIA_encoding( )
 
 	if (shutdownRequired && !stopReq)
 	{
-		DIA_working *work=new DIA_working(_("Shutting down"));
+		DIA_working *work=new DIA_working(QT_TR_NOOP("Shutting down"));
 		bool performShutdown=true;
 
 		for(int i = 0; i <= 30; i++)
@@ -378,7 +378,7 @@ uint32_t tim;
                   tray->setPercent((int)(f*100.));
           gtk_progress_set_percentage(GTK_PROGRESS(WID(progressbar1)),(gfloat)f);
 
-          sprintf(string,_("%d%%"),(int)(100*f));
+          sprintf(string,QT_TR_NOOP("%d%%"),(int)(100*f));
           
           if(isQuiet()) printf("[Encoding]%s\n",string);
               gtk_progress_bar_set_text       (GTK_PROGRESS_BAR(WID(progressbar1)), string);
@@ -401,21 +401,21 @@ void DIA_encoding::setQuantIn(int size)
 void DIA_encoding::setSize(int size)
 {
       ADM_assert(dialog);
-          sprintf(string,_("%lu MB"),size);
+          sprintf(string,QT_TR_NOOP("%lu MB"),size);
           gtk_label_set_text(GTK_LABEL(WID(label_size)),string);
 
 }
 void DIA_encoding::setAudioSizeIn(int size)
 {
       ADM_assert(dialog);
-          sprintf(string,_("%lu MB"),size);
+          sprintf(string,QT_TR_NOOP("%lu MB"),size);
           gtk_label_set_text(GTK_LABEL(WID(label_asize)),string);
 
 }
 void DIA_encoding::setVideoSizeIn(int size)
 {
       ADM_assert(dialog);
-          sprintf(string,_("%lu MB"),size);
+          sprintf(string,QT_TR_NOOP("%lu MB"),size);
           gtk_label_set_text(GTK_LABEL(WID(label_vsize)),string);
 
 }
@@ -511,7 +511,7 @@ create_dialog1 (void)
   dialog1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_widget_set_size_request (dialog1, 500, -1);
   gtk_container_set_border_width (GTK_CONTAINER (dialog1), 12);
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Encoding..."));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Encoding..."));
   gtk_window_set_position (GTK_WINDOW (dialog1), GTK_WIN_POS_CENTER_ON_PARENT);
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
@@ -542,7 +542,7 @@ create_dialog1 (void)
   gtk_table_set_row_spacings (GTK_TABLE (table6), 8);
   gtk_table_set_col_spacings (GTK_TABLE (table6), 14);
 
-  label39 = gtk_label_new (_("<b>Phase:</b>"));
+  label39 = gtk_label_new (QT_TR_NOOP("<b>Phase:</b>"));
   gtk_widget_show (label39);
   gtk_table_attach (GTK_TABLE (table6), label39, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -550,14 +550,14 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label39), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label39), 0, 0.5);
 
-  label_phasis = gtk_label_new (_("None"));
+  label_phasis = gtk_label_new (QT_TR_NOOP("None"));
   gtk_widget_show (label_phasis);
   gtk_table_attach (GTK_TABLE (table6), label_phasis, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_phasis), 0, 0.5);
 
-  label41 = gtk_label_new (_("<b>Video Codec:</b>"));
+  label41 = gtk_label_new (QT_TR_NOOP("<b>Video Codec:</b>"));
   gtk_widget_show (label41);
   gtk_table_attach (GTK_TABLE (table6), label41, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -565,14 +565,14 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label41), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label41), 0, 0.5);
 
-  label_vcodec = gtk_label_new (_("None"));
+  label_vcodec = gtk_label_new (QT_TR_NOOP("None"));
   gtk_widget_show (label_vcodec);
   gtk_table_attach (GTK_TABLE (table6), label_vcodec, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_vcodec), 0, 0.5);
 
-  label43 = gtk_label_new (_("<b>Audio Codec:</b>"));
+  label43 = gtk_label_new (QT_TR_NOOP("<b>Audio Codec:</b>"));
   gtk_widget_show (label43);
   gtk_table_attach (GTK_TABLE (table6), label43, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -580,14 +580,14 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label43), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label43), 0, 0.5);
 
-  label_acodec = gtk_label_new (_("None"));
+  label_acodec = gtk_label_new (QT_TR_NOOP("None"));
   gtk_widget_show (label_acodec);
   gtk_table_attach (GTK_TABLE (table6), label_acodec, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_acodec), 0, 0.5);
 
-  label45 = gtk_label_new (_("<b>Container:</b>"));
+  label45 = gtk_label_new (QT_TR_NOOP("<b>Container:</b>"));
   gtk_widget_show (label45);
   gtk_table_attach (GTK_TABLE (table6), label45, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
@@ -595,7 +595,7 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label45), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label45), 0, 0.5);
 
-  label_container = gtk_label_new (_("Unknown"));
+  label_container = gtk_label_new (QT_TR_NOOP("Unknown"));
   gtk_widget_show (label_container);
   gtk_table_attach (GTK_TABLE (table6), label_container, 1, 2, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
@@ -619,7 +619,7 @@ create_dialog1 (void)
   gtk_table_set_row_spacings (GTK_TABLE (table7), 8);
   gtk_table_set_col_spacings (GTK_TABLE (table7), 14);
 
-  label47 = gtk_label_new (_("<b>Processed Frames:</b>"));
+  label47 = gtk_label_new (QT_TR_NOOP("<b>Processed Frames:</b>"));
   gtk_widget_show (label47);
   gtk_table_attach (GTK_TABLE (table7), label47, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -627,7 +627,7 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label47), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label47), 0, 0.5);
 
-  label48 = gtk_label_new (_("<b>Total Frames:</b>"));
+  label48 = gtk_label_new (QT_TR_NOOP("<b>Total Frames:</b>"));
   gtk_widget_show (label48);
   gtk_table_attach (GTK_TABLE (table7), label48, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -635,7 +635,7 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label48), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label48), 0, 0.5);
 
-  label49 = gtk_label_new (_("<b>Quantiser:</b>"));
+  label49 = gtk_label_new (QT_TR_NOOP("<b>Quantiser:</b>"));
   gtk_widget_show (label49);
   gtk_table_attach (GTK_TABLE (table7), label49, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -643,7 +643,7 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label49), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label49), 0, 0.5);
 
-  label50 = gtk_label_new (_("<b>Average Bitrate:</b>"));
+  label50 = gtk_label_new (QT_TR_NOOP("<b>Average Bitrate:</b>"));
   gtk_widget_show (label50);
   gtk_table_attach (GTK_TABLE (table7), label50, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
@@ -651,28 +651,28 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label50), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label50), 0, 0.5);
 
-  label_bitrate = gtk_label_new (_("0 kB/s"));
+  label_bitrate = gtk_label_new (QT_TR_NOOP("0 kB/s"));
   gtk_widget_show (label_bitrate);
   gtk_table_attach (GTK_TABLE (table7), label_bitrate, 1, 2, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_bitrate), 0, 0.5);
 
-  label_quant = gtk_label_new (_("0"));
+  label_quant = gtk_label_new (QT_TR_NOOP("0"));
   gtk_widget_show (label_quant);
   gtk_table_attach (GTK_TABLE (table7), label_quant, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_quant), 0, 0.5);
 
-  label_totalframe = gtk_label_new (_("0"));
+  label_totalframe = gtk_label_new (QT_TR_NOOP("0"));
   gtk_widget_show (label_totalframe);
   gtk_table_attach (GTK_TABLE (table7), label_totalframe, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_totalframe), 0, 0.5);
 
-  label_frame = gtk_label_new (_("0"));
+  label_frame = gtk_label_new (QT_TR_NOOP("0"));
   gtk_widget_show (label_frame);
   gtk_table_attach (GTK_TABLE (table7), label_frame, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -696,7 +696,7 @@ create_dialog1 (void)
   gtk_table_set_row_spacings (GTK_TABLE (table8), 8);
   gtk_table_set_col_spacings (GTK_TABLE (table8), 14);
 
-  label55 = gtk_label_new (_("<b>Video Size:</b>"));
+  label55 = gtk_label_new (QT_TR_NOOP("<b>Video Size:</b>"));
   gtk_widget_show (label55);
   gtk_table_attach (GTK_TABLE (table8), label55, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -704,7 +704,7 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label55), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label55), 0, 0.5);
 
-  label56 = gtk_label_new (_("<b>Audio Size:</b>"));
+  label56 = gtk_label_new (QT_TR_NOOP("<b>Audio Size:</b>"));
   gtk_widget_show (label56);
   gtk_table_attach (GTK_TABLE (table8), label56, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -712,7 +712,7 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label56), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label56), 0, 0.5);
 
-  label57 = gtk_label_new (_("<b>Total Size:</b>"));
+  label57 = gtk_label_new (QT_TR_NOOP("<b>Total Size:</b>"));
   gtk_widget_show (label57);
   gtk_table_attach (GTK_TABLE (table8), label57, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -720,7 +720,7 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label57), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label57), 0, 0.5);
 
-  label_size = gtk_label_new (_("0 MB"));
+  label_size = gtk_label_new (QT_TR_NOOP("0 MB"));
   gtk_widget_show (label_size);
   gtk_table_attach (GTK_TABLE (table8), label_size, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -728,7 +728,7 @@ create_dialog1 (void)
   gtk_misc_set_alignment (GTK_MISC (label_size), 0, 0.5);
   gtk_label_set_width_chars (GTK_LABEL (label_size), 10);
 
-  label_asize = gtk_label_new (_("0 MB"));
+  label_asize = gtk_label_new (QT_TR_NOOP("0 MB"));
   gtk_widget_show (label_asize);
   gtk_table_attach (GTK_TABLE (table8), label_asize, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -736,7 +736,7 @@ create_dialog1 (void)
   gtk_misc_set_alignment (GTK_MISC (label_asize), 0, 0.5);
   gtk_label_set_width_chars (GTK_LABEL (label_asize), 10);
 
-  label_vsize = gtk_label_new (_("0 MB"));
+  label_vsize = gtk_label_new (QT_TR_NOOP("0 MB"));
   gtk_widget_show (label_vsize);
   gtk_table_attach (GTK_TABLE (table8), label_vsize, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -761,7 +761,7 @@ create_dialog1 (void)
   gtk_table_set_row_spacings (GTK_TABLE (table9), 8);
   gtk_table_set_col_spacings (GTK_TABLE (table9), 14);
 
-  label61 = gtk_label_new (_("<b>Elapsed:</b>"));
+  label61 = gtk_label_new (QT_TR_NOOP("<b>Elapsed:</b>"));
   gtk_widget_show (label61);
   gtk_table_attach (GTK_TABLE (table9), label61, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -769,7 +769,7 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label61), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label61), 0, 0.5);
 
-  label62 = gtk_label_new (_("<b>Time Remaining:</b>"));
+  label62 = gtk_label_new (QT_TR_NOOP("<b>Time Remaining:</b>"));
   gtk_widget_show (label62);
   gtk_table_attach (GTK_TABLE (table9), label62, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -777,7 +777,7 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label62), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label62), 0, 0.5);
 
-  label63 = gtk_label_new (_("<b>Frames/sec:</b>"));
+  label63 = gtk_label_new (QT_TR_NOOP("<b>Frames/sec:</b>"));
   gtk_widget_show (label63);
   gtk_table_attach (GTK_TABLE (table9), label63, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -785,21 +785,21 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label63), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label63), 0, 0.5);
 
-  label_fps = gtk_label_new (_("0"));
+  label_fps = gtk_label_new (QT_TR_NOOP("0"));
   gtk_widget_show (label_fps);
   gtk_table_attach (GTK_TABLE (table9), label_fps, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_fps), 0, 0.5);
 
-  label_eta = gtk_label_new (_("Unknown"));
+  label_eta = gtk_label_new (QT_TR_NOOP("Unknown"));
   gtk_widget_show (label_eta);
   gtk_table_attach (GTK_TABLE (table9), label_eta, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_eta), 0, 0.5);
 
-  label_elapsed = gtk_label_new (_("00:00:00"));
+  label_elapsed = gtk_label_new (QT_TR_NOOP("00:00:00"));
   gtk_widget_show (label_elapsed);
   gtk_table_attach (GTK_TABLE (table9), label_elapsed, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -823,7 +823,7 @@ create_dialog1 (void)
   gtk_widget_show (hbox4);
   gtk_box_pack_start (GTK_BOX (vbox3), hbox4, TRUE, TRUE, 0);
 
-  checkbutton_shutdown = gtk_check_button_new_with_mnemonic (_("Shut down computer when finished"));
+  checkbutton_shutdown = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("Shut down computer when finished"));
   gtk_widget_show (checkbutton_shutdown);
   gtk_box_pack_start (GTK_BOX (hbox4), checkbutton_shutdown, FALSE, FALSE, 0);
 
@@ -831,7 +831,7 @@ create_dialog1 (void)
   gtk_widget_show (label69);
   gtk_box_pack_start (GTK_BOX (hbox4), label69, TRUE, FALSE, 0);
 
-  label68 = gtk_label_new (_("Priority:"));
+  label68 = gtk_label_new (QT_TR_NOOP("Priority:"));
   gtk_widget_show (label68);
   gtk_box_pack_start (GTK_BOX (hbox4), label68, FALSE, FALSE, 6);
   gtk_misc_set_alignment (GTK_MISC (label68), 0, 0.5);
@@ -840,11 +840,11 @@ create_dialog1 (void)
   gtk_widget_show (combobox_priority);
   gtk_box_pack_start (GTK_BOX (hbox4), combobox_priority, FALSE, FALSE, 0);
   GTK_WIDGET_SET_FLAGS (combobox_priority, GTK_CAN_FOCUS);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), _("High"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), _("Above Normal"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), _("Normal"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), _("Below Normal"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), _("Low"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), QT_TR_NOOP("High"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), QT_TR_NOOP("Above Normal"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), QT_TR_NOOP("Normal"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), QT_TR_NOOP("Below Normal"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), QT_TR_NOOP("Low"));
 
   alignment11 = gtk_alignment_new (0.5, 0.5, 1, 1);
   gtk_widget_show (alignment11);
@@ -881,7 +881,7 @@ create_dialog1 (void)
   gtk_widget_show (image2);
   gtk_box_pack_start (GTK_BOX (hbox3), image2, FALSE, FALSE, 0);
 
-  label67 = gtk_label_new_with_mnemonic (_("Pause / Abort"));
+  label67 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Pause / Abort"));
   gtk_widget_show (label67);
   gtk_box_pack_start (GTK_BOX (hbox3), label67, FALSE, FALSE, 0);
 

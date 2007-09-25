@@ -92,7 +92,7 @@ create_dialog1 (void)
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Pipe to"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Pipe to"));
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -101,7 +101,7 @@ create_dialog1 (void)
   gtk_widget_show (vbox1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
 
-  label1 = gtk_label_new (_("Application path/name (/usr/bin/sox...)"));
+  label1 = gtk_label_new (QT_TR_NOOP("Application path/name (/usr/bin/sox...)"));
   gtk_widget_show (label1);
   gtk_box_pack_start (GTK_BOX (vbox1), label1, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
@@ -110,7 +110,7 @@ create_dialog1 (void)
   gtk_widget_show (entryName);
   gtk_box_pack_start (GTK_BOX (vbox1), entryName, FALSE, FALSE, 0);
 
-  label2 = gtk_label_new (_("Full parameter line"));
+  label2 = gtk_label_new (QT_TR_NOOP("Full parameter line"));
   gtk_widget_show (label2);
   gtk_box_pack_start (GTK_BOX (vbox1), label2, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);

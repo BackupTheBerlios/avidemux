@@ -109,7 +109,7 @@ uint8_t error=0;
 		_fd=fopen(name,"wb");
 		if(!_fd)
 		{
-                        GUI_Error_HIG(_("File error"), _("Cannot open \"%s\" for writing."), name);
+                        GUI_Error_HIG(QT_TR_NOOP("File error"), QT_TR_NOOP("Cannot open \"%s\" for writing."), name);
 			return 0;
 		}
 
@@ -123,7 +123,7 @@ uint8_t error=0;
 		{
 			fclose(_fd);
 			_fd=NULL;
-                        GUI_Error_HIG(_("Could not initialize video"), NULL);
+                        GUI_Error_HIG(QT_TR_NOOP("Could not initialize video"), NULL);
 			return 0;
 		
 		}
@@ -131,7 +131,7 @@ uint8_t error=0;
 		{
 			fclose(_fd);
 			_fd=NULL;
-                        GUI_Error_HIG(_("Could not initialize audio"), NULL);
+                        GUI_Error_HIG(QT_TR_NOOP("Could not initialize audio"), NULL);
 			return 0;
 		
 		}

@@ -106,7 +106,7 @@ _again:
           uint8_t intra[64],inter[64];
           char *name;
           FILE *file=NULL;
-          GUI_FileSelRead(_("Select Xvid matrix file to load"), &name);
+          GUI_FileSelRead(QT_TR_NOOP("Select Xvid matrix file to load"), &name);
                if(!name)
                {
                     goto _again;
@@ -118,7 +118,7 @@ _again:
 _erLoad:
                   if(name) ADM_dealloc(name);
                   if(file) fclose(file);
-                  GUI_Error_HIG(_("Error Loading"),_("Error loadind the custom matrix file."));
+                  GUI_Error_HIG(QT_TR_NOOP("Error Loading"),QT_TR_NOOP("Error loadind the custom matrix file."));
                   goto _again;
               }
               // Read it
@@ -136,7 +136,7 @@ _erLoad:
               fclose(file);
               memcpy(localParam.intraMatrix,intra,64);
               memcpy(localParam.interMatrix,inter,64);
-              GUI_Info_HIG(ADM_LOG_INFO,_("Matrix Loaded"),_("The custom matrix file has been successfully loaded."));
+              GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Matrix Loaded"),QT_TR_NOOP("The custom matrix file has been successfully loaded."));
               goto _again;
         }
 
@@ -176,13 +176,13 @@ _erLoad:
        							incoming->finalsize=value;
 				      			
            					}
-						gtk_label_set_text(GTK_LABEL(WID(label11)),_("Size (MBytes):"));
+						gtk_label_set_text(GTK_LABEL(WID(label11)),QT_TR_NOOP("Size (MBytes):"));
             					break;
 				case 3:
 		     				incoming->mode = COMPRESS_2PASS_BITRATE;	
 						value = (uint32_t) gtk_read_entry(WID(entryEntry));
 						incoming->avg_bitrate=value;
-						gtk_label_set_text(GTK_LABEL(WID(label11)),_("Average bitrate (kb/s):"));
+						gtk_label_set_text(GTK_LABEL(WID(label11)),QT_TR_NOOP("Average bitrate (kb/s):"));
             					break;
 
 				case 4:
@@ -351,7 +351,7 @@ uint32_t b;
 			VAL_SET(b);
 			gtk_widget_set_sensitive(WID(spinbuttonQuant),0);
 			gtk_widget_set_sensitive(WID(entryEntry),1);
-			gtk_label_set_text(GTK_LABEL(WID(label11)),_("Target bitrate (kb/s):"));
+			gtk_label_set_text(GTK_LABEL(WID(label11)),QT_TR_NOOP("Target bitrate (kb/s):"));
 			break;
 
 		case COMPRESS_2PASS:
@@ -359,14 +359,14 @@ uint32_t b;
 			VAL_SET(mS);
 			gtk_widget_set_sensitive(WID(spinbuttonQuant),0);
 			gtk_widget_set_sensitive(WID(entryEntry),1);
-			gtk_label_set_text(GTK_LABEL(WID(label11)),_("Target size (MBytes):"));
+			gtk_label_set_text(GTK_LABEL(WID(label11)),QT_TR_NOOP("Target size (MBytes):"));
 			break;
                 case COMPRESS_2PASS_BITRATE:
 			HIST_SET(3);
 			VAL_SET(mA);
 			gtk_widget_set_sensitive(WID(spinbuttonQuant),0);
 			gtk_widget_set_sensitive(WID(entryEntry),1);
-			gtk_label_set_text(GTK_LABEL(WID(label11)),_("Average bitrate (kb/s):"));
+			gtk_label_set_text(GTK_LABEL(WID(label11)),QT_TR_NOOP("Average bitrate (kb/s):"));
 			break;
 
 	    	case COMPRESS_CQ:
@@ -476,12 +476,12 @@ _loop:
         printf("Save\n");
         char *name;
         FILE *fd;
-        GUI_FileSelWrite(_("Select Custom Matrix File to write"),&name);
+        GUI_FileSelWrite(QT_TR_NOOP("Select Custom Matrix File to write"),&name);
         if(!name) goto _loop;
         fd=fopen(name,"wb");
         if(!fd)
         {
-            GUI_Error_HIG(_("Error Writing"),_("Error writing the custom matrix file."));
+            GUI_Error_HIG(QT_TR_NOOP("Error Writing"),QT_TR_NOOP("Error writing the custom matrix file."));
             ADM_dealloc(name);
             goto _loop;
         }
@@ -697,7 +697,7 @@ create_dialog1 (void)
 
   dialog1 = gtk_dialog_new ();
   gtk_container_set_border_width (GTK_CONTAINER (dialog1), 2);
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("XviD encoding options"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("XviD encoding options"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -731,17 +731,17 @@ create_dialog1 (void)
   gtk_widget_show (vbox21);
   gtk_box_pack_start (GTK_BOX (hbox19), vbox21, FALSE, FALSE, 0);
 
-  label10 = gtk_label_new (_("Encoding type:"));
+  label10 = gtk_label_new (QT_TR_NOOP("Encoding type:"));
   gtk_widget_show (label10);
   gtk_box_pack_start (GTK_BOX (vbox21), label10, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
 
-  label11 = gtk_label_new (_("Bitrate (kb/s):"));
+  label11 = gtk_label_new (QT_TR_NOOP("Bitrate (kb/s):"));
   gtk_widget_show (label11);
   gtk_box_pack_start (GTK_BOX (vbox21), label11, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (label11), 0, 0.5);
 
-  label12 = gtk_label_new (_("Quantizer:"));
+  label12 = gtk_label_new (QT_TR_NOOP("Quantizer:"));
   gtk_widget_show (label12);
   gtk_box_pack_start (GTK_BOX (vbox21), label12, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (label12), 0, 0.5);
@@ -753,27 +753,27 @@ create_dialog1 (void)
   optionmenuType = gtk_option_menu_new ();
   gtk_widget_show (optionmenuType);
   gtk_box_pack_start (GTK_BOX (vbox22), optionmenuType, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, optionmenuType, _("Select 1-pass or 2-pass encoding"), NULL);
+  gtk_tooltips_set_tip (tooltips, optionmenuType, QT_TR_NOOP("Select 1-pass or 2-pass encoding"), NULL);
 
   menu1 = gtk_menu_new ();
 
-  one_pass_cbr1 = gtk_menu_item_new_with_mnemonic (_("Single pass - bitrate"));
+  one_pass_cbr1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Single pass - bitrate"));
   gtk_widget_show (one_pass_cbr1);
   gtk_container_add (GTK_CONTAINER (menu1), one_pass_cbr1);
 
-  one_pass_quantizer1 = gtk_menu_item_new_with_mnemonic (_("Single pass - quantizer"));
+  one_pass_quantizer1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Single pass - quantizer"));
   gtk_widget_show (one_pass_quantizer1);
   gtk_container_add (GTK_CONTAINER (menu1), one_pass_quantizer1);
 
-  two_pass1 = gtk_menu_item_new_with_mnemonic (_("Two pass, final size"));
+  two_pass1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Two pass, final size"));
   gtk_widget_show (two_pass1);
   gtk_container_add (GTK_CONTAINER (menu1), two_pass1);
 
-  two_pass__average_bitrate1 = gtk_menu_item_new_with_mnemonic (_("Two pass, average bitrate"));
+  two_pass__average_bitrate1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Two pass, average bitrate"));
   gtk_widget_show (two_pass__average_bitrate1);
   gtk_container_add (GTK_CONTAINER (menu1), two_pass__average_bitrate1);
 
-  same_qz_as_input1 = gtk_menu_item_new_with_mnemonic (_("Same Qz as input"));
+  same_qz_as_input1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Same Qz as input"));
   gtk_widget_show (same_qz_as_input1);
   gtk_container_add (GTK_CONTAINER (menu1), same_qz_as_input1);
 
@@ -782,16 +782,16 @@ create_dialog1 (void)
   entryEntry = gtk_entry_new ();
   gtk_widget_show (entryEntry);
   gtk_box_pack_start (GTK_BOX (vbox22), entryEntry, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, entryEntry, _("Target video bitrate"), NULL);
+  gtk_tooltips_set_tip (tooltips, entryEntry, QT_TR_NOOP("Target video bitrate"), NULL);
   gtk_entry_set_width_chars (GTK_ENTRY (entryEntry), 10);
 
   spinbuttonQuant_adj = gtk_adjustment_new (4, 1, 31, 0.1, 10, 10);
   spinbuttonQuant = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonQuant_adj), 1, 1);
   gtk_widget_show (spinbuttonQuant);
   gtk_box_pack_start (GTK_BOX (vbox22), spinbuttonQuant, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, spinbuttonQuant, _("Constant quantizer - each frame will get the same compression"), NULL);
+  gtk_tooltips_set_tip (tooltips, spinbuttonQuant, QT_TR_NOOP("Constant quantizer - each frame will get the same compression"), NULL);
 
-  label9 = gtk_label_new (_("Variable bitrate mode"));
+  label9 = gtk_label_new (QT_TR_NOOP("Variable bitrate mode"));
   gtk_widget_show (label9);
   gtk_frame_set_label_widget (GTK_FRAME (frame1), label9);
 
@@ -803,45 +803,45 @@ create_dialog1 (void)
   gtk_widget_show (vbox4);
   gtk_box_pack_start (GTK_BOX (hbox7), vbox4, FALSE, FALSE, 0);
 
-  checkbuttonInterlaced = gtk_check_button_new_with_mnemonic (_("_Interlaced"));
+  checkbuttonInterlaced = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("_Interlaced"));
   gtk_widget_show (checkbuttonInterlaced);
   gtk_box_pack_start (GTK_BOX (vbox4), checkbuttonInterlaced, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbuttonInterlaced, _("Enables interlaced frame support - use only if your source contains interlacing artifacts (i.e. fields instead of progressive frames)"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbuttonInterlaced, QT_TR_NOOP("Enables interlaced frame support - use only if your source contains interlacing artifacts (i.e. fields instead of progressive frames)"), NULL);
 
-  checkbuttonGreyScale = gtk_check_button_new_with_mnemonic (_("_Greyscale"));
+  checkbuttonGreyScale = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("_Greyscale"));
   gtk_widget_show (checkbuttonGreyScale);
   gtk_box_pack_start (GTK_BOX (vbox4), checkbuttonGreyScale, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbuttonGreyScale, _("Encode in black & white"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbuttonGreyScale, QT_TR_NOOP("Encode in black & white"), NULL);
 
   vbox5 = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox5);
   gtk_box_pack_start (GTK_BOX (hbox7), vbox5, FALSE, FALSE, 0);
 
-  checkbuttonCartoon = gtk_check_button_new_with_mnemonic (_("Ca_rtoon mode"));
+  checkbuttonCartoon = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("Ca_rtoon mode"));
   gtk_widget_show (checkbuttonCartoon);
   gtk_box_pack_start (GTK_BOX (vbox5), checkbuttonCartoon, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbuttonCartoon, _("Enables special motion estimation features for cartoons/anime"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbuttonCartoon, QT_TR_NOOP("Enables special motion estimation features for cartoons/anime"), NULL);
 
-  checkbuttonChroma = gtk_check_button_new_with_mnemonic (_("C_hroma optimizer"));
+  checkbuttonChroma = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("C_hroma optimizer"));
   gtk_widget_show (checkbuttonChroma);
   gtk_box_pack_start (GTK_BOX (vbox5), checkbuttonChroma, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbuttonChroma, _("Enables a chroma optimizer prefilter"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbuttonChroma, QT_TR_NOOP("Enables a chroma optimizer prefilter"), NULL);
 
   vbox23 = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox23);
   gtk_box_pack_start (GTK_BOX (hbox7), vbox23, TRUE, TRUE, 0);
 
-  checkbuttonTurbo = gtk_check_button_new_with_mnemonic (_("Turbo Mode"));
+  checkbuttonTurbo = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("Turbo Mode"));
   gtk_widget_show (checkbuttonTurbo);
   gtk_box_pack_start (GTK_BOX (vbox23), checkbuttonTurbo, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbuttonTurbo, _("Enables fast 1st pass encoding"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbuttonTurbo, QT_TR_NOOP("Enables fast 1st pass encoding"), NULL);
 
-  checkbuttonPacked = gtk_check_button_new_with_mnemonic (_("Packed bitstream"));
+  checkbuttonPacked = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("Packed bitstream"));
   gtk_widget_show (checkbuttonPacked);
   gtk_box_pack_start (GTK_BOX (vbox23), checkbuttonPacked, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbuttonPacked, _("Enables Divx like packed vop, DO NOT SET, it is ugly"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbuttonPacked, QT_TR_NOOP("Enables Divx like packed vop, DO NOT SET, it is ugly"), NULL);
 
-  labelMain = gtk_label_new (_("Main"));
+  labelMain = gtk_label_new (QT_TR_NOOP("Main"));
   gtk_widget_show (labelMain);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 0), labelMain);
 
@@ -860,11 +860,11 @@ create_dialog1 (void)
   gtk_widget_show (vbox8);
   gtk_box_pack_start (GTK_BOX (hbox8), vbox8, FALSE, FALSE, 0);
 
-  labelMotionSearchPrecision = gtk_label_new (_("Motion search precision:"));
+  labelMotionSearchPrecision = gtk_label_new (QT_TR_NOOP("Motion search precision:"));
   gtk_widget_show (labelMotionSearchPrecision);
   gtk_box_pack_start (GTK_BOX (vbox8), labelMotionSearchPrecision, TRUE, TRUE, 0);
 
-  labelVHQMode = gtk_label_new (_("VHQ mode:"));
+  labelVHQMode = gtk_label_new (QT_TR_NOOP("VHQ mode:"));
   gtk_widget_show (labelVHQMode);
   gtk_box_pack_start (GTK_BOX (vbox8), labelVHQMode, TRUE, TRUE, 0);
   gtk_label_set_justify (GTK_LABEL (labelVHQMode), GTK_JUSTIFY_FILL);
@@ -877,35 +877,35 @@ create_dialog1 (void)
   optionmenuMS = gtk_option_menu_new ();
   gtk_widget_show (optionmenuMS);
   gtk_box_pack_start (GTK_BOX (vbox7), optionmenuMS, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, optionmenuMS, _("Higher settings give higher quality results, at the cost of slower encoding"), NULL);
+  gtk_tooltips_set_tip (tooltips, optionmenuMS, QT_TR_NOOP("Higher settings give higher quality results, at the cost of slower encoding"), NULL);
 
   menu2 = gtk_menu_new ();
 
-  _0___none1 = gtk_menu_item_new_with_mnemonic (_("0 - None"));
+  _0___none1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("0 - None"));
   gtk_widget_show (_0___none1);
   gtk_container_add (GTK_CONTAINER (menu2), _0___none1);
 
-  _1___very_low1 = gtk_menu_item_new_with_mnemonic (_("1 - Very low"));
+  _1___very_low1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("1 - Very low"));
   gtk_widget_show (_1___very_low1);
   gtk_container_add (GTK_CONTAINER (menu2), _1___very_low1);
 
-  _2___low2 = gtk_menu_item_new_with_mnemonic (_("2 - Low"));
+  _2___low2 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("2 - Low"));
   gtk_widget_show (_2___low2);
   gtk_container_add (GTK_CONTAINER (menu2), _2___low2);
 
-  _3___medium1 = gtk_menu_item_new_with_mnemonic (_("3 - Medium"));
+  _3___medium1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("3 - Medium"));
   gtk_widget_show (_3___medium1);
   gtk_container_add (GTK_CONTAINER (menu2), _3___medium1);
 
-  _4___high1 = gtk_menu_item_new_with_mnemonic (_("4 - High"));
+  _4___high1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("4 - High"));
   gtk_widget_show (_4___high1);
   gtk_container_add (GTK_CONTAINER (menu2), _4___high1);
 
-  _5___very_high1 = gtk_menu_item_new_with_mnemonic (_("5 - Very high"));
+  _5___very_high1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("5 - Very high"));
   gtk_widget_show (_5___very_high1);
   gtk_container_add (GTK_CONTAINER (menu2), _5___very_high1);
 
-  _6___ultra_high1 = gtk_menu_item_new_with_mnemonic (_("6 - Ultra high"));
+  _6___ultra_high1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("6 - Ultra high"));
   gtk_widget_show (_6___ultra_high1);
   gtk_container_add (GTK_CONTAINER (menu2), _6___ultra_high1);
 
@@ -914,27 +914,27 @@ create_dialog1 (void)
   optionmenuVHQ = gtk_option_menu_new ();
   gtk_widget_show (optionmenuVHQ);
   gtk_box_pack_start (GTK_BOX (vbox7), optionmenuVHQ, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, optionmenuVHQ, _("VHQ enables an additional search process to increase quality"), NULL);
+  gtk_tooltips_set_tip (tooltips, optionmenuVHQ, QT_TR_NOOP("VHQ enables an additional search process to increase quality"), NULL);
 
   menu3 = gtk_menu_new ();
 
-  _0___off1 = gtk_menu_item_new_with_mnemonic (_("0 - Off"));
+  _0___off1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("0 - Off"));
   gtk_widget_show (_0___off1);
   gtk_container_add (GTK_CONTAINER (menu3), _0___off1);
 
-  _1___mode_decision1 = gtk_menu_item_new_with_mnemonic (_("1 - Mode decision"));
+  _1___mode_decision1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("1 - Mode decision"));
   gtk_widget_show (_1___mode_decision1);
   gtk_container_add (GTK_CONTAINER (menu3), _1___mode_decision1);
 
-  _2___limited_search1 = gtk_menu_item_new_with_mnemonic (_("2 - Limited search"));
+  _2___limited_search1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("2 - Limited search"));
   gtk_widget_show (_2___limited_search1);
   gtk_container_add (GTK_CONTAINER (menu3), _2___limited_search1);
 
-  _3___medium_search1 = gtk_menu_item_new_with_mnemonic (_("3 - Medium search"));
+  _3___medium_search1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("3 - Medium search"));
   gtk_widget_show (_3___medium_search1);
   gtk_container_add (GTK_CONTAINER (menu3), _3___medium_search1);
 
-  _4___wide_search1 = gtk_menu_item_new_with_mnemonic (_("4 - Wide search"));
+  _4___wide_search1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("4 - Wide search"));
   gtk_widget_show (_4___wide_search1);
   gtk_container_add (GTK_CONTAINER (menu3), _4___wide_search1);
 
@@ -944,26 +944,26 @@ create_dialog1 (void)
   gtk_widget_show (hbox10);
   gtk_box_pack_start (GTK_BOX (vbox6), hbox10, FALSE, FALSE, 0);
 
-  checkbuttonChromaMotion = gtk_check_button_new_with_mnemonic (_("C_hroma motion"));
+  checkbuttonChromaMotion = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("C_hroma motion"));
   gtk_widget_show (checkbuttonChromaMotion);
   gtk_box_pack_start (GTK_BOX (hbox10), checkbuttonChromaMotion, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbuttonChromaMotion, _("Use chroma information to estimate motion"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbuttonChromaMotion, QT_TR_NOOP("Use chroma information to estimate motion"), NULL);
 
-  checkbutton4MV = gtk_check_button_new_with_mnemonic (_("_4MV"));
+  checkbutton4MV = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("_4MV"));
   gtk_widget_show (checkbutton4MV);
   gtk_box_pack_start (GTK_BOX (hbox10), checkbutton4MV, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbutton4MV, _("Use 4 motion vectors per macroblock, might give better compression"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbutton4MV, QT_TR_NOOP("Use 4 motion vectors per macroblock, might give better compression"), NULL);
 
-  checkbuttonHQAC = gtk_check_button_new_with_mnemonic (_("HQ _AC"));
+  checkbuttonHQAC = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("HQ _AC"));
   gtk_widget_show (checkbuttonHQAC);
   gtk_box_pack_start (GTK_BOX (hbox10), checkbuttonHQAC, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbuttonHQAC, _("Enable a better prediction of AC component. Turns on Lumi masking - applies more compression to dark/light areas that the eye cannot notice easily"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbuttonHQAC, QT_TR_NOOP("Enable a better prediction of AC component. Turns on Lumi masking - applies more compression to dark/light areas that the eye cannot notice easily"), NULL);
 
   hbox9 = gtk_hbox_new (FALSE, 10);
   gtk_widget_show (hbox9);
   gtk_box_pack_start (GTK_BOX (vbox6), hbox9, FALSE, FALSE, 0);
 
-  labelIFrameIntervalMin = gtk_label_new (_("I-frame interval - Min:"));
+  labelIFrameIntervalMin = gtk_label_new (QT_TR_NOOP("I-frame interval - Min:"));
   gtk_widget_show (labelIFrameIntervalMin);
   gtk_box_pack_start (GTK_BOX (hbox9), labelIFrameIntervalMin, FALSE, FALSE, 0);
 
@@ -971,9 +971,9 @@ create_dialog1 (void)
   spinbuttonIMinPeriod = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonIMinPeriod_adj), 1, 0);
   gtk_widget_show (spinbuttonIMinPeriod);
   gtk_box_pack_start (GTK_BOX (hbox9), spinbuttonIMinPeriod, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, spinbuttonIMinPeriod, _("Minimum space between I-frames, 1 will disable forced I-frame spacing"), NULL);
+  gtk_tooltips_set_tip (tooltips, spinbuttonIMinPeriod, QT_TR_NOOP("Minimum space between I-frames, 1 will disable forced I-frame spacing"), NULL);
 
-  labelIFrameIntervalMax = gtk_label_new (_("Max:"));
+  labelIFrameIntervalMax = gtk_label_new (QT_TR_NOOP("Max:"));
   gtk_widget_show (labelIFrameIntervalMax);
   gtk_box_pack_start (GTK_BOX (hbox9), labelIFrameIntervalMax, FALSE, FALSE, 0);
 
@@ -981,7 +981,7 @@ create_dialog1 (void)
   spinbuttonIMaxPeriod = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonIMaxPeriod_adj), 1, 0);
   gtk_widget_show (spinbuttonIMaxPeriod);
   gtk_box_pack_start (GTK_BOX (hbox9), spinbuttonIMaxPeriod, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, spinbuttonIMaxPeriod, _("Maximum number of frames allowed between I-frames"), NULL);
+  gtk_tooltips_set_tip (tooltips, spinbuttonIMaxPeriod, QT_TR_NOOP("Maximum number of frames allowed between I-frames"), NULL);
 
   frameAdvancedSimpleProfile = gtk_frame_new (NULL);
   gtk_widget_show (frameAdvancedSimpleProfile);
@@ -996,7 +996,7 @@ create_dialog1 (void)
   gtk_widget_show (hbox11);
   gtk_box_pack_start (GTK_BOX (vbox9), hbox11, FALSE, FALSE, 0);
 
-  labelNumberOfBFrames = gtk_label_new (_("Number of B-frames:"));
+  labelNumberOfBFrames = gtk_label_new (QT_TR_NOOP("Number of B-frames:"));
   gtk_widget_show (labelNumberOfBFrames);
   gtk_box_pack_start (GTK_BOX (hbox11), labelNumberOfBFrames, FALSE, FALSE, 0);
 
@@ -1004,28 +1004,28 @@ create_dialog1 (void)
   spinbuttonBFrame = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonBFrame_adj), 1, 0);
   gtk_widget_show (spinbuttonBFrame);
   gtk_box_pack_start (GTK_BOX (hbox11), spinbuttonBFrame, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, spinbuttonBFrame, _("Maximum number of sequential B-frames (when set to 0, the original I/P encoder is used)"), NULL);
+  gtk_tooltips_set_tip (tooltips, spinbuttonBFrame, QT_TR_NOOP("Maximum number of sequential B-frames (when set to 0, the original I/P encoder is used)"), NULL);
 
   hbox12 = gtk_hbox_new (FALSE, 10);
   gtk_widget_show (hbox12);
   gtk_box_pack_start (GTK_BOX (vbox9), hbox12, FALSE, FALSE, 0);
 
-  checkbuttonQPel = gtk_check_button_new_with_mnemonic (_("_Qpel"));
+  checkbuttonQPel = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("_Qpel"));
   gtk_widget_show (checkbuttonQPel);
   gtk_box_pack_start (GTK_BOX (hbox12), checkbuttonQPel, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbuttonQPel, _("Use Quarter pixel resolution for a more precise motion estimation"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbuttonQPel, QT_TR_NOOP("Use Quarter pixel resolution for a more precise motion estimation"), NULL);
 
-  checkbuttonGMC = gtk_check_button_new_with_mnemonic (_("_GMC"));
+  checkbuttonGMC = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("_GMC"));
   gtk_widget_show (checkbuttonGMC);
   gtk_box_pack_start (GTK_BOX (hbox12), checkbuttonGMC, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbuttonGMC, _("Global Motion Compensation can save bits on camera pans, zooming and rotation"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbuttonGMC, QT_TR_NOOP("Global Motion Compensation can save bits on camera pans, zooming and rotation"), NULL);
 
-  checkbuttonBVHQ = gtk_check_button_new_with_mnemonic (_("_BVHQ"));
+  checkbuttonBVHQ = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("_BVHQ"));
   gtk_widget_show (checkbuttonBVHQ);
   gtk_box_pack_start (GTK_BOX (hbox12), checkbuttonBVHQ, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbuttonBVHQ, _("Produces nicer-looking B-frames"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbuttonBVHQ, QT_TR_NOOP("Produces nicer-looking B-frames"), NULL);
 
-  labelAdvancedSimpleProfile = gtk_label_new (_("Advanced Simple Profile"));
+  labelAdvancedSimpleProfile = gtk_label_new (QT_TR_NOOP("Advanced Simple Profile"));
   gtk_widget_show (labelAdvancedSimpleProfile);
   gtk_frame_set_label_widget (GTK_FRAME (frameAdvancedSimpleProfile), labelAdvancedSimpleProfile);
 
@@ -1037,18 +1037,18 @@ create_dialog1 (void)
   gtk_container_add (GTK_CONTAINER (frame_par1), hbox_par1);
   gtk_container_set_border_width (GTK_CONTAINER (hbox_par1), 5);
 
-  checkbutton_par_asinput = gtk_check_button_new_with_mnemonic (_("As input"));
+  checkbutton_par_asinput = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("As input"));
   gtk_widget_show (checkbutton_par_asinput);
   gtk_box_pack_start (GTK_BOX (hbox_par1), checkbutton_par_asinput, FALSE, FALSE, 10);
-  gtk_tooltips_set_tip (tooltips, checkbutton_par_asinput, _("Get PAR from input video file"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbutton_par_asinput, QT_TR_NOOP("Get PAR from input video file"), NULL);
 
   spinbutton_par_width_adj = gtk_adjustment_new (1, 1, 255, 1, 1, 1);
   spinbutton_par_width = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_par_width_adj), 1, 0);
   gtk_widget_show (spinbutton_par_width);
   gtk_box_pack_start (GTK_BOX (hbox_par1), spinbutton_par_width, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, spinbutton_par_width, _("Pixel Width"), NULL);
+  gtk_tooltips_set_tip (tooltips, spinbutton_par_width, QT_TR_NOOP("Pixel Width"), NULL);
 
-  label_par1 = gtk_label_new (_(":"));
+  label_par1 = gtk_label_new (QT_TR_NOOP(":"));
   gtk_widget_show (label_par1);
   gtk_box_pack_start (GTK_BOX (hbox_par1), label_par1, FALSE, FALSE, 2);
   gtk_label_set_justify (GTK_LABEL (label_par1), GTK_JUSTIFY_CENTER);
@@ -1057,13 +1057,13 @@ create_dialog1 (void)
   spinbutton_par_height = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_par_height_adj), 1, 0);
   gtk_widget_show (spinbutton_par_height);
   gtk_box_pack_start (GTK_BOX (hbox_par1), spinbutton_par_height, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, spinbutton_par_height, _("Pixel Height"), NULL);
-  label_par2 = gtk_label_new (_("Pixel Aspect Ratio"));
+  gtk_tooltips_set_tip (tooltips, spinbutton_par_height, QT_TR_NOOP("Pixel Height"), NULL);
+  label_par2 = gtk_label_new (QT_TR_NOOP("Pixel Aspect Ratio"));
   gtk_widget_show (label_par2);
   gtk_frame_set_label_widget (GTK_FRAME (frame_par1), label_par2);
   gtk_label_set_use_markup (GTK_LABEL (label_par2), TRUE);
 
-  labelMotionEstimation = gtk_label_new (_("Motion & Misc"));
+  labelMotionEstimation = gtk_label_new (QT_TR_NOOP("Motion & Misc"));
   gtk_widget_show (labelMotionEstimation);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 1), labelMotionEstimation);
 
@@ -1076,25 +1076,25 @@ create_dialog1 (void)
   gtk_widget_show (hbox13);
   gtk_box_pack_start (GTK_BOX (vbox10), hbox13, FALSE, FALSE, 0);
 
-  labelQuantizationType = gtk_label_new (_("Quantization type:"));
+  labelQuantizationType = gtk_label_new (QT_TR_NOOP("Quantization type:"));
   gtk_widget_show (labelQuantizationType);
   gtk_box_pack_start (GTK_BOX (hbox13), labelQuantizationType, FALSE, FALSE, 0);
 
-  radiobuttonH263 = gtk_radio_button_new_with_mnemonic (NULL, _("_H.263"));
+  radiobuttonH263 = gtk_radio_button_new_with_mnemonic (NULL, QT_TR_NOOP("_H.263"));
   gtk_widget_show (radiobuttonH263);
   gtk_box_pack_start (GTK_BOX (hbox13), radiobuttonH263, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, radiobuttonH263, _("H.263 quantizers smooth the picture (useful at lower bitrates)"), NULL);
+  gtk_tooltips_set_tip (tooltips, radiobuttonH263, QT_TR_NOOP("H.263 quantizers smooth the picture (useful at lower bitrates)"), NULL);
   gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobuttonH263), radiobuttonH263_group);
   radiobuttonH263_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobuttonH263));
 
-  radiobuttonMpeg = gtk_radio_button_new_with_mnemonic (NULL, _("_MPEG"));
+  radiobuttonMpeg = gtk_radio_button_new_with_mnemonic (NULL, QT_TR_NOOP("_MPEG"));
   gtk_widget_show (radiobuttonMpeg);
   gtk_box_pack_start (GTK_BOX (hbox13), radiobuttonMpeg, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, radiobuttonMpeg, _("MPEG quantizers (slightly slower) produce sharper picture (useful at higher bitrates)"), NULL);
+  gtk_tooltips_set_tip (tooltips, radiobuttonMpeg, QT_TR_NOOP("MPEG quantizers (slightly slower) produce sharper picture (useful at higher bitrates)"), NULL);
   gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobuttonMpeg), radiobuttonH263_group);
   radiobuttonH263_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobuttonMpeg));
 
-  radiobuttonCustomMatrix = gtk_radio_button_new_with_mnemonic (NULL, _("_Custom Matrix"));
+  radiobuttonCustomMatrix = gtk_radio_button_new_with_mnemonic (NULL, QT_TR_NOOP("_Custom Matrix"));
   gtk_widget_show (radiobuttonCustomMatrix);
   gtk_box_pack_start (GTK_BOX (hbox13), radiobuttonCustomMatrix, FALSE, FALSE, 0);
   gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobuttonCustomMatrix), radiobuttonH263_group);
@@ -1104,7 +1104,7 @@ create_dialog1 (void)
   gtk_widget_show (hbox20);
   gtk_box_pack_start (GTK_BOX (vbox10), hbox20, FALSE, TRUE, 0);
 
-  labelLoadCustomMatrix = gtk_label_new (_("Load Custom Matrix:  "));
+  labelLoadCustomMatrix = gtk_label_new (QT_TR_NOOP("Load Custom Matrix:  "));
   gtk_widget_show (labelLoadCustomMatrix);
   gtk_box_pack_start (GTK_BOX (hbox20), labelLoadCustomMatrix, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (labelLoadCustomMatrix), GTK_JUSTIFY_RIGHT);
@@ -1125,7 +1125,7 @@ create_dialog1 (void)
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox21), image1, FALSE, FALSE, 0);
 
-  label13 = gtk_label_new_with_mnemonic (_("Open CQM file"));
+  label13 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Open CQM file"));
   gtk_widget_show (label13);
   gtk_box_pack_start (GTK_BOX (hbox21), label13, FALSE, FALSE, 0);
 
@@ -1133,7 +1133,7 @@ create_dialog1 (void)
   gtk_widget_show (vseparator1);
   gtk_box_pack_start (GTK_BOX (hbox20), vseparator1, FALSE, TRUE, 0);
 
-  buttonCreateCustomMatrix = gtk_button_new_with_mnemonic (_("Edit Custom Matrix"));
+  buttonCreateCustomMatrix = gtk_button_new_with_mnemonic (QT_TR_NOOP("Edit Custom Matrix"));
   gtk_widget_show (buttonCreateCustomMatrix);
   gtk_box_pack_start (GTK_BOX (hbox20), buttonCreateCustomMatrix, FALSE, FALSE, 0);
 
@@ -1150,17 +1150,17 @@ create_dialog1 (void)
   gtk_widget_show (vbox11);
   gtk_box_pack_start (GTK_BOX (hbox14), vbox11, FALSE, FALSE, 0);
 
-  labelIFrameQuantizerMin = gtk_label_new (_("I-frame quantizer - Min:"));
+  labelIFrameQuantizerMin = gtk_label_new (QT_TR_NOOP("I-frame quantizer - Min:"));
   gtk_widget_show (labelIFrameQuantizerMin);
   gtk_box_pack_start (GTK_BOX (vbox11), labelIFrameQuantizerMin, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (labelIFrameQuantizerMin), 0, 0.5);
 
-  labelPFrameQuantizerMin = gtk_label_new (_("P-frame quantizer - Min:"));
+  labelPFrameQuantizerMin = gtk_label_new (QT_TR_NOOP("P-frame quantizer - Min:"));
   gtk_widget_show (labelPFrameQuantizerMin);
   gtk_box_pack_start (GTK_BOX (vbox11), labelPFrameQuantizerMin, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (labelPFrameQuantizerMin), 0, 0.5);
 
-  labelBFrameQuantizaterMin = gtk_label_new (_("B-frame quantizer - Min:"));
+  labelBFrameQuantizaterMin = gtk_label_new (QT_TR_NOOP("B-frame quantizer - Min:"));
   gtk_widget_show (labelBFrameQuantizaterMin);
   gtk_box_pack_start (GTK_BOX (vbox11), labelBFrameQuantizaterMin, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (labelBFrameQuantizaterMin), 0, 0.5);
@@ -1173,35 +1173,35 @@ create_dialog1 (void)
   spinbuttonIMin = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonIMin_adj), 1, 0);
   gtk_widget_show (spinbuttonIMin);
   gtk_box_pack_start (GTK_BOX (vbox12), spinbuttonIMin, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, spinbuttonIMin, _("Minimum quantizer allowed for I-frames"), NULL);
+  gtk_tooltips_set_tip (tooltips, spinbuttonIMin, QT_TR_NOOP("Minimum quantizer allowed for I-frames"), NULL);
 
   spinbuttonPMin_adj = gtk_adjustment_new (2, 1, 31, 1, 10, 10);
   spinbuttonPMin = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonPMin_adj), 1, 0);
   gtk_widget_show (spinbuttonPMin);
   gtk_box_pack_start (GTK_BOX (vbox12), spinbuttonPMin, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, spinbuttonPMin, _("Minimum quantizer allowed for P-frames"), NULL);
+  gtk_tooltips_set_tip (tooltips, spinbuttonPMin, QT_TR_NOOP("Minimum quantizer allowed for P-frames"), NULL);
 
   spinbuttonBMin_adj = gtk_adjustment_new (2, 1, 31, 1, 10, 10);
   spinbuttonBMin = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonBMin_adj), 1, 0);
   gtk_widget_show (spinbuttonBMin);
   gtk_box_pack_start (GTK_BOX (vbox12), spinbuttonBMin, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, spinbuttonBMin, _("Minimum quantizer allowed for B-frames"), NULL);
+  gtk_tooltips_set_tip (tooltips, spinbuttonBMin, QT_TR_NOOP("Minimum quantizer allowed for B-frames"), NULL);
 
   vbox13 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox13);
   gtk_box_pack_start (GTK_BOX (hbox14), vbox13, FALSE, FALSE, 0);
 
-  labelIFrameQuantizerMax = gtk_label_new (_("Max:"));
+  labelIFrameQuantizerMax = gtk_label_new (QT_TR_NOOP("Max:"));
   gtk_widget_show (labelIFrameQuantizerMax);
   gtk_box_pack_start (GTK_BOX (vbox13), labelIFrameQuantizerMax, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (labelIFrameQuantizerMax), 0, 0.5);
 
-  labelPFrameQuantizerMax = gtk_label_new (_("Max:"));
+  labelPFrameQuantizerMax = gtk_label_new (QT_TR_NOOP("Max:"));
   gtk_widget_show (labelPFrameQuantizerMax);
   gtk_box_pack_start (GTK_BOX (vbox13), labelPFrameQuantizerMax, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (labelPFrameQuantizerMax), 0, 0.5);
 
-  labelBFrameQuantizerMax = gtk_label_new (_("Max:"));
+  labelBFrameQuantizerMax = gtk_label_new (QT_TR_NOOP("Max:"));
   gtk_widget_show (labelBFrameQuantizerMax);
   gtk_box_pack_start (GTK_BOX (vbox13), labelBFrameQuantizerMax, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (labelBFrameQuantizerMax), 0, 0.5);
@@ -1214,30 +1214,30 @@ create_dialog1 (void)
   spinbuttonIMax = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonIMax_adj), 1, 0);
   gtk_widget_show (spinbuttonIMax);
   gtk_box_pack_start (GTK_BOX (vbox14), spinbuttonIMax, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, spinbuttonIMax, _("Maximum quantizer allowed for I-frames"), NULL);
+  gtk_tooltips_set_tip (tooltips, spinbuttonIMax, QT_TR_NOOP("Maximum quantizer allowed for I-frames"), NULL);
 
   spinbuttonPMax_adj = gtk_adjustment_new (31, 1, 31, 1, 10, 10);
   spinbuttonPMax = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonPMax_adj), 1, 0);
   gtk_widget_show (spinbuttonPMax);
   gtk_box_pack_start (GTK_BOX (vbox14), spinbuttonPMax, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, spinbuttonPMax, _("Maximum quantizer allowed for P-frames"), NULL);
+  gtk_tooltips_set_tip (tooltips, spinbuttonPMax, QT_TR_NOOP("Maximum quantizer allowed for P-frames"), NULL);
 
   spinbuttonBMax_adj = gtk_adjustment_new (31, 1, 31, 1, 10, 10);
   spinbuttonBMax = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonBMax_adj), 1, 0);
   gtk_widget_show (spinbuttonBMax);
   gtk_box_pack_start (GTK_BOX (vbox14), spinbuttonBMax, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, spinbuttonBMax, _("Maximum quantizer allowed for B-frames"), NULL);
+  gtk_tooltips_set_tip (tooltips, spinbuttonBMax, QT_TR_NOOP("Maximum quantizer allowed for B-frames"), NULL);
 
-  labelQuantizerRestrictions = gtk_label_new (_("Quantizer restrictions"));
+  labelQuantizerRestrictions = gtk_label_new (QT_TR_NOOP("Quantizer restrictions"));
   gtk_widget_show (labelQuantizerRestrictions);
   gtk_frame_set_label_widget (GTK_FRAME (frameQuantizationRestrictions), labelQuantizerRestrictions);
 
-  checkbuttonTrellis = gtk_check_button_new_with_mnemonic (_("_Trellis quantization"));
+  checkbuttonTrellis = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("_Trellis quantization"));
   gtk_widget_show (checkbuttonTrellis);
   gtk_box_pack_start (GTK_BOX (vbox10), checkbuttonTrellis, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbuttonTrellis, _("Rate distortion quantization, will find optimal encoding for each block"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbuttonTrellis, QT_TR_NOOP("Rate distortion quantization, will find optimal encoding for each block"), NULL);
 
-  labelQuantization = gtk_label_new (_("Quantization"));
+  labelQuantization = gtk_label_new (QT_TR_NOOP("Quantization"));
   gtk_widget_show (labelQuantization);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 2), labelQuantization);
 
@@ -1265,27 +1265,27 @@ create_dialog1 (void)
   gtk_widget_show (vbox17);
   gtk_box_pack_start (GTK_BOX (hbox), vbox17, TRUE, TRUE, 0);
 
-  labelIFrameBoost = gtk_label_new (_("I-frame boost (%):"));
+  labelIFrameBoost = gtk_label_new (QT_TR_NOOP("I-frame boost (%):"));
   gtk_widget_show (labelIFrameBoost);
   gtk_box_pack_start (GTK_BOX (vbox17), labelIFrameBoost, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (labelIFrameBoost), 0, 0.5);
 
-  labelIFrameCloserThan = gtk_label_new (_("I-frames closer than ... frames..."));
+  labelIFrameCloserThan = gtk_label_new (QT_TR_NOOP("I-frames closer than ... frames..."));
   gtk_widget_show (labelIFrameCloserThan);
   gtk_box_pack_start (GTK_BOX (vbox17), labelIFrameCloserThan, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (labelIFrameCloserThan), 0, 0.5);
 
-  labelAreReducedBy = gtk_label_new (_("...are reduced by (%):"));
+  labelAreReducedBy = gtk_label_new (QT_TR_NOOP("...are reduced by (%):"));
   gtk_widget_show (labelAreReducedBy);
   gtk_box_pack_start (GTK_BOX (vbox17), labelAreReducedBy, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (labelAreReducedBy), 0, 0.5);
 
-  labelMaxOverflowImprovement = gtk_label_new (_("Max overflow improvement (%):"));
+  labelMaxOverflowImprovement = gtk_label_new (QT_TR_NOOP("Max overflow improvement (%):"));
   gtk_widget_show (labelMaxOverflowImprovement);
   gtk_box_pack_start (GTK_BOX (vbox17), labelMaxOverflowImprovement, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (labelMaxOverflowImprovement), 0, 0.5);
 
-  labelMaxOverflowDegradation = gtk_label_new (_("Max overflow degradation (%):"));
+  labelMaxOverflowDegradation = gtk_label_new (QT_TR_NOOP("Max overflow degradation (%):"));
   gtk_widget_show (labelMaxOverflowDegradation);
   gtk_box_pack_start (GTK_BOX (vbox17), labelMaxOverflowDegradation, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (labelMaxOverflowDegradation), 0, 0.5);
@@ -1297,30 +1297,30 @@ create_dialog1 (void)
   entryIBoost = gtk_entry_new ();
   gtk_widget_show (entryIBoost);
   gtk_box_pack_start (GTK_BOX (vbox18), entryIBoost, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, entryIBoost, _("A value of 20 will give 20% more bits to every I-frame"), NULL);
+  gtk_tooltips_set_tip (tooltips, entryIBoost, QT_TR_NOOP("A value of 20 will give 20% more bits to every I-frame"), NULL);
 
   entryIInterv = gtk_entry_new ();
   gtk_widget_show (entryIInterv);
   gtk_box_pack_start (GTK_BOX (vbox18), entryIInterv, FALSE, FALSE, 0);
   gtk_widget_set_size_request (entryIInterv, 158, -1);
-  gtk_tooltips_set_tip (tooltips, entryIInterv, _("I-frames appearing in the range below this value will be treated as consecutive keyframes"), NULL);
+  gtk_tooltips_set_tip (tooltips, entryIInterv, QT_TR_NOOP("I-frames appearing in the range below this value will be treated as consecutive keyframes"), NULL);
 
   entryIreduction = gtk_entry_new ();
   gtk_widget_show (entryIreduction);
   gtk_box_pack_start (GTK_BOX (vbox18), entryIreduction, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, entryIreduction, _("Reduction of bitrate for the first consecutive I-frames. The last I-frame will get treated normally"), NULL);
+  gtk_tooltips_set_tip (tooltips, entryIreduction, QT_TR_NOOP("Reduction of bitrate for the first consecutive I-frames. The last I-frame will get treated normally"), NULL);
 
   entryMaxOvrImp = gtk_entry_new ();
   gtk_widget_show (entryMaxOvrImp);
   gtk_box_pack_start (GTK_BOX (vbox18), entryMaxOvrImp, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, entryMaxOvrImp, _("How much of the overflow the codec can eat into during undersized sections - larger values will bridge the gap faster"), NULL);
+  gtk_tooltips_set_tip (tooltips, entryMaxOvrImp, QT_TR_NOOP("How much of the overflow the codec can eat into during undersized sections - larger values will bridge the gap faster"), NULL);
 
   entryMaxOvrDeg = gtk_entry_new ();
   gtk_widget_show (entryMaxOvrDeg);
   gtk_box_pack_start (GTK_BOX (vbox18), entryMaxOvrDeg, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, entryMaxOvrDeg, _("How much of the overflow the codec can eat into during oversized sections - larger values will bridge the gap faster"), NULL);
+  gtk_tooltips_set_tip (tooltips, entryMaxOvrDeg, QT_TR_NOOP("How much of the overflow the codec can eat into during oversized sections - larger values will bridge the gap faster"), NULL);
 
-  labelTwoPassTuning = gtk_label_new (_("Two pass tuning"));
+  labelTwoPassTuning = gtk_label_new (QT_TR_NOOP("Two pass tuning"));
   gtk_widget_show (labelTwoPassTuning);
   gtk_frame_set_label_widget (GTK_FRAME (frameTwoPassTuning), labelTwoPassTuning);
 
@@ -1337,17 +1337,17 @@ create_dialog1 (void)
   gtk_widget_show (vbox19);
   gtk_box_pack_start (GTK_BOX (hbox18), vbox19, TRUE, TRUE, 0);
 
-  labelHighBitrateScenes = gtk_label_new (_("High bitrate scenes (%):"));
+  labelHighBitrateScenes = gtk_label_new (QT_TR_NOOP("High bitrate scenes (%):"));
   gtk_widget_show (labelHighBitrateScenes);
   gtk_box_pack_start (GTK_BOX (vbox19), labelHighBitrateScenes, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (labelHighBitrateScenes), 0, 0.5);
 
-  labelLowBitrateScenes = gtk_label_new (_("Low bitrate scenes (%):"));
+  labelLowBitrateScenes = gtk_label_new (QT_TR_NOOP("Low bitrate scenes (%):"));
   gtk_widget_show (labelLowBitrateScenes);
   gtk_box_pack_start (GTK_BOX (vbox19), labelLowBitrateScenes, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (labelLowBitrateScenes), 0, 0.5);
 
-  labelOverflowControlStrength = gtk_label_new (_("Overflow control strength (%):"));
+  labelOverflowControlStrength = gtk_label_new (QT_TR_NOOP("Overflow control strength (%):"));
   gtk_widget_show (labelOverflowControlStrength);
   gtk_box_pack_start (GTK_BOX (vbox19), labelOverflowControlStrength, TRUE, TRUE, 0);
   gtk_misc_set_alignment (GTK_MISC (labelOverflowControlStrength), 0, 0.5);
@@ -1359,23 +1359,23 @@ create_dialog1 (void)
   entryHiPass = gtk_entry_new ();
   gtk_widget_show (entryHiPass);
   gtk_box_pack_start (GTK_BOX (vbox20), entryHiPass, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, entryHiPass, _("The higher this value, the more bits get taken from frames larger than the average size, and redistributed to others"), NULL);
+  gtk_tooltips_set_tip (tooltips, entryHiPass, QT_TR_NOOP("The higher this value, the more bits get taken from frames larger than the average size, and redistributed to others"), NULL);
 
   entryLowPass = gtk_entry_new ();
   gtk_widget_show (entryLowPass);
   gtk_box_pack_start (GTK_BOX (vbox20), entryLowPass, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, entryLowPass, _("The higher this value, the more bits get assigned to frames below the average frame size"), NULL);
+  gtk_tooltips_set_tip (tooltips, entryLowPass, QT_TR_NOOP("The higher this value, the more bits get assigned to frames below the average frame size"), NULL);
 
   entryOvrControl = gtk_entry_new ();
   gtk_widget_show (entryOvrControl);
   gtk_box_pack_start (GTK_BOX (vbox20), entryOvrControl, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, entryOvrControl, _("0 = default from core (let XviD decide), else overflow payback percent per frame"), NULL);
+  gtk_tooltips_set_tip (tooltips, entryOvrControl, QT_TR_NOOP("0 = default from core (let XviD decide), else overflow payback percent per frame"), NULL);
 
-  labelCurveCompression = gtk_label_new (_("Curve compression"));
+  labelCurveCompression = gtk_label_new (QT_TR_NOOP("Curve compression"));
   gtk_widget_show (labelCurveCompression);
   gtk_frame_set_label_widget (GTK_FRAME (frameCurveCompression), labelCurveCompression);
 
-  labelSecondPass = gtk_label_new (_("Second Pass"));
+  labelSecondPass = gtk_label_new (QT_TR_NOOP("Second Pass"));
   gtk_widget_show (labelSecondPass);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 3), labelSecondPass);
 
@@ -1565,7 +1565,7 @@ create_dialog3 (void)
   GtkWidget *button14;
 
   dialog3 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog3), _("Edit Custom Matrix"));
+  gtk_window_set_title (GTK_WINDOW (dialog3), QT_TR_NOOP("Edit Custom Matrix"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog3), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox3 = GTK_DIALOG (dialog3)->vbox;
@@ -1588,7 +1588,7 @@ create_dialog3 (void)
   gtk_widget_show (tableIntra);
   gtk_container_add (GTK_CONTAINER (alignment12), tableIntra);
 
-  label19 = gtk_label_new (_("<b>Intra Matrix</b>"));
+  label19 = gtk_label_new (QT_TR_NOOP("<b>Intra Matrix</b>"));
   gtk_widget_show (label19);
   gtk_frame_set_label_widget (GTK_FRAME (frame7), label19);
   gtk_label_set_use_markup (GTK_LABEL (label19), TRUE);
@@ -1606,7 +1606,7 @@ create_dialog3 (void)
   gtk_widget_show (tableInter);
   gtk_container_add (GTK_CONTAINER (alignment11), tableInter);
 
-  label18 = gtk_label_new (_("<b>Inter Matrix</b>"));
+  label18 = gtk_label_new (QT_TR_NOOP("<b>Inter Matrix</b>"));
   gtk_widget_show (label18);
   gtk_frame_set_label_widget (GTK_FRAME (frame6), label18);
   gtk_label_set_use_markup (GTK_LABEL (label18), TRUE);

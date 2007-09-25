@@ -251,7 +251,7 @@ uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo)
    memset(palette,0,sizeof(uint32_t)*16);
    if(!vobsub_parse_ifo(nameIfo,palette,&width,&height,language))
    {
-     GUI_Error_HIG(_("Ifo error"),_("Error reading ifo file, aborting."));   
+     GUI_Error_HIG(QT_TR_NOOP("Ifo error"),QT_TR_NOOP("Error reading ifo file, aborting."));   
         return 0;
    } 
    printf("Ifo: %d x %d\n",width,height);                 
@@ -259,7 +259,7 @@ uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo)
    indexFile=fopen(nameVobSub,"wt");
    if(!indexFile)
    {
-     GUI_Error_HIG(_("Cannot write .idx"),NULL);              
+     GUI_Error_HIG(QT_TR_NOOP("Cannot write .idx"),NULL);              
         return 0;
     }
    subname=ADM_strdup(nameVobSub);
@@ -272,7 +272,7 @@ uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo)
     if(!indexSub)
     {
         fclose(indexFile);
-        GUI_Error_HIG(_("Cannot write .sub"),NULL);
+        GUI_Error_HIG(QT_TR_NOOP("Cannot write .sub"),NULL);
         return 0;
     }
    for(int i=0;i<MAX_LANGUAGE;i++)
@@ -284,7 +284,7 @@ uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo)
    demuxer=new  dmx_demuxerPS(1,&track,1);
    if(!demuxer->open(nameVob))
    {
-     GUI_Error_HIG(_("Problem opening the mpeg files"),NULL);
+     GUI_Error_HIG(QT_TR_NOOP("Problem opening the mpeg files"),NULL);
         delete demuxer;
         fclose(indexFile);
         fclose(indexSub);
@@ -297,7 +297,7 @@ uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo)
     int display=0;
     
    dumpHeader(indexFile,0,width,height,palette);
-   working=new DIA_working(_("Generating VobSub file"));
+   working=new DIA_working(QT_TR_NOOP("Generating VobSub file"));
    
    //*** Main Loop ***
    uint32_t startPts=0,lastPts=0;

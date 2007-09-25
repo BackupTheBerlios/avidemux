@@ -37,8 +37,8 @@ uint8_t DIA_mjpegCodecSetting(COMPRES_PARAMS *param)
         MJPEGConfig *config=(MJPEGConfig *)param->extraSettings;
         ADM_assert(sizeof(MJPEGConfig)==param->extraSettingsLen);
         uint8_t ret=0;
-        diaElemUInteger  qual(&(config->qual),_("_Quality:"),1,100);
-        diaElemToggle    swap(&(config->swapped),_("_Swap U&V:"));
+        diaElemUInteger  qual(&(config->qual),QT_TR_NOOP("_Quality:"),1,100);
+        diaElemToggle    swap(&(config->swapped),QT_TR_NOOP("_Swap U&V:"));
         diaElem *elems[2]={&qual,&swap};
         if( diaFactoryRun("Mjpeg Configuration",2,elems))
         {

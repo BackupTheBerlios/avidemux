@@ -177,7 +177,7 @@ create_dialog1 (void)
 	GtkWidget *drawingarea1;
 
 	dialog1 = gtk_dialog_new ();
-	gtk_window_set_title (GTK_WINDOW (dialog1), _("Preview"));
+	gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Preview"));
 
 	dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
 	gtk_widget_show (dialog_vbox1);

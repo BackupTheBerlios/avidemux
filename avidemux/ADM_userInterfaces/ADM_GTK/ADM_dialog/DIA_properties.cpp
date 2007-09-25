@@ -44,7 +44,7 @@ void DIA_properties( void )
  GtkWidget *dialog;
  uint8_t gmc, qpel,vop;
  uint32_t info=0;
- const char *yesno[2]={_("No"),_("Yes")};
+ const char *yesno[2]={QT_TR_NOOP("No"),QT_TR_NOOP("Yes")};
  uint32_t war,har;
 
     if (playing)
@@ -64,13 +64,13 @@ void DIA_properties( void )
 
         gtk_register_dialog(dialog);
 
-        sprintf(text, _("%lu x %lu"), avifileinfo->width,avifileinfo->height);
+        sprintf(text, QT_TR_NOOP("%lu x %lu"), avifileinfo->width,avifileinfo->height);
         FILL_ENTRY(label_size);
 
-        sprintf(text, _("%2.3f fps"), (float) avifileinfo->fps1000 / 1000.F);
+        sprintf(text, QT_TR_NOOP("%2.3f fps"), (float) avifileinfo->fps1000 / 1000.F);
         FILL_ENTRY(label_fps);
 
-        sprintf(text, _("%ld frames"), avifileinfo->nb_frames);
+        sprintf(text, QT_TR_NOOP("%ld frames"), avifileinfo->nb_frames);
         FILL_ENTRY(label_number);
 
         sprintf(text, "%s", fourCC::tostring(avifileinfo->fcc));
@@ -80,7 +80,7 @@ void DIA_properties( void )
           {
                 frame2time(avifileinfo->nb_frames, avifileinfo->fps1000,
                           &hh, &mm, &ss, &ms);
-                sprintf(text, _("%02d:%02d:%02d.%03d"), hh, mm, ss, ms);
+                sprintf(text, QT_TR_NOOP("%02d:%02d:%02d.%03d"), hh, mm, ss, ms);
                 FILL_ENTRY(label_duration);	
   
           }
@@ -93,7 +93,7 @@ void DIA_properties( void )
         war=video_body->getPARWidth();
         har=video_body->getPARHeight();
         getAspectRatioFromAR(war,har, &s);
-        sprintf(text, _("%s (%u:%u)"), s,war,har);
+        sprintf(text, QT_TR_NOOP("%s (%u:%u)"), s,war,har);
         FILL_ENTRY(labelAspectRatio);	
         // Now audio
         WAVHeader *wavinfo=NULL;
@@ -104,10 +104,10 @@ void DIA_properties( void )
               switch (wavinfo->channels)
                 {
                 case 1:
-                    sprintf(text, _("Mono"));
+                    sprintf(text, QT_TR_NOOP("Mono"));
                     break;
                 case 2:
-                    sprintf(text, _("Stereo"));
+                    sprintf(text, QT_TR_NOOP("Stereo"));
                     break;
                 default:
                     sprintf(text, "%d",wavinfo->channels);
@@ -115,9 +115,9 @@ void DIA_properties( void )
                 }
                 FILL_ENTRY(label1_audiomode);
               
-                sprintf(text, _("%lu Hz"), wavinfo->frequency);
+                sprintf(text, QT_TR_NOOP("%lu Hz"), wavinfo->frequency);
                 FILL_ENTRY(label_fq);
-                sprintf(text, _("%lu Bps / %lu kbps"), wavinfo->byterate,      wavinfo->byterate * 8 / 1000);
+                sprintf(text, QT_TR_NOOP("%lu Bps / %lu kbps"), wavinfo->byterate,      wavinfo->byterate * 8 / 1000);
                 FILL_ENTRY(label_bitrate);
                 sprintf(text, "%s", getStrFromAudioCodec(wavinfo->encoding));
                 FILL_ENTRY(label1_audiofourcc);
@@ -130,10 +130,10 @@ void DIA_properties( void )
                         du*=1000;
                         du/=wavinfo->byterate;
                         ms2time((uint32_t)floor(du), &hh, &mm, &ss, &ms);
-                        sprintf(text, _("%02d:%02d:%02d.%03d"), hh, mm, ss, ms);
+                        sprintf(text, QT_TR_NOOP("%02d:%02d:%02d.%03d"), hh, mm, ss, ms);
 						FILL_ENTRY(label_audioduration);
 
-						sprintf(text, _("%.2f MB"), l / 1048576.F);
+						sprintf(text, QT_TR_NOOP("%.2f MB"), l / 1048576.F);
 						FILL_ENTRY(labelFileSize);
                 }                
                 SET_YES(labelVbr, currentaudiostream->isVBR());
@@ -202,7 +202,7 @@ create_dialog1 (void)
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Properties"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Properties"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -231,21 +231,21 @@ create_dialog1 (void)
   gtk_container_add (GTK_CONTAINER (alignment2), table1);
   gtk_table_set_col_spacings (GTK_TABLE (table1), 12);
 
-  label4 = gtk_label_new (_("Frame Rate:"));
+  label4 = gtk_label_new (QT_TR_NOOP("Frame Rate:"));
   gtk_widget_show (label4);
   gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
 
-  label5 = gtk_label_new (_("Frame Count:"));
+  label5 = gtk_label_new (QT_TR_NOOP("Frame Count:"));
   gtk_widget_show (label5);
   gtk_table_attach (GTK_TABLE (table1), label5, 0, 1, 4, 5,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
 
-  label7 = gtk_label_new (_("Total Duration:"));
+  label7 = gtk_label_new (QT_TR_NOOP("Total Duration:"));
   gtk_widget_show (label7);
   gtk_table_attach (GTK_TABLE (table1), label7, 0, 1, 5, 6,
                     (GtkAttachOptions) (GTK_FILL),
@@ -259,14 +259,14 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_fps), 0, 0.5);
 
-  label_size = gtk_label_new (_(" "));
+  label_size = gtk_label_new (QT_TR_NOOP(" "));
   gtk_widget_show (label_size);
   gtk_table_attach (GTK_TABLE (table1), label_size, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_size), 0, 0.5);
 
-  label3 = gtk_label_new (_("Image Size:"));
+  label3 = gtk_label_new (QT_TR_NOOP("Image Size:"));
   gtk_widget_show (label3);
   gtk_table_attach (GTK_TABLE (table1), label3, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -280,14 +280,14 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_number), 0, 0.5);
 
-  label_duration = gtk_label_new (_(" "));
+  label_duration = gtk_label_new (QT_TR_NOOP(" "));
   gtk_widget_show (label_duration);
   gtk_table_attach (GTK_TABLE (table1), label_duration, 1, 2, 5, 6,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_duration), 0, 0.5);
 
-  label6 = gtk_label_new (_("Codec 4CC:"));
+  label6 = gtk_label_new (QT_TR_NOOP("Codec 4CC:"));
   gtk_widget_show (label6);
   gtk_table_attach (GTK_TABLE (table1), label6, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -301,7 +301,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_videofourcc), 0, 0.5);
 
-  label35 = gtk_label_new (_("Aspect Ratio:"));
+  label35 = gtk_label_new (QT_TR_NOOP("Aspect Ratio:"));
   gtk_widget_show (label35);
   gtk_table_attach (GTK_TABLE (table1), label35, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -315,7 +315,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (labelAspectRatio), 0, 0.5);
 
-  label1 = gtk_label_new (_("<b>Video</b>"));
+  label1 = gtk_label_new (QT_TR_NOOP("<b>Video</b>"));
   gtk_widget_show (label1);
   gtk_frame_set_label_widget (GTK_FRAME (frame1), label1);
   gtk_label_set_use_markup (GTK_LABEL (label1), TRUE);
@@ -334,7 +334,7 @@ create_dialog1 (void)
   gtk_container_add (GTK_CONTAINER (alignment5), table3);
   gtk_table_set_col_spacings (GTK_TABLE (table3), 12);
 
-  labelGMCCap = gtk_label_new (_("Global Motion Compensation:"));
+  labelGMCCap = gtk_label_new (QT_TR_NOOP("Global Motion Compensation:"));
   gtk_widget_show (labelGMCCap);
   gtk_table_attach (GTK_TABLE (table3), labelGMCCap, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -348,7 +348,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (labelGMC), 0, 0.5);
 
-  labelPackedBitstreamCap = gtk_label_new (_("Packed Bitstream:"));
+  labelPackedBitstreamCap = gtk_label_new (QT_TR_NOOP("Packed Bitstream:"));
   gtk_widget_show (labelPackedBitstreamCap);
   gtk_table_attach (GTK_TABLE (table3), labelPackedBitstreamCap, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -362,7 +362,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (labelPacked), 0, 0.5);
 
-  labelQPelCap = gtk_label_new (_("Quarter Pixel:"));
+  labelQPelCap = gtk_label_new (QT_TR_NOOP("Quarter Pixel:"));
   gtk_widget_show (labelQPelCap);
   gtk_table_attach (GTK_TABLE (table3), labelQPelCap, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -376,7 +376,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (labelQP), 0, 0.5);
 
-  label41 = gtk_label_new (_("<b>Extra Video Properties</b>"));
+  label41 = gtk_label_new (QT_TR_NOOP("<b>Extra Video Properties</b>"));
   gtk_widget_show (label41);
   gtk_frame_set_label_widget (GTK_FRAME (frame3), label41);
   gtk_label_set_use_markup (GTK_LABEL (label41), TRUE);
@@ -395,35 +395,35 @@ create_dialog1 (void)
   gtk_container_add (GTK_CONTAINER (alignment3), table2);
   gtk_table_set_col_spacings (GTK_TABLE (table2), 12);
 
-  label13 = gtk_label_new (_("Codec:"));
+  label13 = gtk_label_new (QT_TR_NOOP("Codec:"));
   gtk_widget_show (label13);
   gtk_table_attach (GTK_TABLE (table2), label13, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label13), 0, 0.5);
 
-  label14 = gtk_label_new (_("Channels:"));
+  label14 = gtk_label_new (QT_TR_NOOP("Channels:"));
   gtk_widget_show (label14);
   gtk_table_attach (GTK_TABLE (table2), label14, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label14), 0, 0.5);
 
-  label15 = gtk_label_new (_("Bitrate:"));
+  label15 = gtk_label_new (QT_TR_NOOP("Bitrate:"));
   gtk_widget_show (label15);
   gtk_table_attach (GTK_TABLE (table2), label15, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label15), 0, 0.5);
 
-  label16 = gtk_label_new (_("Frequency:"));
+  label16 = gtk_label_new (QT_TR_NOOP("Frequency:"));
   gtk_widget_show (label16);
   gtk_table_attach (GTK_TABLE (table2), label16, 0, 1, 4, 5,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label16), 0, 0.5);
 
-  label17 = gtk_label_new (_("Total Duration:"));
+  label17 = gtk_label_new (QT_TR_NOOP("Total Duration:"));
   gtk_widget_show (label17);
   gtk_table_attach (GTK_TABLE (table2), label17, 0, 1, 5, 6,
                     (GtkAttachOptions) (GTK_FILL),
@@ -465,7 +465,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_audioduration), 0, 0.5);
 
-  label40 = gtk_label_new (_("File Size:"));
+  label40 = gtk_label_new (QT_TR_NOOP("File Size:"));
   gtk_widget_show (label40);
   gtk_table_attach (GTK_TABLE (table2), label40, 0, 1, 6, 7,
                     (GtkAttachOptions) (GTK_FILL),
@@ -479,7 +479,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (labelFileSize), 0, 0.5);
 
-  label21 = gtk_label_new (_("Variable Bitrate:"));
+  label21 = gtk_label_new (QT_TR_NOOP("Variable Bitrate:"));
   gtk_widget_show (label21);
   gtk_table_attach (GTK_TABLE (table2), label21, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
@@ -493,7 +493,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (labelVbr), 0, 0.5);
 
-  label2 = gtk_label_new (_("<b>Audio</b>"));
+  label2 = gtk_label_new (QT_TR_NOOP("<b>Audio</b>"));
   gtk_widget_show (label2);
   gtk_frame_set_label_widget (GTK_FRAME (frame2), label2);
   gtk_label_set_use_markup (GTK_LABEL (label2), TRUE);

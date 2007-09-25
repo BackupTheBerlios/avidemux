@@ -188,7 +188,7 @@ ADMImage *createImageFromFile_jpeg(const char *filename)
 		    	break;
 		    }
 		    default:
-		    	GUI_Error_HIG(_("Wrong Colorspace"),_("Only YV12/I420 or YUY2/I422 JPegs are supported"));
+		    	GUI_Error_HIG(QT_TR_NOOP("Wrong Colorspace"),QT_TR_NOOP("Only YV12/I420 or YUY2/I422 JPegs are supported"));
 		    }
 		    // Cannot destroy decoder earlier as tmpImage has pointers to its internals
 		    delete decoder;

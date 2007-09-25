@@ -50,12 +50,9 @@ void loadTranslator(void)
 {
 	printf("\n[Locale] Locale: %s\n", QLocale::system().name().toAscii().data());
 
-	//loadTranslation("qt_" + QLocale::system().name());
-	//loadTranslation("avidemux_" + QLocale::system().name());
-
-	loadTranslation(&qtTranslator, "qt_fr");
-	loadTranslation(&avidemuxTranslator, "avidemux_fr");
-
+	loadTranslation(&qtTranslator, "qt_" + QLocale::system().name());
+	loadTranslation(&avidemuxTranslator, "avidemux_" + QLocale::system().name());
+	
 	printf("[Locale] Test: &File -> %s\n\n", translate("MainWindow", "&File"));
 }
 

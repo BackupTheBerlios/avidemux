@@ -23,7 +23,7 @@
 
 static void             updateStatus(void);
 extern bool parseECMAScript(const char *name);
-static const char *StringStatus[]={_("Ready"),_("Succeeded"),_("Failed"),_("Deleted"),_("Running")};
+static const char *StringStatus[]={QT_TR_NOOP("Ready"),QT_TR_NOOP("Succeeded"),QT_TR_NOOP("Failed"),QT_TR_NOOP("Deleted"),QT_TR_NOOP("Running")};
 
 
 typedef enum 
@@ -103,7 +103,7 @@ jobsWindow::jobsWindow(uint32_t n,char **j)     : QDialog()
 
      // Set headers
       QStringList headers;
-     headers << _("Job Name") << _("Status") << _("Start Time") << _("End Time"); 
+     headers << QT_TR_NOOP("Job Name") << QT_TR_NOOP("Status") << QT_TR_NOOP("Start Time") << QT_TR_NOOP("End Time"); 
      
      WIDGET(tableWidget)->setVerticalHeaderLabels(headers);
      updateRows();
@@ -180,7 +180,7 @@ int jobsWindow::DeleteOne(bool b)
 {
   int sel=WIDGET(tableWidget)->currentRow();
         if(sel<=0 || sel>=_nbJobs) return 0;
-        if(GUI_Confirmation_HIG(_("Sure!"),_("Delete job"),_("Are you sure you want to delete %s job ?"),GetFileName(_jobsName[sel])))
+        if(GUI_Confirmation_HIG(QT_TR_NOOP("Sure!"),QT_TR_NOOP("Delete job"),QT_TR_NOOP("Are you sure you want to delete %s job ?"),GetFileName(_jobsName[sel])))
         {
                 desc[sel].status=STATUS_DELETED;
         }
@@ -193,7 +193,7 @@ int jobsWindow::DeleteOne(bool b)
 */
 int jobsWindow::DeleteAll(bool b)
 {
-  if(!GUI_Confirmation_HIG(_("Sure!"),_("Delete *all* job"),_("Are you sure you want to delete ALL jobs ?")))
+  if(!GUI_Confirmation_HIG(QT_TR_NOOP("Sure!"),QT_TR_NOOP("Delete *all* job"),QT_TR_NOOP("Are you sure you want to delete ALL jobs ?")))
   {
           return 0;
   }
@@ -219,7 +219,7 @@ int jobsWindow::RunOne(bool b)
   
   if(desc[sel].status==STATUS_SUCCEED) 
   {
-    GUI_Info_HIG(ADM_LOG_INFO,_("Already done"),_("This script has already been successfully executed."));
+    GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Already done"),QT_TR_NOOP("This script has already been successfully executed."));
     return 0;
   }
 

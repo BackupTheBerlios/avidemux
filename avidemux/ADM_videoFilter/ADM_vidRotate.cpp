@@ -261,14 +261,14 @@ uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
   uint8_t r;
   
   diaMenuEntry rotateValues[]={
-      {0,_("None"),_("None")},
-      {90,_("90 degrees"),_("90°")},
-      {180,_("180 degrees"),_("180°")},
-      {270,_("270 degrees"),_("270°")}
+      {0,QT_TR_NOOP("None"),QT_TR_NOOP("None")},
+      {90,QT_TR_NOOP("90 degrees"),QT_TR_NOOP("90°")},
+      {180,QT_TR_NOOP("180 degrees"),QT_TR_NOOP("180°")},
+      {270,QT_TR_NOOP("270 degrees"),QT_TR_NOOP("270°")}
   };
-  diaElemMenu     rotate(&(_param->angle),_("_Angle:"),4,rotateValues,NULL);
+  diaElemMenu     rotate(&(_param->angle),QT_TR_NOOP("_Angle:"),4,rotateValues,NULL);
   diaElem *allWidgets[]={&rotate};
-  if( !diaFactoryRun(_("Rotate"),1,allWidgets)) return 0;
+  if( !diaFactoryRun(QT_TR_NOOP("Rotate"),1,allWidgets)) return 0;
   
   uint32_t w,h;
   w=_in->getInfo()->width;

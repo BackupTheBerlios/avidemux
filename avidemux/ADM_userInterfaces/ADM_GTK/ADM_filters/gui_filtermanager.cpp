@@ -241,7 +241,7 @@ void on_action (gui_act action)
         conf = videofilters[action_parameter].conf;
         if (videofilters[action_parameter].tag == VF_PARTIAL)	// cannot recurse
         {
-            GUI_Error_HIG (_("The filter is already partial"), NULL);
+            GUI_Error_HIG (QT_TR_NOOP("The filter is already partial"), NULL);
             break;
 	    }
         replace =
@@ -333,15 +333,15 @@ void on_action (gui_act action)
         if (!action_parameter) break;
 
         extern uint32_t curframe;
-        DIA_filterPreview(_("Preview"), videofilters[action_parameter].filter, curframe);
+        DIA_filterPreview(QT_TR_NOOP("Preview"), videofilters[action_parameter].filter, curframe);
 
         break;
 
     case A_LOAD:
 #ifdef USE_LIBXML2
-        GUI_FileSelRead (_("Load set of filters"), filterLoadXml);
+        GUI_FileSelRead (QT_TR_NOOP("Load set of filters"), filterLoadXml);
 #else
-        GUI_FileSelRead (_("Load set of filters"), filterLoad);
+        GUI_FileSelRead (QT_TR_NOOP("Load set of filters"), filterLoad);
 #endif
         updateFilterList ();
         setSelectionNumber(nb_active_filter-1, WID(treeview0), stores[0], 0);
@@ -354,13 +354,13 @@ void on_action (gui_act action)
     case A_SAVE:
         if (nb_active_filter < 2)
         {
-            GUI_Error_HIG (_("Nothing to save"), NULL);
+            GUI_Error_HIG (QT_TR_NOOP("Nothing to save"), NULL);
         }
         else
 #ifdef USE_LIBXML2
-            GUI_FileSelWrite (_("Save set of filters"), filterSaveXml);
+            GUI_FileSelWrite (QT_TR_NOOP("Save set of filters"), filterSaveXml);
 #else
-            GUI_FileSelWrite (_("Save set of filters"), filterSave);
+            GUI_FileSelWrite (QT_TR_NOOP("Save set of filters"), filterSave);
 #endif
         break;
 #if 0

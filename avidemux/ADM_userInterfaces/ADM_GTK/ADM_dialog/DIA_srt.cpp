@@ -88,7 +88,7 @@ int DIA_srtPos(AVDMGenericVideoStream *in,uint32_t *size,uint32_t *position)
 
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
-        gtk_window_set_title (GTK_WINDOW (dialog), _("Subtitle Size and Position"));
+        gtk_window_set_title (GTK_WINDOW (dialog), QT_TR_NOOP("Subtitle Size and Position"));
         gtk_widget_show(dialog);
 	
         myCrop=new flySrtPos( width, height,in,WID(drawingarea1),WID(hscale1));
@@ -219,7 +219,7 @@ create_dialog1 (void)
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Subtitle Size and Position"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Subtitle Size and Position"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -233,7 +233,7 @@ create_dialog1 (void)
   gtk_widget_show (hbox1);
   gtk_box_pack_start (GTK_BOX (vbox1), hbox1, FALSE, FALSE, 0);
 
-  label1 = gtk_label_new (_("Font Size:"));
+  label1 = gtk_label_new (QT_TR_NOOP("Font Size:"));
   gtk_widget_show (label1);
   gtk_box_pack_start (GTK_BOX (hbox1), label1, FALSE, FALSE, 0);
 

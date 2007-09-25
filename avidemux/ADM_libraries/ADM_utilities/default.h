@@ -84,7 +84,6 @@ typedef unsigned char ADM_filename ;
 #endif
 
 extern const char* translate(const char *__domainname, const char *__msgid);
-#define _(String) translate (PACKAGE, String)
 
 #ifdef QT_TR_NOOP
 #undef QT_TR_NOOP

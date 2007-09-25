@@ -189,13 +189,13 @@ EncoderSaveMpeg (const char *name)
       raw = 2;
       break;
     default:
-      GUI_Error_HIG (_("Wrong output format"), _("Select MPEG as the output."));
+      GUI_Error_HIG (QT_TR_NOOP("Wrong output format"), QT_TR_NOOP("Select MPEG as the output."));
       return 0;
     }
   if (current_codec != CodecDVD && raw == 2)
     {
-      GUI_Error_HIG (_("Wrong video codec"),
-                     _("Select DVD as the video codec for MPEG TS output."));
+      GUI_Error_HIG (QT_TR_NOOP("Wrong video codec"),
+                     QT_TR_NOOP("Select DVD as the video codec for MPEG TS output."));
       return 0;
     }
   switch (current_codec)
@@ -715,7 +715,7 @@ getVideoEncoder (uint32_t w, uint32_t h, uint32_t globalHeaderFlag)
     case CodecH263:
       if (!((w == 128) && (h == 96)) && !((w == 176) && (h == 144)))
 	{
-          GUI_Error_HIG (_("Only QCIF and subQCIF are allowed for H.263"), NULL);
+          GUI_Error_HIG (QT_TR_NOOP("Only QCIF and subQCIF are allowed for H.263"), NULL);
 	  return 0;
 	}
       e = new EncoderFFMPEG (FF_H263, &ffmpegH263Codec);
@@ -907,7 +907,7 @@ videoCodecSetConf (char *name, uint32_t extraLen, uint8_t * extraData)
   param = videoCodecGetDescriptor (current_codec);
   if (!param)
     {
-      GUI_Error_HIG (_("Fatal error"), NULL);
+      GUI_Error_HIG (QT_TR_NOOP("Fatal error"), NULL);
       printf ("Current codec:%d\n", current_codec);
       ADM_assert (0);
     }

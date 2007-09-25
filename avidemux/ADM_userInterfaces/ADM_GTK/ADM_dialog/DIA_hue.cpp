@@ -71,7 +71,7 @@ uint8_t DIA_getHue(Hue_Param *param, AVDMGenericVideoStream *in)
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
         
-        gtk_window_set_title (GTK_WINDOW (dialog), _("Hue"));
+        gtk_window_set_title (GTK_WINDOW (dialog), QT_TR_NOOP("Hue"));
 
         gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
             GTK_SIGNAL_FUNC(draw),
@@ -168,7 +168,7 @@ GtkWidget   *create_dialog1 (void)
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Hue/Saturation"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Hue/Saturation"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -182,7 +182,7 @@ GtkWidget   *create_dialog1 (void)
   gtk_widget_show (table1);
   gtk_box_pack_start (GTK_BOX (vbox1), table1, TRUE, TRUE, 0);
 
-  label1 = gtk_label_new (_("<b>Hue:</b>"));
+  label1 = gtk_label_new (QT_TR_NOOP("<b>Hue:</b>"));
   gtk_widget_show (label1);
   gtk_table_attach (GTK_TABLE (table1), label1, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -190,7 +190,7 @@ GtkWidget   *create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label1), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label1), 0, 0.5);
 
-  label2 = gtk_label_new (_("<b>Saturation:</b>"));
+  label2 = gtk_label_new (QT_TR_NOOP("<b>Saturation:</b>"));
   gtk_widget_show (label2);
   gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),

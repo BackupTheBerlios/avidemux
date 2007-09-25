@@ -255,7 +255,7 @@ uint8_t    h263Header::open(char *name)
 	{
 		default:
 			printf("\n incorrect size !\n");
-                        GUI_Error_HIG(_("Size is not (s)QCIF"), NULL);
+                        GUI_Error_HIG(QT_TR_NOOP("Size is not (s)QCIF"), NULL);
 		
 		case 1:  w=128;h=96;break;
 		case 2:  w=176;h=144;break;

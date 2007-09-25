@@ -139,7 +139,7 @@ DIA_encoding  *encoding;
             case ADM_TS:
                     if(!currentaudiostream)
                     {
-                      GUI_Error_HIG(_("There is no audio track"), NULL);
+                      GUI_Error_HIG(QT_TR_NOOP("There is no audio track"), NULL);
 					  goto finishvcdff;
                     }
                     audio=mpt_getAudioStream();
@@ -150,7 +150,7 @@ DIA_encoding  *encoding;
             {
                 if(!currentaudiostream)
                 {
-                  GUI_Error_HIG(_("There is no audio track"), NULL);
+                  GUI_Error_HIG(QT_TR_NOOP("There is no audio track"), NULL);
 				  goto finishvcdff;
                 }
                 audio=mpt_getAudioStream();
@@ -160,7 +160,7 @@ DIA_encoding  *encoding;
                 // Later check if it is SVCD
                 if(!audio)
                 {
-                  GUI_Error_HIG(_("Audio track is not suitable"), NULL);
+                  GUI_Error_HIG(QT_TR_NOOP("Audio track is not suitable"), NULL);
 				  goto finishvcdff;
                 }
                 // Check
@@ -170,7 +170,7 @@ DIA_encoding  *encoding;
                 {
                         if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
                         {
-                            GUI_Error_HIG(("Incompatible audio"),_( "For VCD, audio must be 44.1 kHz MP2."));
+                            GUI_Error_HIG(("Incompatible audio"),QT_TR_NOOP( "For VCD, audio must be 44.1 kHz MP2."));
 							goto finishvcdff;
                         }
                         mux=MUXER_VCD;
@@ -190,7 +190,7 @@ DIA_encoding  *encoding;
                             if(hdr->frequency!=48000 || 
                                 (hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3 && hdr->encoding!=WAV_LPCM))
                             {
-                                GUI_Error_HIG(_("Incompatible audio"), _("For DVD, audio must be 48 kHz MP2, AC3 or LPCM."));
+                                GUI_Error_HIG(QT_TR_NOOP("Incompatible audio"), QT_TR_NOOP("For DVD, audio must be 48 kHz MP2, AC3 or LPCM."));
 								goto finishvcdff;
                             }
                             mux=MUXER_DVD;
@@ -302,7 +302,7 @@ DIA_encoding  *encoding;
                         
                         printf("Verifying log file\n");
                         if(encoder->verifyLog(twoPass,total))
-                          if(GUI_Question(_("Reuse log file ?")))
+                          if(GUI_Question(QT_TR_NOOP("Reuse log file ?")))
                                 {
                                         reuse=1;
                                 }
@@ -317,7 +317,7 @@ DIA_encoding  *encoding;
                                         bitstream.cleanup(i);
                                         if(!encoder->encode( i, &bitstream))//&len,(uint8_t *) _buffer,&flags))
                                         {
-                                          GUI_Error_HIG(_("Error in pass 1"), NULL);
+                                          GUI_Error_HIG(QT_TR_NOOP("Error in pass 1"), NULL);
                                         }
                                         encoding->setFrame(i,bitstream.len,bitstream.out_quantizer,total);
                                         if(!encoding->isAlive())
@@ -363,7 +363,7 @@ DIA_encoding  *encoding;
                 file=fopen(name,"wb");
                 if(!file)
                 {
-                  GUI_Error_HIG(_("File error"), _("Cannot open \"%s\" for writing."), name);
+                  GUI_Error_HIG(QT_TR_NOOP("File error"), QT_TR_NOOP("Cannot open \"%s\" for writing."), name);
 				  goto finishvcdff;
                 }
               }
@@ -460,7 +460,7 @@ DIA_encoding  *encoding;
                 bitstream.cleanup(i);
                 if(!encoder->encode( i,&bitstream))// &len,(uint8_t *) _outbuffer,&flags))
                 {
-                  GUI_Error_HIG(_("Error in pass 2"), NULL);
+                  GUI_Error_HIG(QT_TR_NOOP("Error in pass 2"), NULL);
                         goto finishvcdff;
                 }
                 if(!bitstream.len) continue;

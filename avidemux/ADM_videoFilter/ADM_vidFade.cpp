@@ -62,16 +62,16 @@ uint8_t AVDM_Fade::configure(AVDMGenericVideoStream *in)
   uint32_t mx=_info.nb_frames;
   _in=in;
   
-  diaMenuEntry menuE[2]={{0,_("Out"),_("Fade out")},{1,_("In"),_("Fade in")}};
+  diaMenuEntry menuE[2]={{0,QT_TR_NOOP("Out"),QT_TR_NOOP("Fade out")},{1,QT_TR_NOOP("In"),QT_TR_NOOP("Fade in")}};
   uint32_t start,end;
   VIDFADE_PARAM param=*_param;
   
 while(1)
 {
-    diaElemMenu     menu(&(param.inOut),_("_Fade type:"), 2,menuE);
-    diaElemUInteger start(&(param.startFade),_("_Start frame:"),0,mx);
-    diaElemUInteger end(&(param.endFade),_("_End frame:"),0,mx);
-    diaElemToggle   black(&(param.toBlack),_("Fade to _black"));
+    diaElemMenu     menu(&(param.inOut),QT_TR_NOOP("_Fade type:"), 2,menuE);
+    diaElemUInteger start(&(param.startFade),QT_TR_NOOP("_Start frame:"),0,mx);
+    diaElemUInteger end(&(param.endFade),QT_TR_NOOP("_End frame:"),0,mx);
+    diaElemToggle   black(&(param.toBlack),QT_TR_NOOP("Fade to _black"));
     
     diaElem *elems[4]={&menu,&start,&end,&black};
   
@@ -80,7 +80,7 @@ while(1)
       // Check it is consistent
       if(param.startFade>=param.endFade || (param.startFade>=mx) || (param.endFade>=mx))
       {
-        GUI_Error_HIG(_("Parameter Error"),_("Start must be before end, and both within video # of frames."));
+        GUI_Error_HIG(QT_TR_NOOP("Parameter Error"),QT_TR_NOOP("Start must be before end, and both within video # of frames."));
         continue; 
       }
       //

@@ -96,7 +96,7 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
                     (GtkAttachOptions) (0), 0, 0);
   
   /* Add text -> encoding mode */
-  label1 = gtk_label_new_with_mnemonic (_("_Encoding mode:"));
+  label1 = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Encoding mode:"));
   gtk_misc_set_alignment (GTK_MISC (label1), 0.0, 0.5);
   gtk_widget_show(label1);
   
@@ -106,7 +106,7 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
   
   
   /* Add text -> encoding mode */
-  label2 = gtk_label_new_with_mnemonic (_("_Bitrate (kb/s):"));
+  label2 = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Bitrate (kb/s):"));
   gtk_misc_set_alignment (GTK_MISC (label2), 0.0, 0.5);
   gtk_widget_show(label2);
   /* put entry in hbox */
@@ -120,18 +120,18 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
   
   gtk_label_set_mnemonic_widget (GTK_LABEL(label1), combo);
   if((copy.capabilities & ADM_ENC_CAP_CBR)) 
-	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Single pass - bitrate"));
+	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),QT_TR_NOOP("Single pass - bitrate"));
   if((copy.capabilities & ADM_ENC_CAP_CQ))
-	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Single pass - constant quality"));
+	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),QT_TR_NOOP("Single pass - constant quality"));
   if((copy.capabilities & ADM_ENC_CAP_SAME))
-	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Single pass - same qz as input"));
+	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),QT_TR_NOOP("Single pass - same qz as input"));
   if((copy.capabilities & ADM_ENC_CAP_AQ))
-	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Single pass - Average quantizer"));
+	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),QT_TR_NOOP("Single pass - Average quantizer"));
 
   if((copy.capabilities & ADM_ENC_CAP_2PASS))
-	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Two pass - video size"));
+	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),QT_TR_NOOP("Two pass - video size"));
   if((copy.capabilities & ADM_ENC_CAP_2PASS_BR))
-	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_("Two pass - average bitrate"));
+	  gtk_combo_box_append_text (GTK_COMBO_BOX (combo),QT_TR_NOOP("Two pass - average bitrate"));
   
   /**/
   
@@ -259,38 +259,38 @@ void diaElemBitrate::updateMe(void)
 //#undef P
 #undef M
 #undef S
-//#define P(x) gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_(#x));
+//#define P(x) gtk_label_set_text_with_mnemonic(GTK_LABEL(label),QT_TR_NOOP(#x));
 #define M(x,y) gtk_spin_button_set_range  (GTK_SPIN_BUTTON(spin),x,y)
 #define S(x)   gtk_spin_button_set_value  (GTK_SPIN_BUTTON(spin),x)
   switch(mode)
   {
     case COMPRESS_CBR: //CBR
-          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("_Bitrate (kb/s):"));
+          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),QT_TR_NOOP("_Bitrate (kb/s):"));
           M(0,20000);
           S(copy.bitrate);
           break; 
     case COMPRESS_CQ:// CQ
-          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("_Quantizer:"));
+          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),QT_TR_NOOP("_Quantizer:"));
           M(2,maxQ);
           S(copy.qz);
           break;
     case COMPRESS_AQ:// CQ
-              gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("A_vg Quantizer:"));
+              gtk_label_set_text_with_mnemonic(GTK_LABEL(label),QT_TR_NOOP("A_vg Quantizer:"));
               M(2,64);
               S(copy.qz);
               break;
     case COMPRESS_2PASS : // 2pass Filesize
-          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("_Video size (MB):"));
+          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),QT_TR_NOOP("_Video size (MB):"));
           M(1,8000);
           S(copy.finalsize);
           break;
     case COMPRESS_2PASS_BITRATE : // 2pass Avg
-          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("_Average bitrate (kb/s):"));
+          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),QT_TR_NOOP("_Average bitrate (kb/s):"));
           M(0,20000);
           S(copy.avg_bitrate);
           break;
     case COMPRESS_SAME : // Same Qz as input
-          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_("-"));
+          gtk_label_set_text_with_mnemonic(GTK_LABEL(label),QT_TR_NOOP("-"));
           M(0,0);
           break;
     default:ADM_assert(0);

@@ -33,17 +33,17 @@ uint8_t DIA_animated(ANIMATED_PARAM *param,uint32_t w, uint32_t h,uint32_t n)
 {	
   uint8_t r=0;
 #define PX(x) &(param->x)
-   diaElemFile      jpeg(0,(char **)PX(backgroundImg),_("_Background Image:"));
-   diaElemToggle    isNtsc(PX(isNTSC),_("_NTSC(default is Pal):"));
-   diaElemUInteger   vignetteW(PX(vignetteW),_("Vignette _Width:"),16,w/3);
-   diaElemUInteger   vignetteH(PX(vignetteH),_("Vignette _Height:"),16,h/2);
+   diaElemFile      jpeg(0,(char **)PX(backgroundImg),QT_TR_NOOP("_Background Image:"));
+   diaElemToggle    isNtsc(PX(isNTSC),QT_TR_NOOP("_NTSC(default is Pal):"));
+   diaElemUInteger   vignetteW(PX(vignetteW),QT_TR_NOOP("Vignette _Width:"),16,w/3);
+   diaElemUInteger   vignetteH(PX(vignetteH),QT_TR_NOOP("Vignette _Height:"),16,h/2);
    
    diaElemUInteger *timecode[MAX_VIGNETTE];
-   diaElemFrame timecodes(_("Vignette frame number"));
+   diaElemFrame timecodes(QT_TR_NOOP("Vignette frame number"));
 
    for(int i=0;i<MAX_VIGNETTE;i++)
    {
-     timecode[i]=new diaElemUInteger(&(param->timecode[i]),_("Timecode:"),0,n);
+     timecode[i]=new diaElemUInteger(&(param->timecode[i]),QT_TR_NOOP("Timecode:"),0,n);
      timecodes.swallow(timecode[i]);
    }
 

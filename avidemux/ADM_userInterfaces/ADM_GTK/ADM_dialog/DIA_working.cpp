@@ -147,7 +147,7 @@ uint8_t DIA_working::update(uint32_t percent)
 	gtk_label_set_text(GTK_LABEL(lookup_widget(dialog,"labelRemaining")), ms2timedisplay((uint32_t) floor(((elapsed * 100.) / percent) - elapsed)));
 	gtk_progress_set_percentage(GTK_PROGRESS(lookup_widget(dialog,"progressbar1")),(gfloat)(percent / 100.));
 
-	sprintf(string, _("%d%%"), percent);
+	sprintf(string, QT_TR_NOOP("%d%%"), percent);
     gtk_progress_bar_set_text(GTK_PROGRESS_BAR(lookup_widget(dialog, "progressbar1")), string);
 
 	UI_purge();
@@ -220,7 +220,7 @@ create_dialog1 (void)
 
   dialog1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_widget_set_size_request (dialog1, 250, -1);
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Processing"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Processing"));
   gtk_window_set_position (GTK_WINDOW (dialog1), GTK_WIN_POS_CENTER_ON_PARENT);
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
   gtk_window_set_resizable (GTK_WINDOW (dialog1), FALSE);
@@ -241,7 +241,7 @@ create_dialog1 (void)
   gtk_table_set_row_spacings (GTK_TABLE (table1), 4);
   gtk_table_set_col_spacings (GTK_TABLE (table1), 12);
 
-  label2 = gtk_label_new (_("<b>Elapsed:</b>"));
+  label2 = gtk_label_new (QT_TR_NOOP("<b>Elapsed:</b>"));
   gtk_widget_show (label2);
   gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -256,7 +256,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (labelElapsed), 0, 0.5);
 
-  label4 = gtk_label_new (_("<b>Time remaining:</b>"));
+  label4 = gtk_label_new (QT_TR_NOOP("<b>Time remaining:</b>"));
   gtk_widget_show (label4);
   gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),

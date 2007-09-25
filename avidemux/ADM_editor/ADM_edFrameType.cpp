@@ -55,12 +55,12 @@ aviInfo    info;
 						
 	if(!_nb_video)
 	{
-          GUI_Error_HIG(_("No video loaded"), NULL);
+          GUI_Error_HIG(QT_TR_NOOP("No video loaded"), NULL);
 		return 0;
 	}
 	if(!isIndexable())
 	{
-          GUI_Error_HIG(_("Not indexable"),_( "DivX 5 + packed?"));
+          GUI_Error_HIG(QT_TR_NOOP("Not indexable"),QT_TR_NOOP( "DivX 5 + packed?"));
 		return 0;
 	}
 
@@ -90,7 +90,7 @@ aviInfo    info;
 	}
 	DIA_working *work;
         uint8_t nocopy;
-	work=new DIA_working(_("Rebuilding Frames"));
+	work=new DIA_working(QT_TR_NOOP("Rebuilding Frames"));
 
 
 	for(uint32_t vid=0;vid<_nb_video;vid++)
@@ -126,7 +126,7 @@ aviInfo    info;
 	  				{
 						delete work;
 						vi->decoder->decodeFull();
-						GUI_Error_HIG(_("Aborted"), NULL);
+						GUI_Error_HIG(QT_TR_NOOP("Aborted"), NULL);
 						delete [] compBuffer;
 						delete  prepBuffer;
 						delete  prepBufferNoCopy;

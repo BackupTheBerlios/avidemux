@@ -68,7 +68,7 @@ create_colorselectiondialog1 (void)
   GtkWidget *help_button1;
   GtkWidget *color_selection1;
 
-  colorselectiondialog1 = gtk_color_selection_dialog_new (_("Select Color"));
+  colorselectiondialog1 = gtk_color_selection_dialog_new (QT_TR_NOOP("Select Color"));
   gtk_window_set_resizable (GTK_WINDOW (colorselectiondialog1), FALSE);
 
   ok_button1 = GTK_COLOR_SELECTION_DIALOG (colorselectiondialog1)->ok_button;

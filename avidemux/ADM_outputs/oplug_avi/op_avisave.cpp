@@ -71,23 +71,23 @@ uint8_t ADM_aviUISetMuxer(  void )
   
   
   diaMenuEntry muxingType[]={
-  {MUX_REGULAR,_("Normal")},
-  {MUX_N_FRAMES,_("Mux every N video frames")},
-  {MUX_N_BYTES,_("Mux by packet size")}
+  {MUX_REGULAR,QT_TR_NOOP("Normal")},
+  {MUX_N_FRAMES,QT_TR_NOOP("Mux every N video frames")},
+  {MUX_N_BYTES,QT_TR_NOOP("Mux by packet size")}
   };
   
-    diaElemMenu      mux(&(mux_mode),_("Muxing _type:"),3,muxingType);
-    diaElemUInteger blockSize(&(muxSize),_("_Split every MB:"),1,9000);
+    diaElemMenu      mux(&(mux_mode),QT_TR_NOOP("Muxing _type:"),3,muxingType);
+    diaElemUInteger blockSize(&(muxSize),QT_TR_NOOP("_Split every MB:"),1,9000);
     
-    diaElemUInteger n_frames(&(mux_n_frame),_("Mux _every x video frames:"),1,100);
-    diaElemUInteger n_block(&(mux_size_block),_("Mux in _blocks of x bytes:"),1,50000);
+    diaElemUInteger n_frames(&(mux_n_frame),QT_TR_NOOP("Mux _every x video frames:"),1,100);
+    diaElemUInteger n_block(&(mux_size_block),QT_TR_NOOP("Mux in _blocks of x bytes:"),1,50000);
     
     
      mux.link(&(muxingType[1]),1,&n_frames);
      mux.link(&(muxingType[2]),1,&n_block);
     
      diaElem *elems[4]={&mux,&n_frames,&n_block,&blockSize};
-     if( diaFactoryRun(_("AVI Muxer Options"),4,elems))
+     if( diaFactoryRun(QT_TR_NOOP("AVI Muxer Options"),4,elems))
     {
       muxMode=(PARAM_MUX)mux_mode;
       switch(muxMode)
@@ -185,7 +185,7 @@ uint8_t ret=0;
   if (!setupAudio ())
     {
       guiStop();
-      GUI_Error_HIG (_("Error initalizing audio filters"), NULL);
+      GUI_Error_HIG (QT_TR_NOOP("Error initalizing audio filters"), NULL);
       delete writter;
       writter = NULL;
       return 0;
@@ -194,7 +194,7 @@ uint8_t ret=0;
    if (!setupVideo (_name))
     {
       guiStop();
-      GUI_Error_HIG (_("Error initalizing video filters"), NULL);
+      GUI_Error_HIG (QT_TR_NOOP("Error initalizing video filters"), NULL);
       delete   	writter;
       writter = NULL;
      // guiStop();
@@ -443,7 +443,7 @@ uint8_t   GenericAviSave::reigniteChunk( uint32_t dataLen, uint8_t *data )
 			   audio_filter,
 			   audio_filter2))
     {
-      GUI_Error_HIG (_("Cannot initiate save"), NULL);
+      GUI_Error_HIG (QT_TR_NOOP("Cannot initiate save"), NULL);
 
       return 0;
     }

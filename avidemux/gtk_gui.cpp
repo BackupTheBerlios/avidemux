@@ -248,7 +248,7 @@ int nw;
 		return;
     
     case ACT_RunScript:
-                GUI_FileSelRead (_("Select ECMAScript to Run"),(SELFILE_CB *) A_parseECMAScript);
+                GUI_FileSelRead (QT_TR_NOOP("Select ECMAScript to Run"),(SELFILE_CB *) A_parseECMAScript);
                         
                         //
     		return;
@@ -295,7 +295,7 @@ int nw;
       return;
     case ACT_SetLogFile:
 //      GUI_FileSelWrite ("Select log File to use", encoderSetLogFile);
-      GUI_Error_HIG(_("Obsolete"), NULL);
+      GUI_Error_HIG(QT_TR_NOOP("Obsolete"), NULL);
       return;
       break;
     case ACT_SetMuxParam:
@@ -334,7 +334,7 @@ int nw;
   	  			return;
 						break;*/
     case ACT_SelectEncoder:
-      GUI_Error_HIG (_("Obsolete"), NULL);
+      GUI_Error_HIG (QT_TR_NOOP("Obsolete"), NULL);
       break;
 
     default:
@@ -362,7 +362,7 @@ int nw;
   // restict disabled uncoded actions
   if ((int) action >= ACT_DUMMY)
     {
-      GUI_Error_HIG (_("Not coded in this version"), NULL);
+      GUI_Error_HIG (QT_TR_NOOP("Not coded in this version"), NULL);
       return;
 
     }
@@ -377,12 +377,12 @@ int nw;
                 A_TimeShift();
                 break;
 	case ACT_OpenAvi:
-          GUI_FileSelRead (_("Select AVI File..."), (SELFILE_CB *)A_openAvi);
+          GUI_FileSelRead (QT_TR_NOOP("Select AVI File..."), (SELFILE_CB *)A_openAvi);
 	  break;
 
 	case ACT_BrokenAvi:
 	  printf ("\n Opening in broken mode...\n");
-          GUI_FileSelRead (_("Select AVI File..."), A_openBrokenAvi);
+          GUI_FileSelRead (QT_TR_NOOP("Select AVI File..."), A_openBrokenAvi);
 	  break;
 
 
@@ -438,19 +438,19 @@ int nw;
 			}
     			break;
     case ACT_SaveUnpackedMpeg4:
-      if(GUI_Question(_("This is to be used to undo packed VOP on MPEG-4.\nContinue ?")))
+      if(GUI_Question(QT_TR_NOOP("This is to be used to undo packed VOP on MPEG-4.\nContinue ?")))
 			{ 
-                          GUI_FileSelWrite (_("Select AVI File to Write"), (SELFILE_CB *)A_SaveUnpackedVop);
+                          GUI_FileSelWrite (QT_TR_NOOP("Select AVI File to Write"), (SELFILE_CB *)A_SaveUnpackedVop);
 				
 			}
     			break;
 			
     case ACT_SaveOGM:
-                        GUI_FileSelWrite (_("Select OGM File to Write"), (SELFILE_CB *)ogmSave);
+                        GUI_FileSelWrite (QT_TR_NOOP("Select OGM File to Write"), (SELFILE_CB *)ogmSave);
     			break;
 				
     case ACT_SaveWork:
-      GUI_FileSelWrite (_("Select Workbench to Save"), A_saveWorkbench);
+      GUI_FileSelWrite (QT_TR_NOOP("Select Workbench to Save"), A_saveWorkbench);
 	  UI_refreshCustomMenu();
       break;
     case ACT_ADD_JOB:
@@ -462,7 +462,7 @@ int nw;
          A_saveWorkbench( tmp ); // will write "actual_workbench_file" itself
          ADM_dealloc(tmp);
       }else{
-        GUI_FileSelWrite (_("Select Workbench to Save"), A_saveWorkbench);
+        GUI_FileSelWrite (QT_TR_NOOP("Select Workbench to Save"), A_saveWorkbench);
 		UI_refreshCustomMenu();
       }
       break;
@@ -494,7 +494,7 @@ int nw;
                 }
                 break;
     case ACT_SaveRaw:
-      GUI_FileSelWrite (_("Select Raw File to Save"), (SELFILE_CB *)ADM_saveRaw);
+      GUI_FileSelWrite (QT_TR_NOOP("Select Raw File to Save"), (SELFILE_CB *)ADM_saveRaw);
       break;
     case ACT_CutWizard:
       ADM_cutWizard ();
@@ -504,17 +504,17 @@ int nw;
                 break;
 
     case ACT_OpenAvi:
-      GUI_FileSelRead (_("Select AVI File..."),(SELFILE_CB *) A_openAvi);
+      GUI_FileSelRead (QT_TR_NOOP("Select AVI File..."),(SELFILE_CB *) A_openAvi);
       break;
     case ACT_BrokenAvi:
-      GUI_FileSelRead (_("Select AVI File..."), A_openBrokenAvi);
+      GUI_FileSelRead (QT_TR_NOOP("Select AVI File..."), A_openBrokenAvi);
       break;
     case ACT_AppendAvi:
-      GUI_FileSelRead (_("Select AVI File to Append..."),(SELFILE_CB *) A_appendAvi);
+      GUI_FileSelRead (QT_TR_NOOP("Select AVI File to Append..."),(SELFILE_CB *) A_appendAvi);
       break;
     case ACT_SaveWave:
       	{
-          GUI_FileSelWrite (_("Select File to Save Audio"),(SELFILE_CB *)A_audioSave);
+          GUI_FileSelWrite (QT_TR_NOOP("Select File to Save Audio"),(SELFILE_CB *)A_audioSave);
 	
 	}
       break;
@@ -548,14 +548,14 @@ int nw;
       break;
 
     case ACT_SaveBunchJPG:
-      GUI_FileSelWrite (_("Select JPEG Sequence to Save"), A_saveBunchJpg);      
+      GUI_FileSelWrite (QT_TR_NOOP("Select JPEG Sequence to Save"), A_saveBunchJpg);      
     	break;
     case ACT_SaveImg:
-      GUI_FileSelWrite (_("Select BMP to Save"), A_saveImg);
+      GUI_FileSelWrite (QT_TR_NOOP("Select BMP to Save"), A_saveImg);
       //GUI_FileSelWrite ("Select Jpg to save ", A_saveJpg);
       break;
     case ACT_SaveJPG :
-      GUI_FileSelWrite (_("Select JPEG to Save"), (SELFILE_CB *)A_saveJpg);
+      GUI_FileSelWrite (QT_TR_NOOP("Select JPEG to Save"), (SELFILE_CB *)A_saveJpg);
       	//GUI_FileSelWrite ("Select Jpg to save ", A_saveJpg);
       	break;
     
@@ -608,7 +608,7 @@ int nw;
       GUI_NextPrevBlackFrame(-1);
       break;
     case ACT_AllBlackFrames:    
-      GUI_FileSelWrite (_("Select File to Save"), (SELFILE_CB *)A_ListAllBlackFrames);
+      GUI_FileSelWrite (QT_TR_NOOP("Select File to Save"), (SELFILE_CB *)A_ListAllBlackFrames);
         break;                        
     
     case ACT_PreviousFrame:
@@ -652,13 +652,13 @@ int nw;
       break;
 
     case ACT_AudioSourceMP3:
-      GUI_FileSelRead (_("Select MP3 to Load"), (SELFILE_CB *)A_loadMP3);
+      GUI_FileSelRead (QT_TR_NOOP("Select MP3 to Load"), (SELFILE_CB *)A_loadMP3);
       break;
     case ACT_AudioSourceAC3:
-      GUI_FileSelRead (_("Select AC3 to Load"), (SELFILE_CB *)A_loadAC3);
+      GUI_FileSelRead (QT_TR_NOOP("Select AC3 to Load"), (SELFILE_CB *)A_loadAC3);
       break;
     case ACT_AudioSourceWAV:
-      GUI_FileSelRead (_("Select WAV to Load"),(SELFILE_CB *) A_loadWave);
+      GUI_FileSelRead (QT_TR_NOOP("Select WAV to Load"),(SELFILE_CB *) A_loadWave);
       break;
     case ACT_AudioSourceNone:
       //currentaudiostream=(AVDMGenericAudioStream *)NULL;
@@ -706,18 +706,18 @@ int nw;
 		  GUI_GoToFrame (curframe);
 		}
 	      else
-                GUI_Error_HIG (_("Out of bounds"), NULL);
+                GUI_Error_HIG (QT_TR_NOOP("Out of bounds"), NULL);
 	    }
 	}
       break;
 //----------------------test-----------------------
     case ACT_SaveAvi:
-      GUI_FileSelWrite (_("Select File to Save"),(SELFILE_CB *)A_SaveWrapper); // A_SaveAudioNVideo);
+      GUI_FileSelWrite (QT_TR_NOOP("Select File to Save"),(SELFILE_CB *)A_SaveWrapper); // A_SaveAudioNVideo);
       break;
 //---------------------------------------------------
     case ACT_Copy:
       		if( frameEnd < frameStart ){
-                  GUI_Error_HIG(_("Marker A > B"), _("Cannot copy."));
+                  GUI_Error_HIG(QT_TR_NOOP("Marker A > B"), QT_TR_NOOP("Cannot copy."));
       		}else{
     		   video_body->copyToClipBoard (frameStart,frameEnd);
       		}
@@ -729,7 +729,7 @@ int nw;
       		ReSync ();
 	  	if (!video_body->updateVideoInfo (avifileinfo))
 		{
-                  GUI_Error_HIG (_("Something bad happened (II))"), NULL);
+                  GUI_Error_HIG (QT_TR_NOOP("Something bad happened (II))"), NULL);
 		}
      		 rebuild_status_bar ();
       		UI_setMarkers (frameStart, frameEnd);
@@ -743,7 +743,7 @@ int nw;
 		break;
     case ACT_ResetSegments:
        if(avifileinfo)
-         if(GUI_Question(_("Are you sure?")))
+         if(GUI_Question(QT_TR_NOOP("Are you sure?")))
 	{
 		video_body->resetSeg();
   		video_body->getVideoInfo (avifileinfo);
@@ -798,7 +798,7 @@ int nw;
 	fps/=1000.;
 
 
-      	if (DIA_GetFloatValue (&fps, 1., 60., _("Frame Rate"),_("_Frames per second:")))
+      	if (DIA_GetFloatValue (&fps, 1., 60., QT_TR_NOOP("Frame Rate"),QT_TR_NOOP("_Frames per second:")))
 	{
 	
 	  info.fps1000 = (uint32_t) (floor (fps * 1000.+0.49));
@@ -821,8 +821,8 @@ int nw;
         }
       GUI_handleVFilter();
       if( getLastVideoFilter()->getInfo()->width % 8 ){
-        GUI_Error_HIG(_("Width is not a multiple of 8"),
-                      _("This will make trouble for AVI files."));
+        GUI_Error_HIG(QT_TR_NOOP("Width is not a multiple of 8"),
+                      QT_TR_NOOP("This will make trouble for AVI files."));
       }
       if (getPreviewMode()!=ADM_PREVIEW_NONE)
       {
@@ -832,7 +832,7 @@ int nw;
       break;
 
     case ACT_RebuildKF:
-      if (GUI_Question (_("Rebuild all Keyframes?")))
+      if (GUI_Question (QT_TR_NOOP("Rebuild all Keyframes?")))
 	{
 	  A_rebuildKeyFrame ();
 	  //GUI_Info_HIG ("Done", "Save your file and restart Avidemux.");
@@ -890,10 +890,10 @@ int A_openAvi2 (char *name, uint8_t mode)
   fd = fopen (name, "rb");
   if (!fd){
     if( errno == EACCES ){
-      GUI_Error_HIG(_("Permission error"), _("Cannot open \"%s\"."), name);
+      GUI_Error_HIG(QT_TR_NOOP("Permission error"), QT_TR_NOOP("Cannot open \"%s\"."), name);
     }
     if( errno == ENOENT ){
-      GUI_Error_HIG(_("File error"), _("\"%s\" does not exist."), name);
+      GUI_Error_HIG(QT_TR_NOOP("File error"), QT_TR_NOOP("\"%s\" does not exist."), name);
     }
     return 0;
   }
@@ -935,10 +935,10 @@ int A_openAvi2 (char *name, uint8_t mode)
 	avifileinfo = NULL;
 
 	if( fourCC::check(id,(uint8_t *)"//AD") ){
-          GUI_Error_HIG(_("Cannot open project using the video loader."),
-                        _(  "Try 'File' -> 'Load/Run Project...'"));
+          GUI_Error_HIG(QT_TR_NOOP("Cannot open project using the video loader."),
+                        QT_TR_NOOP(  "Try 'File' -> 'Load/Run Project...'"));
 	}else{
-          GUI_Error_HIG (_("Could not open the file"), NULL);
+          GUI_Error_HIG (QT_TR_NOOP("Could not open the file"), NULL);
 	}
 	return 0;
     }
@@ -973,7 +973,7 @@ int A_openAvi2 (char *name, uint8_t mode)
             {
                 if(nbAudio>1)
                 {   // Multiple track warn user
-                  GUI_Info_HIG(ADM_LOG_INFO,_("Multiple Audio Tracks"),_("The file you just loaded contains several audio tracks.\n"
+                  GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Multiple Audio Tracks"),QT_TR_NOOP("The file you just loaded contains several audio tracks.\n"
                       "Go to Audio->MainTrack to select the active one."));
                 }
             }
@@ -1036,8 +1036,8 @@ void  updateLoaded ()
       if (aviaudiostream)
 	if (!aviaudiostream->isDecompressable ())
 	  {
-            GUI_Error_HIG (_("No audio decoder found for this file"),
-                           _( "Save (A+V) will generate bad AVI. Save audio will work."));
+            GUI_Error_HIG (QT_TR_NOOP("No audio decoder found for this file"),
+                           QT_TR_NOOP( "Save (A+V) will generate bad AVI. Save audio will work."));
 	  }
 
     }
@@ -1096,7 +1096,7 @@ A_appendAvi (char *name)
   if (!video_body->addFile (name))
     {
       DIA_StopBusy ();
-      GUI_Error_HIG (_("Something failed when appending"), NULL);
+      GUI_Error_HIG (QT_TR_NOOP("Something failed when appending"), NULL);
       return 0;
     }
   DIA_StopBusy ();
@@ -1105,7 +1105,7 @@ A_appendAvi (char *name)
   video_body->dumpSeg ();
   if (!video_body->updateVideoInfo (avifileinfo))
     {
-      GUI_Error_HIG (_("Something bad happened (II)"), NULL);
+      GUI_Error_HIG (QT_TR_NOOP("Something bad happened (II)"), NULL);
       return 0;
     }
 
@@ -1169,7 +1169,7 @@ A_saveAudio (char *name)
   if (!currentaudiostream->isCompressed ())
     {
       GUI_Error_HIG
-          (_("Cannot save the audio in copy mode"), _("Select WAV PCM as the audio codec, otherwise the audio file would be raw PCM."));
+          (QT_TR_NOOP("Cannot save the audio in copy mode"), QT_TR_NOOP("Select WAV PCM as the audio codec, otherwise the audio file would be raw PCM."));
       return;
     }
 
@@ -1177,7 +1177,7 @@ A_saveAudio (char *name)
   out = fopen (name, "wb");
   if (!out) return;
   
-  work=new DIA_working(_("Saving audio"));
+  work=new DIA_working(QT_TR_NOOP("Saving audio"));
   
   uint32_t timeEnd,timeStart,sample,hold,len;
   uint64_t tgt_sample,cur_sample;
@@ -1254,7 +1254,7 @@ int A_saveJpg (char *name)
     ADMImage image(avifileinfo->width, avifileinfo->height);
     if(!GUI_getFrameContent(&image, curframe))
     {
-      GUI_Error_HIG(_("Get Frame"),_("Cannot get this frame to save"));
+      GUI_Error_HIG(QT_TR_NOOP("Get Frame"),QT_TR_NOOP("Cannot get this frame to save"));
       return 0; 
     }
     return (int) image.saveAsJpg (name);
@@ -1291,7 +1291,7 @@ void A_saveBunchJpg(char *name)
   
         if(frameStart>frameEnd)
                 {
-                  GUI_Error_HIG(_("Mark A > B"), _("Set your markers correctly."));
+                  GUI_Error_HIG(QT_TR_NOOP("Mark A > B"), QT_TR_NOOP("Set your markers correctly."));
                         return;
                 }
         // Split name into base + extension
@@ -1300,13 +1300,13 @@ void A_saveBunchJpg(char *name)
         src=new ADMImage(avifileinfo->width,avifileinfo->height);
         ADM_assert(src);
 
-        working=new DIA_working(_("Saving as set of jpegs"));
+        working=new DIA_working(QT_TR_NOOP("Saving as set of jpegs"));
         for(curImg=frameStart;curImg<=frameEnd;curImg++)
         {	
                 working->update(curImg-frameStart,frameEnd-frameStart);	
                 if (!GUI_getFrameContent (src,curImg ))
                 {
-                  GUI_Error_HIG(_("Cannot decode frame"), _("Aborting."));
+                  GUI_Error_HIG(QT_TR_NOOP("Cannot decode frame"), QT_TR_NOOP("Aborting."));
                         goto _bunch_abort;
                 }
                 if(!working->isAlive()) goto _bunch_abort;
@@ -1317,9 +1317,9 @@ void A_saveBunchJpg(char *name)
         
 _bunch_abort:
         if(success)
-            GUI_Info_HIG(ADM_LOG_INFO,_("Done"),_( "Saved %d images."), curImg-frameStart);
+            GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Done"),QT_TR_NOOP( "Saved %d images."), curImg-frameStart);
         else
-            GUI_Error_HIG(_("Error"),_( "Could not save all images."));
+            GUI_Error_HIG(QT_TR_NOOP("Error"),QT_TR_NOOP( "Could not save all images."));
         delete working	;
         delete src;
         return ;
@@ -1336,9 +1336,9 @@ void A_saveImg (char *name)
   ADMImage image(avifileinfo->width,avifileinfo->height);
   GUI_getFrameContent(&image, curframe);
   if(image.saveAsBmp(name))
-        GUI_Info_HIG (ADM_LOG_INFO,_("Done"),_( "Saved \"%s\"."), GetFileName(name));
+        GUI_Info_HIG (ADM_LOG_INFO,QT_TR_NOOP("Done"),QT_TR_NOOP( "Saved \"%s\"."), GetFileName(name));
   else
-        GUI_Error_HIG (_("BMP op failed"),_( "Saving %s as a BMP file failed."), GetFileName(name));
+        GUI_Error_HIG (QT_TR_NOOP("BMP op failed"),QT_TR_NOOP( "Saving %s as a BMP file failed."), GetFileName(name));
 }
 
 //_____________________________________________________________
@@ -1358,8 +1358,8 @@ A_loadAC3 (char *name)
 
   if (ac3->open (name) == 0)
     {
-      GUI_Error_HIG (_("Failed to open the file"), _("Not a WAV file?"));
-      printf (_("WAV open file failed..."));
+      GUI_Error_HIG (QT_TR_NOOP("Failed to open the file"), QT_TR_NOOP("Not a WAV file?"));
+      printf (QT_TR_NOOP("WAV open file failed..."));
       delete ac3;
       return 0;
     }
@@ -1424,7 +1424,7 @@ A_loadWave (char *name)
 
   if (wav->open (name) == 0)
     {
-      GUI_Error_HIG (_("Failed to open the file"), _("Not a WAV file?"));
+      GUI_Error_HIG (QT_TR_NOOP("Failed to open the file"), QT_TR_NOOP("Not a WAV file?"));
       printf ("WAV open file failed...");
       delete wav;
       return 0;
@@ -1488,21 +1488,21 @@ A_saveAudioDecodedTest (char *name)
   if (currentaudiostream->isCompressed ())
     if (!currentaudiostream->isDecompressable ())
       {
-        GUI_Error_HIG (_("Cannot decompress audio frame"), NULL);
+        GUI_Error_HIG (QT_TR_NOOP("Cannot decompress audio frame"), NULL);
 	return;
       }
 
 
   if (!(out = fopen (name, "wb")))
     {
-      GUI_Error_HIG (_("File error"), _("Cannot open \"%s\" for writing."), name);
+      GUI_Error_HIG (QT_TR_NOOP("File error"), QT_TR_NOOP("Cannot open \"%s\" for writing."), name);
       return;
     }
 
   outbuffer = (uint8_t *) ADM_alloc (2 * OUTCHUNK);	// 1Meg cache;
   if (!outbuffer)
     {
-      GUI_Error_HIG (_("Memory Error"), NULL);
+      GUI_Error_HIG (QT_TR_NOOP("Memory Error"), NULL);
       return;
     }
 
@@ -1534,7 +1534,7 @@ A_saveAudioDecodedTest (char *name)
 			return;
 		}
    
-    	DIA_working *work=new DIA_working(_("Saving audio"));
+    	DIA_working *work=new DIA_working(QT_TR_NOOP("Saving audio"));
 
 
 //
@@ -1555,7 +1555,7 @@ A_saveAudioDecodedTest (char *name)
   
   if( frameStart == frameEnd ){
      /* JSC: we will write some bytes, but nobody should expect useful data */
-    GUI_Error_HIG(_("No frames to encode"),_("Please check markers. Is \"A>\" == \">B\"?"));
+    GUI_Error_HIG(QT_TR_NOOP("No frames to encode"),QT_TR_NOOP("Please check markers. Is \"A>\" == \">B\"?"));
   }
 
   while ((sampleCurrent<sampleTarget))
@@ -1694,7 +1694,7 @@ uint8_t ADM_saveRaw (const char *name)
   fi = fopen (idx, "wt");
   if (!fd)
     return 0;
-  work=new DIA_working(_("Saving raw video stream"));
+  work=new DIA_working(QT_TR_NOOP("Saving raw video stream"));
 
   // preamble
 #if 0
@@ -1840,7 +1840,7 @@ ADMImage *aImage;
 DIA_working *work;
 
 	nb = avifileinfo->nb_frames;
-	work=new DIA_working(_("Checking video"));
+	work=new DIA_working(QT_TR_NOOP("Checking video"));
 	aImage=new ADMImage(avifileinfo->width,avifileinfo->height);
   for(uint32_t i=0;i<nb;i++)
   {
@@ -1856,11 +1856,11 @@ DIA_working *work;
   delete work;
   delete aImage;
   if(error==0)
-    GUI_Info_HIG(ADM_LOG_IMPORTANT,_("No error found"), NULL);
+    GUI_Info_HIG(ADM_LOG_IMPORTANT,QT_TR_NOOP("No error found"), NULL);
 else
 	{
 		char str[400];
-                sprintf(str,_("Errors found in %u frames"),error);
+                sprintf(str,QT_TR_NOOP("Errors found in %u frames"),error);
 		GUI_Info_HIG(ADM_LOG_IMPORTANT,str, NULL);
 
 	}
@@ -1878,7 +1878,7 @@ int A_audioSave(char *name)
 			if (!currentaudiostream->isDecompressable ())
 		  	{
 		    		GUI_Error_HIG
-                                    (_("Cannot decompress the audio stream"),_( "Switch audio codec to Copy."));
+                                    (QT_TR_NOOP("Cannot decompress the audio stream"),QT_TR_NOOP( "Switch audio codec to Copy."));
 		   		return 0;
 		  	}
 		// if we get here, either not compressed
@@ -1905,26 +1905,26 @@ uint32_t count;
       count = end - start;
      
       if( end < start ){
-        GUI_Error_HIG(_("Marker A > B"), _("Cannot delete the selection."));
+        GUI_Error_HIG(QT_TR_NOOP("Marker A > B"), QT_TR_NOOP("Cannot delete the selection."));
          return 0;
       }
       if (count >= info.nb_frames - 1)
 	{
-          GUI_Error_HIG (_("You can't remove all frames"), NULL);
+          GUI_Error_HIG (QT_TR_NOOP("You can't remove all frames"), NULL);
 	  return 0;
 	}
 
       video_body->dumpSeg ();
       if (!video_body->removeFrames (start, end))
 	{
-          GUI_Error_HIG (_("Something bad happened"), NULL);
+          GUI_Error_HIG (QT_TR_NOOP("Something bad happened"), NULL);
 	  return 0;
 	}
       video_body->dumpSeg ();
       //resync GUI and video
       if (!video_body->updateVideoInfo (avifileinfo))
 	{
-          GUI_Error_HIG (_("Something bad happened (II)"), NULL);
+          GUI_Error_HIG (QT_TR_NOOP("Something bad happened (II)"), NULL);
 	}
       
 
@@ -1986,7 +1986,7 @@ void A_audioTrack( void )
 
         if(!video_body->getAudioStreamsInfo(0,&nb, &infos))
         {
-          GUI_Error_HIG(_("Could not get tracks info"), NULL);
+          GUI_Error_HIG(QT_TR_NOOP("Could not get tracks info"), NULL);
                 return ;
         }
         newtrack=oldtrack=(uint32_t)video_body->getCurrentAudioStreamNumber(0);
@@ -1994,19 +1994,19 @@ void A_audioTrack( void )
         
         /* Build dialog factory widget */
         diaMenuEntry sourcesStream[]={
-            {AudioAvi,_("Video"),_("Take audio from video file")},
-            {AudioNone,_("None"),_("No audio")},
-            {AudioAC3,_("External AC3"),_("Take audio from external AC3 file")},
-            {AudioMP3,_("External MP3"),_("Take audio from external MP3 file")},
-            {AudioWav,_("External WAV"),_("Take audio from external WAV file")}
+            {AudioAvi,QT_TR_NOOP("Video"),QT_TR_NOOP("Take audio from video file")},
+            {AudioNone,QT_TR_NOOP("None"),QT_TR_NOOP("No audio")},
+            {AudioAC3,QT_TR_NOOP("External AC3"),QT_TR_NOOP("Take audio from external AC3 file")},
+            {AudioMP3,QT_TR_NOOP("External MP3"),QT_TR_NOOP("Take audio from external MP3 file")},
+            {AudioWav,QT_TR_NOOP("External WAV"),QT_TR_NOOP("Take audio from external WAV file")}
         };
         
         
-        diaElemMenu   sourceMenu(&nw,_("_Audio source:"),5,sourcesStream,NULL);
+        diaElemMenu   sourceMenu(&nw,QT_TR_NOOP("_Audio source:"),5,sourcesStream,NULL);
         
         
         
-        diaElemFile  sourceName(0,&newtrackname,_("_External file:"));
+        diaElemFile  sourceName(0,&newtrackname,QT_TR_NOOP("_External file:"));
         
         // Now build the list of embedded track
 #define MAX_AUDIO_TRACK 10
@@ -2021,7 +2021,7 @@ void A_audioTrack( void )
         }
          if(infos) delete [] infos;
          
-         diaElemMenuDynamic   sourceFromVideo(&newtrack,_("_Track from video:"),nb,sourceavitracks);
+         diaElemMenuDynamic   sourceFromVideo(&newtrack,QT_TR_NOOP("_Track from video:"),nb,sourceavitracks);
          diaElem *allWidgets[]={&sourceMenu,&sourceFromVideo,&sourceName};
          
          /* Link..*/
@@ -2031,13 +2031,13 @@ void A_audioTrack( void )
          sourceMenu.link(&(sourcesStream[4]),1,&sourceName);
          
          
-         if( diaFactoryRun(_("Main Audio Track"),3,allWidgets))
+         if( diaFactoryRun(QT_TR_NOOP("Main Audio Track"),3,allWidgets))
          {
            if(nw!=AudioNone && nw!=AudioAvi)
            {
               if( !ADM_fileExist(newtrackname))
               {
-                GUI_Info_HIG(ADM_LOG_INFO,_("Cannot load"),_("The selected audio file does not exist.")); 
+                GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Cannot load"),QT_TR_NOOP("The selected audio file does not exist.")); 
                 goto roger_and_out;
               }
            }
@@ -2094,16 +2094,16 @@ void A_externalAudioTrack( void )
         char  *newtrackname=ADM_strdup(secondAudioName);
 
    diaMenuEntry sourcesStream[]={
-            {AudioNone,_("None"),_("No audio")},
-            {AudioAC3,_("External AC3"),_("Take audio from external AC3 file")},
-            {AudioMP3,_("External MP3"),_("Take audio from external MP3 file")},
-            {AudioWav,_("External WAV"),_("Take audio from external WAV file")}
+            {AudioNone,QT_TR_NOOP("None"),QT_TR_NOOP("No audio")},
+            {AudioAC3,QT_TR_NOOP("External AC3"),QT_TR_NOOP("Take audio from external AC3 file")},
+            {AudioMP3,QT_TR_NOOP("External MP3"),QT_TR_NOOP("Take audio from external MP3 file")},
+            {AudioWav,QT_TR_NOOP("External WAV"),QT_TR_NOOP("Take audio from external WAV file")}
         };
         
         old=nw=secondAudioSource;
 
-        diaElemMenu     sourceMenu(&nw,_("_Audio source:"),4,sourcesStream,NULL);
-        diaElemFile     sourceName(0,&newtrackname,_("_External file:"));
+        diaElemMenu     sourceMenu(&nw,QT_TR_NOOP("_Audio source:"),4,sourcesStream,NULL);
+        diaElemFile     sourceName(0,&newtrackname,QT_TR_NOOP("_External file:"));
         diaElem *allWidgets[]={&sourceMenu,&sourceName};
 
   /* Link..*/
@@ -2112,10 +2112,10 @@ void A_externalAudioTrack( void )
          sourceMenu.link(&(sourcesStream[3]),1,&sourceName);
          sourceMenu.link(&(sourcesStream[1]),1,&sourceName);
 
-         if( !diaFactoryRun(_("Second Audio Track"),2,allWidgets)) return;
+         if( !diaFactoryRun(QT_TR_NOOP("Second Audio Track"),2,allWidgets)) return;
          if(!ADM_fileExist(newtrackname))
          {
-           GUI_Info_HIG(ADM_LOG_INFO,_("Cannot load"),_("The selected audio file does not exist."));
+           GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Cannot load"),QT_TR_NOOP("The selected audio file does not exist."));
            return;
          }
         if(secondAudioSource!=AudioNone)
@@ -2144,7 +2144,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                         if (!tmp->open (name))
                         {
                                 delete tmp;
-                                GUI_Error_HIG(_("Error loading the MP3 file"), NULL);
+                                GUI_Error_HIG(QT_TR_NOOP("Error loading the MP3 file"), NULL);
                                 
                         }
                         else
@@ -2153,7 +2153,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                                 secondAudioSource=AudioMP3;
                                 secondAudioName=ADM_strdup(name);
                                 printf ("\n MP3 loaded\n");
-                                GUI_Info_HIG(ADM_LOG_INFO,_("Second track loaded"), NULL);
+                                GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Second track loaded"), NULL);
                                 return 1;
                         }
                         }
@@ -2167,7 +2167,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                         if (!tmp->open (name))
                         {
                                 delete tmp;
-                                GUI_Error_HIG(_("Error loading the AC3 file"), NULL);
+                                GUI_Error_HIG(QT_TR_NOOP("Error loading the AC3 file"), NULL);
                         }
                         else
                         {
@@ -2175,7 +2175,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                                 secondAudioSource=AudioAC3;
                                 secondAudioName=ADM_strdup(name);
                                 printf ("\n AC3 loaded\n");
-                                GUI_Info_HIG(ADM_LOG_INFO,_("Second track loaded"), NULL);
+                                GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Second track loaded"), NULL);
                                 return 1;
                         }
                         }
@@ -2189,7 +2189,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                         if (!tmp->open (name))
                         {
                                 delete tmp;
-                                GUI_Error_HIG(_("Error loading the WAV file"), NULL);
+                                GUI_Error_HIG(QT_TR_NOOP("Error loading the WAV file"), NULL);
                         }
                         else
                         {
@@ -2197,7 +2197,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                                 secondAudioSource=AudioAC3;
                                 secondAudioName=ADM_strdup(name);
                                 printf ("\n AC3 loaded\n");
-                                GUI_Info_HIG(ADM_LOG_INFO,_("Second track loaded"), NULL);
+                                GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Second track loaded"), NULL);
                                 return 1;
                         }}
                         break;
@@ -2256,7 +2256,7 @@ void A_addJob(void)
 
         if(!video_body->saveAsScript(fullname,final))
         {
-          GUI_Error_HIG(_("Saving failed"),_("Saving the job failed. Maybe you have permission issue with ~/.avidemux"));
+          GUI_Error_HIG(QT_TR_NOOP("Saving failed"),QT_TR_NOOP("Saving the job failed. Maybe you have permission issue with ~/.avidemux"));
         }
 
         delete fullname;
@@ -2268,11 +2268,11 @@ int A_SaveWrapper(char *name)
 
         if(A_Save(name))
         {
-          GUI_Info_HIG (ADM_LOG_INFO,_("Done"),_( "File %s has been successfully saved."),GetFileName(name));
+          GUI_Info_HIG (ADM_LOG_INFO,QT_TR_NOOP("Done"),QT_TR_NOOP( "File %s has been successfully saved."),GetFileName(name));
         }
         else
         {
-          GUI_Error_HIG (_("Failed"), _("File %s was NOT saved correctly."),GetFileName(name));
+          GUI_Error_HIG (QT_TR_NOOP("Failed"), QT_TR_NOOP("File %s was NOT saved correctly."),GetFileName(name));
         }
         return 1;
 }
@@ -2435,12 +2435,12 @@ void GUI_avsProxy(void)
     {
         currentaudiostream = NULL;
         avifileinfo = NULL;
-        GUI_Error_HIG (_("AvsProxy"), _("Failed to connect to avsproxy.\nIs it running ?"));
+        GUI_Error_HIG (QT_TR_NOOP("AvsProxy"), QT_TR_NOOP("Failed to connect to avsproxy.\nIs it running ?"));
         return ;
     }
 
        updateLoaded ();
-       UI_setTitle(_("avsproxy"));
+       UI_setTitle(QT_TR_NOOP("avsproxy"));
        return ;
 }
 /**
@@ -2468,10 +2468,10 @@ void GUI_showCurrentFrameHex(void)
     else sprintf(sType,"P");
  sprintf(sSize,"%d bytes",fullLen);
  
- diaElemReadOnlyText Type(sType,_("Frame type:"));
- diaElemReadOnlyText Size(sSize,_("Frame size:"));
+ diaElemReadOnlyText Type(sType,QT_TR_NOOP("Frame type:"));
+ diaElemReadOnlyText Size(sSize,QT_TR_NOOP("Frame size:"));
  diaElem *elems[]={&Type,&Size,&binhex   };
- if(diaFactoryRun(_("Frame Hex Dump"),3,elems))
+ if(diaFactoryRun(QT_TR_NOOP("Frame Hex Dump"),3,elems))
  
  delete [] buffer;
 }

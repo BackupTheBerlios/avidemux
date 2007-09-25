@@ -49,7 +49,7 @@ uint8_t A_autoDrive(Action action)
         //
         if(!currentaudiostream)
         {
-          GUI_Error_HIG(_("No audio track"),_( "An audio track is necessary to create such file"));
+          GUI_Error_HIG(QT_TR_NOOP("No audio track"),QT_TR_NOOP( "An audio track is necessary to create such file"));
                 return 0;
         }
 
@@ -75,8 +75,8 @@ uint8_t A_autoDrive(Action action)
         					// set fq
         					
 #else
-        					 GUI_Error_HIG(_("Codec Error"),
-        					        _( "You don't have LAME!.\nIt is needed to create FLV  video."));
+        					 GUI_Error_HIG(QT_TR_NOOP("Codec Error"),
+        					        QT_TR_NOOP( "You don't have LAME!.\nIt is needed to create FLV  video."));
 #endif
         					 if(fq==44100 || fq==22050 || fq==11025)
         					         						{}
@@ -90,7 +90,7 @@ uint8_t A_autoDrive(Action action)
         			// Now video
         			 if(!videoCodecSelectByName("FLV1")) 
                     {
-                      GUI_Error_HIG(_("Codec Error"),_( "Cannot select FLV1  codec."));
+                      GUI_Error_HIG(QT_TR_NOOP("Codec Error"),QT_TR_NOOP( "Cannot select FLV1  codec."));
                         return 0;
                     }
         			break;
@@ -117,7 +117,7 @@ uint8_t A_autoDrive(Action action)
                             if(!videoCodecSelectByName("FFMpeg4"))            
 #endif
                             {
-                              GUI_Error_HIG(_("Codec Error"),_( "Cannot select mpeg4 sp codec."));
+                              GUI_Error_HIG(QT_TR_NOOP("Codec Error"),QT_TR_NOOP( "Cannot select mpeg4 sp codec."));
                                 return 0;
                             }
                             // Set mode & bitrate 
@@ -151,8 +151,8 @@ uint8_t A_autoDrive(Action action)
 #ifdef USE_FAAC
                           audioCodecSetcodec(AUDIOENC_FAAC);
 #else
-                          GUI_Error_HIG(_("Codec Error"),
-                                        _( "You don't have FAAC!.\nIt is needed to create PSP compatible video."));
+                          GUI_Error_HIG(QT_TR_NOOP("Codec Error"),
+                                        QT_TR_NOOP( "You don't have FAAC!.\nIt is needed to create PSP compatible video."));
 #endif
                                     // ? Needed ?
                           if(currentaudiostream->getInfo()->frequency!=fq)

@@ -415,7 +415,7 @@ typedef union JSTempValueUnion {
  * JS_PUSH_TEMP_ROOT_OBJECT and JS_PUSH_TEMP_ROOT_STRING are type-safe
  * alternatives to JS_PUSH_TEMP_ROOT_GCTHING for JSObject and JSString. They
  * also provide a simple way to get a single pointer to rooted JSObject or
- * JSString via JS_PUSH_TEMP_ROOT_(OBJECT|STRTING)(cx, NULL, &tvr). Then
+ * JSString via JS_PUSH_TEMP_ROOTQT_TR_NOOP(OBJECT|STRTING)(cx, NULL, &tvr). Then
  * &tvr.u.object or tvr.u.string gives the necessary pointer, which puns
  * tvr.u.value safely because JSObject * and JSString * are GC-things and, as
  * such, their tag bits are all zeroes.

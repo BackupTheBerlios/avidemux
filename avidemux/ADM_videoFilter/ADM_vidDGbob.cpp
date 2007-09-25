@@ -78,19 +78,19 @@ uint8_t DGbob::configure(AVDMGenericVideoStream *in)
         _in=in;
 #define PX(x) &(_param->x)
   
-     diaMenuEntry menuField[2]={{0,_("Top"),NULL},
-                             {1,_("Bottom"),NULL}
+     diaMenuEntry menuField[2]={{0,QT_TR_NOOP("Top"),NULL},
+                             {1,QT_TR_NOOP("Bottom"),NULL}
                           };
   
-     diaMenuEntry menuMode[3]={{0,_("Keep nb of frames and fps"),NULL},
-                            {1,_("Double nb of frames and fps"),NULL},
-                            {2,_("Double nb of frames (slow motion)"),NULL}
+     diaMenuEntry menuMode[3]={{0,QT_TR_NOOP("Keep nb of frames and fps"),NULL},
+                            {1,QT_TR_NOOP("Double nb of frames and fps"),NULL},
+                            {2,QT_TR_NOOP("Double nb of frames (slow motion)"),NULL}
                           };
                           
-    diaElemMenu     menu1(PX(order),_("_Field order:"), 2,menuField);
-    diaElemMenu     menu2(PX(mode),_("_Mode:"), 3,menuMode);
-    diaElemUInteger threshold(PX(thresh),_("_Threshold:"),0,255);
-    diaElemToggle  extra(PX(ap),_("_Extra"),_("Extra check, avoid using it"));
+    diaElemMenu     menu1(PX(order),QT_TR_NOOP("_Field order:"), 2,menuField);
+    diaElemMenu     menu2(PX(mode),QT_TR_NOOP("_Mode:"), 3,menuMode);
+    diaElemUInteger threshold(PX(thresh),QT_TR_NOOP("_Threshold:"),0,255);
+    diaElemToggle  extra(PX(ap),QT_TR_NOOP("_Extra"),QT_TR_NOOP("Extra check, avoid using it"));
     
       diaElem *elems[4]={&menu1,&menu2,&threshold ,&extra};
    if(diaFactoryRun("DGBob",4,elems))

@@ -134,7 +134,7 @@ create_dialog1 (void)
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Chroma Noise Reduction 2"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Chroma Noise Reduction 2"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -159,7 +159,7 @@ create_dialog1 (void)
   gtk_container_add (GTK_CONTAINER (alignment3), hscale1);
   gtk_scale_set_digits (GTK_SCALE (hscale1), 2);
 
-  label9 = gtk_label_new (_("<b>Scene change Treshold</b>"));
+  label9 = gtk_label_new (QT_TR_NOOP("<b>Scene change Treshold</b>"));
   gtk_widget_show (label9);
   gtk_frame_set_label_widget (GTK_FRAME (frame3), label9);
   gtk_label_set_use_markup (GTK_LABEL (label9), TRUE);
@@ -178,7 +178,7 @@ create_dialog1 (void)
   gtk_widget_show (table1);
   gtk_container_add (GTK_CONTAINER (alignment1), table1);
 
-  label3 = gtk_label_new (_("Sensibility"));
+  label3 = gtk_label_new (QT_TR_NOOP("Sensibility"));
   gtk_widget_show (label3);
   gtk_table_attach (GTK_TABLE (table1), label3, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -186,7 +186,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_CENTER);
   gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
 
-  label4 = gtk_label_new (_("Max"));
+  label4 = gtk_label_new (QT_TR_NOOP("Max"));
   gtk_widget_show (label4);
   gtk_table_attach (GTK_TABLE (table1), label4, 2, 3, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -201,21 +201,21 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
 
-  label5 = gtk_label_new (_("Luma :"));
+  label5 = gtk_label_new (QT_TR_NOOP("Luma :"));
   gtk_widget_show (label5);
   gtk_table_attach (GTK_TABLE (table1), label5, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
 
-  label6 = gtk_label_new (_("Chroma U :"));
+  label6 = gtk_label_new (QT_TR_NOOP("Chroma U :"));
   gtk_widget_show (label6);
   gtk_table_attach (GTK_TABLE (table1), label6, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
 
-  label7 = gtk_label_new (_("Chroma V :"));
+  label7 = gtk_label_new (QT_TR_NOOP("Chroma V :"));
   gtk_widget_show (label7);
   gtk_table_attach (GTK_TABLE (table1), label7, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
@@ -258,7 +258,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  label10 = gtk_label_new (_("Narrow"));
+  label10 = gtk_label_new (QT_TR_NOOP("Narrow"));
   gtk_widget_show (label10);
   gtk_table_attach (GTK_TABLE (table1), label10, 3, 4, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -283,7 +283,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  label1 = gtk_label_new (_("<b>Settings</b>"));
+  label1 = gtk_label_new (QT_TR_NOOP("<b>Settings</b>"));
   gtk_widget_show (label1);
   gtk_frame_set_label_widget (GTK_FRAME (frame1), label1);
   gtk_label_set_use_markup (GTK_LABEL (label1), TRUE);
@@ -302,11 +302,11 @@ create_dialog1 (void)
   gtk_widget_show (vbox2);
   gtk_container_add (GTK_CONTAINER (alignment2), vbox2);
 
-  checkbuttonChroma = gtk_check_button_new_with_mnemonic (_("Use also chroma to detect scene change"));
+  checkbuttonChroma = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("Use also chroma to detect scene change"));
   gtk_widget_show (checkbuttonChroma);
   gtk_box_pack_start (GTK_BOX (vbox2), checkbuttonChroma, FALSE, FALSE, 0);
 
-  label8 = gtk_label_new (_("<b>Mode</b>"));
+  label8 = gtk_label_new (QT_TR_NOOP("<b>Mode</b>"));
   gtk_widget_show (label8);
   gtk_frame_set_label_widget (GTK_FRAME (frame2), label8);
   gtk_label_set_use_markup (GTK_LABEL (label8), TRUE);

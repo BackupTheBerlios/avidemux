@@ -101,7 +101,7 @@ GtkWidget *create_dialog1 (void)
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Video encoder"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Video encoder"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -115,7 +115,7 @@ GtkWidget *create_dialog1 (void)
   gtk_widget_show (combobox1);
   gtk_box_pack_start (GTK_BOX (hbox1), combobox1, TRUE, TRUE, 0);
 
-  buttonConf = gtk_button_new_with_mnemonic (_("Configure"));
+  buttonConf = gtk_button_new_with_mnemonic (QT_TR_NOOP("Configure"));
   gtk_widget_show (buttonConf);
   gtk_box_pack_start (GTK_BOX (hbox1), buttonConf, FALSE, FALSE, 0);
 

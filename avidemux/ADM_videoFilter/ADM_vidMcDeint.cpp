@@ -101,18 +101,18 @@ static char buf[50];
 uint8_t AVDMVideoMCDeint::configure(AVDMGenericVideoStream * instream)
 {
   
-   diaMenuEntry menuMode[4]={{0,_("Fast"),NULL},
-                             {1,_("Medium"),NULL},
-                             {2,_("Slow iterative motion search"),NULL},
-                             {3,_("Extra slow (same as 3+multiple reference frames)"),NULL}
+   diaMenuEntry menuMode[4]={{0,QT_TR_NOOP("Fast"),NULL},
+                             {1,QT_TR_NOOP("Medium"),NULL},
+                             {2,QT_TR_NOOP("Slow iterative motion search"),NULL},
+                             {3,QT_TR_NOOP("Extra slow (same as 3+multiple reference frames)"),NULL}
                           };
-   diaMenuEntry menuField[2]={{0,_("Top"),NULL},
-                             {1,_("Bottom"),NULL}
+   diaMenuEntry menuField[2]={{0,QT_TR_NOOP("Top"),NULL},
+                             {1,QT_TR_NOOP("Bottom"),NULL}
                           };
   
-    diaElemMenu     menu1(&(_param->mode),_("_Mode:"), 4,menuMode);
-    diaElemMenu     menu2(&(_param->initial_parity),_("_Field dominance:"), 2,menuField);
-    diaElemUInteger qp(&(_param->qp),_("_Qp:"),1,60);
+    diaElemMenu     menu1(&(_param->mode),QT_TR_NOOP("_Mode:"), 4,menuMode);
+    diaElemMenu     menu2(&(_param->initial_parity),QT_TR_NOOP("_Field dominance:"), 2,menuField);
+    diaElemUInteger qp(&(_param->qp),QT_TR_NOOP("_Qp:"),1,60);
     
     diaElem *elems[3]={&menu1,&menu2,&qp};
   

@@ -68,7 +68,7 @@ uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in)
 
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
-        gtk_window_set_title (GTK_WINDOW (dialog), _("ASHARP"));
+        gtk_window_set_title (GTK_WINDOW (dialog), QT_TR_NOOP("ASHARP"));
         gtk_widget_show(dialog);
 
         gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
@@ -180,7 +180,7 @@ create_dialog1 (void)
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("ASharp by MarcFD"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("ASharp by MarcFD"));
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -193,7 +193,7 @@ create_dialog1 (void)
   gtk_widget_show (table1);
   gtk_box_pack_start (GTK_BOX (vbox1), table1, TRUE, TRUE, 0);
 
-  label1 = gtk_label_new (_("Threshold :"));
+  label1 = gtk_label_new (QT_TR_NOOP("Threshold :"));
   gtk_widget_show (label1);
   gtk_table_attach (GTK_TABLE (table1), label1, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -201,7 +201,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label1), 0, 0.5);
 
-  label2 = gtk_label_new (_("Strength :"));
+  label2 = gtk_label_new (QT_TR_NOOP("Strength :"));
   gtk_widget_show (label2);
   gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -209,7 +209,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
 
-  label3 = gtk_label_new (_("Block Adaptative :"));
+  label3 = gtk_label_new (QT_TR_NOOP("Block Adaptative :"));
   gtk_widget_show (label3);
   gtk_table_attach (GTK_TABLE (table1), label3, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -217,7 +217,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
 
-  label4 = gtk_label_new (_("Unknown flag :"));
+  label4 = gtk_label_new (QT_TR_NOOP("Unknown flag :"));
   gtk_widget_show (label4);
   gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
@@ -249,7 +249,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonB), TRUE);
 
-  checkbuttonBF = gtk_check_button_new_with_mnemonic (_(" "));
+  checkbuttonBF = gtk_check_button_new_with_mnemonic (QT_TR_NOOP(" "));
   gtk_widget_show (checkbuttonBF);
   gtk_table_attach (GTK_TABLE (table1), checkbuttonBF, 1, 2, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),

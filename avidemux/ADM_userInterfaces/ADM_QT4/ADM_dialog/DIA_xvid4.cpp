@@ -54,30 +54,30 @@ int code;
         diaElemTabs tabMain("Main",6,main);
          /* Tab 2 motion */
          diaMenuEntry motionMenu[] = {
-                             {0,       _("None"),NULL}
-                            ,{1,      _("Very Low"),NULL}
-                            ,{2,      _("Low"),NULL}
-                            ,{3,      _("Medium"),NULL}
-                            ,{4,      _("High"),NULL}
-                            ,{5,      _("Very High"),NULL}
-                            ,{6,      _("Ultra High"),NULL}};
-        diaElemMenu motion(PX(guiLevel),_("Motion Search Precision"),7,motionMenu);
+                             {0,       QT_TR_NOOP("None"),NULL}
+                            ,{1,      QT_TR_NOOP("Very Low"),NULL}
+                            ,{2,      QT_TR_NOOP("Low"),NULL}
+                            ,{3,      QT_TR_NOOP("Medium"),NULL}
+                            ,{4,      QT_TR_NOOP("High"),NULL}
+                            ,{5,      QT_TR_NOOP("Very High"),NULL}
+                            ,{6,      QT_TR_NOOP("Ultra High"),NULL}};
+        diaElemMenu motion(PX(guiLevel),QT_TR_NOOP("Motion Search Precision"),7,motionMenu);
         
          diaMenuEntry vhqMenu[] = {
-                             {0,       _("Off"),NULL}
-                            ,{1,      _("Mode Decision"),NULL}
-                            ,{2,      _("Limited Search"),NULL}
-                            ,{3,      _("Medium Search"),NULL}
-                            ,{4,      _("Wide Search"),NULL} };
-         diaElemMenu vhq(PX(vhqmode),_("VHQ Mode"),5,vhqMenu);
+                             {0,       QT_TR_NOOP("Off"),NULL}
+                            ,{1,      QT_TR_NOOP("Mode Decision"),NULL}
+                            ,{2,      QT_TR_NOOP("Limited Search"),NULL}
+                            ,{3,      QT_TR_NOOP("Medium Search"),NULL}
+                            ,{4,      QT_TR_NOOP("Wide Search"),NULL} };
+         diaElemMenu vhq(PX(vhqmode),QT_TR_NOOP("VHQ Mode"),5,vhqMenu);
         
         
         /* Tab2-ASP */
-          diaElemUInteger  bframe(PX(bframes),_("Max B Frames"),0,3);
-          diaElemToggle    qpel(PX(qpel),_("Quarter Pixel"));
-          diaElemToggle    gmc(PX(gmc),_("GMC"));
-          diaElemToggle    bvhq(PX(bvhq),_("BVHQ"));
-          diaElemFrame  frameASP(_("Advanced Simple Profile"));
+          diaElemUInteger  bframe(PX(bframes),QT_TR_NOOP("Max B Frames"),0,3);
+          diaElemToggle    qpel(PX(qpel),QT_TR_NOOP("Quarter Pixel"));
+          diaElemToggle    gmc(PX(gmc),QT_TR_NOOP("GMC"));
+          diaElemToggle    bvhq(PX(bvhq),QT_TR_NOOP("BVHQ"));
+          diaElemFrame  frameASP(QT_TR_NOOP("Advanced Simple Profile"));
           frameASP.swallow(&bframe);
           frameASP.swallow(&qpel);
           frameASP.swallow(&gmc);
@@ -85,17 +85,17 @@ int code;
         
          
           /* Tab 2 motion extra */
-            diaElemToggle    inter4mv(PX(inter4mv),_("4MV"));
-            diaElemToggle    chroma_me(PX(chroma_me),_("Chroma ME"));
-            diaElemToggle    hqac(PX(chroma_me),_("HQ AC"));
-          diaElemFrame  frameMore(_("More Search"));
+            diaElemToggle    inter4mv(PX(inter4mv),QT_TR_NOOP("4MV"));
+            diaElemToggle    chroma_me(PX(chroma_me),QT_TR_NOOP("Chroma ME"));
+            diaElemToggle    hqac(PX(chroma_me),QT_TR_NOOP("HQ AC"));
+          diaElemFrame  frameMore(QT_TR_NOOP("More Search"));
           frameMore.swallow(&inter4mv);
           frameMore.swallow(&chroma_me);
           frameMore.swallow(&hqac);
           /* Tab 2 gop size */
-          diaElemUInteger  min_key_interval(PX(min_key_interval),_("Min Gop Size"),1,900);
-          diaElemUInteger  max_key_interval(PX(max_key_interval),_("Max Gop Size"),1,900);
-            diaElemFrame  frameGop(_("GOP Size"));
+          diaElemUInteger  min_key_interval(PX(min_key_interval),QT_TR_NOOP("Min Gop Size"),1,900);
+          diaElemUInteger  max_key_interval(PX(max_key_interval),QT_TR_NOOP("Max Gop Size"),1,900);
+            diaElemFrame  frameGop(QT_TR_NOOP("GOP Size"));
               frameGop.swallow(&min_key_interval);
               frameGop.swallow(&max_key_interval);
             
@@ -103,18 +103,18 @@ int code;
           diaElemTabs tabMotion("Motion",5,motions);
         /* Tab 3 Qz*/
           diaMenuEntry qzMenu[] = {
-                             {0,       _("H263"),NULL}
-                            ,{1,      _("Mpeg"),NULL}}                            ;
-           diaElemMenu h263(PX(mpegQuantizer),_("Quantization Matrix"),2,qzMenu);
-           diaElemToggle    trellis(PX(trellis),_("Trellis Quantization"));
+                             {0,       QT_TR_NOOP("H263"),NULL}
+                            ,{1,      QT_TR_NOOP("Mpeg"),NULL}}                            ;
+           diaElemMenu h263(PX(mpegQuantizer),QT_TR_NOOP("Quantization Matrix"),2,qzMenu);
+           diaElemToggle    trellis(PX(trellis),QT_TR_NOOP("Trellis Quantization"));
            
            
           diaElem *qz[]={&h263,&trellis};
-          diaElemTabs tabQz(_("Quantization"),2,qz);
+          diaElemTabs tabQz(QT_TR_NOOP("Quantization"),2,qz);
           
           /* Tab 4 : 2nd pass */
-#define MKENTRY(y,x) diaElemUInteger  x(PX(x),_(#y),0,100);frameOne.swallow(&x);
-        diaElemFrame  frameOne(_("Two Pass Tuning")); 
+#define MKENTRY(y,x) diaElemUInteger  x(PX(x),QT_TR_NOOP(#y),0,100);frameOne.swallow(&x);
+        diaElemFrame  frameOne(QT_TR_NOOP("Two Pass Tuning")); 
          
         MKENTRY(Key Frame Boost(%),	keyframe_boost		);
         
@@ -124,8 +124,8 @@ int code;
         MKENTRY(Max Overglow Degradation(%),	max_overflow_degradation	);
 
 #undef MKENTRY
-#define MKENTRY(y,x) diaElemUInteger  x(PX(x),_(#y),0,100);frameTwo.swallow(&x);
-        diaElemFrame  frameTwo(_("Curve Compression"));  
+#define MKENTRY(y,x) diaElemUInteger  x(PX(x),QT_TR_NOOP(#y),0,100);frameTwo.swallow(&x);
+        diaElemFrame  frameTwo(QT_TR_NOOP("Curve Compression"));  
 
         MKENTRY(High Bitrate Scenes (%),curve_compression_high	);
         MKENTRY(Low Bitrate Scenes (%),curve_compression_low	);
@@ -139,7 +139,7 @@ int code;
           
           /* End of tabs */
         diaElemTabs *tabs[4]={&tabMain,&tabMotion,&tabQz,&tabPass};
-        if( diaFactoryRunTabs(_("Xvid4 Configuration"),4,tabs))
+        if( diaFactoryRunTabs(QT_TR_NOOP("Xvid4 Configuration"),4,tabs))
 	{
            memcpy(incoming->extraSettings,&localParam,sizeof(localParam));
            return 1;

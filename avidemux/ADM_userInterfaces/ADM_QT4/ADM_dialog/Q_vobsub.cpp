@@ -120,7 +120,7 @@ void Ui_vobsubWindow::idxSel(bool i)
 {
 	char fileIdx[1024];
 	
-	if(FileSel_SelectRead(_("Select Idx File"),fileIdx,1023, NULL) && ADM_fileExist(fileIdx))
+	if(FileSel_SelectRead(QT_TR_NOOP("Select Idx File"),fileIdx,1023, NULL) && ADM_fileExist(fileIdx))
 	{
 		// Set entry
 		ui.lineEditIdx->setText(fileIdx);

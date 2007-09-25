@@ -100,7 +100,7 @@ DIR *dir=NULL;
 			last=selected_filename[strlen(selected_filename) - 1]; 
 			 if (last == '/' || last =='\\' )
 			 {
-                           GUI_Error_HIG(_("Cannot open directory as a file"), NULL);
+                           GUI_Error_HIG(QT_TR_NOOP("Cannot open directory as a file"), NULL);
 						return 0;
 			}
 			else
@@ -201,7 +201,7 @@ DIR *dir=NULL;
 			last=selected_filename[strlen(selected_filename) - 1]; 
 			 if (last == '/' || last =='\\' )
 			 {
-                           GUI_Error_HIG(_("Cannot open directory as a file"), NULL);
+                           GUI_Error_HIG(QT_TR_NOOP("Cannot open directory as a file"), NULL);
 						return 0;
 			}
 			else
@@ -325,7 +325,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 				// try to open it..
 				if(!fd)
 				{
-                                  GUI_Error_HIG(_("File error"), _("Cannot open \"%s\"."), name);
+                                  GUI_Error_HIG(QT_TR_NOOP("File error"), QT_TR_NOOP("Cannot open \"%s\"."), name);
 					return;
 				}
 			}
@@ -335,7 +335,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 				  struct stat buf;
 				  int fdino;
 					fclose(fd);
-                                        if(!GUI_Question(_("Overwrite file ?")))
+                                        if(!GUI_Question(QT_TR_NOOP("Overwrite file ?")))
 						return;
 	                                /*
 	                                ** JSC Fri Feb 10 00:07:30 CET 2006
@@ -360,7 +360,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 							  char str[512];
 								snprintf(str,512,"File \"%s\" exists and is opened by avidemux",name);
 								GUI_Error_HIG(str,
-                                                                    _("It could be possible that you try to overwrite an input file!"));
+                                                                    QT_TR_NOOP("It could be possible that you try to overwrite an input file!"));
 								return;
 							}
 						}
@@ -374,7 +374,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 							if( buf.st_ino == fdino ){
 							  char str[512];
 								snprintf(str,512,"File \"%s\" exists and is the actual ECMAscript file",name);
-                                                                GUI_Error_HIG(str,_("It could be possible that you try to overwrite an input file!"));
+                                                                GUI_Error_HIG(str,QT_TR_NOOP("It could be possible that you try to overwrite an input file!"));
 								return;
 							}
 						}
@@ -385,7 +385,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 				fd=fopen(name,"wb");
 				if(!fd)
 				{
-                                  GUI_Error_HIG(_("Cannot write the file"),_( "No write access to \"%s\"."), name);
+                                  GUI_Error_HIG(QT_TR_NOOP("Cannot write the file"),QT_TR_NOOP( "No write access to \"%s\"."), name);
 					return;
 				}
 			}
@@ -464,7 +464,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 #else			
                         if (*(selected_filename + strlen(selected_filename) - 1) == '/'){
 #endif	 
-                        GUI_Error_HIG(_("Cannot open directory as a file"), NULL);
+                        GUI_Error_HIG(QT_TR_NOOP("Cannot open directory as a file"), NULL);
                 }
                 else
                 {
@@ -519,7 +519,7 @@ uint8_t         initFileSelector(void)
 
        
         filter_image=gtk_file_filter_new();
-        gtk_file_filter_set_name(filter_image,_("Images"));
+        gtk_file_filter_set_name(filter_image,QT_TR_NOOP("Images"));
         ADD_PAT(filter_image,png);
         ADD_PAT(filter_image,bmp);
         ADD_PAT(filter_image,jpg);
@@ -531,7 +531,7 @@ uint8_t         initFileSelector(void)
 
         
         filter_all=gtk_file_filter_new();
-        gtk_file_filter_set_name(filter_all,_("All"));
+        gtk_file_filter_set_name(filter_all,QT_TR_NOOP("All"));
         gtk_file_filter_add_pattern (filter_all, "*");
 
         return 1;

@@ -309,7 +309,7 @@ create_dialog1 (void)
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Resize"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Resize"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -323,14 +323,14 @@ create_dialog1 (void)
   gtk_widget_show (table2);
   gtk_box_pack_start (GTK_BOX (vbox1), table2, FALSE, FALSE, 0);
 
-  label1 = gtk_label_new (_(" Width "));
+  label1 = gtk_label_new (QT_TR_NOOP(" Width "));
   gtk_widget_show (label1);
   gtk_table_attach (GTK_TABLE (table2), label1, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label1), 0, 0.5);
 
-  label2 = gtk_label_new (_(" Height "));
+  label2 = gtk_label_new (QT_TR_NOOP(" Height "));
   gtk_widget_show (label2);
   gtk_table_attach (GTK_TABLE (table2), label2, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -353,13 +353,13 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton_height), TRUE);
 
-  label5 = gtk_label_new (_("Source :"));
+  label5 = gtk_label_new (QT_TR_NOOP("Source :"));
   gtk_widget_show (label5);
   gtk_table_attach (GTK_TABLE (table2), label5, 2, 3, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  label6 = gtk_label_new (_("Destination"));
+  label6 = gtk_label_new (QT_TR_NOOP("Destination"));
   gtk_widget_show (label6);
   gtk_table_attach (GTK_TABLE (table2), label6, 2, 3, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -373,15 +373,15 @@ create_dialog1 (void)
 
   menu1 = gtk_menu_new ();
 
-  item1_1 = gtk_menu_item_new_with_mnemonic (_("1:1"));
+  item1_1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("1:1"));
   gtk_widget_show (item1_1);
   gtk_container_add (GTK_CONTAINER (menu1), item1_1);
 
-  _4_1 = gtk_menu_item_new_with_mnemonic (_("4:3"));
+  _4_1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("4:3"));
   gtk_widget_show (_4_1);
   gtk_container_add (GTK_CONTAINER (menu1), _4_1);
 
-  _16_1 = gtk_menu_item_new_with_mnemonic (_("16:9"));
+  _16_1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("16:9"));
   gtk_widget_show (_16_1);
   gtk_container_add (GTK_CONTAINER (menu1), _16_1);
 
@@ -395,49 +395,49 @@ create_dialog1 (void)
 
   menu2 = gtk_menu_new ();
 
-  menuitem1 = gtk_menu_item_new_with_mnemonic (_("1:1"));
+  menuitem1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("1:1"));
   gtk_widget_show (menuitem1);
   gtk_container_add (GTK_CONTAINER (menu2), menuitem1);
 
-  menuitem2 = gtk_menu_item_new_with_mnemonic (_("4:3"));
+  menuitem2 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("4:3"));
   gtk_widget_show (menuitem2);
   gtk_container_add (GTK_CONTAINER (menu2), menuitem2);
 
-  menuitem3 = gtk_menu_item_new_with_mnemonic (_("16:9"));
+  menuitem3 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("16:9"));
   gtk_widget_show (menuitem3);
   gtk_container_add (GTK_CONTAINER (menu2), menuitem3);
 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu_dest), menu2);
 
-  label3 = gtk_label_new (_(" Error X:"));
+  label3 = gtk_label_new (QT_TR_NOOP(" Error X:"));
   gtk_widget_show (label3);
   gtk_table_attach (GTK_TABLE (table2), label3, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
 
-  label_errorx = gtk_label_new (_("0"));
+  label_errorx = gtk_label_new (QT_TR_NOOP("0"));
   gtk_widget_show (label_errorx);
   gtk_table_attach (GTK_TABLE (table2), label_errorx, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_errorx), 0, 0.5);
 
-  label7 = gtk_label_new (_(" Error Y:"));
+  label7 = gtk_label_new (QT_TR_NOOP(" Error Y:"));
   gtk_widget_show (label7);
   gtk_table_attach (GTK_TABLE (table2), label7, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label7), 0, 0.5);
 
-  label_errory = gtk_label_new (_("0"));
+  label_errory = gtk_label_new (QT_TR_NOOP("0"));
   gtk_widget_show (label_errory);
   gtk_table_attach (GTK_TABLE (table2), label_errory, 1, 2, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_errory), 0, 0.5);
 
-  checkbutton_16 = gtk_check_button_new_with_mnemonic (_("16 round up"));
+  checkbutton_16 = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("16 round up"));
   gtk_widget_show (checkbutton_16);
   gtk_table_attach (GTK_TABLE (table2), checkbutton_16, 3, 4, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -451,15 +451,15 @@ create_dialog1 (void)
 
   menu3 = gtk_menu_new ();
 
-  bilinear1 = gtk_menu_item_new_with_mnemonic (_("Bilinear"));
+  bilinear1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Bilinear"));
   gtk_widget_show (bilinear1);
   gtk_container_add (GTK_CONTAINER (menu3), bilinear1);
 
-  bicubic1 = gtk_menu_item_new_with_mnemonic (_("Bicubic"));
+  bicubic1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Bicubic"));
   gtk_widget_show (bicubic1);
   gtk_container_add (GTK_CONTAINER (menu3), bicubic1);
 
-  lanczos1 = gtk_menu_item_new_with_mnemonic (_("Lanczos3"));
+  lanczos1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Lanczos3"));
   gtk_widget_show (lanczos1);
   gtk_container_add (GTK_CONTAINER (menu3), lanczos1);
 

@@ -39,31 +39,31 @@ Mpeg2encParam *conf=(Mpeg2encParam *)incoming->extraSettings;
 ADM_assert(incoming->extraSettingsLen==sizeof(Mpeg2encParam));
 
 diaMenuEntry wideM[]={
-  {0,_("4:3")},
-  {1,_("16:9")}};
+  {0,QT_TR_NOOP("4:3")},
+  {1,QT_TR_NOOP("16:9")}};
 diaMenuEntry matrixM[]={
-  {0,_("Default")},
-  {1,_("TMPGEnc")},
-  {2,_("Anime")},
-  {3,_("KVCD")}
+  {0,QT_TR_NOOP("Default")},
+  {1,QT_TR_NOOP("TMPGEnc")},
+  {2,QT_TR_NOOP("Anime")},
+  {3,QT_TR_NOOP("KVCD")}
 };
 diaMenuEntry interM[]={
-  {0,_("Progressive")},
-  {1,_("Interlaced TFF")},
-  {2,_("Interlaced BFF")}
+  {0,QT_TR_NOOP("Progressive")},
+  {1,QT_TR_NOOP("Interlaced TFF")},
+  {2,QT_TR_NOOP("Interlaced BFF")}
 };
                       
          diaElemBitrate bitrate(incoming,NULL);
-         diaElemMenu      widescreen(&(conf->widescreen),_("Aspect _ratio:"),2,wideM);
-         diaElemMenu      matrix(&(conf->user_matrix),_("_Matrices:"),4,matrixM);
-         diaElemUInteger gop(&(conf->gop_size),_("_GOP size:"),1,30);
-         diaElemUInteger maxb(&(conf->maxBitrate),_("Ma_x. bitrate:"),100,9000);
+         diaElemMenu      widescreen(&(conf->widescreen),QT_TR_NOOP("Aspect _ratio:"),2,wideM);
+         diaElemMenu      matrix(&(conf->user_matrix),QT_TR_NOOP("_Matrices:"),4,matrixM);
+         diaElemUInteger gop(&(conf->gop_size),QT_TR_NOOP("_GOP size:"),1,30);
+         diaElemUInteger maxb(&(conf->maxBitrate),QT_TR_NOOP("Ma_x. bitrate:"),100,9000);
 
 uint32_t inter;
           if(!conf->interlaced) inter=0;
             else if(conf->bff) inter=2;
                 else inter=1;
-         diaElemMenu      interW(&inter,_("_Interlacing:"),3,interM);
+         diaElemMenu      interW(&inter,QT_TR_NOOP("_Interlacing:"),3,interM);
   
       diaElem *elems[6]={&bitrate,&widescreen,&interW,&matrix,&gop,&maxb};
     

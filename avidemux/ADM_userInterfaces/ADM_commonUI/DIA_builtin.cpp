@@ -125,23 +125,23 @@ uint8_t DIA_builtin(void)
 	gettext=1;
 #endif
     
-	diaElemFrame videoFrame(_("Video Codecs"));
-	diaElemNotch tXvid4(xvid4, _("Xvid"));
-	diaElemNotch tX264(X264, _("x264"));
+	diaElemFrame videoFrame(QT_TR_NOOP("Video Codecs"));
+	diaElemNotch tXvid4(xvid4, QT_TR_NOOP("Xvid"));
+	diaElemNotch tX264(X264, QT_TR_NOOP("x264"));
 
 	videoFrame.swallow(&tXvid4);
 	videoFrame.swallow(&tX264);
 
-	diaElemFrame audioFrame(_("Audio Codecs"));	
-	diaElemNotch tAften(aften, _("Aften"));	
-	diaElemNotch tLibamrnb(libamrnb, _("amrnb"));
-    diaElemNotch tFaac(faac, _("FAAC"));
-    diaElemNotch tFaad(faad, _("FAAD2"));
-	diaElemNotch tLame(lame, _("LAME"));
-	diaElemNotch tA52dec(a52dec, _("liba52"));
-	diaElemNotch tLibdca(libdca, _("libdca"));
-	diaElemNotch tMad(mad, _("MAD"));
-	diaElemNotch tVorbis(vorbis, _("Vorbis"));
+	diaElemFrame audioFrame(QT_TR_NOOP("Audio Codecs"));	
+	diaElemNotch tAften(aften, QT_TR_NOOP("Aften"));	
+	diaElemNotch tLibamrnb(libamrnb, QT_TR_NOOP("amrnb"));
+    diaElemNotch tFaac(faac, QT_TR_NOOP("FAAC"));
+    diaElemNotch tFaad(faad, QT_TR_NOOP("FAAD2"));
+	diaElemNotch tLame(lame, QT_TR_NOOP("LAME"));
+	diaElemNotch tA52dec(a52dec, QT_TR_NOOP("liba52"));
+	diaElemNotch tLibdca(libdca, QT_TR_NOOP("libdca"));
+	diaElemNotch tMad(mad, QT_TR_NOOP("MAD"));
+	diaElemNotch tVorbis(vorbis, QT_TR_NOOP("Vorbis"));
 
 	audioFrame.swallow(&tAften);
 	audioFrame.swallow(&tLibamrnb);	
@@ -153,33 +153,33 @@ uint8_t DIA_builtin(void)
 	audioFrame.swallow(&tMad);
 	audioFrame.swallow(&tVorbis);
 
-	diaElemNotch tArts(arts, _("aRts"));
-	diaElemNotch tEsd(esd, _("ESD"));
-        diaElemNotch tFontConfig(fontconfig, _("Fontconfig"));
-	diaElemNotch tFreetype(freetype, _("FreeType 2"));
-	diaElemNotch tGettext(gettext, _("gettext"));
-        diaElemNotch tAlsa(alsa, _("ALSA"));
-	diaElemNotch tOss(oss, _("OSS"));
-	diaElemNotch tSdl(sdl, _("SDL"));
-	diaElemNotch tXvideo(xvideo, _("XVideo"));
+	diaElemNotch tArts(arts, QT_TR_NOOP("aRts"));
+	diaElemNotch tEsd(esd, QT_TR_NOOP("ESD"));
+        diaElemNotch tFontConfig(fontconfig, QT_TR_NOOP("Fontconfig"));
+	diaElemNotch tFreetype(freetype, QT_TR_NOOP("FreeType 2"));
+	diaElemNotch tGettext(gettext, QT_TR_NOOP("gettext"));
+        diaElemNotch tAlsa(alsa, QT_TR_NOOP("ALSA"));
+	diaElemNotch tOss(oss, QT_TR_NOOP("OSS"));
+	diaElemNotch tSdl(sdl, QT_TR_NOOP("SDL"));
+	diaElemNotch tXvideo(xvideo, QT_TR_NOOP("XVideo"));
 
-	diaElemNotch tAltivec(altivec, _("AltiVec"));
-	diaElemNotch tPowerPc(powerpc, _("PowerPC"));
-	diaElemNotch tX86(x86, _("x86"));
-	diaElemNotch tX86_64(x86_64, _("x86-64"));
+	diaElemNotch tAltivec(altivec, QT_TR_NOOP("AltiVec"));
+	diaElemNotch tPowerPc(powerpc, QT_TR_NOOP("PowerPC"));
+	diaElemNotch tX86(x86, QT_TR_NOOP("x86"));
+	diaElemNotch tX86_64(x86_64, QT_TR_NOOP("x86-64"));
 
 
 	diaElem *codecElems[] = {&videoFrame, &audioFrame};
 	diaElem *libsElems[] = {&tArts, &tEsd, &tFontConfig, &tFreetype, &tGettext, &tAlsa, &tOss, &tSdl, &tXvideo};
 	diaElem *CPUElems[] = {&tAltivec, &tPowerPc, &tX86, &tX86_64};
 
-	diaElemTabs tabCodec(_("Codecs"), 2, codecElems);
-	diaElemTabs tabLibs(_("Libraries"), 9, libsElems);
-	diaElemTabs tabCPU(_("CPU"), 4, CPUElems);
+	diaElemTabs tabCodec(QT_TR_NOOP("Codecs"), 2, codecElems);
+	diaElemTabs tabLibs(QT_TR_NOOP("Libraries"), 9, libsElems);
+	diaElemTabs tabCPU(QT_TR_NOOP("CPU"), 4, CPUElems);
 
 	diaElemTabs *tabs[] = {&tabCodec, &tabLibs, &tabCPU};
 
-    diaFactoryRunTabs(_("Built-in Support"), 3, tabs);
+    diaFactoryRunTabs(QT_TR_NOOP("Built-in Support"), 3, tabs);
 
     return 1;
 }

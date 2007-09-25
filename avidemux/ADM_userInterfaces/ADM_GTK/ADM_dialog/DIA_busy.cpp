@@ -117,7 +117,7 @@ create_dialog1 (void)
   GtkWidget *dialog_action_area1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Busy"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Busy"));
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);

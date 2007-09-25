@@ -120,7 +120,7 @@ GtkWidget*
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Partial"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Partial"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -134,14 +134,14 @@ GtkWidget*
   gtk_widget_show (table1);
   gtk_box_pack_start (GTK_BOX (vbox1), table1, TRUE, TRUE, 0);
 
-  label1 = gtk_label_new (_("Start frame for partial :"));
+  label1 = gtk_label_new (QT_TR_NOOP("Start frame for partial :"));
   gtk_widget_show (label1);
   gtk_table_attach (GTK_TABLE (table1), label1, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label1), 0, 0.5);
 
-  label2 = gtk_label_new (_("End frame for partial :"));
+  label2 = gtk_label_new (QT_TR_NOOP("End frame for partial :"));
   gtk_widget_show (label2);
   gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -164,7 +164,7 @@ GtkWidget*
                     (GtkAttachOptions) (0), 0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonSize), TRUE);
 
-  buttonConf = gtk_button_new_with_mnemonic (_("Configure partialized filter"));
+  buttonConf = gtk_button_new_with_mnemonic (QT_TR_NOOP("Configure partialized filter"));
   gtk_widget_show (buttonConf);
   gtk_box_pack_start (GTK_BOX (vbox1), buttonConf, FALSE, FALSE, 0);
 

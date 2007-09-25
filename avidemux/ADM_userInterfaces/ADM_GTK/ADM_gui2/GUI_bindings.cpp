@@ -392,7 +392,7 @@ uint8_t  bindGUI( void )
                 for(uint32_t i=0;i<nbVid;i++)
                 {
                         name=encoderGetIndexedName(i);
-                        gtk_combo_box_append_text      (combo_box,_(name));
+                        gtk_combo_box_append_text      (combo_box,QT_TR_NOOP(name));
                 }
 
         gtk_combo_box_set_active(combo_box,0);
@@ -408,7 +408,7 @@ uint8_t  bindGUI( void )
                 for(uint32_t i=0;i<nbAud;i++)
                 {
                         name=audioFilterGetIndexedName(i);
-                        gtk_combo_box_append_text      (combo_box,_(name));	
+                        gtk_combo_box_append_text      (combo_box,QT_TR_NOOP(name));	
                 }
         gtk_combo_box_set_active(combo_box,0);
 	on_audio_change();
@@ -421,17 +421,17 @@ uint8_t  bindGUI( void )
                 printf("Found %d Format \n",nbFormat);		       
                 for(uint32_t i=0;i<nbFormat;i++)
                 {
-                        gtk_combo_box_append_text      (combo_box,_(ADM_allOutputFormat[i].text));	
+                        gtk_combo_box_append_text      (combo_box,QT_TR_NOOP(ADM_allOutputFormat[i].text));	
                 }
         gtk_combo_box_set_active(combo_box,0);
         /* File in preview mode combobox */
             const char *previewText[]=
                 {
-                    _("Input"),
-                    _("Output"),
-                    _("Side"),
-                    _("Top"),
-                    _("Separate")
+                    QT_TR_NOOP("Input"),
+                    QT_TR_NOOP("Output"),
+                    QT_TR_NOOP("Side"),
+                    QT_TR_NOOP("Top"),
+                    QT_TR_NOOP("Separate")
                 };
 
                 combo_box=GTK_COMBO_BOX(lookup_widget(guiRootWindow,PREVIEW_WIDGET));
@@ -605,7 +605,7 @@ char	c='?';
 		default:c='?';break;
 	
 	}
-	sprintf(string,_("Frame:%c(%02d)"),c,qp);
+	sprintf(string,QT_TR_NOOP("Frame:%c(%02d)"),c,qp);
 	gtk_label_set_text( wid,string);	
 
 }

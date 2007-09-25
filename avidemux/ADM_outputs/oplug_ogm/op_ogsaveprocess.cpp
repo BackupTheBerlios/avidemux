@@ -73,7 +73,7 @@ uint32_t w,h,fps1000,fcc;
     	{
       		delete 	_encode;
       		_encode = NULL;
-                GUI_Error_HIG (_("Filter init failed"), NULL);
+                GUI_Error_HIG (QT_TR_NOOP("Filter init failed"), NULL);
       		return 0;
     	};
  	w= _incoming->getInfo ()->width;
@@ -97,7 +97,7 @@ uint32_t w,h,fps1000,fcc;
 		if((tmp=fopen(TwoPassLogFile,"rt")))
 		{
 			fclose(tmp);
-                        if(GUI_Question(_("\n Reuse the existing log-file ?")))
+                        if(GUI_Question(QT_TR_NOOP("\n Reuse the existing log-file ?")))
 			{
 				reuse=1;
 			}

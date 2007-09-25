@@ -404,15 +404,15 @@ thisIsMpeg:
 	  printf ("\n not identified ...\n");
 	}
       else
-        GUI_Error_HIG(_("File type identified but no loader support detected..."),
-                      _("May be related to an old index file."));
+        GUI_Error_HIG(QT_TR_NOOP("File type identified but no loader support detected..."),
+                      QT_TR_NOOP("May be related to an old index file."));
       return 0;
     }
 
    // check opening was successful
    if (ret == 0) {
      char str[512+1];
-     snprintf(str,512,_("Attempt to open %s failed!"), name);
+     snprintf(str,512,QT_TR_NOOP("Attempt to open %s failed!"), name);
       str[512] = '\0';
       GUI_Error_HIG(str,NULL);
       delete _videos[_nb_video]._aviheader;;
@@ -436,7 +436,7 @@ thisIsMpeg:
                  (strlen(str)?" and ":""),
                  (strlen(str)?" are ":" is ") );
          str[512] = '\0';
-         GUI_Error_HIG(str,_("You cannot mix different video dimensions yet. Using the partial video filter later, will not work around this problem. The workaround is:\n1.) \"resize\" / \"add border\" / \"crop\" each stream to the same resolution\n2.) concatinate them together"));
+         GUI_Error_HIG(str,QT_TR_NOOP("You cannot mix different video dimensions yet. Using the partial video filter later, will not work around this problem. The workaround is:\n1.) \"resize\" / \"add border\" / \"crop\" each stream to the same resolution\n2.) concatinate them together"));
          delete _videos[_nb_video]._aviheader;;
          return 0;
       }
@@ -548,7 +548,7 @@ float duration;
         {
           uint32_t autovbr=0;
           prefs->get(FEATURE_AUTO_BUILDMAP,&autovbr);
-          if(autovbr || GUI_Confirmation_HIG(_("Build Time Map"),_( "Build VBR time map?"), VBR_MSG))
+          if(autovbr || GUI_Confirmation_HIG(QT_TR_NOOP("Build Time Map"),QT_TR_NOOP( "Build VBR time map?"), VBR_MSG))
                 {
                 _videos[_nb_video]._isAudioVbr=_videos[_nb_video]._audiostream->buildAudioTimeLine ();
                 }
@@ -582,7 +582,7 @@ TryAgain:
 		}
                 if(isH264Compatible(info.fcc))
                 {
-                  if(getEnv(ENV_EDITOR_X264) || GUI_Confirmation_HIG(_("Use that mode"),_("H264 detected"),_("If the file is using bframe as reference, it can lead to crash or stutteting.\nAvidemux can use another mode which is safed but <b>YOU WILL LOOSE FRAME ACCURACY</b>.\nDo you want to use that mode ?")))
+                  if(getEnv(ENV_EDITOR_X264) || GUI_Confirmation_HIG(QT_TR_NOOP("Use that mode"),QT_TR_NOOP("H264 detected"),QT_TR_NOOP("If the file is using bframe as reference, it can lead to crash or stutteting.\nAvidemux can use another mode which is safed but <b>YOU WILL LOOSE FRAME ACCURACY</b>.\nDo you want to use that mode ?")))
                     {
                               printf("Switching to non low delay codec\n");
                               _videos[_nb_video-1].decoder = getDecoderH264noLogic (info.fcc,  info.width, info.height, l, d);
@@ -709,8 +709,8 @@ TryAgain:
                                                                   uint32_t autounpack=0;
                                                                   prefs->get(FEATURE_AUTO_UNPACK,&autounpack);
 									if( forced || autounpack || GUI_YesNo(
-                                                                                _("Packed Bitstream detected"),
-                                                                        _("Do you want me to unpack it ?")))
+                                                                                QT_TR_NOOP("Packed Bitstream detected"),
+                                                                        QT_TR_NOOP("Do you want me to unpack it ?")))
 									{
 									OpenDMLHeader *dml=NULL;
 									count++;	
@@ -730,18 +730,18 @@ TryAgain:
                                            info.width, info.height, l, d);
 										goto TryAgain;
 									}
-                                                                        GUI_Error_HIG(_("Could not unpack the video"),_( "Using backup decoder - not frame accurate."));
+                                                                        GUI_Error_HIG(QT_TR_NOOP("Could not unpack the video"),QT_TR_NOOP( "Using backup decoder - not frame accurate."));
 									}
 								}
 #if  1 //def USE_DIVX
                                                                 if(count)
-                                                                        GUI_Info_HIG(ADM_LOG_IMPORTANT,_("Weird"),_( "The unpacking succeedeed but the index is still not up to date."));
+                                                                        GUI_Info_HIG(ADM_LOG_IMPORTANT,QT_TR_NOOP("Weird"),QT_TR_NOOP( "The unpacking succeedeed but the index is still not up to date."));
 								printf("\n Switching codec...\n");
 								delete vid->decoder;
 								vid->decoder=getDecoderVopPacked(info.fcc, info.width,info.height,0,NULL);
 								ispacked=1;
 #else
-								GUI_Info_HIG(ADM_LOG_IMPORTANT,_("Troubles ahead"), _("This a VOP packed AVI."));
+								GUI_Info_HIG(ADM_LOG_IMPORTANT,QT_TR_NOOP("Troubles ahead"), QT_TR_NOOP("This a VOP packed AVI."));
 #endif
 
 							}
@@ -752,7 +752,7 @@ TryAgain:
                                                 {
                                                    uint32_t reindex=0;
                                                   prefs->get(FEATURE_AUTO_REBUILDINDEX,&reindex);
-                                                  if(reindex || GUI_YesNo(_("Index is not up to date"),_("You should use Tool->Rebuild frame. Do it now ?")))
+                                                  if(reindex || GUI_YesNo(QT_TR_NOOP("Index is not up to date"),QT_TR_NOOP("You should use Tool->Rebuild frame. Do it now ?")))
                                                         {
                                                                 rebuildFrameType();
 							}
@@ -1507,7 +1507,7 @@ uint8_t         ADM_Composer::tryIndexing(char *name,char *idxname)
       prefs->get(FEATURE_TRYAUTOIDX,&autoidx);
       if (!autoidx)
         {
-          if (!GUI_Question (_("This looks like mpeg\n Do you want to index it?")))
+          if (!GUI_Question (QT_TR_NOOP("This looks like mpeg\n Do you want to index it?")))
             {
                 return 0;
             }
@@ -1559,7 +1559,7 @@ uint8_t         ADM_Composer::tryIndexing(char *name,char *idxname)
                         delete [] tracks;
                 delete [] idx;
 
-                if(!r) GUI_Error_HIG(_("Indexing failed"), NULL); 
+                if(!r) GUI_Error_HIG(QT_TR_NOOP("Indexing failed"), NULL); 
                 return r;
 }
 /**

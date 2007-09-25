@@ -50,7 +50,7 @@ uint8_t DIA_glyphEdit(void)
   uint8_t ret=0;
   // First select a file
   
-   GUI_FileSelRead(_("Select GlyphFile to edit"), &glyphName);
+   GUI_FileSelRead(QT_TR_NOOP("Select GlyphFile to edit"), &glyphName);
   if(!glyphName) return 0;
   
   // Try to load it
@@ -118,9 +118,9 @@ uint8_t DIA_glyphEdit(void)
                           {
                             // Dialog Factory to the rescue ! 
                               
-                              diaElemText txt(&tomatch,_("String"),NULL);
+                              diaElemText txt(&tomatch,QT_TR_NOOP("String"),NULL);
                               diaElem *elems[]={&txt};
-                              if(!diaFactoryRun(_("Search string"),1,elems))
+                              if(!diaFactoryRun(QT_TR_NOOP("Search string"),1,elems))
                               {
                                   continue;
                                   break;
@@ -146,7 +146,7 @@ uint8_t DIA_glyphEdit(void)
                           }
                           ADM_dezalloc(tomatch);
                           if(!currentGlyph->next)
-                                GUI_Error_HIG(_("End reached"),_("No more glyphs"));
+                                GUI_Error_HIG(QT_TR_NOOP("End reached"),QT_TR_NOOP("No more glyphs"));
                           }
                           
                           continue;
@@ -189,7 +189,7 @@ uint8_t DIA_glyphEdit(void)
                             }
                             else 
                             {
-                              GUI_Error_HIG(_("End reached"),_("No more glyphs"));
+                              GUI_Error_HIG(QT_TR_NOOP("End reached"),QT_TR_NOOP("No more glyphs"));
                               break;
                             }
                         }
@@ -213,7 +213,7 @@ uint8_t DIA_glyphEdit(void)
                                   continue;
                               } 
                             } 
-                            GUI_Error_HIG(_("Head reached"),_("No more glyphs"));
+                            GUI_Error_HIG(QT_TR_NOOP("Head reached"),QT_TR_NOOP("No more glyphs"));
                             break;
                         }
                         continue;break;
@@ -341,7 +341,7 @@ create_dialog1 (void)
   GtkWidget *closebutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("dialog1"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("dialog1"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -393,7 +393,7 @@ create_dialog1 (void)
   gtk_widget_show (image2);
   gtk_box_pack_start (GTK_BOX (hbox4), image2, FALSE, FALSE, 0);
 
-  label2 = gtk_label_new_with_mnemonic (_("Prev. Empty"));
+  label2 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Prev. Empty"));
   gtk_widget_show (label2);
   gtk_box_pack_start (GTK_BOX (hbox4), label2, FALSE, FALSE, 0);
 
@@ -415,7 +415,7 @@ create_dialog1 (void)
   gtk_widget_show (image3);
   gtk_box_pack_start (GTK_BOX (hbox5), image3, FALSE, FALSE, 0);
 
-  label3 = gtk_label_new_with_mnemonic (_("Next Empty"));
+  label3 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Next Empty"));
   gtk_widget_show (label3);
   gtk_box_pack_start (GTK_BOX (hbox5), label3, FALSE, FALSE, 0);
 

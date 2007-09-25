@@ -249,7 +249,7 @@ create_pixmap_old                          (GtkWidget       *widget,
 
   if (!pathname)
     {
-      g_warning (_("Couldn't find pixmap file: %s"), filename);
+      g_warning (QT_TR_NOOP("Couldn't find pixmap file: %s"), filename);
       return gtk_image_new ();
     }
 
@@ -273,7 +273,7 @@ create_pixbuf_old                          (const gchar     *filename)
 
   if (!pathname)
     {
-      g_warning (_("Couldn't find pixmap file: %s"), filename);
+      g_warning (QT_TR_NOOP("Couldn't find pixmap file: %s"), filename);
       return NULL;
     }
 

@@ -202,7 +202,7 @@ create_dialog1 (void)
 
   dialog1 = gtk_dialog_new ();
   gtk_container_set_border_width (GTK_CONTAINER (dialog1), 6);
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("MPlayer eq2"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("MPlayer eq2"));
   gtk_window_set_resizable (GTK_WINDOW (dialog1), FALSE);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -228,7 +228,7 @@ create_dialog1 (void)
   gtk_table_set_row_spacings (GTK_TABLE (table2), 6);
   gtk_table_set_col_spacings (GTK_TABLE (table2), 12);
 
-  label4 = gtk_label_new_with_mnemonic (_("Brigh_tness:"));
+  label4 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Brigh_tness:"));
   gtk_widget_show (label4);
   gtk_table_attach (GTK_TABLE (table2), label4, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -236,7 +236,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label4), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
 
-  label5 = gtk_label_new_with_mnemonic (_("_Saturation:"));
+  label5 = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Saturation:"));
   gtk_widget_show (label5);
   gtk_table_attach (GTK_TABLE (table2), label5, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -271,7 +271,7 @@ create_dialog1 (void)
   gtk_scale_set_value_pos (GTK_SCALE (hscaleContrast), GTK_POS_RIGHT);
   gtk_scale_set_digits (GTK_SCALE (hscaleContrast), 2);
 
-  label3 = gtk_label_new_with_mnemonic (_("_Contrast:"));
+  label3 = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Contrast:"));
   gtk_widget_show (label3);
   gtk_table_attach (GTK_TABLE (table2), label3, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -297,7 +297,7 @@ create_dialog1 (void)
   gtk_table_set_row_spacings (GTK_TABLE (table3), 6);
   gtk_table_set_col_spacings (GTK_TABLE (table3), 12);
 
-  label6 = gtk_label_new_with_mnemonic (_("_Initial:"));
+  label6 = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Initial:"));
   gtk_widget_show (label6);
   gtk_table_attach (GTK_TABLE (table3), label6, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -323,7 +323,7 @@ create_dialog1 (void)
   gtk_scale_set_value_pos (GTK_SCALE (hscaleGammaR), GTK_POS_RIGHT);
   gtk_scale_set_digits (GTK_SCALE (hscaleGammaR), 2);
 
-  label8 = gtk_label_new_with_mnemonic (_("_Red:"));
+  label8 = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Red:"));
   gtk_widget_show (label8);
   gtk_table_attach (GTK_TABLE (table3), label8, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -340,7 +340,7 @@ create_dialog1 (void)
   gtk_scale_set_value_pos (GTK_SCALE (hscaleGammaG), GTK_POS_RIGHT);
   gtk_scale_set_digits (GTK_SCALE (hscaleGammaG), 2);
 
-  label9 = gtk_label_new_with_mnemonic (_("_Green:"));
+  label9 = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Green:"));
   gtk_widget_show (label9);
   gtk_table_attach (GTK_TABLE (table3), label9, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -348,7 +348,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label9), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label9), 0, 0.5);
 
-  label10 = gtk_label_new_with_mnemonic (_("_Blue:"));
+  label10 = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Blue:"));
   gtk_widget_show (label10);
   gtk_table_attach (GTK_TABLE (table3), label10, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
@@ -356,7 +356,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label10), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
 
-  label7 = gtk_label_new_with_mnemonic (_("_Weight:"));
+  label7 = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Weight:"));
   gtk_widget_show (label7);
   gtk_table_attach (GTK_TABLE (table3), label7, 0, 1, 4, 5,
                     (GtkAttachOptions) (GTK_FILL),
@@ -382,7 +382,7 @@ create_dialog1 (void)
   gtk_scale_set_value_pos (GTK_SCALE (hscaleGammaWeight), GTK_POS_RIGHT);
   gtk_scale_set_digits (GTK_SCALE (hscaleGammaWeight), 2);
 
-  label2 = gtk_label_new (_("<b>Gamma</b>"));
+  label2 = gtk_label_new (QT_TR_NOOP("<b>Gamma</b>"));
   gtk_widget_show (label2);
   gtk_frame_set_label_widget (GTK_FRAME (frame2), label2);
   gtk_label_set_use_markup (GTK_LABEL (label2), TRUE);

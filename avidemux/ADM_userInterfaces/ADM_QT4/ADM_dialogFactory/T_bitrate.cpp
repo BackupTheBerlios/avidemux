@@ -58,7 +58,7 @@ class  ADM_Qbitrate : public QWidget
            
            maxQ=mq;
            int index=0,set=-1;
-#define add(x,z,y) if(compress->capabilities & ADM_ENC_CAP_##x) {combo->addItem(_(#y));\
+#define add(x,z,y) if(compress->capabilities & ADM_ENC_CAP_##x) {combo->addItem(QT_TR_NOOP(#y));\
 						if(p->mode==COMPRESS_##z) set=index;\
 						index++;}
   
@@ -150,7 +150,7 @@ void ADM_Qbitrate::readBack(void)
 void ADM_Qbitrate::comboChanged(int i)
 {
   printf("Changed\n"); 
- #define P(x) text2->setText(_(#x))
+ #define P(x) text2->setText(QT_TR_NOOP(#x))
 #define M(x,y) box->setMinimum  (x);box->setMaximum  (y);
 #define S(x)   box->setValue(x);
   COMPRESSION_MODE mode=readPulldown(compress,i);

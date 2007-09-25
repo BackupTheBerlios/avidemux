@@ -58,7 +58,7 @@ DIA_ocr (void)
   tooltips = gtk_tooltips_new ();
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Mini OCR"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Mini OCR"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -76,28 +76,28 @@ DIA_ocr (void)
   gtk_widget_show (table1);
   gtk_container_add (GTK_CONTAINER (frame5), table1);
 
-  labelNbGlyphs = gtk_label_new (_("0"));
+  labelNbGlyphs = gtk_label_new (QT_TR_NOOP("0"));
   gtk_widget_show (labelNbGlyphs);
   gtk_table_attach (GTK_TABLE (table1), labelNbGlyphs, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (labelNbGlyphs), 0, 0.5);
 
-  labelTime = gtk_label_new (_("0:0:0"));
+  labelTime = gtk_label_new (QT_TR_NOOP("0:0:0"));
   gtk_widget_show (labelTime);
   gtk_table_attach (GTK_TABLE (table1), labelTime, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (labelTime), 0, 0.5);
 
-  labelNbLines = gtk_label_new (_("0"));
+  labelNbLines = gtk_label_new (QT_TR_NOOP("0"));
   gtk_widget_show (labelNbLines);
   gtk_table_attach (GTK_TABLE (table1), labelNbLines, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (labelNbLines), 0, 0.5);
 
-  label9 = gtk_label_new (_("# of lines"));
+  label9 = gtk_label_new (QT_TR_NOOP("# of lines"));
   gtk_widget_show (label9);
   gtk_table_attach (GTK_TABLE (table1), label9, 0, 1, 1, 2,
                     (GtkAttachOptions) (0),
@@ -105,7 +105,7 @@ DIA_ocr (void)
   gtk_label_set_justify (GTK_LABEL (label9), GTK_JUSTIFY_FILL);
   gtk_misc_set_alignment (GTK_MISC (label9), 0, 0.5);
 
-  label15 = gtk_label_new (_("TimeCode:"));
+  label15 = gtk_label_new (QT_TR_NOOP("TimeCode:"));
   gtk_widget_show (label15);
   gtk_table_attach (GTK_TABLE (table1), label15, 0, 1, 2, 3,
                     (GtkAttachOptions) (0),
@@ -113,7 +113,7 @@ DIA_ocr (void)
   gtk_label_set_justify (GTK_LABEL (label15), GTK_JUSTIFY_FILL);
   gtk_misc_set_alignment (GTK_MISC (label15), 0, 0.5);
 
-  label8 = gtk_label_new (_("# of Glyphs :"));
+  label8 = gtk_label_new (QT_TR_NOOP("# of Glyphs :"));
   gtk_widget_show (label8);
   gtk_table_attach (GTK_TABLE (table1), label8, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -121,7 +121,7 @@ DIA_ocr (void)
   gtk_label_set_justify (GTK_LABEL (label8), GTK_JUSTIFY_FILL);
   gtk_misc_set_alignment (GTK_MISC (label8), 0, 0.5);
 
-  label7 = gtk_label_new (_("<b>Stats</b>"));
+  label7 = gtk_label_new (QT_TR_NOOP("<b>Stats</b>"));
   gtk_widget_show (label7);
   gtk_frame_set_label_widget (GTK_FRAME (frame5), label7);
   gtk_label_set_use_markup (GTK_LABEL (label7), TRUE);
@@ -138,7 +138,7 @@ DIA_ocr (void)
   gtk_widget_show (table2);
   gtk_box_pack_start (GTK_BOX (vbox7), table2, FALSE, FALSE, 0);
 
-  label13 = gtk_label_new (_("Current Glyph"));
+  label13 = gtk_label_new (QT_TR_NOOP("Current Glyph"));
   gtk_widget_show (label13);
   gtk_table_attach (GTK_TABLE (table2), label13, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -151,14 +151,14 @@ DIA_ocr (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
 
-  label14 = gtk_label_new (_(" Text:"));
+  label14 = gtk_label_new (QT_TR_NOOP(" Text:"));
   gtk_widget_show (label14);
   gtk_table_attach (GTK_TABLE (table2), label14, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label14), 0, 0.5);
 
-  labelText = gtk_label_new (_(" "));
+  labelText = gtk_label_new (QT_TR_NOOP(" "));
   gtk_widget_show (labelText);
   gtk_table_attach (GTK_TABLE (table2), labelText, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -173,31 +173,31 @@ DIA_ocr (void)
   gtk_widget_show (hbuttonbox1);
   gtk_box_pack_start (GTK_BOX (vbox7), hbuttonbox1, FALSE, FALSE, 0);
 
-  buttonCalibrate = gtk_button_new_with_mnemonic (_("_Calibrate"));
+  buttonCalibrate = gtk_button_new_with_mnemonic (QT_TR_NOOP("_Calibrate"));
   gtk_widget_show (buttonCalibrate);
   gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonCalibrate);
   GTK_WIDGET_SET_FLAGS (buttonCalibrate, GTK_CAN_DEFAULT);
-  gtk_tooltips_set_tip (tooltips, buttonCalibrate, _("If the glyphs are too thin, enter a lower value here"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonCalibrate, QT_TR_NOOP("If the glyphs are too thin, enter a lower value here"), NULL);
 
-  buttonSkipAll = gtk_button_new_with_mnemonic (_("S_kip all"));
+  buttonSkipAll = gtk_button_new_with_mnemonic (QT_TR_NOOP("S_kip all"));
   gtk_widget_show (buttonSkipAll);
   gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonSkipAll);
   GTK_WIDGET_SET_FLAGS (buttonSkipAll, GTK_CAN_DEFAULT);
-  gtk_tooltips_set_tip (tooltips, buttonSkipAll, _("Skip the whole image"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonSkipAll, QT_TR_NOOP("Skip the whole image"), NULL);
 
-  buttonSkip = gtk_button_new_with_mnemonic (_("Skip Glyph"));
+  buttonSkip = gtk_button_new_with_mnemonic (QT_TR_NOOP("Skip Glyph"));
   gtk_widget_show (buttonSkip);
   gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonSkip);
   GTK_WIDGET_SET_FLAGS (buttonSkip, GTK_CAN_DEFAULT);
-  gtk_tooltips_set_tip (tooltips, buttonSkip, _("Skip the current letter/glyph"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonSkip, QT_TR_NOOP("Skip the current letter/glyph"), NULL);
 
-  buttonIgnore = gtk_button_new_with_mnemonic (_("_Ignore glyph"));
+  buttonIgnore = gtk_button_new_with_mnemonic (QT_TR_NOOP("_Ignore glyph"));
   gtk_widget_show (buttonIgnore);
   gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonIgnore);
   GTK_WIDGET_SET_FLAGS (buttonIgnore, GTK_CAN_DEFAULT);
-  gtk_tooltips_set_tip (tooltips, buttonIgnore, _("This glyph will be ignored from now on"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonIgnore, QT_TR_NOOP("This glyph will be ignored from now on"), NULL);
 
-  buttonOk = gtk_button_new_with_mnemonic (_("Ok"));
+  buttonOk = gtk_button_new_with_mnemonic (QT_TR_NOOP("Ok"));
   gtk_widget_show (buttonOk);
   gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonOk);
   GTK_WIDGET_SET_FLAGS (buttonOk, GTK_CAN_DEFAULT);
@@ -211,7 +211,7 @@ DIA_ocr (void)
   gtk_widget_show (hseparator1);
   gtk_box_pack_start (GTK_BOX (vbox7), hseparator1, TRUE, TRUE, 0);
 
-  label12 = gtk_label_new (_("<b>Bitmap</b>"));
+  label12 = gtk_label_new (QT_TR_NOOP("<b>Bitmap</b>"));
   gtk_widget_show (label12);
   gtk_frame_set_label_widget (GTK_FRAME (frameBitmap), label12);
   gtk_label_set_use_markup (GTK_LABEL (label12), TRUE);

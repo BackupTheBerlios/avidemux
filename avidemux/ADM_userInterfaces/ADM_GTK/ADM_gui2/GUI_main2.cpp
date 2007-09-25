@@ -270,7 +270,7 @@ create_mainWindow (void)
   accel_group = gtk_accel_group_new ();
 
   mainWindow = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title (GTK_WINDOW (mainWindow), _("Avidemux"));
+  gtk_window_set_title (GTK_WINDOW (mainWindow), QT_TR_NOOP("Avidemux"));
   mainWindow_icon_pixbuf = create_pixbuf ("avidemux_icon_small.png");
   if (mainWindow_icon_pixbuf)
     {
@@ -287,14 +287,14 @@ create_mainWindow (void)
   gtk_box_pack_start (GTK_BOX (vbox1), menuBar, FALSE, FALSE, 0);
   GTK_WIDGET_SET_FLAGS (menuBar, GTK_CAN_FOCUS);
 
-  menuitem1 = gtk_menu_item_new_with_mnemonic (_("_File"));
+  menuitem1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_File"));
   gtk_widget_show (menuitem1);
   gtk_container_add (GTK_CONTAINER (menuBar), menuitem1);
 
   menuitem1_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem1), menuitem1_menu);
 
-  open_video1 = gtk_image_menu_item_new_with_mnemonic (_("_Open..."));
+  open_video1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_Open..."));
   gtk_widget_show (open_video1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), open_video1);
   gtk_widget_add_accelerator (open_video1, "activate", accel_group,
@@ -305,7 +305,7 @@ create_mainWindow (void)
   gtk_widget_show (image8448);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (open_video1), image8448);
 
-  append_video1 = gtk_image_menu_item_new_with_mnemonic (_("_Append..."));
+  append_video1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_Append..."));
   gtk_widget_show (append_video1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), append_video1);
   gtk_widget_add_accelerator (append_video1, "activate", accel_group,
@@ -316,7 +316,7 @@ create_mainWindow (void)
   gtk_widget_show (image8449);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (append_video1), image8449);
 
-  save_stuff = gtk_image_menu_item_new_with_mnemonic (_("_Save"));
+  save_stuff = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_Save"));
   gtk_widget_show (save_stuff);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), save_stuff);
 
@@ -327,7 +327,7 @@ create_mainWindow (void)
   save_stuff_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (save_stuff), save_stuff_menu);
 
-  save_as_avi1 = gtk_menu_item_new_with_mnemonic (_("Save _Video..."));
+  save_as_avi1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Save _Video..."));
   gtk_widget_show (save_as_avi1);
   gtk_container_add (GTK_CONTAINER (save_stuff_menu), save_as_avi1);
   gtk_widget_add_accelerator (save_as_avi1, "activate", accel_group,
@@ -339,15 +339,15 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (save_stuff_menu), separator1);
   gtk_widget_set_sensitive (separator1, FALSE);
 
-  save_image1 = gtk_menu_item_new_with_mnemonic (_("Save _BMP Image..."));
+  save_image1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Save _BMP Image..."));
   gtk_widget_show (save_image1);
   gtk_container_add (GTK_CONTAINER (save_stuff_menu), save_image1);
 
-  save_jpg_image1 = gtk_menu_item_new_with_mnemonic (_("Save _JPEG Image..."));
+  save_jpg_image1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Save _JPEG Image..."));
   gtk_widget_show (save_jpg_image1);
   gtk_container_add (GTK_CONTAINER (save_stuff_menu), save_jpg_image1);
 
-  save_selection_as_jpegs1 = gtk_menu_item_new_with_mnemonic (_("Save _Selection as JPEG Images..."));
+  save_selection_as_jpegs1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Save _Selection as JPEG Images..."));
   gtk_widget_show (save_selection_as_jpegs1);
   gtk_container_add (GTK_CONTAINER (save_stuff_menu), save_selection_as_jpegs1);
 
@@ -360,7 +360,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), separator3);
   gtk_widget_set_sensitive (separator3, FALSE);
 
-  save_project1 = gtk_image_menu_item_new_with_mnemonic (_("Save _Project"));
+  save_project1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("Save _Project"));
   gtk_widget_show (save_project1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), save_project1);
 
@@ -368,7 +368,7 @@ create_mainWindow (void)
   gtk_widget_show (image8451);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (save_project1), image8451);
 
-  save_project_as1 = gtk_image_menu_item_new_with_mnemonic (_("Save P_roject As..."));
+  save_project_as1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("Save P_roject As..."));
   gtk_widget_show (save_project_as1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), save_project_as1);
 
@@ -376,7 +376,7 @@ create_mainWindow (void)
   gtk_widget_show (image8452);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (save_project_as1), image8452);
 
-  run_script1 = gtk_image_menu_item_new_with_mnemonic (_("_Load/Run Project..."));
+  run_script1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_Load/Run Project..."));
   gtk_widget_show (run_script1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), run_script1);
 
@@ -384,11 +384,11 @@ create_mainWindow (void)
   gtk_widget_show (image8453);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (run_script1), image8453);
 
-  add_to_joblist1 = gtk_menu_item_new_with_mnemonic (_("A_dd to Joblist..."));
+  add_to_joblist1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("A_dd to Joblist..."));
   gtk_widget_show (add_to_joblist1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), add_to_joblist1);
 
-  joblist1 = gtk_menu_item_new_with_mnemonic (_("Show _Joblist"));
+  joblist1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Show _Joblist"));
   gtk_widget_show (joblist1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), joblist1);
   gtk_widget_add_accelerator (joblist1, "activate", accel_group,
@@ -400,7 +400,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), separator16);
   gtk_widget_set_sensitive (separator16, FALSE);
 
-  connect_to_avsproxy1 = gtk_menu_item_new_with_mnemonic (_("Co_nnect to avsproxy"));
+  connect_to_avsproxy1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Co_nnect to avsproxy"));
   gtk_widget_show (connect_to_avsproxy1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), connect_to_avsproxy1);
 
@@ -409,7 +409,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), separator18);
   gtk_widget_set_sensitive (separator18, FALSE);
 
-  video_informations1 = gtk_image_menu_item_new_with_mnemonic (_("Proper_ties"));
+  video_informations1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("Proper_ties"));
   gtk_widget_show (video_informations1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), video_informations1);
   gtk_widget_add_accelerator (video_informations1, "activate", accel_group,
@@ -420,7 +420,7 @@ create_mainWindow (void)
   gtk_widget_show (image8454);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (video_informations1), image8454);
 
-  avi_muxer_options1 = gtk_menu_item_new_with_mnemonic (_("AVI _Muxer Options"));
+  avi_muxer_options1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("AVI _Muxer Options"));
   gtk_widget_show (avi_muxer_options1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), avi_muxer_options1);
 
@@ -429,7 +429,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), separator4);
   gtk_widget_set_sensitive (separator4, FALSE);
 
-  quit1 = gtk_image_menu_item_new_with_mnemonic (_("_Quit"));
+  quit1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_Quit"));
   gtk_widget_show (quit1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), quit1);
   gtk_widget_add_accelerator (quit1, "activate", accel_group,
@@ -440,14 +440,14 @@ create_mainWindow (void)
   gtk_widget_show (image8455);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (quit1), image8455);
 
-  menuitem2 = gtk_menu_item_new_with_mnemonic (_("_Edit"));
+  menuitem2 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Edit"));
   gtk_widget_show (menuitem2);
   gtk_container_add (GTK_CONTAINER (menuBar), menuitem2);
 
   menuitem2_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem2), menuitem2_menu);
 
-  reset_edits1 = gtk_image_menu_item_new_with_mnemonic (_("_Reset Edits"));
+  reset_edits1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_Reset Edits"));
   gtk_widget_show (reset_edits1);
   gtk_container_add (GTK_CONTAINER (menuitem2_menu), reset_edits1);
 
@@ -460,7 +460,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (menuitem2_menu), separator5);
   gtk_widget_set_sensitive (separator5, FALSE);
 
-  cut1 = gtk_image_menu_item_new_with_mnemonic (_("Cu_t"));
+  cut1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("Cu_t"));
   gtk_widget_show (cut1);
   gtk_container_add (GTK_CONTAINER (menuitem2_menu), cut1);
   gtk_widget_add_accelerator (cut1, "activate", accel_group,
@@ -471,7 +471,7 @@ create_mainWindow (void)
   gtk_widget_show (image8457);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (cut1), image8457);
 
-  copy1 = gtk_image_menu_item_new_with_mnemonic (_("_Copy"));
+  copy1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_Copy"));
   gtk_widget_show (copy1);
   gtk_container_add (GTK_CONTAINER (menuitem2_menu), copy1);
   gtk_widget_add_accelerator (copy1, "activate", accel_group,
@@ -482,7 +482,7 @@ create_mainWindow (void)
   gtk_widget_show (image8458);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (copy1), image8458);
 
-  paste1 = gtk_image_menu_item_new_with_mnemonic (_("_Paste"));
+  paste1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_Paste"));
   gtk_widget_show (paste1);
   gtk_container_add (GTK_CONTAINER (menuitem2_menu), paste1);
   gtk_widget_add_accelerator (paste1, "activate", accel_group,
@@ -493,7 +493,7 @@ create_mainWindow (void)
   gtk_widget_show (image8459);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (paste1), image8459);
 
-  delete1 = gtk_image_menu_item_new_with_mnemonic (_("_Delete"));
+  delete1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_Delete"));
   gtk_widget_show (delete1);
   gtk_container_add (GTK_CONTAINER (menuitem2_menu), delete1);
   gtk_widget_add_accelerator (delete1, "activate", accel_group,
@@ -509,14 +509,14 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (menuitem2_menu), separator6);
   gtk_widget_set_sensitive (separator6, FALSE);
 
-  set_marker_a1 = gtk_menu_item_new_with_mnemonic (_("Set Marker _A"));
+  set_marker_a1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Set Marker _A"));
   gtk_widget_show (set_marker_a1);
   gtk_container_add (GTK_CONTAINER (menuitem2_menu), set_marker_a1);
   gtk_widget_add_accelerator (set_marker_a1, "activate", accel_group,
                               GDK_bracketleft, (GdkModifierType)( 0 ),
                               GTK_ACCEL_VISIBLE);
 
-  set_marker_b1 = gtk_menu_item_new_with_mnemonic (_("Set Marker _B"));
+  set_marker_b1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Set Marker _B"));
   gtk_widget_show (set_marker_b1);
   gtk_container_add (GTK_CONTAINER (menuitem2_menu), set_marker_b1);
   gtk_widget_add_accelerator (set_marker_b1, "activate", accel_group,
@@ -528,7 +528,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (menuitem2_menu), separator7);
   gtk_widget_set_sensitive (separator7, FALSE);
 
-  preferences1 = gtk_image_menu_item_new_with_mnemonic (_("Pre_ferences"));
+  preferences1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("Pre_ferences"));
   gtk_widget_show (preferences1);
   gtk_container_add (GTK_CONTAINER (menuitem2_menu), preferences1);
 
@@ -536,19 +536,19 @@ create_mainWindow (void)
   gtk_widget_show (image8461);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (preferences1), image8461);
 
-  view1 = gtk_menu_item_new_with_mnemonic (_("_View"));
+  view1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_View"));
   gtk_widget_show (view1);
   gtk_container_add (GTK_CONTAINER (menuBar), view1);
 
   view1_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (view1), view1_menu);
 
-  toolbar1 = gtk_check_menu_item_new_with_mnemonic (_("_Main Toolbar"));
+  toolbar1 = gtk_check_menu_item_new_with_mnemonic (QT_TR_NOOP("_Main Toolbar"));
   gtk_widget_show (toolbar1);
   gtk_container_add (GTK_CONTAINER (view1_menu), toolbar1);
   gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (toolbar1), TRUE);
 
-  sidebar1 = gtk_check_menu_item_new_with_mnemonic (_("_A/V Sidebar"));
+  sidebar1 = gtk_check_menu_item_new_with_mnemonic (QT_TR_NOOP("_A/V Sidebar"));
   gtk_widget_show (sidebar1);
   gtk_container_add (GTK_CONTAINER (view1_menu), sidebar1);
   gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (sidebar1), TRUE);
@@ -558,52 +558,52 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (view1_menu), separator8);
   gtk_widget_set_sensitive (separator8, FALSE);
 
-  zoom_1_4 = gtk_menu_item_new_with_mnemonic (_("_Zoom 1:4"));
+  zoom_1_4 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Zoom 1:4"));
   gtk_widget_show (zoom_1_4);
   gtk_container_add (GTK_CONTAINER (view1_menu), zoom_1_4);
   gtk_widget_add_accelerator (zoom_1_4, "activate", accel_group,
                               GDK_4, (GdkModifierType)( GDK_CONTROL_MASK | GDK_SHIFT_MASK),
                               GTK_ACCEL_VISIBLE);
 
-  zoom_1_2 = gtk_menu_item_new_with_mnemonic (_("Z_oom 1:2"));
+  zoom_1_2 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Z_oom 1:2"));
   gtk_widget_show (zoom_1_2);
   gtk_container_add (GTK_CONTAINER (view1_menu), zoom_1_2);
   gtk_widget_add_accelerator (zoom_1_2, "activate", accel_group,
                               GDK_2, (GdkModifierType)( GDK_CONTROL_MASK | GDK_SHIFT_MASK),
                               GTK_ACCEL_VISIBLE);
 
-  zoom_1_1 = gtk_menu_item_new_with_mnemonic (_("Zoom _1:1"));
+  zoom_1_1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Zoom _1:1"));
   gtk_widget_show (zoom_1_1);
   gtk_container_add (GTK_CONTAINER (view1_menu), zoom_1_1);
   gtk_widget_add_accelerator (zoom_1_1, "activate", accel_group,
                               GDK_1, (GdkModifierType)( GDK_CONTROL_MASK | GDK_MOD1_MASK),
                               GTK_ACCEL_VISIBLE);
 
-  zoom_2_1 = gtk_menu_item_new_with_mnemonic (_("Zoom _2:1"));
+  zoom_2_1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Zoom _2:1"));
   gtk_widget_show (zoom_2_1);
   gtk_container_add (GTK_CONTAINER (view1_menu), zoom_2_1);
   gtk_widget_add_accelerator (zoom_2_1, "activate", accel_group,
                               GDK_2, (GdkModifierType)( GDK_CONTROL_MASK | GDK_MOD1_MASK),
                               GTK_ACCEL_VISIBLE);
 
-  video_1 = gtk_menu_item_new_with_mnemonic (_("Vi_deo"));
+  video_1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Vi_deo"));
   gtk_widget_show (video_1);
   gtk_container_add (GTK_CONTAINER (menuBar), video_1);
 
   video_1_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (video_1), video_1_menu);
 
-  decoder_options1 = gtk_menu_item_new_with_mnemonic (_("_Decoder Options"));
+  decoder_options1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Decoder Options"));
   gtk_widget_show (decoder_options1);
   gtk_container_add (GTK_CONTAINER (video_1_menu), decoder_options1);
   gtk_widget_add_accelerator (decoder_options1, "activate", accel_group,
                               GDK_F3, (GdkModifierType)( 0 ),
                               GTK_ACCEL_VISIBLE);
 
-  set_postprocessing1 = gtk_menu_item_new_with_mnemonic (_("_Postprocessing"));
+  set_postprocessing1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Postprocessing"));
   gtk_widget_show (set_postprocessing1);
   gtk_container_add (GTK_CONTAINER (video_1_menu), set_postprocessing1);
-  gtk_tooltips_set_tip (tooltips, set_postprocessing1, _("Select postprocessing level"), NULL);
+  gtk_tooltips_set_tip (tooltips, set_postprocessing1, QT_TR_NOOP("Select postprocessing level"), NULL);
   gtk_widget_add_accelerator (set_postprocessing1, "activate", accel_group,
                               GDK_F4, (GdkModifierType)( 0 ),
                               GTK_ACCEL_VISIBLE);
@@ -613,14 +613,14 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (video_1_menu), separator9);
   gtk_widget_set_sensitive (separator9, FALSE);
 
-  preview1 = gtk_check_menu_item_new_with_mnemonic (_("P_review"));
+  preview1 = gtk_check_menu_item_new_with_mnemonic (QT_TR_NOOP("P_review"));
   gtk_widget_show (preview1);
   gtk_container_add (GTK_CONTAINER (video_1_menu), preview1);
   gtk_widget_add_accelerator (preview1, "activate", accel_group,
                               GDK_F5, (GdkModifierType)( 0 ),
                               GTK_ACCEL_VISIBLE);
 
-  display_output1 = gtk_check_menu_item_new_with_mnemonic (_("Display _Output"));
+  display_output1 = gtk_check_menu_item_new_with_mnemonic (QT_TR_NOOP("Display _Output"));
   gtk_widget_show (display_output1);
   gtk_container_add (GTK_CONTAINER (video_1_menu), display_output1);
   gtk_widget_add_accelerator (display_output1, "activate", accel_group,
@@ -632,40 +632,40 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (video_1_menu), separator10);
   gtk_widget_set_sensitive (separator10, FALSE);
 
-  change_fps = gtk_menu_item_new_with_mnemonic (_("_Frame Rate"));
+  change_fps = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Frame Rate"));
   gtk_widget_show (change_fps);
   gtk_container_add (GTK_CONTAINER (video_1_menu), change_fps);
 
-  videoencoder = gtk_menu_item_new_with_mnemonic (_("_Encoder"));
+  videoencoder = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Encoder"));
   gtk_widget_show (videoencoder);
   gtk_container_add (GTK_CONTAINER (video_1_menu), videoencoder);
   gtk_widget_add_accelerator (videoencoder, "activate", accel_group,
                               GDK_V, (GdkModifierType)( GDK_CONTROL_MASK | GDK_MOD1_MASK),
                               GTK_ACCEL_VISIBLE);
 
-  filters1 = gtk_menu_item_new_with_mnemonic (_("Fil_ters"));
+  filters1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Fil_ters"));
   gtk_widget_show (filters1);
   gtk_container_add (GTK_CONTAINER (video_1_menu), filters1);
   gtk_widget_add_accelerator (filters1, "activate", accel_group,
                               GDK_F, (GdkModifierType)( GDK_CONTROL_MASK | GDK_MOD1_MASK),
                               GTK_ACCEL_VISIBLE);
 
-  audio1 = gtk_menu_item_new_with_mnemonic (_("_Audio"));
+  audio1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Audio"));
   gtk_widget_show (audio1);
   gtk_container_add (GTK_CONTAINER (menuBar), audio1);
 
   audio1_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (audio1), audio1_menu);
 
-  main_audio = gtk_menu_item_new_with_mnemonic (_("_Main Track"));
+  main_audio = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Main Track"));
   gtk_widget_show (main_audio);
   gtk_container_add (GTK_CONTAINER (audio1_menu), main_audio);
 
-  second_audio_track1 = gtk_menu_item_new_with_mnemonic (_("_Second Track"));
+  second_audio_track1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Second Track"));
   gtk_widget_show (second_audio_track1);
   gtk_container_add (GTK_CONTAINER (audio1_menu), second_audio_track1);
 
-  build_vbr_time_map1 = gtk_menu_item_new_with_mnemonic (_("_Build VBR Time Map"));
+  build_vbr_time_map1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Build VBR Time Map"));
   gtk_widget_show (build_vbr_time_map1);
   gtk_container_add (GTK_CONTAINER (audio1_menu), build_vbr_time_map1);
 
@@ -674,7 +674,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (audio1_menu), separator11);
   gtk_widget_set_sensitive (separator11, FALSE);
 
-  save_audio1 = gtk_image_menu_item_new_with_mnemonic (_("S_ave..."));
+  save_audio1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("S_ave..."));
   gtk_widget_show (save_audio1);
   gtk_container_add (GTK_CONTAINER (audio1_menu), save_audio1);
   gtk_widget_add_accelerator (save_audio1, "activate", accel_group,
@@ -685,25 +685,25 @@ create_mainWindow (void)
   gtk_widget_show (image8462);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (save_audio1), image8462);
 
-  audio_encoder1 = gtk_menu_item_new_with_mnemonic (_("_Encoder"));
+  audio_encoder1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Encoder"));
   gtk_widget_show (audio_encoder1);
   gtk_container_add (GTK_CONTAINER (audio1_menu), audio_encoder1);
   gtk_widget_add_accelerator (audio_encoder1, "activate", accel_group,
                               GDK_A, (GdkModifierType)( GDK_CONTROL_MASK | GDK_MOD1_MASK),
                               GTK_ACCEL_VISIBLE);
 
-  filters2 = gtk_menu_item_new_with_mnemonic (_("_Filters"));
+  filters2 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Filters"));
   gtk_widget_show (filters2);
   gtk_container_add (GTK_CONTAINER (audio1_menu), filters2);
 
-  tools1 = gtk_menu_item_new_with_mnemonic (_("_Tools"));
+  tools1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Tools"));
   gtk_widget_show (tools1);
   gtk_container_add (GTK_CONTAINER (menuBar), tools1);
 
   tools1_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (tools1), tools1_menu);
 
-  calculator1 = gtk_image_menu_item_new_with_mnemonic (_("_Calculator"));
+  calculator1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_Calculator"));
   gtk_widget_show (calculator1);
   gtk_container_add (GTK_CONTAINER (tools1_menu), calculator1);
   gtk_widget_add_accelerator (calculator1, "activate", accel_group,
@@ -719,19 +719,19 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (tools1_menu), separator12);
   gtk_widget_set_sensitive (separator12, FALSE);
 
-  rebuild_frames = gtk_menu_item_new_with_mnemonic (_("_Rebuild Frames (I & B)"));
+  rebuild_frames = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Rebuild Frames (I & B)"));
   gtk_widget_show (rebuild_frames);
   gtk_container_add (GTK_CONTAINER (tools1_menu), rebuild_frames);
 
-  check_frames = gtk_menu_item_new_with_mnemonic (_("C_heck Frames (slow)"));
+  check_frames = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("C_heck Frames (slow)"));
   gtk_widget_show (check_frames);
   gtk_container_add (GTK_CONTAINER (tools1_menu), check_frames);
 
-  bitrate_histogram1 = gtk_menu_item_new_with_mnemonic (_("_Bitrate Histogram"));
+  bitrate_histogram1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Bitrate Histogram"));
   gtk_widget_show (bitrate_histogram1);
   gtk_container_add (GTK_CONTAINER (tools1_menu), bitrate_histogram1);
 
-  item1 = gtk_menu_item_new_with_mnemonic (_("_Scan for Black Frames..."));
+  item1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Scan for Black Frames..."));
   gtk_widget_show (item1);
   gtk_container_add (GTK_CONTAINER (tools1_menu), item1);
 
@@ -740,19 +740,19 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (tools1_menu), separator13);
   gtk_widget_set_sensitive (separator13, FALSE);
 
-  v2v = gtk_menu_item_new_with_mnemonic (_("_VOB -> VobSub"));
+  v2v = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_VOB -> VobSub"));
   gtk_widget_show (v2v);
   gtk_container_add (GTK_CONTAINER (tools1_menu), v2v);
 
-  ocr_vobsub_2_srt = gtk_menu_item_new_with_mnemonic (_("_OCR (VobSub -> srt)"));
+  ocr_vobsub_2_srt = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_OCR (VobSub -> srt)"));
   gtk_widget_show (ocr_vobsub_2_srt);
   gtk_container_add (GTK_CONTAINER (tools1_menu), ocr_vobsub_2_srt);
 
-  ocr_dvb = gtk_menu_item_new_with_mnemonic (_("OCR (TS->srt)"));
+  ocr_dvb = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("OCR (TS->srt)"));
   gtk_widget_show (ocr_dvb);
   gtk_container_add (GTK_CONTAINER (tools1_menu), ocr_dvb);
 
-  edit_glyph1 = gtk_menu_item_new_with_mnemonic (_("_Edit Glyph"));
+  edit_glyph1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Edit Glyph"));
   gtk_widget_show (edit_glyph1);
   gtk_container_add (GTK_CONTAINER (tools1_menu), edit_glyph1);
 
@@ -761,49 +761,49 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (tools1_menu), separator17);
   gtk_widget_set_sensitive (separator17, FALSE);
 
-  see_hex1 = gtk_menu_item_new_with_mnemonic (_("_Frame Hex Dump"));
+  see_hex1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Frame Hex Dump"));
   gtk_widget_show (see_hex1);
   gtk_container_add (GTK_CONTAINER (tools1_menu), see_hex1);
 
-  help1 = gtk_menu_item_new_with_mnemonic (_("A_uto"));
+  help1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("A_uto"));
   gtk_widget_show (help1);
   gtk_container_add (GTK_CONTAINER (menuBar), help1);
 
   help1_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (help1), help1_menu);
 
-  vcd1 = gtk_menu_item_new_with_mnemonic (_("_VCD"));
+  vcd1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_VCD"));
   gtk_widget_show (vcd1);
   gtk_container_add (GTK_CONTAINER (help1_menu), vcd1);
 
-  svcd1 = gtk_menu_item_new_with_mnemonic (_("_SVCD"));
+  svcd1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_SVCD"));
   gtk_widget_show (svcd1);
   gtk_container_add (GTK_CONTAINER (help1_menu), svcd1);
 
-  dvd1 = gtk_menu_item_new_with_mnemonic (_("_DVD"));
+  dvd1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_DVD"));
   gtk_widget_show (dvd1);
   gtk_container_add (GTK_CONTAINER (help1_menu), dvd1);
 
-  psp1 = gtk_menu_item_new_with_mnemonic (_("_PSP"));
+  psp1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_PSP"));
   gtk_widget_show (psp1);
   gtk_container_add (GTK_CONTAINER (help1_menu), psp1);
 
-  psp__h264_1 = gtk_menu_item_new_with_mnemonic (_("PSP (_H.264)"));
+  psp__h264_1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("PSP (_H.264)"));
   gtk_widget_show (psp__h264_1);
   gtk_container_add (GTK_CONTAINER (help1_menu), psp__h264_1);
 
-  flv1 = gtk_menu_item_new_with_mnemonic (_("F_LV"));
+  flv1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("F_LV"));
   gtk_widget_show (flv1);
   gtk_container_add (GTK_CONTAINER (help1_menu), flv1);
 
-  go1 = gtk_menu_item_new_with_mnemonic (_("_Go"));
+  go1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Go"));
   gtk_widget_show (go1);
   gtk_container_add (GTK_CONTAINER (menuBar), go1);
 
   go1_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (go1), go1_menu);
 
-  play_video1 = gtk_image_menu_item_new_with_mnemonic (_("_Play/Stop"));
+  play_video1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_Play/Stop"));
   gtk_widget_show (play_video1);
   gtk_container_add (GTK_CONTAINER (go1_menu), play_video1);
   gtk_widget_add_accelerator (play_video1, "activate", accel_group,
@@ -814,7 +814,7 @@ create_mainWindow (void)
   gtk_widget_show (image8464);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (play_video1), image8464);
 
-  previous_frame1 = gtk_image_menu_item_new_with_mnemonic (_("P_revious Frame"));
+  previous_frame1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("P_revious Frame"));
   gtk_widget_show (previous_frame1);
   gtk_container_add (GTK_CONTAINER (go1_menu), previous_frame1);
   gtk_widget_add_accelerator (previous_frame1, "activate", accel_group,
@@ -825,7 +825,7 @@ create_mainWindow (void)
   gtk_widget_show (image8465);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (previous_frame1), image8465);
 
-  next_frame1 = gtk_image_menu_item_new_with_mnemonic (_("_Next Frame"));
+  next_frame1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_Next Frame"));
   gtk_widget_show (next_frame1);
   gtk_container_add (GTK_CONTAINER (go1_menu), next_frame1);
   gtk_widget_add_accelerator (next_frame1, "activate", accel_group,
@@ -836,7 +836,7 @@ create_mainWindow (void)
   gtk_widget_show (image8466);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (next_frame1), image8466);
 
-  previous_intra_frame1 = gtk_image_menu_item_new_with_mnemonic (_("Pr_evious Intra Frame"));
+  previous_intra_frame1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("Pr_evious Intra Frame"));
   gtk_widget_show (previous_intra_frame1);
   gtk_container_add (GTK_CONTAINER (go1_menu), previous_intra_frame1);
   gtk_widget_add_accelerator (previous_intra_frame1, "activate", accel_group,
@@ -847,7 +847,7 @@ create_mainWindow (void)
   gtk_widget_show (image8467);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (previous_intra_frame1), image8467);
 
-  next_intra_frame1 = gtk_image_menu_item_new_with_mnemonic (_("Next _Intra Frame"));
+  next_intra_frame1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("Next _Intra Frame"));
   gtk_widget_show (next_intra_frame1);
   gtk_container_add (GTK_CONTAINER (go1_menu), next_intra_frame1);
   gtk_widget_add_accelerator (next_intra_frame1, "activate", accel_group,
@@ -858,15 +858,15 @@ create_mainWindow (void)
   gtk_widget_show (image8468);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (next_intra_frame1), image8468);
 
-  search_previous_black_frame1 = gtk_menu_item_new_with_mnemonic (_("Previou_s Black Frame"));
+  search_previous_black_frame1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Previou_s Black Frame"));
   gtk_widget_show (search_previous_black_frame1);
   gtk_container_add (GTK_CONTAINER (go1_menu), search_previous_black_frame1);
 
-  search_next_black_frame1 = gtk_menu_item_new_with_mnemonic (_("Ne_xt Black Frame"));
+  search_next_black_frame1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Ne_xt Black Frame"));
   gtk_widget_show (search_next_black_frame1);
   gtk_container_add (GTK_CONTAINER (go1_menu), search_next_black_frame1);
 
-  first_frame1 = gtk_image_menu_item_new_with_mnemonic (_("_First Frame"));
+  first_frame1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_First Frame"));
   gtk_widget_show (first_frame1);
   gtk_container_add (GTK_CONTAINER (go1_menu), first_frame1);
   gtk_widget_add_accelerator (first_frame1, "activate", accel_group,
@@ -877,7 +877,7 @@ create_mainWindow (void)
   gtk_widget_show (image8469);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (first_frame1), image8469);
 
-  last_frame1 = gtk_image_menu_item_new_with_mnemonic (_("_Last Frame"));
+  last_frame1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_Last Frame"));
   gtk_widget_show (last_frame1);
   gtk_container_add (GTK_CONTAINER (go1_menu), last_frame1);
   gtk_widget_add_accelerator (last_frame1, "activate", accel_group,
@@ -893,14 +893,14 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (go1_menu), separator14);
   gtk_widget_set_sensitive (separator14, FALSE);
 
-  go_to_marker_a1 = gtk_menu_item_new_with_mnemonic (_("Go to Marker _A"));
+  go_to_marker_a1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Go to Marker _A"));
   gtk_widget_show (go_to_marker_a1);
   gtk_container_add (GTK_CONTAINER (go1_menu), go_to_marker_a1);
   gtk_widget_add_accelerator (go_to_marker_a1, "activate", accel_group,
                               GDK_bracketleft, (GdkModifierType)( GDK_CONTROL_MASK),
                               GTK_ACCEL_VISIBLE);
 
-  go_to_marker_b1 = gtk_menu_item_new_with_mnemonic (_("Go to Marker _B"));
+  go_to_marker_b1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Go to Marker _B"));
   gtk_widget_show (go_to_marker_b1);
   gtk_container_add (GTK_CONTAINER (go1_menu), go_to_marker_b1);
   gtk_widget_add_accelerator (go_to_marker_b1, "activate", accel_group,
@@ -912,7 +912,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (go1_menu), separator15);
   gtk_widget_set_sensitive (separator15, FALSE);
 
-  jum_to_frame1 = gtk_image_menu_item_new_with_mnemonic (_("Go to Fra_me..."));
+  jum_to_frame1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("Go to Fra_me..."));
   gtk_widget_show (jum_to_frame1);
   gtk_container_add (GTK_CONTAINER (go1_menu), jum_to_frame1);
   gtk_widget_add_accelerator (jum_to_frame1, "activate", accel_group,
@@ -923,7 +923,7 @@ create_mainWindow (void)
   gtk_widget_show (image8471);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (jum_to_frame1), image8471);
 
-  jump_to_time1 = gtk_image_menu_item_new_with_mnemonic (_("Go to _Time..."));
+  jump_to_time1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("Go to _Time..."));
   gtk_widget_show (jump_to_time1);
   gtk_container_add (GTK_CONTAINER (go1_menu), jump_to_time1);
   gtk_widget_add_accelerator (jump_to_time1, "activate", accel_group,
@@ -934,22 +934,22 @@ create_mainWindow (void)
   gtk_widget_show (image8472);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (jump_to_time1), image8472);
 
-  custom1 = gtk_menu_item_new_with_mnemonic (_("_Custom"));
+  custom1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Custom"));
   gtk_widget_show (custom1);
   gtk_container_add (GTK_CONTAINER (menuBar), custom1);
 
-  help2 = gtk_menu_item_new_with_mnemonic (_("_Help"));
+  help2 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Help"));
   gtk_widget_show (help2);
   gtk_container_add (GTK_CONTAINER (menuBar), help2);
 
   help2_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (help2), help2_menu);
 
-  show_builtin_support1 = gtk_menu_item_new_with_mnemonic (_("_Built-in Support"));
+  show_builtin_support1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Built-in Support"));
   gtk_widget_show (show_builtin_support1);
   gtk_container_add (GTK_CONTAINER (help2_menu), show_builtin_support1);
 
-  about1 = gtk_image_menu_item_new_with_mnemonic (_("_About"));
+  about1 = gtk_image_menu_item_new_with_mnemonic (QT_TR_NOOP("_About"));
   gtk_widget_show (about1);
   gtk_container_add (GTK_CONTAINER (help2_menu), about1);
 
@@ -967,7 +967,7 @@ create_mainWindow (void)
   gtk_widget_show (menutoolbuttonOpen);
   gtk_tool_item_set_homogeneous (GTK_TOOL_ITEM (menutoolbuttonOpen), FALSE);
   gtk_container_add (GTK_CONTAINER (toolbar2), menutoolbuttonOpen);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (menutoolbuttonOpen), tooltips, _("Open a file"), NULL);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (menutoolbuttonOpen), tooltips, QT_TR_NOOP("Open a file"), NULL);
   gtk_tool_item_set_is_important (GTK_TOOL_ITEM (menutoolbuttonOpen), TRUE);
 
   toolitem11 = (GtkWidget*) gtk_tool_item_new ();
@@ -977,13 +977,13 @@ create_mainWindow (void)
   toolbuttonSave = (GtkWidget*) gtk_tool_button_new_from_stock ("gtk-save");
   gtk_widget_show (toolbuttonSave);
   gtk_container_add (GTK_CONTAINER (toolbar2), toolbuttonSave);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonSave), tooltips, _("Save the file"), NULL);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonSave), tooltips, QT_TR_NOOP("Save the file"), NULL);
   gtk_tool_item_set_is_important (GTK_TOOL_ITEM (toolbuttonSave), TRUE);
 
   toolbuttonInfo = (GtkWidget*) gtk_tool_button_new_from_stock ("gtk-properties");
   gtk_widget_show (toolbuttonInfo);
   gtk_container_add (GTK_CONTAINER (toolbar2), toolbuttonInfo);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonInfo), tooltips, _("Audio/video file information"), NULL);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonInfo), tooltips, QT_TR_NOOP("Audio/video file information"), NULL);
 
   separatortoolitem1 = (GtkWidget*) gtk_separator_tool_item_new ();
   gtk_widget_show (separatortoolitem1);
@@ -991,10 +991,10 @@ create_mainWindow (void)
 
   tmp_image = create_pixmap (mainWindow, "gnome-calculator.xpm");
   gtk_widget_show (tmp_image);
-  toolbuttonCalc = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Calculator"));
+  toolbuttonCalc = (GtkWidget*) gtk_tool_button_new (tmp_image, QT_TR_NOOP("Calculator"));
   gtk_widget_show (toolbuttonCalc);
   gtk_container_add (GTK_CONTAINER (toolbar2), toolbuttonCalc);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonCalc), tooltips, _("Bitrate/size calculator"), NULL);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonCalc), tooltips, QT_TR_NOOP("Bitrate/size calculator"), NULL);
   gtk_tool_item_set_is_important (GTK_TOOL_ITEM (toolbuttonCalc), TRUE);
 
   separatortoolitem2 = (GtkWidget*) gtk_separator_tool_item_new ();
@@ -1055,7 +1055,7 @@ create_mainWindow (void)
   gtk_widget_show (vbox11);
   gtk_box_pack_start (GTK_BOX (vbox9), vbox11, FALSE, FALSE, 0);
 
-  label18 = gtk_label_new (_("<b>Video</b>"));
+  label18 = gtk_label_new (QT_TR_NOOP("<b>Video</b>"));
   gtk_widget_show (label18);
   gtk_box_pack_start (GTK_BOX (vbox11), label18, FALSE, FALSE, 0);
   gtk_label_set_use_markup (GTK_LABEL (label18), TRUE);
@@ -1073,20 +1073,20 @@ create_mainWindow (void)
   comboboxVideo = gtk_combo_box_new_text ();
   gtk_widget_show (comboboxVideo);
   gtk_box_pack_start (GTK_BOX (vbox7), comboboxVideo, FALSE, FALSE, 0);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxVideo), _("Copy"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxVideo), QT_TR_NOOP("Copy"));
 
-  buttonConfV = gtk_button_new_with_mnemonic (_("Configure"));
+  buttonConfV = gtk_button_new_with_mnemonic (QT_TR_NOOP("Configure"));
   gtk_widget_show (buttonConfV);
   gtk_box_pack_start (GTK_BOX (vbox7), buttonConfV, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonConfV, _("Configure video encoder"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonConfV, QT_TR_NOOP("Configure video encoder"), NULL);
   gtk_widget_add_accelerator (buttonConfV, "clicked", accel_group,
                               GDK_F3, (GdkModifierType)( 0 ),
                               GTK_ACCEL_VISIBLE);
 
-  buttonFilters = gtk_button_new_with_mnemonic (_("Filters"));
+  buttonFilters = gtk_button_new_with_mnemonic (QT_TR_NOOP("Filters"));
   gtk_widget_show (buttonFilters);
   gtk_box_pack_start (GTK_BOX (vbox7), buttonFilters, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonFilters, _("Video filters"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonFilters, QT_TR_NOOP("Video filters"), NULL);
   gtk_widget_add_accelerator (buttonFilters, "clicked", accel_group,
                               GDK_F1, (GdkModifierType)( 0 ),
                               GTK_ACCEL_VISIBLE);
@@ -1095,7 +1095,7 @@ create_mainWindow (void)
   gtk_widget_show (vbox12);
   gtk_box_pack_start (GTK_BOX (vbox9), vbox12, FALSE, FALSE, 0);
 
-  label19 = gtk_label_new (_("<b>Audio</b>"));
+  label19 = gtk_label_new (QT_TR_NOOP("<b>Audio</b>"));
   gtk_widget_show (label19);
   gtk_box_pack_start (GTK_BOX (vbox12), label19, FALSE, FALSE, 0);
   gtk_label_set_use_markup (GTK_LABEL (label19), TRUE);
@@ -1113,12 +1113,12 @@ create_mainWindow (void)
   comboboxAudio = gtk_combo_box_new_text ();
   gtk_widget_show (comboboxAudio);
   gtk_box_pack_start (GTK_BOX (vbox8), comboboxAudio, FALSE, FALSE, 0);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxAudio), _("Copy"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxAudio), QT_TR_NOOP("Copy"));
 
-  buttonConfA = gtk_button_new_with_mnemonic (_("Configure"));
+  buttonConfA = gtk_button_new_with_mnemonic (QT_TR_NOOP("Configure"));
   gtk_widget_show (buttonConfA);
   gtk_box_pack_start (GTK_BOX (vbox8), buttonConfA, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonConfA, _("Configure audio encoder"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonConfA, QT_TR_NOOP("Configure audio encoder"), NULL);
   gtk_widget_add_accelerator (buttonConfA, "clicked", accel_group,
                               GDK_F4, (GdkModifierType)( 0 ),
                               GTK_ACCEL_VISIBLE);
@@ -1126,7 +1126,7 @@ create_mainWindow (void)
   buttonAudioFilter = gtk_button_new ();
   gtk_widget_show (buttonAudioFilter);
   gtk_box_pack_start (GTK_BOX (vbox8), buttonAudioFilter, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonAudioFilter, _("Audio filters"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonAudioFilter, QT_TR_NOOP("Audio filters"), NULL);
   gtk_widget_add_accelerator (buttonAudioFilter, "clicked", accel_group,
                               GDK_F2, (GdkModifierType)( 0 ),
                               GTK_ACCEL_VISIBLE);
@@ -1139,7 +1139,7 @@ create_mainWindow (void)
   gtk_widget_show (hbox18);
   gtk_container_add (GTK_CONTAINER (alignment16), hbox18);
 
-  label22 = gtk_label_new_with_mnemonic (_("Filters"));
+  label22 = gtk_label_new_with_mnemonic (QT_TR_NOOP("Filters"));
   gtk_widget_show (label22);
   gtk_box_pack_start (GTK_BOX (hbox18), label22, FALSE, FALSE, 0);
 
@@ -1147,23 +1147,23 @@ create_mainWindow (void)
   gtk_widget_show (hbox19);
   gtk_box_pack_start (GTK_BOX (vbox8), hbox19, TRUE, TRUE, 0);
 
-  CheckButtonTimeshift = gtk_check_button_new_with_mnemonic (_("Shift:"));
+  CheckButtonTimeshift = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("Shift:"));
   gtk_widget_show (CheckButtonTimeshift);
   gtk_box_pack_start (GTK_BOX (hbox19), CheckButtonTimeshift, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, CheckButtonTimeshift, _("Enable time shift"), NULL);
+  gtk_tooltips_set_tip (tooltips, CheckButtonTimeshift, QT_TR_NOOP("Enable time shift"), NULL);
 
   spinbuttonTimeShift_adj = gtk_adjustment_new (0, -99999, 99999, 1, 10, 10);
   spinbuttonTimeShift = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonTimeShift_adj), 1, 0);
   gtk_widget_show (spinbuttonTimeShift);
   gtk_box_pack_start (GTK_BOX (hbox19), spinbuttonTimeShift, TRUE, TRUE, 0);
-  gtk_tooltips_set_tip (tooltips, spinbuttonTimeShift, _("Audio/video time shift (ms)"), NULL);
+  gtk_tooltips_set_tip (tooltips, spinbuttonTimeShift, QT_TR_NOOP("Audio/video time shift (ms)"), NULL);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonTimeShift), TRUE);
 
   vbox13 = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox13);
   gtk_box_pack_start (GTK_BOX (vbox9), vbox13, FALSE, FALSE, 0);
 
-  label20 = gtk_label_new (_("<b>Format</b>"));
+  label20 = gtk_label_new (QT_TR_NOOP("<b>Format</b>"));
   gtk_widget_show (label20);
   gtk_box_pack_start (GTK_BOX (vbox13), label20, FALSE, FALSE, 0);
   gtk_label_set_use_markup (GTK_LABEL (label20), TRUE);
@@ -1196,7 +1196,7 @@ create_mainWindow (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
 
-  label21 = gtk_label_new (_("<b>Selection</b>"));
+  label21 = gtk_label_new (QT_TR_NOOP("<b>Selection</b>"));
   gtk_widget_show (label21);
   gtk_box_pack_start (GTK_BOX (vbox14), label21, FALSE, FALSE, 0);
   gtk_label_set_use_markup (GTK_LABEL (label21), TRUE);
@@ -1213,7 +1213,7 @@ create_mainWindow (void)
   gtk_table_set_row_spacings (GTK_TABLE (table1), 3);
   gtk_table_set_col_spacings (GTK_TABLE (table1), 3);
 
-  labelMarkA = gtk_label_new (_(" 0000000"));
+  labelMarkA = gtk_label_new (QT_TR_NOOP(" 0000000"));
   gtk_widget_show (labelMarkA);
   gtk_table_attach (GTK_TABLE (table1), labelMarkA, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -1221,7 +1221,7 @@ create_mainWindow (void)
   GTK_WIDGET_SET_FLAGS (labelMarkA, GTK_CAN_FOCUS);
   gtk_label_set_selectable (GTK_LABEL (labelMarkA), TRUE);
 
-  labelMarkB = gtk_label_new (_(" 0000000"));
+  labelMarkB = gtk_label_new (QT_TR_NOOP(" 0000000"));
   gtk_widget_show (labelMarkB);
   gtk_table_attach (GTK_TABLE (table1), labelMarkB, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -1229,23 +1229,23 @@ create_mainWindow (void)
   GTK_WIDGET_SET_FLAGS (labelMarkB, GTK_CAN_FOCUS);
   gtk_label_set_selectable (GTK_LABEL (labelMarkB), TRUE);
 
-  buttonGotoA = gtk_button_new_with_mnemonic (_("A:"));
+  buttonGotoA = gtk_button_new_with_mnemonic (QT_TR_NOOP("A:"));
   gtk_widget_show (buttonGotoA);
   gtk_table_attach (GTK_TABLE (table1), buttonGotoA, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
   gtk_widget_set_size_request (buttonGotoA, -1, 20);
   GTK_WIDGET_UNSET_FLAGS (buttonGotoA, GTK_CAN_FOCUS);
-  gtk_tooltips_set_tip (tooltips, buttonGotoA, _("Go to marker A"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonGotoA, QT_TR_NOOP("Go to marker A"), NULL);
 
-  buttonGotoB = gtk_button_new_with_mnemonic (_("B:"));
+  buttonGotoB = gtk_button_new_with_mnemonic (QT_TR_NOOP("B:"));
   gtk_widget_show (buttonGotoB);
   gtk_table_attach (GTK_TABLE (table1), buttonGotoB, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
   gtk_widget_set_size_request (buttonGotoB, -1, 20);
   GTK_WIDGET_UNSET_FLAGS (buttonGotoB, GTK_CAN_FOCUS);
-  gtk_tooltips_set_tip (tooltips, buttonGotoB, _("Go to marker B"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonGotoB, QT_TR_NOOP("Go to marker B"), NULL);
 
   hbox10 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox10);
@@ -1257,7 +1257,7 @@ create_mainWindow (void)
   gtk_widget_show (buttonPlay);
   gtk_box_pack_start (GTK_BOX (hbox10), buttonPlay, FALSE, FALSE, 0);
   GTK_WIDGET_UNSET_FLAGS (buttonPlay, GTK_CAN_FOCUS);
-  gtk_tooltips_set_tip (tooltips, buttonPlay, _("Play"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonPlay, QT_TR_NOOP("Play"), NULL);
   gtk_widget_add_accelerator (buttonPlay, "clicked", accel_group,
                               GDK_space, (GdkModifierType)( 0 ),
                               GTK_ACCEL_VISIBLE);
@@ -1271,7 +1271,7 @@ create_mainWindow (void)
   buttonStop = gtk_button_new ();
   gtk_widget_show (buttonStop);
   gtk_box_pack_start (GTK_BOX (hbox10), buttonStop, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonStop, _("Stop"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonStop, QT_TR_NOOP("Stop"), NULL);
   gtk_button_set_relief (GTK_BUTTON (buttonStop), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click (GTK_BUTTON (buttonStop), FALSE);
 
@@ -1283,7 +1283,7 @@ create_mainWindow (void)
   gtk_widget_show (buttonPrevFrame);
   gtk_box_pack_start (GTK_BOX (hbox10), buttonPrevFrame, FALSE, FALSE, 0);
   GTK_WIDGET_UNSET_FLAGS (buttonPrevFrame, GTK_CAN_FOCUS);
-  gtk_tooltips_set_tip (tooltips, buttonPrevFrame, _("Previous frame"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonPrevFrame, QT_TR_NOOP("Previous frame"), NULL);
   gtk_widget_add_accelerator (buttonPrevFrame, "clicked", accel_group,
                               GDK_KP_4, (GdkModifierType)( 0 ),
                               GTK_ACCEL_VISIBLE);
@@ -1298,7 +1298,7 @@ create_mainWindow (void)
   gtk_widget_show (buttonNextFrame);
   gtk_box_pack_start (GTK_BOX (hbox10), buttonNextFrame, FALSE, FALSE, 0);
   GTK_WIDGET_UNSET_FLAGS (buttonNextFrame, GTK_CAN_FOCUS);
-  gtk_tooltips_set_tip (tooltips, buttonNextFrame, _("Next frame"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonNextFrame, QT_TR_NOOP("Next frame"), NULL);
   gtk_widget_add_accelerator (buttonNextFrame, "clicked", accel_group,
                               GDK_KP_6, (GdkModifierType)( 0 ),
                               GTK_ACCEL_VISIBLE);
@@ -1313,7 +1313,7 @@ create_mainWindow (void)
   gtk_widget_show (buttonPrevKFrame);
   gtk_box_pack_start (GTK_BOX (hbox10), buttonPrevKFrame, FALSE, FALSE, 0);
   GTK_WIDGET_UNSET_FLAGS (buttonPrevKFrame, GTK_CAN_FOCUS);
-  gtk_tooltips_set_tip (tooltips, buttonPrevKFrame, _("Previous keyframe"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonPrevKFrame, QT_TR_NOOP("Previous keyframe"), NULL);
   gtk_widget_add_accelerator (buttonPrevKFrame, "clicked", accel_group,
                               GDK_KP_2, (GdkModifierType)( 0 ),
                               GTK_ACCEL_VISIBLE);
@@ -1328,7 +1328,7 @@ create_mainWindow (void)
   gtk_widget_show (buttonNextKFrame);
   gtk_box_pack_start (GTK_BOX (hbox10), buttonNextKFrame, FALSE, FALSE, 0);
   GTK_WIDGET_UNSET_FLAGS (buttonNextKFrame, GTK_CAN_FOCUS);
-  gtk_tooltips_set_tip (tooltips, buttonNextKFrame, _("Next keyframe"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonNextKFrame, QT_TR_NOOP("Next keyframe"), NULL);
   gtk_widget_add_accelerator (buttonNextKFrame, "clicked", accel_group,
                               GDK_KP_8, (GdkModifierType)( 0 ),
                               GTK_ACCEL_VISIBLE);
@@ -1342,7 +1342,7 @@ create_mainWindow (void)
   buttonMarkA = gtk_button_new ();
   gtk_widget_show (buttonMarkA);
   gtk_box_pack_start (GTK_BOX (hbox10), buttonMarkA, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonMarkA, _("Selection: start"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonMarkA, QT_TR_NOOP("Selection: start"), NULL);
   gtk_button_set_relief (GTK_BUTTON (buttonMarkA), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click (GTK_BUTTON (buttonMarkA), FALSE);
 
@@ -1353,7 +1353,7 @@ create_mainWindow (void)
   buttonMarkB = gtk_button_new ();
   gtk_widget_show (buttonMarkB);
   gtk_box_pack_start (GTK_BOX (hbox10), buttonMarkB, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonMarkB, _("Selection: end"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonMarkB, QT_TR_NOOP("Selection: end"), NULL);
   gtk_button_set_relief (GTK_BUTTON (buttonMarkB), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click (GTK_BUTTON (buttonMarkB), FALSE);
 
@@ -1364,7 +1364,7 @@ create_mainWindow (void)
   buttonPrevBlack = gtk_button_new ();
   gtk_widget_show (buttonPrevBlack);
   gtk_box_pack_start (GTK_BOX (hbox10), buttonPrevBlack, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonPrevBlack, _("Previous black frame"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonPrevBlack, QT_TR_NOOP("Previous black frame"), NULL);
   gtk_button_set_relief (GTK_BUTTON (buttonPrevBlack), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click (GTK_BUTTON (buttonPrevBlack), FALSE);
 
@@ -1375,7 +1375,7 @@ create_mainWindow (void)
   buttonNextBlack = gtk_button_new ();
   gtk_widget_show (buttonNextBlack);
   gtk_box_pack_start (GTK_BOX (hbox10), buttonNextBlack, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonNextBlack, _("Next black frame"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonNextBlack, QT_TR_NOOP("Next black frame"), NULL);
   gtk_button_set_relief (GTK_BUTTON (buttonNextBlack), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click (GTK_BUTTON (buttonNextBlack), FALSE);
 
@@ -1386,7 +1386,7 @@ create_mainWindow (void)
   buttonBegin = gtk_button_new ();
   gtk_widget_show (buttonBegin);
   gtk_box_pack_start (GTK_BOX (hbox10), buttonBegin, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonBegin, _("First frame"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonBegin, QT_TR_NOOP("First frame"), NULL);
   gtk_button_set_relief (GTK_BUTTON (buttonBegin), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click (GTK_BUTTON (buttonBegin), FALSE);
 
@@ -1397,7 +1397,7 @@ create_mainWindow (void)
   buttonEnd = gtk_button_new ();
   gtk_widget_show (buttonEnd);
   gtk_box_pack_start (GTK_BOX (hbox10), buttonEnd, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonEnd, _("Last frame"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonEnd, QT_TR_NOOP("Last frame"), NULL);
   gtk_button_set_relief (GTK_BUTTON (buttonEnd), GTK_RELIEF_NONE);
   gtk_button_set_focus_on_click (GTK_BUTTON (buttonEnd), FALSE);
 
@@ -1419,44 +1419,44 @@ create_mainWindow (void)
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  label1 = gtk_label_new (_("Frame: "));
+  label1 = gtk_label_new (QT_TR_NOOP("Frame: "));
   gtk_widget_show (label1);
   gtk_box_pack_start (GTK_BOX (hbox16), label1, FALSE, FALSE, 0);
 
   boxCurFrame = gtk_entry_new ();
   gtk_widget_show (boxCurFrame);
   gtk_box_pack_start (GTK_BOX (hbox16), boxCurFrame, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, boxCurFrame, _("Current frame"), NULL);
+  gtk_tooltips_set_tip (tooltips, boxCurFrame, QT_TR_NOOP("Current frame"), NULL);
   gtk_entry_set_max_length (GTK_ENTRY (boxCurFrame), 8);
-  gtk_entry_set_text (GTK_ENTRY (boxCurFrame), _("0"));
+  gtk_entry_set_text (GTK_ENTRY (boxCurFrame), QT_TR_NOOP("0"));
   gtk_entry_set_width_chars (GTK_ENTRY (boxCurFrame), 8);
 
-  labelTotalFrame = gtk_label_new (_("/ 0000000"));
+  labelTotalFrame = gtk_label_new (QT_TR_NOOP("/ 0000000"));
   gtk_widget_show (labelTotalFrame);
   gtk_box_pack_start (GTK_BOX (hbox16), labelTotalFrame, FALSE, FALSE, 0);
   GTK_WIDGET_SET_FLAGS (labelTotalFrame, GTK_CAN_FOCUS);
   gtk_label_set_selectable (GTK_LABEL (labelTotalFrame), TRUE);
   gtk_misc_set_padding (GTK_MISC (labelTotalFrame), 5, 0);
 
-  label4 = gtk_label_new (_("Time: "));
+  label4 = gtk_label_new (QT_TR_NOOP("Time: "));
   gtk_widget_show (label4);
   gtk_box_pack_start (GTK_BOX (hbox16), label4, FALSE, FALSE, 0);
 
   boxCurTime = gtk_entry_new ();
   gtk_widget_show (boxCurTime);
   gtk_box_pack_start (GTK_BOX (hbox16), boxCurTime, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, boxCurTime, _("Current time"), NULL);
-  gtk_entry_set_text (GTK_ENTRY (boxCurTime), _("00:00:00.000"));
+  gtk_tooltips_set_tip (tooltips, boxCurTime, QT_TR_NOOP("Current time"), NULL);
+  gtk_entry_set_text (GTK_ENTRY (boxCurTime), QT_TR_NOOP("00:00:00.000"));
   gtk_entry_set_width_chars (GTK_ENTRY (boxCurTime), 13);
 
-  labelTotalTime = gtk_label_new (_("/ 00:00:00,000"));
+  labelTotalTime = gtk_label_new (QT_TR_NOOP("/ 00:00:00,000"));
   gtk_widget_show (labelTotalTime);
   gtk_box_pack_start (GTK_BOX (hbox16), labelTotalTime, FALSE, FALSE, 0);
   GTK_WIDGET_SET_FLAGS (labelTotalTime, GTK_CAN_FOCUS);
   gtk_label_set_selectable (GTK_LABEL (labelTotalTime), TRUE);
   gtk_misc_set_padding (GTK_MISC (labelTotalTime), 5, 0);
 
-  labelFrameType = gtk_label_new (_("Frame: ?"));
+  labelFrameType = gtk_label_new (QT_TR_NOOP("Frame: ?"));
   gtk_widget_show (labelFrameType);
   gtk_box_pack_start (GTK_BOX (hbox16), labelFrameType, FALSE, FALSE, 0);
   GTK_WIDGET_SET_FLAGS (labelFrameType, GTK_CAN_FOCUS);

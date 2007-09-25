@@ -370,7 +370,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                             }
                             else
                             {
-                                GUI_Error_HIG(_("Incompatible frame rate"), NULL);
+                                GUI_Error_HIG(QT_TR_NOOP("Incompatible frame rate"), NULL);
                                 return 0;
                             }
                             }

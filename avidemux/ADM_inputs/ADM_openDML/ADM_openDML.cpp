@@ -278,7 +278,7 @@ uint32_t rd;
 				printf("expected %d\n",sizeof(_videostream));
 				if(_Tracks[i].strh.size<sizeof(_videostream)-8) // RECT is not mandatory
 				{
-                                  GUI_Error_HIG(_("Malformed header"), NULL);
+                                  GUI_Error_HIG(QT_TR_NOOP("Malformed header"), NULL);
 					return 0;
 				}		
 				printf("Trying to continue anyway\n");			
@@ -360,7 +360,7 @@ uint32_t rd;
                                                 printf("expected %d\n",sizeof(_audiostream));
                                                 if(_Tracks[run].strh.size<sizeof(_audiostream)-8)
                                                 {
-                                                  GUI_Error_HIG(_("Malformed header"), NULL);
+                                                  GUI_Error_HIG(QT_TR_NOOP("Malformed header"), NULL);
                                                         return 0;
                                                 }
                                                 printf("Trying to continue anyway\n");			
@@ -495,7 +495,7 @@ uint32_t count=0;
 				printf("expected %d\n",sizeof(tmp));
 				if(_Tracks[i].strh.size<sizeof(tmp)-8)
 				{
-                                  GUI_Error_HIG(_("Malformed header"), NULL);
+                                  GUI_Error_HIG(QT_TR_NOOP("Malformed header"), NULL);
 					return 0;
 				}		
 				printf("Trying to continue anyway\n");			

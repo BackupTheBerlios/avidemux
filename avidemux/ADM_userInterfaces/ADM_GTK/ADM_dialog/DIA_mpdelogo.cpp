@@ -376,7 +376,7 @@ create_dialog1 (void)
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Mplayer Delogo"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Mplayer Delogo"));
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
@@ -394,35 +394,35 @@ create_dialog1 (void)
   gtk_widget_show (table2);
   gtk_box_pack_start (GTK_BOX (vbox2), table2, TRUE, TRUE, 0);
 
-  label3 = gtk_label_new (_("X"));
+  label3 = gtk_label_new (QT_TR_NOOP("X"));
   gtk_widget_show (label3);
   gtk_table_attach (GTK_TABLE (table2), label3, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
 
-  label4 = gtk_label_new (_("Y"));
+  label4 = gtk_label_new (QT_TR_NOOP("Y"));
   gtk_widget_show (label4);
   gtk_table_attach (GTK_TABLE (table2), label4, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
 
-  label5 = gtk_label_new (_("W"));
+  label5 = gtk_label_new (QT_TR_NOOP("W"));
   gtk_widget_show (label5);
   gtk_table_attach (GTK_TABLE (table2), label5, 2, 3, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
 
-  label6 = gtk_label_new (_("H"));
+  label6 = gtk_label_new (QT_TR_NOOP("H"));
   gtk_widget_show (label6);
   gtk_table_attach (GTK_TABLE (table2), label6, 2, 3, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
 
-  label7 = gtk_label_new (_("Band"));
+  label7 = gtk_label_new (QT_TR_NOOP("Band"));
   gtk_widget_show (label7);
   gtk_table_attach (GTK_TABLE (table2), label7, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
