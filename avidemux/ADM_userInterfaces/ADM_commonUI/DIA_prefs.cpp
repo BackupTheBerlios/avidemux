@@ -197,25 +197,37 @@ char     *globalGlyphName=NULL;
         diaElemToggle togAutoIndex(&autoindex,QT_TR_NOOP("Automatically _rebuild index"));
         diaElemToggle togAutoUnpack(&autounpack,QT_TR_NOOP("Automatically remove _packed bitstream"));
 
+        diaElemFrame frameSimd(QT_TR_NOOP("SIMD"));
 
-        
-        diaElemToggle capsToggleAll(&capsAll,QT_TR_NOOP("Enable all SIMD"));
-        diaElemFrame      frameSimd(QT_TR_NOOP("SIMD"));
-        frameSimd.swallow(&capsToggleAll);
-        
-#define CAPS_TOGGLE(x) diaElemToggle       capsToggle##x(&(caps##x),QT_TR_NOOP("Enable "#x));\
-						capsToggleAll.link(0,&(capsToggle##x));  frameSimd.swallow(   &(capsToggle##x));      
-						  
+		diaElemToggle capsToggleAll(&capsAll,QT_TR_NOOP("Enable all SIMD"));
+        diaElemToggle capsToggleMMX(&capsMMX, QT_TR_NOOP("Enable MMX"));
+		diaElemToggle capsToggleMMXEXT(&capsMMXEXT, QT_TR_NOOP("Enable MMXEXT"));
+		diaElemToggle capsToggle3DNOW(&caps3DNOW, QT_TR_NOOP("Enable 3DNOW"));
+		diaElemToggle capsToggle3DNOWEXT(&caps3DNOWEXT, QT_TR_NOOP("Enable 3DNOWEXT"));
+		diaElemToggle capsToggleSSE(&capsSSE, QT_TR_NOOP("Enable SSE"));
+		diaElemToggle capsToggleSSE2(&capsSSE2, QT_TR_NOOP("Enable SSE2"));
+		diaElemToggle capsToggleSSE3(&capsSSE3, QT_TR_NOOP("Enable SSE3"));
+		diaElemToggle capsToggleSSSE3(&capsSSSE3, QT_TR_NOOP("Enable SSSE3"));
 
-        CAPS_TOGGLE(MMX);
-        CAPS_TOGGLE(MMXEXT);
-        CAPS_TOGGLE(3DNOW);
-        CAPS_TOGGLE(3DNOWEXT);
-        CAPS_TOGGLE(SSE);
-        CAPS_TOGGLE(SSE2);
-        CAPS_TOGGLE(SSE3);
-        CAPS_TOGGLE(SSSE3);        
-      
+		capsToggleAll.link(0, &capsToggleMMX);
+		capsToggleAll.link(0, &capsToggleMMXEXT);
+		capsToggleAll.link(0, &capsToggle3DNOW);
+		capsToggleAll.link(0, &capsToggle3DNOWEXT);
+		capsToggleAll.link(0, &capsToggleSSE);
+		capsToggleAll.link(0, &capsToggleSSE2);
+		capsToggleAll.link(0, &capsToggleSSE3);
+		capsToggleAll.link(0, &capsToggleSSSE3);
+
+		frameSimd.swallow(&capsToggleAll);
+		frameSimd.swallow(&capsToggleMMX);
+		frameSimd.swallow(&capsToggleMMXEXT);
+		frameSimd.swallow(&capsToggle3DNOW);
+		frameSimd.swallow(&capsToggle3DNOWEXT);
+		frameSimd.swallow(&capsToggleSSE);
+		frameSimd.swallow(&capsToggleSSE2);
+		frameSimd.swallow(&capsToggleSSE3);
+		frameSimd.swallow(&capsToggleSSSE3);
+
 		diaElemThreadCount lavcThreadCount(&lavcThreads, QT_TR_NOOP("_lavc threads:"));
 		diaElemThreadCount x264ThreadCount(&x264Threads, QT_TR_NOOP("_x264 threads:"));
 		diaElemThreadCount xvidThreadCount(&xvidThreads, QT_TR_NOOP("X_vid threads:"));

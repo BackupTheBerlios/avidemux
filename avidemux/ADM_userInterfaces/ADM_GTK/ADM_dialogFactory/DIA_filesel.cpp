@@ -90,7 +90,7 @@ void diaElemFile::setMe(void *dialog, void *opaque,uint32_t line)
   
   /*  add button */
   
-  button = gtk_button_new_with_mnemonic ("_Browse...");
+  button = gtk_button_new_with_mnemonic (QT_TR_NOOP("_Browse..."));
   gtk_widget_show (button);
   gtk_box_pack_start (GTK_BOX (hbox1), button, FALSE, FALSE, 0);
 
@@ -242,7 +242,7 @@ void diaElemDirSelect::setMe(void *dialog, void *opaque,uint32_t line)
   
   /*  add button */
   
-  button = gtk_button_new_with_mnemonic ("_Browse...");
+  button = gtk_button_new_with_mnemonic (QT_TR_NOOP("_Browse..."));
   gtk_widget_show (button);
   gtk_box_pack_start (GTK_BOX (hbox1), button, FALSE, FALSE, 0);
 
