@@ -1,7 +1,7 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
 noinst_LIBRARIES = libADM_library.a
 
-INCLUDES = $(all_includes)
+INCLUDES = $(all_includes) -DADMLOCALE='"'$(ADM_LOCALEDIR)'"'
 
 libADM_library_a_METASOURCES = AUTO
 

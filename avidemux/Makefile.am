@@ -46,7 +46,7 @@ user_interface_cli = \
 		
 		
 user_interface_qt4 = \
-			./ADM_ocr/libADM_ocr.a	\			
+			./ADM_ocr/libADM_ocr.a	\
 			./ADM_userInterfaces/ADM_QT4/libADM_UI_QT4.a   \
 			./ADM_userInterfaces/ADM_QT4/ADM_gui/libADM_gui2.a	\
 			./ADM_userInterfaces/ADM_QT4/ADM_dialog/libADM_dialog.a	\
@@ -166,7 +166,6 @@ endif
 
 INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \
 	$(SMONKEY_CFLAGS) \
-	-DADMLOCALE='"'$(ADM_LOCALEDIR)'"' \
 	-IADM_inputs -IADM_outputs \
 	-IADM_lavutil  -IADM_libraries -IADM_libraries/ADM_utilities -IADM_libraries/ADM_lavutil \
 	-IADM_userInterfaces/ADM_commonUI \
