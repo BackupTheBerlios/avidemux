@@ -422,7 +422,15 @@ _retry:
 					mpegInfo.size);
 			*len=mpegInfo.size;
 			*samples=mpegInfo.samples;
-			packetHead+=startOffset+mpegInfo.size;
+			//packetHead+=startOffset+mpegInfo.size;
+                        // Patch from yhjvgskxwizgr (forum)
+                       if(startOffset < mpegInfo.size/2)  // we probably have our correct frame, so set head to the next
+                               packetHead+=startOffset+mpegInfo.size;
+                       else if(startOffset < mpegInfo.size)  // we probably have the next frame, so duplicate it to keep a/v synced
+                               packetHead+=startOffset;
+                       else  // we have next or later frame, so next time continue searching one frame later to keep a/v synced
+                               packetHead+=mpegInfo.size;
+                        // /Patch
 			return 1;
 }		
 //---
