@@ -44,7 +44,7 @@ extern int ADM_cpu_num_processors(void);
 AVCodec *codec=avcodec_find_decoder(x);\
 if(!codec) {GUI_Alert(QT_TR_NOOP("Internal error finding codec"#x));ADM_assert(0);} \
   codecId=x; \
-  _context->workaround_bugs=FF_BUG_AUTODETECT; \
+  _context->workaround_bugs=1*FF_BUG_AUTODETECT+1*FF_BUG_NO_PADDING; \
   _context->error_concealment=3; \
   if (avcodec_open(_context, codec) < 0)  \
                       { \
@@ -220,6 +220,7 @@ decoderFF::decoderFF (uint32_t w, uint32_t h):decoders (w, h)
   printf ("[lavc] Build: %d\n", LIBAVCODEC_BUILD);
   _context->debug_mv |= FF_SHOW;
   _context->debug |= FF_DEBUG_VIS_MB_TYPE + FF_DEBUG_VIS_QP;
+  
 }
 
 //_____________________________________________________

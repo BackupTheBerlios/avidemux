@@ -271,7 +271,8 @@ static int decode_slice(MpegEncContext *s){
 
     /* try to detect the padding bug */
     if(      s->codec_id==CODEC_ID_MPEG4
-       &&   (s->workaround_bugs&FF_BUG_AUTODETECT)
+       &&   (s->workaround_bugs&FF_BUG_AUTODETECT) 
+       &&  !(s->workaround_bugs&FF_BUG_NO_PADDING) // MEANX
        &&    s->gb.size_in_bits - get_bits_count(&s->gb) >=0
        &&    s->gb.size_in_bits - get_bits_count(&s->gb) < 48
 //       &&   !s->resync_marker
@@ -294,8 +295,10 @@ static int decode_slice(MpegEncContext *s){
                 s->padding_bug_score++;
         }
     }
-
-    if(s->workaround_bugs&FF_BUG_AUTODETECT){
+ // MEANX : slice end not reached when autodetect is set
+      if( !(s->workaround_bugs&FF_BUG_NO_PADDING) &&
+            s->workaround_bugs&FF_BUG_AUTODETECT ){
+    //if(s->workaround_bugs&FF_BUG_AUTODETECT ){
         if(s->padding_bug_score > -2 && !s->data_partitioning /*&& (s->divx_version || !s->resync_marker)*/)
             s->workaround_bugs |=  FF_BUG_NO_PADDING;
         else
