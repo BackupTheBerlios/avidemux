@@ -15,19 +15,14 @@
  *                                                                         *
  ***************************************************************************/
  
- 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ADM_assert.h>
+#include "default.h"
+
 #include <math.h>
 
-#include "config.h"
+#include "ADM_assert.h"
 #include "fourcc.h"
 #include "avio.hxx"
-#include "config.h"
 #include "avi_vars.h"
-
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
@@ -41,6 +36,7 @@
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 #include "ADM_vidParticle.h"
+#include "DIA_flyDialog.h" // for MenuMapping
 
 FILE * ADMVideoParticle::outfp = 0;
 uint32_t ADMVideoParticle::last_frame_written = 0xffffffff;
@@ -66,7 +62,7 @@ ADMVideoParticle::ADMVideoParticle (AVDMGenericVideoStream *in, CONFcouple *coup
     _info.encoding = 1;
     _uncompressed = new ADMImage(_in->getInfo()->width, _in->getInfo()->height);
     ADM_assert(_uncompressed);
-    _param = NEW(PARTICLE_PARAM);
+    _param = new PARTICLE_PARAM;
 
     if (couples)
     {
@@ -78,8 +74,7 @@ ADMVideoParticle::ADMVideoParticle (AVDMGenericVideoStream *in, CONFcouple *coup
         GET(bottom_crop);
         GET(output_format);
 
-        char * tmp;
-        GET2(output_file, tmp);
+        GET(output_file);
         GET(camera_number);
         GET(debug);
     }
@@ -92,7 +87,7 @@ ADMVideoParticle::ADMVideoParticle (AVDMGenericVideoStream *in, CONFcouple *coup
         _param->top_crop = 0;
         _param->bottom_crop = 0;
         _param->output_format = OUTPUTFMT_FORMAT_NEW;
-        _param->output_file = ADM_strdup ("");
+        // _param->output_file = ""; // implicit
         _param->camera_number = 1;
         _param->debug = 0;
     }
@@ -122,7 +117,36 @@ uint8_t	ADMVideoParticle::getCoupledConf (CONFcouple **couples)
 
 uint8_t ADMVideoParticle::configure(AVDMGenericVideoStream *in)
 {
-    UNUSED_ARG(in);
+    diaMenuEntry tOutputFmt [] = {
+        { OUTPUTFMT_FORMAT_NEW,
+          QT_TR_NOOP("New format, preferred, good for Tracker3D"), NULL },
+        { OUTPUTFMT_FORMAT_OLD,
+          QT_TR_NOOP("Old format that Tracker3D can't read directly"), NULL },
+    };
+
+    diaElemMenu output_format
+        (&(_param->output_format), QT_TR_NOOP("Output _Format:"),
+         sizeof (tOutputFmt) / sizeof (diaMenuEntry), tOutputFmt);
+
+    MenuMapping menu_mapping [] = {
+        { "outputFormatMenu", my_offsetof (PARTICLE_PARAM, output_format),
+          sizeof (tOutputFmt) / sizeof (diaMenuEntry), tOutputFmt },
+    };
+
+    uint8_t ret = DIA_particle (_in, _param, menu_mapping,
+                                sizeof (menu_mapping) / sizeof (MenuMapping));
+    if (ret == 1)
+    {
+        return ret;
+    }
+    else if (ret == 0) // 0 = cancel
+    {
+        return ret;
+    }
+    else
+    {
+        ADM_assert (ret == 255); // 255 = whizzy dialog not implemented
+    }
 
     diaElemUInteger min_area
         (&(_param->min_area),
@@ -144,20 +168,8 @@ uint8_t ADMVideoParticle::configure(AVDMGenericVideoStream *in)
         (&(_param->bottom_crop),
          QT_TR_NOOP("_Bottom crop (ignore particles in):"), 0, 0x7fffffff);
 
-    diaMenuEntry tOutputFmt [] = {
-        { OUTPUTFMT_FORMAT_NEW,
-          QT_TR_NOOP("New format, preferred, good for Tracker3D"), NULL },
-        { OUTPUTFMT_FORMAT_OLD,
-          QT_TR_NOOP("Old format that Tracker3D can't read directly"), NULL },
-    };
-
-    diaElemMenu output_format
-        (&(_param->output_format), QT_TR_NOOP("_Output Format:"),
-         sizeof (tOutputFmt) / sizeof (diaMenuEntry), tOutputFmt);
-
     diaElemFile output_file
-        (1, const_cast<char **>(&(_param->output_file)),
-         QT_TR_NOOP("_Output File:"), "pts");
+        (1, &(_param->output_file), QT_TR_NOOP("_Output File:"), "pts");
 
     diaElemUInteger camera_number
         (&(_param->camera_number), QT_TR_NOOP("_Camera number:"), 1, 0x7fffffff);
@@ -169,9 +181,9 @@ uint8_t ADMVideoParticle::configure(AVDMGenericVideoStream *in)
                           &top_crop, &bottom_crop, &output_format,
                           &output_file, &camera_number, &debug };
 
-    uint8_t ret = diaFactoryRun("Particle", sizeof (elems) / sizeof (diaElem *), elems);
+    ret = diaFactoryRun ("Particle Detection Configuration",
+                         sizeof (elems) / sizeof (diaElem *), elems);
     return ret;
-	
 }
 
 ADMVideoParticle::~ADMVideoParticle()
@@ -201,11 +213,11 @@ char *ADMVideoParticle::printConf (void)
                           _param->top_crop, _param->bottom_crop);
     }
 
-    if (_param->output_file && _param->output_file[0])
+    if (!_param->output_file.empty())
     {
         cptr += snprintf (cptr, CONF_LEN - (cptr - conf), ", %s Output to %s",
                           _param->output_format == OUTPUTFMT_FORMAT_OLD
-                          ? "Old" : "New", _param->output_file);
+                          ? "Old" : "New", _param->output_file.c_str());
     }
 
     cptr += snprintf (cptr, CONF_LEN - (cptr - conf), ", Camera # %u",
@@ -224,51 +236,28 @@ uint8_t ADMVideoParticle::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
     if (frame >= _info.nb_frames)
         return 0;
 
-    uint32_t real_frame = frame + _info.orgFrame;
-
-    uint32_t debug = _param->debug;
-
-    if (debug & 1)
+    if (_param->debug & 1)
         printf ("in ADMVideoParticle::getFrameNumberNoAlloc(%d, ...)\n", frame);
 
-    uint32_t w = _info.width;
-    uint32_t h = _info.height;
-    uint32_t planesize = w * h;
-    uint32_t uvplanesize = planesize >> 2;
-    uint32_t size = planesize + (uvplanesize * 2);
-    *len = size;
-			
     if (!_in->getFrameNumberNoAlloc (frame, len, _uncompressed, flags))
         return 0;
-    ADMImage * image = _uncompressed;
 
-    memset (UPLANE (data), 128, uvplanesize);
-    memset (VPLANE (data), 128, uvplanesize);
-    memset (YPLANE (data), 0, planesize);
+    uint32_t planesize = _info.width * _info.height;
+    uint32_t size = (planesize * 3) >> 1;
+    *len = size;
 
-    // HERE: we should erase anything outside the ROI (region of interest),
-    // unless we decide to handle that some other way and/or place...
-
-    uint8_t * imagePixels = YPLANE (image);
-    ImageTool imtool (imagePixels, w, h, data);
-    imtool.setDebug (debug);
-    imtool.setMinArea (_param->min_area);
-    imtool.setMaxArea (_param->max_area);
-    static uint32_t particleNum = 0;
-
+    uint32_t real_frame = frame + _info.orgFrame;
     OutputFmt outfmt = static_cast <OutputFmt> (_param->output_format);
-    uint32_t camera_number = _param->camera_number;
 
-    if (!outfp && real_frame == 0
-        && _param->output_file && _param->output_file[0])
+    if (!outfp && real_frame == 0 && !_param->output_file.empty())
     {
         printf ("Preparing to write particle list to %s\n",
-                _param->output_file);
+                _param->output_file.c_str());
 
-        outfp = fopen (_param->output_file, "w");
+        outfp = fopen (_param->output_file.c_str(), "w");
         if (!outfp)
         {
-            perror (_param->output_file);
+            perror (_param->output_file.c_str());
         }
         else if (real_frame == 0) // ick
         {
@@ -279,10 +268,59 @@ uint8_t ADMVideoParticle::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
         }
     }
 
-    for (uint32_t y = 0; y < h; y++)
+    uint8_t ret = doParticle (_uncompressed, data, _in, real_frame,
+                              (last_frame_written == real_frame) ? 0 : outfp,
+                              _param, _info.width, _info.height);
+
+    last_frame_written = real_frame;
+
+    if (outfp && real_frame >= _info.nb_frames + _info.orgFrame - 1)
     {
-        uint8_t * pixelrow = imagePixels + (y * w);
-        for (uint32_t x = 0; x < w; x++)
+        fclose (outfp);
+        outfp = 0;
+        printf ("Finished writing particle list to %s\n",
+                _param->output_file.c_str());
+    }
+
+    return ret;
+}
+
+uint8_t
+ADMVideoParticle::doParticle (ADMImage * image, ADMImage * data,
+                              AVDMGenericVideoStream * in,
+                              uint32_t real_frame,
+                              FILE * do_outfp, PARTICLE_PARAM * param,
+                              uint32_t width, uint32_t height)
+{
+    uint32_t debug = param->debug;
+
+    uint32_t planesize = width * height;
+    uint32_t uvplanesize = planesize >> 2;
+    uint32_t size = planesize + (uvplanesize * 2);
+			
+    memset (UPLANE (data), 128, uvplanesize);
+    memset (VPLANE (data), 128, uvplanesize);
+    memset (YPLANE (data), 0, planesize);
+
+    // HERE: we should erase anything outside the ROI (region of interest),
+    // unless we decide to handle that some other way and/or place...
+
+    uint8_t * imagePixels = YPLANE (image);
+    ImageTool imtool (imagePixels, width, height, data);
+    imtool.setDebug (debug);
+    imtool.setMinArea (param->min_area);
+    imtool.setMaxArea (param->max_area);
+    imtool.setCropping (param->left_crop, param->right_crop,
+                        param->top_crop, param->bottom_crop);
+    static uint32_t particleNum = 0;
+
+    OutputFmt outfmt = static_cast <OutputFmt> (param->output_format);
+    uint32_t camera_number = param->camera_number;
+
+    for (uint32_t y = param->top_crop; y < height - param->bottom_crop; y++)
+    {
+        uint8_t * pixelrow = imagePixels + (y * width);
+        for (uint32_t x = param->left_crop; x < width - param->right_crop; x++)
         {
             if (imtool.goodPixel (pixelrow [x]))
             {
@@ -292,38 +330,29 @@ uint8_t ADMVideoParticle::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
                 uint32_t area = imtool.particleArea();
                 float centroid_x = imtool.particleCentroidX();
                 float centroid_y = imtool.particleCentroidY();
+
                 if (debug & 0x01)
                     printf ("%d %d %.6f %.6f %d\n",
                             ++particleNum, area, centroid_x, centroid_y,
                             real_frame + 1);
 
-                if (!outfp || last_frame_written == real_frame)
+                if (!do_outfp)
                     continue;
 
                 if (outfmt == OUTPUTFMT_FORMAT_NEW)
                 {
-                    fprintf (outfp, "%d %d %.6f %.6f %d %d\n",
+                    fprintf (do_outfp, "%d %d %.6f %.6f %d %d\n",
                              real_frame + 1, camera_number, centroid_x, centroid_y,
                              area, ++particleNum);
                 }
                 else
                 {
-                    fprintf (outfp, "%d %d %.6f %.6f %d\n",
+                    fprintf (do_outfp, "%d %d %.6f %.6f %d\n",
                              ++particleNum, area, centroid_x, centroid_y,
                              real_frame + 1);
                 }
             }
         }
-    }
-
-    last_frame_written = real_frame;
-
-    if (outfp && real_frame >= _info.nb_frames + _info.orgFrame - 1)
-    {
-        fclose (outfp);
-        outfp = 0;
-        printf ("Finished writing particle list to %s\n",
-                _param->output_file);
     }
 
     data->copyInfo(image);

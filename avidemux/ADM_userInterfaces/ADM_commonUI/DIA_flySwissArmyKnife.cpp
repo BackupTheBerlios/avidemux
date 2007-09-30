@@ -1,9 +1,9 @@
 /***************************************************************************
-                          ADM_guiContrast.cpp  -  description
-                             -------------------
-    begin                : Mon Sep 23 2002
-    copyright            : (C) 2002 by mean
-    email                : fixounet@free.fr
+                          DIA_flySwissArmyKnife.cpp  -  configuration dialog for
+						   Swiss Army Knife filter
+                              -------------------
+                         Chris MacGregor, September 2007
+                         chris-avidemux@bouncingdog.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -21,40 +21,41 @@
 
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_videoFilter/ADM_vidContrast.h"
+#include "ADM_videoFilter/ADM_vidSwissArmyKnife.h"
 #include "DIA_flyDialog.h"
-#include "DIA_flyContrast.h"
+#include "DIA_flySwissArmyKnife.h"
+
 /************* COMMON PART *********************/
-uint8_t  flyContrast::update(void)
+
+uint8_t flySwissArmyKnife::sliderChanged ()
+{
+    if (!param.enable_preview)
+        return 0;
+
+    return ADM_flyDialog::sliderChanged();
+}
+
+uint8_t  flySwissArmyKnife::update ()
 {
     download();
+    if (!param.enable_preview)
+        return 0;
+
     process();
-	copyYuvFinalToRgb();
+    copyYuvFinalToRgb();
     display();
     return 1;
 }
-// Ugly !
-static uint8_t tableluma[256], tablechroma[256];
 
-uint8_t flyContrast::process(void)
-
+uint8_t flySwissArmyKnife::process ()
 {
-  buildContrastTable (param.coef, param.offset, tableluma, tablechroma);
+    if (!param.enable_preview)
+        return 0;
 
-  memcpy (_yuvBufferOut->data, _yuvBuffer->data, (_h * _w * 3)>>1);
-  if (param.doLuma)
-    {
-      doContrast (YPLANE(_yuvBuffer), YPLANE(_yuvBufferOut), tableluma, _w, _h);
-    }
-  if (param.doChromaU)
-    {
-      doContrast (UPLANE(_yuvBuffer), UPLANE(_yuvBufferOut), tablechroma, _w >> 1, _h >> 1);
-    }
-
-  if (param.doChromaV)
-    {
-     doContrast (VPLANE(_yuvBuffer), VPLANE(_yuvBufferOut), tablechroma, _w >> 1, _h >> 1);
-    }
-    return 1;
+    uint8_t ret =
+        ADMVideoSwissArmyKnife::doSwissArmyKnife (_yuvBuffer, _yuvBufferOut,
+                                                  _in, sakp, &param, _w, _h);
+    return ret;
 }
+
 /************* COMMON PART *********************/

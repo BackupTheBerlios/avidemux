@@ -17,18 +17,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
-#include <stdio.h>         
-#include <stdlib.h>
-#include <math.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/time.h>
-
-#include <../ADM_assert.h>
 
 #include "default.h"
+
+#include "ADM_assert.h"
 
 #include "ADM_commonUI/GUI_render.h"
 

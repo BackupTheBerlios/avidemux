@@ -171,6 +171,13 @@ diaElemFile::diaElemFile(uint32_t write,char **filename,const char *toggleTitle,
  
 }
 
+diaElemFile::diaElemFile(uint32_t write,std::string * filename,const char *toggleTitle,
+                         const char *defaultSuffix, const char *tip)
+  : diaElem(ELEM_FILE_READ)
+{
+ 
+}
+
 diaElemFile::~diaElemFile()
 {
   

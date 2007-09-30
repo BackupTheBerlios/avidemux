@@ -1,6 +1,6 @@
 
 /***************************************************************************
-                          DIA_animated
+                          DIA_none
     copyright            : (C) 2006 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
@@ -54,5 +54,21 @@ void destroyGUI(void) {}
 int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b) {return 0;}
 uint8_t DIA_glyphEdit(void){ return 0;};
 int32_t UI_readJog(void) {return 0;}
+struct THRESHOLD_PARAM;
+uint8_t DIA_threshold(AVDMGenericVideoStream *in,
+                      THRESHOLD_PARAM * param) { return 255; }
+struct SWISSARMYKNIFE_PARAM;
+struct ADMVideoSwissArmyKnife;
+struct MenuMapping;
+uint8_t DIA_SwissArmyKnife (AVDMGenericVideoStream * in,
+                            ADMVideoSwissArmyKnife * sakp,
+                            SWISSARMYKNIFE_PARAM * param,
+                            const MenuMapping * menu_mapping,
+                            uint32_t menu_mapping_count) { return 255; }
+struct PARTICLE_PARAM;
+uint8_t DIA_particle (AVDMGenericVideoStream *in,
+                      PARTICLE_PARAM * param,
+                      const MenuMapping * menu_mapping,
+                      uint32_t menu_mapping_count) { return 255; }
 
 //EOF

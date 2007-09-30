@@ -14,19 +14,12 @@
  *                                                                         *
  ***************************************************************************/
  
- 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ADM_assert.h>
-#include <math.h>
+#include "default.h"
 
-#include "config.h"
+#include "ADM_assert.h"
 #include "fourcc.h"
 #include "avio.hxx"
-#include "config.h"
 #include "avi_vars.h"
-
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
@@ -50,13 +43,13 @@ ADMVideoThreshold::ADMVideoThreshold(AVDMGenericVideoStream *in,CONFcouple *coup
 			
 {
     printf ("ADMVideoThreshold ctor (%p)\n", this);
-    _in=in;
+    _in = in;
     memcpy(&_info,in->getInfo(),sizeof(_info));
-    _info.encoding=1;	
-    _uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
-    ADM_assert(_uncompressed);    	  	
-    _param=NEW( THRESHOLD_PARAM );
-    if(couples)
+    _info.encoding = 1;
+    _uncompressed = new ADMImage(_in->getInfo()->width, _in->getInfo()->height);
+    ADM_assert(_uncompressed);
+    _param = new THRESHOLD_PARAM;
+    if (couples)
     {
         GET(min);
         GET(max);
@@ -71,27 +64,31 @@ ADMVideoThreshold::ADMVideoThreshold(AVDMGenericVideoStream *in,CONFcouple *coup
         _param->debug = 0;
     }
 
-    computeLookupTable();
+    computeLookupTable (_param, lookup_table);
 }
 
-void ADMVideoThreshold::computeLookupTable ()
+uint8_t ADMVideoThreshold::computeLookupTable (THRESHOLD_PARAM * param,
+                                               uint8_t lookup_table [256])
 {
-    if (_param->min > _param->max)
+    uint8_t changed = false;
+
+    if (param->min > param->max)
     {
-        uint32_t tmp = _param->min;
-        _param->min = _param->max;
-        _param->max = tmp;
-        _param->in_range_is_white = !_param->in_range_is_white;
+        uint32_t tmp = param->min;
+        param->min = param->max;
+        param->max = tmp;
+        param->in_range_is_white = !param->in_range_is_white;
+        changed = true;
     }
 
-    uint32_t min = _param->min;
-    uint32_t max = _param->max;
+    uint32_t min = param->min;
+    uint32_t max = param->max;
     ADM_assert (min <= max);
 
     uint8_t in_range_value;
     uint8_t out_of_range_value;
 
-    if (_param->in_range_is_white)
+    if (param->in_range_is_white)
     {
         in_range_value = 255;
         out_of_range_value = 0;
@@ -109,6 +106,8 @@ void ADMVideoThreshold::computeLookupTable ()
         else
             lookup_table [i] = in_range_value;
     }
+
+    return changed;
 }
 
 uint8_t	ADMVideoThreshold::getCoupledConf( CONFcouple **couples)
@@ -129,7 +128,20 @@ uint8_t	ADMVideoThreshold::getCoupledConf( CONFcouple **couples)
 
 uint8_t ADMVideoThreshold::configure(AVDMGenericVideoStream *in)
 {
-    UNUSED_ARG(in);
+    uint8_t ret = DIA_threshold (_in, _param);
+    if (ret == 1)
+    {
+        computeLookupTable (_param, lookup_table);
+        return ret;
+    }
+    else if (ret == 0) // 0 = cancel
+    {
+        return ret;
+    }
+    else
+    {
+        ADM_assert (ret == 255); // 255 = whizzy dialog not implemented
+    }
 
     diaElemUSlider minslide(&(_param->min), QT_TR_NOOP("Mi_nimum value to be in-range:"), 0, 255);
     diaElemUSlider maxslide(&(_param->max), QT_TR_NOOP("Ma_ximum value to be in-range:"), 0, 255);
@@ -148,11 +160,11 @@ uint8_t ADMVideoThreshold::configure(AVDMGenericVideoStream *in)
                           0, 0x7fffffff);
     diaElem * elems[] = { &minslide, &maxslide, &in_range_is_white, &debug };
 
-    uint8_t ret = diaFactoryRun("Threshold", sizeof (elems) / sizeof (diaElem *), elems);
+    ret = diaFactoryRun("Threshold Configuration", sizeof (elems) / sizeof (diaElem *), elems);
 
     if (ret) // 0 = cancel
     {
-        computeLookupTable();
+        computeLookupTable (_param, lookup_table);
     }
 
     return ret;
@@ -162,8 +174,8 @@ ADMVideoThreshold::~ADMVideoThreshold()
 {
     printf ("ADMVideoThreshold dtor (%p)\n", this);
     DELETE(_param);
-    delete  _uncompressed;	
-    _uncompressed=NULL;
+    delete _uncompressed;	
+    _uncompressed = NULL;
 }
 
 char *ADMVideoThreshold::printConf (void) 
@@ -195,7 +207,7 @@ uint8_t ADMVideoThreshold::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
                 frame);
 
     uint32_t planesize = _info.width * _info.height;
-    uint32_t size = (planesize*3)>>1;
+    uint32_t size = (planesize * 3) >> 1;
     *len = size;
 			
     if (!_in->getFrameNumberNoAlloc (frame, len, _uncompressed, flags))
@@ -210,55 +222,12 @@ uint8_t ADMVideoThreshold::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
     uint8_t * destp = YPLANE (data) + planesize;
     uint32_t pixremaining = planesize + 1;
 
-#ifdef THRESHOLD_HISTO
-    uint32_t histo_before [256];
-    uint32_t histo_after [256];
-
-    memset (histo_before, 0, 256 * sizeof (uint32_t));
-    memset (histo_after, 0, 256 * sizeof (uint32_t));
-#endif
-
-#ifdef DUMP_FRAME_DATA
-    FILE * fp = fopen ("/tmp/framedump.new.out", "a");
-    ADM_assert(fp);
-#endif
-
     while (--pixremaining)
     {
         int32_t curr = *--currp;
 
-#ifdef THRESHOLD_HISTO
-        histo_before [curr]++;
-#endif
-
-#ifdef DUMP_FRAME_DATA
-        fprintf (fp, "%x\n", curr);
-#endif
-
         *--destp = lookup_table [curr];
-
-#ifdef THRESHOLD_HISTO
-        histo_after [*destp]++;
-#endif
     }
-
-#ifdef DUMP_FRAME_DATA
-    fclose (fp);
-#endif
-
-#ifdef THRESHOLD_HISTO
-    if (debug & 0x800)
-    {
-        printf ("    Histogram:\n\tValue\tBefore\tAfter\tValue\tBefore\tAfter"
-                "\tValue\tBefore\tAfter\tValue\tBefore\tAfter\n");
-        for (int val = 0; val <= 63; val++)
-            printf ("\t%3d:\t%6d\t%6d\t%3d:\t%6d\t%6d\t%3d:\t%6d\t%6d\t%3d:\t%6d\t%6d\n",
-                    val, histo_before [val], histo_after [val],
-                    val + 64, histo_before [val + 64], histo_after [val + 64],
-                    val + 128, histo_before [val + 128], histo_after [val + 128],
-                    val + 192, histo_before [val + 192], histo_after [val + 192]);
-    }
-#endif
 
     // HERE: the following two lines do a luma-only-ize
 
@@ -268,3 +237,27 @@ uint8_t ADMVideoThreshold::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
     data->copyInfo(image);
     return 1;
 }	                           
+
+// This is used by the preview code for the configuration dialog.
+
+void ADMVideoThreshold::doThreshold (ADMImage * from, ADMImage * to,
+                                     uint8_t * lookup_table,
+                                     uint32_t pixelcount)
+{
+    uint8_t * currp = YPLANE (from) + pixelcount;
+    uint8_t * destp = YPLANE (to) + pixelcount;
+    uint32_t pixremaining = pixelcount + 1;
+    uint8_t * table = lookup_table;
+
+    while (--pixremaining)
+    {
+        int32_t curr = *--currp;
+
+        *--destp = table [curr];
+    }
+
+    // HERE: the following two lines do a luma-only-ize
+
+    memset (UPLANE (to), 128, pixelcount >> 2);
+    memset (VPLANE (to), 128, pixelcount >> 2);
+}

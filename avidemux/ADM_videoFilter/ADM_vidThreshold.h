@@ -16,7 +16,9 @@
  
 #ifndef __THRESHOLD__
 #define __THRESHOLD__   
+
 #include "ADM_video/ADM_cache.h"
+
 typedef struct THRESHOLD_PARAM
 {
 
@@ -27,27 +29,34 @@ typedef struct THRESHOLD_PARAM
 
 } THRESHOLD_PARAM;
 
-class  ADMVideoThreshold:public AVDMGenericVideoStream
- {
-
+class ADMVideoThreshold : public AVDMGenericVideoStream
+{
  protected:
     	
-     THRESHOLD_PARAM *  _param;
+     THRESHOLD_PARAM * _param;
      uint8_t lookup_table [256];
 
  public:
  		
 
-     ADMVideoThreshold(  AVDMGenericVideoStream *in,CONFcouple *setup);
+     ADMVideoThreshold (AVDMGenericVideoStream *in, CONFcouple *setup);
 
      ~ADMVideoThreshold();
 
-     virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-                                              ADMImage *data,uint32_t *flags);
+     virtual uint8_t 	getFrameNumberNoAlloc (uint32_t frame, uint32_t *len,
+                                               ADMImage *data,uint32_t *flags);
 
-     virtual uint8_t 	configure( AVDMGenericVideoStream *instream);
+     virtual uint8_t 	configure (AVDMGenericVideoStream *instream);
      virtual char 		   *printConf(void);
-     virtual uint8_t 	getCoupledConf( CONFcouple **couples);
-     void computeLookupTable();
- };
+     virtual uint8_t 	getCoupledConf (CONFcouple **couples);
+
+     static uint8_t computeLookupTable (THRESHOLD_PARAM * param,
+                                        uint8_t lookup_table [256]);
+     static void doThreshold (ADMImage * from, ADMImage * to,
+                              uint8_t * lookup_table, uint32_t pixelcount);
+};
+
+uint8_t DIA_threshold (AVDMGenericVideoStream *in,
+                       THRESHOLD_PARAM * param);
+
 #endif

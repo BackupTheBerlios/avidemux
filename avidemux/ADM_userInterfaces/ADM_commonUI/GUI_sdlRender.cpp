@@ -14,7 +14,9 @@
 //  The pitch stride has to be changed as there could be some padding depending on the OS
 //
 //
-#include "config.h"
+
+#include "default.h"
+
 #if defined(USE_SDL)
 
 #include <stdio.h>
@@ -25,11 +27,16 @@
 #include <sys/time.h>
 
 extern "C" {
+// get rid of warnings due to different definitions
+#undef HAVE_INTTYPES_H
+#undef HAVE_MALLOC_H
+#undef HAVE_STDINT_H
+#undef HAVE_STDLIB_H
+#undef HAVE_STRING_H
+#undef HAVE_SYS_TYPES_H
 #include "SDL/SDL.h"
 #include "SDL/SDL_syswm.h"
 }
-
-#include "default.h"
 
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_colorspace/ADM_rgb.h"

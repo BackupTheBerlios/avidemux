@@ -23,11 +23,20 @@
 #include <assert.h>
 #include <math.h>
 #include <inttypes.h>
+#ifdef HAVE_UNISTD_H
+// avoid warnings due to different definition of this in freetype headers
+#define WE_DO_HAVE_UNISTD_H
+#undef HAVE_UNISTD_H
+#endif
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_STROKER_H
 #include FT_GLYPH_H
 #include FT_SYNTHESIS_H
+#ifdef WE_DO_HAVE_UNISTD_H
+#undef HAVE_UNISTD_H
+#define HAVE_UNISTD_H
+#endif
 
 #include "mputils.h"
 

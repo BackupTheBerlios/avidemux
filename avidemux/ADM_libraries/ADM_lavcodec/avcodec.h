@@ -2230,7 +2230,8 @@ void av_resample_close(struct AVResampleContext *c);
 /**
  * @deprecated Use the software scaler (swscale) instead.
  */
-typedef struct ImgReSampleContext ImgReSampleContext attribute_deprecated;
+//typedef struct ImgReSampleContext ImgReSampleContext attribute_deprecated;
+typedef struct ImgReSampleContext ImgReSampleContext;
 
 /**
  * @deprecated Use the software scaler (swscale) instead.

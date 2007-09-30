@@ -17,13 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 
-
-
-#include <config.h>
-#include <math.h>
-#include <string.h>
-#include <stdio.h>
-
 #include "default.h"
 
 #include "ADM_assert.h"

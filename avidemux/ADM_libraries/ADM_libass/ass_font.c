@@ -21,11 +21,21 @@
 #include "config.h"
 
 #include <inttypes.h>
+#ifdef HAVE_UNISTD_H
+// avoid warnings due to different definition of this in freetype headers
+#define WE_DO_HAVE_UNISTD_H
+#undef HAVE_UNISTD_H
+#endif
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_SYNTHESIS_H
 #include FT_GLYPH_H
 #include FT_TRUETYPE_TABLES_H
+#ifdef HAVE_UNISTD_H
+// avoid warnings due to different definition of this in freetype headers
+#define WE_DO_HAVE_UNISTD_H
+#undef HAVE_UNISTD_H
+#endif
 
 #include "ass.h"
 #include "ass_library.h"

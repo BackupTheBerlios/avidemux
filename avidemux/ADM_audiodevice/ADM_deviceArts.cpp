@@ -14,21 +14,14 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
+#include "default.h"
+
 #ifndef ADM_WIN32 
 #ifdef USE_ARTS
 #include <artsc.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
 #include <ADM_assert.h>  
-#include "default.h"
 #include "ADM_audiodevice.h"
 #include  "ADM_audiodevice/ADM_deviceoss.h"
 #include  "ADM_audiodevice/ADM_deviceArts.h"

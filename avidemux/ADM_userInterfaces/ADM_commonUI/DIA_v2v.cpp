@@ -14,16 +14,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-# include "config.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-
-# include <math.h>
 #include "default.h"
+
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
 #include "DIA_factory.h"

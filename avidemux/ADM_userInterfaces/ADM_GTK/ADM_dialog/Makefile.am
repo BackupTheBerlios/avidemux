@@ -28,6 +28,9 @@ libADM_dialogGtk_a_SOURCES =  DIA_vcodec.cpp DIA_acodec.cpp \
 	DIA_coloryuv.cpp \
 	DIA_quota.cpp \
 	DIA_partial.cpp  \
+	DIA_threshold.cpp \
+	DIA_SwissArmyKnife.cpp \
+	DIA_particle.cpp \
 	DIA_flyDialog.cpp
 
 
@@ -51,6 +54,6 @@ DIA_preview.cpp     \
 DIA_busy.cpp         DIA_properties.cpp  DIA_xvid.cpp \
 DIA_busy.h            DIA_quota.cpp       DIA_xvid4.cpp \
 DIA_calculator.cpp   DIA_encoding.cpp      DIA_recent.cpp \
-DIA_chromaShift.cpp  DIA_encoding.h        DIA_lavpp_deint.cpp   
-
+DIA_chromaShift.cpp  DIA_encoding.h        DIA_lavpp_deint.cpp \
+DIA_threshold.cpp    DIA_SwissArmyKnife.cpp DIA_particle.cpp
 

@@ -18,19 +18,12 @@
  *                                                                         *
  ***************************************************************************/
  
- 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ADM_assert.h>
-#include <math.h>
+#include "default.h"
 
-#include "config.h"
+#include "ADM_assert.h"
 #include "fourcc.h"
 #include "avio.hxx"
-#include "config.h"
 #include "avi_vars.h"
-
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
@@ -67,12 +60,13 @@ BUILD_CREATE(computeaverage_create,ADMVideoComputeAverage);
 ADMVideoComputeAverage::ADMVideoComputeAverage(AVDMGenericVideoStream *in,CONFcouple *couples)
 			
 {
-    _in=in;
-    memcpy(&_info,in->getInfo(),sizeof(_info));
+    _in = in;
+    memcpy (&_info, in->getInfo(), sizeof(_info));
     _info.encoding = 1;	
-    _uncompressed = new ADMImage (_in->getInfo()->width,_in->getInfo()->height);
+    _uncompressed = new ADMImage (_in->getInfo()->width, _in->getInfo()->height);
     ADM_assert(_uncompressed);
-    _param=NEW (COMPUTEAVERAGE_PARAM);
+    _param = new COMPUTEAVERAGE_PARAM;
+
     if (couples)
     {
         GET(start_frame);

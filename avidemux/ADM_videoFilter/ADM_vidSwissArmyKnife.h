@@ -32,24 +32,35 @@ struct SWISSARMYKNIFE_PARAM
     uint32_t tool; // ADMVideoSwissArmyKnife::Tool
     uint32_t input_type; // ADMVideoSwissArmyKnife::Input
 
-    const char * input_file;
+    std::string input_file;
     float load_bias;
     float load_multiplier;
 
     float input_constant;
 
-    uint32_t memory_constant_denom;
+    float    memory_constant_alpha;
     uint32_t init_start_frame;
     uint32_t init_end_frame;
     uint32_t init_by_rolling;
 
     int32_t  bias;
-    int32_t  scale_from_min;
-    int32_t  scale_from_max;
+    float    result_bias;
+    float    result_multiplier;
     uint32_t histogram_frame_interval;
     uint32_t debug;
 
+    bool     enable_preview;  // not loaded/stored; only for dialog
 };
+
+// Alas, because offsetof() is only supposed to work on POD (plain old data)
+// structs, and our SWISSARMYKNIFE_PARAM includes a std::string (which has a
+// constructor, and which causes SWISSARMYKNIFE_PARAM to therefore have an
+// implicit constructor), we need to define our own offsetof() to use for the
+// dialog menus.  See
+// http://www.cplusplus.com/reference/clibrary/cstddef/offsetof.html for more
+// on offsetof().
+
+#define my_offsetof(_type, _memb) (size_t (&(((_type *)1)->_memb)) - 1)
 
 class ADMVideoSwissArmyKnife : public AVDMGenericVideoStream
 {
@@ -79,6 +90,8 @@ protected:
 
         uint32_t      image_w;
         uint32_t      image_h;
+        float         image_bias;
+        float         image_multiplier;
         uint8_t *     image_int;
         float *       image_float;
 
@@ -86,7 +99,7 @@ protected:
         time_t        input_file_mtime;
 
         float *       bg;
-        uint32_t      bg_mc;
+        float         bg_mca;
         uint32_t      bg_isf;
         uint32_t      bg_ief;
         uint32_t      bg_x;
@@ -111,13 +124,15 @@ protected:
 
               image_w (0),
               image_h (0),
+              image_bias (0),
+              image_multiplier (0),
               image_int (0),
               image_float (0),
 
               input_file_mtime (0),
 
               bg (0),
-              bg_mc (0),
+              bg_mca (0),
               bg_isf (0),
               bg_ief (0),
               bg_x (0),
@@ -149,6 +164,7 @@ protected:
 
     PersistentInfo * myInfo;
 
+public:
     enum Input
     {
         INPUT_INVALID = 0,
@@ -162,6 +178,7 @@ protected:
         INPUT_COUNT
     };
 
+protected:
     enum Tool
     {
         TOOL_INVALID = 0,
@@ -214,7 +231,6 @@ protected:
 
         TOOL_ADD_HISTOGRAM = TOOL_A_WITH_HISTOGRAM - TOOL_A,
         TOOL_ADD_SCALING = TOOL_A_SCALED - TOOL_A,
-
     };
 
     struct ToolMap
@@ -222,11 +238,12 @@ protected:
         Tool toolid;
         const char * outputName; // displayed name
         const char * format;     // printf format (%s is A)
+        const char * spacy_format; // same with more whitespace
     };
 
     static ToolMap tool_map [];
 
-    SWISSARMYKNIFE_PARAM *  _param;
+    SWISSARMYKNIFE_PARAM * _param;
 
 public:
 
@@ -237,28 +254,53 @@ public:
                                            ADMImage *data, uint32_t *flags);
 
     virtual uint8_t configure (AVDMGenericVideoStream *instream);
-    virtual char * printConf(void);
+    virtual char * printConf (void);
     virtual uint8_t getCoupledConf (CONFcouple **couples);
+
+    static char * getConf (SWISSARMYKNIFE_PARAM * param, bool forDialog);
+
+    static uint8_t doSwissArmyKnife (ADMImage * from_image,
+                                     ADMImage * to_image,
+                                     AVDMGenericVideoStream * in,
+                                     ADMVideoSwissArmyKnife * sak,
+                                     SWISSARMYKNIFE_PARAM * param,
+                                     uint32_t width, uint32_t height);
 
 private:
 
     template <typename Oper, typename Histo>
     void computeRollingAverage (ADMImage * image, ADMImage * data,
-                                uint32_t planesize, int32_t bias,
+                                uint32_t planesize,
+                                SWISSARMYKNIFE_PARAM * param,
+                                int32_t bias,
                                 const Oper & op_in,
                                 const Histo & histogram_in);
 
     template <typename InputImageType, typename Oper, typename Histo>
     void applyImage (ADMImage * image, ADMImage * data,
-                     uint32_t planesize, int32_t bias,
-                     InputImageType * input_image,
+                     uint32_t planesize,
+                     SWISSARMYKNIFE_PARAM * param,
+                     int32_t bias, InputImageType * input_image,
                      const Oper & op_in, const Histo & histogram_in);
 
     template <typename Oper, typename Histo>
     void applyConstant (ADMImage * image, ADMImage * data,
-                        uint32_t planesize, int32_t bias,
+                        uint32_t planesize,
+                        SWISSARMYKNIFE_PARAM * param,
+                        int32_t bias,
                         const Oper & op_in,
                         const Histo & histogram_in);
-
+    const ADV_Info & getInfo () const
+    {
+        return _info;
+    }
 };
+
+struct MenuMapping;
+uint8_t DIA_SwissArmyKnife (AVDMGenericVideoStream * in,
+                            ADMVideoSwissArmyKnife * sakp,
+                            SWISSARMYKNIFE_PARAM * param,
+                            const MenuMapping * menu_mapping,
+                            uint32_t menu_mapping_count);
+
 #endif

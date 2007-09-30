@@ -17,11 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <config.h>
-#include <string.h>
-#include <stdio.h>
-# include <math.h>
-
 #include "default.h"
 
 #include "ADM_image.h"

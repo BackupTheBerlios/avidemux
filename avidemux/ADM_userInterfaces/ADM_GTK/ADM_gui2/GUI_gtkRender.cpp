@@ -14,11 +14,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 
-#include <stdio.h>         
-#include <stdlib.h>
-#include <unistd.h>
+#include "default.h"
 
 #include <gtk/gtk.h>
 #ifdef ADM_WIN32
@@ -29,7 +26,6 @@
 #endif
 
 #include "../ADM_assert.h"
-#include "default.h"
 #include "../ADM_osSupport/ADM_misc.h"
 
 #include "ADM_commonUI/GUI_render.h"
@@ -64,7 +60,9 @@ void UI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr)
 
     if(lastW>w || lastH>h)
     {
-      printf("[GTK] Warning window bigger than display %u x %u vs %u x %u\n",w,h,lastW,lastH);
+// This makes a lot of noise if you use the Crop filter...  perhaps it should
+// be output only once?  Or maybe there is a real bug - I'm not sure.  [Chris MacGregor]
+//      printf("[GTK] Warning window bigger than display %u x %u vs %u x %u\n",w,h,lastW,lastH);
     }
 
     gdk_draw_rgb_32_image(widget->window, widget->style->fg_gc[GTK_STATE_NORMAL], 0,    // X

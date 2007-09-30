@@ -24,12 +24,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+#include "default.h"
+
 #include <math.h>
 #include <iconv.h>
 #include <errno.h>
@@ -37,7 +34,6 @@
 
 #ifdef USE_FREETYPE
 //#define __STDC_ISO_10646__
-#include "default.h"
 #include "ADM_osSupport/ADM_misc.h"
 
 #include "ADM_toolkit/toolkit.hxx"
@@ -48,7 +44,7 @@
 
 #include "ADM_video/ADM_vidFont.h"
 #include "ADM_videoFilter/ADM_vidSRT.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER

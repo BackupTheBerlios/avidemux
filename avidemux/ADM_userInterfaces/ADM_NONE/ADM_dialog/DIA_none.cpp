@@ -105,6 +105,22 @@ uint8_t DIA_dnr(uint32_t *llock,uint32_t *lthresh, uint32_t *clock,
 int DIA_srtPos(AVDMGenericVideoStream *source,uint32_t *size,uint32_t *position) {return 0;}
 int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b) {return 0;}			
 uint8_t DIA_glyphEdit(void) {return 0;}
+struct THRESHOLD_PARAM;
+uint8_t DIA_threshold(AVDMGenericVideoStream *in,
+                      THRESHOLD_PARAM * param) { return 255; }
+struct SWISSARMYKNIFE_PARAM;
+struct ADMVideoSwissArmyKnife;
+struct MenuMapping;
+uint8_t DIA_SwissArmyKnife (AVDMGenericVideoStream * in,
+                            ADMVideoSwissArmyKnife * sakp,
+                            SWISSARMYKNIFE_PARAM * param,
+                            const MenuMapping * menu_mapping,
+                            uint32_t menu_mapping_count) { return 255; }
+struct PARTICLE_PARAM;
+uint8_t DIA_particle (AVDMGenericVideoStream *in,
+                      PARTICLE_PARAM * param,
+                      const MenuMapping * menu_mapping,
+                      uint32_t menu_mapping_count) { return 255; }
 uint8_t ADM_ocrUpdateNbLines(void *ui,uint32_t cur,uint32_t total) {return 0;}
 uint8_t ADM_ocrUpdateNbGlyphs(void *ui,uint32_t nbGlyphs) {return 0;}
 uint8_t ADM_ocrUpdateTextAndTime(void *ui,char *decodedString,char *timeCode) {	return 0;}

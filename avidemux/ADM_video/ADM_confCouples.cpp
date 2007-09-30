@@ -14,16 +14,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
- 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-#include <time.h>
-#include <sys/time.h>
-
-
+#include "default.h"
 
 #include "fourcc.h"
 #include "avio.hxx"
@@ -117,6 +109,15 @@ uint8_t CONFcouple::setCouple(const char *myname,const ADM_filename *val)
 	cur++;
 	return 1;
 }
+uint8_t CONFcouple::setCouple(const char *myname,const std::string & val)
+{
+	ADM_assert(cur<nb);
+
+	name[cur]=ADM_strdup(myname);
+	value[cur]=ADM_strdup(val.c_str());
+	cur++;
+	return 1;
+}
 
 
 uint8_t CONFcouple::getCouple(const char *myname,uint32_t *val)
@@ -155,9 +156,18 @@ uint8_t CONFcouple::getCouple(const char *myname,ADM_filename **val)
 	*val=(ADM_filename *)ADM_strdup(value[index]);
 	return 1;
 }
+uint8_t CONFcouple::getCouple(const char *myname,std::string *val)
+{
+	int32_t index=lookupName(myname);
+
+	ADM_assert(index!=-1);
+	ADM_assert(index<(int)nb);
+	*val=value[index];
+	return 1;
+}
 uint8_t CONFcouple::getCouple(const char *myname,float *val)
 {
-int32_t index=lookupName(myname);
+	int32_t index=lookupName(myname);
 
 	ADM_assert(index!=-1);
 	ADM_assert(index<(int)nb);

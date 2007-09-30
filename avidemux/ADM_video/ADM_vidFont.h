@@ -18,8 +18,17 @@
 #undef free
 #undef alloc
 #undef realloc
+#ifdef HAVE_UNISTD_H
+// avoid warnings due to different definition of this in freetype headers
+#define WE_DO_HAVE_UNISTD_H
+#undef HAVE_UNISTD_H
+#endif
  #include <ft2build.h>
  #include FT_FREETYPE_H
+#ifdef WE_DO_HAVE_UNISTD_H
+#undef HAVE_UNISTD_H
+#define HAVE_UNISTD_H
+#endif
 
  class ADMfont
  {

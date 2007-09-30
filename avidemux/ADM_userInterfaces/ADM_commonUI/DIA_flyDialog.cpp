@@ -12,11 +12,6 @@
 *                                                                         *
 ***************************************************************************///
 
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "default.h"
 
 #include "ADM_colorspace/ADM_rgb.h"
@@ -76,8 +71,8 @@ ADM_flyDialog::ADM_flyDialog(uint32_t width,uint32_t height,AVDMGenericVideoStre
 			_resizeMethod = RESIZE_NONE;
 		else
 		{
-			_zoomW = _w * zoom;
-			_zoomH = _h * zoom;
+			_zoomW = uint32_t (_w * zoom);
+			_zoomH = uint32_t (_h * zoom);
 		}
 	}
 

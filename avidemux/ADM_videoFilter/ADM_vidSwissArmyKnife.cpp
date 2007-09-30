@@ -15,13 +15,10 @@
  *                                                                         *
  ***************************************************************************/
  
- 
+#include "default.h"
+
 #include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <errno.h>
-#include <ADM_assert.h>
 #include <math.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -30,10 +27,9 @@
 #include <fstream>
 #include <iterator>
 
-#include "config.h"
+#include "ADM_assert.h"
 #include "fourcc.h"
 #include "avio.hxx"
-#include "config.h"
 #include "avi_vars.h"
 
 #include "ADM_toolkit/toolkit.hxx"
@@ -50,6 +46,7 @@
 #include "ADM_vidSwissArmyKnife.h"
 #include "ADM_vidParticle.h" // for ImageTool
 #include "ADM_vidComputeAverage.h" // for ADMVideoComputeAverage::FileHeader
+#include "DIA_flyDialog.h" // for MenuMapping
 
 static const int MAX_PIXEL_LUMA = 255;
 
@@ -57,27 +54,27 @@ static FILTER_PARAM swissArmyKnifeParam =
 {
     15,
     { "tool", "input_type", "input_file", "load_bias",              // 4
-      "load_multiplier", "input_constant", "memory_constant_denom", // + 3 = 7
+      "load_multiplier", "input_constant", "memory_constant_alpha", // + 3 = 7
       "init_start_frame", "init_end_frame", "init_by_rolling",      // + 3 = 10
-      "bias", "scale_from_min", "scale_from_max",                   // + 3 = 13
+      "bias", "result_bias", "result_multiplier",                   // + 3 = 13
       "histogram_frame_interval", "debug"                           // + 2 = 15
     }
 };
 
 ADMVideoSwissArmyKnife::ToolMap ADMVideoSwissArmyKnife::tool_map [] =
 {
-    { TOOL_A,         "A",        "%s" },
-    { TOOL_P,         "P",        "P" },
-    { TOOL_P_MINUS_A, "P-A",      "P-%s" },
-    { TOOL_A_MINUS_P, "A-P",      "%s-P" },
-    { TOOL_P_PLUS_A,  "P+A",      "P+%s" },
-    { TOOL_P_TIMES_A, "P*A",      "P*%s" },
-    { TOOL_P_DIVBY_A, "P/A",      "P/%s" },
-    { TOOL_A_DIVBY_P, "A/P",      "%s/P" },
-    { TOOL_MIN_P_A,   "min(P,A)", "min(P,%s)" },
-    { TOOL_MAX_P_A,   "max(P,A)", "max(P,%s)" },
+    { TOOL_A,         "A",        "%s",        "%s"     },
+    { TOOL_P,         "P",        "P",         "P"      },
+    { TOOL_P_MINUS_A, "P-A",      "P-%s",      "P - %s" },
+    { TOOL_A_MINUS_P, "A-P",      "%s-P",      "%s - P" },
+    { TOOL_P_PLUS_A,  "P+A",      "P+%s",      "P + %s" },
+    { TOOL_P_TIMES_A, "P*A",      "P*%s",      "P * %s" },
+    { TOOL_P_DIVBY_A, "P/A",      "P/%s",      "P / %s" },
+    { TOOL_A_DIVBY_P, "A/P",      "%s/P",      "%s / P" },
+    { TOOL_MIN_P_A,   "min(P,A)", "min(P,%s)", "min (P, %s)" },
+    { TOOL_MAX_P_A,   "max(P,A)", "max(P,%s)", "max (P, %s)" },
 
-    { TOOL_INVALID, 0, 0 }
+    { TOOL_INVALID, 0, 0, 0 }
 };
 
 // This is a hack to work around the fact that the ctor & dtor get called
@@ -104,52 +101,56 @@ ADMVideoSwissArmyKnife::ADMVideoSwissArmyKnife(AVDMGenericVideoStream *in,CONFco
     _info.encoding = 1;
     _uncompressed = new ADMImage(_in->getInfo()->width, _in->getInfo()->height);
     ADM_assert(_uncompressed);
-    _param=NEW(SWISSARMYKNIFE_PARAM);
+    _param = new SWISSARMYKNIFE_PARAM;
 
     if (couples)
     {
         GET(tool);
         GET(input_type);
 
-        char * tmp;
-        GET2(input_file, tmp);
+        GET(input_file);
         GET(load_bias);
         GET(load_multiplier);
 
         GET(input_constant);
 
-        GET(memory_constant_denom);
+        GET(memory_constant_alpha);
         GET(init_start_frame);
         GET(init_end_frame);
         GET(init_by_rolling);
 
         GET(bias);
-        GET(scale_from_min);
-        GET(scale_from_max);
+        GET(result_bias);
+        GET(result_multiplier);
         GET(histogram_frame_interval);
         GET(debug);
+
+        _param->enable_preview
+            = (_param->input_type != INPUT_ROLLING_AVERAGE);
     }
     else
     {
         _param->tool = TOOL_P_MINUS_A;
         _param->input_type = INPUT_ROLLING_AVERAGE;
 
-        _param->input_file = ADM_strdup ("");
+        // _param->input_file = ""; // implicit
         _param->load_bias = 0.0;
         _param->load_multiplier = 1.0;
 
         _param->input_constant = 0;
 
-        _param->memory_constant_denom = 100;
         _param->init_start_frame = 1;
         _param->init_end_frame = 100;
+        _param->memory_constant_alpha = 1.0 / _param->init_end_frame;
         _param->init_by_rolling = false;
 
         _param->bias = 128;
-        _param->scale_from_min = 0;
-        _param->scale_from_max = 255;
+        _param->result_bias = 0.0;
+        _param->result_multiplier = 1.0;
         _param->histogram_frame_interval = 0;
         _param->debug = 0;
+
+        _param->enable_preview = false;
     }
 
     // This is a hack to work around the fact that the ctor & dtor get called
@@ -238,24 +239,22 @@ uint8_t	ADMVideoSwissArmyKnife::getCoupledConf (CONFcouple **couples)
 
     CSET(input_constant);
 
-    CSET(memory_constant_denom);
+    CSET(memory_constant_alpha);
     CSET(init_start_frame);
     CSET(init_end_frame);
     CSET(init_by_rolling);
 
     CSET(bias);
-    CSET(scale_from_min);
-    CSET(scale_from_max);
+    CSET(result_bias);
+    CSET(result_multiplier);
     CSET(histogram_frame_interval);
     CSET(debug);
 
     return 1;
 }
 
-uint8_t ADMVideoSwissArmyKnife::configure(AVDMGenericVideoStream *in)
+uint8_t ADMVideoSwissArmyKnife::configure (AVDMGenericVideoStream *in)
 {
-    UNUSED_ARG(in);
-
     diaMenuEntry tTool [] = {
         { TOOL_A,          QT_TR_NOOP("P' = A"), NULL },
         { TOOL_P,          QT_TR_NOOP("P' = P"), NULL },
@@ -286,13 +285,38 @@ uint8_t ADMVideoSwissArmyKnife::configure(AVDMGenericVideoStream *in)
         (&(_param->tool),
          QT_TR_NOOP("Select _Operation on each pixel P and input A:"),
          sizeof (tTool) / sizeof (diaMenuEntry), tTool);
+
     diaElemMenu input_type
         (&(_param->input_type),
          QT_TR_NOOP("Input _Type:"),
          sizeof (tInputType) / sizeof (diaMenuEntry), tInputType);
 
+    MenuMapping menu_mapping [] = {
+        { "operationMenu", my_offsetof (SWISSARMYKNIFE_PARAM, tool),
+          sizeof (tTool) / sizeof (diaMenuEntry), tTool },
+        { "inputTypeMenu", my_offsetof (SWISSARMYKNIFE_PARAM, input_type),
+          sizeof (tInputType) / sizeof (diaMenuEntry), tInputType },
+    };
+
+    // printf ("ADM_vidSwissArmyKnife: _param = %p\n", _param);
+    uint8_t ret = DIA_SwissArmyKnife (_in, this, _param, menu_mapping,
+                                      sizeof (menu_mapping)
+                                      / sizeof (MenuMapping));
+    if (ret == 1)
+    {
+        return ret;
+    }
+    else if (ret == 0) // 0 = cancel
+    {
+        return ret;
+    }
+    else
+    {
+        ADM_assert (ret == 255); // 255 = whizzy dialog not implemented
+    }
+
     diaElemFile input_file
-        (0, const_cast<char **>(&(_param->input_file)),
+        (0, &(_param->input_file),
          QT_TR_NOOP("Input _File (image or convolution kernel):"));
     diaElemFloat load_bias
         (&(_param->load_bias),
@@ -309,9 +333,9 @@ uint8_t ADMVideoSwissArmyKnife::configure(AVDMGenericVideoStream *in)
         (&(_param->input_constant),
          QT_TR_NOOP("Input _Constant:"), -99999, +99999); // arbitrary!
 
-    diaElemUInteger memory_constant_denom
-        (&(_param->memory_constant_denom),
-         QT_TR_NOOP("Denominator of memory constant _alpha\n"
+    diaElemFloat memory_constant_alpha
+        (&(_param->memory_constant_alpha),
+         QT_TR_NOOP("Memory constant _alpha\n"
            "(where A = (1-alpha)*A + alpha*curr_frame):"),
          0, 0x7fffffff);
     diaElemUInteger init_start_frame
@@ -330,12 +354,15 @@ uint8_t ADMVideoSwissArmyKnife::configure(AVDMGenericVideoStream *in)
     diaElemSlider bias
         (&(_param->bias),
          QT_TR_NOOP("_Bias (will be added to result):"), -256, +256);
-    diaElemSlider scale_from_min
-        (&(_param->scale_from_min),
-         QT_TR_NOOP("Mi_nimum value (will be scaled to 0):"), -1024, +1024);
-    diaElemSlider scale_from_max
-        (&(_param->scale_from_max),
-         QT_TR_NOOP("Ma_ximum value (will be scaled to 255):"), -1024, +1024);
+    diaElemFloat result_bias
+        (&(_param->result_bias),
+         QT_TR_NOOP("_Result Bias (added to each result pixel):"),
+         -99999, +99999); // arbitrary!
+    diaElemFloat result_multiplier
+        (&(_param->result_multiplier),
+         QT_TR_NOOP("Result _Multiplier (each result pixel\n"
+           "multiplied by this):"),
+         -99999, +99999); // arbitrary!
     diaElemUInteger histogram_frame_interval
         (&(_param->histogram_frame_interval),
          QT_TR_NOOP("_Histogram every N frames (0 to disable):"), 0, 0x7fffffff);
@@ -344,19 +371,19 @@ uint8_t ADMVideoSwissArmyKnife::configure(AVDMGenericVideoStream *in)
 
     diaElem * elems[] = { &tool, &input_type, &input_file, &load_bias,
                           &load_multiplier, &input_constant,
-                          &memory_constant_denom, &init_start_frame,
+                          &memory_constant_alpha, &init_start_frame,
                           &init_end_frame, &init_by_rolling,
-                          &bias, &scale_from_min, &scale_from_max,
+                          &bias, &result_bias, &result_multiplier,
                           &histogram_frame_interval, &debug };
 
-    uint8_t ret = diaFactoryRun("SwissArmyKnife", sizeof (elems) / sizeof (diaElem *), elems);
+    ret = diaFactoryRun ("Swiss Army Knife Configuration",
+                         sizeof (elems) / sizeof (diaElem *), elems);
     if (ret) // 0 = cancel
     {
         myInfo->image_data_invalid = true;
         myInfo->histogram_data_invalid = true;
     }
     return ret;
-	
 }
 
 ADMVideoSwissArmyKnife::~ADMVideoSwissArmyKnife()
@@ -391,14 +418,20 @@ ADMVideoSwissArmyKnife::~ADMVideoSwissArmyKnife()
     _uncompressed = NULL;
 }
 
-char * ADMVideoSwissArmyKnife::printConf( void) 
+char * ADMVideoSwissArmyKnife::printConf ()
+{
+    return getConf (_param, false);
+}
+
+char * ADMVideoSwissArmyKnife::getConf (SWISSARMYKNIFE_PARAM * param,
+                                        bool forDialog)
 {
     const int CONF_LEN = 1024;
     static char conf[CONF_LEN];
 
     ToolMap * tm;
     for (tm = tool_map; tm->outputName; tm++)
-        if (tm->toolid == _param->tool)
+        if (tm->toolid == param->tool)
             break;
 
     char inputstr [CONF_LEN];
@@ -406,75 +439,91 @@ char * ADMVideoSwissArmyKnife::printConf( void)
     where[0] = '\0';
     char moreinfo [256];
     moreinfo[0] = '\0';
-    const char * input_file = _param->input_file;
+    const char * input_file = param->input_file.c_str();
     if (!input_file || !*input_file)
         input_file = "**** no file selected ****";
-    switch (_param->input_type)
+
+    const char * space = forDialog ? " " : "";
+
+    switch (param->input_type)
     {
     case INPUT_CUSTOM_CONVOLUTION:
-        snprintf (inputstr, CONF_LEN, "convolve(P,%s)", input_file);
+        snprintf (inputstr, CONF_LEN, "convolve%s(P,%s%s)",
+                  space, space, input_file);
         break;
     case INPUT_FILE_IMAGE_FLOAT:
         snprintf (inputstr, CONF_LEN,
-                  (_param->load_bias == 0.0 && _param->load_multiplier == 1.0)
-                  ? "pixel_from(%s)"
-                  : "((pixel_from(%s)%+.6f)*%.6f)",
-                  input_file, _param->load_bias, _param->load_multiplier);
+                  (param->load_bias == 0.0 && param->load_multiplier == 1.0)
+                  ? "pixel_from%s(%s)"
+                  : (forDialog ? "((pixel_from%s(%s) + %.6f) * %.6f)"
+                     : "((pixel_from%s(%s)%+.6f)*%.6f)"),
+                  space, input_file,
+                  param->load_bias, param->load_multiplier);
         break;
     case INPUT_FILE_IMAGE_INTEGER:
         snprintf (inputstr, CONF_LEN,
-                  (_param->load_bias == 0.0 && _param->load_multiplier == 1.0)
-                  ? "integer(pixel_from(%s))"
-                  : "integer((pixel_from(%s)%+.6f)*%.6f)",
-                  input_file, _param->load_bias, _param->load_multiplier);
+                  (param->load_bias == 0.0 && param->load_multiplier == 1.0)
+                  ? "integer(pixel_from%s(%s))"
+                  : (forDialog ? "integer((pixel_from%s(%s) + %.6f) * %.6f)"
+                     : "integer((pixel_from%s(%s)%+.6f)*%.6f)"),
+                  space, input_file,
+                  param->load_bias, param->load_multiplier);
         break;
     case INPUT_CONSTANT_VALUE:
-        if (int (_param->input_constant) == _param->input_constant)
-            sprintf (inputstr, "%d", int (_param->input_constant));
+        if (int (param->input_constant) == param->input_constant)
+            sprintf (inputstr, "%d", int (param->input_constant));
         else
-            sprintf (inputstr, "%.6f", _param->input_constant);
+            sprintf (inputstr, "%.6f", param->input_constant);
         break;
     case INPUT_ROLLING_AVERAGE:
         sprintf (inputstr, "A");
         sprintf (where, " (where each frame, A=(A*(1-alpha))+(P*alpha), "
-                 "alpha=1/%u=%.6f)", _param->memory_constant_denom,
-                 1.0 / _param->memory_constant_denom);
-        if (_param->init_start_frame)
+                 "alpha%s=%s%.6f)",
+                 space, space, param->memory_constant_alpha);
+        if (param->init_start_frame)
             sprintf (moreinfo, ", initial A = %s avg of frames %u - %u",
-                     _param->init_by_rolling ? "rolling" : "straight",
-                     _param->init_start_frame, _param->init_end_frame);
+                     param->init_by_rolling ? "rolling" : "straight",
+                     param->init_start_frame, param->init_end_frame);
         break;
     default:
         sprintf (inputstr, "OOOPS!! (unexpected type %d)",
-                 _param->input_type);
+                 param->input_type);
         break;
     }
 
     char * cptr = conf;
 
-    cptr += snprintf (conf, CONF_LEN, "Swiss Army Knife: P' = ");
-    cptr += snprintf (cptr, CONF_LEN - (cptr - conf), tm->format, inputstr);
-    if (_param->bias)
-        cptr += snprintf (cptr, CONF_LEN - (cptr - conf), "%+d",
-                          _param->bias);
-    cptr += snprintf (cptr, CONF_LEN - (cptr - conf), "%s", where);
-    if (_param->scale_from_min != 0 || _param->scale_from_max != 255)
+    bool result_is_scaled
+        = (param->result_bias != 0.0 || param->result_multiplier != 1.0);
+
+    if (!forDialog)
+        cptr += snprintf (conf, CONF_LEN, "Swiss Army Knife: ");
+    cptr += snprintf (cptr, CONF_LEN - (cptr - conf), "P' = %s",
+                      result_is_scaled ? "((" : "");
+    cptr += snprintf (cptr, CONF_LEN - (cptr - conf),
+                      forDialog ? tm->spacy_format : tm->format, inputstr);
+    if (param->bias)
         cptr += snprintf (cptr, CONF_LEN - (cptr - conf),
-                          ", scaled from %d..%d to 0..255",
-                          _param->scale_from_min, _param->scale_from_max);
+                          forDialog ? " + %d" : "%+d", param->bias);
+    cptr += snprintf (cptr, CONF_LEN - (cptr - conf), "%s", where);
+    if (result_is_scaled)
+        cptr += snprintf (cptr, CONF_LEN - (cptr - conf),
+                          forDialog ? ") + %.6f) * %.6f" : ")%+.6f)*%.6f",
+                          param->result_bias, param->result_multiplier);
     cptr += snprintf (cptr, CONF_LEN - (cptr - conf), "%s", moreinfo);
-    if (_param->histogram_frame_interval)
+    if (param->histogram_frame_interval)
         cptr += snprintf (cptr, CONF_LEN - (cptr - conf),
                           ", histogram every %u frames",
-                          _param->histogram_frame_interval);
-    if (_param->debug)
+                          param->histogram_frame_interval);
+    if (param->debug)
         cptr += snprintf (cptr, CONF_LEN - (cptr - conf),
-                          ", debug=0x%x", _param->debug);
-    fprintf (stderr, "conf is (%d) \"%s\"\n", cptr - conf, conf);
+                          ", debug%s=%s0x%x", space, space, param->debug);
+    if (!forDialog)
+        fprintf (stderr, "SAK conf is (%d) \"%s\"\n", cptr - conf, conf);
     return conf;
 }
 
-//==============================================================================
+//============================================================================
 
 // Note: The structure of the following code (with the template functions, and
 // the functor objects, etc.) is all about minimizing the code executed
@@ -488,7 +537,7 @@ char * ADMVideoSwissArmyKnife::printConf( void)
 // point of templates.  So, buckle your seat belts, because this is where C++
 // gets really fun!
 
-//==============================================================================
+//============================================================================
 
 class HistogramNull // do-nothing version
 {
@@ -516,7 +565,7 @@ public:
     }
 };
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 class Histogram
 {
@@ -709,7 +758,7 @@ private:
     }
 };
 
-//==============================================================================
+//============================================================================
 
 template <typename Oper, typename Histo>
 void ImageTool::convolve (const std::vector <float> & kernel,
@@ -819,12 +868,13 @@ void ImageTool::convolve (const std::vector <float> & kernel,
     }
 }
 
-//==============================================================================
+//============================================================================
 
 template <typename Oper, typename Histo>
 void ADMVideoSwissArmyKnife::computeRollingAverage (ADMImage * image,
                                                     ADMImage * data,
                                                     uint32_t planesize,
+                                                    SWISSARMYKNIFE_PARAM * param,
                                                     int32_t bias,
                                                     const Oper & op_in,
                                                     const Histo & histogram_in)
@@ -837,7 +887,7 @@ void ADMVideoSwissArmyKnife::computeRollingAverage (ADMImage * image,
     Histo histogram = histogram_in;
     Oper op = op_in;
 
-    float alpha = 1.0 / _param->memory_constant_denom;
+    float alpha = param->memory_constant_alpha;
     float oneminusalpha = 1 - alpha;
 
     // HERE: for speed, we do luma (Y plane) only.  However, some
@@ -881,18 +931,20 @@ void ADMVideoSwissArmyKnife::computeRollingAverage (ADMImage * image,
         *--destp = result;
     }
 
-    if (_param->debug & 2)
+    if (param->debug & 2)
     {
         if (satlow || sathigh)
             printf ("    Saturated %d low, %d high\n", satlow, sathigh);
     }
 }
 
-//==============================================================================
+//============================================================================
 
 template <typename InputImageType, typename Oper, typename Histo>
 void ADMVideoSwissArmyKnife::applyImage (ADMImage * image, ADMImage * data,
-                                         uint32_t planesize, int32_t bias,
+                                         uint32_t planesize,
+                                         SWISSARMYKNIFE_PARAM * param,
+                                         int32_t bias,
                                          InputImageType * input_image,
                                          const Oper & op_in,
                                          const Histo & histogram_in)
@@ -944,18 +996,20 @@ void ADMVideoSwissArmyKnife::applyImage (ADMImage * image, ADMImage * data,
         *--destp = result;
     }
 
-    if (_param->debug & 2)
+    if (param->debug & 2)
     {
         if (satlow || sathigh)
             printf ("    Saturated %d low, %d high\n", satlow, sathigh);
     }
 }
 
-//==============================================================================
+//============================================================================
 
 template <typename Oper, typename Histo>
 void ADMVideoSwissArmyKnife::applyConstant (ADMImage * image, ADMImage * data,
-                                            uint32_t planesize, int32_t bias,
+                                            uint32_t planesize,
+                                            SWISSARMYKNIFE_PARAM * param,
+                                            int32_t bias,
                                             const Oper & op_in,
                                             const Histo & histogram_in)
 {
@@ -973,7 +1027,7 @@ void ADMVideoSwissArmyKnife::applyConstant (ADMImage * image, ADMImage * data,
 
     uint8_t * currp = YPLANE (image) + planesize;
     uint8_t * destp = YPLANE (data) + planesize;
-    float A = _param->input_constant;
+    float A = param->input_constant;
     uint32_t pixremaining = planesize + 1;
 
     uint32_t sathigh = 0;
@@ -1005,14 +1059,14 @@ void ADMVideoSwissArmyKnife::applyConstant (ADMImage * image, ADMImage * data,
         *--destp = result;
     }
 
-    if (_param->debug & 2)
+    if (param->debug & 2)
     {
         if (satlow || sathigh)
             printf ("    Saturated %d low, %d high\n", satlow, sathigh);
     }
 }
 
-//==============================================================================
+//============================================================================
 
 class OpPequalsA
 {
@@ -1156,195 +1210,218 @@ public:
     }
 };
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 class OpPequalsA_Scaled
 {
-    float scale_min;
+    float bias;
     float multiplier;
 public:
-    OpPequalsA_Scaled (int32_t scale_min, int32_t scale_max)
-        : scale_min (scale_min),
-          multiplier (MAX_PIXEL_LUMA / float (scale_max - scale_min))  { }
+    OpPequalsA_Scaled (float bias, float multiplier)
+        : bias (bias),
+          multiplier (multiplier)  { }
 
     int32_t operator () (int32_t P, float A) const
     {
-        return static_cast <int32_t> (((A - scale_min) * multiplier) + .5);
+        return static_cast <int32_t> (((A + bias) * multiplier) + .5);
     }
 };
 
 class OpPequalsP_Scaled
 {
-    float scale_min;
+    float bias;
     float multiplier;
 public:
-    OpPequalsP_Scaled (int32_t scale_min, int32_t scale_max)
-        : scale_min (scale_min),
-          multiplier (MAX_PIXEL_LUMA / float (scale_max - scale_min))  { }
+    OpPequalsP_Scaled (float bias, float multiplier)
+        : bias (bias),
+          multiplier (multiplier)  { }
 
     int32_t operator () (int32_t P, float A) const
     {
-        return static_cast <int32_t> (((P - scale_min) * multiplier) + .5);
+        return static_cast <int32_t> (((P + bias) * multiplier) + .5);
     }
 };
 
 class OpPequalsPminusA_Scaled
 {
-    float scale_min;
+    float bias;
     float multiplier;
 public:
-    OpPequalsPminusA_Scaled (int32_t scale_min, int32_t scale_max)
-        : scale_min (scale_min),
-          multiplier (MAX_PIXEL_LUMA / float (scale_max - scale_min))  { }
+    OpPequalsPminusA_Scaled (float bias, float multiplier)
+        : bias (bias),
+          multiplier (multiplier)  { }
 
     int32_t operator () (int32_t P, float A) const
     {
         return (static_cast <int32_t>
-                ((((P - A) - scale_min) * multiplier) + .5));
+                ((((P - A) + bias) * multiplier) + .5));
     }
 };
 
 class OpPequalsAminusP_Scaled
 {
-    float scale_min;
+    float bias;
     float multiplier;
 public:
-    OpPequalsAminusP_Scaled (int32_t scale_min, int32_t scale_max)
-        : scale_min (scale_min),
-          multiplier (MAX_PIXEL_LUMA / float (scale_max - scale_min))  { }
+    OpPequalsAminusP_Scaled (float bias, float multiplier)
+        : bias (bias),
+          multiplier (multiplier)  { }
 
     int32_t operator () (int32_t P, float A) const
     {
         return (static_cast <int32_t>
-                ((((A - P) - scale_min) * multiplier) + .5));
+                ((((A - P) + bias) * multiplier) + .5));
     }
 };
 
 class OpPequalsPplusA_Scaled
 {
-    float scale_min;
+    float bias;
     float multiplier;
 public:
-    OpPequalsPplusA_Scaled (int32_t scale_min, int32_t scale_max)
-        : scale_min (scale_min),
-          multiplier (MAX_PIXEL_LUMA / float (scale_max - scale_min))  { }
+    OpPequalsPplusA_Scaled (float bias, float multiplier)
+        : bias (bias),
+          multiplier (multiplier)  { }
 
     int32_t operator () (int32_t P, float A) const
     {
         return (static_cast <int32_t>
-                ((((P + A) - scale_min) * multiplier) + .5));
+                ((((P + A) + bias) * multiplier) + .5));
     }
 };
 
 class OpPequalsPtimesA_Scaled
 {
-    float scale_min;
+    float bias;
     float multiplier;
 public:
-    OpPequalsPtimesA_Scaled (int32_t scale_min, int32_t scale_max)
-        : scale_min (scale_min),
-          multiplier (MAX_PIXEL_LUMA / float (scale_max - scale_min))  { }
+    OpPequalsPtimesA_Scaled (float bias, float multiplier)
+        : bias (bias),
+          multiplier (multiplier)  { }
 
     int32_t operator () (int32_t P, float A) const
     {
         return (static_cast <int32_t>
-                ((((P * A) - scale_min) * multiplier) + .5));
+                ((((P * A) + bias) * multiplier) + .5));
     }
 };
 
 class OpPequalsPdivByA_Scaled
 {
-    float scale_min;
+    float bias;
     float multiplier;
 public:
-    OpPequalsPdivByA_Scaled (int32_t scale_min, int32_t scale_max)
-        : scale_min (scale_min),
-          multiplier (MAX_PIXEL_LUMA / float (scale_max - scale_min))  { }
+    OpPequalsPdivByA_Scaled (float bias, float multiplier)
+        : bias (bias),
+          multiplier (multiplier)  { }
 
     int32_t operator () (int32_t P, float A) const
     {
         return (static_cast <int32_t>
-                ((((P / A) - scale_min) * multiplier) + .5));
+                ((((P / A) + bias) * multiplier) + .5));
     }
 };
 
 class OpPequalsAdivByP_Scaled
 {
-    float scale_min;
+    float bias;
     float multiplier;
 public:
-    OpPequalsAdivByP_Scaled (int32_t scale_min, int32_t scale_max)
-        : scale_min (scale_min),
-          multiplier (MAX_PIXEL_LUMA / float (scale_max - scale_min))  { }
+    OpPequalsAdivByP_Scaled (float bias, float multiplier)
+        : bias (bias),
+          multiplier (multiplier)  { }
 
     int32_t operator () (int32_t P, float A) const
     {
         return (static_cast <int32_t>
-                ((((A / P) - scale_min) * multiplier) + .5));
+                ((((A / P) + bias) * multiplier) + .5));
     }
 };
 
 class OpPequalsMinPA_Scaled
 {
-    float scale_min;
+    float bias;
     float multiplier;
 public:
-    OpPequalsMinPA_Scaled (int32_t scale_min, int32_t scale_max)
-        : scale_min (scale_min),
-          multiplier (MAX_PIXEL_LUMA / float (scale_max - scale_min))  { }
+    OpPequalsMinPA_Scaled (float bias, float multiplier)
+        : bias (bias),
+          multiplier (multiplier)  { }
 
     int32_t operator () (int32_t P, float A) const
     {
         return (static_cast <int32_t>
-                ((((A > P ? P : A) - scale_min) * multiplier) + .5));
+                ((((A > P ? P : A) + bias) * multiplier) + .5));
     }
 };
 
 class OpPequalsMaxPA_Scaled
 {
-    float scale_min;
+    float bias;
     float multiplier;
 public:
-    OpPequalsMaxPA_Scaled (int32_t scale_min, int32_t scale_max)
-        : scale_min (scale_min),
-          multiplier (MAX_PIXEL_LUMA / float (scale_max - scale_min))  { }
+    OpPequalsMaxPA_Scaled (float bias, float multiplier)
+        : bias (bias),
+          multiplier (multiplier)  { }
 
     int32_t operator () (int32_t P, float A) const
     {
         return (static_cast <int32_t>
-                ((((A > P ? A : P) - scale_min) * multiplier) + .5));
+                ((((A > P ? A : P) + bias) * multiplier) + .5));
     }
 };
 
-//==============================================================================
+//============================================================================
 
-uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          			ADMImage *data, uint32_t *flags)
+uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame,
+                                                      uint32_t *len,
+                                                      ADMImage *data,
+                                                      uint32_t *flags)
 {
     if (frame >= _info.nb_frames)
         return 0;
 
-    uint32_t debug = _param->debug;
-
-    if (debug & 1)
+    if (_param->debug & 1)
         printf ("in ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(%d, ...)\n",
                 frame);
 
-    bool doingConvolution = (_param->input_type == INPUT_CUSTOM_CONVOLUTION);
-    bool doingRollingAvg = (_param->input_type == INPUT_ROLLING_AVERAGE);
-    bool doingFileImage = (_param->input_type == INPUT_FILE_IMAGE_FLOAT
-                           || _param->input_type == INPUT_FILE_IMAGE_INTEGER);
-    bool doingFileImageFloat = (_param->input_type == INPUT_FILE_IMAGE_FLOAT);
-    bool doingApplyConstant = (_param->input_type == INPUT_CONSTANT_VALUE);
+    if (!_in->getFrameNumberNoAlloc (frame, len, _uncompressed, flags))
+        return 0;
+
+    uint32_t planesize = _info.width * _info.height;
+    uint32_t size = (planesize * 3) >> 1;
+    *len = size;
+
+    uint8_t ret = doSwissArmyKnife (_uncompressed, data, _in, this, _param,
+                                    _info.width, _info.height);
+    return ret;
+}
+
+uint8_t
+ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
+                                          ADMImage * data,
+                                          AVDMGenericVideoStream * in,
+                                          ADMVideoSwissArmyKnife * sak,
+                                          SWISSARMYKNIFE_PARAM * param,
+                                          uint32_t width, uint32_t height)
+{
+    PersistentInfo * myInfo = sak->myInfo;
+    uint32_t debug = param->debug;
+
+    bool doingConvolution = (param->input_type == INPUT_CUSTOM_CONVOLUTION);
+    bool doingRollingAvg = (param->input_type == INPUT_ROLLING_AVERAGE);
+    bool doingFileImage = (param->input_type == INPUT_FILE_IMAGE_FLOAT
+                           || param->input_type == INPUT_FILE_IMAGE_INTEGER);
+    bool doingFileImageFloat = (param->input_type == INPUT_FILE_IMAGE_FLOAT);
+    bool doingApplyConstant = (param->input_type == INPUT_CONSTANT_VALUE);
 
     bool needRead = false;
     bool needFile = doingConvolution || doingFileImage;
 
     if (needFile)
     {
-        if (myInfo->input_file_name != _param->input_file)
+        if (myInfo->input_file_name != param->input_file)
         {
-            myInfo->input_file_name = _param->input_file;
+            myInfo->input_file_name = param->input_file;
             myInfo->input_file_mtime = 0;
             printf ("SwissArmyKnife: new input file has been selected: %s\n",
                     myInfo->input_file_name.c_str());
@@ -1369,19 +1446,22 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
             needRead = true;
             myInfo->input_file_mtime = st.st_mtime;
         }
-        else if (!needRead && myInfo->image_data_invalid)
-            needRead = true;
+        else if (!needRead)
+        {
+            if (myInfo->image_data_invalid
+                || myInfo->image_bias != param->load_bias
+                || myInfo->image_multiplier != param->load_multiplier)
+            {
+                needRead = true;
+            }
+        }
     }
 
     FloatVector & kernel = myInfo->kernel;
     uint32_t & kernel_w = myInfo->kernel_w;
     uint32_t & kernel_h = myInfo->kernel_h;
 
-    uint32_t w = _info.width;
-    uint32_t h = _info.height;
-    uint32_t planesize = w * h;
-    uint32_t size = (planesize * 3) >> 1;
-    *len = size;
+    uint32_t planesize = width * height;
 			
     if (needRead)
     {
@@ -1475,8 +1555,8 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
         }
         else // file image (not convolution)
         {
-            ADM_assert (_param->input_type == INPUT_FILE_IMAGE_FLOAT
-                        || _param->input_type == INPUT_FILE_IMAGE_INTEGER);
+            ADM_assert (param->input_type == INPUT_FILE_IMAGE_FLOAT
+                        || param->input_type == INPUT_FILE_IMAGE_INTEGER);
 
             const char * filename = myInfo->input_file_name.c_str();
             FILE * fin = fopen (filename, "rb");
@@ -1537,7 +1617,7 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
             float * floatpixp = myInfo->image_float + pixelcount;
             uint8_t * intpixp = myInfo->image_int + pixelcount;
 
-            if (_param->load_bias == 0.0 && _param->load_multiplier == 1.0)
+            if (param->load_bias == 0.0 && param->load_multiplier == 1.0)
             {
                 printf ("Converting %u pixels to integer values (and keeping "
                         "the floats, too)\n", pixelcount);
@@ -1550,8 +1630,8 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
             }
             else
             {
-                float load_bias = _param->load_bias;
-                float load_multiplier = _param->load_multiplier;
+                float load_bias = param->load_bias;
+                float load_multiplier = param->load_multiplier;
 
                 printf ("applying P = (P + %.6f) * %.6f to %u pixels\n",
                         load_bias, load_multiplier, pixelcount);
@@ -1577,32 +1657,34 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
 
             myInfo->image_w = width;
             myInfo->image_h = height;
+            myInfo->image_bias = param->load_bias;
+            myInfo->image_multiplier = param->load_multiplier;
             myInfo->image_data_invalid = false;
         }
     }
     else if (doingRollingAvg)
     {
         if (!myInfo->bg
-            || myInfo->bg_x != w || myInfo->bg_y != h
-            || myInfo->bg_mc != _param->memory_constant_denom
-            || myInfo->bg_isf != _param->init_start_frame
-            || myInfo->bg_ief != _param->init_end_frame
-            || myInfo->bg_ibr != _param->init_by_rolling)
+            || myInfo->bg_x != width || myInfo->bg_y != height
+            || myInfo->bg_mca != param->memory_constant_alpha
+            || myInfo->bg_isf != param->init_start_frame
+            || myInfo->bg_ief != param->init_end_frame
+            || myInfo->bg_ibr != param->init_by_rolling)
         {
-            if (!myInfo->bg || myInfo->bg_x != w || myInfo->bg_y != h)
+            if (!myInfo->bg || myInfo->bg_x != width || myInfo->bg_y != height)
             {
-                myInfo->bg_x = w;
-                myInfo->bg_y = h;
+                myInfo->bg_x = width;
+                myInfo->bg_y = height;
                 delete [] myInfo->bg;
                 myInfo->bg = new float [planesize];
             }
 
             myInfo->histogram_data_invalid = true;
 
-            myInfo->bg_mc = _param->memory_constant_denom;
-            myInfo->bg_isf = _param->init_start_frame;
-            myInfo->bg_ief = _param->init_end_frame;
-            myInfo->bg_ibr = _param->init_by_rolling;
+            myInfo->bg_mca = param->memory_constant_alpha;
+            myInfo->bg_isf = param->init_start_frame;
+            myInfo->bg_ief = param->init_end_frame;
+            myInfo->bg_ibr = param->init_by_rolling;
 
             if (myInfo->bg_isf && myInfo->bg_isf <= myInfo->bg_ief)
             {
@@ -1610,26 +1692,27 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
 
                 uint32_t firstframe = myInfo->bg_isf - 1;
                 uint32_t lastframe = myInfo->bg_ief - 1;
-                if (lastframe >= _info.nb_frames)
+                const ADV_Info & info = sak->getInfo();
+                if (lastframe >= info.nb_frames)
                 {
-                    lastframe = _info.nb_frames - 1;
-                    if (firstframe > _info.nb_frames)
+                    lastframe = info.nb_frames - 1;
+                    if (firstframe > info.nb_frames)
                     {
                         firstframe = lastframe - do_frames + 1;
-                        if (firstframe > _info.nb_frames)
+                        if (firstframe > info.nb_frames)
                             firstframe = 0;
                     }
                     do_frames = lastframe - firstframe + 1;
                 }
 
                 // if (debug & 2)
-                printf ("Getting a \"head start\" on rolling average by computing %s "
-                        "%d frames of size %dx%d from %d to %d with alpha = %.5f (1/%d)\n",
-                        myInfo->bg_ibr ? "rolling average over" : "straight average of",
+                printf ("Getting a \"head start\" on rolling average by "
+                        "computing a %s %d frames of size %dx%d from %d to "
+                        "%d with alpha = %.6f\n",
+                        myInfo->bg_ibr ? "rolling average over"
+                        : "straight average of",
                         do_frames, myInfo->bg_x, myInfo->bg_y,
-                        firstframe + 1, lastframe + 1,
-                        1.0 / myInfo->bg_mc, myInfo->bg_mc);
-
+                        firstframe + 1, lastframe + 1, myInfo->bg_mca);
 
                 ADMImage aimage (myInfo->bg_x, myInfo->bg_y);
 
@@ -1647,9 +1730,9 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
                     // loop that follows:
                     {
                         uint32_t flen;
-                        uint32_t fflags = *flags;
-                        if (!_in->getFrameNumberNoAlloc (firstframe, &flen,
-                                                         &aimage, &fflags))
+                        uint32_t fflags = 0;
+                        if (!in->getFrameNumberNoAlloc (firstframe, &flen,
+                                                        &aimage, &fflags))
                             return 0;
 
                         uint8_t * currp = YPLANE (&aimage) + planesize;
@@ -1663,15 +1746,15 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
                         ++firstframe; // don't include this one again
                     }
 
-                    float alpha = 1.0 / _param->memory_constant_denom;
+                    float alpha = param->memory_constant_alpha;
                     float oneminusalpha = 1 - alpha;
 
                     for (int fnum = firstframe; fnum <= lastframe; fnum++)
                     {
                         uint32_t flen;
-                        uint32_t fflags = *flags;
-                        if (!_in->getFrameNumberNoAlloc (fnum, &flen,
-                                                         &aimage, &fflags))
+                        uint32_t fflags = 0;
+                        if (!in->getFrameNumberNoAlloc (fnum, &flen,
+                                                        &aimage, &fflags))
                             return 0;
 
                         uint8_t * currp = YPLANE (&aimage) + planesize;
@@ -1692,9 +1775,9 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
                     for (int fnum = firstframe; fnum <= lastframe; fnum++)
                     {
                         uint32_t flen;
-                        uint32_t fflags = *flags;
-                        if (!_in->getFrameNumberNoAlloc (fnum, &flen,
-                                                         &aimage, &fflags))
+                        uint32_t fflags = 0;
+                        if (!in->getFrameNumberNoAlloc (fnum, &flen,
+                                                        &aimage, &fflags))
                             return 0;
 
                         uint8_t * currp = YPLANE (&aimage) + planesize;
@@ -1732,42 +1815,38 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
         {
             if (debug & 4)
                 printf ("Using existing baseline background of size %dx%d with "
-                        "alpha = %.5f (1/%d)\n", myInfo->bg_x, myInfo->bg_y,
-                        1.0 / myInfo->bg_mc, myInfo->bg_mc);
+                        "alpha = %.6f (1/%d)\n", myInfo->bg_x, myInfo->bg_y,
+                        myInfo->bg_mca);
         }
     }			
 
-    if (!_in->getFrameNumberNoAlloc (frame, len, _uncompressed, flags))
-        return 0;
-
-    ADMImage * image = _uncompressed;
     uint8_t * imagePixels = YPLANE (image);
 
-    ImageTool imtool (imagePixels, w, h, data);
+    ImageTool imtool (imagePixels, width, height, data);
     imtool.setDebug (debug);
 
     Histogram * histogram = 0;
-    int32_t bias = _param->bias;
-    uint32_t tool = _param->tool;
+    int32_t bias = param->bias;
+    uint32_t tool = param->tool;
 
-    // HERE: give some thought to the general issue of keeping myInfo & _param
+    // HERE: give some thought to the general issue of keeping myInfo & param
     // in sync, and resetting the histogram (or whatever) when things change.
 
-    if (_param->histogram_frame_interval != 0)
+    if (param->histogram_frame_interval != 0)
     {
         histogram = new Histogram (myInfo->histogram_input_data,
                                    myInfo->histogram_output_data,
-                                   _param->histogram_frame_interval,
+                                   param->histogram_frame_interval,
                                    myInfo->histogram_frame_count,
-                                   w * h);
+                                   width * height);
         tool += TOOL_ADD_HISTOGRAM;
         if (myInfo->histogram_frame_interval !=
-            _param->histogram_frame_interval)
+            param->histogram_frame_interval)
         {
             if (myInfo->histogram_frame_interval)
                 myInfo->histogram_data_invalid = true;
             myInfo->histogram_frame_interval
-                = _param->histogram_frame_interval;
+                = param->histogram_frame_interval;
         }
 
         if (myInfo->histogram_data_invalid)
@@ -1777,12 +1856,10 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
         }
     }
 
-    int32_t scale_min = _param->scale_from_min;
-    int32_t scale_max = _param->scale_from_max;
-    if (scale_min != 0 || scale_max != 255)
+    float rbias = param->result_bias;
+    float rmultiplier = param->result_multiplier;
+    if (fabsf (rbias) >= 0.0001 || fabsf (rmultiplier - 1.0) >= 0.0001)
     {
-        // printf ("Scaling enabled (from %d..%d to 0..255)\n",
-        //         scale_min, scale_max);
         tool += TOOL_ADD_SCALING;
     }
 
@@ -1854,89 +1931,89 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
 
         case TOOL_A_SCALED:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsA_Scaled (scale_min, scale_max), HistogramNull());
+                             OpPequalsA_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_P_SCALED: // HERE_SCALED: we could optimize this if we wanted to
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsP_Scaled (scale_min, scale_max), HistogramNull());
+                             OpPequalsP_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_P_MINUS_A_SCALED:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPminusA_Scaled (scale_min, scale_max), HistogramNull());
+                             OpPequalsPminusA_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_A_MINUS_P_SCALED:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsAminusP_Scaled (scale_min, scale_max), HistogramNull());
+                             OpPequalsAminusP_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_P_PLUS_A_SCALED:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPplusA_Scaled (scale_min, scale_max), HistogramNull());
+                             OpPequalsPplusA_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_P_TIMES_A_SCALED:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPtimesA_Scaled (scale_min, scale_max), HistogramNull());
+                             OpPequalsPtimesA_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_P_DIVBY_A_SCALED:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPdivByA_Scaled (scale_min, scale_max), HistogramNull());
+                             OpPequalsPdivByA_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_A_DIVBY_P_SCALED:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsAdivByP_Scaled (scale_min, scale_max), HistogramNull());
+                             OpPequalsAdivByP_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_MIN_P_A_SCALED:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsMinPA_Scaled (scale_min, scale_max), HistogramNull());
+                             OpPequalsMinPA_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_MAX_P_A_SCALED:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsMaxPA_Scaled (scale_min, scale_max), HistogramNull());
+                             OpPequalsMaxPA_Scaled (rbias, rmultiplier), HistogramNull());
             break;
 
         case TOOL_A_SCALED_WITH_HISTOGRAM:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsA_Scaled (scale_min, scale_max), *histogram);
+                             OpPequalsA_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_P_SCALED_WITH_HISTOGRAM: // HERE: we could optimize this if we wanted to
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsP_Scaled (scale_min, scale_max), *histogram);
+                             OpPequalsP_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_P_MINUS_A_SCALED_WITH_HISTOGRAM:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPminusA_Scaled (scale_min, scale_max), *histogram);
+                             OpPequalsPminusA_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_A_MINUS_P_SCALED_WITH_HISTOGRAM:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsAminusP_Scaled (scale_min, scale_max), *histogram);
+                             OpPequalsAminusP_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_P_PLUS_A_SCALED_WITH_HISTOGRAM:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPplusA_Scaled (scale_min, scale_max), *histogram);
+                             OpPequalsPplusA_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_P_TIMES_A_SCALED_WITH_HISTOGRAM:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPtimesA_Scaled (scale_min, scale_max), *histogram);
+                             OpPequalsPtimesA_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_P_DIVBY_A_SCALED_WITH_HISTOGRAM:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPdivByA_Scaled (scale_min, scale_max), *histogram);
+                             OpPequalsPdivByA_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_A_DIVBY_P_SCALED_WITH_HISTOGRAM:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsAdivByP_Scaled (scale_min, scale_max), *histogram);
+                             OpPequalsAdivByP_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_MIN_P_A_SCALED_WITH_HISTOGRAM:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsMinPA_Scaled (scale_min, scale_max), *histogram);
+                             OpPequalsMinPA_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_MAX_P_A_SCALED_WITH_HISTOGRAM:
             imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsMaxPA_Scaled (scale_min, scale_max), *histogram);
+                             OpPequalsMaxPA_Scaled (rbias, rmultiplier), *histogram);
             break;
 
         default:
             printf ("SwissArmyKnife: unknown operation (tool) %d!\n",
-                    _param->tool);
+                    param->tool);
             return 0;
         }
     }
@@ -1945,185 +2022,205 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
         switch (tool)
         {
         case TOOL_A:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsA(), HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsA(), HistogramNull());
             break;
         case TOOL_P: // HERE: we could optimize this if we wanted to
-            computeRollingAverage (image, data, planesize, bias, OpPequalsP(), HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsP(), HistogramNull());
             break;
         case TOOL_P_MINUS_A:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsPminusA(), HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPminusA(), HistogramNull());
             break;
         case TOOL_A_MINUS_P:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsAminusP(), HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsAminusP(), HistogramNull());
             break;
         case TOOL_P_PLUS_A:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsPplusA(), HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPplusA(), HistogramNull());
             break;
         case TOOL_P_TIMES_A:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsPtimesA(), HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPtimesA(), HistogramNull());
             break;
         case TOOL_P_DIVBY_A:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsPdivByA(), HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPdivByA(), HistogramNull());
             break;
         case TOOL_A_DIVBY_P:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsAdivByP(), HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsAdivByP(), HistogramNull());
             break;
         case TOOL_MIN_P_A:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsMinPA(), HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsMinPA(), HistogramNull());
             break;
         case TOOL_MAX_P_A:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsMaxPA(), HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsMaxPA(), HistogramNull());
             break;
 
         case TOOL_A_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsA(), *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsA(), *histogram);
             break;
         case TOOL_P_WITH_HISTOGRAM: // HERE: we could optimize this if we wanted to
-            computeRollingAverage (image, data, planesize, bias, OpPequalsP(), *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsP(), *histogram);
             break;
         case TOOL_P_MINUS_A_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsPminusA(), *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPminusA(), *histogram);
             break;
         case TOOL_A_MINUS_P_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsAminusP(), *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsAminusP(), *histogram);
             break;
         case TOOL_P_PLUS_A_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsPplusA(), *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPplusA(), *histogram);
             break;
         case TOOL_P_TIMES_A_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsPtimesA(), *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPtimesA(), *histogram);
             break;
         case TOOL_P_DIVBY_A_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsPdivByA(), *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPdivByA(), *histogram);
             break;
         case TOOL_A_DIVBY_P_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsAdivByP(), *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsAdivByP(), *histogram);
             break;
         case TOOL_MIN_P_A_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsMinPA(), *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsMinPA(), *histogram);
             break;
         case TOOL_MAX_P_A_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias, OpPequalsMaxPA(), *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsMaxPA(), *histogram);
             break;
 
         case TOOL_A_SCALED:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsA_Scaled (scale_min, scale_max),
-                                   HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsA_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
             break;
         case TOOL_P_SCALED: // HERE_SCALED: we could optimize this if we wanted to
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsP_Scaled (scale_min, scale_max),
-                                   HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsP_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
             break;
         case TOOL_P_MINUS_A_SCALED:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsPminusA_Scaled (scale_min, scale_max),
-                                   HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPminusA_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
             break;
         case TOOL_A_MINUS_P_SCALED:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsAminusP_Scaled (scale_min, scale_max),
-                                   HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsAminusP_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
             break;
         case TOOL_P_PLUS_A_SCALED:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsPplusA_Scaled (scale_min, scale_max),
-                                   HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPplusA_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
             break;
         case TOOL_P_TIMES_A_SCALED:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsPtimesA_Scaled (scale_min, scale_max),
-                                   HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPtimesA_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
             break;
         case TOOL_P_DIVBY_A_SCALED:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsPdivByA_Scaled (scale_min, scale_max),
-                                   HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPdivByA_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
             break;
         case TOOL_A_DIVBY_P_SCALED:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsAdivByP_Scaled (scale_min, scale_max),
-                                   HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsAdivByP_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
             break;
         case TOOL_MIN_P_A_SCALED:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsMinPA_Scaled (scale_min, scale_max),
-                                   HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsMinPA_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
             break;
         case TOOL_MAX_P_A_SCALED:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsMaxPA_Scaled (scale_min, scale_max),
-                                   HistogramNull());
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsMaxPA_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
             break;
 
         case TOOL_A_SCALED_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsA_Scaled (scale_min, scale_max),
-                                   *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsA_Scaled (rbias, rmultiplier),
+                                        *histogram);
             break;
         case TOOL_P_SCALED_WITH_HISTOGRAM: // HERE: we could optimize this if we wanted to
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsP_Scaled (scale_min, scale_max),
-                                   *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsP_Scaled (rbias, rmultiplier),
+                                        *histogram);
             break;
         case TOOL_P_MINUS_A_SCALED_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsPminusA_Scaled (scale_min, scale_max),
-                                   *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPminusA_Scaled (rbias, rmultiplier),
+                                        *histogram);
             break;
         case TOOL_A_MINUS_P_SCALED_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsAminusP_Scaled (scale_min, scale_max),
-                                   *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsAminusP_Scaled (rbias, rmultiplier),
+                                        *histogram);
             break;
         case TOOL_P_PLUS_A_SCALED_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsPplusA_Scaled (scale_min, scale_max),
-                                   *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPplusA_Scaled (rbias, rmultiplier),
+                                        *histogram);
             break;
         case TOOL_P_TIMES_A_SCALED_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsPtimesA_Scaled (scale_min, scale_max),
-                                   *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPtimesA_Scaled (rbias, rmultiplier),
+                                        *histogram);
             break;
         case TOOL_P_DIVBY_A_SCALED_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsPdivByA_Scaled (scale_min, scale_max),
-                                   *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsPdivByA_Scaled (rbias, rmultiplier),
+                                        *histogram);
             break;
         case TOOL_A_DIVBY_P_SCALED_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsAdivByP_Scaled (scale_min, scale_max),
-                                   *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsAdivByP_Scaled (rbias, rmultiplier),
+                                        *histogram);
             break;
         case TOOL_MIN_P_A_SCALED_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsMinPA_Scaled (scale_min, scale_max),
-                                   *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsMinPA_Scaled (rbias, rmultiplier),
+                                        *histogram);
             break;
         case TOOL_MAX_P_A_SCALED_WITH_HISTOGRAM:
-            computeRollingAverage (image, data, planesize, bias,
-                                   OpPequalsMaxPA_Scaled (scale_min, scale_max),
-                                   *histogram);
+            sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsMaxPA_Scaled (rbias, rmultiplier),
+                                        *histogram);
             break;
 
         default:
             printf ("SwissArmyKnife: unknown operation (tool) %d!\n",
-                    _param->tool);
+                    param->tool);
             return 0;
         }
     }
     else if (doingFileImageFloat)
     {
-        if (w != myInfo->image_w || h != myInfo->image_h)
+        if (width != myInfo->image_w || height != myInfo->image_h)
         {
             const char * bar = "*************************";
             printf ("\n%s%s%s\nAttempting to apply a %ux%u input image to "
                     "%ux%u video - even if I could do that, it probably "
                     "wouldn't be what you wanted...\n%s%s%s\n",
                     bar, bar, bar, myInfo->image_w, myInfo->image_h,
-                    w, h, bar, bar, bar);
+                    width, height, bar, bar, bar);
             return 0;
         }
 
@@ -2132,185 +2229,205 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
         switch (tool)
         {
         case TOOL_A:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsA(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsA(), HistogramNull());
             break;
         case TOOL_P: // HERE: we could optimize this if we wanted to
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsP(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsP(), HistogramNull());
             break;
         case TOOL_P_MINUS_A:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsPminusA(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPminusA(), HistogramNull());
             break;
         case TOOL_A_MINUS_P:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsAminusP(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsAminusP(), HistogramNull());
             break;
         case TOOL_P_PLUS_A:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsPplusA(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPplusA(), HistogramNull());
             break;
         case TOOL_P_TIMES_A:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsPtimesA(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPtimesA(), HistogramNull());
             break;
         case TOOL_P_DIVBY_A:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsPdivByA(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPdivByA(), HistogramNull());
             break;
         case TOOL_A_DIVBY_P:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsAdivByP(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsAdivByP(), HistogramNull());
             break;
         case TOOL_MIN_P_A:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsMinPA(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsMinPA(), HistogramNull());
             break;
         case TOOL_MAX_P_A:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsMaxPA(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsMaxPA(), HistogramNull());
             break;
 
         case TOOL_A_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsA(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsA(), *histogram);
             break;
         case TOOL_P_WITH_HISTOGRAM: // HERE: we could optimize this if we wanted to
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsP(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsP(), *histogram);
             break;
         case TOOL_P_MINUS_A_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsPminusA(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPminusA(), *histogram);
             break;
         case TOOL_A_MINUS_P_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsAminusP(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsAminusP(), *histogram);
             break;
         case TOOL_P_PLUS_A_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsPplusA(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPplusA(), *histogram);
             break;
         case TOOL_P_TIMES_A_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsPtimesA(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPtimesA(), *histogram);
             break;
         case TOOL_P_DIVBY_A_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsPdivByA(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPdivByA(), *histogram);
             break;
         case TOOL_A_DIVBY_P_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsAdivByP(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsAdivByP(), *histogram);
             break;
         case TOOL_MIN_P_A_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsMinPA(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsMinPA(), *histogram);
             break;
         case TOOL_MAX_P_A_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img, OpPequalsMaxPA(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsMaxPA(), *histogram);
             break;
 
         case TOOL_A_SCALED:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsA_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsA_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_P_SCALED: // HERE_SCALED: we could optimize this if we wanted to
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsP_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsP_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_P_MINUS_A_SCALED:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsPminusA_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPminusA_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_A_MINUS_P_SCALED:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsAminusP_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsAminusP_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_P_PLUS_A_SCALED:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsPplusA_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPplusA_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_P_TIMES_A_SCALED:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsPtimesA_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPtimesA_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_P_DIVBY_A_SCALED:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsPdivByA_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPdivByA_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_A_DIVBY_P_SCALED:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsAdivByP_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsAdivByP_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_MIN_P_A_SCALED:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsMinPA_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsMinPA_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_MAX_P_A_SCALED:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsMaxPA_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsMaxPA_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
 
         case TOOL_A_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsA_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsA_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_P_SCALED_WITH_HISTOGRAM: // HERE: we could optimize this if we wanted to
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsP_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsP_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_P_MINUS_A_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsPminusA_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPminusA_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_A_MINUS_P_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsAminusP_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsAminusP_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_P_PLUS_A_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsPplusA_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPplusA_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_P_TIMES_A_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsPtimesA_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPtimesA_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_P_DIVBY_A_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsPdivByA_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsPdivByA_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_A_DIVBY_P_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsAdivByP_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsAdivByP_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_MIN_P_A_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsMinPA_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsMinPA_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_MAX_P_A_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, flt_img,
-                           OpPequalsMaxPA_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyImage (image, data, planesize, param, bias, flt_img,
+                             OpPequalsMaxPA_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
 
         default:
             printf ("SwissArmyKnife: unknown operation (tool) %d!\n",
-                    _param->tool);
+                    param->tool);
             return 0;
         }
     }
     else if (doingFileImage)
     {
-        if (w != myInfo->image_w || h != myInfo->image_h)
+        if (width != myInfo->image_w || height != myInfo->image_h)
         {
             const char * bar = "*************************";
             printf ("\n%s%s%s\nAttempting to apply a %ux%u input image to "
                     "%ux%u video - even if I could do that, it probably "
                     "wouldn't be what you wanted...\n%s%s%s\n",
                     bar, bar, bar, myInfo->image_w, myInfo->image_h,
-                    w, h, bar, bar, bar);
+                    width, height, bar, bar, bar);
             return 0;
         }
 
@@ -2319,172 +2436,192 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
         switch (tool)
         {
         case TOOL_A:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsA(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsA(), HistogramNull());
             break;
         case TOOL_P: // HERE: we could optimize this if we wanted to
-            applyImage (image, data, planesize, bias, int_img, OpPequalsP(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsP(), HistogramNull());
             break;
         case TOOL_P_MINUS_A:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsPminusA(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPminusA(), HistogramNull());
             break;
         case TOOL_A_MINUS_P:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsAminusP(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsAminusP(), HistogramNull());
             break;
         case TOOL_P_PLUS_A:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsPplusA(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPplusA(), HistogramNull());
             break;
         case TOOL_P_TIMES_A:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsPtimesA(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPtimesA(), HistogramNull());
             break;
         case TOOL_P_DIVBY_A:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsPdivByA(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPdivByA(), HistogramNull());
             break;
         case TOOL_A_DIVBY_P:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsAdivByP(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsAdivByP(), HistogramNull());
             break;
         case TOOL_MIN_P_A:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsMinPA(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsMinPA(), HistogramNull());
             break;
         case TOOL_MAX_P_A:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsMaxPA(), HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsMaxPA(), HistogramNull());
             break;
 
         case TOOL_A_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsA(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsA(), *histogram);
             break;
         case TOOL_P_WITH_HISTOGRAM: // HERE: we could optimize this if we wanted to
-            applyImage (image, data, planesize, bias, int_img, OpPequalsP(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsP(), *histogram);
             break;
         case TOOL_P_MINUS_A_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsPminusA(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPminusA(), *histogram);
             break;
         case TOOL_A_MINUS_P_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsAminusP(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsAminusP(), *histogram);
             break;
         case TOOL_P_PLUS_A_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsPplusA(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPplusA(), *histogram);
             break;
         case TOOL_P_TIMES_A_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsPtimesA(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPtimesA(), *histogram);
             break;
         case TOOL_P_DIVBY_A_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsPdivByA(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPdivByA(), *histogram);
             break;
         case TOOL_A_DIVBY_P_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsAdivByP(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsAdivByP(), *histogram);
             break;
         case TOOL_MIN_P_A_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsMinPA(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsMinPA(), *histogram);
             break;
         case TOOL_MAX_P_A_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img, OpPequalsMaxPA(), *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsMaxPA(), *histogram);
             break;
 
         case TOOL_A_SCALED:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsA_Scaled (scale_min, scale_max),
-                        HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsA_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_P_SCALED: // HERE_SCALED: we could optimize this if we wanted to
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsP_Scaled (scale_min, scale_max),
-                        HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsP_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_P_MINUS_A_SCALED:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsPminusA_Scaled (scale_min, scale_max),
-                        HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPminusA_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_A_MINUS_P_SCALED:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsAminusP_Scaled (scale_min, scale_max),
-                        HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsAminusP_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_P_PLUS_A_SCALED:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsPplusA_Scaled (scale_min, scale_max),
-                        HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPplusA_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_P_TIMES_A_SCALED:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsPtimesA_Scaled (scale_min, scale_max),
-                        HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPtimesA_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_P_DIVBY_A_SCALED:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsPdivByA_Scaled (scale_min, scale_max),
-                        HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPdivByA_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_A_DIVBY_P_SCALED:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsAdivByP_Scaled (scale_min, scale_max),
-                        HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsAdivByP_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_MIN_P_A_SCALED:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsMinPA_Scaled (scale_min, scale_max),
-                        HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsMinPA_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
         case TOOL_MAX_P_A_SCALED:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsMaxPA_Scaled (scale_min, scale_max),
-                        HistogramNull());
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsMaxPA_Scaled (rbias, rmultiplier),
+                             HistogramNull());
             break;
 
         case TOOL_A_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsA_Scaled (scale_min, scale_max),
-                        *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsA_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_P_SCALED_WITH_HISTOGRAM: // HERE: we could optimize this if we wanted to
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsP_Scaled (scale_min, scale_max),
-                        *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsP_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_P_MINUS_A_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsPminusA_Scaled (scale_min, scale_max),
-                        *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPminusA_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_A_MINUS_P_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsAminusP_Scaled (scale_min, scale_max),
-                        *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsAminusP_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_P_PLUS_A_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsPplusA_Scaled (scale_min, scale_max),
-                        *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPplusA_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_P_TIMES_A_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsPtimesA_Scaled (scale_min, scale_max),
-                        *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPtimesA_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_P_DIVBY_A_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsPdivByA_Scaled (scale_min, scale_max),
-                        *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsPdivByA_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_A_DIVBY_P_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsAdivByP_Scaled (scale_min, scale_max),
-                        *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsAdivByP_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_MIN_P_A_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsMinPA_Scaled (scale_min, scale_max),
-                        *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsMinPA_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
         case TOOL_MAX_P_A_SCALED_WITH_HISTOGRAM:
-            applyImage (image, data, planesize, bias, int_img,
-                        OpPequalsMaxPA_Scaled (scale_min, scale_max),
-                        *histogram);
+            sak->applyImage (image, data, planesize, param, bias, int_img,
+                             OpPequalsMaxPA_Scaled (rbias, rmultiplier),
+                             *histogram);
             break;
 
         default:
             printf ("SwissArmyKnife: unknown operation (tool) %d!\n",
-                    _param->tool);
+                    param->tool);
             return 0;
         }
     }
@@ -2493,172 +2630,192 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
         switch (tool)
         {
         case TOOL_A:
-            applyConstant (image, data, planesize, bias, OpPequalsA(), HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsA(), HistogramNull());
             break;
         case TOOL_P: // HERE: we could optimize this if we wanted to
-            applyConstant (image, data, planesize, bias, OpPequalsP(), HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsP(), HistogramNull());
             break;
         case TOOL_P_MINUS_A:
-            applyConstant (image, data, planesize, bias, OpPequalsPminusA(), HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPminusA(), HistogramNull());
             break;
         case TOOL_A_MINUS_P:
-            applyConstant (image, data, planesize, bias, OpPequalsAminusP(), HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsAminusP(), HistogramNull());
             break;
         case TOOL_P_PLUS_A:
-            applyConstant (image, data, planesize, bias, OpPequalsPplusA(), HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPplusA(), HistogramNull());
             break;
         case TOOL_P_TIMES_A:
-            applyConstant (image, data, planesize, bias, OpPequalsPtimesA(), HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPtimesA(), HistogramNull());
             break;
         case TOOL_P_DIVBY_A:
-            applyConstant (image, data, planesize, bias, OpPequalsPdivByA(), HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPdivByA(), HistogramNull());
             break;
         case TOOL_A_DIVBY_P:
-            applyConstant (image, data, planesize, bias, OpPequalsAdivByP(), HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsAdivByP(), HistogramNull());
             break;
         case TOOL_MIN_P_A:
-            applyConstant (image, data, planesize, bias, OpPequalsMinPA(), HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsMinPA(), HistogramNull());
             break;
         case TOOL_MAX_P_A:
-            applyConstant (image, data, planesize, bias, OpPequalsMaxPA(), HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsMaxPA(), HistogramNull());
             break;
 
         case TOOL_A_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias, OpPequalsA(), *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsA(), *histogram);
             break;
         case TOOL_P_WITH_HISTOGRAM: // HERE: we could optimize this if we wanted to
-            applyConstant (image, data, planesize, bias, OpPequalsP(), *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsP(), *histogram);
             break;
         case TOOL_P_MINUS_A_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias, OpPequalsPminusA(), *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPminusA(), *histogram);
             break;
         case TOOL_A_MINUS_P_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias, OpPequalsAminusP(), *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsAminusP(), *histogram);
             break;
         case TOOL_P_PLUS_A_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias, OpPequalsPplusA(), *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPplusA(), *histogram);
             break;
         case TOOL_P_TIMES_A_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias, OpPequalsPtimesA(), *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPtimesA(), *histogram);
             break;
         case TOOL_P_DIVBY_A_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias, OpPequalsPdivByA(), *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPdivByA(), *histogram);
             break;
         case TOOL_A_DIVBY_P_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias, OpPequalsAdivByP(), *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsAdivByP(), *histogram);
             break;
         case TOOL_MIN_P_A_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias, OpPequalsMinPA(), *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsMinPA(), *histogram);
             break;
         case TOOL_MAX_P_A_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias, OpPequalsMaxPA(), *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsMaxPA(), *histogram);
             break;
 
         case TOOL_A_SCALED:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsA_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsA_Scaled (rbias, rmultiplier),
+                                HistogramNull());
             break;
         case TOOL_P_SCALED: // HERE_SCALED: we could optimize this if we wanted to
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsP_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsP_Scaled (rbias, rmultiplier),
+                                HistogramNull());
             break;
         case TOOL_P_MINUS_A_SCALED:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsPminusA_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPminusA_Scaled (rbias, rmultiplier),
+                                HistogramNull());
             break;
         case TOOL_A_MINUS_P_SCALED:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsAminusP_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsAminusP_Scaled (rbias, rmultiplier),
+                                HistogramNull());
             break;
         case TOOL_P_PLUS_A_SCALED:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsPplusA_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPplusA_Scaled (rbias, rmultiplier),
+                                HistogramNull());
             break;
         case TOOL_P_TIMES_A_SCALED:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsPtimesA_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPtimesA_Scaled (rbias, rmultiplier),
+                                HistogramNull());
             break;
         case TOOL_P_DIVBY_A_SCALED:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsPdivByA_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPdivByA_Scaled (rbias, rmultiplier),
+                                HistogramNull());
             break;
         case TOOL_A_DIVBY_P_SCALED:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsAdivByP_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsAdivByP_Scaled (rbias, rmultiplier),
+                                HistogramNull());
             break;
         case TOOL_MIN_P_A_SCALED:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsMinPA_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsMinPA_Scaled (rbias, rmultiplier),
+                                HistogramNull());
             break;
         case TOOL_MAX_P_A_SCALED:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsMaxPA_Scaled (scale_min, scale_max),
-                           HistogramNull());
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsMaxPA_Scaled (rbias, rmultiplier),
+                                HistogramNull());
             break;
 
         case TOOL_A_SCALED_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsA_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsA_Scaled (rbias, rmultiplier),
+                                *histogram);
             break;
         case TOOL_P_SCALED_WITH_HISTOGRAM: // HERE: we could optimize this if we wanted to
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsP_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsP_Scaled (rbias, rmultiplier),
+                                *histogram);
             break;
         case TOOL_P_MINUS_A_SCALED_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsPminusA_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPminusA_Scaled (rbias, rmultiplier),
+                                *histogram);
             break;
         case TOOL_A_MINUS_P_SCALED_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsAminusP_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsAminusP_Scaled (rbias, rmultiplier),
+                                *histogram);
             break;
         case TOOL_P_PLUS_A_SCALED_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsPplusA_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPplusA_Scaled (rbias, rmultiplier),
+                                *histogram);
             break;
         case TOOL_P_TIMES_A_SCALED_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsPtimesA_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPtimesA_Scaled (rbias, rmultiplier),
+                                *histogram);
             break;
         case TOOL_P_DIVBY_A_SCALED_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsPdivByA_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsPdivByA_Scaled (rbias, rmultiplier),
+                                *histogram);
             break;
         case TOOL_A_DIVBY_P_SCALED_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsAdivByP_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsAdivByP_Scaled (rbias, rmultiplier),
+                                *histogram);
             break;
         case TOOL_MIN_P_A_SCALED_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsMinPA_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsMinPA_Scaled (rbias, rmultiplier),
+                                *histogram);
             break;
         case TOOL_MAX_P_A_SCALED_WITH_HISTOGRAM:
-            applyConstant (image, data, planesize, bias,
-                           OpPequalsMaxPA_Scaled (scale_min, scale_max),
-                           *histogram);
+            sak->applyConstant (image, data, planesize, param, bias,
+                                OpPequalsMaxPA_Scaled (rbias, rmultiplier),
+                                *histogram);
             break;
 
         default:
             printf ("SwissArmyKnife: unknown operation (tool) %d!\n",
-                    _param->tool);
+                    param->tool);
             return 0;
         }
     }
@@ -2680,5 +2837,6 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame, uint32_t *
     memset (VPLANE (data), 128, planesize >> 2);
 
     data->copyInfo(image);
+
     return 1;
 }	                           

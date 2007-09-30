@@ -14,19 +14,15 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+#include "default.h"
+
 #include <math.h>
 #include <iconv.h>
 
 
 #ifdef USE_FREETYPE
 
-#include "default.h"
 #include "ADM_osSupport/ADM_misc.h"
 
 #include "ADM_toolkit/toolkit.hxx"
@@ -39,14 +35,14 @@
 #include "ADM_video/ADM_vidFont.h"
 #include "ADM_videoFilter/ADM_vidSRT.h"
 
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_filter/video_filters.h"
 
-#include <prefs.h>
+#include "prefs.h"
 
 static FILTER_PARAM subParam={15,{"_fontsize","_subname","_fontname","_charset",
 				"_baseLine","_Y_percent","_U_percent","_V_percent",

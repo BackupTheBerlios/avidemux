@@ -15,6 +15,9 @@ DIA_animated.cpp \
 DIA_ocr.cpp \
 DIA_tsSub.cpp \
 DIA_flyEq2.cpp \
+DIA_flyThreshold.cpp \
+DIA_flySwissArmyKnife.cpp \
+DIA_flyParticle.cpp \
 DIA_flv1.cpp
 
 commonObjs:=$(subst .cpp,.o,$(libADM_CommonUI_a_SOURCES))

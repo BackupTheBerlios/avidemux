@@ -44,6 +44,7 @@ extern adm_fast_memcpy myAdmMemcpy;
   #define realloc #error
   #define memalign #error
   #define free  #error
+  #undef strdup
   #define strdup #error
   #define calloc #error
 #else
@@ -51,6 +52,7 @@ extern adm_fast_memcpy myAdmMemcpy;
   #define realloc ADM_realloc
   #define memalign(x,y) ADM_alloc(y)
   #define free  ADM_dealloc
+  #undef strdup
   #define strdup ADM_strdup
   #define calloc ADM_calloc
 #endif

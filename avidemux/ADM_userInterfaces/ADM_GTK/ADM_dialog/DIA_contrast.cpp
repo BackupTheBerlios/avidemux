@@ -1,5 +1,5 @@
 /***************************************************************************
-                          ADM_guiContrast.cpp  -  description
+                          DIA_contrast.cpp  -  description
                              -------------------
     begin                : Mon Sep 23 2002
     copyright            : (C) 2002 by mean
@@ -69,7 +69,7 @@ uint8_t DIA_contrast(AVDMGenericVideoStream *in,CONTRAST_PARAM *param)
 
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
-        gtk_window_set_title (GTK_WINDOW (dialog), QT_TR_NOOP("ASHARP"));
+        gtk_window_set_title (GTK_WINDOW (dialog), QT_TR_NOOP("Contrast"));
         gtk_widget_show(dialog);	
         
           // and value changed

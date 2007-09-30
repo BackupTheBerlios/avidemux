@@ -16,11 +16,20 @@
  ***************************************************************************/
 #ifndef __ZDEFAULT
 #define __ZDEFAULT
+
+#include "config.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 /*
    	The maximum width/height is MAXIMUM_SIZE 768*768 for now
 */
 #define MAXIMUM_SIZE 2048
-
 
 typedef unsigned char ADM_filename ;
 

@@ -14,13 +14,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
+
+#include "default.h"
+
 #include <iconv.h>
-#include <string.h> // thanks !
-#include "config.h"
-#include <errno.h>
-#include "ADM_utilities/default.h"
 
  #ifdef USE_FREETYPE
 

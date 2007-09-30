@@ -16,22 +16,19 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 
-#include <stdlib.h>
-#include <stdio.h>
+#include "default.h"
+
 #include <gtk/gtk.h>
 
-#include <dirent.h>
 #include <errno.h>
+#include <sys/types.h>
 #include <sys/stat.h>
-#ifndef ADM_WIN32
-	#include <unistd.h>
-#endif
+#include <dirent.h>
 
 #include "avi_vars.h"
 #include "ADM_misc.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "ADM_toolkit/filesel.h"
 #include "ADM_toolkit/toolkit.hxx"

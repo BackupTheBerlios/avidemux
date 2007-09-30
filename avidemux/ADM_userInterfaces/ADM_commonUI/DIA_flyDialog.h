@@ -30,6 +30,16 @@ enum ResizeMethod {
 	RESIZE_LAST = 2		// Resize image after filter has been applied (slower for RGB)
 };
 
+class diaMenuEntry;  // defined in DIA_factory.h; only need pointer here
+
+struct MenuMapping
+{
+    const char * widgetName; // name of the combo box widget or equivalent
+    uint32_t paramOffset;   // offsetof(FOO_PARAM, menu_option_member)
+    uint32_t count;
+    const diaMenuEntry * menu;
+};
+
 class ADM_flyDialog
 {
   protected:
@@ -50,7 +60,17 @@ class ADM_flyDialog
           void copyYuvFinalToRgb(void);
           void copyYuvScratchToRgb(void);
 		  void copyRgbFinalToDisplay(void);
-
+          void setupMenus (const void * params,
+                           const MenuMapping * menu_mapping,
+                           uint32_t menu_mapping_count);
+          void getMenuValues (void * params,
+                              const MenuMapping * menu_mapping,
+                              uint32_t menu_mapping_count);
+  public:
+          uint32_t getMenuValue (const MenuMapping * mm);
+          const MenuMapping * lookupMenu (const char * widgetName,
+                                          const MenuMapping * menu_mapping,
+                                          uint32_t menu_mapping_count);
   public:
           void    *_cookie; // whatever
           void    *_slider; // widget
@@ -60,7 +80,7 @@ class ADM_flyDialog
   virtual uint8_t    process(void)=0;
   virtual uint8_t    download(void)=0;
   virtual uint8_t    upload(void)=0;
-          /* /filte dependant */
+          /* /filter dependant */
   
   virtual uint8_t    sliderChanged(void);
         /* This is GTK/QT/whatever dependant */
@@ -75,6 +95,7 @@ class ADM_flyDialog
           ADM_flyDialog(uint32_t width, uint32_t height, AVDMGenericVideoStream *in,
                              void *canvas, void *slider, int yuv, ResizeMethod resizeMethod);
   virtual ~ADM_flyDialog(void);
+
 };
 
 #endif

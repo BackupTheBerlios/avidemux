@@ -16,10 +16,13 @@
  
 #ifndef __PARTICLE__
 #define __PARTICLE__   
+
+#include <string>
+
 #include "ADM_video/ADM_cache.h"
+
 struct PARTICLE_PARAM
 {
-
     uint32_t min_area;
     uint32_t max_area;
     uint32_t left_crop;
@@ -27,11 +30,20 @@ struct PARTICLE_PARAM
     uint32_t top_crop;
     uint32_t bottom_crop;
     uint32_t output_format;
-    const char * output_file;
+    std::string output_file;
     uint32_t camera_number;
     uint32_t debug;
-
 };
+
+// Alas, because offsetof() is only supposed to work on POD (plain old data)
+// structs, and our PARTICLE_PARAM includes a std::string (which has a
+// constructor, and which causes PARTICLE_PARAM to therefore have an implicit
+// constructor), we need to define our own offsetof() to use for the dialog
+// menus.  See
+// http://www.cplusplus.com/reference/clibrary/cstddef/offsetof.html for more
+// on offsetof().
+
+#define my_offsetof(_type, _memb) (size_t (&(((_type *)1)->_memb)) - 1)
 
 class ADMVideoParticle : public AVDMGenericVideoStream
 {
@@ -56,17 +68,22 @@ class ADMVideoParticle : public AVDMGenericVideoStream
      };
 
 
-     ADMVideoParticle(  AVDMGenericVideoStream *in,CONFcouple *setup);
+     ADMVideoParticle (AVDMGenericVideoStream *in, CONFcouple *setup);
 
      ~ADMVideoParticle();
 
-     virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-                                              ADMImage *data,uint32_t *flags);
+     virtual uint8_t getFrameNumberNoAlloc (uint32_t frame, uint32_t *len,
+                                            ADMImage *data,uint32_t *flags);
 
-     virtual uint8_t 	configure( AVDMGenericVideoStream *instream);
-     virtual char 		   *printConf(void);
-     virtual uint8_t 	getCoupledConf( CONFcouple **couples);
+     virtual uint8_t configure (AVDMGenericVideoStream *instream);
+     virtual char * printConf (void);
+     virtual uint8_t getCoupledConf (CONFcouple **couples);
 							
+     static uint8_t doParticle (ADMImage * image, ADMImage * data,
+                                AVDMGenericVideoStream * in,
+                                uint32_t real_frame,
+                                FILE * do_outfp, PARTICLE_PARAM * param,
+                                uint32_t width, uint32_t height);
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -139,6 +156,10 @@ private:
     uint8_t * my_pixels;
     uint32_t my_w;
     uint32_t my_h;
+    uint32_t my_left_margin;
+    uint32_t my_right_margin;
+    uint32_t my_top_margin;
+    uint32_t my_bottom_margin;
     ADMImage * my_outImage;
     uint32_t my_minArea;
     uint32_t my_maxArea;
@@ -177,12 +198,25 @@ public:
         : my_pixels (pixels),
           my_w (w),
           my_h (h),
+          my_left_margin (0),
+          my_right_margin (w),
+          my_top_margin (0),
+          my_bottom_margin (h),
           my_outImage (outImage),
           my_particleArea (0),
           my_particleCentroidX (0),
           my_particleCentroidY (0),
           debug (0)
     {
+    }
+
+    void setCropping (uint32_t left_crop, uint32_t right_crop,
+                      uint32_t top_crop, uint32_t bottom_crop)
+    {
+        my_left_margin = left_crop;
+        my_right_margin = my_w - right_crop;
+        my_top_margin = top_crop;
+        my_bottom_margin = my_h - bottom_crop;
     }
 
     // Return true if the pixel is part of a particle.
@@ -207,7 +241,9 @@ public:
     }
 
     // This one does bounds checking, and forces references "off the edge" to
-    // the nearest valid pixel - it's useful for convolutions.
+    // the nearest valid pixel - it's useful for convolutions.  It does not
+    // currently respect the crop settings, only because we know that this
+    // function is used only when those aren't set.
 
     uint8_t & getPixelSafely (int32_t x, int32_t y) const
     {
@@ -247,7 +283,9 @@ public:
 
     bool validPixel (uint32_t x, uint32_t y) const
     {
-        return (x < my_w && y < my_h);
+        // return (x < my_w && y < my_h);
+        return (x >= my_left_margin && x < my_right_margin
+                && y >= my_top_margin && y < my_bottom_margin);
     }
 
     bool goodPixel (uint32_t x, uint32_t y) const
@@ -310,4 +348,11 @@ public:
         my_maxArea = newMaxArea;
     }
 };
+
+struct MenuMapping;
+uint8_t DIA_particle (AVDMGenericVideoStream *in,
+                      PARTICLE_PARAM * param,
+                      const MenuMapping * menu_mapping,
+                      uint32_t menu_mapping_count);
+
 #endif

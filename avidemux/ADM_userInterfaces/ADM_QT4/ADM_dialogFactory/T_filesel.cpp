@@ -105,7 +105,7 @@ class  ADM_Qfilesel : public QWidget
         ADM_fileMode fileMode;
         const char * defaultSuffix;
             
-        ADM_Qfilesel(QWidget *z,const char *title,char *entry,QGridLayout *layout,int line, ADM_fileMode mode, const char * defaultSuffix)
+        ADM_Qfilesel(QWidget *z,const char *title,const char *entry,QGridLayout *layout,int line, ADM_fileMode mode, const char * defaultSuffix)
             : QWidget(z),
               defaultSuffix (defaultSuffix)
         {
@@ -142,7 +142,20 @@ class  ADM_Qfilesel : public QWidget
 diaElemFile::diaElemFile(uint32_t writemode,char **filename,const char *toggleTitle,
                          const char *defaultSuffix,const char *tip)
   : diaElem(ELEM_FILE_READ),
-    defaultSuffix (defaultSuffix)
+    defaultSuffix (defaultSuffix),
+    paramIsStdString (false)
+{
+  param=(void *)filename;
+  paramTitle=shortkey(toggleTitle);
+  this->tip=tip;
+  _write=writemode;
+}
+
+diaElemFile::diaElemFile(uint32_t writemode,std::string *filename,const char *toggleTitle,
+                         const char * defaultSuffix,const char *tip)
+  : diaElem(ELEM_FILE_READ),
+    defaultSuffix (defaultSuffix),
+    paramIsStdString (true)
 {
   param=(void *)filename;
   paramTitle=shortkey(toggleTitle);
@@ -159,21 +172,32 @@ void diaElemFile::setMe(void *dialog, void *opaque,uint32_t line)
 {
  QGridLayout *layout=(QGridLayout*) opaque;
  ADM_Qfilesel *fs;
+ const char * val;
+ if (paramIsStdString)
+     val = ((std::string *)param)->c_str();
+ else
+     val = *((const char **)param);
   if(_write)
-      fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,ADM_FILEMODE_WRITE, defaultSuffix);
+      fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle, val, layout, line,ADM_FILEMODE_WRITE, defaultSuffix);
   else
-      fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,ADM_FILEMODE_READ, 0);
+      fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle, val, layout, line,ADM_FILEMODE_READ, 0);
   myWidget=(void *)fs; 
 }
 void diaElemFile::getMe(void)
 {
-  
-  char **n=(char **)param;
-  if(*n) ADM_dealloc(*n);
-  
   ADM_Qfilesel *fs=(ADM_Qfilesel *)myWidget;
   QString s=(fs->edit)->text();
-  *n=ADM_strdup( s.toLatin1() );
+  const char * val = s.toLatin1();
+  if (paramIsStdString)
+  {
+      *((std::string *)param) = val;
+  }
+  else
+  {
+      char **n=(char **)param;
+      if(*n) ADM_dealloc(*n);
+      *n=ADM_strdup(val);
+  }
 }
 void diaElemFile::enable(uint32_t onoff)
 {
