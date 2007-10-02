@@ -3,13 +3,6 @@
 /* MPEG2DEC */
 #cmakedefine ACCEL_DETECT
 
-#if ${WIN32_DEF}
-#define rindex strrchr
-#define index strchr
-#define ftello ftello64
-#define fseeko fseeko64
-#endif
-
 /* Big endian CPU - SPARC or PowerPC */
 #cmakedefine ADM_BIG_ENDIAN
 
@@ -302,3 +295,17 @@
 
 /* use Nvwa memory leak detector */
 #cmakedefine FIND_LEAKS
+
+#cmakedefine ADM_OS_APPLE
+#cmakedefine ADM_OS_UNIX
+#cmakedefine ADM_OS_WINDOWS
+
+#cmakedefine ADM_CPU_X86
+#cmakedefine ADM_CPU_X86_64
+
+#ifdef ADM_OS_WINDOWS
+#define rindex strrchr
+#define index strchr
+#define ftello ftello64
+#define fseeko fseeko64
+#endif
