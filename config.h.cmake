@@ -48,57 +48,38 @@
 #cmakedefine ARCH_X86_64
 
 /* FFMPEG */
-#cmakedefine CONFIG_AC3_ENCODER
-#cmakedefine CONFIG_AMR_NB
-#cmakedefine CONFIG_CYUV_DECODER
-#cmakedefine CONFIG_DARWIN
+#cmakedefine CONFIG_ENCODERS
+#cmakedefine CONFIG_DVVIDEO_ENCODER
+
 #cmakedefine CONFIG_DECODERS
 #cmakedefine CONFIG_DVVIDEO_DECODER
-#cmakedefine CONFIG_DVVIDEO_ENCODER
-#cmakedefine CONFIG_ENCODERS
-#cmakedefine CONFIG_FFV1_DECODER
-#cmakedefine CONFIG_FFV1_ENCODER
-#cmakedefine CONFIG_FFVHUFF_DECODER
-#cmakedefine CONFIG_FFVHUFF_ENCODER
-#cmakedefine CONFIG_H263P_DECODER
-#cmakedefine CONFIG_H263P_ENCODER
 #cmakedefine CONFIG_H263_DECODER
-#cmakedefine CONFIG_H263_ENCODER
-#cmakedefine CONFIG_H264_DECODER
-#cmakedefine CONFIG_HUFFYUV_DECODER
-#cmakedefine CONFIG_HUFFYUV_ENCODER
-#cmakedefine CONFIG_MJPEG_DECODER
-#cmakedefine CONFIG_MJPEG_ENCODER
-#cmakedefine CONFIG_MOV_MUXER
-#cmakedefine CONFIG_MATROSKA_MUXER
-#cmakedefine CONFIG_MP2_ENCODER
-#cmakedefine CONFIG_MP4_MUXER
-#cmakedefine CONFIG_MPEG1VIDEO_DECODER
-#cmakedefine CONFIG_MPEG1VIDEO_ENCODER
-#cmakedefine CONFIG_MPEG2VIDEO_DECODER
-#cmakedefine CONFIG_MPEG2VIDEO_ENCODER
 #cmakedefine CONFIG_MPEG4_DECODER
-#cmakedefine CONFIG_MPEG4_ENCODER
 #cmakedefine CONFIG_MPEGAUDIO_HP
-#cmakedefine CONFIG_MSMPEG4V2_DECODER
-#cmakedefine CONFIG_MSMPEG4V3_DECODER
-#cmakedefine CONFIG_MSMPEG4V3_ENCODER
-#cmakedefine CONFIG_MUXERS
-#cmakedefine CONFIG_PSP_MUXER
-#cmakedefine CONFIG_QDM2_DECODER
-#cmakedefine CONFIG_RISKY
 #cmakedefine CONFIG_SNOW_DECODER
-#cmakedefine CONFIG_SNOW_ENCODER
-#cmakedefine CONFIG_SVQ3_DECODER
-#cmakedefine CONFIG_TG2_MUXER
-#cmakedefine CONFIG_TGP_MUXER
-#cmakedefine CONFIG_TSCC_DECODER
 #cmakedefine CONFIG_VC1_DECODER
-#cmakedefine CONFIG_WMAV2_DECODER
-#cmakedefine CONFIG_WMV1_DECODER
 #cmakedefine CONFIG_WMV2_DECODER
 #cmakedefine CONFIG_WMV3_DECODER
 #cmakedefine CONFIG_ZLIB
+
+#cmakedefine CONFIG_MUXERS
+#cmakedefine CONFIG_MOV_MUXER
+#cmakedefine CONFIG_MP4_MUXER
+#cmakedefine CONFIG_PSP_MUXER
+#cmakedefine CONFIG_TG2_MUXER
+#cmakedefine CONFIG_TGP_MUXER
+
+#cmakedefine ENABLE_MMX ${ENABLE_MMX}
+#cmakedefine ENABLE_THREADS ${ENABLE_THREADS}
+#cmakedefine HAVE_FAST_UNALIGNED
+#cmakedefine HAVE_LRINTF
+#cmakedefine HAVE_MMX
+#cmakedefine HAVE_THREADS
+#cmakedefine RUNTIME_CPUDETECT
+
+#cmakedefine HAVE_FAST_64BIT
+#cmakedefine HAVE_SSSE3
+#cmakedefine CONFIG_DARWIN
 
 /* Name mangling */
 #cmakedefine CYG_MANGLING
@@ -124,11 +105,6 @@
 /* Enable AltiVec by default */
 #cmakedefine HAVE_BUILTIN_VECTOR
 
-/* FFMPEG */
-#cmakedefine HAVE_FAST_UNALIGNED
-#cmakedefine HAVE_FAST_64BIT
-#cmakedefine HAVE_SSSE3
-
 /* FontConfig detected */
 #cmakedefine HAVE_FONTCONFIG
 
@@ -144,16 +120,8 @@
 /* Define to 1 if you have the `mp3lame' library (-lmp3lame). */
 #cmakedefine HAVE_LIBMP3LAME
 
-/* lrintf exists? */
-#cmakedefine HAVE_LRINTF
-
 /* Use malloc.h */
 #cmakedefine HAVE_MALLOC_H
-
-/* post proc */
-#cmakedefine HAVE_MMX
-#cmakedefine ENABLE_MMX ${ENABLE_MMX}
-#cmakedefine ENABLE_THREADS ${ENABLE_THREADS}
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #cmakedefine HAVE_STDINT_H
@@ -169,9 +137,6 @@
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #cmakedefine HAVE_SYS_TYPES_H
-
-/* HAVE_THREADS */
-#cmakedefine HAVE_THREADS
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #cmakedefine HAVE_UNISTD_H
@@ -202,9 +167,6 @@
 
 /* Define to the version of this package. */
 #cmakedefine PACKAGE_VERSION
-
-/* Let FFmpeg decide which is faster */
-#cmakedefine RUNTIME_CPUDETECT
 
 /* use liba52 */
 #cmakedefine USE_AC3

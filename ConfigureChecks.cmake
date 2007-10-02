@@ -113,23 +113,6 @@ ENDIF (ADM_CPU_X86)
 ########################################
 # Libavcodec
 ########################################
-SET(ENABLE_THREADS 1)
-SET(HAVE_LRINTF 1)
-SET(HAVE_FAST_UNALIGNED 1)
-SET(HAVE_THREADS 1)
-SET(RUNTIME_CPUDETECT 1)
-SET(HAVE_MMX 1)
-SET(ENABLE_MMX 1)
-
-IF (ADM_CPU_X86_64)
-	SET(HAVE_FAST_64BIT 1)
-ENDIF (ADM_CPU_X86_64)
- 
-IF (NOT NO_SSSE3)
-	SET(HAVE_SSSE3 1)
-ENDIF(NOT NO_SSSE3)
-
-# Set lavcodec/util/format configuration
 SET_LAVCODEC_FLAGS()
 
 ########################################
