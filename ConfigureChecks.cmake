@@ -48,24 +48,6 @@ INCLUDE(adm_checkHeaderLib)
 INCLUDE(adm_compile)
 
 ########################################
-# Check functions, includes, symbols
-########################################
-CHECK_FUNCTION_EXISTS(gettimeofday HAVE_GETTIMEOFDAY)
-
-CHECK_INCLUDE_FILES(inttypes.h      HAVE_INTTYPES_H)                    # simapi.h
-CHECK_INCLUDE_FILES(stddef.h        HAVE_STDDEF_H)                      # simapi.h
-CHECK_INCLUDE_FILES(stdint.h        HAVE_STDINT_H)                      # simapi.h
-CHECK_INCLUDE_FILES(stdlib.h        HAVE_STDLIB_H)                      # simapi.h
-CHECK_INCLUDE_FILES(string.h        HAVE_STRING_H)                      # _core/libintl.cpp
-CHECK_INCLUDE_FILES(sys/stat.h      HAVE_SYS_STAT_H)                    # gpg/gpg.cpp
-CHECK_INCLUDE_FILES(sys/types.h     HAVE_SYS_TYPES_H)                   # simapi.h
-CHECK_INCLUDE_FILES(unistd.h        HAVE_UNISTD_H)                      # simapi.h
-CHECK_INCLUDE_FILES(malloc.h        HAVE_MALLOC_H)                      # simapi.h
-CHECK_INCLUDE_FILES(libintl.h       HAVE_LIBINTL_H)                      # simapi.h
-
-CHECK_SYMBOL_EXISTS(strcasecmp  "strings.h"         HAVE_STRCASECMP)    # simapi.h, various
-
-########################################
 # Mangling
 ########################################
 IF (ADM_OS_WINDOWS OR ADM_OS_APPLE)
@@ -80,6 +62,12 @@ IF (ADM_OS_WINDOWS)
 	ADD_DEFINITIONS(-mms-bitfields -mno-cygwin)
 ELSE (ADM_OS_WINDOWS)
 	IF (ADM_OS_APPLE)
+		SET(CFLAGS_ORIG $ENV{CFLAGS})
+		SET(CXXFLAGS_ORIG $ENV{CXXFLAGS})
+		
+		SET(ENV{CFLAGS} "-I /opt/local/include -L/opt/local/lib $ENV{CFLAGS}")
+		SET(ENV{CXXFLAGS} "-I /opt/local/include -L/opt/local/lib $ENV{CXXFLAGS}")
+		
 		SET(ADM_BSD_FAMILY 1)
 	ENDIF (ADM_OS_APPLE)
 
@@ -100,6 +88,23 @@ SET(USE_AC3 1)
 SET(USE_FFMPEG 1)
 SET(USE_MJPEG 1)
 SET(USE_LIBXML2 1)
+
+########################################
+# Check functions, includes, symbols
+########################################
+CHECK_FUNCTION_EXISTS(gettimeofday HAVE_GETTIMEOFDAY)
+
+CHECK_INCLUDE_FILES(inttypes.h      HAVE_INTTYPES_H)                    # simapi.h
+CHECK_INCLUDE_FILES(stddef.h        HAVE_STDDEF_H)                      # simapi.h
+CHECK_INCLUDE_FILES(stdint.h        HAVE_STDINT_H)                      # simapi.h
+CHECK_INCLUDE_FILES(stdlib.h        HAVE_STDLIB_H)                      # simapi.h
+CHECK_INCLUDE_FILES(string.h        HAVE_STRING_H)                      # _core/libintl.cpp
+CHECK_INCLUDE_FILES(sys/stat.h      HAVE_SYS_STAT_H)                    # gpg/gpg.cpp
+CHECK_INCLUDE_FILES(sys/types.h     HAVE_SYS_TYPES_H)                   # simapi.h
+CHECK_INCLUDE_FILES(unistd.h        HAVE_UNISTD_H)                      # simapi.h
+CHECK_INCLUDE_FILES(malloc.h        HAVE_MALLOC_H)                      # simapi.h
+
+CHECK_SYMBOL_EXISTS(strcasecmp  "strings.h"         HAVE_STRCASECMP)    # simapi.h, various
 
 ########################################
 # LibMad
@@ -123,24 +128,30 @@ SET(ACCEL_DETECT 1)
 ########################################
 # Gettext
 ########################################
-IF (HAVE_LIBINTL_H)
-	MESSAGE(STATUS "<Checking gettext>")
-	MESSAGE(STATUS "<****************>")
+MESSAGE(STATUS "<Checking gettext>")
+MESSAGE(STATUS "<****************>")
 
-	IF (NO_NLS)
-		MESSAGE(STATUS "<disabled per request>")
-	ELSE (NO_NLS)
+IF (NO_NLS)
+	MESSAGE(STATUS "<disabled per request>")
+ELSE (NO_NLS)
+	FIND_PATH(LIBINTL_H_DIR libintl.h $ENV{CXXFLAGS})
+	MESSAGE(STATUS "libintl Header Path: ${LIBINTL_H_DIR}")
+
+	IF (NOT LIBINTL_H_DIR STREQUAL "LIBINTL_H-NOTFOUND")
+		FIND_LIBRARY(LIBINTL_LIB_DIR intl $ENV{CXXFLAGS})
+		MESSAGE(STATUS "libintl Library Path: ${LIBINTL_LIB_DIR}")
+
 		# Try linking without -lintl
-		ADM_COMPILE(gettext.cpp "" "" WITHOUT_LIBINTL outputWithoutLibintl)
+		ADM_COMPILE(gettext.cpp -I${LIBINTL_H_DIR} "" WITHOUT_LIBINTL outputWithoutLibintl)
 		
 		IF (WITHOUT_LIBINTL)
 			SET(HAVE_GETTEXT 1)
 			MESSAGE(STATUS "Ok, No lib needed (${ADM_GETTEXT_LIB})")
 		ELSE (WITHOUT_LIBINTL)
-			ADM_COMPILE(gettext.cpp "" "-lintl" WITH_LIBINTL outputWithLibintl)
+			ADM_COMPILE(gettext.cpp -I${LIBINTL_H_DIR} ${LIBINTL_LIB_DIR} WITH_LIBINTL outputWithLibintl)
 			
 			IF (WITH_LIBINTL)
-				SET(ADM_GETTEXT_LIB "-lintl")
+				SET(ADM_GETTEXT_LIB ${LIBINTL_LIB_DIR})
 				SET(HAVE_GETTEXT 1)
 				
 				MESSAGE(STATUS "Ok, libintl needed")
@@ -149,8 +160,12 @@ IF (HAVE_LIBINTL_H)
 				MESSAGE(STATUS "Does not work, with ${outputWithLibintl}")
 			ENDIF (WITH_LIBINTL)
 		ENDIF (WITHOUT_LIBINTL)
-	ENDIF (NO_NLS)
-ENDIF (HAVE_LIBINTL_H)
+	ENDIF (NOT LIBINTL_H_DIR STREQUAL "LIBINTL_H-NOTFOUND")
+
+	IF (HAVE_GETTEXT)
+		SET(ADM_GETTEXT_INCLUDE -I${LIBINTL_H_DIR})
+	ENDIF(HAVE_GETTEXT)
+ENDIF (NO_NLS)
 
 ########################################
 # Locale
@@ -422,8 +437,11 @@ ENDIF(USE_FAAD_P OR USE_FAAD_A)
 
 # See if we need old FAAD or new
 IF (USE_FAAD)
+	FIND_PATH(FAAD_H_DIR faad.h $ENV{CXXFLAGS})
+	FIND_LIBRARY(FAAD_LIB_DIR faad $ENV{CXXFLAGS})
+	
 	MESSAGE(STATUS "<Checking if faad needs old proto>")
-	ADM_COMPILE_WITH_WITHOUT(faad_check.cpp "-DOLD_FAAD_PROTO" "-lfaad" FAAD_WITH)
+	ADM_COMPILE_WITH_WITHOUT(faad_check.cpp "-DOLD_FAAD_PROTO -I${FAAD_H_DIR}" "${FAAD_LIB_DIR}" FAAD_WITH)
 	
 	IF(FAAD_WITH)
 		MESSAGE(STATUS "Yes")
