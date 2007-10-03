@@ -242,35 +242,38 @@ add_libs_all_targets(ADM_utilities)
 ###########################################
 # Add external libs
 ###########################################
-# ARTS
-if(USE_ARTS)
-	add_libs_all_targets(${ARTS_LDFLAGS})
-endif(USE_ARTS)
+#iconv
+if(NEEED_LIBICONV)
+	add_libs_all_targets(iconv)
+endif(NEEED_LIBICONV)
 
-# libAMRNB
-if(USE_AMR_NB AND NOT USE_LATE_BINDING)
-	add_libs_all_targets(amrnb)
-endif(USE_AMR_NB AND NOT USE_LATE_BINDING)
+#gettext
+if(ADM_GETTEXT_LIB)
+	INCLUDE_DIRECTORIES(${ADM_GETTEXT_INCLUDE})
+	TARGET_LINK_LIBRARIES(avidemux2_cli ${ADM_GETTEXT_LIB})
 
-#libdts
-if(USE_LIBDCA AND NOT USE_LATE_BINDING)
-	add_libs_all_targets(dts)
-endif(USE_LIBDCA AND NOT USE_LATE_BINDING)
+	if(GTK_FOUND)
+		TARGET_LINK_LIBRARIES(avidemux2_gtk ${ADM_GETTEXT_LIB})
+	endif(GTK_FOUND)
+endif(ADM_GETTEXT_LIB)
 
-# xvid
-if(USE_XVID_4)
-	add_libs_all_targets(xvidcore)
-endif(USE_XVID_4)
-
-#alsa
-if(ALSA_FOUND)
-	add_libs_all_targets(${ASOUND_LIBRARY})
-endif(ALSA_FOUND)
+#freetype
+if(USE_FREETYPE)
+	add_libs_all_targets(${FT_LDFLAGS})
+endif(USE_FREETYPE)
 
 #fontconfig
 if(USE_FONTCONFIG)
 	add_libs_all_targets(fontconfig)
 endif(USE_FONTCONFIG)
+
+# png
+if(USE_PNG)
+	add_libs_all_targets(png)
+endif(USE_PNG)
+
+# Xml2
+add_libs_all_targets(xml2)
 
 #XVideo 
 if(USE_XV)
@@ -288,15 +291,20 @@ if(USE_XV)
 	endif(QT4_FOUND AND NOT ADM_OS_APPLE)
 endif(USE_XV)
 
-# Lame
-if(HAVE_LIBMP3LAME)
-	add_libs_all_targets(mp3lame)
-endif(HAVE_LIBMP3LAME)
-
 # SDL
 if(USE_SDL)
 	add_libs_all_targets(${SDL_LDFLAGS})
 endif(USE_SDL)
+
+# ARTS
+if(USE_ARTS)
+	add_libs_all_targets(${ARTS_LDFLAGS})
+endif(USE_ARTS)
+
+#alsa
+if(ALSA_FOUND)
+	add_libs_all_targets(${ASOUND_LIBRARY})
+endif(ALSA_FOUND)
 
 # ESD
 if(USE_ESD)
@@ -308,15 +316,20 @@ if(USE_JACK)
 	add_libs_all_targets(jack)
 endif(USE_JACK)
 
-# x264
-if(USE_X264)
-	add_libs_all_targets(x264)
-endif(USE_X264)
+# libAMRNB
+if(USE_AMR_NB AND NOT USE_LATE_BINDING)
+	add_libs_all_targets(amrnb)
+endif(USE_AMR_NB AND NOT USE_LATE_BINDING)
 
-# png
-if(USE_PNG)
-	add_libs_all_targets(png)
-endif(USE_PNG)
+#libdts
+if(USE_LIBDCA AND NOT USE_LATE_BINDING)
+	add_libs_all_targets(dts)
+endif(USE_LIBDCA AND NOT USE_LATE_BINDING)
+
+# Lame
+if(HAVE_LIBMP3LAME)
+	add_libs_all_targets(mp3lame)
+endif(HAVE_LIBMP3LAME)
 
 # Vorbis
 if(USE_VORBIS)
@@ -339,33 +352,20 @@ if(USE_FAAD)
 	add_libs_all_targets(faad)
 endif(USE_FAAD)
 
-#freetype
-if(USE_FREETYPE)
-	add_libs_all_targets(${FT_LDFLAGS})
-endif(USE_FREETYPE)
-
-#gettext
-if(ADM_GETTEXT_LIB)
-	INCLUDE_DIRECTORIES(${ADM_GETTEXT_INCLUDE})
-	TARGET_LINK_LIBRARIES(avidemux2_cli ${ADM_GETTEXT_LIB})
-
-	if(GTK_FOUND)
-		TARGET_LINK_LIBRARIES(avidemux2_gtk ${ADM_GETTEXT_LIB})
-	endif(GTK_FOUND)
-endif(ADM_GETTEXT_LIB)
-
-#iconv
-if(NEEED_LIBICONV)
-	add_libs_all_targets(iconv)
-endif(NEEED_LIBICONV)
-
 #libsamplerate
 if(USE_SRC)
 	add_libs_all_targets(samplerate)
 endif(USE_SRC)
 
-# Xml2
-add_libs_all_targets(xml2)
+# xvid
+if(USE_XVID_4)
+	add_libs_all_targets(xvidcore)
+endif(USE_XVID_4)
+
+# x264
+if(USE_X264)
+	add_libs_all_targets(x264)
+endif(USE_X264)
 
 ###########################################
 # Specific
