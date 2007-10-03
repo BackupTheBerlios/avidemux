@@ -220,7 +220,6 @@ int main(void)
     DECLARE_ENCODER (MPEG2VIDEO, mpeg2video);
     DECLARE_ENCODER (MPEG4, mpeg4);
     DECLARE_ENCODER (FLV, flv);
-    DECLARE_ENCODER (SNOW, snow);
     DECLARE_ENCODER (MP2, mp2);
     DECLARE_ENCODER (DVVIDEO, dvvideo);
     DECLARE_ENCODER (HUFFYUV, huffyuv);
