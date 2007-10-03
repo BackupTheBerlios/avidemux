@@ -274,24 +274,18 @@ endif(USE_FONTCONFIG)
 
 #XVideo 
 if(USE_XV)
-	TARGET_LINK_LIBRARIES(avidemux2_cli Xext)
-	TARGET_LINK_LIBRARIES(avidemux2_cli X11)
+	TARGET_LINK_LIBRARIES(avidemux2_cli ${X11_LIBRARIES})
 	TARGET_LINK_LIBRARIES(avidemux2_cli Xv)
-	TARGET_LINK_LIBRARIES(avidemux2_cli m)
 	
 	if(GTK_FOUND)
-		TARGET_LINK_LIBRARIES(avidemux2_gtk Xext)
-		TARGET_LINK_LIBRARIES(avidemux2_gtk X11)
+		TARGET_LINK_LIBRARIES(avidemux2_gtk ${X11_LIBRARIES})
 		TARGET_LINK_LIBRARIES(avidemux2_gtk Xv)
-		TARGET_LINK_LIBRARIES(avidemux2_gtk m)
 	endif(GTK_FOUND)
 	
-	if(QT4_FOUND AND NOT CMAKE_OSX_SYSROOT)
-		TARGET_LINK_LIBRARIES(avidemux2_qt4 Xext)
-		TARGET_LINK_LIBRARIES(avidemux2_qt4 X11)
+	if(QT4_FOUND AND NOT ADM_OS_APPLE)
+		TARGET_LINK_LIBRARIES(avidemux2_qt4 ${X11_LIBRARIES})
 		TARGET_LINK_LIBRARIES(avidemux2_qt4 Xv)
-		TARGET_LINK_LIBRARIES(avidemux2_qt4 m)
-	endif(QT4_FOUND AND NOT CMAKE_OSX_SYSROOT)
+	endif(QT4_FOUND AND NOT ADM_OS_APPLE)
 endif(USE_XV)
 
 # Lame
@@ -395,7 +389,7 @@ endif(QT4_FOUND)
 ########################
 # Win32
 ########################
-IF(WIN32)
+IF (ADM_OS_WINDOWS)
 	add_libs_all_targets(z)
 	add_libs_all_targets(ADM_osSupport)
 	add_libs_all_targets(pthreadGC2)
@@ -412,19 +406,15 @@ IF(WIN32)
 	if(USE_SDL)
 		add_definitions(${SDL_CFLAGS})
 	endif(USE_SDL)
-ENDIF(WIN32)
+ENDIF (ADM_OS_WINDOWS)
 
 ########################
 # MacOsX
 ########################
-if(CMAKE_OSX_SYSROOT)
+if (ADM_OS_APPLE)
 	add_libs_all_targets(z)
 	add_libs_all_targets("-framework CoreServices -framework CoreAudio -framework AudioUnit")
-	
-	if(GTK_FOUND)
-		LINK_DIRECTORIES(avidemux2_gtk /usr/X11R6/lib)
-	endif(GTK_FOUND)
-endif(CMAKE_OSX_SYSROOT)
+endif (ADM_OS_APPLE)
 
 ########################
 # all
