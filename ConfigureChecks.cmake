@@ -2,6 +2,7 @@
 # CPU and Host
 ########################################
 MESSAGE(STATUS "Checking CPU and OS")
+INCLUDE(CMakeDetermineSystem)
 
 IF (WIN32)
 	SET(ADM_OS_WINDOWS 1)
@@ -43,7 +44,6 @@ INCLUDE(CheckSymbolExists)
 INCLUDE(CheckFunctionExists)
 INCLUDE(CheckLibraryExists)
 INCLUDE(lavcodec)
-INCLUDE(CMakeDetermineSystem)
 INCLUDE(adm_checkHeaderLib)
 INCLUDE(adm_compile)
 
