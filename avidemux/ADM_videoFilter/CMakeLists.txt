@@ -49,3 +49,7 @@ if(FT_FOUND)
 add_definitions(${FT_CFLAGS})
 endif(FT_FOUND)
 include_directories(../ADM_inputs)
+
+IF (ADM_OS_APPLE AND ADM_DEBUG)
+	SET_SOURCE_FILES_PROPERTIES(ADM_vidYadif_asm.c PROPERTIES COMPILE_FLAGS "-O2")
+ENDIF (ADM_OS_APPLE AND ADM_DEBUG)
