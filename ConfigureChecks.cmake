@@ -67,7 +67,9 @@ ELSE (ADM_OS_WINDOWS)
 		
 		SET(ENV{CFLAGS} "-I /opt/local/include -L/opt/local/lib $ENV{CFLAGS}")
 		SET(ENV{CXXFLAGS} "-I /opt/local/include -L/opt/local/lib $ENV{CXXFLAGS}")
-		
+
+		LINK_DIRECTORIES(/opt/local/lib)
+
 		SET(ADM_BSD_FAMILY 1)
 	ENDIF (ADM_OS_APPLE)
 

@@ -269,7 +269,15 @@ endif(USE_FONTCONFIG)
 
 # png
 if(USE_PNG)
-	add_libs_all_targets(png)
+	TARGET_LINK_LIBRARIES(avidemux2_cli png)
+	
+	if(GTK_FOUND)
+		TARGET_LINK_LIBRARIES(avidemux2_gtk png)
+	endif(GTK_FOUND)
+	
+	if(QT4_FOUND AND NOT ADM_OS_APPLE)
+		TARGET_LINK_LIBRARIES(avidemux2_qt4 png)
+	endif(QT4_FOUND AND NOT ADM_OS_APPLE)
 endif(USE_PNG)
 
 # Xml2
@@ -277,18 +285,8 @@ add_libs_all_targets(xml2)
 
 #XVideo 
 if(USE_XV)
-	TARGET_LINK_LIBRARIES(avidemux2_cli ${X11_LIBRARIES})
-	TARGET_LINK_LIBRARIES(avidemux2_cli Xv)
-	
-	if(GTK_FOUND)
-		TARGET_LINK_LIBRARIES(avidemux2_gtk ${X11_LIBRARIES})
-		TARGET_LINK_LIBRARIES(avidemux2_gtk Xv)
-	endif(GTK_FOUND)
-	
-	if(QT4_FOUND AND NOT ADM_OS_APPLE)
-		TARGET_LINK_LIBRARIES(avidemux2_qt4 ${X11_LIBRARIES})
-		TARGET_LINK_LIBRARIES(avidemux2_qt4 Xv)
-	endif(QT4_FOUND AND NOT ADM_OS_APPLE)
+	add_libs_all_targets("${X11_LIBRARIES}")
+	add_libs_all_targets(Xv)
 endif(USE_XV)
 
 # SDL
