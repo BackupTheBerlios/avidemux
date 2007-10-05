@@ -2006,7 +2006,7 @@ void A_audioTrack( void )
         
         
         
-        diaElemFile  sourceName(0,&newtrackname,QT_TR_NOOP("_External file:"));
+        diaElemFile  sourceName(0,&newtrackname,QT_TR_NOOP("_External file:"), NULL, QT_TR_NOOP("Select file"));
         
         // Now build the list of embedded track
 #define MAX_AUDIO_TRACK 10
@@ -2103,7 +2103,7 @@ void A_externalAudioTrack( void )
         old=nw=secondAudioSource;
 
         diaElemMenu     sourceMenu(&nw,QT_TR_NOOP("_Audio source:"),4,sourcesStream,NULL);
-        diaElemFile     sourceName(0,&newtrackname,QT_TR_NOOP("_External file:"));
+        diaElemFile     sourceName(0,&newtrackname,QT_TR_NOOP("_External file:"), NULL, QT_TR_NOOP("Select file"));
         diaElem *allWidgets[]={&sourceMenu,&sourceName};
 
   /* Link..*/

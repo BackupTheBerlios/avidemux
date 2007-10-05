@@ -317,7 +317,7 @@ uint8_t ADMVideoSwissArmyKnife::configure (AVDMGenericVideoStream *in)
 
     diaElemFile input_file
         (0, &(_param->input_file),
-         QT_TR_NOOP("Input _File (image or convolution kernel):"));
+         QT_TR_NOOP("Input _File (image or convolution kernel):"), NULL, QT_TR_NOOP("Select file"));
     diaElemFloat load_bias
         (&(_param->load_bias),
          QT_TR_NOOP("_Load Bias (added to each pixel\n"

@@ -186,7 +186,7 @@ uint8_t ADMVideoComputeAverage::configure(AVDMGenericVideoStream *in)
          -1000000, 0x7fffffff);
     diaElemFile output_file
         (1, const_cast<char **>(&(_param->output_file)),
-         QT_TR_NOOP("_Output File:"), "avg");
+         QT_TR_NOOP("_Output File:"), NULL, QT_TR_NOOP("Select output file"));
     diaElemSlider bias
         (&(_param->bias),
          QT_TR_NOOP("_Bias (only for display; use 0 for "

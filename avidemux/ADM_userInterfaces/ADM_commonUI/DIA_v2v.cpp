@@ -31,9 +31,9 @@ uint8_t ret=0;
 char *tmp=NULL,*tmp2=NULL,*tmp3=NULL;
 
         
-        diaElemFile eVob(0,&tmp,QT_TR_NOOP("_VOB file(s):"),"");
-        diaElemFile eIfo(0,&tmp2,QT_TR_NOOP("_IFO file:"),"");
-        diaElemFile eVsub(1,&tmp3,QT_TR_NOOP("Vob_Sub file:"),"");
+        diaElemFile eVob(0,&tmp,QT_TR_NOOP("_VOB file(s):"), NULL, QT_TR_NOOP("Select VOB file(s)"));
+        diaElemFile eIfo(0,&tmp2,QT_TR_NOOP("_IFO file:"), NULL, QT_TR_NOOP("Select IFO file"));
+        diaElemFile eVsub(1,&tmp3,QT_TR_NOOP("VobSub file:"), NULL, QT_TR_NOOP("Select VobSub file"));
         
         while(1)
         {

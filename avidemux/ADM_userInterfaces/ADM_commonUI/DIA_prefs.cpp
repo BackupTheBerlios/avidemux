@@ -361,12 +361,12 @@ char     *globalGlyphName=NULL;
 #else
                filterPath = ADM_strdup("c:\\");
 #endif
-        diaElemDirSelect  entryFilterPath(&filterPath,QT_TR_NOOP("_Filter directory:"),"");
+        diaElemDirSelect  entryFilterPath(&filterPath,QT_TR_NOOP("_Filter directory:"),QT_TR_NOOP("Select filter directory"));
 		diaElemToggle loadEx(&activeXfilter,QT_TR_NOOP("_Load external filters"));
 		loadEx.link(1, &entryFilterPath);
 
 		diaElemToggle togGlobalGlyph(&useGlobalGlyph, QT_TR_NOOP("Use _Global GlyphSet"));
-		diaElemFile  entryGLyphPath(0,&globalGlyphName,QT_TR_NOOP("Gl_yphSet:"),"");
+		diaElemFile  entryGLyphPath(0,&globalGlyphName,QT_TR_NOOP("Gl_yphSet:"), NULL, QT_TR_NOOP("Select GlyphSet file"));
 		togGlobalGlyph.link(1, &entryGLyphPath);
 
         /* User Interface */

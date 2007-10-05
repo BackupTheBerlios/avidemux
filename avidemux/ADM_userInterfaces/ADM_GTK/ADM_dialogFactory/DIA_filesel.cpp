@@ -27,26 +27,36 @@ static void dirSel(void *w,void *p);
 #include "prefs.h"
 
 diaElemFile::diaElemFile(uint32_t writemode,char **filename,const char *toggleTitle,
-                         const char * defaultSuffix,const char *tip)
+                         const char * defaultSuffix,const char *selectFileDesc)
   : diaElem(ELEM_FILE_READ),
     defaultSuffix (defaultSuffix),
     paramIsStdString (false)
 {
   param=(void *)filename;
   paramTitle=toggleTitle;
-  this->tip=tip;
+
+  if (!selectFileDesc || strlen(selectFileDesc) == 0)
+	  tip = toggleTitle;
+  else
+      tip = selectFileDesc;
+
   _write=writemode;
 }
 
 diaElemFile::diaElemFile(uint32_t writemode,std::string *filename,const char *toggleTitle,
-                         const char * defaultSuffix,const char *tip)
+                         const char * defaultSuffix,const char *selectFileDesc)
   : diaElem(ELEM_FILE_READ),
     defaultSuffix (defaultSuffix),
     paramIsStdString (true)
 {
   param=(void *)filename;
   paramTitle=toggleTitle;
-  this->tip=tip;
+
+  if (!tip || strlen(tip) == 0)
+	  this->tip = toggleTitle;
+  else
+      this->tip = selectFileDesc;
+
   _write=writemode;
 }
 
@@ -174,11 +184,11 @@ void diaElemFile::changeFile(void)
               }
           }
       }
-      t = FileSel_SelectWrite(paramTitle,buffer,MAX_SEL,txt);
+      t = FileSel_SelectWrite(tip,buffer,MAX_SEL,txt);
   }
   else
   {
-      t = FileSel_SelectRead(paramTitle,buffer,MAX_SEL,txt);
+      t = FileSel_SelectRead(tip,buffer,MAX_SEL,txt);
   }
   if(t)
   {
@@ -213,12 +223,16 @@ void fileRead(void *w,void *p)
 
 
 /*********************************************************************/
-diaElemDirSelect::diaElemDirSelect(char **filename,const char *toggleTitle,const char *tip)
+diaElemDirSelect::diaElemDirSelect(char **filename,const char *toggleTitle,const char *selectDirDesc)
   : diaElem(ELEM_DIR_SELECT)
 {
   param=(void *)filename;
   paramTitle=toggleTitle;
-  this->tip=tip;
+
+  if (!selectDirDesc || strlen(selectDirDesc) == 0)
+	  tip = toggleTitle;
+  else
+      tip = selectDirDesc;
 }
 
 diaElemDirSelect::~diaElemDirSelect()
@@ -310,7 +324,7 @@ void diaElemDirSelect::changeFile(void)
   const char *txt;
   txt =gtk_entry_get_text (GTK_ENTRY (widget));
   
-  if(FileSel_SelectDir(paramTitle,buffer,MAX_SEL,txt))
+  if(FileSel_SelectDir(this->tip,buffer,MAX_SEL,txt))
   {
     char **name=(char **)param;
     if(*name) delete [] *name;

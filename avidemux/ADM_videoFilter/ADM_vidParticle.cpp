@@ -169,7 +169,7 @@ uint8_t ADMVideoParticle::configure(AVDMGenericVideoStream *in)
          QT_TR_NOOP("_Bottom crop (ignore particles in):"), 0, 0x7fffffff);
 
     diaElemFile output_file
-        (1, &(_param->output_file), QT_TR_NOOP("_Output File:"), "pts");
+        (1, &(_param->output_file), QT_TR_NOOP("_Output File:"), NULL, QT_TR_NOOP("Select file"));
 
     diaElemUInteger camera_number
         (&(_param->camera_number), QT_TR_NOOP("_Camera number:"), 1, 0x7fffffff);

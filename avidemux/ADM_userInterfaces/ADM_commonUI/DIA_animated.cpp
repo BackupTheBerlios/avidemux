@@ -33,7 +33,7 @@ uint8_t DIA_animated(ANIMATED_PARAM *param,uint32_t w, uint32_t h,uint32_t n)
 {	
   uint8_t r=0;
 #define PX(x) &(param->x)
-   diaElemFile      jpeg(0,(char **)PX(backgroundImg),QT_TR_NOOP("_Background Image:"));
+   diaElemFile      jpeg(0,(char **)PX(backgroundImg),QT_TR_NOOP("_Background Image:"), NULL, QT_TR_NOOP("Select background image"));
    diaElemToggle    isNtsc(PX(isNTSC),QT_TR_NOOP("_NTSC(default is Pal):"));
    diaElemUInteger   vignetteW(PX(vignetteW),QT_TR_NOOP("Vignette _Width:"),16,w/3);
    diaElemUInteger   vignetteH(PX(vignetteH),QT_TR_NOOP("Vignette _Height:"),16,h/2);

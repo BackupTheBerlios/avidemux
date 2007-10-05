@@ -20,7 +20,7 @@
 #include <iconv.h>
 
 #include "default.h"
-#include "ADM_commonUI//GUI_render.h"
+#include "ADM_commonUI/GUI_render.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "DIA_flyDialog.h"
 
@@ -85,8 +85,8 @@ diaMenuEntry encoding[]={
 };       
 
 #define PX(x) &(param->x)
-  diaElemFile subtitle(0,(char **)PX(_subname),QT_TR_NOOP("_Subtitle file:"));
-  diaElemFile font(0,(char **)PX(_fontname),QT_TR_NOOP("_Font (TTF):"));
+  diaElemFile subtitle(0,(char **)PX(_subname),QT_TR_NOOP("_Subtitle file:"), NULL, QT_TR_NOOP("Select Subtitle file"));
+  diaElemFile font(0,(char **)PX(_fontname),QT_TR_NOOP("_Font (TTF):"), NULL, QT_TR_NOOP("Select TTF file"));
   int colors[3]={param->_Y_percent,param->_U_percent,param->_V_percent};
   
   uint32_t fontSize=param->_fontsize;

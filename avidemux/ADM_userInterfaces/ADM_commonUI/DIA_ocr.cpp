@@ -90,8 +90,8 @@ uint8_t DIA_ocrGen(void)
 _again:  
   // Fist build a dialogFactory to get input and output files
   diaElemButton   selectIdx(QT_TR_NOOP("Select idx file:"), cb_idx,&subparam,NULL);
-  diaElemFile     selectGlyph(1,&glyphFileName,QT_TR_NOOP("Use glyphset (optional):"),NULL);  
-  diaElemFile     selectSrt(1,&srtFileName,QT_TR_NOOP("Output SRT file"),NULL);
+  diaElemFile     selectGlyph(1,&glyphFileName,QT_TR_NOOP("Use GlyphSet (optional):"), NULL, QT_TR_NOOP("Select GlyphSet file"));
+  diaElemFile     selectSrt(1,&srtFileName,QT_TR_NOOP("Output SRT file"), NULL, QT_TR_NOOP("Save SRT file"));
   
   diaElem *elems[]={&selectIdx,&selectSrt,&selectGlyph};
   
@@ -153,7 +153,7 @@ _again:
         {
             char *save=NULL;
             uint32_t nb=1;
-              diaElemFile     selectSave(1,&save,QT_TR_NOOP("Glyphset filename"),NULL);
+              diaElemFile     selectSave(1,&save,QT_TR_NOOP("GlyphSet filename"), NULL, QT_TR_NOOP("Save GlyphSet file"));
               diaElem *elems2[]={&selectSave};
             if( diaFactoryRun(QT_TR_NOOP("Save Glyph"),1,elems2))
             {
@@ -205,10 +205,10 @@ uint8_t DIA_ocrDvb(void)
   }
 _againX:  
   // Fist build a dialogFactory to get input and output files
-  diaElemFile     selectTs(1,&tsFileName,QT_TR_NOOP("Input TS:"),NULL);
+  diaElemFile     selectTs(1,&tsFileName,QT_TR_NOOP("Input TS:"), NULL, QT_TR_NOOP("Select TS file"));
   diaElemUInteger selectPid(&pid,QT_TR_NOOP("Subtitle PID:"),0,255);
-  diaElemFile     selectGlyph(1,&glyphFileName,QT_TR_NOOP("Use glyphset (optional):"),NULL);  
-  diaElemFile     selectSrt(1,&srtFileName,QT_TR_NOOP("Output SRT file"),NULL);
+  diaElemFile     selectGlyph(1,&glyphFileName,QT_TR_NOOP("Use glyphset (optional):"), NULL, QT_TR_NOOP("Select GlyphSet file"));  
+  diaElemFile     selectSrt(1,&srtFileName,QT_TR_NOOP("Output SRT file"), NULL, QT_TR_NOOP("Save SRT file"));
   
   diaElem *elems[]={&selectTs,&selectPid,&selectSrt,&selectGlyph};
   
@@ -273,9 +273,9 @@ _againX:
         {
             char *save=NULL;
             uint32_t nb=1;
-              diaElemFile     selectSave(1,&save,QT_TR_NOOP("Glyphset filename"),NULL);
+              diaElemFile     selectSave(1,&save,QT_TR_NOOP("GlyphSet filename"), NULL, QT_TR_NOOP("Save GlyphSet file"));
               diaElem *elems2[]={&selectSave};
-            if( diaFactoryRun(QT_TR_NOOP("Save Glyph"),1,elems2))
+            if( diaFactoryRun(QT_TR_NOOP("Save GlyphSet"),1,elems2))
             {
               saveGlyph(save,&head,nb);
             }
