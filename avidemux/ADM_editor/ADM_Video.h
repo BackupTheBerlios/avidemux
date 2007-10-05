@@ -41,6 +41,7 @@ typedef struct
 	uint32_t   fps1000;
 	uint32_t   nb_frames;
   	uint32_t   fcc;	
+        uint32_t   bpp;
 } aviInfo;
 
 uint8_t WAV2AudioInfo(WAVHeader *hdr,audioInfo *info);

@@ -104,7 +104,7 @@ public:
 };
 
 decoders *getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
-		      uint8_t * extraData);
+		      uint8_t * extraData,uint32_t bpp=0);
 decoders *getDecoderVopPacked (uint32_t fcc, uint32_t w, uint32_t h,
 			       uint32_t extraLen, uint8_t * extraData);
 decoders *getDecoderH264noLogic (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,

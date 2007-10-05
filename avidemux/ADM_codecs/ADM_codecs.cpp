@@ -203,9 +203,9 @@ decoders *getDecoderH264noLogic (uint32_t fcc, uint32_t w, uint32_t h, uint32_t 
 }
 decoders *
 getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
-	    uint8_t * extraData)
+	    uint8_t * extraData,uint32_t bpp)
 {
-
+  printf("\nSearching decoder (%d x %d, extradataSize:%d)...\n",w,h,extraLen);
   if (isMSMpeg4Compatible (fcc) == 1)
     {
       // For div3, no problem we take ffmpeg
@@ -242,7 +242,7 @@ getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
   if (fourCC::check (fcc, (uint8_t *) "HFYU"))
     {
 
-      return (decoders *) (new decoderFFhuff (w, h, extraLen, extraData));
+      return (decoders *) (new decoderFFhuff (w, h, extraLen, extraData,bpp));
     }
 #ifdef USE_PNG
   if (fourCC::check (fcc, (uint8_t *) "PNG "))
@@ -259,7 +259,7 @@ getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
   if (fourCC::check (fcc, (uint8_t *) "FFVH"))
     {
 
-      return (decoders *) (new decoderFF_ffhuff (w, h, extraLen, extraData));
+      return (decoders *) (new decoderFF_ffhuff (w, h, extraLen, extraData,bpp));
     }
   if (fourCC::check (fcc, (uint8_t *) "SVQ3"))
     {
@@ -269,8 +269,7 @@ getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
   if (fourCC::check (fcc, (uint8_t *) "tscc"))
     {
 
-      return (decoders *) (new decoderCamtasia (w, h, 16));
-//stream->biBitCount)); // Fixme should be bit per pixel
+      return (decoders *) (new decoderCamtasia (w, h, bpp));
     }
 
      if (fourCC::check (fcc, (uint8_t *) "CRAM"))

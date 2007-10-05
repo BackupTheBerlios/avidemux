@@ -525,7 +525,7 @@ float duration;
   uint8_t 	*d;
   _videos[_nb_video]._aviheader->getExtraHeaderData (&l, &d);
   _videos[_nb_video].decoder = getDecoder (info.fcc,
-					   info.width, info.height, l, d);
+					   info.width, info.height, l, d,info.bpp);
 
   _videos[_nb_video]._videoCache   =   new EditorCache(10,info.width,info.height) ;
   //

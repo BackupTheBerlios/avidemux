@@ -190,7 +190,7 @@ protected:
 
 
 public:
-  decoderFFhuff (uint32_t w, uint32_t h, uint32_t l, uint8_t * d);
+  decoderFFhuff (uint32_t w, uint32_t h, uint32_t l, uint8_t * d,uint32_t bpp);
 
 };
 class decoderFF_ffhuff:public decoderFF
@@ -199,7 +199,7 @@ protected:
 
 
 public:
-  decoderFF_ffhuff (uint32_t w, uint32_t h, uint32_t l, uint8_t * d);
+  decoderFF_ffhuff (uint32_t w, uint32_t h, uint32_t l, uint8_t * d,uint32_t bpp);
 
 };
 class decoderFFWMV2:public decoderFF
@@ -272,7 +272,7 @@ protected:
 
 
 public:
-  decoderCamtasia (uint32_t w, uint32_t h, uint32_t bpp);
+  decoderCamtasia (uint32_t w, uint32_t h,uint32_t bpp);
 
 };
 class decoderFFTheora:public decoderFF

@@ -88,6 +88,7 @@ uint8_t vidHeader::getVideoInfo (aviInfo * info)
   info->height = _video_bih.biHeight;
   info->nb_frames = _mainaviheader.dwTotalFrames;
   info->fcc = _videostream.fccHandler;
+  info->bpp = _video_bih.biBitCount;
   u = _videostream.dwRate;
   u *= 1000.F;
   d = _videostream.dwScale;
