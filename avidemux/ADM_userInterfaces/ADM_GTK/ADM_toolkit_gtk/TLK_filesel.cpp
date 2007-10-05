@@ -332,7 +332,12 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 				  struct stat buf;
 				  int fdino;
 					fclose(fd);
-                                        if(!GUI_Question(QT_TR_NOOP("Overwrite file ?")))
+
+					char msg[300];
+
+					snprintf(msg, 300, QT_TR_NOOP("%s already exists.\n\nDo you want to replace it?"), GetFileName(name));
+
+                                        if(!GUI_Question(msg))
 						return;
 	                                /*
 	                                ** JSC Fri Feb 10 00:07:30 CET 2006
@@ -341,8 +346,8 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 	                                ** i'm testing until fd=1024, should be MAXFD computed by configure
 	                                ** keep in mind:
 	                                ** you can overwrite .idx files, they are loaded into memory and closed soon
-	                                ** you cannot overwrite segment data files, all files are keeped open and
-	                                **   are detected here
+	                                ** you cannot overwrite segment data files, all files are kept open and
+	                                ** are detected here
 	                                */
 #ifndef ADM_WIN32
 					if( stat(name,&buf) == -1 ){
@@ -355,9 +360,9 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 						if( fstat(i,&buf) != -1 ){
 							if( buf.st_ino == fdino ){
 							  char str[512];
-								snprintf(str,512,"File \"%s\" exists and is opened by avidemux",name);
+								snprintf(str,512,"File \"%s\" exists and is opened by Avidemux",name);
 								GUI_Error_HIG(str,
-                                                                    QT_TR_NOOP("It could be possible that you try to overwrite an input file!"));
+                                                                    QT_TR_NOOP("It is possible that you are trying to overwrite an input file!"));
 								return;
 							}
 						}
@@ -371,7 +376,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 							if( buf.st_ino == fdino ){
 							  char str[512];
 								snprintf(str,512,"File \"%s\" exists and is the actual ECMAscript file",name);
-                                                                GUI_Error_HIG(str,QT_TR_NOOP("It could be possible that you try to overwrite an input file!"));
+                                                                GUI_Error_HIG(str,QT_TR_NOOP("It is possible that you are trying to overwrite an input file!"));
 								return;
 							}
 						}
