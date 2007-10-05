@@ -183,7 +183,7 @@ uint8_t ADMVideoYadif::configure( AVDMGenericVideoStream *instream)
      
      diaElem *elems[]={&mMode,&morder};
      
-     if(diaFactoryRun("yadif",sizeof(elems)/sizeof(diaElem *),elems))
+     if(diaFactoryRun(QT_TR_NOOP("yadif"),sizeof(elems)/sizeof(diaElem *),elems))
      {
         updateInfo();
         return 1;

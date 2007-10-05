@@ -464,12 +464,12 @@ uint8_t AVDMFastVideoConvolution::configure(AVDMGenericVideoStream * instream)
 {
   
   //return DIA_getLumaChroma(&(_param->luma),&(_param->chroma)) ; 
-  diaElemToggle luma(&(_param->luma),"_Process luma","Process luma plane");
-  diaElemToggle chroma(&(_param->chroma),"P_rocess chroma");
+  diaElemToggle luma(&(_param->luma),QT_TR_NOOP("_Process luma"),QT_TR_NOOP("Process luma plane"));
+  diaElemToggle chroma(&(_param->chroma),QT_TR_NOOP("P_rocess chroma"));
   
   diaElem *elems[2]={&luma,&chroma};
   
-  return diaFactoryRun("Fast Convolution",2,elems);
+  return diaFactoryRun(QT_TR_NOOP("Fast Convolution"),2,elems);
 }
 
 

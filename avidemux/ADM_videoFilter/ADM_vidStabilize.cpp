@@ -63,7 +63,7 @@ int i;
          diaElemUInteger chroma(_param,QT_TR_NOOP("Stabilize Threshold"),1,255);    
          diaElem *elems[]={&chroma};
   
-    return diaFactoryRun("Stabilize",sizeof(elems)/sizeof(diaElem *),elems);
+    return diaFactoryRun(QT_TR_NOOP("Stabilize"),sizeof(elems)/sizeof(diaElem *),elems);
 	
 }
 //--------------------------------------------------------	

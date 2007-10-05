@@ -29,7 +29,7 @@ diaElemUInteger   em(&m,QT_TR_NOOP("_Minutes:"),0,59);
 diaElemUInteger   es(&s,QT_TR_NOOP("_Seconds:"),0,59);
         diaElem *allWidgets[]={&eh,&em,&es};
 
-  if(!diaFactoryRun("Go to Time",3,allWidgets)) return 0;
+  if(!diaFactoryRun(QT_TR_NOOP("Go to Time"),3,allWidgets)) return 0;
     *hh=h;
     *mm=m;
     *ss=s;

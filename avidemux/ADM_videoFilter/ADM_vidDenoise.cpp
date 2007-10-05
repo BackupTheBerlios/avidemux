@@ -394,7 +394,7 @@ uint8_t ADMVideoDenoise::configure(AVDMGenericVideoStream * instream)
     
        diaElem *elems[5]={&lumaLock,&chromaLock,&lumaThreshold,&chromaThreshold,&sceneChange};
   
-   return diaFactoryRun("Denoise",5,elems);
+   return diaFactoryRun(QT_TR_NOOP("Denoise"),5,elems);
 }
 
 // EOF

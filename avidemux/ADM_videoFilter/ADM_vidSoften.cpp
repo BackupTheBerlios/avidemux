@@ -71,7 +71,7 @@ uint8_t ADMVideoMaskedSoften::configure( AVDMGenericVideoStream *instream)
 	  
     diaElem *elems[3]={&luma,&chroma,&radius};
   
-    return diaFactoryRun("Soften",3,elems);
+    return diaFactoryRun(QT_TR_NOOP("Soften"),3,elems);
 }
 uint8_t	ADMVideoMaskedSoften::getCoupledConf( CONFcouple **couples)
 {

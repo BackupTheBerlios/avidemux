@@ -50,7 +50,7 @@ uint8_t DIA_animated(ANIMATED_PARAM *param,uint32_t w, uint32_t h,uint32_t n)
  
       diaElem *elems[5]={&jpeg,&isNtsc,&vignetteW,&vignetteH,&timecodes};
     
-  if( diaFactoryRun("MPEG-2 Configuration",5,elems))
+  if( diaFactoryRun(QT_TR_NOOP("MPEG-2 Configuration"),5,elems))
   {
     r=1;
   }

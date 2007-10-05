@@ -75,7 +75,7 @@ while(1)
     
     diaElem *elems[4]={&menu,&start,&end,&black};
   
-    if( diaFactoryRun("Fade",4,elems))
+    if( diaFactoryRun(QT_TR_NOOP("Fade"),4,elems))
     {
       // Check it is consistent
       if(param.startFade>=param.endFade || (param.startFade>=mx) || (param.endFade>=mx))

@@ -92,7 +92,7 @@ uint8_t ADMVideoSubASS::configure(AVDMGenericVideoStream * instream)
     
        diaElem *elems[5]={&file,&dSpacing,&dScale,&dTop,&dBottom};
   
-   if( diaFactoryRun("ASS",5,elems))
+   if( diaFactoryRun(QT_TR_NOOP("ASS"),5,elems))
    {
 #undef MKME
 #define MKME(x,y) _params->y=(float)x

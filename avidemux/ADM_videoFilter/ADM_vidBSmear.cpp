@@ -204,7 +204,7 @@ uint8_t AVDMVideoStreamBSMear::configure(AVDMGenericVideoStream *in)
           diaElemUInteger dbottom(&(bottom),"_Bottom border:", 0,height);
             
           diaElem *elems[4]={&dleft,&dright,&dtop,&dbottom};
-          if(diaFactoryRun("Blacken Borders",4,elems))
+          if(diaFactoryRun(QT_TR_NOOP("Blacken Borders"),4,elems))
           {
             if((left&1) || (right&1)|| (top&1) || (bottom&1) ||
                      (top+bottom>=height)|| (left+right>width))

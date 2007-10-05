@@ -116,7 +116,7 @@ uint8_t AVDMVideoMCDeint::configure(AVDMGenericVideoStream * instream)
     
     diaElem *elems[3]={&menu1,&menu2,&qp};
   
-    return  diaFactoryRun("mcDeinterlace",3,elems);
+    return  diaFactoryRun(QT_TR_NOOP("mcDeinterlace"),3,elems);
 
 }
 uint8_t AVDMVideoMCDeint::getCoupledConf( CONFcouple **couples)

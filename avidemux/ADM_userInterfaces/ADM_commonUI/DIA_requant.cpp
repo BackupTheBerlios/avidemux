@@ -48,7 +48,7 @@ uint8_t DIA_requant(COMPRES_PARAMS *param)
         diaElemFloat  shrink(&fp,QT_TR_NOOP("_Shrink Factor:"),1,4.0);
         
         diaElem *elems[1]={&shrink};
-        if( diaFactoryRun("Requant Configuration",1,elems))
+        if( diaFactoryRun(QT_TR_NOOP("Requant Configuration"),1,elems))
         {
             ret=1;
             *pp=(uint32_t)(fp*1000);

@@ -92,7 +92,7 @@ uint8_t ADMVideoLogo::configure(AVDMGenericVideoStream * instream)
 	    
 	   diaElem *elems[4]={&file,&positionX,&positionY,&alpha};
 	  
-	   if( diaFactoryRun("Logo",4,elems))
+	   if( diaFactoryRun(QT_TR_NOOP("Logo"),4,elems))
 	   {
 		   init();
 		   return 1;

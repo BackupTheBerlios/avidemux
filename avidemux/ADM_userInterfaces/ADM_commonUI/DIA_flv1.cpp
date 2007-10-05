@@ -46,7 +46,7 @@ uint8_t DIA_flv1Param(COMPRES_PARAMS *incoming)
 
          diaElem *elems[2]={&bitrate,&gop};
     
-  if( diaFactoryRun("FLV1 Configuration",2,elems))
+  if( diaFactoryRun(QT_TR_NOOP("FLV1 Configuration"),2,elems))
   {
     return 1;
   }

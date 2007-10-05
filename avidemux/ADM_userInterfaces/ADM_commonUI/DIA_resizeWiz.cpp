@@ -28,19 +28,19 @@
 uint8_t DIA_resizeWiz(RESWIZ_FORMAT *format, RESWIZ_AR *source, RESWIZ_AR *destination)
 {
 uint8_t r=0;
-#define ONELINE(x,y) {RESWIZ_##x,QT_TR_NOOP(y),NULL}
+#define ONELINE(x,y) {RESWIZ_##x,y,NULL}
             diaMenuEntry menuFTarget[6]={
-                             ONELINE(VCD,"VCD"),
-                             ONELINE(SVCD,"SVCD"),
-                             ONELINE(DVD,"DVD"),
-                             ONELINE(DVD_HD1,"DVD half D1"),
-                             ONELINE(PSP,"PSP 480*272"),
-                             ONELINE(PSP_FULLRES,"PSP full res (720*480"),
+                             ONELINE(VCD,QT_TR_NOOP("VCD")),
+                             ONELINE(SVCD,QT_TR_NOOP("SVCD")),
+                             ONELINE(DVD,QT_TR_NOOP("DVD")),
+                             ONELINE(DVD_HD1,QT_TR_NOOP("DVD half D1")),
+                             ONELINE(PSP,QT_TR_NOOP("PSP 480*272")),
+                             ONELINE(PSP_FULLRES,QT_TR_NOOP("PSP full res (720*480")),
                           };
              diaMenuEntry menuFAspect[3]={
-               {RESWIZ_AR_1_1,"1:1",NULL},
-               {RESWIZ_AR_4_3,"4:3",NULL},
-               {RESWIZ_AR_16_9,"16:9",NULL}
+               {RESWIZ_AR_1_1,QT_TR_NOOP("1:1"),NULL},
+               {RESWIZ_AR_4_3,QT_TR_NOOP("4:3"),NULL},
+               {RESWIZ_AR_16_9,QT_TR_NOOP("16:9"),NULL}
                           };
   
   
@@ -56,7 +56,7 @@ uint8_t r=0;
     
     
       diaElem *elems[3]={&menu1,&menu2,&menu3};
-    if(diaFactoryRun("Auto Wizard",3,elems))
+    if(diaFactoryRun(QT_TR_NOOP("Auto Wizard"),3,elems))
     {
        *format=(RESWIZ_FORMAT) tformat;
        *source=(RESWIZ_AR) tsource;

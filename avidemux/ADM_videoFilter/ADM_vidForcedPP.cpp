@@ -78,7 +78,7 @@ uint8_t ADMVideoForcedPP::configure( AVDMGenericVideoStream *instream)
       diaElem *elems[5]={&postProcStrength,&quant,&fhzd
                         ,&fvzd,&fdring};
 
-   if(diaFactoryRun("Forced Postprocessing",5,elems))
+   if(diaFactoryRun(QT_TR_NOOP("Forced Postprocessing"),5,elems))
   {
 #undef DOME
 #define DOME(x,y) if(y) _param->postProcType |=x;

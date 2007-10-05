@@ -204,11 +204,11 @@ uint8_t Decimate::configure(AVDMGenericVideoStream *in)
     diaElemMenu menuQuality(PX(quality),QT_TR_NOOP("_Quality:"), 4,tQuality);
     diaElemFloat menuThresh1(&t1,QT_TR_NOOP("_Threshold 1:"),0,100.);
     diaElemFloat menuThresh2(&t2,QT_TR_NOOP("T_hreshold 2:"),0,100.);
-    diaElemUInteger cycle(PX(cycle),"C_ycle:",2,40);
+    diaElemUInteger cycle(PX(cycle),QT_TR_NOOP("C_ycle:"),2,40);
     
     diaElem *elems[]={&cycle,&menuMode,&menuQuality,&menuThresh1,&menuThresh2};
     
-  if(diaFactoryRun("Decomb Decimate",5,elems))
+  if(diaFactoryRun(QT_TR_NOOP("Decomb Decimate"),5,elems))
   {
     _param->threshold=(double )t1;
     _param->threshold2=(double )t2;

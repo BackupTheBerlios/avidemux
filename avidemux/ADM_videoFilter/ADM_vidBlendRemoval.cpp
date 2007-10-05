@@ -88,7 +88,7 @@ uint8_t vidBlendRemoval::configure (AVDMGenericVideoStream * in)
     
        diaElem *elems[]={&thresh,&noise,&identical,&show};
   
-   if(  diaFactoryRun("Blend Removal",sizeof(elems)/sizeof(diaElem *),elems))
+   if(  diaFactoryRun(QT_TR_NOOP("Blend Removal"),sizeof(elems)/sizeof(diaElem *),elems))
    {
         _lastRemoved=0xFFFFFFF;
         return 1;

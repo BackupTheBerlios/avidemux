@@ -504,7 +504,7 @@ JSBool facInt(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
    diaElemUInteger blend(&tog,QT_TR_NOOP("Uinteger"),0,255);
     diaElem *elems[]={&blend   };
     
-  if(diaFactoryRun("Test uinteger",1,elems))
+  if(diaFactoryRun(QT_TR_NOOP("Test uinteger"),1,elems))
   {
     *rval = BOOLEAN_TO_JSVAL(1);
     printf("Value : %u\n",tog);

@@ -85,7 +85,7 @@ uint8_t DIA_vobsub(vobSubParam *param)
         }
         else
         {
-                gtk_label_set_text(GTK_LABEL(WID(labelVobsub)),"none");     
+                gtk_label_set_text(GTK_LABEL(WID(labelVobsub)),QT_TR_NOOP("none"));     
         }
         gtk_write_entry(WID(entryShift),shift);
         r=gtk_dialog_run(GTK_DIALOG(dialog));

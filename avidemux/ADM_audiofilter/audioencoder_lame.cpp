@@ -253,7 +253,7 @@ int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor)
   
       diaElem *elems[]={&menuMode,&Mode,&quality,&bitrate,&reservoir};
     
-  if( diaFactoryRun("LAME Configuration",5,elems))
+  if( diaFactoryRun(QT_TR_NOOP("LAME Configuration"),5,elems))
   {
     lameParam->mode=(ADM_mode)mmode; 
     lameParam->preset=(ADM_LAME_PRESET)ppreset;

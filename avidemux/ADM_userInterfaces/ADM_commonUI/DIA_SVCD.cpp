@@ -67,7 +67,7 @@ uint32_t inter;
   
       diaElem *elems[6]={&bitrate,&widescreen,&interW,&matrix,&gop,&maxb};
     
-  if( diaFactoryRun("MPEG-2 Configuration",6,elems))
+  if( diaFactoryRun(QT_TR_NOOP("MPEG-2 Configuration"),6,elems))
   {
     switch(inter)
     {

@@ -87,7 +87,7 @@ uint8_t ADMVideoResampleFPS::configure(AVDMGenericVideoStream *in)
     
     diaElem *elems[2]={&fps,&blend};
   
-    if( diaFactoryRun("Resample fps",2,elems))
+    if( diaFactoryRun(QT_TR_NOOP("Resample fps"),2,elems))
     {
         f*=1000;
       _param->newfps=(uint32_t)floor(f+0.4); 

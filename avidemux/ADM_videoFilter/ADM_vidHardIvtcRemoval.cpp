@@ -93,7 +93,7 @@ uint8_t vidHardPDRemoval::configure (AVDMGenericVideoStream * in)
     
        diaElem *elems[]={&thresh,&noise,&identical,&show};
   
-   if(  diaFactoryRun("Hard IVTC Removal",sizeof(elems)/sizeof(diaElem *),elems))
+   if(  diaFactoryRun(QT_TR_NOOP("Hard IVTC Removal"),sizeof(elems)/sizeof(diaElem *),elems))
    {
         _lastRemoved=0xFFFFFFF;
         return 1;

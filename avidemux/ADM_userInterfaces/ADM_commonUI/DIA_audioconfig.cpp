@@ -53,7 +53,7 @@ int DIA_defaultSettings(ADM_audioEncoderDescriptor *descriptor)
   
       diaElem *elems[]={&bitrate};
     
-  return ( diaFactoryRun("Audio Configuration",1,elems));
+  return ( diaFactoryRun(QT_TR_NOOP("Audio Configuration"),1,elems));
 
 } 
 //EOF 

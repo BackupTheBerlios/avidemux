@@ -93,7 +93,7 @@ uint8_t DGbob::configure(AVDMGenericVideoStream *in)
     diaElemToggle  extra(PX(ap),QT_TR_NOOP("_Extra"),QT_TR_NOOP("Extra check, avoid using it"));
     
       diaElem *elems[4]={&menu1,&menu2,&threshold ,&extra};
-   if(diaFactoryRun("DGBob",4,elems))
+   if(diaFactoryRun(QT_TR_NOOP("DGBob"),4,elems))
   {
                 update();
                 return 1;

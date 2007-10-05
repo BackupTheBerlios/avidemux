@@ -95,7 +95,7 @@ uint8_t ADMVideoMosaic::configure(AVDMGenericVideoStream * instream)
     
        diaElem *elems[]={&hz,&vz,&shrink,&show};
   
-   if(  diaFactoryRun("Mosaic",sizeof(elems)/sizeof(diaElem *),elems))
+   if(  diaFactoryRun(QT_TR_NOOP("Mosaic"),sizeof(elems)/sizeof(diaElem *),elems))
    {
         reset();
         return 1;

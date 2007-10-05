@@ -221,17 +221,17 @@ uint8_t AVDMVideoAddBorder::configure(AVDMGenericVideoStream *in)
           width=_in->getInfo()->width;
           height=_in->getInfo()->height;
           
-          diaElemUInteger dleft(&left,"_Left border:",       0,width);
-          diaElemUInteger dright(&right,"_Right border:",    0,width);
-          diaElemUInteger dtop(&(top),"_Top border:",          0,height);
-          diaElemUInteger dbottom(&(bottom),"_Bottom border:", 0,height);
+          diaElemUInteger dleft(&left,QT_TR_NOOP("_Left border:"),       0,width);
+          diaElemUInteger dright(&right,QT_TR_NOOP("_Right border:"),    0,width);
+          diaElemUInteger dtop(&(top),QT_TR_NOOP("_Top border:"),          0,height);
+          diaElemUInteger dbottom(&(bottom),QT_TR_NOOP("_Bottom border:"), 0,height);
             
           diaElem *elems[4]={&dleft,&dright,&dtop,&dbottom};
-          if(diaFactoryRun("Add Borders",4,elems))
+          if(diaFactoryRun(QT_TR_NOOP("Add Borders"),4,elems))
           {
             if((left&1) || (right&1)|| (top&1) || (bottom&1))
             {
-              GUI_Error_HIG("Incorrect parameters","All parameters must be even and within range."); 
+              GUI_Error_HIG(QT_TR_NOOP("Incorrect parameters"),QT_TR_NOOP("All parameters must be even and within range.")); 
               continue;
             }
             else

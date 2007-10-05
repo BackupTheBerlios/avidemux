@@ -169,7 +169,7 @@ uint8_t r=0;
     
   diaElem *elems[4]={&mask,&highq,&threshold,&strength};
 
-  if(diaFactoryRun("MSharpen",4,elems))
+  if(diaFactoryRun(QT_TR_NOOP("MSharpen"),4,elems))
   {
          invstrength=255-_param->strength;
          return 1;

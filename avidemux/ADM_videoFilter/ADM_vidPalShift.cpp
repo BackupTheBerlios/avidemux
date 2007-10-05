@@ -77,7 +77,7 @@ ADMVideoPalShift::ADMVideoPalShift(  AVDMGenericVideoStream *in,CONFcouple *setu
     
     diaElem *elems[]={&chroma};
   
-    return diaFactoryRun("Pal Field Shift",sizeof(elems)/sizeof(diaElem *),elems);
+    return diaFactoryRun(QT_TR_NOOP("Pal Field Shift"),sizeof(elems)/sizeof(diaElem *),elems);
 
 } 
 ADMVideoPalShift::~ADMVideoPalShift()

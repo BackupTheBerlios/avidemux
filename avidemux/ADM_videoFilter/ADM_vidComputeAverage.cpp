@@ -205,7 +205,7 @@ uint8_t ADMVideoComputeAverage::configure(AVDMGenericVideoStream *in)
     diaElem * elems[] = { &start_frame, &end_frame, &output_file,
                           &bias, &display_mode };
 
-    uint8_t ret = diaFactoryRun("ComputeAverage", sizeof (elems) / sizeof (diaElem *), elems);
+    uint8_t ret = diaFactoryRun(QT_TR_NOOP("ComputeAverage"), sizeof (elems) / sizeof (diaElem *), elems);
     return ret;
 	
 }

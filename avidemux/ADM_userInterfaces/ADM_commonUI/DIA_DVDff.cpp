@@ -85,7 +85,7 @@ uint32_t inter;
   
       diaElem *elems[9]={&bitrate,&maxb,&minb,&xvid,&vbv,&widescreen,&interW,&matrix,&gop};
     
-  if( diaFactoryRun("libavcodec MPEG-2 Configuration",9,elems))
+  if( diaFactoryRun(QT_TR_NOOP("libavcodec MPEG-2 Configuration"),9,elems))
   {
     switch(inter)
     {

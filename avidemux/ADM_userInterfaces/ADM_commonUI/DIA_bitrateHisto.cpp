@@ -211,12 +211,12 @@ uint32_t maxBFrame=0;
 */
 #define DOME(a,b,c)       sprintf(bf,"%u",b); diaElemReadOnlyText a(bf,c);
         char bf[100];
-        DOME(mx,max,"Max. bitrate:");
-        DOME(med,medium,"Average bitrate:");
-        DOME(nI,nbIFrame,"Number of I frames:");
-        DOME(nP,nbPFrame,"Number of P frames:");
-        DOME(nB,nbBFrame,"Number of B frames:");
-        DOME(nMB,maxBFrame,"Max. B frames:");
+        DOME(mx,max,QT_TR_NOOP("Max. bitrate:"));
+        DOME(med,medium,QT_TR_NOOP("Average bitrate:"));
+        DOME(nI,nbIFrame,QT_TR_NOOP("Number of I frames:"));
+        DOME(nP,nbPFrame,QT_TR_NOOP("Number of P frames:"));
+        DOME(nB,nbBFrame,QT_TR_NOOP("Number of B frames:"));
+        DOME(nMB,maxBFrame,QT_TR_NOOP("Max. B frames:"));
         
         diaElemBar foo(0,"foo");
 #define P(X) bar[X] 

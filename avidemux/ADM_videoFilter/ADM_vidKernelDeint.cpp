@@ -97,7 +97,7 @@ _in=instream;
     
     diaElem *elems[5]={&menu1,&threshold,&sharp,&twoway,&map};
   
-   return  diaFactoryRun("KernelDeint",5,elems);
+   return  diaFactoryRun(QT_TR_NOOP("KernelDeint"),5,elems);
 }
 uint8_t	ADMVideoKernelDeint::getCoupledConf( CONFcouple **couples)
 {

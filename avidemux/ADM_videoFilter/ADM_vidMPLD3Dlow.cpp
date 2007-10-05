@@ -77,7 +77,7 @@ uint8_t ADMVideoMPD3Dlow::configure(AVDMGenericVideoStream *instream)
     
        diaElem *elems[3]={&luma,&chroma,&temporal};
   
-   if(  diaFactoryRun("MPlayer denoise3d",3,elems))
+   if(  diaFactoryRun(QT_TR_NOOP("MPlayer denoise3d"),3,elems))
         {
 #undef OOP
 #define OOP(x,y) _param->y=(double) f##x

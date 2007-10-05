@@ -294,7 +294,7 @@ int DIA_getVorbisSettings(ADM_audioEncoderDescriptor *descriptor)
   
       diaElem *elems[]={&menuMode,&bitrate,&quality};
     
-  if( diaFactoryRun("Vorbis Configuration",3,elems))
+  if( diaFactoryRun(QT_TR_NOOP("Vorbis Configuration"),3,elems))
   {
     vorbisParam->mode=(ADM_VORBIS_MODE)mmode;
     vorbisParam->quality=(float)qqual;

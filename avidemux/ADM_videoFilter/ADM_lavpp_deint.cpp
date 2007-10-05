@@ -116,7 +116,7 @@ uint8_t ADMVideoLavPPDeint::configure(AVDMGenericVideoStream *in)
     
     diaElem *elems[2]={&menu1,&autolevel};
   
-   if(diaFactoryRun("libavcodec deinterlacer",2,elems))
+   if(diaFactoryRun(QT_TR_NOOP("libavcodec deinterlacer"),2,elems))
   {
     setup();
     return 1; 

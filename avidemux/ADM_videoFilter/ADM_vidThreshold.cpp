@@ -160,7 +160,7 @@ uint8_t ADMVideoThreshold::configure(AVDMGenericVideoStream *in)
                           0, 0x7fffffff);
     diaElem * elems[] = { &minslide, &maxslide, &in_range_is_white, &debug };
 
-    ret = diaFactoryRun("Threshold Configuration", sizeof (elems) / sizeof (diaElem *), elems);
+    ret = diaFactoryRun(QT_TR_NOOP("Threshold Configuration"), sizeof (elems) / sizeof (diaElem *), elems);
 
     if (ret) // 0 = cancel
     {

@@ -301,12 +301,12 @@ uint32_t inbox;
 
 uint8_t ADMVideoLargeMedian::configure(AVDMGenericVideoStream * instream)
 {
-  diaElemToggle luma(&(_param->luma),"_Process luma","Process luma plane");
-  diaElemToggle chroma(&(_param->chroma),"P_rocess chroma");
+  diaElemToggle luma(&(_param->luma),QT_TR_NOOP("_Process luma"),QT_TR_NOOP("Process luma plane"));
+  diaElemToggle chroma(&(_param->chroma),QT_TR_NOOP("P_rocess chroma"));
   
   diaElem *elems[2]={&luma,&chroma};
   
-  return diaFactoryRun("Large Median 5x5",2,elems);
+  return diaFactoryRun(QT_TR_NOOP("Large Median 5x5"),2,elems);
   
 }
 

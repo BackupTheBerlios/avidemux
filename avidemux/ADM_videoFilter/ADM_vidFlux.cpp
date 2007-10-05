@@ -130,12 +130,12 @@ uint8_t r;
     temporal=_param->temporal_threshold;
     spatial=_param->spatial_threshold;
 
-    diaElemInteger Gtemporal(&temporal,"_Temporal threshold:",0,255);
-    diaElemInteger Gspatial(&spatial,"_Spatial threshold:",0,255);
+    diaElemInteger Gtemporal(&temporal,QT_TR_NOOP("_Temporal threshold:"),0,255);
+    diaElemInteger Gspatial(&spatial,QT_TR_NOOP("_Spatial threshold:"),0,255);
 	  
     diaElem *elems[2]={&Gtemporal,&Gspatial};
   
-    r=diaFactoryRun("FluxSmooth",2,elems);
+    r=diaFactoryRun(QT_TR_NOOP("FluxSmooth"),2,elems);
     if(r)
     {
        _param->temporal_threshold=temporal;

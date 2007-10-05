@@ -103,7 +103,7 @@ int i,j;
     
     diaElem *elems[]={&luma,&chroma};
   
-    if(diaFactoryRun("Temporal Cleaner",sizeof(elems)/sizeof(diaElem *),elems))
+    if(diaFactoryRun(QT_TR_NOOP("Temporal Cleaner"),sizeof(elems)/sizeof(diaElem *),elems))
     {
       ythresholdMask = (uint64_t)_param->ythresholdMask;
       cthresholdMask = (uint64_t)_param->cthresholdMask;	   

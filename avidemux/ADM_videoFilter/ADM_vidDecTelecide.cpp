@@ -128,7 +128,7 @@ uint8_t Telecide::configure(AVDMGenericVideoStream *in)
         &direct,&backward,&noise,&post,&blend,
         &chroma,&show,&debug    };
     
-  if(diaFactoryRun("Decomb Telecide",12,elems))
+  if(diaFactoryRun(QT_TR_NOOP("Decomb Telecide"),12,elems))
   {
     
       _param->vthresh=(double)vthresh;
