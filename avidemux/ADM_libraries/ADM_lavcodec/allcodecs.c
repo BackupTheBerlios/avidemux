@@ -98,6 +98,7 @@ void avcodec_register_all(void)
     REGISTER_ENCODER(LJPEG, ljpeg);
     REGISTER_DECODER(LOCO, loco);
     REGISTER_DECODER(MDEC, mdec);
+    REGISTER_DECODER(AMV, amv); // MEANX
     REGISTER_ENCDEC (MJPEG, mjpeg);
     REGISTER_DECODER(MJPEGB, mjpegb);
     REGISTER_DECODER(MMVIDEO, mmvideo);
@@ -233,6 +234,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER(XAN_DPCM, xan_dpcm);
 
     /* adpcm codecs */
+    REGISTER_ENCDEC (ADPCM_IMA_AMV, adpcm_ima_amv); //meanx
     REGISTER_ENCDEC (ADPCM_4XM, adpcm_4xm);
     REGISTER_ENCDEC (ADPCM_ADX, adpcm_adx);
     REGISTER_ENCDEC (ADPCM_CT, adpcm_ct);

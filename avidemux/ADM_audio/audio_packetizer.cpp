@@ -100,6 +100,7 @@ _refill:
                 case WAV_8BITS_UNSIGNED:
 		case WAV_ULAW:
                 case WAV_MSADPCM:
+                case WAV_AMV_ADPCM:
 				return getPacketPCM(dest,len,samples);
 				break;
 		case WAV_AC3:
@@ -110,7 +111,7 @@ _refill:
 				return getPacketWMA(dest,len,samples);
 				break;
 		default:
-				printf("Unsupported!\n");
+				printf("*** PACKETIZER : Unsupported!\n");
 				return 0;
 	}
 	return 0;

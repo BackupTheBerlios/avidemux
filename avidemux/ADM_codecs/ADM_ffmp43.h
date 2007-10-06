@@ -321,5 +321,11 @@ protected:
 public:
   decoderFFDVBSub (uint32_t w, uint32_t h, uint32_t l, uint8_t * d);
 };
+class decoderFFAMV:public decoderFF
+{
+protected:
+public:
+  decoderFFAMV (uint32_t w, uint32_t h, uint32_t l, uint8_t * d);
+};
 
 #endif

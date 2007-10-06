@@ -51,7 +51,7 @@ uint8_t scratchPad[SCRATCH_PAD_SIZE];
        :  ADM_Audiocodec(fourcc)
  {
     _tail=_head=0;
-    ADM_assert(fourcc==WAV_WMA || fourcc==WAV_QDM2);	
+    ADM_assert(fourcc==WAV_WMA || fourcc==WAV_QDM2 || fourcc==WAV_AMV_ADPCM);	
     _contextVoid=(void *)avcodec_alloc_context();
     ADM_assert(_contextVoid);
     // Fills in some values...
@@ -59,13 +59,20 @@ uint8_t scratchPad[SCRATCH_PAD_SIZE];
     _context->channels = info->channels;
     _blockalign=_context->block_align = info->blockalign;
     _context->bit_rate = info->byterate*8;
-    if(fourcc==WAV_WMA)
+    switch(fourcc)
+    {
+      case WAV_WMA:
         _context->codec_id = CODEC_ID_WMAV2;
-    else
-        if(fourcc==WAV_QDM2)
+        break;
+      case WAV_QDM2:
         _context->codec_id = CODEC_ID_QDM2;
-            else ADM_assert(0);
-
+        break;
+      case WAV_AMV_ADPCM:
+        _context->codec_id = CODEC_ID_ADPCM_IMA_AMV;
+        break;
+      default:
+             ADM_assert(0);
+    }
     _context->extradata=(uint8_t *)d;
     _context->extradata_size=(int)l;
     printf(" Using %ld bytes of extra header data\n",l);
@@ -75,7 +82,7 @@ uint8_t scratchPad[SCRATCH_PAD_SIZE];
    if(!codec) {GUI_Error_HIG(QT_TR_NOOP("Internal error"), QT_TR_NOOP("Cannot open WMA2 codec."));ADM_assert(0);} 
     if (avcodec_open(_context, codec) < 0)
     {
-        printf("\n WMA decoder init failed !\n");
+        printf("\n Lavc audio decoder init failed !\n");
         ADM_assert(0);
     }
     if(!_blockalign)

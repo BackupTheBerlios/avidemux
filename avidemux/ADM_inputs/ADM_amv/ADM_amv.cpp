@@ -162,7 +162,7 @@ uint8_t amvHeader::open(char *name)
   _isvideopresent=1;
   // Build a fake stream/bih bih
 #define ENTRY(x,y) _videostream.x=y
-  uint32_t codec=MKFCC('M','J','P','G');
+  uint32_t codec=MKFCC('A','M','V',' ');
     ENTRY(	fccType,MKFCC('v','i','d','s'));
     ENTRY(	fccHandler,codec);
     ENTRY(	dwInitialFrames,0);
@@ -181,12 +181,6 @@ uint8_t amvHeader::open(char *name)
     // If audio...
     if(audioTrack.index)
     {
-      wavHeader. 	encoding=WAV_ULAW;
-      wavHeader. 	channels=1;					/* 1 = mono, 2 = stereo */
-      wavHeader. 	frequency=8000;				/* One of 11025, 22050, or 44100 48000 Hz */
-      wavHeader. 	byterate=8000;					/* Average bytes per second */
-      wavHeader. 	blockalign=1;				/* Bytes per sample block */
-      wavHeader. 	bitspersample=16;	 
       _isaudiopresent=1;
       _audio=new amvAudio(name,&audioTrack,&wavHeader);
     }
@@ -316,9 +310,20 @@ uint8_t amvHeader::readTrack(int nb)
     return 0;
   }
   sz=read32();
-  
+  uint32_t pos=ftell(_fd);
   printf("\t\t[AMV] strf size : %u,sizeof :%u\n",sz,sizeof(AVIStreamHeader));
-  fseeko(_fd,sz,SEEK_CUR);
+  if(nb==1) // Second track=Audio
+  {
+                                   read16(); // Tag
+      wavHeader. 	channels  =read16();
+      wavHeader. 	frequency =read32();
+      wavHeader. 	byterate  =read32();
+      wavHeader. 	blockalign=read16();
+      wavHeader. 	encoding  =WAV_AMV_ADPCM;       
+      wavHeader. 	bitspersample=16;	 
+ 
+  }
+  fseeko(_fd,sz+pos,SEEK_SET);
   
   return 1;
 }
@@ -433,66 +438,8 @@ uint8_t  amvHeader::getFrameNoAlloc(uint32_t frame,ADMCompressedImage *img)
  if(frame>=_mainaviheader.dwTotalFrames) return 0;
  amvIndex *idx=&(videoTrack.index[frame]);
  fseeko(_fd,idx->pos,SEEK_SET);
- 
- uint8_t buffer[idx->size];
- 
- fread(buffer,idx->size,1,_fd);
- // Now create a fake jpg header...
- uint8_t *head,*tail;
- 
- tail=&(buffer[idx->size-2]);// Remove ff D9 EOI
- head=buffer;
- // Search SOI
- while(  (head[0]!=0xff || head[1]!=0xD8) && head<tail-2) head++;
- if(head>=tail-2) return 0;
- head+=2;
- // Build fake jpg header
- // NB: It might not be jpg after all ...
- uint8_t *m=img->data;
- *m++=0xFF;
- *m++=0xD8;
- 
-  *m++=0xFF;
-  *m++=0xC0; // SOF0
-  
-  *m++=0x0; // Lf
-  *m++=0x8+3*2; // Lf
-  
-  
-  *m++=0x8; // P: Bits /channel
-  
-  
-  *m++=_video_bih.biHeight >>8;
-  *m++=_video_bih.biHeight &0xFF;
-
-  
-  *m++=_video_bih.biWidth >>8;
-  *m++=_video_bih.biWidth &0xFF;
-
- //
-  *m++=3; // Nf
-  
-  *m++=1; // NCi
-  *m++=1*16+1; // Hvi/VZi
-  *m++=0; // Tqi
-  
-  *m++=2; // NCi
-  *m++=2*16+1; // Hvi/VZi
-  *m++=0; // Tqi
-  
-  *m++=3; // NCi
-  *m++=2*16+1; // Hvi/VZi
-  *m++=0; // Tqi
-  
-  *m++=0xFF; // 
-  *m++=0xDA; // Start of scan
-  
-  memcpy(m,head,tail-head);
-  m+=tail-head;
-  *m++=0xff;
-  *m++=0xD9; // end of image
-  
-  img->dataLength=m-img->data;
+ fread(img->data,idx->size,1,_fd);
+  img->dataLength=idx->size;
   img->flags=AVI_KEY_FRAME;
  return 1;
 }

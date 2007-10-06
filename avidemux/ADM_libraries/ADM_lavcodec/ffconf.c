@@ -7,6 +7,8 @@
 int main(void)
 {
 #define DECLARE_DECODER(a,b); printf("#define ENABLE_"#a"_DECODER 1\n"); 
+  
+    DECLARE_DECODER(ADPCM_IMA_AMV, amv);
     DECLARE_DECODER(CINEPAK, cinepak);
     DECLARE_DECODER(DNXHD, dnxhd);
     DECLARE_DECODER(FOURXM, fourxm);
@@ -47,8 +49,8 @@ int main(void)
     DECLARE_DECODER (RV20, rv20);
     DECLARE_DECODER (DVBSUB, dvbsub);
     DECLARE_DECODER (FLV, flv);
-	DECLARE_DECODER (SNOW, snow);
-
+    DECLARE_DECODER (SNOW, snow);
+    DECLARE_DECODER (AMV, amv);
 #undef DECLARE_DECODER
 #define DECLARE_DECODER(a,b); printf("#define ENABLE_"#a"_DECODER 0\n"); 
 
@@ -227,7 +229,7 @@ int main(void)
 
 #undef DECLARE_ENCODER
 #define DECLARE_ENCODER(a,b); printf("#define ENABLE_"#a"_ENCODER 0\n"); 
-
+    DECLARE_ENCODER(ADPCM_IMA_AMV, amv);
     DECLARE_ENCODER(LIBX264, libx264);
     DECLARE_ENCODER(LIBXVID, libxvid);
     DECLARE_ENCODER(LJPEG, ljpeg);

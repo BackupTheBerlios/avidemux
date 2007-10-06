@@ -23,6 +23,8 @@
 
 #include "avcodec.h"
 
+extern AVCodec adpcm_ima_amv_encoder;
+extern AVCodec adpcm_ima_amv_decoder;
 extern AVCodec ac3_encoder;
 extern AVCodec asv1_encoder;
 extern AVCodec asv2_encoder;
@@ -168,6 +170,7 @@ extern AVCodec snow_decoder;
 extern AVCodec sol_dpcm_decoder;
 extern AVCodec sonic_decoder;
 extern AVCodec sp5x_decoder;
+extern AVCodec amv_decoder; // MEANX
 extern AVCodec svq1_decoder;
 extern AVCodec svq3_decoder;
 extern AVCodec targa_decoder;

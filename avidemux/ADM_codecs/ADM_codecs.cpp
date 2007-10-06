@@ -352,7 +352,13 @@ if (fourCC::check (fcc, (uint8_t *) "FFV1"))
       printf ("\n using YUY2 codec\n");
       return (decoders *) (new decoderYUY2 (w, h));
     }
+  if (fourCC::check (fcc, (uint8_t *) "AMV "))
+    {
+      printf ("\n using AMV codec\n");
+      return (decoders *) (new decoderFFAMV (w, h,extraLen,extraData));
+    }
 
+    
   if (fourCC::check (fcc, (uint8_t *) "VP6F"))
     {
       printf ("\n using VP6F codec\n");

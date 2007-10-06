@@ -66,6 +66,7 @@ typedef struct
 #define WAV_ULAW	57 // dummy id
 #define WAV_QDM2 	58
 #define WAV_IMAADPCM    17
+#define WAV_AMV_ADPCM    9900
 #define WAV_UNKNOWN     9999
 #include "../ADM_audiocodec/ADM_audiocodec.h"
 #include "ADM_fileio.h"
