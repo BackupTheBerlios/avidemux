@@ -65,8 +65,8 @@ ELSE (ADM_OS_WINDOWS)
 		SET(CFLAGS_ORIG $ENV{CFLAGS})
 		SET(CXXFLAGS_ORIG $ENV{CXXFLAGS})
 		
-		SET(ENV{CFLAGS} "-I /opt/local/include -L/opt/local/lib $ENV{CFLAGS}")
-		SET(ENV{CXXFLAGS} "-I /opt/local/include -L/opt/local/lib $ENV{CXXFLAGS}")
+		SET(ENV{CFLAGS} "-I/opt/local/include -L/opt/local/lib $ENV{CFLAGS}")
+		SET(ENV{CXXFLAGS} "-I/opt/local/include -L/opt/local/lib $ENV{CXXFLAGS}")
 
 		LINK_DIRECTORIES(/opt/local/lib)
 
