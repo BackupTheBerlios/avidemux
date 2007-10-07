@@ -1446,7 +1446,7 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
             needRead = true;
             myInfo->input_file_mtime = st.st_mtime;
         }
-        else if (!needRead)
+        else if (!needRead && doingFileImage)
         {
             if (myInfo->image_data_invalid
                 || myInfo->image_bias != param->load_bias
@@ -1479,8 +1479,9 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
             ifstream inputStream (filename);
             if (!inputStream)
             {
-                printf ("SwissArmyKnife: can't open input file %s, but it "
-                        "apparently does exist...(%d)\n", filename, errno);
+                fprintf (stderr, "SwissArmyKnife: can't open input file %s, "
+                         "but it apparently does exist...(%d)\n",
+                         filename, errno);
                 return 0;
             }
 
@@ -1562,8 +1563,9 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
             FILE * fin = fopen (filename, "rb");
             if (!fin)
             {
-                printf ("SwissArmyKnife: can't open input file %s, but it "
-                        "apparently does exist...(%d)\n", filename, errno);
+                fprintf (stderr, "SwissArmyKnife: can't open input file %s, "
+                         "but it apparently does exist...(%d)\n",
+                         filename, errno);
                 return 0;
             }
 
@@ -1571,9 +1573,9 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
             int nread = fread (&header, sizeof (header), 1, fin);
             if (nread != 1 || strncmp (header.magic, "DGCMimgF", 8) != 0)
             {
-                printf ("SwissArmyKnife: %s does not appear to be a valid "
-                        "DG/CM floating-point raw image file (produced by the "
-                        "ComputeAverage filter)\n", filename);
+                fprintf (stderr, "SwissArmyKnife: %s does not appear to be a "
+                         "valid DG/CM floating-point raw image file (produced "
+                         "by the ComputeAverage filter)\n", filename);
                 fclose (fin);
                 return 0;
             }
@@ -1584,9 +1586,9 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
 
             if (width > 2000 || height > 2000)
             {
-                printf ("SwissArmyKnife: invalid image dimensions "
-                        "(%dx%d) in %s\n",
-                        int (width), int (height), filename);
+                fprintf (stderr, "SwissArmyKnife: invalid image dimensions "
+                         "(%dx%d) in %s\n",
+                         int (width), int (height), filename);
                 fclose (fin);
                 return 0;
             }
@@ -1601,9 +1603,9 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
             fclose (fin);
             if (nread != pixelcount)
             {
-                printf ("SwissArmyKnife: failed to read image data "
-                        "(%ux%u = %u) from %s (got %u)\n",
-                        width, height, pixelcount, filename, nread);
+                fprintf (stderr, "SwissArmyKnife: failed to read image data "
+                         "(%ux%u = %u) from %s (got %u)\n",
+                         width, height, pixelcount, filename, nread);
                 delete [] myInfo->image_float;
                 myInfo->image_float = 0;
                 return 0;
@@ -1865,6 +1867,13 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
 
     if (doingConvolution)
     {
+        if (kernel.empty())
+        {
+            fprintf (stderr, "No convolution kernel loaded - can't do "
+                     "convolution!\n");
+            return 0;
+        }
+
         switch (tool)
         {
         case TOOL_A:
@@ -2012,8 +2021,8 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
             break;
 
         default:
-            printf ("SwissArmyKnife: unknown operation (tool) %d!\n",
-                    param->tool);
+            fprintf (stderr, "SwissArmyKnife: unknown operation (tool) %d!\n",
+                     param->tool);
             return 0;
         }
     }
@@ -2206,8 +2215,8 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
             break;
 
         default:
-            printf ("SwissArmyKnife: unknown operation (tool) %d!\n",
-                    param->tool);
+            fprintf (stderr, "SwissArmyKnife: unknown operation (tool) %d!\n",
+                     param->tool);
             return 0;
         }
     }
@@ -2216,11 +2225,11 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
         if (width != myInfo->image_w || height != myInfo->image_h)
         {
             const char * bar = "*************************";
-            printf ("\n%s%s%s\nAttempting to apply a %ux%u input image to "
-                    "%ux%u video - even if I could do that, it probably "
-                    "wouldn't be what you wanted...\n%s%s%s\n",
-                    bar, bar, bar, myInfo->image_w, myInfo->image_h,
-                    width, height, bar, bar, bar);
+            fprintf (stderr, "\n%s%s%s\nAttempting to apply a %ux%u input "
+                     "image to %ux%u video - even if I could do that, it "
+                     "probably wouldn't be what you wanted...\n%s%s%s\n",
+                     bar, bar, bar, myInfo->image_w, myInfo->image_h,
+                     width, height, bar, bar, bar);
             return 0;
         }
 
@@ -2413,8 +2422,8 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
             break;
 
         default:
-            printf ("SwissArmyKnife: unknown operation (tool) %d!\n",
-                    param->tool);
+            fprintf (stderr, "SwissArmyKnife: unknown operation (tool) %d!\n",
+                     param->tool);
             return 0;
         }
     }
@@ -2423,11 +2432,11 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
         if (width != myInfo->image_w || height != myInfo->image_h)
         {
             const char * bar = "*************************";
-            printf ("\n%s%s%s\nAttempting to apply a %ux%u input image to "
-                    "%ux%u video - even if I could do that, it probably "
-                    "wouldn't be what you wanted...\n%s%s%s\n",
-                    bar, bar, bar, myInfo->image_w, myInfo->image_h,
-                    width, height, bar, bar, bar);
+            fprintf (stderr, "\n%s%s%s\nAttempting to apply a %ux%u input "
+                     "image to %ux%u video - even if I could do that, it "
+                     "probably wouldn't be what you wanted...\n%s%s%s\n",
+                     bar, bar, bar, myInfo->image_w, myInfo->image_h,
+                     width, height, bar, bar, bar);
             return 0;
         }
 
@@ -2620,8 +2629,8 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
             break;
 
         default:
-            printf ("SwissArmyKnife: unknown operation (tool) %d!\n",
-                    param->tool);
+            fprintf (stderr, "SwissArmyKnife: unknown operation (tool) %d!\n",
+                     param->tool);
             return 0;
         }
     }
@@ -2814,14 +2823,14 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
             break;
 
         default:
-            printf ("SwissArmyKnife: unknown operation (tool) %d!\n",
-                    param->tool);
+            fprintf (stderr, "SwissArmyKnife: unknown operation (tool) %d!\n",
+                     param->tool);
             return 0;
         }
     }
     else
     {
-        printf ("ooops!  input selection botch in SwissArmyKnife!\n");
+        fprintf (stderr, "ooops!  input selection botch in SwissArmyKnife!\n");
         return 0;
     }
 

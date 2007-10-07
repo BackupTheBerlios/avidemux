@@ -454,8 +454,8 @@ void ADMVideoComputeAverage::write_output_file () const
     const char * output_file = _param->output_file;
     if (!output_file || !*output_file)
     {
-        printf ("ADMVideoComputeAverage: Wanted to write output file, but "
-                "no file has been specified!!\n");
+        fprintf (stderr, "ADMVideoComputeAverage: Wanted to write output "
+                 "file, but no file has been specified!!\n");
         return;
     }
 
@@ -481,8 +481,7 @@ void ADMVideoComputeAverage::write_output_file () const
     int nwritten = fwrite (&header, sizeof (FileHeader), 1, fp);
     if (nwritten != 1)
     {
-        printf ("Failed to write file header to %s\n", output_file);
-        fflush (stdout);
+        fprintf (stderr, "Failed to write file header to %s\n", output_file);
         perror (output_file);
         fclose (fp);
         unlink (output_file);
@@ -508,8 +507,8 @@ void ADMVideoComputeAverage::write_output_file () const
         nwritten = fwrite (&avg, sizeof (float), 1, fp);
         if (nwritten != 1)
         {
-            printf ("Failed to write pixel %u to %s\n",
-                    pixelcount - pixremaining + 1, output_file);
+            fprintf (stderr, "Failed to write pixel %u to %s\n",
+                     pixelcount - pixremaining + 1, output_file);
             fflush (stdout);
             perror (output_file);
             fclose (fp);
@@ -518,9 +517,10 @@ void ADMVideoComputeAverage::write_output_file () const
         }
     }
 
-    printf ("Successfully wrote %ux%u = %u floating point pixel averages "
-            "(from %.6f to %.6f) of %u frames to %s\n",
-            width, height, pixelcount, minavg, maxavg, frame_count, output_file);
+    fprintf (stderr, "Successfully wrote %ux%u = %u floating point pixel "
+             "averages (from %.6f to %.6f) of %u frames to %s\n",
+             width, height, pixelcount, minavg, maxavg, frame_count,
+             output_file);
 
     fclose (fp);
 }

@@ -251,7 +251,7 @@ uint8_t ADMVideoParticle::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 
     if (!outfp && real_frame == 0 && !_param->output_file.empty())
     {
-        printf ("Preparing to write particle list to %s\n",
+        printf ("Starting to write particle list to %s\n",
                 _param->output_file.c_str());
 
         outfp = fopen (_param->output_file.c_str(), "w");
@@ -278,8 +278,8 @@ uint8_t ADMVideoParticle::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
     {
         fclose (outfp);
         outfp = 0;
-        printf ("Finished writing particle list to %s\n",
-                _param->output_file.c_str());
+        fprintf (stderr, "Finished writing particle list to %s\n",
+                 _param->output_file.c_str());
     }
 
     return ret;
@@ -666,8 +666,8 @@ uint8_t ImageTool::autoOutline (uint32_t x, uint32_t y)
         if (validPixel (px, py))
             outPixel (px, py) = 255;
         else
-            printf ("################# Uh oh, about to stomp invalid centroid pixel (%d, %d)!!\n",
-                    px, py);
+            fprintf (stderr, "################# Uh oh, about to stomp "
+                     "invalid centroid pixel (%d, %d)!!\n", px, py);
 #ifdef USE_COLOR_IN_OUTPUT
         outUPixel (px, py) = 255;
         outVPixel (px, py) = 255;
