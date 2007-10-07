@@ -39,6 +39,7 @@ extern int A_saveJpg (char *name);
 extern uint8_t loadVideoCodecConf( char *name);
 extern int videoCodecConfigure(char *p,uint32_t i, uint8_t  *c);
 
+extern void filterCleanUp( void );
 
 
 JSPropertySpec ADM_JSAvidemuxVideo::avidemuxvideo_properties[] = 
@@ -51,6 +52,7 @@ JSFunctionSpec ADM_JSAvidemuxVideo::avidemuxvideo_methods[] =
 {
 	{ "clear", Clear, 0, 0, 0 },	// clear
 	{ "add", Add, 3, 0, 0 },	// add
+        { "clearFilters", ClearFilters, 0, 0, 0 }, // Delete all filters
 	{ "addFilter", AddFilter, 10, 0, 0 },	// Add filter to filter chain
 	{ "codec", Codec, 3, 0, 0 },	// Set the video codec
 	{ "codecConf", CodecConf, 1, 0, 0 },	// load video codec config
@@ -194,6 +196,13 @@ JSBool ADM_JSAvidemuxVideo::Add(JSContext *cx, JSObject *obj, uintN argc,
         return JS_TRUE;
 }// end Add
 
+
+JSBool ADM_JSAvidemuxVideo::ClearFilters(JSContext *cx, JSObject *obj, uintN argc,
+                                       jsval *argv, jsval *rval)
+{// begin Clear
+	filterCleanUp();
+        return JS_TRUE;
+}// end Clear
 
 
 JSBool ADM_JSAvidemuxVideo::AddFilter(JSContext *cx, JSObject *obj, uintN argc, 
