@@ -56,8 +56,10 @@ typedef enum
   
   ACT_SetPostProcessing,
   ACT_NextFrame,
+  ACT_Back100Frames,
   ACT_Back50Frames,
   ACT_Back25Frames,
+  ACT_Forward100Frames,
   ACT_Forward50Frames,
   ACT_Forward25Frames,
   ACT_NextKFrame,

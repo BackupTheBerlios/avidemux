@@ -87,6 +87,11 @@ gboolean UI_on_key_press(GtkWidget *widget, GdkEventKey* event, gpointer user_da
 		{
 			action = ACT_PreviousFrame;
 		}
+                // 100 frames
+                else if((shift == TRUE) && (ctrl == TRUE))
+                {
+                        action = ACT_Back100Frames;
+                }
 		// 50 frames
 		else if(ctrl == TRUE)
 		{
@@ -105,6 +110,12 @@ gboolean UI_on_key_press(GtkWidget *widget, GdkEventKey* event, gpointer user_da
 		{
 			action = ACT_NextFrame;
 		}
+                // 100 frames
+                else if((shift == TRUE) && (ctrl == TRUE))
+                {
+                        action = ACT_Forward100Frames;
+                }
+
 		else if(ctrl == TRUE)
 		{
 			action = ACT_Forward50Frames;

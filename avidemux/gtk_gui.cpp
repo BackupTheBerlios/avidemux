@@ -615,6 +615,14 @@ int nw;
     case ACT_PreviousFrame:
         GUI_PrevFrame();
       break;
+    case ACT_Forward100Frames:
+      GUI_GoToKFrame (curframe + (avifileinfo->fps1000 / 1000 * 4));
+      break;
+
+    case ACT_Back100Frames:
+      GUI_GoToKFrame (curframe - (avifileinfo->fps1000 / 1000 * 4));
+      break;
+
 
     case ACT_Forward50Frames:
       GUI_GoToFrame (curframe + 50);
