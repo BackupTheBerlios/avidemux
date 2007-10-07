@@ -29,13 +29,14 @@ uint8_t DIA_resizeWiz(RESWIZ_FORMAT *format, RESWIZ_AR *source, RESWIZ_AR *desti
 {
 uint8_t r=0;
 #define ONELINE(x,y) {RESWIZ_##x,y,NULL}
-            diaMenuEntry menuFTarget[6]={
+            diaMenuEntry menuFTarget[7]={
                              ONELINE(VCD,QT_TR_NOOP("VCD")),
                              ONELINE(SVCD,QT_TR_NOOP("SVCD")),
                              ONELINE(DVD,QT_TR_NOOP("DVD")),
                              ONELINE(DVD_HD1,QT_TR_NOOP("DVD half D1")),
                              ONELINE(PSP,QT_TR_NOOP("PSP 480*272")),
                              ONELINE(PSP_FULLRES,QT_TR_NOOP("PSP full res (720*480")),
+                             ONELINE(IPOD,"IPOD 320*240"),
                           };
              diaMenuEntry menuFAspect[3]={
                {RESWIZ_AR_1_1,QT_TR_NOOP("1:1"),NULL},
@@ -49,7 +50,7 @@ uint8_t r=0;
     uint32_t tsource=(uint32_t )*source;
     uint32_t tdestination=(uint32_t )*destination;
                           
-    diaElemMenu     menu1(&tformat,QT_TR_NOOP("_Target type:"), 6,menuFTarget);
+    diaElemMenu     menu1(&tformat,QT_TR_NOOP("_Target type:"), 7,menuFTarget);
     diaElemMenu     menu2(&tsource,QT_TR_NOOP("_Source aspect ratio:"), 3,menuFAspect);
     diaElemMenu     menu3(&tdestination,QT_TR_NOOP("_Destination aspect ratio:"), 3,menuFAspect);
     

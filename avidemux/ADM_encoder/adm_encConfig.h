@@ -17,4 +17,5 @@ uint8_t videoCodecSetFinalSize (uint32_t size);
 
 //
 void setPSP_X264Preset(void);
+void setIpod_Xvid4Preset(void);
 #endif

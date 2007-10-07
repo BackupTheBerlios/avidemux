@@ -72,9 +72,10 @@ static targetFmt DVD={720, 720, 576, 480};
 static targetFmt DVDHD1={352, 720, 576, 480};
 static targetFmt PSP={480, 480, 272, 272};
 static targetFmt PSPH264={720, 720, 480, 480};
+static targetFmt IPOD={320, 240, 320, 240};
 /* Dont forget to update DIA_resizeWiz if you change something here */
 
-targetFmt *allFormats[6]={&VCD,&SVCD,&DVD,&DVDHD1,&PSP,&PSPH264};
+targetFmt *allFormats[7]={&VCD,&SVCD,&DVD,&DVDHD1,&PSP,&PSPH264,&IPOD};
 extern AVDMGenericVideoStream *createResampleFps(AVDMGenericVideoStream *in,uint32_t targetfps1000);
 #define ARME(x) format=RESWIZ_##x;
 
@@ -84,6 +85,21 @@ uint8_t setVCD (void)
   ARME (VCD);
   return computeResize();
 }
+
+/**
+    \fn     setIPOD (void)
+    \brief  Setup  video size & fps to be compatible with IPOD
+*/
+uint8_t setIPOD (void)
+{
+  int8_t r=0;
+ADV_Info *info;
+uint32_t fps1000;
+
+    ARME (IPOD);
+    return computeResize();
+}
+
 /**
     \fn     setPSP (void)
     \brief  Setup  video size & fps to be compatible with PSP

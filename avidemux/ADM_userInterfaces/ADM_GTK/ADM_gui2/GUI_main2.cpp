@@ -139,6 +139,7 @@ create_mainWindow (void)
   GtkWidget *psp1;
   GtkWidget *psp__h264_1;
   GtkWidget *flv1;
+  GtkWidget *Ipod;
   GtkWidget *go1;
   GtkWidget *go1_menu;
   GtkWidget *play_video1;
@@ -178,7 +179,6 @@ create_mainWindow (void)
   GtkWidget *toolbuttonSave;
   GtkWidget *toolbuttonInfo;
   GtkWidget *separatortoolitem1;
-  GtkWidget *tmp_image;
   GtkWidget *toolbuttonCalc;
   GtkWidget *separatortoolitem2;
   GtkWidget *toolitem12;
@@ -219,14 +219,16 @@ create_mainWindow (void)
   GtkWidget *comboboxFormat;
   GtkWidget *guiDrawing;
   GtkWidget *table2;
-  GtkWidget *vbox14;
-  GtkWidget *label21;
-  GtkWidget *alignment15;
-  GtkWidget *table1;
-  GtkWidget *labelMarkA;
-  GtkWidget *labelMarkB;
-  GtkWidget *buttonGotoA;
-  GtkWidget *buttonGotoB;
+  GtkWidget *jogg;
+  GtkWidget *hbox16;
+  GtkWidget *label1;
+  GtkWidget *boxCurFrame;
+  GtkWidget *labelTotalFrame;
+  GtkWidget *label4;
+  GtkWidget *boxCurTime;
+  GtkWidget *labelTotalTime;
+  GtkWidget *labelFrameType;
+  GtkWidget *sliderNavigate;
   GtkWidget *hbox10;
   GtkWidget *buttonPlay;
   GtkWidget *image591;
@@ -252,16 +254,14 @@ create_mainWindow (void)
   GtkWidget *image5057;
   GtkWidget *buttonEnd;
   GtkWidget *image2245;
-  GtkWidget *sliderNavigate;
-  GtkWidget *hbox16;
-  GtkWidget *label1;
-  GtkWidget *boxCurFrame;
-  GtkWidget *labelTotalFrame;
-  GtkWidget *label4;
-  GtkWidget *boxCurTime;
-  GtkWidget *labelTotalTime;
-  GtkWidget *labelFrameType;
-  GtkWidget *jogg;
+  GtkWidget *vbox14;
+  GtkWidget *label21;
+  GtkWidget *alignment15;
+  GtkWidget *table1;
+  GtkWidget *buttonGotoB;
+  GtkWidget *buttonGotoA;
+  GtkWidget *labelMarkB;
+  GtkWidget *labelMarkA;
   extern GtkAccelGroup *accel_group;
   GtkTooltips *tooltips;
 
@@ -796,6 +796,10 @@ create_mainWindow (void)
   gtk_widget_show (flv1);
   gtk_container_add (GTK_CONTAINER (help1_menu), flv1);
 
+  Ipod = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("IPOD (mpeg4)"));
+  gtk_widget_show (Ipod);
+  gtk_container_add (GTK_CONTAINER (help1_menu), Ipod);
+
   go1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("_Go"));
   gtk_widget_show (go1);
   gtk_container_add (GTK_CONTAINER (menuBar), go1);
@@ -989,9 +993,7 @@ create_mainWindow (void)
   gtk_widget_show (separatortoolitem1);
   gtk_container_add (GTK_CONTAINER (toolbar2), separatortoolitem1);
 
-  tmp_image = create_pixmap (mainWindow, "gnome-calculator.xpm");
-  gtk_widget_show (tmp_image);
-  toolbuttonCalc = (GtkWidget*) gtk_tool_button_new (tmp_image, QT_TR_NOOP("Calculator"));
+  toolbuttonCalc = (GtkWidget*) gtk_tool_button_new (NULL, QT_TR_NOOP("Calculator"));
   gtk_widget_show (toolbuttonCalc);
   gtk_container_add (GTK_CONTAINER (toolbar2), toolbuttonCalc);
   gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonCalc), tooltips, QT_TR_NOOP("Bitrate/size calculator"), NULL);
@@ -1190,62 +1192,70 @@ create_mainWindow (void)
   gtk_container_set_border_width (GTK_CONTAINER (table2), 3);
   gtk_table_set_col_spacings (GTK_TABLE (table2), 6);
 
-  vbox14 = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (vbox14);
-  gtk_table_attach (GTK_TABLE (table2), vbox14, 1, 2, 1, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
-
-  label21 = gtk_label_new (QT_TR_NOOP("<b>Selection</b>"));
-  gtk_widget_show (label21);
-  gtk_box_pack_start (GTK_BOX (vbox14), label21, FALSE, FALSE, 0);
-  gtk_label_set_use_markup (GTK_LABEL (label21), TRUE);
-  gtk_misc_set_alignment (GTK_MISC (label21), 0, 0.5);
-
-  alignment15 = gtk_alignment_new (0.5, 0.5, 1, 1);
-  gtk_widget_show (alignment15);
-  gtk_box_pack_start (GTK_BOX (vbox14), alignment15, TRUE, TRUE, 0);
-  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment15), 3, 0, 12, 0);
-
-  table1 = gtk_table_new (2, 2, FALSE);
-  gtk_widget_show (table1);
-  gtk_container_add (GTK_CONTAINER (alignment15), table1);
-  gtk_table_set_row_spacings (GTK_TABLE (table1), 3);
-  gtk_table_set_col_spacings (GTK_TABLE (table1), 3);
-
-  labelMarkA = gtk_label_new (QT_TR_NOOP(" 0000000"));
-  gtk_widget_show (labelMarkA);
-  gtk_table_attach (GTK_TABLE (table1), labelMarkA, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
+  jogg = jog_shuttle_new ();gtk_widget_set_size_request (jogg, -1, 16); 
+  gtk_widget_show (jogg);
+  gtk_table_attach (GTK_TABLE (table2), jogg, 1, 2, 0, 1,
+                    (GtkAttachOptions) (0),
                     (GtkAttachOptions) (0), 0, 0);
-  GTK_WIDGET_SET_FLAGS (labelMarkA, GTK_CAN_FOCUS);
-  gtk_label_set_selectable (GTK_LABEL (labelMarkA), TRUE);
+  GTK_WIDGET_UNSET_FLAGS (jogg, GTK_CAN_FOCUS);
+  GTK_WIDGET_UNSET_FLAGS (jogg, GTK_CAN_DEFAULT);
 
-  labelMarkB = gtk_label_new (QT_TR_NOOP(" 0000000"));
-  gtk_widget_show (labelMarkB);
-  gtk_table_attach (GTK_TABLE (table1), labelMarkB, 1, 2, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
+  hbox16 = gtk_hbox_new (FALSE, 6);
+  gtk_widget_show (hbox16);
+  gtk_table_attach (GTK_TABLE (table2), hbox16, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  GTK_WIDGET_SET_FLAGS (labelMarkB, GTK_CAN_FOCUS);
-  gtk_label_set_selectable (GTK_LABEL (labelMarkB), TRUE);
 
-  buttonGotoA = gtk_button_new_with_mnemonic (QT_TR_NOOP("A:"));
-  gtk_widget_show (buttonGotoA);
-  gtk_table_attach (GTK_TABLE (table1), buttonGotoA, 0, 1, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
-  gtk_widget_set_size_request (buttonGotoA, -1, 20);
-  GTK_WIDGET_UNSET_FLAGS (buttonGotoA, GTK_CAN_FOCUS);
-  gtk_tooltips_set_tip (tooltips, buttonGotoA, QT_TR_NOOP("Go to marker A"), NULL);
+  label1 = gtk_label_new (QT_TR_NOOP("Frame: "));
+  gtk_widget_show (label1);
+  gtk_box_pack_start (GTK_BOX (hbox16), label1, FALSE, FALSE, 0);
 
-  buttonGotoB = gtk_button_new_with_mnemonic (QT_TR_NOOP("B:"));
-  gtk_widget_show (buttonGotoB);
-  gtk_table_attach (GTK_TABLE (table1), buttonGotoB, 0, 1, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
-  gtk_widget_set_size_request (buttonGotoB, -1, 20);
-  GTK_WIDGET_UNSET_FLAGS (buttonGotoB, GTK_CAN_FOCUS);
-  gtk_tooltips_set_tip (tooltips, buttonGotoB, QT_TR_NOOP("Go to marker B"), NULL);
+  boxCurFrame = gtk_entry_new ();
+  gtk_widget_show (boxCurFrame);
+  gtk_box_pack_start (GTK_BOX (hbox16), boxCurFrame, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, boxCurFrame, QT_TR_NOOP("Current frame"), NULL);
+  gtk_entry_set_max_length (GTK_ENTRY (boxCurFrame), 8);
+  gtk_entry_set_text (GTK_ENTRY (boxCurFrame), QT_TR_NOOP("0"));
+  gtk_entry_set_width_chars (GTK_ENTRY (boxCurFrame), 8);
+
+  labelTotalFrame = gtk_label_new (QT_TR_NOOP("/ 0000000"));
+  gtk_widget_show (labelTotalFrame);
+  gtk_box_pack_start (GTK_BOX (hbox16), labelTotalFrame, FALSE, FALSE, 0);
+  GTK_WIDGET_SET_FLAGS (labelTotalFrame, GTK_CAN_FOCUS);
+  gtk_label_set_selectable (GTK_LABEL (labelTotalFrame), TRUE);
+  gtk_misc_set_padding (GTK_MISC (labelTotalFrame), 5, 0);
+
+  label4 = gtk_label_new (QT_TR_NOOP("Time: "));
+  gtk_widget_show (label4);
+  gtk_box_pack_start (GTK_BOX (hbox16), label4, FALSE, FALSE, 0);
+
+  boxCurTime = gtk_entry_new ();
+  gtk_widget_show (boxCurTime);
+  gtk_box_pack_start (GTK_BOX (hbox16), boxCurTime, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, boxCurTime, QT_TR_NOOP("Current time"), NULL);
+  gtk_entry_set_text (GTK_ENTRY (boxCurTime), QT_TR_NOOP("00:00:00.000"));
+  gtk_entry_set_width_chars (GTK_ENTRY (boxCurTime), 13);
+
+  labelTotalTime = gtk_label_new (QT_TR_NOOP("/ 00:00:00,000"));
+  gtk_widget_show (labelTotalTime);
+  gtk_box_pack_start (GTK_BOX (hbox16), labelTotalTime, FALSE, FALSE, 0);
+  GTK_WIDGET_SET_FLAGS (labelTotalTime, GTK_CAN_FOCUS);
+  gtk_label_set_selectable (GTK_LABEL (labelTotalTime), TRUE);
+  gtk_misc_set_padding (GTK_MISC (labelTotalTime), 5, 0);
+
+  labelFrameType = gtk_label_new (QT_TR_NOOP("Frame: ?"));
+  gtk_widget_show (labelFrameType);
+  gtk_box_pack_start (GTK_BOX (hbox16), labelFrameType, FALSE, FALSE, 0);
+  GTK_WIDGET_SET_FLAGS (labelFrameType, GTK_CAN_FOCUS);
+  gtk_label_set_selectable (GTK_LABEL (labelFrameType), TRUE);
+
+  sliderNavigate = gtk_markscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 99.99, 0.01, 1, 0)));
+  gtk_widget_show (sliderNavigate);gtk_scale_set_draw_value (GTK_SCALE (sliderNavigate), FALSE);
+  gtk_table_attach (GTK_TABLE (table2), sliderNavigate, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+  GTK_WIDGET_UNSET_FLAGS (sliderNavigate, GTK_CAN_FOCUS);
+  gtk_scale_set_value_pos (GTK_SCALE (sliderNavigate), GTK_POS_LEFT);
 
   hbox10 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox10);
@@ -1405,70 +1415,62 @@ create_mainWindow (void)
   gtk_widget_show (image2245);
   gtk_container_add (GTK_CONTAINER (buttonEnd), image2245);
 
-  sliderNavigate = gtk_markscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 99.99, 0.01, 1, 0)));
-  gtk_widget_show (sliderNavigate);gtk_scale_set_draw_value (GTK_SCALE (sliderNavigate), FALSE);
-  gtk_table_attach (GTK_TABLE (table2), sliderNavigate, 0, 1, 0, 1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
-  GTK_WIDGET_UNSET_FLAGS (sliderNavigate, GTK_CAN_FOCUS);
-  gtk_scale_set_value_pos (GTK_SCALE (sliderNavigate), GTK_POS_LEFT);
-
-  hbox16 = gtk_hbox_new (FALSE, 6);
-  gtk_widget_show (hbox16);
-  gtk_table_attach (GTK_TABLE (table2), hbox16, 0, 1, 2, 3,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+  vbox14 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox14);
+  gtk_table_attach (GTK_TABLE (table2), vbox14, 1, 2, 1, 3,
+                    (GtkAttachOptions) (0),
                     (GtkAttachOptions) (0), 0, 0);
 
-  label1 = gtk_label_new (QT_TR_NOOP("Frame: "));
-  gtk_widget_show (label1);
-  gtk_box_pack_start (GTK_BOX (hbox16), label1, FALSE, FALSE, 0);
+  label21 = gtk_label_new (QT_TR_NOOP("<b>Selection</b>"));
+  gtk_widget_show (label21);
+  gtk_box_pack_start (GTK_BOX (vbox14), label21, FALSE, FALSE, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label21), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label21), 0, 0.5);
 
-  boxCurFrame = gtk_entry_new ();
-  gtk_widget_show (boxCurFrame);
-  gtk_box_pack_start (GTK_BOX (hbox16), boxCurFrame, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, boxCurFrame, QT_TR_NOOP("Current frame"), NULL);
-  gtk_entry_set_max_length (GTK_ENTRY (boxCurFrame), 8);
-  gtk_entry_set_text (GTK_ENTRY (boxCurFrame), QT_TR_NOOP("0"));
-  gtk_entry_set_width_chars (GTK_ENTRY (boxCurFrame), 8);
+  alignment15 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment15);
+  gtk_box_pack_start (GTK_BOX (vbox14), alignment15, TRUE, TRUE, 0);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment15), 3, 0, 12, 0);
 
-  labelTotalFrame = gtk_label_new (QT_TR_NOOP("/ 0000000"));
-  gtk_widget_show (labelTotalFrame);
-  gtk_box_pack_start (GTK_BOX (hbox16), labelTotalFrame, FALSE, FALSE, 0);
-  GTK_WIDGET_SET_FLAGS (labelTotalFrame, GTK_CAN_FOCUS);
-  gtk_label_set_selectable (GTK_LABEL (labelTotalFrame), TRUE);
-  gtk_misc_set_padding (GTK_MISC (labelTotalFrame), 5, 0);
+  table1 = gtk_table_new (2, 2, FALSE);
+  gtk_widget_show (table1);
+  gtk_container_add (GTK_CONTAINER (alignment15), table1);
+  gtk_table_set_row_spacings (GTK_TABLE (table1), 3);
+  gtk_table_set_col_spacings (GTK_TABLE (table1), 3);
 
-  label4 = gtk_label_new (QT_TR_NOOP("Time: "));
-  gtk_widget_show (label4);
-  gtk_box_pack_start (GTK_BOX (hbox16), label4, FALSE, FALSE, 0);
+  buttonGotoB = gtk_button_new_with_mnemonic (QT_TR_NOOP("B:"));
+  gtk_widget_show (buttonGotoB);
+  gtk_table_attach (GTK_TABLE (table1), buttonGotoB, 0, 1, 1, 2,
+                    (GtkAttachOptions) (0),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_size_request (buttonGotoB, -1, 20);
+  GTK_WIDGET_UNSET_FLAGS (buttonGotoB, GTK_CAN_FOCUS);
+  gtk_tooltips_set_tip (tooltips, buttonGotoB, QT_TR_NOOP("Go to marker B"), NULL);
 
-  boxCurTime = gtk_entry_new ();
-  gtk_widget_show (boxCurTime);
-  gtk_box_pack_start (GTK_BOX (hbox16), boxCurTime, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, boxCurTime, QT_TR_NOOP("Current time"), NULL);
-  gtk_entry_set_text (GTK_ENTRY (boxCurTime), QT_TR_NOOP("00:00:00.000"));
-  gtk_entry_set_width_chars (GTK_ENTRY (boxCurTime), 13);
+  buttonGotoA = gtk_button_new_with_mnemonic (QT_TR_NOOP("A:"));
+  gtk_widget_show (buttonGotoA);
+  gtk_table_attach (GTK_TABLE (table1), buttonGotoA, 0, 1, 0, 1,
+                    (GtkAttachOptions) (0),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_size_request (buttonGotoA, -1, 20);
+  GTK_WIDGET_UNSET_FLAGS (buttonGotoA, GTK_CAN_FOCUS);
+  gtk_tooltips_set_tip (tooltips, buttonGotoA, QT_TR_NOOP("Go to marker A"), NULL);
 
-  labelTotalTime = gtk_label_new (QT_TR_NOOP("/ 00:00:00,000"));
-  gtk_widget_show (labelTotalTime);
-  gtk_box_pack_start (GTK_BOX (hbox16), labelTotalTime, FALSE, FALSE, 0);
-  GTK_WIDGET_SET_FLAGS (labelTotalTime, GTK_CAN_FOCUS);
-  gtk_label_set_selectable (GTK_LABEL (labelTotalTime), TRUE);
-  gtk_misc_set_padding (GTK_MISC (labelTotalTime), 5, 0);
+  labelMarkB = gtk_label_new (QT_TR_NOOP(" 0000000"));
+  gtk_widget_show (labelMarkB);
+  gtk_table_attach (GTK_TABLE (table1), labelMarkB, 1, 2, 1, 2,
+                    (GtkAttachOptions) (0),
+                    (GtkAttachOptions) (0), 0, 0);
+  GTK_WIDGET_SET_FLAGS (labelMarkB, GTK_CAN_FOCUS);
+  gtk_label_set_selectable (GTK_LABEL (labelMarkB), TRUE);
 
-  labelFrameType = gtk_label_new (QT_TR_NOOP("Frame: ?"));
-  gtk_widget_show (labelFrameType);
-  gtk_box_pack_start (GTK_BOX (hbox16), labelFrameType, FALSE, FALSE, 0);
-  GTK_WIDGET_SET_FLAGS (labelFrameType, GTK_CAN_FOCUS);
-  gtk_label_set_selectable (GTK_LABEL (labelFrameType), TRUE);
-
-  jogg = jog_shuttle_new ();gtk_widget_set_size_request (jogg, -1, 16); 
-  gtk_widget_show (jogg);
-  gtk_table_attach (GTK_TABLE (table2), jogg, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_EXPAND), 0, 0);
-  GTK_WIDGET_UNSET_FLAGS (jogg, GTK_CAN_FOCUS);
-  GTK_WIDGET_UNSET_FLAGS (jogg, GTK_CAN_DEFAULT);
+  labelMarkA = gtk_label_new (QT_TR_NOOP(" 0000000"));
+  gtk_widget_show (labelMarkA);
+  gtk_table_attach (GTK_TABLE (table1), labelMarkA, 1, 2, 0, 1,
+                    (GtkAttachOptions) (0),
+                    (GtkAttachOptions) (0), 0, 0);
+  GTK_WIDGET_SET_FLAGS (labelMarkA, GTK_CAN_FOCUS);
+  gtk_label_set_selectable (GTK_LABEL (labelMarkA), TRUE);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (mainWindow, mainWindow, "mainWindow");
@@ -1580,6 +1582,7 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, psp1, "psp1");
   GLADE_HOOKUP_OBJECT (mainWindow, psp__h264_1, "psp__h264_1");
   GLADE_HOOKUP_OBJECT (mainWindow, flv1, "flv1");
+  GLADE_HOOKUP_OBJECT (mainWindow, Ipod, "Ipod");
   GLADE_HOOKUP_OBJECT (mainWindow, go1, "go1");
   GLADE_HOOKUP_OBJECT (mainWindow, go1_menu, "go1_menu");
   GLADE_HOOKUP_OBJECT (mainWindow, play_video1, "play_video1");
@@ -1657,14 +1660,16 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, comboboxFormat, "comboboxFormat");
   GLADE_HOOKUP_OBJECT (mainWindow, guiDrawing, "guiDrawing");
   GLADE_HOOKUP_OBJECT (mainWindow, table2, "table2");
-  GLADE_HOOKUP_OBJECT (mainWindow, vbox14, "vbox14");
-  GLADE_HOOKUP_OBJECT (mainWindow, label21, "label21");
-  GLADE_HOOKUP_OBJECT (mainWindow, alignment15, "alignment15");
-  GLADE_HOOKUP_OBJECT (mainWindow, table1, "table1");
-  GLADE_HOOKUP_OBJECT (mainWindow, labelMarkA, "labelMarkA");
-  GLADE_HOOKUP_OBJECT (mainWindow, labelMarkB, "labelMarkB");
-  GLADE_HOOKUP_OBJECT (mainWindow, buttonGotoA, "buttonGotoA");
-  GLADE_HOOKUP_OBJECT (mainWindow, buttonGotoB, "buttonGotoB");
+  GLADE_HOOKUP_OBJECT (mainWindow, jogg, "jogg");
+  GLADE_HOOKUP_OBJECT (mainWindow, hbox16, "hbox16");
+  GLADE_HOOKUP_OBJECT (mainWindow, label1, "label1");
+  GLADE_HOOKUP_OBJECT (mainWindow, boxCurFrame, "boxCurFrame");
+  GLADE_HOOKUP_OBJECT (mainWindow, labelTotalFrame, "labelTotalFrame");
+  GLADE_HOOKUP_OBJECT (mainWindow, label4, "label4");
+  GLADE_HOOKUP_OBJECT (mainWindow, boxCurTime, "boxCurTime");
+  GLADE_HOOKUP_OBJECT (mainWindow, labelTotalTime, "labelTotalTime");
+  GLADE_HOOKUP_OBJECT (mainWindow, labelFrameType, "labelFrameType");
+  GLADE_HOOKUP_OBJECT (mainWindow, sliderNavigate, "sliderNavigate");
   GLADE_HOOKUP_OBJECT (mainWindow, hbox10, "hbox10");
   GLADE_HOOKUP_OBJECT (mainWindow, buttonPlay, "buttonPlay");
   GLADE_HOOKUP_OBJECT (mainWindow, image591, "image591");
@@ -1690,16 +1695,14 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, image5057, "image5057");
   GLADE_HOOKUP_OBJECT (mainWindow, buttonEnd, "buttonEnd");
   GLADE_HOOKUP_OBJECT (mainWindow, image2245, "image2245");
-  GLADE_HOOKUP_OBJECT (mainWindow, sliderNavigate, "sliderNavigate");
-  GLADE_HOOKUP_OBJECT (mainWindow, hbox16, "hbox16");
-  GLADE_HOOKUP_OBJECT (mainWindow, label1, "label1");
-  GLADE_HOOKUP_OBJECT (mainWindow, boxCurFrame, "boxCurFrame");
-  GLADE_HOOKUP_OBJECT (mainWindow, labelTotalFrame, "labelTotalFrame");
-  GLADE_HOOKUP_OBJECT (mainWindow, label4, "label4");
-  GLADE_HOOKUP_OBJECT (mainWindow, boxCurTime, "boxCurTime");
-  GLADE_HOOKUP_OBJECT (mainWindow, labelTotalTime, "labelTotalTime");
-  GLADE_HOOKUP_OBJECT (mainWindow, labelFrameType, "labelFrameType");
-  GLADE_HOOKUP_OBJECT (mainWindow, jogg, "jogg");
+  GLADE_HOOKUP_OBJECT (mainWindow, vbox14, "vbox14");
+  GLADE_HOOKUP_OBJECT (mainWindow, label21, "label21");
+  GLADE_HOOKUP_OBJECT (mainWindow, alignment15, "alignment15");
+  GLADE_HOOKUP_OBJECT (mainWindow, table1, "table1");
+  GLADE_HOOKUP_OBJECT (mainWindow, buttonGotoB, "buttonGotoB");
+  GLADE_HOOKUP_OBJECT (mainWindow, buttonGotoA, "buttonGotoA");
+  GLADE_HOOKUP_OBJECT (mainWindow, labelMarkB, "labelMarkB");
+  GLADE_HOOKUP_OBJECT (mainWindow, labelMarkA, "labelMarkA");
   GLADE_HOOKUP_OBJECT_NO_REF (mainWindow, tooltips, "tooltips");
 
   gtk_window_add_accel_group (GTK_WINDOW (mainWindow), accel_group);

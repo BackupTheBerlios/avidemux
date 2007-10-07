@@ -57,6 +57,40 @@ uint8_t A_autoDrive(Action action)
 #define PSP_AUDIO_FQ 24000        
         switch(action)
         {
+                case ACT_AUTO_IPOD:
+#if  !defined(USE_XVID_4) || !defined(USE_FAAC)
+                  GUI_Error_HIG(QT_TR_NOOP("Codec Error"),
+                                        QT_TR_NOOP( "You need both Xvid4 and FAAC support for Ipod profile"));
+#else
+                    if(!setIPOD()) return 0;
+                
+                    // Video codec
+
+                    if(!videoCodecSelectByName("XVID4")) 
+                    {
+                      GUI_Error_HIG(QT_TR_NOOP("Codec Error"),QT_TR_NOOP( "Cannot select mpeg4 sp codec."));
+                        return 0;
+                    }
+                    setIpod_Xvid4Preset();
+                    // Set mode & bitrate 
+                    setVideoEncoderSettings(COMPRESS_CBR,400,0,NULL);
+                    // Audio Codec
+                    if(   (currentaudiostream->getInfo()->channels==2)&&
+                        (currentaudiostream->getInfo()->encoding==WAV_AAC))
+                    {
+                        audioCodecSetcodec(AUDIOENC_COPY);
+                    }
+                    else
+                    {
+                          audioCodecSetcodec(AUDIOENC_FAAC);
+                          audioFilter_SetBitrate(128);
+                      }
+#endif
+                      break;
+//******************************** IPOD *******************************
+                          
+                          
+                          break;
         		case ACT_AUTO_FLV:
         			// Check audio is mp3 @ 44.1/22.05/11.025 kHz MP3
         			if(currentaudiostream)
@@ -259,6 +293,9 @@ uint8_t A_autoDrive(Action action)
         // Except for PSP
         switch(action)
         {
+          case ACT_AUTO_IPOD:
+              UI_SetCurrentFormat(ADM_MP4);
+              break;
           case ACT_AUTO_PSP:
           case ACT_AUTO_PSP_H264:
               UI_SetCurrentFormat(ADM_PSP);

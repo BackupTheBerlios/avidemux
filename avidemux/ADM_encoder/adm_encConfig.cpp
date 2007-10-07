@@ -955,6 +955,18 @@ uint8_t oplug_mpegInit(void)
   DVDExtra.maxBitrate = (DVDExtra.maxBitrate*1000) >> 3;
   return 1;
 } */
+
+#ifdef USE_XVID_4
+/**
+    \fn     setIpod_Xvid4Preset(void)
+    \brief  set XVID4 codec conf to the Ipod preset
+*/
+void setIpod_Xvid4Preset(void)
+{
+ memcpy(&xvid4Extra,&xvid4ExtraIPOD,sizeof(xvid4ExtraIPOD)); 
+}
+#endif
+
 #ifdef USE_X264
 /**
     \fn     setPSP_X264Preset(void)

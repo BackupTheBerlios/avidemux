@@ -17,7 +17,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#ifndef vidVCD_H
+#define vidVCD_H
 
 uint8_t setSVCD( void );
 uint8_t setVCD( void );
@@ -25,4 +26,6 @@ uint8_t setPSP(void);
 uint8_t setPSPFullRes(void);
 uint8_t setDVD( void );
 uint8_t setHalfD1( void );
+uint8_t setIPOD( void );
 
+#endif

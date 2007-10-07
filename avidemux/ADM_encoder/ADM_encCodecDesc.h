@@ -615,6 +615,56 @@ xvid4EncParam xvid4Extra = {
   0,                            // Use inter
   0                             // Use intra
 };
+xvid4EncParam xvid4ExtraIPOD = {
+  6,				//int guiLevel;              
+
+  1,				//int min_key_interval;
+  250,				// Max key interval
+  0,				//int bframes;
+
+  0,				//int mpegQuantizer; 
+  0,				//int interlaced;
+  1,				//int inter4mv;
+  0,				//int trellis;       
+  0,				//int cartoon;
+  0,				//int greyscale;             
+  0,				// qpel
+  0,				// GMC
+  1,				// BVHQ
+  1,				// hqac
+  0,				// Chroma optim
+  {2, 2, 2}
+  ,				//qmin
+  {31, 31, 31}
+  ,				//qmax
+
+  0,				//par as input
+  1,				//par width
+  1,				//par height
+
+  // This if for 2 pass   
+  0,				//int keyframe_boost;
+  0,				//int curve_compression_high;
+  0,				//int curve_compression_low;
+  5,				//int overflow_control_strength;
+  5,				//int max_overflow_improvement;
+  5,				//int max_overflow_degradation;
+  0,				//int kfreduction;
+  0,				//int kfthreshold;
+
+  0,				//24,//int container_frame_overhead;
+  150,				//int bquant_ratio;
+  100,				//int bquant_offset;    
+  1,				//vhqmode                
+  1,				// chroma me
+  0,				// turbo
+  0,				// Packed bitstream - Not Xvid Default
+  1,				// closed_gop
+  0,				// bframe_threshold
+  0,                            // Use inter
+  0                             // Use intra
+};
+
 extern uint8_t DIA_xvid4 (COMPRES_PARAMS * incoming);
 COMPRES_PARAMS Xvid4Codec = {
   CodecXvid4,

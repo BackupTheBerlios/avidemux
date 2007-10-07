@@ -96,6 +96,7 @@ CALLBACK(dvd1                                   ,ACT_AUTO_DVD);
 CALLBACK(psp1                                   ,ACT_AUTO_PSP);
 CALLBACK(psp__h264_1,                           ACT_AUTO_PSP_H264);
 CALLBACK(flv1,                                  ACT_AUTO_FLV);
+CALLBACK(Ipod,                                  ACT_AUTO_IPOD);
 
 CALLBACK(add_to_joblist1                       ,ACT_ADD_JOB);
 CALLBACK(joblist1                              ,ACT_HANDLE_JOB);
