@@ -1,3 +1,4 @@
+#include "config.h"
 #include <errno.h>
 #include <string.h>
 #include <stdarg.h>
@@ -17,13 +18,13 @@ struct qfile_t {
 #define msg_len 512
 static qfile_t qfile[qfile_len];
 
-#include <libxml/tree.h>
-int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
-
 #include "ADM_toolkit/toolkit.hxx"
 //#include "ADM_misc.h"
          
 #ifdef USE_LIBXML2
+#include <libxml/tree.h>
+int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
+
 int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format){
 	/*
 	 * xmlSaveFormatFile -> xmlDocDumpFormatMemory

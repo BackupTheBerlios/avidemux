@@ -1,10 +1,9 @@
-#include <config.h>
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <libintl.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -17,9 +16,7 @@
 #include <QDialog>
 #include <QMessageBox>
 
-
 #include "ADM_toolkit/toolkit.hxx"
-
 #include "ADM_assert.h" 
 
 static int beQuiet=0;

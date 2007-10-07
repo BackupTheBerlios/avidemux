@@ -18,15 +18,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <config.h>
+#include "config.h"
  
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
 #include <errno.h>
-
-#include <glib.h>
 
 #include "config.h"
 #include "prefs.h"
