@@ -12,7 +12,7 @@ static QTranslator avidemuxTranslator;
 
 static void loadTranslation(QTranslator *qTranslator, QString translation)
 {
-	printf("[Locale] Loading language file %s ", translation.toAscii().data());	
+	printf("[Locale] Loading language file %s ", translation.toUtf8().constData());	
 
 	if (qTranslator->load(translation))
 	{
@@ -31,7 +31,7 @@ void initTranslator(void)
 const char* translate(const char *__domainname, const char *__msgid)
 {
 	static int counter = 0;
-	QString messageString = QApplication::translate(__domainname,  __msgid);
+	QString messageString = QApplication::translate("",  __msgid);
 
 	counter++;
 
@@ -42,19 +42,21 @@ const char* translate(const char *__domainname, const char *__msgid)
 		delete[] translatedMessage[counter];
 
 	translatedMessage[counter] = new char[messageString.toUtf8().length() + 1];
-	strcpy(translatedMessage[counter], messageString.toUtf8().data());
+	strcpy(translatedMessage[counter], messageString.toUtf8().constData());
 
 	return translatedMessage[counter];
 }
 
 void loadTranslator(void)
 {
-	printf("\n[Locale] Locale: %s\n", QLocale::system().name().toAscii().data());
+	printf("\n[Locale] Locale: %s\n", QLocale::system().name().toUtf8().constData());
 
-	loadTranslation(&qtTranslator, "qt_" + QLocale::system().name());
-	loadTranslation(&avidemuxTranslator, "avidemux_" + QLocale::system().name());
+	QString appdir = QCoreApplication::applicationDirPath() + "/i18n/";
+
+	loadTranslation(&qtTranslator, appdir + "qt_" + QLocale::system().name());
+	loadTranslation(&avidemuxTranslator, appdir + "avidemux_" + QLocale::system().name());
 	
-	printf("[Locale] Test: &File -> %s\n\n", translate("MainWindow", "&File"));
+	printf("[Locale] Test: &File -> %s\n\n", QApplication::translate("MainWindow", "&Edit").toUtf8().data());
 }
 
 void destroyTranslator(void)

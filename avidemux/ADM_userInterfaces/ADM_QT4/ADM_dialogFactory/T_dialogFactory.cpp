@@ -65,7 +65,7 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
   ADM_assert(nb);
   ADM_assert(elems);
   
-  dialog.setWindowTitle(title);
+  dialog.setWindowTitle(QString::fromUtf8(title));
   
   QGridLayout layout(&dialog);
   
@@ -133,7 +133,7 @@ uint8_t diaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs)
   ADM_assert(nb);
   ADM_assert(tabs);
   
-  dialog.setWindowTitle(title);
+  dialog.setWindowTitle(QString::fromUtf8(title));
   
   QGridLayout layout(&dialog);
 
@@ -199,7 +199,7 @@ void insertTab(uint32_t index, diaElemTabs *tab, QTabWidget *wtab)
     
   }
   
-  wtab->addTab(wid,tab->title);
+  wtab->addTab(wid,QString::fromUtf8(tab->title));
   for(int i=0;i<tab->nbElems;i++)
   {
     tab->dias[i]->finalize(); 

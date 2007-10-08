@@ -66,7 +66,7 @@ void diaElemFrame::setMe(void *dialog, void *opaque,uint32_t line)
    myWidget=(void *)layout2; 
 
     QLabel *text=new QLabel( (QWidget *)dialog);
-    QString string(paramTitle);
+    QString string = QString::fromUtf8(paramTitle);
     
     string="<b>"+string+"</b>";
     text->setText(string);

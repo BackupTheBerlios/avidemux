@@ -26,16 +26,16 @@ extern QWidget *QuiMainWindows;
 void            GUI_Alert(const char *alertstring)
 {
     QMessageBox::StandardButton reply;
-              reply = QMessageBox::critical(QuiMainWindows, "Alert",
-                                        alertstring,
+              reply = QMessageBox::critical(QuiMainWindows, QString::fromUtf8(QT_TR_NOOP("Alert")),
+                                        QString::fromUtf8(alertstring),
                                         QMessageBox::Ok );
 }
 //****************************************************************************************************
 void            GUI_Info(const char *alertstring)
 {
     QMessageBox::StandardButton reply;
-              reply = QMessageBox::information(QuiMainWindows, "Info",
-                                        alertstring,
+              reply = QMessageBox::information(QuiMainWindows, QString::fromUtf8(QT_TR_NOOP("Info")),
+                                        QString::fromUtf8(alertstring),
                                         QMessageBox::Ok );
 }
 
@@ -67,8 +67,8 @@ void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, cons
             va_end(ap);
          }
         QMessageBox::StandardButton reply;
-          reply = QMessageBox::information(QuiMainWindows, "Info",
-                                    alertstring,
+          reply = QMessageBox::information(QuiMainWindows, QString::fromUtf8(QT_TR_NOOP("Info")),
+                                    QString::fromUtf8(alertstring),
                                     QMessageBox::Ok );
 
 }
@@ -100,8 +100,8 @@ void            GUI_Error_HIG(const char *primary, const char *secondary_format,
             va_end(ap);
          }
           QMessageBox::StandardButton reply;
-          reply = QMessageBox::critical(QuiMainWindows, "Info",
-                                    alertstring,
+          reply = QMessageBox::critical(QuiMainWindows, QString::fromUtf8(QT_TR_NOOP("Info")),
+                                    QString::fromUtf8(alertstring),
                                     QMessageBox::Ok );
 }
 //****************************************************************************************************
@@ -129,8 +129,8 @@ char alertstring2[1024];
               va_end(ap);
         }
           QMessageBox::StandardButton reply;
-          reply = QMessageBox::question(QuiMainWindows, "Confirmation",
-                                    alertstring,
+          reply = QMessageBox::question(QuiMainWindows, QString::fromUtf8(QT_TR_NOOP("Confirmation")),
+                                    QString::fromUtf8(alertstring),
                                     QMessageBox::Yes | QMessageBox::No );
           if(reply==QMessageBox::Yes) return 1;
         return 0; 
@@ -160,8 +160,8 @@ char alertstring2[1024];
               va_end(ap);
         }
           QMessageBox::StandardButton reply;
-          reply = QMessageBox::question(QuiMainWindows, "Confirmation",
-                                    alertstring,
+          reply = QMessageBox::question(QuiMainWindows, QString::fromUtf8(QT_TR_NOOP("Confirmation")),
+                                    QString::fromUtf8(alertstring),
                                     QMessageBox::Yes | QMessageBox::No );
           if(reply==QMessageBox::Yes) return 1;
         return 0; 
@@ -175,8 +175,8 @@ int             GUI_Question(const char *alertstring)
                       printf("Question: %s\n", alertstring);
                       return 0;
               }
-          reply = QMessageBox::question(QuiMainWindows, "Question",
-                                    alertstring,
+          reply = QMessageBox::question(QuiMainWindows, QString::fromUtf8(QT_TR_NOOP("Question")),
+                                    QString::fromUtf8(alertstring),
                                     QMessageBox::Yes | QMessageBox::No );
           if(reply==QMessageBox::Yes) return 1;
           return 0;
@@ -199,7 +199,7 @@ QMessageBox *box;
 char alertstring[1024];
 
         box=new QMessageBox(QuiMainWindows);
-        box->setWindowTitle("Question ?");
+        box->setWindowTitle(QString::fromUtf8(QT_TR_NOOP("Question ?")));
         box->addButton(choice1,QMessageBox::YesRole);
         box->addButton(choice2,QMessageBox::NoRole);
          if (title)
@@ -207,9 +207,9 @@ char alertstring[1024];
               snprintf(alertstring,1024,"%s",title);
         }else
         {
-            snprintf(alertstring,1024,"Question");
+            snprintf(alertstring,1024,QT_TR_NOOP("Question"));
         }
-        box->setText(alertstring);
+        box->setText(QString::fromUtf8(alertstring));
         box->setIcon(QMessageBox::Question);
         reply = box->exec();
         delete box;

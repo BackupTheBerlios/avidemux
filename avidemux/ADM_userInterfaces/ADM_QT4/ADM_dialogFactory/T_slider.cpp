@@ -126,7 +126,7 @@ void diaElemGenericSlider<T>::setMe(void *dialog, void *opaque,uint32_t line)
  
   myWidget = (void *)slider;
 
-  QLabel *text = new QLabel (paramTitle, (QWidget *)dialog);
+  QLabel *text = new QLabel (QString::fromUtf8(paramTitle), (QWidget *)dialog);
   text->setBuddy (slider);
 
   QGridLayout *layout = (QGridLayout*) opaque;

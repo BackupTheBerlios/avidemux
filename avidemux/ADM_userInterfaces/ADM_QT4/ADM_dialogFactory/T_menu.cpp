@@ -149,14 +149,14 @@ void diaElemMenuDynamic::setMe(void *dialog, void *opaque,uint32_t line)
   QGridLayout *layout=(QGridLayout*) opaque;
      myWidget=(void *)combo; 
 
-  QLabel *text=new QLabel( this->paramTitle,(QWidget *)dialog);
+	 QLabel *text=new QLabel( QString::fromUtf8(this->paramTitle),(QWidget *)dialog);
   
   // Fill in combobox
   int mem=0;
   diaMenuEntryDynamic **entries=menu;
   for(int i=0;i<nbMenu;i++)
   {
-    combo->addItem(entries[i]->text);
+    combo->addItem(QString::fromUtf8(entries[i]->text));
     if( *(uint32_t *)param==entries[i]->val) mem=i;
   }
    combo->setCurrentIndex(mem);

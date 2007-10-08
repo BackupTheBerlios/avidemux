@@ -54,7 +54,7 @@ class  ADM_Qbutton : public QWidget
           
            _cb=cb;
            _cookie=cookie;
-           button=new QPushButton(blah,z);
+           button=new QPushButton(QString::fromUtf8(blah),z);
            button->show();
            layout->addWidget(button,line,0);
            QObject::connect(button, SIGNAL(clicked(bool)), this, SLOT(clicked(bool )));

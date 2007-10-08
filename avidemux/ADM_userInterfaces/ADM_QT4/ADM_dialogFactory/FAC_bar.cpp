@@ -59,7 +59,7 @@ void diaElemBar::setMe(void *dialog, void *opaque,uint32_t line)
   box->setValue(per);
   box->show();
  
- QLabel *text=new QLabel( this->paramTitle,(QWidget *)dialog);
+ QLabel *text=new QLabel(QString::fromUtf8(this->paramTitle),(QWidget *)dialog);
  text->setBuddy(box);
  layout->addWidget(text,line,0);
  layout->addWidget(box,line,1);

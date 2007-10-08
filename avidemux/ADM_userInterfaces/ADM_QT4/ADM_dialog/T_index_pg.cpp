@@ -235,13 +235,13 @@ void Ui_indexingDialog::setTime(const char *f)
 }
 void Ui_indexingDialog::setImage(const char *f)
 {
-    dialog->ui.labelImages->setText(f);
+	dialog->ui.labelImages->setText(QString::fromUtf8(f));
 }
 
 void Ui_indexingDialog::setETA(const char *f)
 {
    // printf("Eta:%s\n",f);
-  dialog->ui.labelTimeLeft->setText(f);
+  dialog->ui.labelTimeLeft->setText(QString::fromUtf8(f));
 }
 void Ui_indexingDialog::setPercent(float f)
 {

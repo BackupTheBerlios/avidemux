@@ -50,9 +50,9 @@ public:
 
 	ADM_QthreadCount(QWidget *widget, const char *title, uint32_t value, QGridLayout *layout, int line) : QWidget(widget) 
 	{
-		radiobutton1 = new QRadioButton("Disabled", widget);
-		radiobutton2 = new QRadioButton("Auto-detect", widget);
-		radiobutton3 = new QRadioButton("Custom", widget);
+		radiobutton1 = new QRadioButton(QString::fromUtf8(QT_TR_NOOP("Disabled")), widget);
+		radiobutton2 = new QRadioButton(QString::fromUtf8(QT_TR_NOOP("Auto-detect")), widget);
+		radiobutton3 = new QRadioButton(QString::fromUtf8(QT_TR_NOOP("Custom")), widget);
 
 		buttonGroup = new QButtonGroup;
 		buttonGroup->addButton(radiobutton1);
@@ -62,7 +62,7 @@ public:
 		spinBox = new QSpinBox();
 		spinBox->setRange(2, 32);
 
-		text = new QLabel(title, widget);
+		text = new QLabel(QString::fromUtf8(title), widget);
 		text->setBuddy(radiobutton1);
 
 		layout->addWidget(text, line, 0);

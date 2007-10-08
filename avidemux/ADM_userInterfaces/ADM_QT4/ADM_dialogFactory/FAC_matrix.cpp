@@ -72,7 +72,7 @@ void diaElemMatrix::setMe(void *dialog, void *opaque,uint32_t line)
 	  
 	  
 	 
-	 QLabel *text=new QLabel( this->paramTitle,(QWidget *)dialog);
+	 QLabel *text=new QLabel( QString::fromUtf8(this->paramTitle),(QWidget *)dialog);
 	 layout->addWidget(text,line,0);
 	 
 	 QGridLayout *layout2=new QGridLayout((QWidget *)dialog);

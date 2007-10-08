@@ -45,13 +45,13 @@ int code;
          /* Tab 1 main */
            diaElemBitrate bitrate(incoming,NULL);
 #define MKTOGGLE(y,x)           diaElemToggle  t_##x(PX(x),#y)
-        MKTOGGLE(Interlaced,	    interlaced);
-        MKTOGGLE(Cartoon Mode,      cartoon);
-        MKTOGGLE(Greyscale,         greyscale);
-        MKTOGGLE(Cartoon Mode,      turbo);
-        MKTOGGLE(Greyscale,         chroma_opt);
+        MKTOGGLE(QT_TR_NOOP("Interlaced"),	    interlaced);
+        MKTOGGLE(QT_TR_NOOP("Cartoon Mode"),      cartoon);
+        MKTOGGLE(QT_TR_NOOP("Greyscale"),         greyscale);
+        MKTOGGLE(QT_TR_NOOP("Cartoon Mode"),      turbo);
+        MKTOGGLE(QT_TR_NOOP("Greyscale"),         chroma_opt);
         diaElem *main[]={&bitrate,&t_interlaced,&t_cartoon,&t_greyscale,&t_turbo,&t_chroma_opt};
-        diaElemTabs tabMain("Main",6,main);
+        diaElemTabs tabMain(QT_TR_NOOP("Main"),6,main);
          /* Tab 2 motion */
          diaMenuEntry motionMenu[] = {
                              {0,       QT_TR_NOOP("None"),NULL}
@@ -100,7 +100,7 @@ int code;
               frameGop.swallow(&max_key_interval);
             
            diaElem *motions[]={&motion,&vhq,&frameMore,&frameGop,&frameASP};
-          diaElemTabs tabMotion("Motion",5,motions);
+          diaElemTabs tabMotion(QT_TR_NOOP("Motion"),5,motions);
         /* Tab 3 Qz*/
           diaMenuEntry qzMenu[] = {
                              {0,       QT_TR_NOOP("H263"),NULL}
@@ -132,7 +132,7 @@ int code;
         MKENTRY(Overflow Control Strength,overflow_control_strength	);
                 
          diaElem *twopass[]={&frameOne,&frameTwo};
-          diaElemTabs tabPass("Two Pass",2,twopass);
+          diaElemTabs tabPass(QT_TR_NOOP("Two Pass"),2,twopass);
         /**/
         
         

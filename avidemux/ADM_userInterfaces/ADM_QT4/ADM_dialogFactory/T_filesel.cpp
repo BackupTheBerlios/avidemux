@@ -119,7 +119,7 @@ class  ADM_Qfilesel : public QWidget
           button=new QDialogButtonBox(QDialogButtonBox::Open,Qt::Horizontal,z);
           button->show();
 
-          text=new QLabel( title,z);
+		  text=new QLabel(QString::fromUtf8(title),z);
           text->setBuddy(edit);
           layout->addWidget(text,line,0);
           layout->addWidget(edit,line,1);

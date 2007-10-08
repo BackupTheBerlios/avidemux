@@ -58,8 +58,8 @@ void diaElemReadOnlyText::setMe(void *dialog, void *opaque,uint32_t line)
 
    
  
- QLabel *text=new QLabel( this->paramTitle,(QWidget *)dialog);
-  QLabel *text2=new QLabel( (char *)param,(QWidget *)dialog);
+ QLabel *text=new QLabel( QString::fromUtf8(this->paramTitle),(QWidget *)dialog);
+  QLabel *text2=new QLabel( QString::fromUtf8((char *)param),(QWidget *)dialog);
  text->setBuddy(text2);
  layout->addWidget(text,line,0);
  layout->addWidget(text2,line,1);
@@ -92,8 +92,8 @@ void diaElemText::setMe(void *dialog, void *opaque,uint32_t line)
 
  QGridLayout *layout=(QGridLayout*) opaque;
  
- QLabel *text=new QLabel( this->paramTitle,(QWidget *)dialog);
- QLineEdit *lineEdit = new QLineEdit( *(char **)param);
+ QLabel *text=new QLabel( QString::fromUtf8(this->paramTitle),(QWidget *)dialog);
+ QLineEdit *lineEdit = new QLineEdit( QString::fromUtf8(*(char **)param));
  
  text->setBuddy(lineEdit);
  layout->addWidget(text,line,0);

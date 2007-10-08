@@ -48,7 +48,7 @@ int code;
            diaElemBitrate bitrate(config,NULL);
            bitrate.setMaxQz(51);
            diaElem *main[]={&bitrate};
-           diaElemTabs tabMain("Main",1,main);
+           diaElemTabs tabMain(QT_TR_NOOP("Main"),1,main);
 
            
         /* Tab 2 Motion */
@@ -95,7 +95,7 @@ int code;
          frameMe.swallow(&interlaced);
          
            diaElem *motions[]={&frameMe};
-          diaElemTabs tabMotion("Motion",1,motions);
+          diaElemTabs tabMotion(QT_TR_NOOP("Motion"),1,motions);
          
          
         /* Tab3-Misc  */
@@ -123,7 +123,7 @@ int code;
           frameMisc.swallow(&deblockThreshold);
             
            diaElem *misc[]={&frameMisc};
-          diaElemTabs tabMisc("Misc",1,misc);
+          diaElemTabs tabMisc(QT_TR_NOOP("Misc"),1,misc);
         /* Tab 4 Partition & frame*/
          
              diaElemToggle    _8x8(PX(_8x8),QT_TR_NOOP("8x8 Transform"));

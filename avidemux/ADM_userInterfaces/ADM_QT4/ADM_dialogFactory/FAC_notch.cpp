@@ -46,7 +46,7 @@ diaElemNotch::~diaElemNotch()
 }
 void diaElemNotch::setMe(void *dialog, void *opaque,uint32_t line)
 {
-  QCheckBox *box=new QCheckBox(paramTitle,(QWidget *)dialog);
+  QCheckBox *box=new QCheckBox(QString::fromUtf8(paramTitle),(QWidget *)dialog);
  QGridLayout *layout=(QGridLayout*) opaque;
  myWidget=(void *)box; 
  if( yesno)

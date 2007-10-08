@@ -463,8 +463,8 @@ uint8_t DIA_encoding::isAlive( void )
 
         if(stopReq)
         {
-          if(GUI_Alternate("The encoding is paused. Do you want to resume or abort ?",
-                              "Resume","Abort"))
+          if(GUI_Alternate((char*)QT_TR_NOOP("The encoding is paused. Do you want to resume or abort?"),
+                              (char*)QT_TR_NOOP("Resume"),(char*)QT_TR_NOOP("Abort")))
                  {
                          stopReq=0;
                  }
