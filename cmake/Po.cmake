@@ -50,10 +50,10 @@ MACRO(COMPILE_PO_FILES po_subdir _sources)
                 
             SET(mo_files ${mo_files} ${_out})
 
-            INSTALL(FILES ${_out} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/locale/${_basename}/LC_MESSAGES RENAME avidemux.mo)
+            INSTALL(FILES ${_out} DESTINATION "${CMAKE_INSTALL_PREFIX}/share/locale/${_basename}/LC_MESSAGES" RENAME avidemux.mo)
         ENDFOREACH(po_input ${po_files})
 
         SET(${_sources} ${${_sources}} ${mo_files})
     ENDIF(MSGFMT_EXECUTABLE)
-ENDMACRO(COMPILE_PO_FILES po_subdir)
+ENDMACRO(COMPILE_PO_FILES)
 

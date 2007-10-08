@@ -214,6 +214,7 @@ add_definitions (-D_FILE_OFFSET_BITS=64 -D_LARGE_FILES)
 add_definitions( -DHAVE_CONFIG_H )
 
 ADD_SUBDIRECTORY(avidemux)
+ADD_SUBDIRECTORY(po)
 
 ###############################
 # Summary

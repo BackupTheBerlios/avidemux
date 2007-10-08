@@ -4,10 +4,7 @@
 #  It is not for the faint of heart and pretty ugly
 #
 ##########################################################
-
-INCLUDE(Po)
 SET(adm_EXE_SRCS ADM_preview.cpp  gtk_gui.cpp  gui_autodrive.cpp  GUI_jobs.cpp  gui_navigate.cpp  guiplay.cpp  gui_savenew.cpp  main.cpp)
-COMPILE_PO_FILES(${CMAKE_SOURCE_DIR}/po adm_EXE_SRCS)
 
 include_directories(ADM_userInterfaces/ADM_commonUI ADM_outputs)
 add_definitions(${GLIB_CFLAGS})
