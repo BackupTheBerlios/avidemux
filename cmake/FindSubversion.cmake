@@ -61,8 +61,8 @@ IF(Subversion_SVN_EXECUTABLE)
   SET(Subversion_FOUND TRUE)
 
   MACRO(Subversion_WC_INFO dir prefix)
-    SET(LANG_ENV_VAR $ENV{LANG})
-    SET(ENV{LANG} "en")
+    SET(MESSAGES_ENV_VAR $ENV{LC_MESSAGES})
+    SET(ENV{LC_MESSAGES} "C")
 
     EXECUTE_PROCESS(COMMAND ${Subversion_SVN_EXECUTABLE} --version
       WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
@@ -107,7 +107,7 @@ IF(Subversion_SVN_EXECUTABLE)
       MESSAGE(SEND_ERROR "Command \"${Subversion_SVN_EXECUTABLE} log -r BASE ${dir}\" failed with output:\n${Subversion_svn_log_error}")
     ENDIF(NOT ${Subversion_svn_log_result} EQUAL 0)
 
-    SET($ENV{LANG} LANG_ENV_VAR)
+    SET($ENV{LC_MESSAGES} MESSAGES_ENV_VAR)
   ENDMACRO(Subversion_WC_INFO)
 
 ENDIF(Subversion_SVN_EXECUTABLE)
