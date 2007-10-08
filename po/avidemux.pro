@@ -519,8 +519,11 @@ HEADERS = \
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flyDialog.h \ 
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flyEq2.h \ 
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flyHue.h \ 
+../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flyParticle.h \ 
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flyPreview.h \ 
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flySrtPos.h \ 
+../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flySwissArmyKnife.h \ 
+../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flyThreshold.h \ 
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_idx_pg.h \ 
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_resizeWiz.h \ 
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_working.h \ 
@@ -900,7 +903,10 @@ SOURCES = \
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flyDialog.cpp \ 
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flyEq2.cpp \ 
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flyHue.cpp \ 
+../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flyParticle.cpp \ 
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flySrtPos.cpp \ 
+../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flySwissArmyKnife.cpp \ 
+../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flyThreshold.cpp \ 
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_gototime.cpp \ 
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavcodec.cpp \ 
 ../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavDecoder.cpp \ 
@@ -1084,4 +1090,5 @@ FORMS = \
 ../avidemux/ADM_userInterfaces/ADM_QT4/ADM_ocr/ocr.ui \ 
 
 TRANSLATIONS = \
+./avidemux_it.ts \ 
 
