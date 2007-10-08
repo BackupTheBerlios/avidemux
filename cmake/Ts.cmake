@@ -38,15 +38,9 @@ MACRO(COMPILE_TS_FILES ts_subdir _sources)
             GET_FILENAME_COMPONENT(_in       ${ts_input} ABSOLUTE)
             GET_FILENAME_COMPONENT(_basename ${ts_input} NAME_WE)
 
-            IF(WIN32)
-                FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/po)
-                GET_FILENAME_COMPONENT(_outXml ${CMAKE_BINARY_DIR}/po/${_basename}.xml ABSOLUTE)
-                GET_FILENAME_COMPONENT(_out ${CMAKE_BINARY_DIR}/po/${_basename}.qm ABSOLUTE)
-            ELSE(WIN32)
-                FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/po)
-                GET_FILENAME_COMPONENT(_outXml ${CMAKE_CURRENT_BINARY_DIR}/po/${_basename}.xml ABSOLUTE)
-                GET_FILENAME_COMPONENT(_out ${CMAKE_CURRENT_BINARY_DIR}/po/${_basename}.qm ABSOLUTE)
-            ENDIF(WIN32)
+            FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+            GET_FILENAME_COMPONENT(_outXml ${CMAKE_CURRENT_BINARY_DIR}/${_basename}.xml ABSOLUTE)
+            GET_FILENAME_COMPONENT(_out ${CMAKE_CURRENT_BINARY_DIR}/${_basename}.qm ABSOLUTE)
             
             ADD_CUSTOM_COMMAND(
                 OUTPUT ${_outXml}

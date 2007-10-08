@@ -29,13 +29,8 @@ MACRO(COMPILE_PO_FILES po_subdir _sources)
             GET_FILENAME_COMPONENT(_in       ${po_input} ABSOLUTE)
             GET_FILENAME_COMPONENT(_basename ${po_input} NAME_WE)
 
-            IF(WIN32)
-                FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/po)
-                GET_FILENAME_COMPONENT(_out ${CMAKE_BINARY_DIR}/po/${_basename}.mo ABSOLUTE)
-            ELSE(WIN32)
-                FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/po)
-                GET_FILENAME_COMPONENT(_out ${CMAKE_CURRENT_BINARY_DIR}/po/${_basename}.mo ABSOLUTE)
-            ENDIF(WIN32)
+            FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+            GET_FILENAME_COMPONENT(_out ${CMAKE_CURRENT_BINARY_DIR}/${_basename}.mo ABSOLUTE)
             
             ADD_CUSTOM_COMMAND(
                 OUTPUT ${_out}
