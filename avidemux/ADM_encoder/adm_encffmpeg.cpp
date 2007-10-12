@@ -91,7 +91,7 @@ EncoderFFMPEGHuff::configure (AVDMGenericVideoStream * instream)
   ADM_assert (_vbuffer);
   _in = instream;
 
-  _codec = new ffmpegEncoderCQ (_w, _h, _id);
+  _codec = new ffmpegEncoderHuff(_w, _h, _id);
   _codec->init (_param.qz, _fps, 0);
   return 1;
 

@@ -35,6 +35,8 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_assert.h"
 #include "ADM_codecs/ADM_ffmpeg.h"
+#include "ADM_libraries/ADM_libswscale/swscale.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 #include "prefs.h"
 
 //#define TEST_NOB 1
@@ -88,11 +90,11 @@ void ffmpegEncoder::postAmble (ADMBitstream * out, uint32_t sz)
 }
 //static myENC_RESULT res;
 /*****************************************/
-ffmpegEncoder::ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id):encoder (width,
+ffmpegEncoder::ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id,PixelFormat format):encoder (width,
 	 height)
 {
-  printf ("[LAVCODEC]Build: %d\n", LIBAVCODEC_BUILD);
-
+  printf ("[LAVCODEC]Build: %d, colorspace :%x\n", LIBAVCODEC_BUILD,format);
+  _targetColorSpace=format;//PIX_FMT_YUV420P
   _id = id;
   _swap = 0;
   _context = NULL;
@@ -105,10 +107,9 @@ ffmpegEncoder::ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id):e
   _frame.pts = AV_NOPTS_VALUE;
   _context->width = _w;
   _context->height = _h;
-  _frame.linesize[0] = _w;
-  _frame.linesize[1] = _w >> 1;
-  _frame.linesize[2] = _w >> 1;
+
   _isMT = 0;
+  encodePreamble(NULL);
 
 };
 /*****************************************/
@@ -143,22 +144,31 @@ ffmpegEncoder::~ffmpegEncoder ()
 uint8_t
 ffmpegEncoder::encodePreamble (uint8_t * in)
 {
-  _frame.linesize[0] = _w;
-  _frame.linesize[1] = _w >> 1;
-  _frame.linesize[2] = _w >> 1;
-
-/*
-   		It seems ffmpeg likes the u & v to be swapped WTF...
-
-*/
-
-  _frame.data[0] = in;
-  _frame.data[2] = in + _w * _h;
-  _frame.data[1] = in + _w * _h + ((_w * _h) >> 2);
-
   _frame.key_frame = 0;
   _frame.pict_type = 0;
-// No!  _frame.quality = 0;
+
+  switch(_targetColorSpace)
+  {
+    case PIX_FMT_YUV420P:
+        _frame.linesize[0] = _w;
+        _frame.linesize[1] = _w >> 1;
+        _frame.linesize[2] = _w >> 1;
+        _frame.data[0] = in;
+        _frame.data[2] = in + _w * _h;
+        _frame.data[1] = in + _w * _h + ((_w * _h) >> 2);
+        break;
+ case PIX_FMT_YUV422P:
+        _frame.linesize[0] = _w;
+        _frame.linesize[1] = _w >> 1;
+        _frame.linesize[2] = _w >> 1;
+        _frame.data[0] = in;
+        _frame.data[2] = in + _w * _h;
+        _frame.data[1] = in + _w * _h + ((_w * _h) >> 1);
+      
+        break;
+    default:
+      ADM_assert(0);
+  }
   return 1;
 }
 
@@ -646,7 +656,7 @@ ffmpegEncoder::mplayer_init (void)
   /*
      default values : Copy/past from mplayer
    */
-  _context->pix_fmt = PIX_FMT_YUV420P;	//PIX_FMT_YV12;
+  _context->pix_fmt = _targetColorSpace;
 
   if (!_settingsPresence)
     {
@@ -807,6 +817,96 @@ ffmpegEncoderHuff::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
   return initContext ();
 }
 //__________________________________
+/**
+
+*/
+
+ffmpegEncoderHuff::ffmpegEncoderHuff (uint32_t width, uint32_t height,FF_CODEC_ID id) 
+  :   ffmpegEncoder (width,height, id,PIX_FMT_YUV422P) 
+{
+  // Allocate our resampler & intermediate
+  yuy2=new uint8_t[width*height*2];
+  // And resizer
+  int flags;
+  flags=SWS_BICUBIC;
+  #if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+		
+		#define ADD(x,y) if( CpuCaps::has##x()) flags|=SWS_CPU_CAPS_##y;
+		ADD(MMX,MMX);		
+		ADD(3DNOW,3DNOW);
+		ADD(MMXEXT,MMX2);
+#endif	
+#ifdef USE_ALTIVEC
+		flags|=SWS_CPU_CAPS_ALTIVEC;
+#endif
+
+        _contextSWs=sws_getContext(
+                        width,height,
+                        PIX_FMT_YUV420P,
+                        width,height,
+                        PIX_FMT_YUV422P,
+                        flags, NULL, NULL,NULL);
+
+        ADM_assert(_context);
+                
+}
+/**
+
+*/
+
+ffmpegEncoderHuff::~ffmpegEncoderHuff()
+{
+  if(yuy2)
+  {
+    delete [] yuy2;
+    yuy2=NULL;  
+  }
+  if(_contextSWs)
+  {
+    sws_freeContext( (SwsContext *)_contextSWs);
+    _contextSWs=NULL; 
+  }
+  stopEncoder ();
+}
+/**
+
+*/
+  uint8_t   ffmpegEncoderHuff::encode(ADMImage *in,ADMBitstream *out)
+{
+    int32_t sz = 0;
+    ADM_assert(out->bufferSize);
+    encodePreamble(yuy2);
+    /* Convert */
+    uint8_t *src[3];
+    uint8_t *dst[3];
+    int ssrc[3];
+    int ddst[3];
+
+    uint32_t page;
+
+    page=_w*_h;
+    src[0]=YPLANE(in);
+    src[1]=UPLANE(in);
+    src[2]=VPLANE(in);
+
+    ssrc[0]=_w;
+    ssrc[1]=ssrc[2]=_w>>1;
+
+    
+    dst[0]=yuy2;
+    dst[1]=yuy2+page;
+    dst[2]=yuy2+((page*3)>>1);
+    ddst[0]=_w;
+    ddst[1]=ddst[2]=_w>>1;
+
+    sws_scale((SwsContext *)_contextSWs,src,ssrc,0,_h,dst,ddst);
+    
+    /***/
+    if ((sz = avcodec_encode_video (_context, out->data, out->bufferSize, &_frame)) < 0)
+        return 0;
+    postAmble(out,sz);
+    return 1;
+}
 //------------------------------
 uint8_t
   ffmpegEncoderFFHuff::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
@@ -827,7 +927,6 @@ uint8_t
 
   return initContext ();
 }
-
 
 //_______________________________________
 uint8_t

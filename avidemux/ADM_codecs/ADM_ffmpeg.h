@@ -63,12 +63,13 @@ protected:
   uint8_t gopMpeg1 (void);
   uint32_t frameType (void);
   uint8_t encodePreamble (uint8_t * in);
+  PixelFormat _targetColorSpace;
 
 public:
     uint8_t setConfig (FFcodecSetting * set);
   uint8_t setLogFile (const char *name);
   void encoderMT (void);
-    ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id);
+    ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id,PixelFormat format=PIX_FMT_YUV420P);
    virtual ~ffmpegEncoder ();
 
   virtual uint8_t stopEncoder (void);
@@ -154,20 +155,22 @@ public:
   virtual uint8_t encode (ADMImage * in, ADMBitstream * out);
   virtual ~ ffmpegEncoderVBRExternal ();
 };
-
+//*********************************************************
 class ffmpegEncoderHuff:public ffmpegEncoder
 {
 protected: 
+            uint8_t *yuy2;
+            void *_contextSWs;
+
 public:
-                ffmpegEncoderHuff (uint32_t width, uint32_t height,FF_CODEC_ID id):
-                        ffmpegEncoder (width,height, id) {}
+                ffmpegEncoderHuff (uint32_t width, uint32_t height,FF_CODEC_ID id);
+                        
 
   virtual uint8_t init (uint32_t val, uint32_t fps1000, uint8_t vbr = 0);
-  virtual ~ ffmpegEncoderHuff ()
-  {
-    stopEncoder ();
-  }
+          uint8_t encode(ADMImage *in,ADMBitstream *out);
+  virtual ~ ffmpegEncoderHuff ();
 };
+//*********************************************************
 class ffmpegEncoderFFHuff:public ffmpegEncoder
 {
 protected: 
