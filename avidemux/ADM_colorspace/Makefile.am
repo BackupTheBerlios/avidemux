@@ -4,7 +4,7 @@ noinst_LIBRARIES = libADM_colorspace.a
 
 libADM_colorspace_a_METASOURCES = AUTO
 
-libADM_colorspace_a_SOURCES = ADM_rgb.cpp yuv.cpp rgb2yuv.cpp
+libADM_colorspace_a_SOURCES = ADM_rgb.cpp yuv.cpp rgb2yuv.cpp ADM_colorspace.cpp
 
 
 EXTRA_DIST =  ADM_rgb.cpp  ADM_rgb.h  colorspace.h  rgb2yuv.cpp  yuv.cpp
