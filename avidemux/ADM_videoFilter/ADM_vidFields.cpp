@@ -226,9 +226,9 @@ int i,j;
 	_in=instream;
 	i=(int)_param->motion_trigger;
 	j=(int)_param->blend_trigger;
-	if(GUI_getIntegerValue(&i,0,255,"Motion  Threshold"))
+	if(GUI_getIntegerValue(&i,0,255,QT_TR_NOOP("Motion Threshold")))
 	{
-		if(GUI_getIntegerValue(&j,0,255,"Blend  Threshold"))
+		if(GUI_getIntegerValue(&j,0,255,QT_TR_NOOP("Blend Threshold")))
 		{
 			_param->motion_trigger=(uint8_t)i;
 			_param->blend_trigger=(uint8_t)j;

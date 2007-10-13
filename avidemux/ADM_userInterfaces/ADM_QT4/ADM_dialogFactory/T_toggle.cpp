@@ -98,7 +98,7 @@ diaElemToggle::~diaElemToggle()
 }
 void diaElemToggle::setMe(void *dialog, void *opaque,uint32_t l)
 {
- ADM_QCheckBox *box=new ADM_QCheckBox(paramTitle,(QWidget *)dialog,this,TT_TOGGLE);
+ ADM_QCheckBox *box=new ADM_QCheckBox(QString::fromUtf8(paramTitle),(QWidget *)dialog,this,TT_TOGGLE);
  QGridLayout *layout=(QGridLayout*) opaque;
  myWidget=(void *)box; 
  if( *(uint32_t *)param)
@@ -194,7 +194,7 @@ diaElemToggleUint::~diaElemToggleUint()
 }
 void diaElemToggleUint::setMe(void *dialog, void *opaque,uint32_t line)
 {
- ADM_QCheckBox *box=new ADM_QCheckBox(paramTitle,(QWidget *)dialog,this,TT_TOGGLE_UINT);
+ ADM_QCheckBox *box=new ADM_QCheckBox(QString::fromUtf8(paramTitle),(QWidget *)dialog,this,TT_TOGGLE_UINT);
  QGridLayout *layout=(QGridLayout*) opaque;
  myWidget=(void *)box; 
  if( *(uint32_t *)param)
@@ -292,7 +292,7 @@ diaElemToggleInt::~diaElemToggleInt()
 }
 void diaElemToggleInt::setMe(void *dialog, void *opaque,uint32_t line)
 {
- ADM_QCheckBox *box=new ADM_QCheckBox(paramTitle,(QWidget *)dialog,this,TT_TOGGLE_INT);
+ ADM_QCheckBox *box=new ADM_QCheckBox(QString::fromUtf8(paramTitle),(QWidget *)dialog,this,TT_TOGGLE_INT);
  QGridLayout *layout=(QGridLayout*) opaque;
  myWidget=(void *)box; 
  if( *(uint32_t *)param)

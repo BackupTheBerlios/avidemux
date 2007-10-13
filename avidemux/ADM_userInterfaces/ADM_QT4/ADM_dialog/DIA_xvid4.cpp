@@ -44,12 +44,12 @@ int code;
          // Our tabs
          /* Tab 1 main */
            diaElemBitrate bitrate(incoming,NULL);
-#define MKTOGGLE(y,x)           diaElemToggle  t_##x(PX(x),#y)
-        MKTOGGLE(QT_TR_NOOP("Interlaced"),	    interlaced);
-        MKTOGGLE(QT_TR_NOOP("Cartoon Mode"),      cartoon);
-        MKTOGGLE(QT_TR_NOOP("Greyscale"),         greyscale);
-        MKTOGGLE(QT_TR_NOOP("Cartoon Mode"),      turbo);
-        MKTOGGLE(QT_TR_NOOP("Greyscale"),         chroma_opt);
+#define MKTOGGLE(y,x)           diaElemToggle  t_##x(PX(x),y)
+        MKTOGGLE(QT_TR_NOOP("_Interlaced"),	    interlaced);
+        MKTOGGLE(QT_TR_NOOP("Ca_rtoon mode"),      cartoon);
+        MKTOGGLE(QT_TR_NOOP("_Greyscale"),         greyscale);
+        MKTOGGLE(QT_TR_NOOP("Turbo mode"),      turbo);
+        MKTOGGLE(QT_TR_NOOP("C_hroma optimizer"),         chroma_opt);
         diaElem *main[]={&bitrate,&t_interlaced,&t_cartoon,&t_greyscale,&t_turbo,&t_chroma_opt};
         diaElemTabs tabMain(QT_TR_NOOP("Main"),6,main);
          /* Tab 2 motion */
@@ -113,24 +113,24 @@ int code;
           diaElemTabs tabQz(QT_TR_NOOP("Quantization"),2,qz);
           
           /* Tab 4 : 2nd pass */
-#define MKENTRY(y,x) diaElemUInteger  x(PX(x),QT_TR_NOOP(#y),0,100);frameOne.swallow(&x);
+#define MKENTRY(y,x) diaElemUInteger x(PX(x),y,0,100); frameOne.swallow(&x);
         diaElemFrame  frameOne(QT_TR_NOOP("Two Pass Tuning")); 
          
-        MKENTRY(Key Frame Boost(%),	keyframe_boost		);
+        MKENTRY(QT_TR_NOOP("Key Frame Boost(%)"), keyframe_boost);
         
-        MKENTRY(I-frames closer than...	,		kfthreshold			);
-        MKENTRY(.. are reduced by(%),	kfreduction			);
-        MKENTRY(Max Overflow Improvement(%),	max_overflow_improvement	);
-        MKENTRY(Max Overglow Degradation(%),	max_overflow_degradation	);
+        MKENTRY(QT_TR_NOOP("I-frames closer than..."), kfthreshold);
+        MKENTRY(QT_TR_NOOP(".. are reduced by(%)"), kfreduction);
+        MKENTRY(QT_TR_NOOP("Max Overflow Improvement(%)"), max_overflow_improvement);
+        MKENTRY(QT_TR_NOOP("Max Overglow Degradation(%)"), max_overflow_degradation);
 
 #undef MKENTRY
-#define MKENTRY(y,x) diaElemUInteger  x(PX(x),QT_TR_NOOP(#y),0,100);frameTwo.swallow(&x);
+#define MKENTRY(y,x) diaElemUInteger  x(PX(x),y,0,100);frameTwo.swallow(&x);
         diaElemFrame  frameTwo(QT_TR_NOOP("Curve Compression"));  
 
-        MKENTRY(High Bitrate Scenes (%),curve_compression_high	);
-        MKENTRY(Low Bitrate Scenes (%),curve_compression_low	);
-        MKENTRY(Overflow Control Strength,overflow_control_strength	);
-                
+        MKENTRY(QT_TR_NOOP("High Bitrate Scenes (%)"), curve_compression_high);
+        MKENTRY(QT_TR_NOOP("Low Bitrate Scenes (%)"), curve_compression_low);
+        MKENTRY(QT_TR_NOOP("Overflow Control Strength"), overflow_control_strength);
+
          diaElem *twopass[]={&frameOne,&frameTwo};
           diaElemTabs tabPass(QT_TR_NOOP("Two Pass"),2,twopass);
         /**/

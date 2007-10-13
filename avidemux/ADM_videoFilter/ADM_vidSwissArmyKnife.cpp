@@ -376,7 +376,7 @@ uint8_t ADMVideoSwissArmyKnife::configure (AVDMGenericVideoStream *in)
                           &bias, &result_bias, &result_multiplier,
                           &histogram_frame_interval, &debug };
 
-    ret = diaFactoryRun ("Swiss Army Knife Configuration",
+    ret = diaFactoryRun (QT_TR_NOOP("Swiss Army Knife Configuration"),
                          sizeof (elems) / sizeof (diaElem *), elems);
     if (ret) // 0 = cancel
     {
