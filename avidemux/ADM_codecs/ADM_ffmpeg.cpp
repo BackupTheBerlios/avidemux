@@ -35,7 +35,6 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_assert.h"
 #include "ADM_codecs/ADM_ffmpeg.h"
-#include "ADM_libraries/ADM_libswscale/swscale.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
 #include "prefs.h"
 
@@ -826,29 +825,8 @@ ffmpegEncoderHuff::ffmpegEncoderHuff (uint32_t width, uint32_t height,FF_CODEC_I
 {
   // Allocate our resampler & intermediate
   yuy2=new uint8_t[width*height*2];
-  // And resizer
-  int flags;
-  flags=SWS_BICUBIC;
-  #if (defined( ARCH_X86)  || defined(ARCH_X86_64))
-		
-		#define ADD(x,y) if( CpuCaps::has##x()) flags|=SWS_CPU_CAPS_##y;
-		ADD(MMX,MMX);		
-		ADD(3DNOW,3DNOW);
-		ADD(MMXEXT,MMX2);
-#endif	
-#ifdef USE_ALTIVEC
-		flags|=SWS_CPU_CAPS_ALTIVEC;
-#endif
-
-        _contextSWs=sws_getContext(
-                        width,height,
-                        PIX_FMT_YUV420P,
-                        width,height,
-                        PIX_FMT_YUV422P,
-                        flags, NULL, NULL,NULL);
-
-        ADM_assert(_context);
-                
+  // And Color converted
+    convert=new ADMColorspace(width,height, ADM_COLOR_YV12,ADM_COLOR_YUV422P);
 }
 /**
 
@@ -861,10 +839,10 @@ ffmpegEncoderHuff::~ffmpegEncoderHuff()
     delete [] yuy2;
     yuy2=NULL;  
   }
-  if(_contextSWs)
+  if(convert)
   {
-    sws_freeContext( (SwsContext *)_contextSWs);
-    _contextSWs=NULL; 
+   delete convert;
+    convert=NULL; 
   }
   stopEncoder ();
 }
@@ -877,29 +855,7 @@ ffmpegEncoderHuff::~ffmpegEncoderHuff()
     ADM_assert(out->bufferSize);
     encodePreamble(yuy2);
     /* Convert */
-    uint8_t *src[3];
-    uint8_t *dst[3];
-    int ssrc[3];
-    int ddst[3];
-
-    uint32_t page;
-
-    page=_w*_h;
-    src[0]=YPLANE(in);
-    src[1]=UPLANE(in);
-    src[2]=VPLANE(in);
-
-    ssrc[0]=_w;
-    ssrc[1]=ssrc[2]=_w>>1;
-
-    
-    dst[0]=yuy2;
-    dst[1]=yuy2+page;
-    dst[2]=yuy2+((page*3)>>1);
-    ddst[0]=_w;
-    ddst[1]=ddst[2]=_w>>1;
-
-    sws_scale((SwsContext *)_contextSWs,src,ssrc,0,_h,dst,ddst);
+   convert->convert(in->data,yuy2);
     
     /***/
     if ((sz = avcodec_encode_video (_context, out->data, out->bufferSize, &_frame)) < 0)

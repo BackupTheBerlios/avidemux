@@ -21,6 +21,7 @@
 
 #ifndef __FFMPEG_ENC__
 #define   __FFMPEG_ENC__
+#include "ADM_colorspace/ADM_colorspace.h"
 typedef enum
 {
   FF_MSMP4V3 = 1,
@@ -160,7 +161,7 @@ class ffmpegEncoderHuff:public ffmpegEncoder
 {
 protected: 
             uint8_t *yuy2;
-            void *_contextSWs;
+            ADMColorspace *convert;
 
 public:
                 ffmpegEncoderHuff (uint32_t width, uint32_t height,FF_CODEC_ID id);
