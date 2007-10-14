@@ -27,12 +27,9 @@ MACRO(FIND_LRELEASE)
 	ENDIF(NOT LRELEASE_EXECUTABLE AND NOT LRELEASE_NOT_FOUND)
 ENDMACRO(FIND_LRELEASE)
 
-MACRO(COMPILE_TS_FILES ts_subdir _sources)
-	FIND_XSLTPROC()
-	FIND_LRELEASE()
-	
+MACRO(COMPILE_AVIDEMUX_TS_FILES ts_subdir _sources)
     IF(XSLTPROC_EXECUTABLE AND LRELEASE_EXECUTABLE)
-        FILE(GLOB ts_files ${ts_subdir}/*.ts)
+        FILE(GLOB ts_files ${ts_subdir}/avidemux_*.ts)
 
         FOREACH(ts_input ${ts_files})
             GET_FILENAME_COMPONENT(_in       ${ts_input} ABSOLUTE)
@@ -71,5 +68,43 @@ MACRO(COMPILE_TS_FILES ts_subdir _sources)
 
         SET(${_sources} ${${_sources}} ${qm_files})
     ENDIF(XSLTPROC_EXECUTABLE AND LRELEASE_EXECUTABLE)
-ENDMACRO(COMPILE_TS_FILES)
+ENDMACRO(COMPILE_AVIDEMUX_TS_FILES)
 
+MACRO(COMPILE_QT_TS_FILES ts_subdir _sources)
+    IF(XSLTPROC_EXECUTABLE AND LRELEASE_EXECUTABLE)
+        FILE(GLOB ts_files ${ts_subdir}/qt_*.ts)
+
+        FOREACH(ts_input ${ts_files})
+            GET_FILENAME_COMPONENT(_in       ${ts_input} ABSOLUTE)
+            GET_FILENAME_COMPONENT(_basename ${ts_input} NAME_WE)
+
+            FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+            GET_FILENAME_COMPONENT(_out ${CMAKE_CURRENT_BINARY_DIR}/${_basename}.qm ABSOLUTE)
+            
+            ADD_CUSTOM_COMMAND(
+                OUTPUT ${_out}
+                COMMAND ${CMAKE_COMMAND}
+                    -E echo
+                    "Generating" ${_out} "from" ${_in}
+                COMMAND ${LRELEASE_EXECUTABLE}
+                    ${_in}
+                    -qm ${_out}
+                DEPENDS ${_in}
+            )
+                
+            SET(qm_files ${qm_files} ${_out})
+
+			INSTALL(FILES ${_out} DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/i18n")
+        ENDFOREACH(ts_input ${ts_files})
+
+        SET(${_sources} ${${_sources}} ${qm_files})
+    ENDIF(XSLTPROC_EXECUTABLE AND LRELEASE_EXECUTABLE)
+ENDMACRO(COMPILE_QT_TS_FILES)
+
+MACRO(COMPILE_TS_FILES ts_subdir _sources)
+	FIND_XSLTPROC()
+	FIND_LRELEASE()
+	
+	COMPILE_AVIDEMUX_TS_FILES(${ts_subdir} ${_sources})
+	COMPILE_QT_TS_FILES(${ts_subdir} ${_sources})
+ENDMACRO(COMPILE_TS_FILES)
