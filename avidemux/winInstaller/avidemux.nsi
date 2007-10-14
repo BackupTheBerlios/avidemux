@@ -130,6 +130,7 @@ endGtk${LANG_CODE}:
 installQt4${LANG_CODE}:	
 	SetOutPath $INSTDIR\i18n
     File ..\..\..\avidemux_2.4_build\i18n\avidemux_${LANG_CODE}.qm
+    File ..\..\..\avidemux_2.4_build\i18n\qt_${LANG_CODE}.qm
     
     WriteRegStr HKLM "${REGKEY}\Components" ${LANG_NAME} 1
 endQt4${LANG_CODE}:    
