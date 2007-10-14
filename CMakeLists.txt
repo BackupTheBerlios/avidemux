@@ -29,8 +29,6 @@ MESSAGE("EXTRA CXXflags:${CMAKE_CXX_FLAGS}")
 #*************************************************
 include(UsePkgConfig)
 include(MacroEnsureOutOfSourceBuild)
-
-include(Po)
 include(CheckCXXCompilerFlag)
 
 #**************************************************
@@ -56,6 +54,16 @@ IF(NOT Subversion_FOUND)
 ENDIF(NOT Subversion_FOUND)
 
 #**************************************************
+# PKG Config
+#**************************************************
+MESSAGE(STATUS "<Checking for PKG-CONFIG>")
+MESSAGE(STATUS "<***********************>")
+if(NOT PKGCONFIG_EXECUTABLE)
+             MESSAGE(FATAL_ERROR "Could not find pkg-config")
+endif(NOT PKGCONFIG_EXECUTABLE)
+MESSAGE(STATUS "OK ${PKGCONFIG_EXECUTABLE}")
+
+#**************************************************
 # libxml2
 #**************************************************
 MESSAGE(STATUS "<Checking for LibXML2>")
@@ -65,17 +73,7 @@ if(NOT LIBXML2_FOUND)
   MESSAGE(FATAL_ERROR "Could not find Libxml2")
 endif(NOT LIBXML2_FOUND)
 MESSAGE(STATUS "LibXML2 OK")
-SET(LIBXML2_DEFINITIONS,${LIBXML2_DEFINITIONS})
-SET(LIBXML2_INCLUDE_DIR,${LIBXML2_INCLUDE_DIR})
-#**************************************************
-# PKG Config
-#**************************************************
-MESSAGE(STATUS "<Checking for PKG-CONFIG>")
-MESSAGE(STATUS "<***********************>")
-if(NOT PKGCONFIG_EXECUTABLE)
-             MESSAGE(FATAL_ERROR "Could not find pkg-config")
-endif(NOT PKGCONFIG_EXECUTABLE)
-MESSAGE(STATUS "OK ${PKGCONFIG_EXECUTABLE}")
+
 #**************************************************
 # Search for FREETYPE
 #**************************************************
@@ -90,9 +88,6 @@ IF(NOT FT_INCLUDE)
     MESSAGE(STATUS "Could not find Freetype ")
 ELSE(NOT FT_INCLUDE)
     SET(FT_FOUND TRUE)
-    SET(FT_CFLAGS ${FT_CFLAGS})
-    SET(FT_LDFLAGS ${FT_LDFLAGS})
-    SET(FT_INCLUDE ${FT_INCLUDE})
     MESSAGE(STATUS "LDFLAGS <${FT_LDFLAGS}>")
     MESSAGE(STATUS "LIBS <${FT_LIB}>")
     MESSAGE(STATUS OK)
@@ -123,9 +118,6 @@ IF(NOT GLIB_INCLUDE)
     MESSAGE(STATUS "Could not find GLIB - cannot compile avidemux2_gtk here")
 ELSE(NOT GLIB_INCLUDE)
     SET(GLIB_FOUND,TRUE)
-    SET(GLIB_CFLAGS,${GLIB_CFLAGS})
-    SET(GLIB_LDFLAGS,${GLIB_LDFLAGS})
-    SET(GLIB_LIB,${GLIB_LIB})
     MESSAGE(STATUS OK)
     MESSAGE("GLIB Found ("${GLIB_CFLAGS}")")
     
@@ -144,9 +136,6 @@ IF(NOT GTK_CFLAGS)
     MESSAGE(STATUS "Could not find GTK - cannot compile avidemux2_gtk here")
 ELSE(NOT GTK_CFLAGS)
     SET(GTK_FOUND TRUE)
-    SET(GTK_CFLAGS,${GTK_CFLAGS})
-    SET(GTK_LDFLAGS,${GTK_LDFLAGS})
-    SET(GTK_LIB,${GTK_LIB})
     MESSAGE(STATUS OK)
 ENDIF(NOT GTK_CFLAGS)
 endif(NO_GTK)
@@ -203,10 +192,11 @@ include(ConfigureChecks.cmake)
 
 # create config.h
 CONFIGURE_FILE(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-# #
- include_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/avidemux ${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries)
- include_directories(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_utilities/ ${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_lavutil)
- include_directories(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_lavcodec  )
+
+include_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/avidemux ${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries)
+include_directories(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_utilities/ ${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_lavutil)
+include_directories(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_lavcodec  )
+
 #**********************************************
 # Some CFLAGS
 #**********************************************

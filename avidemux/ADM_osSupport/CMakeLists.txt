@@ -5,3 +5,4 @@ ADM_crashdump.cpp  ADM_fileio.cpp  ADM_memory.cpp  ADM_misc.cpp        ADM_quota
 
 ADD_LIBRARY(ADM_osSupport STATIC ${ADM_osSupport_SRCS})
 add_definitions(${LIBXML2_DEFINITIONS})
+include_directories(${LIBXML2_INCLUDE_DIR})

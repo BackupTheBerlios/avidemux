@@ -22,7 +22,11 @@
 #include <sys/stat.h>
 
 #include <unistd.h>
-#include <glib.h>    
+
+#ifdef WIN32
+#include <glib.h>
+#endif
+
 #include "default.h"
 #include "ADM_misc.h"
 
@@ -30,7 +34,7 @@
 #include "ADM_toolkit/filesel.h"
 #include "ADM_toolkit/toolkit.hxx"
 
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #undef fread
 #undef fwrite
 #undef fopen
@@ -50,18 +54,17 @@ size_t ADM_fwrite (void *ptr, size_t size, size_t n, FILE *sstream)
 FILE  *ADM_fopen (const char *file, const char *mode)
 {
   FILE *f;
+
 #ifndef ADM_WIN32
   return fopen(file,mode); 
 #else
-  
-  
   gchar *retval = g_locale_from_utf8 (file, -1, NULL, NULL, NULL);
   f=fopen(retval,mode);
   g_free (retval);
-  return f;
-  
+  return f;  
 #endif
 }
+
 int    ADM_fclose (FILE *file)
 {
   return fclose(file); 
