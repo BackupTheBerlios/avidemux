@@ -18,14 +18,11 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
+//#include "default.h" // avi_vars.h includes this
+#include "avi_vars.h"
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
 
-#include "fourcc.h"
-#include "avi_vars.h"
 #include "ADM_toolkit/filesel.h"
 
 #include "ADM_assert.h"
@@ -36,7 +33,6 @@
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "gui_action.hxx"
 #include "gtkgui.h"
-#include "gui_action.hxx"
 #include "ADM_toolkit/toolkit.hxx"
 //#include "ADM_toolkit/toolkit_gtk.h"
 #include "GUI_render.h"
@@ -59,25 +55,26 @@ uint32_t len;
 
 
 }
-void GUI_NextFrame(void)
+void GUI_NextFrame(uint32_t frameCount)
 {
 //    uint8_t *ptr;
 uint32_t flags;
     if (playing)
 	return;
 
-    if( avifileinfo && curframe + 1 == avifileinfo->nb_frames )
+    if( avifileinfo && curframe + frameCount >= avifileinfo->nb_frames )
 	return;
 
     if (avifileinfo)
       {
-        if( !GUI_getFrame(curframe + 1,&flags))
+        uint32_t newframe = curframe + frameCount;
+        if( !GUI_getFrame(newframe,&flags))
         	{
                   GUI_Error_HIG(QT_TR_NOOP("Decompressing error"),QT_TR_NOOP( "Cannot decode next frame."));
            	}
            else
             {
-                  curframe++;
+                  curframe = newframe;
                   admPreview::update( curframe) ;
                   update_status_bar();
   
@@ -444,14 +441,14 @@ uint8_t A_rebuildKeyFrame(void)
     \fn GUI_PrevFrame
     \brief Go to current frame -1
 */
-void        GUI_PrevFrame(void )
+void        GUI_PrevFrame(uint32_t frameCount)
 {
-      if (curframe)
+      if (int (curframe) - int (frameCount) >= 0)
         {
           
-          DIA_StartBusy ();
-          GUI_GoToFrame (curframe - 1);
-          DIA_StopBusy ();
+          // DIA_StartBusy ();
+          GUI_GoToFrame (curframe - frameCount);
+          // DIA_StopBusy ();
         }
 }
 /**
@@ -515,4 +512,3 @@ void A_jog(void)
   jog--;
 }
 //EOF
-        

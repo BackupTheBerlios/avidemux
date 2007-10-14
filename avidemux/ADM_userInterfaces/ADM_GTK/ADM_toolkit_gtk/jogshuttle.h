@@ -28,6 +28,7 @@ struct _JogShuttleClass
 
 GtkWidget *jog_shuttle_new (void);
 gfloat jog_shuttle_get_value (GtkWidget *wheel);
+void jog_shuttle_set_value (GtkWidget *wheel, gfloat value);
 
 G_END_DECLS
 

@@ -1,3 +1,7 @@
+// This is for the simulated jog/shuttle control on the main window, but it
+// can also be controlled by jog/shuttle controllers that exist in the
+// physical world (which are handled in ADM_jogshuttle.cpp).
+
 #include <gtk/gtk.h>
 #include "jogshuttle.h"
 
@@ -16,6 +20,7 @@ struct _JogShuttlePrivate
 {
 	gfloat pos[6];
 	gboolean pressed;
+	gboolean external_control;
 	gfloat start;
 	gfloat offset;
 	gfloat value;
@@ -62,6 +67,7 @@ jog_shuttle_init (JogShuttle *wheel)
 	priv = JOG_SHUTTLE_GET_PRIVATE (wheel);
 	
 	priv->pressed = FALSE;
+	priv->external_control = FALSE;
 	priv->offset = 0;
 	priv->value = 0;
 	gtk_widget_add_events (GTK_WIDGET (wheel), GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
@@ -307,6 +313,7 @@ draw_lines (GtkWidget *wheel, cairo_t *cr)
 	}
 	
 	priv->value = (priv->pos[3]-middle) / middle;
+        //printf ("pos[3] = %f\n", priv->pos[3]);
  	emit_value_changed_signal (JOG_SHUTTLE(wheel));
 }
 
@@ -316,7 +323,7 @@ jog_shuttle_expose (GtkWidget *wheel, GdkEventExpose *event)
 	JogShuttlePrivate *priv;
 	priv = JOG_SHUTTLE_GET_PRIVATE (wheel);
 	
-	if (!priv->pressed)
+	if (!priv->pressed && !priv->external_control)
 	{
 		reset(wheel);
 	}
@@ -339,10 +346,43 @@ jog_shuttle_expose (GtkWidget *wheel, GdkEventExpose *event)
 gfloat 
 jog_shuttle_get_value (GtkWidget *wheel)
 {
+	if (!wheel)
+	    return 0;
 	JogShuttlePrivate *priv;
 	priv = JOG_SHUTTLE_GET_PRIVATE (wheel);
-        if(priv->pressed==FALSE) return 0;
+        if (!priv->pressed && !priv->external_control)
+            return 0;
 	return (priv->value);
+}
+
+void
+jog_shuttle_set_value (GtkWidget *wheel, gfloat value)
+{
+	JogShuttlePrivate *priv;
+	priv = JOG_SHUTTLE_GET_PRIVATE (wheel);
+        priv->external_control = (value < -0.001 || value > 0.001);
+	priv->offset = 0;
+
+	gfloat width = wheel->allocation.width;
+        gfloat offset = value * (width / 2);
+	
+        gfloat was = priv->pos[3];
+	int i;
+	for (i=0; i<6; i++)
+	{
+		priv->pos[i] = width / 6 * i + offset;
+	}
+
+        //printf ("value = %f, offset = %f, pos[3] = %f (was %f)\n", value, offset, priv->pos[3], was);
+
+	GtkWidget * widget = GTK_WIDGET (wheel);
+	if (!widget->window)
+            return;
+
+	GdkRegion * region = gdk_drawable_get_clip_region (widget->window);
+	gdk_window_invalidate_region (widget->window, region, TRUE);
+	gdk_window_process_updates (widget->window, TRUE);
+	gdk_region_destroy (region);
 }
 
 GtkWidget *

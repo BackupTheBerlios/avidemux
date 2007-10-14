@@ -13,7 +13,8 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  ***************************************************************************/
-#include "config.h"
+
+#include "default.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,7 +25,6 @@
 #include <gtk/gtk.h>
 
 #include "../ADM_assert.h"
-#include "default.h"
 #include "ADM_commonUI/GUI_render.h"
 #include "../gui_action.hxx"
 
@@ -43,6 +43,7 @@
 #include "../prefs.h"
 #include "../ADM_toolkit_gtk/gtkmarkscale.h"
 #include "../ADM_toolkit_gtk/jogshuttle.h"
+#include "../ADM_toolkit_gtk/ADM_jogshuttle.h"
 
 uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h);
 
@@ -153,6 +154,7 @@ gboolean UI_SliderReleased(GtkWidget *widget, GdkEventButton *event, gpointer us
 gboolean UI_returnFocus(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 // Global
 GtkAccelGroup *accel_group;
+PhysicalJogShuttle *physical_jog_shuttle;
 //
 void guiCallback(GtkMenuItem * menuitem, gpointer user_data);
 
@@ -225,8 +227,9 @@ uint32_t w,h;
                 UI_getPhysicalScreenSize(&w,&h); //gtk_widget_get_parent_window (guiRootWindow));
                 printf("The screen seems to be %u x %u px\n",w,h);
  
-                 GUI_gtk_grow_off(1);
+                GUI_gtk_grow_off(1);
 
+                physical_jog_shuttle = &(PhysicalJogShuttle::getInstance());
                
 	return ret;
 }
@@ -237,6 +240,8 @@ void destroyGUI(void)
 
 	for(int i=0;i<ADM_nbCustom;i++)
 		delete(customNames[i]);
+
+        delete physical_jog_shuttle;
 }
 
 /**
@@ -578,6 +583,11 @@ int32_t UI_readJog(void)
         val=val*100;
         return (int32_t )val;
         
+}
+
+GtkWidget * lookup_jog_shuttle_widget (void)
+{
+    return lookup_widget(guiRootWindow,"jogg");
 }
 
 void UI_setTitle(const char *name)
@@ -1189,15 +1199,15 @@ void trampoline(void)
  * */
 static uint32_t jogScale[10]={
 50,
-50,
 40,
-40,
-20,
+30,
 20,  // 5
 10,
 5,
 3,
-2
+2,
+1,
+0
 };
 static int nbTimer=0;
 static int jogLock=0;
@@ -1222,6 +1232,7 @@ static int jogTimer(void)
     v=UI_readJog();
     r=abs(v);
     r=r/10;
+    //printf ("r %d v %d\n", r, v);
     if(!r)
     {
       return FALSE;
@@ -1230,6 +1241,7 @@ static int jogTimer(void)
     if(count)     count--;
     if(count)     return TRUE;
     count=tickToTime(r);
+    //printf ("r %d v %d count %d\n", r, v, count);
     if(jogLock) return FALSE;
     
     jogLock++;
