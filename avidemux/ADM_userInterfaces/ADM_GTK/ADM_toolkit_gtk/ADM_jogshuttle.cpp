@@ -41,6 +41,7 @@
 //#include "default.h" // avi_vars.h includes this
 #include "avi_vars.h"
 
+#ifdef USE_JOG
 #include <math.h>
 #include <errno.h>
 #include <linux/input.h>
@@ -487,3 +488,4 @@ void PhysicalJogShuttle::inputCallback (gint source, GdkInputCondition condition
         return;
     }
 }
+#endif

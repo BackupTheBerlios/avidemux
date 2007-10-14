@@ -154,7 +154,9 @@ gboolean UI_SliderReleased(GtkWidget *widget, GdkEventButton *event, gpointer us
 gboolean UI_returnFocus(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 // Global
 GtkAccelGroup *accel_group;
+#ifdef USE_JOG
 PhysicalJogShuttle *physical_jog_shuttle;
+#endif
 //
 void guiCallback(GtkMenuItem * menuitem, gpointer user_data);
 
@@ -228,9 +230,9 @@ uint32_t w,h;
                 printf("The screen seems to be %u x %u px\n",w,h);
  
                 GUI_gtk_grow_off(1);
-
+#ifdef USE_JOG
                 physical_jog_shuttle = &(PhysicalJogShuttle::getInstance());
-               
+#endif 
 	return ret;
 }
 
@@ -240,8 +242,9 @@ void destroyGUI(void)
 
 	for(int i=0;i<ADM_nbCustom;i++)
 		delete(customNames[i]);
-
+#ifdef USE_JOG
         delete physical_jog_shuttle;
+#endif
 }
 
 /**

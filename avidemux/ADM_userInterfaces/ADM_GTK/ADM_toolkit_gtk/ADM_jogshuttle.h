@@ -27,6 +27,7 @@
 #include <map>
 
 #include <gtk/gtk.h>
+#ifdef USE_JOG
 #include "mediactrl.h"
 
 /** 
@@ -93,5 +94,5 @@ private:
     ButtonActionMap button_action_map;
     bool show_buttons;
 };
-
+#endif
 #endif

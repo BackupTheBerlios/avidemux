@@ -33,6 +33,8 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef USE_JOG
+
 #include <linux/input.h>
 #include "mediactrl.h"
 
@@ -465,3 +467,4 @@ void media_ctrl_open(struct media_ctrl *mc)
 {
 	find_first_device(mc);
 }
+#endif
