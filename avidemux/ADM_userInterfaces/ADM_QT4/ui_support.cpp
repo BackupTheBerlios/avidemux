@@ -55,8 +55,8 @@ void loadTranslator(void)
 
 	loadTranslation(&qtTranslator, appdir + "qt_" + QLocale::system().name());
 	loadTranslation(&avidemuxTranslator, appdir + "avidemux_" + QLocale::system().name());
-	
-	printf("[Locale] Test: &File -> %s\n\n", QApplication::translate("MainWindow", "&Edit").toUtf8().data());
+
+	printf("[Locale] Test: &Edit -> %s\n\n", QApplication::translate("MainWindow", "&Edit").toUtf8().data());
 }
 
 void destroyTranslator(void)

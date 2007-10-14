@@ -288,17 +288,17 @@ endif(USE_XV)
 
 # SDL
 if(USE_SDL)
-	add_libs_all_targets(${SDL_LDFLAGS})
+	add_libs_all_targets("${SDL_LIBRARY}")
 endif(USE_SDL)
 
 # ARTS
 if(USE_ARTS)
-	add_libs_all_targets(${ARTS_LDFLAGS})
+	add_libs_all_targets("${ARTS_LDFLAGS}")
 endif(USE_ARTS)
 
 #alsa
 if(ALSA_FOUND)
-	add_libs_all_targets(${ASOUND_LIBRARY})
+	add_libs_all_targets("${ASOUND_LIBRARY}")
 endif(ALSA_FOUND)
 
 # ESD
@@ -398,10 +398,6 @@ IF (ADM_OS_WINDOWS)
 	if(CMAKE_BUILD_TYPE STREQUAL "Release")
 		add_ldflags_all_targets("-Wl,-s")
 	endif(CMAKE_BUILD_TYPE STREQUAL "Release")
-
-	if(USE_SDL)
-		add_definitions(${SDL_CFLAGS})
-	endif(USE_SDL)
 ENDIF (ADM_OS_WINDOWS)
 
 ########################

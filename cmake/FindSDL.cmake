@@ -31,6 +31,7 @@
 # reasons because not all systems place things in SDL/ (see FreeBSD).
 FIND_PATH(SDL_INCLUDE_DIR SDL.h
   $ENV{SDLDIR}/include
+  $ENV{SDLDIR}/include/SDL
   ~/Library/Frameworks/SDL.framework/Headers
   /Library/Frameworks/SDL.framework/Headers
   /usr/local/include/SDL
@@ -125,7 +126,7 @@ IF(MINGW)
   SET(MINGW32_LIBRARY mingw32 CACHE STRING "mwindows for MinGW")
 ENDIF(MINGW)
 
-SET(SDL_FOUND "NO")
+SET(SDL_FOUND FALSE)
 IF(SDL_LIBRARY_TEMP)
   # For SDLmain
   IF(SDLMAIN_LIBRARY)
@@ -156,7 +157,7 @@ IF(SDL_LIBRARY_TEMP)
   # Set the final string here so the GUI reflects the final state.
   SET(SDL_LIBRARY ${SDL_LIBRARY_TEMP} CACHE STRING "Where the SDL Library can be found")
 
-  SET(SDL_FOUND "YES")
+  SET(SDL_FOUND TRUE)
 ENDIF(SDL_LIBRARY_TEMP)
 
 MARK_AS_ADVANCED(SDL_LIBRARY_TEMP)
