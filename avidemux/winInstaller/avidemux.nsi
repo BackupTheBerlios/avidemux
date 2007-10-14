@@ -285,7 +285,7 @@ SectionGroup "Additional languages" SecGrpLang
 
     Section "Serbian Latin (GTK+ only)" SecLangSerbianLatin
         SectionIn 2
-        !insertmacro InstallGtkLanguage SerbianLatin sr@Latn
+        !insertmacro InstallGtkLanguage SerbianLatin sr@latin
     SectionEnd
 
     Section "Spanish (GTK+ only)" SecLangSpanish
@@ -440,7 +440,7 @@ Section /o un.Serbian UnSecLangSerbianCyrillic
 SectionEnd
 
 Section /o un.SerbianLatin UnSecLangSerbianLatin
-	!insertmacro UninstallLanguage SerbianLatin sr@Latn
+	!insertmacro UninstallLanguage SerbianLatin sr@latin
 SectionEnd
 
 Section /o un.Spanish UnSecLangSpanish
