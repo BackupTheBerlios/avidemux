@@ -1,3 +1,10 @@
+avidemux (1:2.4.0-svn0) unstable; urgency=low
+  * debian folder taken from Christan marillat repository
+    (debian-multimedia.org).
+  * Updated to 2.4 svn.
+
+ -- Mean <fixounet@free.fr>  Sun, 14 Oct 2007 12:08:03 +0100
+
 avidemux (1:2.3.0-0.0) unstable; urgency=low
 
   * New upstream release.
