@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
+/* Jog Shuttle */
+#cmakedefine USE_JOG
+
 /* MPEG2DEC */
 #cmakedefine ACCEL_DETECT
 

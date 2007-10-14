@@ -75,7 +75,10 @@ ELSE (ADM_OS_WINDOWS)
 
 	CHECK_FUNCTION_EXISTS(chmod HAVE_CHMOD)         # __homedir/homedir.cpp, gpg/gpg.cpp
 ENDIF (ADM_OS_WINDOWS)
-
+# Jog shuttle is only available on linux due to its interface
+IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        SET(USE_JOG 1)
+ENDIF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 ########################################
 # Standard Avidemux defines
 ########################################
