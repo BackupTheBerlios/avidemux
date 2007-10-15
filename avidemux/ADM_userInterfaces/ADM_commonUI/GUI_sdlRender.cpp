@@ -34,8 +34,8 @@ extern "C" {
 #undef HAVE_STDLIB_H
 #undef HAVE_STRING_H
 #undef HAVE_SYS_TYPES_H
-#include "SDL/SDL.h"
-#include "SDL/SDL_syswm.h"
+#include "SDL.h"
+#include "SDL_syswm.h"
 }
 
 #include "ADM_colorspace/colorspace.h"
