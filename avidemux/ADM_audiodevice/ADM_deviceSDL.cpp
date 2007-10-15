@@ -23,7 +23,7 @@
 #include "fourcc.h" 
  
 #ifdef USE_SDL
-#include "SDL/SDL.h"
+#include "SDL.h"
 
 
 #include "ADM_toolkit/toolkit.hxx"

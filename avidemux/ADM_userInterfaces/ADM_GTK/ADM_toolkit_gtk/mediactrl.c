@@ -20,6 +20,8 @@
 * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 #include "config.h"
+
+#ifdef USE_JOG
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
@@ -32,12 +34,9 @@
 #include <stdint.h>
 #include <string.h>
 #include <errno.h>
-
-#ifdef USE_JOG
-
 #include <linux/input.h>
-#include "mediactrl.h"
 
+#include "mediactrl.h"
 
 static char *_shuttle_name = "Shuttle";
 static char *_jog_name = "Jog";

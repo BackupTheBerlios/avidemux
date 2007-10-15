@@ -1,0 +1,9 @@
+include(AdmLib)
+
+SET(ADM_LIB ADM_libsdl)
+SET(${ADM_LIB}_SRCS SDLmain.m)
+
+SDLify(SDLMain.m)
+
+ADD_LIBRARY(${ADM_LIB} STATIC ${${ADM_LIB}_SRCS})
+ADD_ADM_LIB(${ADM_LIB} ADM_libraries)

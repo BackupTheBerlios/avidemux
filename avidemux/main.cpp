@@ -53,7 +53,7 @@ extern "C" {
 
 #ifdef USE_SDL
 extern "C" {
-	#include "SDL/SDL.h"
+	#include "SDL.h"
 }
 
 #include "ADM_userInterfaces/ADM_commonUI/GUI_sdlRender.h"

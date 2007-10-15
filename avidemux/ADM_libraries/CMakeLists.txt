@@ -16,9 +16,13 @@ subdirs (PREORDER ADM_xvidratectl)
 subdirs (PREORDER ADM_libpostproc)
 
 if(USE_FREETYPE)
-subdirs (PREORDER ADM_libass)
+	subdirs (PREORDER ADM_libass)
 endif(USE_FREETYPE)
 
 if (ADM_DEBUG AND FIND_LEAKS)
-subdirs (PREORDER ADM_nvwa)
+	subdirs (PREORDER ADM_nvwa)
 endif (ADM_DEBUG AND FIND_LEAKS)
+
+if (ADM_OS_APPLE)
+	subdirs (PREORDER ADM_libsdl)
+endif (ADM_OS_APPLE)
