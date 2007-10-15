@@ -4,7 +4,7 @@ noinst_LIBRARIES = libADM_lavutil.a
 
 libADM_lavutil_a_METASOURCES = AUTO
 
-libADM_lavutil_a_SOURCES =  integer.c  intfloat_readwrite.c  mathematics.c  rational.c md5.c crc.c log.c  adler32.c lls.c string.c
+libADM_lavutil_a_SOURCES =  integer.c  intfloat_readwrite.c  mathematics.c  rational.c md5.c crc.c log.c  adler32.c lls.c string.c random.c
 
 
 EXTRA_DIST = avutil.h  common.h  integer.h   \

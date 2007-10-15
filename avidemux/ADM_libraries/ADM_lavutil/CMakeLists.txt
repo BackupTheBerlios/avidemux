@@ -5,7 +5,7 @@ include(AdmLib)
 SET(ADM_LIB ADM_lavutil)
 #
 SET(${ADM_LIB}_SRCS 
-integer.c  intfloat_readwrite.c  mathematics.c  rational.c md5.c crc.c log.c  adler32.c lls.c
+integer.c  intfloat_readwrite.c  mathematics.c  rational.c md5.c crc.c log.c  adler32.c lls.c random.c
 string.c
 
 )

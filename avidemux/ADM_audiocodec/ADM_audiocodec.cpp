@@ -44,6 +44,10 @@ ADM_Audiocodec *out = NULL;
 			}
  		switch(fourcc)
    			{
+                                case WAV_NELLYMOSER:
+                                        printf("\n Audio codec:  NELLYMOSER\n");
+                                        out= (ADM_Audiocodec *)new ADM_AudiocodecImaAdpcm(fourcc,info);
+                                        break;
                                 case WAV_IMAADPCM:
                                         printf("\n Audio codec:  IMA MS ADPCM\n");
                                         out= (ADM_Audiocodec *)new ADM_AudiocodecImaAdpcm(fourcc,info);

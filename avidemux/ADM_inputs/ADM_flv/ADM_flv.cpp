@@ -301,6 +301,7 @@ uint8_t   flvHeader::setAudioHeader(uint32_t format,uint32_t fq,uint32_t bps,uin
   }
   switch(format)
   {
+    case 6: wavHeader.encoding=WAV_NELLYMOSER;break;
     case 2: wavHeader.encoding=WAV_MP3;break;
     case 3: wavHeader.encoding=WAV_PCM;break; 
     case 0: wavHeader.encoding=WAV_LPCM;break;

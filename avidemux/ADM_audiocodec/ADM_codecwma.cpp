@@ -70,6 +70,10 @@ uint8_t scratchPad[SCRATCH_PAD_SIZE];
       case WAV_AMV_ADPCM:
         _context->codec_id = CODEC_ID_ADPCM_IMA_AMV;
         break;
+      case WAV_NELLYMOSER:
+        _context->codec_id = CODEC_ID_NELLYMOSER;
+        break;
+
       default:
              ADM_assert(0);
     }

@@ -22,9 +22,9 @@
 #define ALLCODECS_H
 
 #include "avcodec.h"
-
-extern AVCodec adpcm_ima_amv_encoder;
-extern AVCodec adpcm_ima_amv_decoder;
+extern AVCodec nellymoser_decoder; // MEANX backport
+extern AVCodec adpcm_ima_amv_encoder; // MEANX Backport
+extern AVCodec adpcm_ima_amv_decoder; // MEANX Backport
 extern AVCodec ac3_encoder;
 extern AVCodec asv1_encoder;
 extern AVCodec asv2_encoder;

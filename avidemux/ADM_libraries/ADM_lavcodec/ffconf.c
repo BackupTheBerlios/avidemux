@@ -8,6 +8,7 @@ int main(void)
 {
 #define DECLARE_DECODER(a,b); printf("#define ENABLE_"#a"_DECODER 1\n"); 
   
+    DECLARE_DECODER(NELLYMOSER,nellymoser);
     DECLARE_DECODER(ADPCM_IMA_AMV, amv);
     DECLARE_DECODER(CINEPAK, cinepak);
     DECLARE_DECODER(DNXHD, dnxhd);
