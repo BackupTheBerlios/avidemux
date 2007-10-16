@@ -51,7 +51,7 @@ uint8_t scratchPad[SCRATCH_PAD_SIZE];
        :  ADM_Audiocodec(fourcc)
  {
     _tail=_head=0;
-    ADM_assert(fourcc==WAV_WMA || fourcc==WAV_QDM2 || fourcc==WAV_AMV_ADPCM);	
+
     _contextVoid=(void *)avcodec_alloc_context();
     ADM_assert(_contextVoid);
     // Fills in some values...
@@ -69,9 +69,11 @@ uint8_t scratchPad[SCRATCH_PAD_SIZE];
         break;
       case WAV_AMV_ADPCM:
         _context->codec_id = CODEC_ID_ADPCM_IMA_AMV;
+        _blockalign=1;
         break;
       case WAV_NELLYMOSER:
         _context->codec_id = CODEC_ID_NELLYMOSER;
+        _blockalign=1;
         break;
 
       default:
@@ -145,6 +147,10 @@ int nbChunk;
           {
             printf("Produced : %u, buffer %u,in%u\n",pout,SCRATCH_PAD_SIZE,_tail-_head);
             ADM_assert(0); 
+          }
+          if(_context->codec_id == CODEC_ID_NELLYMOSER)
+          { // Hack, it returns inconsistent size
+            out=nbChunk*_blockalign;
           }
           _head+=out; // consumed bytes
           pout>>=1;

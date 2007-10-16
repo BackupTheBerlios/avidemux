@@ -170,6 +170,12 @@ uint32_t target=mstime;
 uint32_t _nbClusters=_track->_nbIndex;
 
       // First identify the cluster...
+      // Special case when first chunk does not start at 0
+      if(_nbClusters && mstime<_track->_index[0].timeCode)
+      {
+            goToBlock(0);
+            return 1;
+      }
       int clus=-1;
             for(int i=0;i<_nbClusters-1;i++)
             {
