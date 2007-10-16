@@ -47,6 +47,8 @@ const char* translate(const char *__domainname, const char *__msgid)
 	return translatedMessage[counter];
 }
 
+#define HIDE_STRING_FROM_QT(domainname, msgid)  QApplication::translate(domainname, msgid) // to hide string from lupdate so a true test can be conducted
+
 void loadTranslator(void)
 {
 	printf("\n[Locale] Locale: %s\n", QLocale::system().name().toUtf8().constData());
@@ -56,7 +58,7 @@ void loadTranslator(void)
 	loadTranslation(&qtTranslator, appdir + "qt_" + QLocale::system().name());
 	loadTranslation(&avidemuxTranslator, appdir + "avidemux_" + QLocale::system().name());
 
-	printf("[Locale] Test: &Edit -> %s\n\n", QApplication::translate("MainWindow", "&Edit").toUtf8().data());
+	printf("[Locale] Test: &Edit -> %s\n\n", HIDE_STRING_FROM_QT("MainWindow", "&Edit").toUtf8().data());
 }
 
 void destroyTranslator(void)
