@@ -1016,53 +1016,84 @@ uint8_t UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
 	 gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,FORMAT_WIDGET)),fmt);
 	return 1;
 }
+/**
+    \fn DNDmerge
+    \brief Extract the actual filename from the DNDstring file://abcd and store it into where
+*/
+static void DNDmerge(char **where, char *start,char *end)
+{
+  int len=end-start;
+  ADM_assert(len>7); // file:// = 7 bytes
+  len-=7;
+  *where=(char *)ADM_alloc(end-start+1);  // 7 more but who cares ?
+  memcpy(*where,start+7,len);
+  
+  // chomp it
+  char *tail=(*where)+len;
+  do
+  { 
+      *tail=0;
+      tail--;
+  }while(*tail==0xA || *tail==0xd);
+}
 // DND CYB
+#define MAX_DND_FILES 20
+/**
+    \fn DNDDataReceived
+    \brief DnDrop file handling, code by CYB, modified by mean
+        The datas are incoming like this file://abcd\rfile://xyz\r...
+*/
 void DNDDataReceived( GtkWidget *widget, GdkDragContext *dc,
                                   gint x, gint y, GtkSelectionData *selection_data, guint info, guint t)
 {
-   void *filename;
-   char *start,*end;
-   int cont;
-
-    if (info == TARGET_URI_LIST)
+   char *start,*cur,*old;
+   char *names[MAX_DND_FILES];
+   
+    memset(names,0,sizeof(char *)*MAX_DND_FILES);
+    if (info != TARGET_URI_LIST)
     {
-     start = strstr((char*)selection_data->data,"file://");
-     cont = 0;
-     do
+      gtk_drag_finish(dc,TRUE,FALSE,t);
+      return;
+    }
+    
+    int current=0;
+    start=(char*)selection_data->data;
+    old=start;
+    while(current<MAX_DND_FILES)
+    {
+     cur = strstr(start,"file://");
+     if(!cur) // Not found
      {
-       if (start)
-       {
-        end = strstr((char*)start+1,"file://");
-        if (!end)
-        {
-                      end = start + strlen(start);
-                      cont = 1;
-                      continue;
-        }
-        filename = ADM_alloc(end-start); 
-        if (filename)
-        {
-              memset(filename,0,end-start);
-              memcpy(filename,start+7,end-start-7-2);
-              if (avifileinfo) 
+        if(!current) 
+          break; 
+        DNDmerge(&(names[current-1]),old,start+strlen(start));
+        current++;
+        break;
+     }
+     // Add
+     if(current)
+     {
+        DNDmerge(&(names[current-1]),old,cur);
+     }
+     current++;
+     old=cur;
+     start=cur+1;
+    }
+    
+    // Cleanup
+    for(int i=0;i<current-1;i++)
+    {
+      printf("DND : %d %s\n",i,names[i]);
+      char *filename=names[i];
+      if (avifileinfo) 
               {
-                    // Append video when there's already something
                     fileReadWrite(A_appendAvi, 0, (char*)filename);
                }
                else
                {
                     fileReadWrite(A_openAvi, 0, (char*)filename);
                }
-         } 
-         ADM_dealloc(filename);
-         start = end;
-       }
-       else
-       {
-           cont=1;
-       } 
-     } //do
-     while (!cont);  
+      ADM_dealloc(names[i]); 
     }
     gtk_drag_finish(dc,TRUE,FALSE,t);
 }
