@@ -61,7 +61,7 @@ user_interface_qt4 = \
 
 adm_src =   guiplay.cpp  \
 	gui_savenew.cpp  gui_navigate.cpp gtk_gui.cpp   \
-	main.cpp   \
+	main.cpp   gui_action.cpp  \
 	gui_autodrive.cpp GUI_jobs.cpp ADM_preview.cpp
 
 

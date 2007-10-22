@@ -4,7 +4,7 @@
 #  It is not for the faint of heart and pretty ugly
 #
 ##########################################################
-SET(adm_EXE_SRCS ADM_preview.cpp  gtk_gui.cpp  gui_autodrive.cpp  GUI_jobs.cpp  gui_navigate.cpp  guiplay.cpp  gui_savenew.cpp  main.cpp)
+SET(adm_EXE_SRCS ADM_preview.cpp  gtk_gui.cpp  gui_autodrive.cpp  GUI_jobs.cpp  gui_navigate.cpp  guiplay.cpp  gui_savenew.cpp  main.cpp  gui_action.cpp)
 
 include_directories(ADM_userInterfaces/ADM_commonUI ADM_outputs)
 add_definitions(${GLIB_CFLAGS})

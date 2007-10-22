@@ -17,7 +17,6 @@
 #define DIA_FACTORY_H
 
 #include "ADM_assert.h"
-#include <string>
 
 typedef enum 
 {
@@ -331,12 +330,9 @@ class diaElemFile : public diaElem
 
 protected:
     const char * defaultSuffix;
-    bool paramIsStdString;
 public:
   
   diaElemFile(uint32_t writeMode,char **filename,const char *toggleTitle,
-              const char *defaultSuffix = 0,const char *tip=NULL);
-  diaElemFile(uint32_t writeMode,std::string *filename,const char *toggleTitle,
               const char *defaultSuffix = 0,const char *tip=NULL);
   virtual ~diaElemFile() ;
   void setMe(void *dialog, void *opaque,uint32_t line);

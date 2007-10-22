@@ -17,7 +17,7 @@
  
 #define ADM_FILTER_API_VERSION 1
 /**
-	Not for filter writters :
+	Note for filter writers :
 
 		The constructor accept 2 parameters
 
@@ -26,7 +26,7 @@
 						"size" "13" for example. Passing null means either
 						it has no parameters or set the default value for them.
 
-				_uncompressed : optionnal internal buffer
+				_uncompressed : optional internal buffer
 
 				configure return 1 if the conf has changed, 0 else.
 

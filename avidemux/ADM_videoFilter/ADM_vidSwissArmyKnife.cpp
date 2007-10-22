@@ -108,7 +108,8 @@ ADMVideoSwissArmyKnife::ADMVideoSwissArmyKnife(AVDMGenericVideoStream *in,CONFco
         GET(tool);
         GET(input_type);
 
-        GET(input_file);
+		char* tmp;
+        GET2(input_file, tmp);
         GET(load_bias);
         GET(load_multiplier);
 
@@ -229,11 +230,10 @@ uint8_t	ADMVideoSwissArmyKnife::getCoupledConf (CONFcouple **couples)
     if (myInfo->oldConf == 0)
         pimap.erase (0);
 
-#define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
     CSET(tool);
     CSET(input_type);
 
-    CSET(input_file);
+    (*couples)->setCouple("input_file", _param->input_file.c_str());
     CSET(load_bias);
     CSET(load_multiplier);
 
@@ -315,8 +315,10 @@ uint8_t ADMVideoSwissArmyKnife::configure (AVDMGenericVideoStream *in)
         ADM_assert (ret == 255); // 255 = whizzy dialog not implemented
     }
 
+	char* file = ADM_strdup(_param->input_file.c_str());
+
     diaElemFile input_file
-        (0, &(_param->input_file),
+        (0, &file,
          QT_TR_NOOP("Input _File (image or convolution kernel):"), NULL, QT_TR_NOOP("Select file"));
     diaElemFloat load_bias
         (&(_param->load_bias),
@@ -383,6 +385,10 @@ uint8_t ADMVideoSwissArmyKnife::configure (AVDMGenericVideoStream *in)
         myInfo->image_data_invalid = true;
         myInfo->histogram_data_invalid = true;
     }
+
+	_param->input_file = file;
+	delete[] file;
+
     return ret;
 }
 

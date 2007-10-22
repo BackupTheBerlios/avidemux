@@ -74,7 +74,8 @@ ADMVideoParticle::ADMVideoParticle (AVDMGenericVideoStream *in, CONFcouple *coup
         GET(bottom_crop);
         GET(output_format);
 
-        GET(output_file);
+		char* tmp;
+        GET2(output_file, tmp);
         GET(camera_number);
         GET(debug);
     }
@@ -99,7 +100,6 @@ uint8_t	ADMVideoParticle::getCoupledConf (CONFcouple **couples)
     ADM_assert(_param);
     *couples = new CONFcouple(particleParam.nb);
 
-#define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
     CSET(min_area);
     CSET(max_area);
     CSET(left_crop);
@@ -107,7 +107,7 @@ uint8_t	ADMVideoParticle::getCoupledConf (CONFcouple **couples)
     CSET(top_crop);
     CSET(bottom_crop);
     CSET(output_format);
-    CSET(output_file);
+	(*couples)->setCouple("output_file", _param->output_file.c_str());
     CSET(camera_number);
     CSET(debug);
 
@@ -168,8 +168,10 @@ uint8_t ADMVideoParticle::configure(AVDMGenericVideoStream *in)
         (&(_param->bottom_crop),
          QT_TR_NOOP("_Bottom crop (ignore particles in):"), 0, 0x7fffffff);
 
+	char* file = ADM_strdup(_param->output_file.c_str());
+
     diaElemFile output_file
-        (1, &(_param->output_file), QT_TR_NOOP("_Output File:"), NULL, QT_TR_NOOP("Select file"));
+        (1, &file, QT_TR_NOOP("_Output File:"), NULL, QT_TR_NOOP("Select file"));
 
     diaElemUInteger camera_number
         (&(_param->camera_number), QT_TR_NOOP("_Camera number:"), 1, 0x7fffffff);
@@ -183,6 +185,10 @@ uint8_t ADMVideoParticle::configure(AVDMGenericVideoStream *in)
 
     ret = diaFactoryRun ("Particle Detection Configuration",
                          sizeof (elems) / sizeof (diaElem *), elems);
+
+	_param->output_file = file;
+	delete[] file;
+
     return ret;
 }
 

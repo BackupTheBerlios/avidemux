@@ -13,7 +13,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "default.h"
 
 #include "ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
@@ -29,8 +28,7 @@ static void dirSel(void *w,void *p);
 diaElemFile::diaElemFile(uint32_t writemode,char **filename,const char *toggleTitle,
                          const char * defaultSuffix,const char *selectFileDesc)
   : diaElem(ELEM_FILE_READ),
-    defaultSuffix (defaultSuffix),
-    paramIsStdString (false)
+    defaultSuffix (defaultSuffix)
 {
   param=(void *)filename;
   paramTitle=toggleTitle;
@@ -39,23 +37,6 @@ diaElemFile::diaElemFile(uint32_t writemode,char **filename,const char *toggleTi
 	  tip = toggleTitle;
   else
       tip = selectFileDesc;
-
-  _write=writemode;
-}
-
-diaElemFile::diaElemFile(uint32_t writemode,std::string *filename,const char *toggleTitle,
-                         const char * defaultSuffix,const char *selectFileDesc)
-  : diaElem(ELEM_FILE_READ),
-    defaultSuffix (defaultSuffix),
-    paramIsStdString (true)
-{
-  param=(void *)filename;
-  paramTitle=toggleTitle;
-
-  if (!tip || strlen(tip) == 0)
-	  this->tip = toggleTitle;
-  else
-      this->tip = selectFileDesc;
 
   _write=writemode;
 }
@@ -96,12 +77,8 @@ void diaElemFile::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_widget_show (entry);
   if(param)
   {
-      const char * val;
-      if (paramIsStdString)
-          val = ((std::string *)param)->c_str();
-      else
-          val = *((char **)param);
-      gtk_entry_set_text (GTK_ENTRY (entry), val);
+      char **val=(char **)param;
+      gtk_entry_set_text (GTK_ENTRY (entry), *val);
   }
   gtk_label_set_mnemonic_widget (GTK_LABEL(label), entry);
   
@@ -136,17 +113,9 @@ void diaElemFile::setMe(void *dialog, void *opaque,uint32_t line)
 void diaElemFile::getMe(void)
 {
   GtkWidget **widget=(GtkWidget **)myWidget;
-  const char * val = gtk_entry_get_text (GTK_ENTRY (widget[0]));
-  if (paramIsStdString)
-  {
-      *((std::string *)param) = val;
-  }
-  else
-  {
-      char **name=(char **)param;
-      if(*name) delete [] *name;
-      *name = ADM_strdup(val);
-  }
+  char **name=(char **)param;
+  if(*name) delete *name;
+  *name =ADM_strdup(gtk_entry_get_text (GTK_ENTRY (widget[0])));
 }
 
 void diaElemFile::changeFile(void)
@@ -192,17 +161,10 @@ void diaElemFile::changeFile(void)
   }
   if(t)
   {
-    if (paramIsStdString)
-    {
-        *((std::string *)param) = buffer;
-    }
-    else
-    {
-        char **name=(char **)param;
-        if(*name) delete [] *name;
-        *name = ADM_strdup(buffer);
-    }
-    gtk_entry_set_text (GTK_ENTRY (widget), buffer);
+    char **name=(char **)param;
+    if(*name) delete [] *name;
+    *name =ADM_strdup(buffer);
+     gtk_entry_set_text (GTK_ENTRY (widget), *name);
   }
   
 }
