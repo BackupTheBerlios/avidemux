@@ -677,7 +677,7 @@ uint8_t UI_updateRecentMenu( void )
 		{
 			//actions[nb_item]->setVisible(1);
 			// Replace widget ?
-			actions[nb_item]->setText(names[nb_item]);
+			actions[nb_item]->setText(QString::fromUtf8(names[nb_item]));
 			actions[nb_item]->setVisible(1);
 		}
 		// Update name
@@ -793,7 +793,7 @@ void UI_setTitle(const char *name)
     strncpy(title,name,200);
     strncat(title," - Avidemux", 11);
 
-	QuiMainWindows->setWindowTitle( title);
+	QuiMainWindows->setWindowTitle(QString::fromUtf8(title));
 }
 /**
     \fn     UI_setFrameType( uint32_t frametype,uint32_t qp)
