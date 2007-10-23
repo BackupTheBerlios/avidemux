@@ -306,12 +306,12 @@
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_xvid4.cpp" line="96"/>
         <source>Min Gop Size</source>
-        <translation>Min dimensione Gop</translation>
+        <translation>Dimensione Gop minima</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_xvid4.cpp" line="97"/>
         <source>Max Gop Size</source>
-        <translation>Massima dimensione Gop</translation>
+        <translation>Dimensione Gop massima</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_xvid4.cpp" line="98"/>
@@ -804,12 +804,12 @@
         <translation>_Inverti U e V</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavDecoder.cpp" line="46"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavDecoder.cpp" line="27"/>
         <source>Show motion _vectors</source>
         <translation>Mostra _vettori movimento</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavDecoder.cpp" line="48"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavDecoder.cpp" line="29"/>
         <source>Decoder Options</source>
         <translation>Opzioni decodificatore</translation>
     </message>
@@ -1366,7 +1366,7 @@
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_xvid4.cpp" line="49"/>
         <source>Ca_rtoon mode</source>
-        <translation>Modalità Ca_rtoon</translation>
+        <translation>Modalità ca_rtoon</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_xvid4.cpp" line="50"/>
@@ -1381,7 +1381,7 @@
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_xvid4.cpp" line="52"/>
         <source>C_hroma optimizer</source>
-        <translation>Ottimizzatore _Croma</translation>
+        <translation>Ottimizzatore _croma</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_xvid4.cpp" line="119"/>
@@ -1514,12 +1514,12 @@ Cambia il codec o usa il filtro mixer per ridurre i canali.</translation>
         <translation>Errore interno nel cercare i codec</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_codecs/ADM_ffmpeg.cpp" line="50"/>
+        <location filename="../avidemux/ADM_codecs/ADM_ffmpeg.cpp" line="49"/>
         <source>Internal error opening codec</source>
         <translation>Errore interno nell&apos;aprire i codec</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_codecs/ADM_ffmpeg.cpp" line="52"/>
+        <location filename="../avidemux/ADM_codecs/ADM_ffmpeg.cpp" line="51"/>
         <source>Internal error with context for  codec.
  Did you use too low / too high target for 2 pass ?</source>
         <translation>Errore interno con il contesto per il codec.  Hai usato un obiettivo troppo basso/alto per 2 passate?</translation>
@@ -1745,7 +1745,7 @@ Cambia il codec o usa il filtro mixer per ridurre i canali.</translation>
         <translation>Impossibile scrivere il file</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1507"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1505"/>
         <source>File error</source>
         <translation>Errore file</translation>
     </message>
@@ -1793,27 +1793,27 @@ Vuoi caricarlo?
         <translation>Oops</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_osSupport/ADM_fileio.cpp" line="102"/>
+        <location filename="../avidemux/ADM_osSupport/ADM_fileio.cpp" line="105"/>
         <source>can&apos;t create custom directory (%s).</source>
         <translation>impossibile creare la cartella preferiti (%s).</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_osSupport/ADM_fileio.cpp" line="126"/>
+        <location filename="../avidemux/ADM_osSupport/ADM_fileio.cpp" line="129"/>
         <source>can&apos;t create job directory (%s).</source>
         <translation>impossibile creare la cartella attività (%s).</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_osSupport/ADM_fileio.cpp" line="146"/>
+        <location filename="../avidemux/ADM_osSupport/ADM_fileio.cpp" line="149"/>
         <source>can&apos;t determine $USERPROFILE.</source>
         <translation>impossibile determinare $USERPROFILE.</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_osSupport/ADM_fileio.cpp" line="153"/>
+        <location filename="../avidemux/ADM_osSupport/ADM_fileio.cpp" line="156"/>
         <source>can&apos;t determine $HOME.</source>
         <translation>impossibile determinare $HOME.</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_osSupport/ADM_fileio.cpp" line="164"/>
+        <location filename="../avidemux/ADM_osSupport/ADM_fileio.cpp" line="167"/>
         <source>Cannot create the .avidemux directory</source>
         <translation>Impossibile creare la cartella .avidemux</translation>
     </message>
@@ -2006,7 +2006,7 @@ Spostare il segnalibro A.</translation>
         <translation>Errore nella passata 1</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1507"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1505"/>
         <source>Cannot open &quot;%s&quot; for writing.</source>
         <translation>Impossibile aprire &quot;%s&quot; per la scrittura.</translation>
     </message>
@@ -2281,7 +2281,7 @@ Spostare il segnalibro A.</translation>
         <translation>Riuscito</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2284"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2282"/>
         <source>Failed</source>
         <translation>Fallito</translation>
     </message>
@@ -2313,17 +2313,17 @@ Spostare il segnalibro A.</translation>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_filters/Q_mainfilter.cpp" line="580"/>
         <source>Partial Start Frame:</source>
-        <translation>Fotogramma di inizio parziale:</translation>
+        <translation>Fotogramma di inizio:</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_filters/Q_mainfilter.cpp" line="581"/>
         <source>Partial End Frame:</source>
-        <translation>Fotogramma di fine parziale:</translation>
+        <translation>Fotogramma di fine:</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_filters/Q_mainfilter.cpp" line="582"/>
         <source>Configure child</source>
-        <translation type="unfinished"></translation>
+        <translation>Configura filtro parziale</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_filters/Q_mainfilter.cpp" line="585"/>
@@ -2716,7 +2716,7 @@ Spostare il segnalibro A.</translation>
         <translation>Audio</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2006"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2004"/>
         <source>Video</source>
         <translation>Video</translation>
     </message>
@@ -2806,528 +2806,528 @@ Spostare il segnalibro A.</translation>
         <translation>Non ci sono attività immagazzinate</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="251"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="249"/>
         <source>Select ECMAScript to Run</source>
         <translation>Seleziona uno script ECMA da eseguire</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="337"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="335"/>
         <source>Obsolete</source>
         <translation>Obsoleto</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="365"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="363"/>
         <source>Not coded in this version</source>
         <translation>Non codificato in questa versione</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="511"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="509"/>
         <source>Select AVI File...</source>
         <translation>Seleziona un file video...</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="442"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="440"/>
         <source>This is to be used to undo packed VOP on MPEG-4.
 Continue ?</source>
         <translation>Questo deve essere usato per decomprimere il VOP su MPEG-4.
 Continuare?</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="444"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="442"/>
         <source>Select AVI File to Write</source>
         <translation>Seleziona il file AVI da scrivere</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="450"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="448"/>
         <source>Select OGM File to Write</source>
         <translation>Seleziona il file OGM da scrivere</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="466"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="464"/>
         <source>Select Workbench to Save</source>
         <translation>Seleziona il progetto da salvare</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="498"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="496"/>
         <source>Select Raw File to Save</source>
         <translation>Seleziona il file Raw da salvare</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="514"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="512"/>
         <source>Select AVI File to Append...</source>
         <translation>Seleziona il file video da aggiungere...</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="518"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="516"/>
         <source>Select File to Save Audio</source>
         <translation>Seleziona il file audio da salvare</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="552"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="550"/>
         <source>Select JPEG Sequence to Save</source>
         <translation>Seleziona la sequenza JPEG da salvare</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="555"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="553"/>
         <source>Select BMP to Save</source>
         <translation>Seleziona il file BMP da salvare</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="559"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="557"/>
         <source>Select JPEG to Save</source>
         <translation>Seleziona il file JPEG da salvare</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="724"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="722"/>
         <source>Select File to Save</source>
         <translation>Seleziona il file da salvare</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="664"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="662"/>
         <source>Select MP3 to Load</source>
         <translation>Seleziona il file MP3 da caricare</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="667"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="665"/>
         <source>Select AC3 to Load</source>
         <translation>Seleziona il file AC3 da caricare</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="670"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="668"/>
         <source>Select WAV to Load</source>
         <translation>Seleziona il file WAV da caricare</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="718"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="716"/>
         <source>Out of bounds</source>
         <translation>Oltre i limiti</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1917"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1915"/>
         <source>Marker A &gt; B</source>
         <translation>Segnalibro A &gt; B</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="729"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="727"/>
         <source>Cannot copy.</source>
         <translation>Impossibile copiare.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="741"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="739"/>
         <source>Something bad happened (II))</source>
         <translation>C&apos;è stato qualche errore (II)</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="755"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="753"/>
         <source>Are you sure?</source>
         <translation>Sei sicuro?</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="810"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="808"/>
         <source>Frame Rate</source>
         <translation>Frame rate</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="810"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="808"/>
         <source>_Frames per second:</source>
         <translation>_Fotogrammi al secondo:</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="833"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="831"/>
         <source>Width is not a multiple of 8</source>
         <translation>La larghezza non è un multiplo di 8</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="834"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="832"/>
         <source>This will make trouble for AVI files.</source>
         <translation>Questo causerà un problema per i file AVI.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="844"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="842"/>
         <source>Rebuild all Keyframes?</source>
         <translation>Ricostruire tutti i fotogrammi chiave?</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="902"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="900"/>
         <source>Permission error</source>
         <translation>Errore di permesso</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="902"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="900"/>
         <source>Cannot open &quot;%s&quot;.</source>
         <translation>Impossibile aprire &quot;%s&quot;.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="905"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="903"/>
         <source>&quot;%s&quot; does not exist.</source>
         <translation>&quot;%s&quot; non esiste.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="947"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="945"/>
         <source>Cannot open project using the video loader.</source>
         <translation>Impossibile aprire il progetto usando il caricatore video.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="948"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="946"/>
         <source>Try &apos;File&apos; -&gt; &apos;Load/Run Project...&apos;</source>
         <translation>Prova &apos;File&apos; -&gt; &apos;Carica/esegui progetto...&apos;</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="950"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="948"/>
         <source>Could not open the file</source>
         <translation>Impossibile aprire il file</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="985"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="983"/>
         <source>Multiple Audio Tracks</source>
         <translation>Tracce audio multiple</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="986"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="984"/>
         <source>The file you just loaded contains several audio tracks.
 Go to Audio-&gt;MainTrack to select the active one.</source>
         <translation>Il file appena caricato contiene diverse tracce audio.
 Vai a &apos;Audio&apos; -&gt; &apos;Traccia principale&apos; per selezionare la traccia attiva.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1048"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1046"/>
         <source>No audio decoder found for this file</source>
         <translation>Nessun decodificatore trovato per questo file</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1049"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1047"/>
         <source>Save (A+V) will generate bad AVI. Save audio will work.</source>
         <translation>Salvare (A+V) genererà un file AVI difettoso. Salvare l&apos;audio funzionerà.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1108"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1106"/>
         <source>Something failed when appending</source>
         <translation>Qualcosa è fallito durante l&apos;aggiunta</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1936"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1934"/>
         <source>Something bad happened (II)</source>
         <translation>C&apos;è stato qualche errore (II)</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1181"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1179"/>
         <source>Cannot save the audio in copy mode</source>
         <translation>Impossibile salvare l&apos;audio in modalità copia</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1181"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1179"/>
         <source>Select WAV PCM as the audio codec, otherwise the audio file would be raw PCM.</source>
         <translation>Seleziona il codec audio WAV PCM, altrimenti il file audio sarà PCM grezzo.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1546"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1544"/>
         <source>Saving audio</source>
         <translation>Salvataggio audio in corso</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1266"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1264"/>
         <source>Get Frame</source>
         <translation>Prendi fotogramma</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1266"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1264"/>
         <source>Cannot get this frame to save</source>
         <translation>Impossibile salvare questo fotogramma</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1303"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1301"/>
         <source>Mark A &gt; B</source>
         <translation>Segnalibro A &gt; B</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1303"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1301"/>
         <source>Set your markers correctly.</source>
         <translation>Imposta i tuoi segnalibri correttamente.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1312"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1310"/>
         <source>Saving as set of jpegs</source>
         <translation>Salvataggio come gruppo di jpeg in corso</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1318"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1316"/>
         <source>Cannot decode frame</source>
         <translation>Impossibile decodificare il fotogramma</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1318"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1316"/>
         <source>Aborting.</source>
         <translation>Annullamento in corso.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2280"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2278"/>
         <source>Done</source>
         <translation>Fatto</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1329"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1327"/>
         <source>Saved %d images.</source>
         <translation>%d immagini salvate.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1331"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1329"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1331"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1329"/>
         <source>Could not save all images.</source>
         <translation>Impossibile salvare tutte le immagini.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1348"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1346"/>
         <source>Saved &quot;%s&quot;.</source>
         <translation>&quot;%s&quot; salvato.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1350"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1348"/>
         <source>BMP op failed</source>
         <translation>Op. BMP fallita</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1350"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1348"/>
         <source>Saving %s as a BMP file failed.</source>
         <translation>Salvataggio di %s come file BMP fallito.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1436"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1434"/>
         <source>Failed to open the file</source>
         <translation>L&apos;apertura del file è fallita</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1436"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1434"/>
         <source>Not a WAV file?</source>
         <translation>Non è un file WAV?</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1371"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1369"/>
         <source>WAV open file failed...</source>
         <translation>L&apos;apertura del file WAV è fallita...</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1500"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1498"/>
         <source>Cannot decompress audio frame</source>
         <translation>Impossibile decomprimere il segmento audio</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1514"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1512"/>
         <source>Memory Error</source>
         <translation>Errore di memoria</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1567"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1565"/>
         <source>No frames to encode</source>
         <translation>Nessun fotogramma da codificare</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1567"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1565"/>
         <source>Please check markers. Is &quot;A&gt;&quot; == &quot;&gt;B&quot;?</source>
         <translation>Controlla i segnalibri. È &quot;A&gt;&quot; == &quot;&gt;B&quot;?</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1706"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1704"/>
         <source>Saving raw video stream</source>
         <translation>Salvataggio flusso video grezzo in corso</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1852"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1850"/>
         <source>Checking video</source>
         <translation>Verifica video in corso</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1868"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1866"/>
         <source>No error found</source>
         <translation>Nessun errore trovato</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1872"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1870"/>
         <source>Errors found in %u frames</source>
         <translation>Errori trovati in %u fotogrammi</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1890"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1888"/>
         <source>Cannot decompress the audio stream</source>
         <translation>Impossibile decomprimere il flusso audio</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1890"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1888"/>
         <source>Switch audio codec to Copy.</source>
         <translation>Sposta la codifica audio su Copia.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1917"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1915"/>
         <source>Cannot delete the selection.</source>
         <translation>Impossibile eliminare la selezione.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1922"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1920"/>
         <source>You can&apos;t remove all frames</source>
         <translation>Non puoi rimuovere tutti i fotogrammi</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1929"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1927"/>
         <source>Something bad happened</source>
         <translation>C&apos;è stato qualche errore</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="1998"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="1996"/>
         <source>Could not get tracks info</source>
         <translation>Impossibile ottenere informazioni sulla traccia</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2006"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2004"/>
         <source>Take audio from video file</source>
         <translation>Recupera audio dal file video</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2106"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2104"/>
         <source>None</source>
         <translation>Nessuno</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2106"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2104"/>
         <source>No audio</source>
         <translation>Nessuna traccia audio</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2107"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2105"/>
         <source>External AC3</source>
         <translation>AC3 esterno</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2107"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2105"/>
         <source>Take audio from external AC3 file</source>
         <translation>Prendi l&apos;audio da un file AC3 esterno</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2108"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2106"/>
         <source>External MP3</source>
         <translation>MP3 esterno</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2108"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2106"/>
         <source>Take audio from external MP3 file</source>
         <translation>Prendi l&apos;audio da un file MP3 esterno</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2109"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2107"/>
         <source>External WAV</source>
         <translation>WAV esterno</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2109"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2107"/>
         <source>Take audio from external WAV file</source>
         <translation>Prendi l&apos;audio da un file WAV esterno</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2114"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2112"/>
         <source>_Audio source:</source>
         <translation>Sorgente _audio:</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2115"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2113"/>
         <source>_External file:</source>
         <translation>File _esterno:</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2033"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2031"/>
         <source>_Track from video:</source>
         <translation>_Traccia dal video:</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2043"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2041"/>
         <source>Main Audio Track</source>
         <translation>Traccia audio principale</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2127"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2125"/>
         <source>Cannot load</source>
         <translation>Impossibile caricare</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2127"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2125"/>
         <source>The selected audio file does not exist.</source>
         <translation>Il file audio selezionato non esiste.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2124"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2122"/>
         <source>Second Audio Track</source>
         <translation>Traccia audio secondaria</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2156"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2154"/>
         <source>Error loading the MP3 file</source>
         <translation>Errore nel caricamento del file MP3</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2209"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2207"/>
         <source>Second track loaded</source>
         <translation>Seconda traccia caricata</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2179"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2177"/>
         <source>Error loading the AC3 file</source>
         <translation>Errore nel caricamento del file AC3</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2201"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2199"/>
         <source>Error loading the WAV file</source>
         <translation>Errore nel caricamento del file WAV</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2268"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2266"/>
         <source>Saving failed</source>
         <translation>Salvataggio fallito</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2268"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2266"/>
         <source>Saving the job failed. Maybe you have permission issue with ~/.avidemux</source>
         <translation>Il salvataggio dell&apos;attività è fallito. Forse c&apos;è un problema di permesso con ~/.avidemux</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2280"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2278"/>
         <source>File %s has been successfully saved.</source>
         <translation>Il file %s è stato salvato con successo.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2284"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2282"/>
         <source>File %s was NOT saved correctly.</source>
         <translation>Il file %s non è stato salvato correttamente.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2447"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2445"/>
         <source>AvsProxy</source>
         <translation>AvsProxy</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2447"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2445"/>
         <source>Failed to connect to avsproxy.
 Is it running ?</source>
         <translation>Connessione a avsproxy fallita.
 È in esecuzione?</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2452"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2450"/>
         <source>avsproxy</source>
         <translation>avsproxy</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2480"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2478"/>
         <source>Frame type:</source>
         <translation>Tipo di fotogramma:</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2481"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2479"/>
         <source>Frame size:</source>
         <translation>Dimensione fotogramma:</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2483"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2481"/>
         <source>Frame Hex Dump</source>
         <translation>Hex Dump fotogramma</translation>
     </message>
@@ -3366,32 +3366,32 @@ It is needed to create PSP compatible video.</source>
 È necessario per creare video compatibili con PSP.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gui_navigate.cpp" line="426"/>
+        <location filename="../avidemux/gui_navigate.cpp" line="423"/>
         <source>Decompressing error</source>
         <translation>Errore decompressione</translation>
     </message>
     <message>
-        <location filename="../avidemux/gui_navigate.cpp" line="76"/>
+        <location filename="../avidemux/gui_navigate.cpp" line="73"/>
         <source>Cannot decode next frame.</source>
         <translation>Impossibile decodificare il prossimo fotogramma.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gui_navigate.cpp" line="426"/>
+        <location filename="../avidemux/gui_navigate.cpp" line="423"/>
         <source>Cannot decode keyframe.</source>
         <translation>Impossibile decodificare il fotogramma chiave.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gui_navigate.cpp" line="237"/>
+        <location filename="../avidemux/gui_navigate.cpp" line="234"/>
         <source>Seeking</source>
         <translation>Ricerca in corso</translation>
     </message>
     <message>
-        <location filename="../avidemux/gui_navigate.cpp" line="315"/>
+        <location filename="../avidemux/gui_navigate.cpp" line="312"/>
         <source>Finding black frames</source>
         <translation>Ricerca fotogrammi neri</translation>
     </message>
     <message>
-        <location filename="../avidemux/gui_navigate.cpp" line="390"/>
+        <location filename="../avidemux/gui_navigate.cpp" line="387"/>
         <source>Cannot decode the frame.</source>
         <translation>Impossibile decodificare il fotogramma.</translation>
     </message>
@@ -3513,17 +3513,17 @@ It is needed to create PSP compatible video.</source>
         <translation>Seleziona un file TTF</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="708"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="706"/>
         <source>Go to Frame</source>
         <translation>Vai al fotogramma</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="708"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="706"/>
         <source>_Go to frame:</source>
         <translation>_Vai al fotogramma:</translation>
     </message>
     <message>
-        <location filename="../avidemux/gtk_gui.cpp" line="2115"/>
+        <location filename="../avidemux/gtk_gui.cpp" line="2113"/>
         <source>Select file</source>
         <translation>Seleziona un file</translation>
     </message>
@@ -3645,7 +3645,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="62"/>
         <source>Change framerate while keeping duration.</source>
-        <translation>Cambia framerate mantenendo la durata.</translation>
+        <translation>Cambia frame rate mantenendo la durata.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="63"/>
@@ -3765,7 +3765,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="81"/>
         <source>PAL field shift</source>
-        <translation>Traslazione semiquadro Pal</translation>
+        <translation>PAL Field Shift</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="81"/>
@@ -3775,7 +3775,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="82"/>
         <source>PAL smart</source>
-        <translation>PAL smart</translation>
+        <translation>PAL Smart</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="82"/>
@@ -3860,7 +3860,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="96"/>
         <source>Put two fields on top of one another.</source>
-        <translation>Mette due semiquadri sopra un altro.</translation>
+        <translation>Mette due semiquadri uno sopra l&apos;altro.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="97"/>
@@ -4210,7 +4210,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="165"/>
         <source>Whirl</source>
-        <translation>Rotazione rapida</translation>
+        <translation>Effetto vortice</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="165"/>
@@ -4225,7 +4225,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="166"/>
         <source>Split the picture into tiny thumbnails.</source>
-        <translation>Dividi l&apos;immagine in miniature minuscole.</translation>
+        <translation>Divide l&apos;immagine in miniature minuscole.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="167"/>
@@ -4265,7 +4265,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="172"/>
         <source>Compute average luma value for each pixel throughout all frames, and save to file</source>
-        <translation>Calcola il valore medio di luma per ogni pixel su tutti i fotogrammi, e salva su file</translation>
+        <translation>Calcola il valore medio di luma per ogni pixel su tutti i fotogrammi, e salva su file.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="173"/>
@@ -4275,12 +4275,12 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="173"/>
         <source>Apply operation like P&apos;=P*A, P-A, P+A, etc. using a convolution, rolling average, image from file, or constant</source>
-        <translation>Applica operazioni come P&apos;=P*A, P-A, P+A, ecc. usando avvolgimento, media mobile, immagine da file, o costante</translation>
+        <translation>Applica operazioni come P&apos;=P*A, P-A, P+A, ecc. usando avvolgimento, media mobile, immagine da file, o costante.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="174"/>
         <source>Force too-bright/too-dim pixels to 0 and the rest to 255 or vice-versa</source>
-        <translation>Forza i pixel troppo luminosi/scuri a 0 e il resto a 255 o viceversa</translation>
+        <translation>Forza i pixel troppo luminosi/scuri a 0 e il resto a 255 o viceversa.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="175"/>
@@ -4290,7 +4290,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="175"/>
         <source>Identify &apos;particles&apos; (groups of pixels)</source>
-        <translation>Identifica le &apos;particelle&apos; (gruppi di pixel)</translation>
+        <translation>Identifica le &apos;particelle&apos; (gruppi di pixel).</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="180"/>
@@ -4336,7 +4336,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidComputeAverage.cpp" line="181"/>
         <source>_Start Frame (first frame # to include in average):</source>
-        <translation>Fotogramma _iniziale (primo numero di fotogramma da includere in media):</translation>
+        <translation>Fotogramma _iniziale (primo numero di fotogramma da includere nella media):</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidComputeAverage.cpp" line="185"/>
@@ -4801,40 +4801,40 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidParticle.cpp" line="160"/>
         <source>_Left side crop (ignore particles in):</source>
-        <translation>Crop laterale _sinistro (ignora particelle all&apos;interno):</translation>
+        <translation>Crop laterale _sinistro (ignora questo numero di particelle):</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidParticle.cpp" line="163"/>
         <source>_Right side crop (ignore particles in):</source>
-        <translation>Crop laterale _destro (ignora particelle all&apos;interno):</translation>
+        <translation>Crop laterale d_estro (ignora questo numero di particelle):</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidParticle.cpp" line="166"/>
         <source>_Top crop (ignore particles in):</source>
-        <translation>Crop su_periore (ignora particelle all&apos;interno):</translation>
+        <translation>Crop su_periore (ignora questo numero di particelle):</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidParticle.cpp" line="169"/>
         <source>_Bottom crop (ignore particles in):</source>
-        <translation>Crop _inferiore (ignora particelle all&apos;interno):</translation>
+        <translation>Crop _inferiore (ignora questo numero di particelle):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidParticle.cpp" line="172"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidParticle.cpp" line="174"/>
         <source>_Output File:</source>
         <translation>File in _uscita:</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidParticle.cpp" line="175"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidParticle.cpp" line="177"/>
         <source>_Camera number:</source>
         <translation>Numero _telecamera:</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidParticle.cpp" line="177"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidParticle.cpp" line="179"/>
         <source>_Debugging settings (bits):</source>
         <translation>Impostazioni di _debug (bit):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidParticle.cpp" line="172"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidParticle.cpp" line="174"/>
         <source>Select file</source>
         <translation>Seleziona un file</translation>
     </message>
@@ -5057,87 +5057,87 @@ It is needed to create PSP compatible video.</source>
         <translation>_Tipo in ingresso:</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="320"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="322"/>
         <source>Input _File (image or convolution kernel):</source>
         <translation>_File di ingresso (immagine o nucleo di avvolgimento):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="324"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="326"/>
         <source>_Load Bias (added to each pixel
 in file image when loaded):</source>
         <translation>_Carica Bias (aggiunto a ogni pixel
 nell&apos;immagine al caricamento):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="329"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="331"/>
         <source>Load _Multiplier (each pixel in
 file image mult. by this when loaded):</source>
         <translation>Carica _Moltiplicatore (ogni pixel nell&apos;immagine
 moltiplicato per questo valore al caricamento):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="334"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="336"/>
         <source>Input _Constant:</source>
         <translation>Costant_e in ingresso:</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="339"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="341"/>
         <source>Memory constant _alpha
 (where A = (1-alpha)*A + alpha*curr_frame):</source>
         <translation>Costante di memoria _alpha
 (dove A = (1-alpha)*A + alpha*fotogrammacorrente):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="343"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="345"/>
         <source>Init _Start Frame (first frame # to use for head start):</source>
         <translation>Ini_zializza fotogramma iniziale (primo numero
 di fotogramma da usare per la partenza facilitata):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="347"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="349"/>
         <source>Init _End Frame (last frame # to use for head start):</source>
         <translation>Inizia_lizza fotogramma finale (ultimo numero
 di fotogramma da usare per la partenza facilitata):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="352"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="354"/>
         <source>Init By _Rolling (compute head start using a rolling average rather than a straight average)</source>
         <translation>Inizializza con media mobile (elabora partenza facilitata usando una media mobile invece di una media diretta)</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="356"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="358"/>
         <source>_Bias (will be added to result):</source>
         <translation>_Bias (sarà aggiunto al risultato):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="359"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="361"/>
         <source>_Result Bias (added to each result pixel):</source>
         <translation>Bias _risultato (aggiunto a ogni pixel risultato):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="364"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="366"/>
         <source>Result _Multiplier (each result pixel
 multiplied by this):</source>
         <translation>_Moltiplicatore risultato (ogni pixel risultato
 moltiplicato per questo valore):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="368"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="370"/>
         <source>_Histogram every N frames (0 to disable):</source>
         <translation>_Istogramma ogni N fotogrammi (0 per disattivare):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="370"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="372"/>
         <source>_Debugging settings (bits):</source>
         <translation>Impostazioni di _debug (bit):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="320"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="322"/>
         <source>Select file</source>
         <translation>Seleziona un file</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="379"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="381"/>
         <source>Swiss Army Knife Configuration</source>
         <translation>Configurazione Swiss Army Knife</translation>
     </message>
@@ -5231,12 +5231,12 @@ moltiplicato per questo valore):</translation>
 <context>
     <name>ADM_AudiocodecAMR</name>
     <message>
-        <location filename="../avidemux/ADM_audiocodec/ADM_codecwma.cpp" line="190"/>
+        <location filename="../avidemux/ADM_audiocodec/ADM_codecwma.cpp" line="200"/>
         <source>Internal error</source>
         <translation>Errore interno</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_audiocodec/ADM_codecwma.cpp" line="190"/>
+        <location filename="../avidemux/ADM_audiocodec/ADM_codecwma.cpp" line="200"/>
         <source>Cannot open AMR codec.</source>
         <translation>Impossibile aprire i codec AMR.</translation>
     </message>
@@ -5244,12 +5244,12 @@ moltiplicato per questo valore):</translation>
 <context>
     <name>ADM_AudiocodecWMA</name>
     <message>
-        <location filename="../avidemux/ADM_audiocodec/ADM_codecwma.cpp" line="82"/>
+        <location filename="../avidemux/ADM_audiocodec/ADM_codecwma.cpp" line="88"/>
         <source>Internal error</source>
         <translation>Errore interno</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_audiocodec/ADM_codecwma.cpp" line="82"/>
+        <location filename="../avidemux/ADM_audiocodec/ADM_codecwma.cpp" line="88"/>
         <source>Cannot open WMA2 codec.</source>
         <translation>Impossibile aprire i codec WMA2.</translation>
     </message>
@@ -6385,7 +6385,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/resizing.ui" line="147"/>
         <source>Source A:R</source>
-        <translation>Sorgente A:R</translation>
+        <translation>Sorgente A/R</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/resizing.ui" line="154"/>
@@ -6993,7 +6993,7 @@ p, li { white-space: pre-wrap; }
         <translation>&amp;Strumenti</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ui_support.cpp" line="59"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1450"/>
         <source>&amp;Edit</source>
         <translation>&amp;Modifica</translation>
     </message>
@@ -7120,7 +7120,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1666"/>
         <source>Alt+Return</source>
-        <translation>Alt+Invio</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1674"/>
@@ -7480,7 +7480,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="2092"/>
         <source>End</source>
-        <translation>Fine</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="2100"/>
