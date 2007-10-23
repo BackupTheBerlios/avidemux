@@ -38,29 +38,23 @@
 //   implement that now.  The next best thing would be just the config file,
 //   and they have to edit it directly.  Maybe I can do that...
 
-//#include "default.h" // avi_vars.h includes this
-#include "avi_vars.h"
+#include "config.h"
 
 #ifdef USE_JOG
-#include <math.h>
-#include <errno.h>
-#include <linux/input.h>
-#include <cctype>
-
-#include "gtkgui.h"
-
-#include "gui_action.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "jogshuttle.h"
-#include "ADM_jogshuttle.h"
-
-GtkWidget * lookup_jog_shuttle_widget (void); // GUI_bindings.cpp
-
 #include <string>
 using std::string;
 #include <iostream>
 #include <fstream>
 using std::ifstream;
+#include <errno.h>
+
+#include "gui_action.hxx"
+#include "jogshuttle.h"
+#include "ADM_jogshuttle.h"
+#include "ADM_image.h"
+#include "gtkgui.h"
+
+GtkWidget * lookup_jog_shuttle_widget (void); // GUI_bindings.cpp
 
 /// PhysicalJogShuttle
 
