@@ -44,7 +44,7 @@ extern int ADM_cpu_num_processors(void);
 AVCodec *codec=avcodec_find_decoder(x);\
 if(!codec) {GUI_Alert(QT_TR_NOOP("Internal error finding codec"#x));ADM_assert(0);} \
   codecId=x; \
-  _context->workaround_bugs=1*FF_BUG_AUTODETECT+1*FF_BUG_NO_PADDING; \
+  _context->workaround_bugs=0; /* 1*FF_BUG_AUTODETECT+1*FF_BUG_NO_PADDING;*/ \
   _context->error_concealment=3; \
   if (avcodec_open(_context, codec) < 0)  \
                       { \
