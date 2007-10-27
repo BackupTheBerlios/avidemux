@@ -124,12 +124,12 @@ audioQueueMT context;
 PacketQueue   *pq;//("MP4 audioQ",50,2*1024*1024);
 uint32_t    totalAudioSize=0;
 uint32_t sent=0;
-
+const char *containerTitle;
            switch(type)
            {
-             case ADM_PSP:muxerType=MUXER_PSP;break;
-             case ADM_MP4:muxerType=MUXER_MP4;break;
-             case ADM_MATROSKA:muxerType=MUXER_MATROSKA;break;
+             case ADM_PSP:muxerType=MUXER_PSP;containerTitle="PSP";break;
+             case ADM_MP4:muxerType=MUXER_MP4;containerTitle="MP4";break;
+             case ADM_MATROSKA:muxerType=MUXER_MATROSKA;containerTitle="MKV";break;
              default:
                 ADM_assert(0);
            }
@@ -158,7 +158,9 @@ uint32_t sent=0;
                 }
 
                 // init compressor
-                encoding_gui->setContainer("MP4");
+               
+                  encoding_gui->setContainer(containerTitle);
+               
                 encoding_gui->setAudioCodec("None");
                 if(!videoProcessMode())
                         encoding_gui->setCodec("Copy");
@@ -277,7 +279,7 @@ preFilling:
                          goto stopit;
 //_____________ Loop _____________________
           
-          encoding_gui->setContainer("MP4");
+          encoding_gui->setContainer(containerTitle);
          
           if(!videoProcessMode())
                 encoding_gui->setCodec("Copy");
