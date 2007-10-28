@@ -153,7 +153,7 @@ printf(  "*********************\n");
 #endif
         REGISTERX("vobsub",QT_TR_NOOP("VobSub"),QT_TR_NOOP("Embed VobSub subtitles into picture."),VF_VOBSUB,1,vobsub_create,vobsub_script);
 #if 1 //def ADM_DEBUG
-        REGISTERX("dvbsub",QT_TR_NOOP("DVB sub"),QT_TR_NOOP("Embed DVB-T subtitle."),VF_DVBSUB,1,dvbsub_create,dvbsub_script);
+        REGISTERX("dvbsub",QT_TR_NOOP("DVB sub"),QT_TR_NOOP("Embed DVB-T subtitle."),VF_DVBSUB,0,dvbsub_create,dvbsub_script);
 #endif
 
         //*********************
