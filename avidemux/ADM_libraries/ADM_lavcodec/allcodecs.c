@@ -132,7 +132,7 @@ void avcodec_register_all(void)
     REGISTER_ENCDEC (SGI, sgi);
     REGISTER_DECODER(SMACKER, smacker);
     REGISTER_DECODER(SMC, smc);
-    REGISTER_DECODER(SNOW, snow);
+    REGISTER_ENCDEC(SNOW, snow);
     REGISTER_DECODER(SP5X, sp5x);
     REGISTER_ENCDEC (SVQ1, svq1);
     REGISTER_DECODER(SVQ3, svq3);

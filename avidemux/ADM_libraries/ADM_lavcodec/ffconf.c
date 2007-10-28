@@ -227,6 +227,7 @@ int main(void)
     DECLARE_ENCODER (DVVIDEO, dvvideo);
     DECLARE_ENCODER (HUFFYUV, huffyuv);
     DECLARE_ENCODER (DVBSUB, dvbsub);
+    DECLARE_ENCODER (SNOW, snow);
 
 #undef DECLARE_ENCODER
 #define DECLARE_ENCODER(a,b); printf("#define ENABLE_"#a"_ENCODER 0\n"); 
@@ -335,4 +336,5 @@ printf("#define ENABLE_MMI      0\n");
 printf("#define ENABLE_SH4      0\n");
 printf("#define ENABLE_BFIN      0\n");
 printf("#define ENABLE_SMALL      0\n");
+printf("#define CONFIG_SNOW_ENCODER      1\n");
 }
