@@ -51,6 +51,7 @@ printf(  "*********************\n");
 
 	
 	registerFilter("---- Image size/border alteration----",VF_INVALID,2,NULL,NULL);
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	REGISTERX("crop",QT_TR_NOOP("Crop"),QT_TR_NOOP("Remove lines from top/bottom/left/right."),VF_CROP,1,crop_create,crop_script);
 	REGISTERX("mpresize",QT_TR_NOOP("MPlayer resize"),QT_TR_NOOP("Change image size. Faster than Avisynth's Resize."),VF_MPLAYERRESIZE,1,mpresize_create,mpresize_script);
 	REGISTERX("resize",QT_TR_NOOP("Resize"),QT_TR_NOOP("Picture resizer ported from Avisynth."), VF_RESIZE,1,res_create,resize_script);
@@ -64,6 +65,7 @@ printf(  "*********************\n");
         REGISTERX("fade",QT_TR_NOOP("Fade"),QT_TR_NOOP("Fade in/out."),VF_FADE,1,fade_create,fade_script);     
 
 	registerFilter("----------- Interlacing -------------",VF_INVALID,2,NULL,NULL);
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Buggy : Removed REGISTER("IVTC",VF_IVTC,1,ivtc_create);
 //	REGISTERX("mpivtc","Mplayer ivtc",VF_MPDETC,1,mpdetc_create,mpdetc_script);	
         REGISTERX("YADIF",QT_TR_NOOP("yadif"),QT_TR_NOOP("Yet Another DeInterlacer. Ported from MPlayer."),VF_YADIF,1,yadif_create,yadif_script);
@@ -97,7 +99,7 @@ printf(  "*********************\n");
         REGISTERX("unstackfield",QT_TR_NOOP("Unstack fields"),QT_TR_NOOP("Interleave top and bottom part of the picture."),VF_UNSTACK_FIELD,1,unstackfield_create,unstackfield_script);
 	
 	registerFilter("------------ Luma/Chroma ------------",VF_INVALID,2,NULL,NULL);
-              
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++              
         REGISTERX("eq2",QT_TR_NOOP("MPlayer eq2"),QT_TR_NOOP("Adjust contrast, brightness, saturation and gamma."),VF_EQ2,1,Eq2_create,Eq2_script);
         REGISTERX("hue",QT_TR_NOOP("MPlayer hue"),QT_TR_NOOP("Adjust hue and saturation."),VF_HUE,1,hue_create,hue_script);
         REGISTERX("contrast",QT_TR_NOOP("Contrast"),QT_TR_NOOP("Adjust contrast, brightness and colors."),VF_CONTRAST,1,contrast_create,contrast_script);
@@ -119,6 +121,7 @@ printf(  "*********************\n");
     
 	
 	registerFilter("-------------- Smoother -------------",VF_INVALID,2,NULL,NULL);
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	//   registerFilter("Temporal smoother",tempsmooth_create);	
 	REGISTERX("mpdenoise3d",QT_TR_NOOP("MPlayer denoise3d"),QT_TR_NOOP("Reduce noise, smooth image, increase compressibility."),VF_MPLLQD3D,1,MPD3Dlow_create,MPD3Dlow_script);
 	REGISTERX("mphqdenoise3d",QT_TR_NOOP("MPlayer hqdn3d"),QT_TR_NOOP("High quality version of denoise3d. Slower but more precise."),VF_MPLHQD3D,1,MPD3D_create,MPD3D_script);
@@ -136,6 +139,7 @@ printf(  "*********************\n");
 
 	//REGISTERX("smoothclean","Smooth Clean",VF_SMOOTHCLEAN,0,smooth_create,smooth_script);
         registerFilter("-------- Convolution Kernel ---------",VF_INVALID,2,NULL,NULL);
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         REGISTERX("sharpen",QT_TR_NOOP("Sharpen"),QT_TR_NOOP("Enhance difference between near pixels."),VF_SHARPEN,1,sharpen_create,sharpen_script);
         REGISTERX("msharpen",QT_TR_NOOP("MSharpen"),QT_TR_NOOP("Sharpen edges without amplifying noise. By Donald Graft."),VF_MSHARPEN,1,msharpen_create,msharpen_script);
         REGISTERX("asharp",QT_TR_NOOP("asharp"),QT_TR_NOOP("Adaptative sharpener by MarcFD."),VF_ASHARP,1,asharp_create,asharp_script);
@@ -146,18 +150,24 @@ printf(  "*********************\n");
         REGISTERX("largemedian",QT_TR_NOOP("Median (5x5)"),QT_TR_NOOP("Median kernel 5x5. Good for reducing chroma noise."),VF_LARGEMEDIAN,1,largeMedian_create,largeMedian_script);
         REGISTERX("forcedpp",QT_TR_NOOP("Forced postprocessing"),QT_TR_NOOP("Apply blind postprocessing."),VF_FORCEDPP,1,forcedpp_create,forcedpp_script);        
 
-	registerFilter("----------------- Misc --------------",VF_INVALID,2,NULL,NULL);
+	registerFilter("----------------- Subs --------------",VF_INVALID,2,NULL,NULL);
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #ifdef USE_FREETYPE   
 	REGISTERX("subtitle",QT_TR_NOOP("Subtitler"),QT_TR_NOOP("Add srt/sub subtitles to the picture."),VF_SUBTILE,1,subtitle_create,subtitle_script);
 	REGISTERX("ass",QT_TR_NOOP("ASS"),QT_TR_NOOP("Add ASS/SSA subtitles to the picture."),VF_ASS,1,ass_create,ass_script);
 #endif
+
         REGISTERX("vobsub",QT_TR_NOOP("VobSub"),QT_TR_NOOP("Embed VobSub subtitles into picture."),VF_VOBSUB,1,vobsub_create,vobsub_script);
 #if 1 //def ADM_DEBUG
-        REGISTERX("dvbsub",QT_TR_NOOP("DVB sub"),QT_TR_NOOP("Embed DVB-T subtitle."),VF_DVBSUB,0,dvbsub_create,dvbsub_script);
+        REGISTERX("dvbsub",QT_TR_NOOP("DVB sub"),QT_TR_NOOP("Embed DVB-T subtitle."),VF_DVBSUB,1,dvbsub_create,dvbsub_script);
+#else
+        FILTERDEC(dvbsub_create);
+        FILTERDECX(dvbsub_script) ;
 #endif
 
         //*********************
- registerFilter("-------- Deblender ---------",VF_INVALID,2,NULL,NULL);
+ registerFilter("-------- Misc ---------",VF_INVALID,2,NULL,NULL);
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //	registerFilter("---- Video Analysis Tools ----",VF_INVALID,2,NULL,NULL);
 
         REGISTERX("blendremover",QT_TR_NOOP("Blend remover"),QT_TR_NOOP("Remove blend between previous and next picture."),VF_BLENDREMOVAL,1,blendremove_create,blendremove_script);
