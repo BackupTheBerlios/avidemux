@@ -1,5 +1,4 @@
-# translation of fr.po to Mean
-# translation of avidemux2.po to Mean
+# translation of fr.po to
 # This file is distributed under the same license as the avidemux2 package.
 # Copyright (C) 2003, Mean <fixounet@free.fr>
 msgid ""
@@ -7,13 +6,13 @@ msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-09-26 14:47+0100\n"
-"PO-Revision-Date: 2007-05-26 12:38+0100\n"
+"PO-Revision-Date: 2007-11-01 12:17+0100\n"
 "Last-Translator: \n"
-"Language-Team: Mean <fr@li.org>\n"
+"Language-Team:  <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.3\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #: avidemux/ADM_editor/ADM_outputfmt.h:42
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_calculator.cpp:511
@@ -72,7 +71,7 @@ msgstr ""
 #: avidemux/ADM_audio/audiotimeline.cpp:85
 #: avidemux/ADM_audio/audiotimeline.cpp:96
 msgid "Building VBR map"
-msgstr "Construire le Time Map VBR"
+msgstr "Construction de l'index"
 
 #: avidemux/ADM_audiocodec/ADM_codecwma.cpp:75
 #: avidemux/ADM_audiocodec/ADM_codecwma.cpp:183
@@ -93,7 +92,7 @@ msgstr "Ne peut ouvrir le périphérique audio OSS"
 
 #: avidemux/ADM_audiodevice/ADM_deviceoss.cpp:118
 msgid "Check the permissions for /dev/dsp."
-msgstr "Lister permissions pour /dev/dsp."
+msgstr "Vérifier les permissions pour /dev/dsp."
 
 #: avidemux/ADM_audiofilter/audioencoder_lame.cpp:220
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_audioFilter.cpp:104
@@ -147,7 +146,7 @@ msgstr "_Qualité:"
 
 #: avidemux/ADM_audiofilter/audioencoder_lame.cpp:252
 msgid "_Disable reservoir:"
-msgstr ""
+msgstr "Désactiver le bitrate réservoir"
 
 #: avidemux/ADM_audiofilter/audioencoder_vorbis.cpp:271
 msgid "VBR"
@@ -178,7 +177,7 @@ msgid ""
 "Either change codec or use the mixer filter to have less channels."
 msgstr ""
 "Le nombre de canaux est plus grand que ce que le codec audio peut accepter.\n"
-"Changer de codec ou utiliser le filtre mixer pour avoir moins de canaux."
+"Changez de codec ou utilisez le filtre mixer pour avoir moins de canaux."
 
 #: avidemux/ADM_codecs/ADM_ffmp43.cpp:45
 msgid "Internal error finding codec"
@@ -196,7 +195,7 @@ msgstr "Erreur interne avec le contexte du codec"
 msgid ""
 ".\n"
 " Did you use too low / too high target for 2 pass ?"
-msgstr ""
+msgstr "<br>Avez vous spécificé un bitrate trop haut ou trop bas ?"
 
 #: avidemux/ADM_editor/ADM_edFrameType.cpp:58
 msgid "No video loaded"
@@ -212,7 +211,7 @@ msgstr "DivX 5 + packed ?"
 
 #: avidemux/ADM_editor/ADM_edFrameType.cpp:93
 msgid "Rebuilding Frames"
-msgstr "Reconstuire images "
+msgstr "Reconstuire un index"
 
 #: avidemux/ADM_editor/ADM_edFrameType.cpp:129
 msgid "Aborted"
@@ -270,6 +269,8 @@ msgid ""
 "ACCURACY</b>.\n"
 "Do you want to use that mode ?"
 msgstr ""
+"Si le fichier utilise l'option b-frame as reference, cela peut conduire à un crash ou à des saccades.\nAvidemux peut utilier un autre mode qui est plus stable, mais <b>cela fera perdre la précision à l'image près</b>\n"
+"Voulez vous utiliser ce mode ?"
 
 #: avidemux/ADM_editor/ADM_edit.cpp:712
 msgid "Packed Bitstream detected"
@@ -285,7 +286,7 @@ msgstr "Impossible de dépaquer la vidéo"
 
 #: avidemux/ADM_editor/ADM_edit.cpp:733
 msgid "Using backup decoder - not frame accurate."
-msgstr "Utilisation du décodeur de secours - pas précis sur les images."
+msgstr "Utilisation du décodeur de secours - La navigation ne sera pas précise."
 
 #: avidemux/ADM_editor/ADM_edit.cpp:738
 msgid "Weird"
@@ -293,7 +294,7 @@ msgstr "Etrange"
 
 #: avidemux/ADM_editor/ADM_edit.cpp:738
 msgid "The unpacking succeedeed but the index is still not up to date."
-msgstr "Le dépaquetage a réeussi mais l'index n'est toujours pas jour."
+msgstr "Le dépaquetage a réeussi mais l'index n'est toujours pas à our."
 
 #: avidemux/ADM_editor/ADM_edit.cpp:744
 msgid "Troubles ahead"
@@ -309,8 +310,7 @@ msgstr "L'index n'est pas à jour"
 
 #: avidemux/ADM_editor/ADM_edit.cpp:755
 msgid "You should use Tool->Rebuild frame. Do it now ?"
-msgstr ""
-"Vous devriez utiliser « Outils->Reconstruire image ». Le faire maintenant ?"
+msgstr "Vous devriez utiliser « Outils->Reconstruire image ». Le faire maintenant ?"
 
 #: avidemux/ADM_editor/ADM_edit.cpp:1510
 msgid ""
@@ -354,7 +354,7 @@ msgstr "Choisir « DVD » comme codec vidéo pour une sortie MPEG TS."
 
 #: avidemux/ADM_encoder/adm_encConfig.cpp:718
 msgid "Only QCIF and subQCIF are allowed for H.263"
-msgstr "Seulement QCIF et subQCIF autorisés pour H.263"
+msgstr "Seulement le QCIF et le subQCIF sont autorisés pour le H.263"
 
 #: avidemux/ADM_encoder/adm_encConfig.cpp:910
 msgid "Fatal error"
@@ -362,7 +362,7 @@ msgstr "Erreur fatale"
 
 #: avidemux/ADM_encoder/adm_encffmpeg.cpp:261
 msgid "Incompatible settings"
-msgstr "Règlage incomptaible"
+msgstr "Règlages incomptaibles"
 
 #: avidemux/ADM_encoder/adm_encffmpeg.cpp:261
 msgid "At the moment, the DV codec only accepts 720*576@25"
@@ -406,7 +406,7 @@ msgstr "Il y a plusieurs fichiers MPEG, les ajouter ?"
 
 #: avidemux/ADM_inputs/ADM_mpegdemuxer/dmx_indexer.cpp:250
 msgid "Can't determine aspect ratio"
-msgstr "Impossible de déterminer le radio d'aspect"
+msgstr "Impossible de déterminer le rapport H/L"
 
 #: avidemux/ADM_inputs/ADM_mpegdemuxer/dmx_video.cpp:355
 msgid "Out of memory"
@@ -414,7 +414,7 @@ msgstr "Plus de mémoire"
 
 #: avidemux/ADM_inputs/ADM_mpegdemuxer/dmx_video.cpp:370
 msgid "Opening MPEG"
-msgstr ""
+msgstr "Ouverture du mpeg"
 
 #: avidemux/ADM_inputs/ADM_mpegdemuxer/dmx_video.cpp:539
 msgid "MPEG renumbering error"
@@ -423,7 +423,7 @@ msgstr "Echec de la re-numérotation MPEG"
 #: avidemux/ADM_inputs/ADM_nuv/ADM_nuv.cpp:542
 #: avidemux/ADM_inputs/ADM_nuv/ADM_nuv.cpp:571
 msgid "Opening Nuppel video"
-msgstr ""
+msgstr "Ouverture du nuppel video"
 
 #: avidemux/ADM_inputs/ADM_nuv/ADM_nuv.cpp:547
 msgid "Sure you want to abort ?"
@@ -461,7 +461,7 @@ msgstr ""
 
 #: avidemux/ADM_inputs/ADM_openDML/ADM_opendml_reindex.cpp:68
 msgid "Indexing"
-msgstr ""
+msgstr "Indexation"
 
 #: avidemux/ADM_libraries/ADM_lavformat/ADM_lavformat.cpp:373
 msgid "Incompatible frame rate"
@@ -488,11 +488,11 @@ msgstr "_Fichier"
 
 #: avidemux/ADM_libraries/ADM_utilities/ADM_imageLoader.cpp:191
 msgid "Wrong Colorspace"
-msgstr ""
+msgstr "Colorspace incomatible"
 
 #: avidemux/ADM_libraries/ADM_utilities/ADM_imageLoader.cpp:191
 msgid "Only YV12/I420 or YUY2/I422 JPegs are supported"
-msgstr ""
+msgstr "Seuls le YV12/I420 and YUY2/I422 sont acceptés"
 
 #: avidemux/ADM_libraries/ADM_utilities/ADM_imageUtils.cpp:403
 msgid "Memory error"
@@ -526,7 +526,7 @@ msgstr "Ne peut encoder l'image"
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/TLK_filesel.cpp:328
 #: avidemux/gtk_gui.cpp:896 avidemux/gtk_gui.cpp:1498
 msgid "File error"
-msgstr "Erreur Fichier"
+msgstr "Erreur de fichier"
 
 #: avidemux/ADM_libraries/ADM_utilities/ADM_imageUtils.cpp:481
 #: avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp:366
@@ -608,12 +608,12 @@ msgstr "Problème d'ouverture des fichiers MPEG"
 
 #: avidemux/ADM_ocr/ADM_vob2vobsub.cpp:300
 msgid "Generating VobSub file"
-msgstr ""
+msgstr "Génération du fichier vobub"
 
 #: avidemux/ADM_osSupport/ADM_crashdump.cpp:210
 #: avidemux/ADM_osSupport/ADM_crashdump.cpp:236
 msgid "Fatal Error"
-msgstr ""
+msgstr "Erreur fatale"
 
 #: avidemux/ADM_osSupport/ADM_crashdump.cpp:210
 #: avidemux/ADM_osSupport/ADM_crashdump.cpp:236
@@ -623,6 +623,9 @@ msgid ""
 "Click OK to generate debug information. This may take a few minutes to "
 "complete."
 msgstr ""
+"Une erreur fatale est survenue.\n"
+"\n"
+"Choisir OK pour generer un rapport. Cela peut prendre quelques minutes."
 
 #: avidemux/ADM_osSupport/ADM_crashdump.cpp:437
 msgid "Load it"
@@ -630,7 +633,7 @@ msgstr "Charger le"
 
 #: avidemux/ADM_osSupport/ADM_crashdump.cpp:437
 msgid "Crash file"
-msgstr "Crash fichier"
+msgstr "Fichier de crash."
 
 #: avidemux/ADM_osSupport/ADM_crashdump.cpp:438
 msgid ""
@@ -638,7 +641,7 @@ msgid ""
 "Do you want to load it  ?\n"
 "(It will be deleted in all cases, you should save it if you want to keep it)"
 msgstr ""
-"J'ai détecté un crash de fichier. \n"
+"J'ai détecté un fichier de crash"
 "Voulez le charger ?\n"
 "(Il sera supprimé dans tous les cas, vous devriez le sauver si vous voulez "
 "le garder)"
@@ -717,11 +720,11 @@ msgstr "_Coupe tout les MB:"
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:82
 msgid "Mux _every x video frames:"
-msgstr "Multiplexer _toutes les x images vidéos:"
+msgstr "Multiplexer _toutes les x images"
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:83
 msgid "Mux in _blocks of x bytes:"
-msgstr ""
+msgstr "Muxer en block de X octets"
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:90
 msgid "AVI Muxer Options"
@@ -808,24 +811,24 @@ msgstr ""
 
 #: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:151
 msgid "Unsupported video"
-msgstr ""
+msgstr "Video non supportée"
 
 #: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:151
 msgid "Only FLV1 and VP6 video are supported"
-msgstr ""
+msgstr "Seulement le FLV1 et le VP6 sont acceptés."
 
 #: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:173
 #: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:178
 msgid "Unsupported audio"
-msgstr ""
+msgstr "Audio non accepté"
 
 #: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:173
 msgid "Audio must be mp3 for flv output."
-msgstr ""
+msgstr "L'audio doit etre en MP3 pour le format FLV."
 
 #: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:178
 msgid "Frequency must be 44100, 22050 or 11025 Hz."
-msgstr ""
+msgstr "La frequence doit etre 44100, 22050 ou 11025 Hz"
 
 #: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:254
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:251
@@ -834,7 +837,7 @@ msgstr "Ne peut pas initialiser le flux audio"
 
 #: avidemux/ADM_outputs/oplug_mpeg/op_mpegpass.cpp:89
 msgid "This is not MPEG compatible"
-msgstr "Ce n'est pas un MPEG compatible"
+msgstr "Ce n'est pas compatible avec le MPEG"
 
 #: avidemux/ADM_outputs/oplug_mpeg/op_mpegpass.cpp:89
 msgid "You can't use the Copy codec."
@@ -935,7 +938,7 @@ msgstr "menu"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_animated.cpp:36
 msgid "_Background Image:"
-msgstr ""
+msgstr "Image de fond:"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_animated.cpp:37
 msgid "_NTSC(default is Pal):"
@@ -943,19 +946,19 @@ msgstr ""
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_animated.cpp:38
 msgid "Vignette _Width:"
-msgstr ""
+msgstr "Largeur des imagettes "
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_animated.cpp:39
 msgid "Vignette _Height:"
-msgstr ""
+msgstr "Hauteur des imagettes :"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_animated.cpp:42
 msgid "Vignette frame number"
-msgstr ""
+msgstr "Numéro d'image pour l'imagette"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_animated.cpp:46
 msgid "Timecode:"
-msgstr ""
+msgstr "Temps :"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_audioFilter.cpp:62
 msgid "_Dynamic range compression"
@@ -963,19 +966,19 @@ msgstr "Courbe de compression dynamique"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_audioFilter.cpp:64
 msgid "_Time shift (ms):"
-msgstr ""
+msgstr "Décalage temporel (ms) :"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_audioFilter.cpp:64
 msgid "Time shift value (ms)"
-msgstr ""
+msgstr "Valeur du décalage (ms)"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_audioFilter.cpp:72
 msgid "R_esampling (Hz):"
-msgstr ""
+msgstr "Rééechantillonage(Hz) :"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_audioFilter.cpp:72
 msgid "Resampling frequency (Hz)"
-msgstr ""
+msgstr "Frequence (Hz)"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_audioFilter.cpp:80
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_audioFilter.cpp:89
@@ -1297,15 +1300,15 @@ msgstr ""
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_gototime.cpp:27
 msgid "_Hours:"
-msgstr ""
+msgstr "Heures:"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_gototime.cpp:28
 msgid "_Minutes:"
-msgstr ""
+msgstr "Minutes:"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_gototime.cpp:29
 msgid "_Seconds:"
-msgstr ""
+msgstr "Secondes:"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavcodec.cpp:52
 msgid "Full"
@@ -1438,15 +1441,15 @@ msgstr "Configuration libavcodec MPEG-4"
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavDecoder.cpp:45
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_postproc.cpp:41
 msgid "_Swap U and V"
-msgstr ""
+msgstr "Inverser U et V"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavDecoder.cpp:46
 msgid "Show motion _vectors"
-msgstr ""
+msgstr "Montrer les vecteurs de mouvements"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavDecoder.cpp:48
 msgid "Decoder Options"
-msgstr ""
+msgstr "Options de décodage"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_mjpeg.cpp:41
 msgid "_Swap U&V:"
@@ -1454,60 +1457,60 @@ msgstr "Echanger UV:"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:92
 msgid "Select idx file:"
-msgstr ""
+msgstr "Choisir le fichier idx"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:93
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:210
 msgid "Use glyphset (optional):"
-msgstr ""
+msgstr "Utiliser un dictionnaire de symbole (optionnel):"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:94
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:211
 msgid "Output SRT file"
-msgstr ""
+msgstr "Fichier de sortie (SRT)"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:105
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:222
 msgid "Select input and ouput files"
-msgstr ""
+msgstr "Choisir les fichiers"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:115
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:127
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:246
 msgid "The idx/sub file does not exist."
-msgstr ""
+msgstr "Le couple idx/sub n'existe pas"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:120
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:239
 msgid "Please Select a valid output SRT file."
-msgstr ""
+msgstr "Choisissez un fichier SRT de sortie valide."
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:136
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:255
 msgid "Cannot load the glyphset file."
-msgstr ""
+msgstr "Echec du chargement du dictionnaire"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:156
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:276
 msgid "Glyphset filename"
-msgstr ""
+msgstr "Nom du fichier dictionnaire"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:158
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:278
 msgid "Save Glyph"
-msgstr ""
+msgstr "Sauver le dictionnaire"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:208
 msgid "Input TS:"
-msgstr ""
+msgstr "Fichier TS d'entrée"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:209
 msgid "Subtitle PID:"
-msgstr ""
+msgstr "PID de la piste de sous titre"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:233
 msgid "Please Select a valid TS file."
-msgstr ""
+msgstr "Sélectionnez un fichier TS valide"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_postproc.cpp:40
 #: avidemux/ADM_videoFilter/ADM_vidForcedPP.cpp:60
@@ -1768,11 +1771,11 @@ msgstr "Charger des filtres extérieurs"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_prefs.cpp:368
 msgid "Use _Global GlyphSet"
-msgstr ""
+msgstr "Utiliser un dictionnaire de symbol global"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_prefs.cpp:369
 msgid "Gl_yphSet:"
-msgstr ""
+msgstr "Dictionnaire"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_prefs.cpp:378
 msgid "Automation"
@@ -1805,11 +1808,11 @@ msgstr ""
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_prefs.cpp:414
 msgid "Global GlyphSet"
-msgstr ""
+msgstr "Dictionnaire global"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_prefs.cpp:418
 msgid "External Filters"
-msgstr ""
+msgstr "Filtres externes"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_prefs.cpp:422
 msgid "Preferences"
@@ -1821,43 +1824,43 @@ msgstr "_Facteur shrink :"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_resizeWiz.cpp:59
 msgid "_Target type:"
-msgstr ""
+msgstr "Type de cible"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_resizeWiz.cpp:60
 msgid "_Source aspect ratio:"
-msgstr ""
+msgstr "Rapport H/L source:"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_resizeWiz.cpp:61
 msgid "_Destination aspect ratio:"
-msgstr ""
+msgstr "Rapport H/L destination:"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_srt.cpp:88
 msgid "_Subtitle file:"
-msgstr ""
+msgstr "Fichier de sous titres:"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_srt.cpp:89
 msgid "_Font (TTF):"
-msgstr ""
+msgstr "Fontes (TTF):"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_srt.cpp:104
 msgid "_Encoding:"
-msgstr ""
+msgstr "Encodage:"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_srt.cpp:106
 msgid "S_elect C_olor"
-msgstr ""
+msgstr "Choisir la couleur"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_srt.cpp:107
 msgid "Set Size and _Position"
-msgstr ""
+msgstr "Choisir la taille et la position"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_srt.cpp:108
 msgid "_Auto split"
-msgstr ""
+msgstr "Découpe automatique"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_srt.cpp:109
 msgid "_Delay (ms):"
-msgstr ""
+msgstr "Retard (ms)"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_srt.cpp:112
 msgid "Subtitler"
@@ -1866,7 +1869,7 @@ msgstr ""
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_tdeint.cpp:45
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_tdeint.cpp:51
 msgid "Auto (might not work)"
-msgstr "Auto (ne devrait pas fonctionner)"
+msgstr "Auto (peut ne pas fonctionner)"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_tdeint.cpp:46
 #: avidemux/ADM_videoFilter/ADM_vidYadif.cpp:178
@@ -4041,8 +4044,7 @@ msgid "Enforce a maximum quantizer level"
 msgstr "Imposer un niveau maximum de quantificateur"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_x264.cpp:1265
-msgid ""
-"Define how much the quantizer rate can change between two consecutive frames"
+msgid "Define how much the quantizer rate can change between two consecutive frames"
 msgstr ""
 "Définir combien le taux de quantificateur peut changer entre deux frames "
 "consécutives"
@@ -4452,8 +4454,7 @@ msgstr "Mode Ca_rtoon"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid4.cpp:823
 msgid "Enables special motion estimation features for cartoons/anime"
-msgstr ""
-"Permet l'option d'estimation spéciale des mouvement pour les cartoons/anime"
+msgstr "Permet l'option d'estimation spéciale des mouvement pour les cartoons/anime"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid4.cpp:825
 msgid "C_hroma optimizer"
@@ -4492,8 +4493,7 @@ msgid "VHQ mode:"
 msgstr "Mode VHQ: "
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid4.cpp:880
-msgid ""
-"Higher settings give higher quality results, at the cost of slower encoding"
+msgid "Higher settings give higher quality results, at the cost of slower encoding"
 msgstr ""
 "Plus les règlages sont haut meilleur sera la qualité, mais au prix d'un "
 "encodage plus lent"
@@ -4524,8 +4524,7 @@ msgstr "6 - Ultra haut"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid4.cpp:917
 msgid "VHQ enables an additional search process to increase quality"
-msgstr ""
-"VHQ permet à un processus de recherche complémentaire d'augmenter la qualité"
+msgstr "VHQ permet à un processus de recherche complémentaire d'augmenter la qualité"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid4.cpp:921
 msgid "0 - Off"
@@ -4620,8 +4619,7 @@ msgstr ""
 "plus précise"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid4.cpp:1021
-msgid ""
-"Global Motion Compensation can save bits on camera pans, zooming and rotation"
+msgid "Global Motion Compensation can save bits on camera pans, zooming and rotation"
 msgstr ""
 "La compensation de Mouvement Globale peut économiser des bits sur des prises "
 "de caméra, zooms et rotations"
@@ -5840,8 +5838,7 @@ msgid "_Output File:"
 msgstr ""
 
 #: avidemux/ADM_videoFilter/ADM_vidComputeAverage.cpp:198
-msgid ""
-"_Bias (only for display; use 0 for average, 128 for frame minus average):"
+msgid "_Bias (only for display; use 0 for average, 128 for frame minus average):"
 msgstr ""
 
 #: avidemux/ADM_videoFilter/ADM_vidComputeAverage.cpp:202
@@ -6636,8 +6633,7 @@ msgstr "Pas de décodeur audio pour ce fichier"
 
 #: avidemux/gtk_gui.cpp:1040
 msgid "Save (A+V) will generate bad AVI. Save audio will work."
-msgstr ""
-"Sauvegarder (A+V) générera un mauvais AVI. Sauvegarder l'audio fonctionnera."
+msgstr "Sauvegarder (A+V) générera un mauvais AVI. Sauvegarder l'audio fonctionnera."
 
 #: avidemux/gtk_gui.cpp:1099
 msgid "Something failed when appending"
@@ -6652,8 +6648,7 @@ msgid "Cannot save the audio in copy mode"
 msgstr "Ne peut pas sauvegarder l'audio en mode copie"
 
 #: avidemux/gtk_gui.cpp:1172
-msgid ""
-"Select WAV PCM as the audio codec, otherwise the audio file would be raw PCM."
+msgid "Select WAV PCM as the audio codec, otherwise the audio file would be raw PCM."
 msgstr ""
 "Choisissez WAV PCM comme codec audio, autrement le fichier audio sera en raw "
 "PCM."
@@ -7018,1371 +7013,3 @@ msgstr ""
 "Vous pouvez avoir besoin de la copie intelligente.\n"
 "La permettez-vous ?"
 
-#~ msgid "AVI, unp. VOP"
-#~ msgstr "AVI, sans VOP"
-
-#~ msgid "MPEG Video"
-#~ msgstr "MPEG vidéo "
-
-#~ msgid "Unpacking packed bitstream"
-#~ msgstr "Enlever Packed bitstream"
-
-#~ msgid "Select Glyphfile to save to"
-#~ msgstr "Sélection fichier Glyph à sauvegarder"
-
-#~ msgid "Erase current glyphs ?"
-#~ msgstr "Effacer Glyphe actuel ?"
-
-#~ msgid "Enable _time shift"
-#~ msgstr "Permet le décalage "
-
-#~ msgid "Time shift _value (ms):"
-#~ msgstr "Valeur décalage (ms):"
-
-#~ msgid "_Enable resampling"
-#~ msgstr "_Active le ré-échantillonage"
-
-#~ msgid "_Resampling frequency (Hz):"
-#~ msgstr "_Ré-échantillonage fréquence (Hz):"
-
-#~ msgid "Video codecs:"
-#~ msgstr "Codecs Vidéo:"
-
-#~ msgid "Audio codecs:"
-#~ msgstr "Codecs audio:"
-
-#~ msgid "Ogg Vorbis"
-#~ msgstr "Ogg Vorbis"
-
-#~ msgid "Miscellaneous libraries:"
-#~ msgstr "Librairies divers:"
-
-#~ msgid "CPU:"
-#~ msgstr "CPU:"
-
-#~ msgid "Hour"
-#~ msgstr "Heure"
-
-#~ msgid "Minutes"
-#~ msgstr "Minutes"
-
-#~ msgid "Seconds"
-#~ msgstr "Seconde "
-
-#~ msgid "Swap U & V:"
-#~ msgstr "Echanger U & V:"
-
-#~ msgid "Show _Vectors:"
-#~ msgstr "Montrer les vecteurs de mouvement:"
-
-#~ msgid "Lavcodec Decoder Configuration"
-#~ msgstr "Configuration Lavcodec Decoder"
-
-#~ msgid "_Swap U & V"
-#~ msgstr "_Echanger U & V:"
-
-#~ msgid "_Number of threads:"
-#~ msgstr "Nombre de fils:"
-
-#~ msgid "Target type"
-#~ msgstr "Type de cible"
-
-#~ msgid "Source aspect ratio"
-#~ msgstr "Ratio de la source"
-
-#~ msgid "Dest. aspect ratio"
-#~ msgstr "Ratio d'Aspect"
-
-#~ msgid "Top Field First"
-#~ msgstr "Trame haute en premier"
-
-#~ msgid "Bottom Field First"
-#~ msgstr "Trame basse en premier"
-
-#~ msgid "Bottom Field (keep top)"
-#~ msgstr "Trame basse (garder le haut)"
-
-#~ msgid "Top Field (keep Bottom)"
-#~ msgstr "Trame haute (garder le bas) "
-
-#~ msgid "Cubic Interpolation"
-#~ msgstr "Interpolation cubique"
-
-#~ msgid "Kernel Interpolation"
-#~ msgstr "Interpolation kernel"
-
-#~ msgid "4 Fields Check"
-#~ msgstr "Contrôle 4 trames "
-
-#~ msgid "5 Fields Check"
-#~ msgstr "Contrôle 5 trames "
-
-#~ msgid "4 Fields Check (no avg)"
-#~ msgstr "Contrôle 4 trames (pas de moyenne) "
-
-#~ msgid "5 Fields Check (no avg)"
-#~ msgstr "Contrôle 5 trames (pas de moyenne) "
-
-#~ msgid "No Link"
-#~ msgstr "Pas de lien "
-
-#~ msgid "Full Link"
-#~ msgstr "Lien complet "
-
-#~ msgid "Use Chroma to evalute"
-#~ msgstr "Utiliser Chroma pour évaluer"
-
-#~ msgid "Try weave"
-#~ msgstr "Armature d'essai"
-
-#~ msgid "Sharp"
-#~ msgstr "Sharp"
-
-#~ msgid "Evalute all frames"
-#~ msgstr "Evaluer toutes les images"
-
-#~ msgid "Motion threshold, Luma:"
-#~ msgstr "Seuil mouvement, Luma:"
-
-#~ msgid "Motion threshold, Chroma:"
-#~ msgstr "Seuil mouvement, Chroma:"
-
-#~ msgid "Area combing threshold:"
-#~ msgstr "Seuil zone de madrure:"
-
-#~ msgid "Combed threshold:"
-#~ msgstr "Seuil Madrure:"
-
-#~ msgid "Artefact prot. threshold:"
-#~ msgstr "Seuil protection des artefacts:"
-
-#~ msgid "TDEint Configuration"
-#~ msgstr "Configuration TDEint"
-
-#~ msgid "Vob file(s):"
-#~ msgstr "Fichier(s) Vob"
-
-#~ msgid "IFO file:"
-#~ msgstr "Fichier IFO:"
-
-#~ msgid "Vobsub file:"
-#~ msgstr "Fichier sous-titres Vob:"
-
-#~ msgid "Vob 2 Vobsub"
-#~ msgstr "Vob vers sous-titres Vob"
-
-#~ msgid "VOB file"
-#~ msgstr "Fichier Vob"
-
-#~ msgid "The selected vobfile does not exist."
-#~ msgstr "Le fichier Vob sélectionné n'existe pas."
-
-#~ msgid "IFO file"
-#~ msgstr "Fichier IFO"
-
-#~ msgid "The selected IFO file does not exist."
-#~ msgstr "Le fichier IFO sélectioné n'existe pas."
-
-#~ msgid "VobSub file"
-#~ msgstr "Fichier sous-titres vob"
-
-#~ msgid "Select a correct vobsub path/dir."
-#~ msgstr "Sélectionner un chemin correct pour les sous-titres Vob."
-
-#~ msgid "© 2001-2006 Mean"
-#~ msgstr "© 2001-2006 Mean"
-
-#~ msgid ""
-#~ "Avidemux is free software; you can redistribute it and/or modify it \n"
-#~ "under the terms of the GNU General Public License version 2 \n"
-#~ "as published by the Free Software Foundation.\n"
-#~ "\n"
-#~ "\t\t    GNU GENERAL PUBLIC LICENSE\n"
-#~ "\t\t       Version 2, June 1991\n"
-#~ "\n"
-#~ " Copyright (C) 1989, 1991 Free Software Foundation, Inc.\n"
-#~ "                       51 Franklin St, Fifth Floor, Boston, MA  02110-"
-#~ "1301  USA\n"
-#~ " Everyone is permitted to copy and distribute verbatim copies\n"
-#~ " of this license document, but changing it is not allowed.\n"
-#~ "\n"
-#~ "\t\t\t    Preamble\n"
-#~ "\n"
-#~ "  The licenses for most software are designed to take away your\n"
-#~ "freedom to share and change it.  By contrast, the GNU General Public\n"
-#~ "License is intended to guarantee your freedom to share and change free\n"
-#~ "software--to make sure the software is free for all its users.  This\n"
-#~ "General Public License applies to most of the Free Software\n"
-#~ "Foundation's software and to any other program whose authors commit to\n"
-#~ "using it.  (Some other Free Software Foundation software is covered by\n"
-#~ "the GNU Library General Public License instead.)  You can apply it to\n"
-#~ "your programs, too.\n"
-#~ "\n"
-#~ "  When we speak of free software, we are referring to freedom, not\n"
-#~ "price.  Our General Public Licenses are designed to make sure that you\n"
-#~ "have the freedom to distribute copies of free software (and charge for\n"
-#~ "this service if you wish), that you receive source code or can get it\n"
-#~ "if you want it, that you can change the software or use pieces of it\n"
-#~ "in new free programs; and that you know you can do these things.\n"
-#~ "\n"
-#~ "  To protect your rights, we need to make restrictions that forbid\n"
-#~ "anyone to deny you these rights or to ask you to surrender the rights.\n"
-#~ "These restrictions translate to certain responsibilities for you if you\n"
-#~ "distribute copies of the software, or if you modify it.\n"
-#~ "\n"
-#~ "  For example, if you distribute copies of such a program, whether\n"
-#~ "gratis or for a fee, you must give the recipients all the rights that\n"
-#~ "you have.  You must make sure that they, too, receive or can get the\n"
-#~ "source code.  And you must show them these terms so they know their\n"
-#~ "rights.\n"
-#~ "\n"
-#~ "  We protect your rights with two steps: (1) copyright the software, and\n"
-#~ "(2) offer you this license which gives you legal permission to copy,\n"
-#~ "distribute and/or modify the software.\n"
-#~ "\n"
-#~ "  Also, for each author's protection and ours, we want to make certain\n"
-#~ "that everyone understands that there is no warranty for this free\n"
-#~ "software.  If the software is modified by someone else and passed on, we\n"
-#~ "want its recipients to know that what they have is not the original, so\n"
-#~ "that any problems introduced by others will not reflect on the original\n"
-#~ "authors' reputations.\n"
-#~ "\n"
-#~ "  Finally, any free program is threatened constantly by software\n"
-#~ "patents.  We wish to avoid the danger that redistributors of a free\n"
-#~ "program will individually obtain patent licenses, in effect making the\n"
-#~ "program proprietary.  To prevent this, we have made it clear that any\n"
-#~ "patent must be licensed for everyone's free use or not licensed at all.\n"
-#~ "\n"
-#~ "  The precise terms and conditions for copying, distribution and\n"
-#~ "modification follow.\n"
-#~ "\n"
-#~ "\t\t    GNU GENERAL PUBLIC LICENSE\n"
-#~ "   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION\n"
-#~ "\n"
-#~ "  0. This License applies to any program or other work which contains\n"
-#~ "a notice placed by the copyright holder saying it may be distributed\n"
-#~ "under the terms of this General Public License.  The \"Program\", below,\n"
-#~ "refers to any such program or work, and a \"work based on the Program\"\n"
-#~ "means either the Program or any derivative work under copyright law:\n"
-#~ "that is to say, a work containing the Program or a portion of it,\n"
-#~ "either verbatim or with modifications and/or translated into another\n"
-#~ "language.  (Hereinafter, translation is included without limitation in\n"
-#~ "the term \"modification\".)  Each licensee is addressed as \"you\".\n"
-#~ "\n"
-#~ "Activities other than copying, distribution and modification are not\n"
-#~ "covered by this License; they are outside its scope.  The act of\n"
-#~ "running the Program is not restricted, and the output from the Program\n"
-#~ "is covered only if its contents constitute a work based on the\n"
-#~ "Program (independent of having been made by running the Program).\n"
-#~ "Whether that is true depends on what the Program does.\n"
-#~ "\n"
-#~ "  1. You may copy and distribute verbatim copies of the Program's\n"
-#~ "source code as you receive it, in any medium, provided that you\n"
-#~ "conspicuously and appropriately publish on each copy an appropriate\n"
-#~ "copyright notice and disclaimer of warranty; keep intact all the\n"
-#~ "notices that refer to this License and to the absence of any warranty;\n"
-#~ "and give any other recipients of the Program a copy of this License\n"
-#~ "along with the Program.\n"
-#~ "\n"
-#~ "You may charge a fee for the physical act of transferring a copy, and\n"
-#~ "you may at your option offer warranty protection in exchange for a fee.\n"
-#~ "\n"
-#~ "  2. You may modify your copy or copies of the Program or any portion\n"
-#~ "of it, thus forming a work based on the Program, and copy and\n"
-#~ "distribute such modifications or work under the terms of Section 1\n"
-#~ "above, provided that you also meet all of these conditions:\n"
-#~ "\n"
-#~ "    a) You must cause the modified files to carry prominent notices\n"
-#~ "    stating that you changed the files and the date of any change.\n"
-#~ "\n"
-#~ "    b) You must cause any work that you distribute or publish, that in\n"
-#~ "    whole or in part contains or is derived from the Program or any\n"
-#~ "    part thereof, to be licensed as a whole at no charge to all third\n"
-#~ "    parties under the terms of this License.\n"
-#~ "\n"
-#~ "    c) If the modified program normally reads commands interactively\n"
-#~ "    when run, you must cause it, when started running for such\n"
-#~ "    interactive use in the most ordinary way, to print or display an\n"
-#~ "    announcement including an appropriate copyright notice and a\n"
-#~ "    notice that there is no warranty (or else, saying that you provide\n"
-#~ "    a warranty) and that users may redistribute the program under\n"
-#~ "    these conditions, and telling the user how to view a copy of this\n"
-#~ "    License.  (Exception: if the Program itself is interactive but\n"
-#~ "    does not normally print such an announcement, your work based on\n"
-#~ "    the Program is not required to print an announcement.)\n"
-#~ "\n"
-#~ "These requirements apply to the modified work as a whole.  If\n"
-#~ "identifiable sections of that work are not derived from the Program,\n"
-#~ "and can be reasonably considered independent and separate works in\n"
-#~ "themselves, then this License, and its terms, do not apply to those\n"
-#~ "sections when you distribute them as separate works.  But when you\n"
-#~ "distribute the same sections as part of a whole which is a work based\n"
-#~ "on the Program, the distribution of the whole must be on the terms of\n"
-#~ "this License, whose permissions for other licensees extend to the\n"
-#~ "entire whole, and thus to each and every part regardless of who wrote "
-#~ "it.\n"
-#~ "\n"
-#~ "Thus, it is not the intent of this section to claim rights or contest\n"
-#~ "your rights to work written entirely by you; rather, the intent is to\n"
-#~ "exercise the right to control the distribution of derivative or\n"
-#~ "collective works based on the Program.\n"
-#~ "\n"
-#~ "In addition, mere aggregation of another work not based on the Program\n"
-#~ "with the Program (or with a work based on the Program) on a volume of\n"
-#~ "a storage or distribution medium does not bring the other work under\n"
-#~ "the scope of this License.\n"
-#~ "\n"
-#~ "  3. You may copy and distribute the Program (or a work based on it,\n"
-#~ "under Section 2) in object code or executable form under the terms of\n"
-#~ "Sections 1 and 2 above provided that you also do one of the following:\n"
-#~ "\n"
-#~ "    a) Accompany it with the complete corresponding machine-readable\n"
-#~ "    source code, which must be distributed under the terms of Sections\n"
-#~ "    1 and 2 above on a medium customarily used for software interchange; "
-#~ "or,\n"
-#~ "\n"
-#~ "    b) Accompany it with a written offer, valid for at least three\n"
-#~ "    years, to give any third party, for a charge no more than your\n"
-#~ "    cost of physically performing source distribution, a complete\n"
-#~ "    machine-readable copy of the corresponding source code, to be\n"
-#~ "    distributed under the terms of Sections 1 and 2 above on a medium\n"
-#~ "    customarily used for software interchange; or,\n"
-#~ "\n"
-#~ "    c) Accompany it with the information you received as to the offer\n"
-#~ "    to distribute corresponding source code.  (This alternative is\n"
-#~ "    allowed only for noncommercial distribution and only if you\n"
-#~ "    received the program in object code or executable form with such\n"
-#~ "    an offer, in accord with Subsection b above.)\n"
-#~ "\n"
-#~ "The source code for a work means the preferred form of the work for\n"
-#~ "making modifications to it.  For an executable work, complete source\n"
-#~ "code means all the source code for all modules it contains, plus any\n"
-#~ "associated interface definition files, plus the scripts used to\n"
-#~ "control compilation and installation of the executable.  However, as a\n"
-#~ "special exception, the source code distributed need not include\n"
-#~ "anything that is normally distributed (in either source or binary\n"
-#~ "form) with the major components (compiler, kernel, and so on) of the\n"
-#~ "operating system on which the executable runs, unless that component\n"
-#~ "itself accompanies the executable.\n"
-#~ "\n"
-#~ "If distribution of executable or object code is made by offering\n"
-#~ "access to copy from a designated place, then offering equivalent\n"
-#~ "access to copy the source code from the same place counts as\n"
-#~ "distribution of the source code, even though third parties are not\n"
-#~ "compelled to copy the source along with the object code.\n"
-#~ "\n"
-#~ "  4. You may not copy, modify, sublicense, or distribute the Program\n"
-#~ "except as expressly provided under this License.  Any attempt\n"
-#~ "otherwise to copy, modify, sublicense or distribute the Program is\n"
-#~ "void, and will automatically terminate your rights under this License.\n"
-#~ "However, parties who have received copies, or rights, from you under\n"
-#~ "this License will not have their licenses terminated so long as such\n"
-#~ "parties remain in full compliance.\n"
-#~ "\n"
-#~ "  5. You are not required to accept this License, since you have not\n"
-#~ "signed it.  However, nothing else grants you permission to modify or\n"
-#~ "distribute the Program or its derivative works.  These actions are\n"
-#~ "prohibited by law if you do not accept this License.  Therefore, by\n"
-#~ "modifying or distributing the Program (or any work based on the\n"
-#~ "Program), you indicate your acceptance of this License to do so, and\n"
-#~ "all its terms and conditions for copying, distributing or modifying\n"
-#~ "the Program or works based on it.\n"
-#~ "\n"
-#~ "  6. Each time you redistribute the Program (or any work based on the\n"
-#~ "Program), the recipient automatically receives a license from the\n"
-#~ "original licensor to copy, distribute or modify the Program subject to\n"
-#~ "these terms and conditions.  You may not impose any further\n"
-#~ "restrictions on the recipients' exercise of the rights granted herein.\n"
-#~ "You are not responsible for enforcing compliance by third parties to\n"
-#~ "this License.\n"
-#~ "\n"
-#~ "  7. If, as a consequence of a court judgment or allegation of patent\n"
-#~ "infringement or for any other reason (not limited to patent issues),\n"
-#~ "conditions are imposed on you (whether by court order, agreement or\n"
-#~ "otherwise) that contradict the conditions of this License, they do not\n"
-#~ "excuse you from the conditions of this License.  If you cannot\n"
-#~ "distribute so as to satisfy simultaneously your obligations under this\n"
-#~ "License and any other pertinent obligations, then as a consequence you\n"
-#~ "may not distribute the Program at all.  For example, if a patent\n"
-#~ "license would not permit royalty-free redistribution of the Program by\n"
-#~ "all those who receive copies directly or indirectly through you, then\n"
-#~ "the only way you could satisfy both it and this License would be to\n"
-#~ "refrain entirely from distribution of the Program.\n"
-#~ "\n"
-#~ "If any portion of this section is held invalid or unenforceable under\n"
-#~ "any particular circumstance, the balance of the section is intended to\n"
-#~ "apply and the section as a whole is intended to apply in other\n"
-#~ "circumstances.\n"
-#~ "\n"
-#~ "It is not the purpose of this section to induce you to infringe any\n"
-#~ "patents or other property right claims or to contest validity of any\n"
-#~ "such claims; this section has the sole purpose of protecting the\n"
-#~ "integrity of the free software distribution system, which is\n"
-#~ "implemented by public license practices.  Many people have made\n"
-#~ "generous contributions to the wide range of software distributed\n"
-#~ "through that system in reliance on consistent application of that\n"
-#~ "system; it is up to the author/donor to decide if he or she is willing\n"
-#~ "to distribute software through any other system and a licensee cannot\n"
-#~ "impose that choice.\n"
-#~ "\n"
-#~ "This section is intended to make thoroughly clear what is believed to\n"
-#~ "be a consequence of the rest of this License.\n"
-#~ "\n"
-#~ "  8. If the distribution and/or use of the Program is restricted in\n"
-#~ "certain countries either by patents or by copyrighted interfaces, the\n"
-#~ "original copyright holder who places the Program under this License\n"
-#~ "may add an explicit geographical distribution limitation excluding\n"
-#~ "those countries, so that distribution is permitted only in or among\n"
-#~ "countries not thus excluded.  In such case, this License incorporates\n"
-#~ "the limitation as if written in the body of this License.\n"
-#~ "\n"
-#~ "  9. The Free Software Foundation may publish revised and/or new "
-#~ "versions\n"
-#~ "of the General Public License from time to time.  Such new versions will\n"
-#~ "be similar in spirit to the present version, but may differ in detail to\n"
-#~ "address new problems or concerns.\n"
-#~ "\n"
-#~ "Each version is given a distinguishing version number.  If the Program\n"
-#~ "specifies a version number of this License which applies to it and \"any\n"
-#~ "later version\", you have the option of following the terms and "
-#~ "conditions\n"
-#~ "either of that version or of any later version published by the Free\n"
-#~ "Software Foundation.  If the Program does not specify a version number "
-#~ "of\n"
-#~ "this License, you may choose any version ever published by the Free "
-#~ "Software\n"
-#~ "Foundation.\n"
-#~ "\n"
-#~ "  10. If you wish to incorporate parts of the Program into other free\n"
-#~ "programs whose distribution conditions are different, write to the "
-#~ "author\n"
-#~ "to ask for permission.  For software which is copyrighted by the Free\n"
-#~ "Software Foundation, write to the Free Software Foundation; we sometimes\n"
-#~ "make exceptions for this.  Our decision will be guided by the two goals\n"
-#~ "of preserving the free status of all derivatives of our free software "
-#~ "and\n"
-#~ "of promoting the sharing and reuse of software generally.\n"
-#~ "\n"
-#~ "\t\t\t    NO WARRANTY\n"
-#~ "\n"
-#~ "  11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO "
-#~ "WARRANTY\n"
-#~ "FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN\n"
-#~ "OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES\n"
-#~ "PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY OF ANY KIND, EITHER "
-#~ "EXPRESSED\n"
-#~ "OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF\n"
-#~ "MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK "
-#~ "AS\n"
-#~ "TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE\n"
-#~ "PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,\n"
-#~ "REPAIR OR CORRECTION.\n"
-#~ "\n"
-#~ "  12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN "
-#~ "WRITING\n"
-#~ "WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR\n"
-#~ "REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR "
-#~ "DAMAGES,\n"
-#~ "INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES "
-#~ "ARISING\n"
-#~ "OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT "
-#~ "LIMITED\n"
-#~ "TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY\n"
-#~ "YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY "
-#~ "OTHER\n"
-#~ "PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE\n"
-#~ "POSSIBILITY OF SUCH DAMAGES.\n"
-#~ "\n"
-#~ "\t\t     END OF TERMS AND CONDITIONS\n"
-#~ "\n"
-#~ "\t    How to Apply These Terms to Your New Programs\n"
-#~ "\n"
-#~ "  If you develop a new program, and you want it to be of the greatest\n"
-#~ "possible use to the public, the best way to achieve this is to make it\n"
-#~ "free software which everyone can redistribute and change under these "
-#~ "terms.\n"
-#~ "\n"
-#~ "  To do so, attach the following notices to the program.  It is safest\n"
-#~ "to attach them to the start of each source file to most effectively\n"
-#~ "convey the exclusion of warranty; and each file should have at least\n"
-#~ "the \"copyright\" line and a pointer to where the full notice is found.\n"
-#~ "\n"
-#~ "    <one line to give the program's name and a brief idea of what it does."
-#~ ">\n"
-#~ "    Copyright (C) <year>  <name of author>\n"
-#~ "\n"
-#~ "    This program is free software; you can redistribute it and/or modify\n"
-#~ "    it under the terms of the GNU General Public License as published by\n"
-#~ "    the Free Software Foundation; either version 2 of the License, or\n"
-#~ "    (at your option) any later version.\n"
-#~ "\n"
-#~ "    This program is distributed in the hope that it will be useful,\n"
-#~ "    but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-#~ "    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-#~ "    GNU General Public License for more details.\n"
-#~ "\n"
-#~ "    You should have received a copy of the GNU General Public License\n"
-#~ "    along with this program; if not, write to the Free Software\n"
-#~ "    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-"
-#~ "1301  USA\n"
-#~ "\n"
-#~ "\n"
-#~ "Also add information on how to contact you by electronic and paper mail.\n"
-#~ "\n"
-#~ "If the program is interactive, make it output a short notice like this\n"
-#~ "when it starts in an interactive mode:\n"
-#~ "\n"
-#~ "    Gnomovision version 69, Copyright (C) year name of author\n"
-#~ "    Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show "
-#~ "w'.\n"
-#~ "    This is free software, and you are welcome to redistribute it\n"
-#~ "    under certain conditions; type `show c' for details.\n"
-#~ "\n"
-#~ "The hypothetical commands `show w' and `show c' should show the "
-#~ "appropriate\n"
-#~ "parts of the General Public License.  Of course, the commands you use "
-#~ "may\n"
-#~ "be called something other than `show w' and `show c'; they could even be\n"
-#~ "mouse-clicks or menu items--whatever suits your program.\n"
-#~ "\n"
-#~ "You should also get your employer (if you work as a programmer) or your\n"
-#~ "school, if any, to sign a \"copyright disclaimer\" for the program, if\n"
-#~ "necessary.  Here is a sample; alter the names:\n"
-#~ "\n"
-#~ "  Yoyodyne, Inc., hereby disclaims all copyright interest in the program\n"
-#~ "  `Gnomovision' (which makes passes at compilers) written by James "
-#~ "Hacker.\n"
-#~ "\n"
-#~ "  <signature of Ty Coon>, 1 April 1989\n"
-#~ "  Ty Coon, President of Vice\n"
-#~ "\n"
-#~ "This General Public License does not permit incorporating your program "
-#~ "into\n"
-#~ "proprietary programs.  If your program is a subroutine library, you may\n"
-#~ "consider it more useful to permit linking proprietary applications with "
-#~ "the\n"
-#~ "library.  If this is what you want to do, use the GNU Library General\n"
-#~ "Public License instead of this License."
-#~ msgstr ""
-#~ "Avidemux est un logiciel gratuit et open source; vous pouvez le "
-#~ "redistribuer ou le modifer \n"
-#~ "Sous les termes de la GNU General Public License version 2 \n"
-#~ "est publié par la Free Software Fondation.\n"
-#~ "\n"
-#~ "\t\t    GNU GENERAL PUBLIC LICENSE\n"
-#~ "\t\t       Version 2, June 1991\n"
-#~ "\n"
-#~ " Copyright (C) 1989, 1991 Free Software Foundation, Inc.\n"
-#~ "                       51 Franklin St, Fifth Floor, Boston, MA  02110-"
-#~ "1301  USA\n"
-#~ " Everyone is permitted to copy and distribute verbatim copies\n"
-#~ " of this license document, but changing it is not allowed.\n"
-#~ "\n"
-#~ "\t\t\t    Preamble\n"
-#~ "\n"
-#~ "  The licenses for most software are designed to take away your\n"
-#~ "freedom to share and change it.  By contrast, the GNU General Public\n"
-#~ "License is intended to guarantee your freedom to share and change free\n"
-#~ "software--to make sure the software is free for all its users.  This\n"
-#~ "General Public License applies to most of the Free Software\n"
-#~ "Foundation's software and to any other program whose authors commit to\n"
-#~ "using it.  (Some other Free Software Foundation software is covered by\n"
-#~ "the GNU Library General Public License instead.)  You can apply it to\n"
-#~ "your programs, too.\n"
-#~ "\n"
-#~ "  When we speak of free software, we are referring to freedom, not\n"
-#~ "price.  Our General Public Licenses are designed to make sure that you\n"
-#~ "have the freedom to distribute copies of free software (and charge for\n"
-#~ "this service if you wish), that you receive source code or can get it\n"
-#~ "if you want it, that you can change the software or use pieces of it\n"
-#~ "in new free programs; and that you know you can do these things.\n"
-#~ "\n"
-#~ "  To protect your rights, we need to make restrictions that forbid\n"
-#~ "anyone to deny you these rights or to ask you to surrender the rights.\n"
-#~ "These restrictions translate to certain responsibilities for you if you\n"
-#~ "distribute copies of the software, or if you modify it.\n"
-#~ "\n"
-#~ "  For example, if you distribute copies of such a program, whether\n"
-#~ "gratis or for a fee, you must give the recipients all the rights that\n"
-#~ "you have.  You must make sure that they, too, receive or can get the\n"
-#~ "source code.  And you must show them these terms so they know their\n"
-#~ "rights.\n"
-#~ "\n"
-#~ "  We protect your rights with two steps: (1) copyright the software, and\n"
-#~ "(2) offer you this license which gives you legal permission to copy,\n"
-#~ "distribute and/or modify the software.\n"
-#~ "\n"
-#~ "  Also, for each author's protection and ours, we want to make certain\n"
-#~ "that everyone understands that there is no warranty for this free\n"
-#~ "software.  If the software is modified by someone else and passed on, we\n"
-#~ "want its recipients to know that what they have is not the original, so\n"
-#~ "that any problems introduced by others will not reflect on the original\n"
-#~ "authors' reputations.\n"
-#~ "\n"
-#~ "  Finally, any free program is threatened constantly by software\n"
-#~ "patents.  We wish to avoid the danger that redistributors of a free\n"
-#~ "program will individually obtain patent licenses, in effect making the\n"
-#~ "program proprietary.  To prevent this, we have made it clear that any\n"
-#~ "patent must be licensed for everyone's free use or not licensed at all.\n"
-#~ "\n"
-#~ "  The precise terms and conditions for copying, distribution and\n"
-#~ "modification follow.\n"
-#~ "\n"
-#~ "\t\t    GNU GENERAL PUBLIC LICENSE\n"
-#~ "   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION\n"
-#~ "\n"
-#~ "  0. This License applies to any program or other work which contains\n"
-#~ "a notice placed by the copyright holder saying it may be distributed\n"
-#~ "under the terms of this General Public License.  The \"Program\", below,\n"
-#~ "refers to any such program or work, and a \"work based on the Program\"\n"
-#~ "means either the Program or any derivative work under copyright law:\n"
-#~ "that is to say, a work containing the Program or a portion of it,\n"
-#~ "either verbatim or with modifications and/or translated into another\n"
-#~ "language.  (Hereinafter, translation is included without limitation in\n"
-#~ "the term \"modification\".)  Each licensee is addressed as \"you\".\n"
-#~ "\n"
-#~ "Activities other than copying, distribution and modification are not\n"
-#~ "covered by this License; they are outside its scope.  The act of\n"
-#~ "running the Program is not restricted, and the output from the Program\n"
-#~ "is covered only if its contents constitute a work based on the\n"
-#~ "Program (independent of having been made by running the Program).\n"
-#~ "Whether that is true depends on what the Program does.\n"
-#~ "\n"
-#~ "  1. You may copy and distribute verbatim copies of the Program's\n"
-#~ "source code as you receive it, in any medium, provided that you\n"
-#~ "conspicuously and appropriately publish on each copy an appropriate\n"
-#~ "copyright notice and disclaimer of warranty; keep intact all the\n"
-#~ "notices that refer to this License and to the absence of any warranty;\n"
-#~ "and give any other recipients of the Program a copy of this License\n"
-#~ "along with the Program.\n"
-#~ "\n"
-#~ "You may charge a fee for the physical act of transferring a copy, and\n"
-#~ "you may at your option offer warranty protection in exchange for a fee.\n"
-#~ "\n"
-#~ "  2. You may modify your copy or copies of the Program or any portion\n"
-#~ "of it, thus forming a work based on the Program, and copy and\n"
-#~ "distribute such modifications or work under the terms of Section 1\n"
-#~ "above, provided that you also meet all of these conditions:\n"
-#~ "\n"
-#~ "    a) You must cause the modified files to carry prominent notices\n"
-#~ "    stating that you changed the files and the date of any change.\n"
-#~ "\n"
-#~ "    b) You must cause any work that you distribute or publish, that in\n"
-#~ "    whole or in part contains or is derived from the Program or any\n"
-#~ "    part thereof, to be licensed as a whole at no charge to all third\n"
-#~ "    parties under the terms of this License.\n"
-#~ "\n"
-#~ "    c) If the modified program normally reads commands interactively\n"
-#~ "    when run, you must cause it, when started running for such\n"
-#~ "    interactive use in the most ordinary way, to print or display an\n"
-#~ "    announcement including an appropriate copyright notice and a\n"
-#~ "    notice that there is no warranty (or else, saying that you provide\n"
-#~ "    a warranty) and that users may redistribute the program under\n"
-#~ "    these conditions, and telling the user how to view a copy of this\n"
-#~ "    License.  (Exception: if the Program itself is interactive but\n"
-#~ "    does not normally print such an announcement, your work based on\n"
-#~ "    the Program is not required to print an announcement.)\n"
-#~ "\n"
-#~ "These requirements apply to the modified work as a whole.  If\n"
-#~ "identifiable sections of that work are not derived from the Program,\n"
-#~ "and can be reasonably considered independent and separate works in\n"
-#~ "themselves, then this License, and its terms, do not apply to those\n"
-#~ "sections when you distribute them as separate works.  But when you\n"
-#~ "distribute the same sections as part of a whole which is a work based\n"
-#~ "on the Program, the distribution of the whole must be on the terms of\n"
-#~ "this License, whose permissions for other licensees extend to the\n"
-#~ "entire whole, and thus to each and every part regardless of who wrote "
-#~ "it.\n"
-#~ "\n"
-#~ "Thus, it is not the intent of this section to claim rights or contest\n"
-#~ "your rights to work written entirely by you; rather, the intent is to\n"
-#~ "exercise the right to control the distribution of derivative or\n"
-#~ "collective works based on the Program.\n"
-#~ "\n"
-#~ "In addition, mere aggregation of another work not based on the Program\n"
-#~ "with the Program (or with a work based on the Program) on a volume of\n"
-#~ "a storage or distribution medium does not bring the other work under\n"
-#~ "the scope of this License.\n"
-#~ "\n"
-#~ "  3. You may copy and distribute the Program (or a work based on it,\n"
-#~ "under Section 2) in object code or executable form under the terms of\n"
-#~ "Sections 1 and 2 above provided that you also do one of the following:\n"
-#~ "\n"
-#~ "    a) Accompany it with the complete corresponding machine-readable\n"
-#~ "    source code, which must be distributed under the terms of Sections\n"
-#~ "    1 and 2 above on a medium customarily used for software interchange; "
-#~ "or,\n"
-#~ "\n"
-#~ "    b) Accompany it with a written offer, valid for at least three\n"
-#~ "    years, to give any third party, for a charge no more than your\n"
-#~ "    cost of physically performing source distribution, a complete\n"
-#~ "    machine-readable copy of the corresponding source code, to be\n"
-#~ "    distributed under the terms of Sections 1 and 2 above on a medium\n"
-#~ "    customarily used for software interchange; or,\n"
-#~ "\n"
-#~ "    c) Accompany it with the information you received as to the offer\n"
-#~ "    to distribute corresponding source code.  (This alternative is\n"
-#~ "    allowed only for noncommercial distribution and only if you\n"
-#~ "    received the program in object code or executable form with such\n"
-#~ "    an offer, in accord with Subsection b above.)\n"
-#~ "\n"
-#~ "The source code for a work means the preferred form of the work for\n"
-#~ "making modifications to it.  For an executable work, complete source\n"
-#~ "code means all the source code for all modules it contains, plus any\n"
-#~ "associated interface definition files, plus the scripts used to\n"
-#~ "control compilation and installation of the executable.  However, as a\n"
-#~ "special exception, the source code distributed need not include\n"
-#~ "anything that is normally distributed (in either source or binary\n"
-#~ "form) with the major components (compiler, kernel, and so on) of the\n"
-#~ "operating system on which the executable runs, unless that component\n"
-#~ "itself accompanies the executable.\n"
-#~ "\n"
-#~ "If distribution of executable or object code is made by offering\n"
-#~ "access to copy from a designated place, then offering equivalent\n"
-#~ "access to copy the source code from the same place counts as\n"
-#~ "distribution of the source code, even though third parties are not\n"
-#~ "compelled to copy the source along with the object code.\n"
-#~ "\n"
-#~ "  4. You may not copy, modify, sublicense, or distribute the Program\n"
-#~ "except as expressly provided under this License.  Any attempt\n"
-#~ "otherwise to copy, modify, sublicense or distribute the Program is\n"
-#~ "void, and will automatically terminate your rights under this License.\n"
-#~ "However, parties who have received copies, or rights, from you under\n"
-#~ "this License will not have their licenses terminated so long as such\n"
-#~ "parties remain in full compliance.\n"
-#~ "\n"
-#~ "  5. You are not required to accept this License, since you have not\n"
-#~ "signed it.  However, nothing else grants you permission to modify or\n"
-#~ "distribute the Program or its derivative works.  These actions are\n"
-#~ "prohibited by law if you do not accept this License.  Therefore, by\n"
-#~ "modifying or distributing the Program (or any work based on the\n"
-#~ "Program), you indicate your acceptance of this License to do so, and\n"
-#~ "all its terms and conditions for copying, distributing or modifying\n"
-#~ "the Program or works based on it.\n"
-#~ "\n"
-#~ "  6. Each time you redistribute the Program (or any work based on the\n"
-#~ "Program), the recipient automatically receives a license from the\n"
-#~ "original licensor to copy, distribute or modify the Program subject to\n"
-#~ "these terms and conditions.  You may not impose any further\n"
-#~ "restrictions on the recipients' exercise of the rights granted herein.\n"
-#~ "You are not responsible for enforcing compliance by third parties to\n"
-#~ "this License.\n"
-#~ "\n"
-#~ "  7. If, as a consequence of a court judgment or allegation of patent\n"
-#~ "infringement or for any other reason (not limited to patent issues),\n"
-#~ "conditions are imposed on you (whether by court order, agreement or\n"
-#~ "otherwise) that contradict the conditions of this License, they do not\n"
-#~ "excuse you from the conditions of this License.  If you cannot\n"
-#~ "distribute so as to satisfy simultaneously your obligations under this\n"
-#~ "License and any other pertinent obligations, then as a consequence you\n"
-#~ "may not distribute the Program at all.  For example, if a patent\n"
-#~ "license would not permit royalty-free redistribution of the Program by\n"
-#~ "all those who receive copies directly or indirectly through you, then\n"
-#~ "the only way you could satisfy both it and this License would be to\n"
-#~ "refrain entirely from distribution of the Program.\n"
-#~ "\n"
-#~ "If any portion of this section is held invalid or unenforceable under\n"
-#~ "any particular circumstance, the balance of the section is intended to\n"
-#~ "apply and the section as a whole is intended to apply in other\n"
-#~ "circumstances.\n"
-#~ "\n"
-#~ "It is not the purpose of this section to induce you to infringe any\n"
-#~ "patents or other property right claims or to contest validity of any\n"
-#~ "such claims; this section has the sole purpose of protecting the\n"
-#~ "integrity of the free software distribution system, which is\n"
-#~ "implemented by public license practices.  Many people have made\n"
-#~ "generous contributions to the wide range of software distributed\n"
-#~ "through that system in reliance on consistent application of that\n"
-#~ "system; it is up to the author/donor to decide if he or she is willing\n"
-#~ "to distribute software through any other system and a licensee cannot\n"
-#~ "impose that choice.\n"
-#~ "\n"
-#~ "This section is intended to make thoroughly clear what is believed to\n"
-#~ "be a consequence of the rest of this License.\n"
-#~ "\n"
-#~ "  8. If the distribution and/or use of the Program is restricted in\n"
-#~ "certain countries either by patents or by copyrighted interfaces, the\n"
-#~ "original copyright holder who places the Program under this License\n"
-#~ "may add an explicit geographical distribution limitation excluding\n"
-#~ "those countries, so that distribution is permitted only in or among\n"
-#~ "countries not thus excluded.  In such case, this License incorporates\n"
-#~ "the limitation as if written in the body of this License.\n"
-#~ "\n"
-#~ "  9. The Free Software Foundation may publish revised and/or new "
-#~ "versions\n"
-#~ "of the General Public License from time to time.  Such new versions will\n"
-#~ "be similar in spirit to the present version, but may differ in detail to\n"
-#~ "address new problems or concerns.\n"
-#~ "\n"
-#~ "Each version is given a distinguishing version number.  If the Program\n"
-#~ "specifies a version number of this License which applies to it and \"any\n"
-#~ "later version\", you have the option of following the terms and "
-#~ "conditions\n"
-#~ "either of that version or of any later version published by the Free\n"
-#~ "Software Foundation.  If the Program does not specify a version number "
-#~ "of\n"
-#~ "this License, you may choose any version ever published by the Free "
-#~ "Software\n"
-#~ "Foundation.\n"
-#~ "\n"
-#~ "  10. If you wish to incorporate parts of the Program into other free\n"
-#~ "programs whose distribution conditions are different, write to the "
-#~ "author\n"
-#~ "to ask for permission.  For software which is copyrighted by the Free\n"
-#~ "Software Foundation, write to the Free Software Foundation; we sometimes\n"
-#~ "make exceptions for this.  Our decision will be guided by the two goals\n"
-#~ "of preserving the free status of all derivatives of our free software "
-#~ "and\n"
-#~ "of promoting the sharing and reuse of software generally.\n"
-#~ "\n"
-#~ "\t\t\t    NO WARRANTY\n"
-#~ "\n"
-#~ "  11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO "
-#~ "WARRANTY\n"
-#~ "FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN\n"
-#~ "OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES\n"
-#~ "PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY OF ANY KIND, EITHER "
-#~ "EXPRESSED\n"
-#~ "OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF\n"
-#~ "MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK "
-#~ "AS\n"
-#~ "TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE\n"
-#~ "PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,\n"
-#~ "REPAIR OR CORRECTION.\n"
-#~ "\n"
-#~ "  12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN "
-#~ "WRITING\n"
-#~ "WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR\n"
-#~ "REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR "
-#~ "DAMAGES,\n"
-#~ "INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES "
-#~ "ARISING\n"
-#~ "OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT "
-#~ "LIMITED\n"
-#~ "TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY\n"
-#~ "YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY "
-#~ "OTHER\n"
-#~ "PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE\n"
-#~ "POSSIBILITY OF SUCH DAMAGES.\n"
-#~ "\n"
-#~ "\t\t     END OF TERMS AND CONDITIONS\n"
-#~ "\n"
-#~ "\t    How to Apply These Terms to Your New Programs\n"
-#~ "\n"
-#~ "  If you develop a new program, and you want it to be of the greatest\n"
-#~ "possible use to the public, the best way to achieve this is to make it\n"
-#~ "free software which everyone can redistribute and change under these "
-#~ "terms.\n"
-#~ "\n"
-#~ "  To do so, attach the following notices to the program.  It is safest\n"
-#~ "to attach them to the start of each source file to most effectively\n"
-#~ "convey the exclusion of warranty; and each file should have at least\n"
-#~ "the \"copyright\" line and a pointer to where the full notice is found.\n"
-#~ "\n"
-#~ "    <one line to give the program's name and a brief idea of what it does."
-#~ ">\n"
-#~ "    Copyright (C) <year>  <name of author>\n"
-#~ "\n"
-#~ "    This program is free software; you can redistribute it and/or modify\n"
-#~ "    it under the terms of the GNU General Public License as published by\n"
-#~ "    the Free Software Foundation; either version 2 of the License, or\n"
-#~ "    (at your option) any later version.\n"
-#~ "\n"
-#~ "    This program is distributed in the hope that it will be useful,\n"
-#~ "    but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-#~ "    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-#~ "    GNU General Public License for more details.\n"
-#~ "\n"
-#~ "    You should have received a copy of the GNU General Public License\n"
-#~ "    along with this program; if not, write to the Free Software\n"
-#~ "    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-"
-#~ "1301  USA\n"
-#~ "\n"
-#~ "\n"
-#~ "Also add information on how to contact you by electronic and paper mail.\n"
-#~ "\n"
-#~ "If the program is interactive, make it output a short notice like this\n"
-#~ "when it starts in an interactive mode:\n"
-#~ "\n"
-#~ "    Gnomovision version 69, Copyright (C) year name of author\n"
-#~ "    Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show "
-#~ "w'.\n"
-#~ "    This is free software, and you are welcome to redistribute it\n"
-#~ "    under certain conditions; type `show c' for details.\n"
-#~ "\n"
-#~ "The hypothetical commands `show w' and `show c' should show the "
-#~ "appropriate\n"
-#~ "parts of the General Public License.  Of course, the commands you use "
-#~ "may\n"
-#~ "be called something other than `show w' and `show c'; they could even be\n"
-#~ "mouse-clicks or menu items--whatever suits your program.\n"
-#~ "\n"
-#~ "You should also get your employer (if you work as a programmer) or your\n"
-#~ "school, if any, to sign a \"copyright disclaimer\" for the program, if\n"
-#~ "necessary.  Here is a sample; alter the names:\n"
-#~ "\n"
-#~ "  Yoyodyne, Inc., hereby disclaims all copyright interest in the program\n"
-#~ "  `Gnomovision' (which makes passes at compilers) written by James "
-#~ "Hacker.\n"
-#~ "\n"
-#~ "  <signature of Ty Coon>, 1 April 1989\n"
-#~ "  Ty Coon, President of Vice\n"
-#~ "\n"
-#~ "This General Public License does not permit incorporating your program "
-#~ "into\n"
-#~ "proprietary programs.  If your program is a subroutine library, you may\n"
-#~ "consider it more useful to permit linking proprietary applications with "
-#~ "the\n"
-#~ "library.  If this is what you want to do, use the GNU Library General\n"
-#~ "Public License instead of this License."
-
-#~ msgid "Select background picture"
-#~ msgstr "Sélectionner une image de fond"
-
-#~ msgid "Animated Menu"
-#~ msgstr "Menu animé"
-
-#~ msgid "BackGround Image :"
-#~ msgstr "Image de fond :"
-
-#~ msgid "Standard"
-#~ msgstr "Standard"
-
-#~ msgid "NTSC (default is PAL)"
-#~ msgstr "NTSC (PAL par défaut)"
-
-#~ msgid "Vignette Width"
-#~ msgstr "Largeur vignette"
-
-#~ msgid "Vignette Height"
-#~ msgstr "Hauteur vignette"
-
-#~ msgid "<b>General</b>"
-#~ msgstr "<b>Général</b>"
-
-#~ msgid "Chapter 1"
-#~ msgstr "Chapitre 1"
-
-#~ msgid "Chapter 2"
-#~ msgstr "Chapitre 2"
-
-#~ msgid "Chapter 3"
-#~ msgstr "Chapitre 3"
-
-#~ msgid "Chapter 4"
-#~ msgstr "Chapitre 4"
-
-#~ msgid "Chapter 5"
-#~ msgstr "Chapitre 5"
-
-#~ msgid "Chapter 6"
-#~ msgstr "Chapitre 6"
-
-#~ msgid "Start frame for this vignette."
-#~ msgstr "Image de début pour cette vignette"
-
-#~ msgid "<b>TimeCode</b>"
-#~ msgstr "<b>TimeCode</b>"
-
-#~ msgid "Bitrate Calculator"
-#~ msgstr "Calculateur Bitrate"
-
-#~ msgid "Select video to write"
-#~ msgstr "Sélectionner la vidéo à ecrire"
-
-#~ msgid "Please select or enter a valid filename"
-#~ msgstr "SVP sélectionner ou entrer un nom de fichier valide"
-
-#~ msgid "Please select or enter a valid jobname"
-#~ msgstr "SVP sélectionner ou entrer un nom de tâche valide"
-
-#~ msgid "<b>Glyphs</b>"
-#~ msgstr "<b>Glyphes</b>"
-
-#~ msgid "  "
-#~ msgstr "  "
-
-#~ msgid "VobSub"
-#~ msgstr "Sous-titres vob"
-
-#~ msgid "Output Srt"
-#~ msgstr "Tri sortie"
-
-#~ msgid "<b>Files</b>"
-#~ msgstr "<b>Fichier</b>"
-
-#~ msgid "StartOcr"
-#~ msgstr "Démarrer Ocr"
-
-#~ msgid "Calibrate"
-#~ msgstr "Calibrer"
-
-#~ msgid "Skip all"
-#~ msgstr "Sauter tout"
-
-#~ msgid "Ignore glyph"
-#~ msgstr "Ignorer Glyphe"
-
-#~ msgid "Stack Field"
-#~ msgstr "Empiler les champs"
-
-#~ msgid "Subtitle to load"
-#~ msgstr "Sous-Titres à charger"
-
-#~ msgid "TTF font to use"
-#~ msgstr "Utiliser la police TTF"
-
-#~ msgid "Subtitle selector"
-#~ msgstr "Sélecteur sous-titres"
-
-#~ msgid "Subtitle file "
-#~ msgstr "Fichier sous-titres"
-
-#~ msgid "Font (TTF)"
-#~ msgstr "Police (TTF)"
-
-#~ msgid "Encoding "
-#~ msgstr "Encodage"
-
-#~ msgid "Font Size"
-#~ msgstr "Taille police"
-
-#~ msgid "sub"
-#~ msgstr "sub"
-
-#~ msgid "font"
-#~ msgstr "police"
-
-#~ msgid "Ascii"
-#~ msgstr "ASCII"
-
-#~ msgid "Select color"
-#~ msgstr "Sélectionner couleur"
-
-#~ msgid "Select"
-#~ msgstr "Choisir"
-
-#~ msgid "Auto split"
-#~ msgstr "Auto coupe"
-
-#~ msgid "Delay in ms"
-#~ msgstr "Délai en ms"
-
-#~ msgid "Force background"
-#~ msgstr "Forcer le fond"
-
-#~ msgid "XVCD encoding"
-#~ msgstr "Encodage XVCD"
-
-#~ msgid "Constant Bitrate"
-#~ msgstr "Bitrate constant"
-
-#~ msgid "Dual pass"
-#~ msgstr "Double passe"
-
-#~ msgid "Min bitrate (kbps) :"
-#~ msgstr "Bitrate Min (kbps) :"
-
-#~ msgid "Max bitrate (kbps) :"
-#~ msgstr "Bitrate Max (kbps) :"
-
-#~ msgid "Default mpeg"
-#~ msgstr "MPEG par défaut"
-
-#~ msgid "Tmpeng "
-#~ msgstr "Tmpeng "
-
-#~ msgid "Animé"
-#~ msgstr "Animé"
-
-#~ msgid "K-VCD"
-#~ msgstr "K-VCD"
-
-#~ msgid "Gop Size  (12):"
-#~ msgstr "Taille GOP (12) :"
-
-#~ msgid "Use Xvid ratecontrol"
-#~ msgstr "Utilise le contrôle du bitrate du XviD"
-
-#~ msgid "Zoom _4:1"
-#~ msgstr "Zoom _4:1"
-
-#~ msgid "_Jump to Frame..."
-#~ msgstr "_Aller à l'image..."
-
-#~ msgid "Jump to _Time..."
-#~ msgstr "Aller au _temps..."
-
-#~ msgid "/0000000"
-#~ msgstr "/0000000"
-
-#~ msgid "/00:00:00,000"
-#~ msgstr "/00:00:00,000"
-
-#~ msgid "Incorrect output file"
-#~ msgstr "Fichier de sortie incorrect"
-
-#~ msgid "Select SRT to save"
-#~ msgstr "Sélection SRT à enregistrer"
-
-#~ msgid "Select Glyoh to save"
-#~ msgstr "Sélection Glyphe à enregistrer"
-
-#~ msgid "No glyphs to save"
-#~ msgstr "Pas de glyphe à enregistrer"
-
-#~ msgid "Very Low"
-#~ msgstr "Très bas"
-
-#~ msgid "Very High"
-#~ msgstr "Très haut"
-
-#~ msgid "Ultra High"
-#~ msgstr " Ultra haut"
-
-#~ msgid "Motion Search Precision"
-#~ msgstr "Précision recherche de mouvement"
-
-#~ msgid "Off"
-#~ msgstr "Off"
-
-#~ msgid "Mode Decision"
-#~ msgstr " Mode décision"
-
-#~ msgid "Limited Search"
-#~ msgstr " Recherche limitée"
-
-#~ msgid "Medium Search"
-#~ msgstr "Recherche moyenne"
-
-#~ msgid "Wide Search"
-#~ msgstr "Recherche large"
-
-#~ msgid "VHQ Mode"
-#~ msgstr "Mode VHQ"
-
-#~ msgid "Max B Frames"
-#~ msgstr "Image-B max"
-
-#~ msgid "Quarter Pixel"
-#~ msgstr "Quarter Pixel"
-
-#~ msgid "GMC"
-#~ msgstr "GMC"
-
-#~ msgid "BVHQ"
-#~ msgstr "BVHQ"
-
-#~ msgid "4MV"
-#~ msgstr "4MV"
-
-#~ msgid "HQ AC"
-#~ msgstr "HQ AC"
-
-#~ msgid "More Search"
-#~ msgstr "Plus de Recherche"
-
-#~ msgid "Min Gop Size"
-#~ msgstr "Taille GOP min"
-
-#~ msgid "Max Gop Size"
-#~ msgstr "Taille GOP max"
-
-#~ msgid "GOP Size"
-#~ msgstr "Taille GOP"
-
-#~ msgid "H263"
-#~ msgstr "H.263"
-
-#~ msgid "Mpeg"
-#~ msgstr "Mpeg"
-
-#~ msgid "Quantization Matrix"
-#~ msgstr "Matrice de Quantisation"
-
-#~ msgid "Trellis Quantization"
-#~ msgstr "Quantification de treillis"
-
-#~ msgid "Two Pass Tuning"
-#~ msgstr "Deux passes tunée"
-
-#~ msgid "Curve Compression"
-#~ msgstr "Courbe compression"
-
-#~ msgid "Xvid4 Configuration"
-#~ msgstr "Configuration XviD"
-
-#~ msgid "# Images :%0lu"
-#~ msgstr "# Images :%0lu"
-
-#~ msgid "Time Left :%02d:%02d:%02d"
-#~ msgstr "Temps passé :%02d:%02d:%02d"
-
-#~ msgid "Select File to Read"
-#~ msgstr "Sélection du fichier à lire"
-
-#~ msgid "Select File to Write"
-#~ msgstr "Sélectionner le fichier à ecrire"
-
-#~ msgid "Select Directory"
-#~ msgstr "Sélectionner chemin"
-
-#~ msgid "_Subtitle file (ass/ssa)"
-#~ msgstr "Fichier sous-titres (ass/ssa)"
-
-#~ msgid "_Line spacing"
-#~ msgstr "_Espacement lignes"
-
-#~ msgid "_Font scale"
-#~ msgstr "_Echelle police"
-
-#~ msgid "_Top margin"
-#~ msgstr "_Marge haute"
-
-#~ msgid "_Bottom margin"
-#~ msgstr "_Marge basse"
-
-#~ msgid "threshold"
-#~ msgstr "seuil"
-
-#~ msgid "noise"
-#~ msgstr "bruit"
-
-#~ msgid "If pixel are closer than noise, they are considered to be the same"
-#~ msgstr ""
-#~ "Si les pixels sont proches du seuil de bruit, ils sont considéré comme "
-#~ "identiques"
-
-#~ msgid "show"
-#~ msgstr "Montrer"
-
-#~ msgid "Mode"
-#~ msgstr "Mode"
-
-#~ msgid "Quality"
-#~ msgstr "Qualité"
-
-#~ msgid "Threshold 1"
-#~ msgstr "Seuil 1"
-
-#~ msgid "Threshold 2"
-#~ msgstr "Seuil 2"
-
-#~ msgid "Strategy"
-#~ msgstr "Stratégie"
-
-#~ msgid "Field Order"
-#~ msgstr "Ordre trame"
-
-#~ msgid "Post Processing"
-#~ msgstr "Post Traitement"
-
-#~ msgid "Try backward"
-#~ msgstr "Essayer champ arrière"
-
-#~ msgid "Direct Threshold"
-#~ msgstr "Seuil Direct"
-
-#~ msgid "Backward Threshold"
-#~ msgstr "Seuil Arrière"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Seuil de bruit"
-
-#~ msgid "Post Proc Threshold"
-#~ msgstr "Post trait. Seuil"
-
-#~ msgid "Use Chroma to decide"
-#~ msgstr "Utiliser chroma pour décider"
-
-#~ msgid "Show info"
-#~ msgstr "Montrer info"
-
-#~ msgid "Debug"
-#~ msgstr "Debug"
-
-#~ msgid "Blend"
-#~ msgstr "Mélange"
-
-#~ msgid "Try reverse"
-#~ msgstr "Essayer à l'envers"
-
-#~ msgid "Angle"
-#~ msgstr "Angle"
-
-#~ msgid "Rotate Params"
-#~ msgstr "Paramètre Rotation"
-
-#~ msgid "Luma Temporal Threshold"
-#~ msgstr "Seuil Temporal Luma"
-
-#~ msgid "Chroma Temporal Threshold"
-#~ msgstr "Seuil Temporal Chroma"
-
-#~ msgid "Bottom Field first"
-#~ msgstr "Trame basse d'abord"
-
-#~ msgid "Order"
-#~ msgstr "Ordre"
-
-#~ msgid "Select ECMAScript to run "
-#~ msgstr "Sélection ECMAscript à lancer"
-
-#~ msgid "Select AVI file..."
-#~ msgstr "Sélectionner un fichier AVI..."
-
-#~ msgid "Select AVI file to write"
-#~ msgstr "Sélection fichier AVI à écrire"
-
-#~ msgid "Select OGM file to write"
-#~ msgstr "Sélection du fichier OGM à écrire"
-
-#~ msgid "Select workbench to save"
-#~ msgstr "Sélection projet à enregistrer"
-
-#~ msgid "Select raw file to save"
-#~ msgstr "Sélection fichier raw à enregistrer"
-
-#~ msgid "Select AVI file to append..."
-#~ msgstr "Sélection du fichier AVI à ajouter..."
-
-#~ msgid "Select file to save audio"
-#~ msgstr "Sélection du fichier audio à enregistrer"
-
-#~ msgid "Select JPEG sequence to save"
-#~ msgstr "Sélection séquence JPEG à enregistrer"
-
-#~ msgid "Select BMP to save"
-#~ msgstr "Sélection fichier BMP à enregistrer"
-
-#~ msgid "Select JPEG to save"
-#~ msgstr "Sélection fichier JPEG à enregistrer"
-
-#~ msgid "Select file to save"
-#~ msgstr "Sélection du fichier à enregistrer"
-
-#~ msgid "Select MP3 to load"
-#~ msgstr "Sélection fichier MP3 à charger"
-
-#~ msgid "Select AC3 to load"
-#~ msgstr "Sélection fichier AC3 à charger"
-
-#~ msgid "Select WAV to load"
-#~ msgstr "Sélection fichier WAV à charger"
-
-#~ msgid "Change Frames per Second"
-#~ msgstr "Changer Images par Seconde"
-
-#~ msgid "New FPS?"
-#~ msgstr "Nouveau FPS?"
-
-#~ msgid "Something very wrong happened when buildint joblist"
-#~ msgstr ""
-#~ "Quelque chose de très mauvais c'est passé duant la construction de la "
-#~ "liste des tâches"
-
-#~ msgid "Nothing to do."
-#~ msgstr "Rien à faire."
-
-#~ msgid "There is no jobs stored, nothing to do"
-#~ msgstr "Il n'y a aucune tâche stockée, donc rien à faire"
