@@ -237,6 +237,7 @@ MainWindow::MainWindow() : QMainWindow()
 	ui.setupUi(this);
 
 	this->setStatusBar(0);
+	this->adjustSize();
 
 	// Preview modes
 	QActionGroup *groupPreviewModes = new QActionGroup(this);

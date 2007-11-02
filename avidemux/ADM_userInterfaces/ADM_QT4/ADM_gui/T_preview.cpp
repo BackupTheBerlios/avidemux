@@ -163,13 +163,20 @@ void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
 
 	hostFrame->resize(displayW, displayH);
 	videoWindow->resize(displayW, displayH);
-
 	UI_purge();
 
-	// Resize only works every second time so both calls are necessary - don't know why ???
-	QuiMainWindows->resize(1, 1);
-	UI_purge();	
-	QuiMainWindows->resize(1, 1);
+	QuiMainWindows->adjustSize();
+	UI_purge();
+
+// Trolltech need to get their act together.  Resizing doesn't work well or the same on all platforms.
+#if defined(__APPLE__)
+	// Hack required for Mac to resize properly.  adjustSize() just doesn't cut the mustard.
+	QuiMainWindows->resize(QuiMainWindows->width() + 1, QuiMainWindows->height() + 1);
+#else
+	// resizing doesn't work unless called twice on Windows and Linux.
+	QuiMainWindows->adjustSize();
+#endif
+
 	UI_purge();
 
 	printf("[RDR] Resizing to %u x %u\n", displayW, displayH);
