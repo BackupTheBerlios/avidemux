@@ -23,6 +23,6 @@ if (ADM_DEBUG AND FIND_LEAKS)
 	subdirs (PREORDER ADM_nvwa)
 endif (ADM_DEBUG AND FIND_LEAKS)
 
-if (ADM_OS_APPLE)
+if (ADM_OS_APPLE AND USE_SDL)
 	subdirs (PREORDER ADM_libsdl)
-endif (ADM_OS_APPLE)
+endif (ADM_OS_APPLE AND USE_SDL)
