@@ -553,7 +553,13 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                 //
                                 switch(entryName)
                                 {
-                                  case MKFCCR('s','2','6','3'):  //s263 d263
+                                  case MKFCCR('m','j','p','b'):  //mjpegb
+                                  {
+                                        commonPart(MJPB);
+                                        left=0;
+                                  }
+                                  break;
+                                case MKFCCR('s','2','6','3'):  //s263 d263
                                   {
                                         commonPart(H263);
                                          adm_atom d263(&son);

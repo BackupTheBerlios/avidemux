@@ -31,7 +31,7 @@ SET(${ADM_LIB}_SRCS
                 dvbsub_parser.c
                 dvbsubdec.c
                 dvbsub.c xiph.c
-                sp5xdec.c nellymoserdec.c
+                sp5xdec.c nellymoserdec.c mjpegbdec.c
 )
 # ADD x86 ones
 

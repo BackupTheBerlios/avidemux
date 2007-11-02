@@ -323,7 +323,12 @@ if (fourCC::check (fcc, (uint8_t *) "FFV1"))
       //    return(decoders *)( new decoderDIVX(w,h));
     }
 
-  if (fourCC::check (fcc, (uint8_t *) "MJPG")
+  if (fourCC::check (fcc, (uint8_t *) "MJPB"))
+    {
+      printf ("\n using FF mjpeg codec\n");
+      return (decoders *) (new decoderFFMjpegB (w, h,extraLen,extraData));
+    }
+if (fourCC::check (fcc, (uint8_t *) "MJPG")
       || fourCC::check (fcc, (uint8_t *) "mjpa"))
     {
 #if  0

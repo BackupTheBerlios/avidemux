@@ -644,6 +644,11 @@ decoderFFAMV::decoderFFAMV (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):dec
   WRAP_Open (CODEC_ID_AMV);
   //_context->codec_id=CODEC_ID_AMV;
 }
+decoderFFMjpegB::decoderFFMjpegB (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,   h)
+{
+  WRAP_Open (CODEC_ID_MJPEGB);
+  //_context->codec_id=CODEC_ID_AMV;
+}
 decoderFFDVBSub::decoderFFDVBSub (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,	   h)
 {
   _context->sub_id=1;
