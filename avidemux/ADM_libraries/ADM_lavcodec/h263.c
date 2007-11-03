@@ -3122,7 +3122,15 @@ static inline int mpeg4_is_resync(MpegEncContext *s){
     int bits_count= get_bits_count(&s->gb);
     int v= show_bits(&s->gb, 16);
 
-    if(s->workaround_bugs&FF_BUG_NO_PADDING){
+    // MEANX if( s->workaround_bugs&FF_BUG_NO_PADDING){
+    if(s->lavc_build==4655) // Breaks multithreaded decoding meanx
+    {
+    #if 0
+    #undef printf
+    printf("bugs: %X lavc_build:%d xvid_build:%d divx_version:%d divx_build:%d %s\n",
+               s->workaround_bugs, s->lavc_build, s->xvid_build, s->divx_version, s->divx_build,
+               s->divx_packed ? "p" : "");
+    #endif
         return 0;
     }
 
