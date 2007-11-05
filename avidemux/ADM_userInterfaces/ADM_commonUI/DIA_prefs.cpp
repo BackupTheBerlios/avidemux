@@ -19,8 +19,7 @@
 #include <string.h>
 #include <stdio.h>
 
-# include <config.h>
-
+#include "config.h"
 #include "default.h"
 
 # include "prefs.h"
@@ -298,37 +297,36 @@ char     *globalGlyphName=NULL;
                               ,{3,      QT_TR_NOOP("Pro Logic II"),NULL}
          };
         diaElemMenu menuMixer(&downmix,QT_TR_NOOP("_Local playback downmixing:"), sizeof(mixerEntries)/sizeof(diaMenuEntry),mixerEntries,"");
-#undef MKADID        
-#define MKADID(x) {DEVICE_##x,QT_TR_NOOP(#x),NULL}
-        diaMenuEntry audioEntries[]=
-{
-	
-#ifdef OSS_SUPPORT	
-	MKADID(OSS),
-#endif	
-#ifdef USE_ARTS
-	MKADID(ARTS),
-#endif	
-#ifdef ALSA_SUPPORT
-	MKADID(ALSA),
-#endif	
-#ifdef CONFIG_DARWIN
-	MKADID(COREAUDIO),
-#endif
-#if	defined(USE_SDL) && !defined(ADM_WIN32)	
-	MKADID(SDL),
-#endif	
-#ifdef ADM_WIN32	
-	MKADID(WIN32),
-#endif	
-#ifdef USE_ESD	
-	MKADID(ESD),
-#endif	
-#ifdef USE_JACK
-	MKADID(JACK),
-#endif	
-        MKADID(DUMMY)
-};
+
+		diaMenuEntry audioEntries[] =
+		{
+		#ifdef ALSA_SUPPORT
+			{DEVICE_ALSA, QT_TR_NOOP("ALSA")},
+		#endif
+		#ifdef USE_ARTS
+			{DEVICE_ARTS, QT_TR_NOOP("aRts")},
+		#endif
+		#ifdef CONFIG_DARWIN
+			{DEVICE_COREAUDIO, QT_TR_NOOP("Core Audio")},
+		#endif
+		#ifdef USE_ESD
+			{DEVICE_ESD, QT_TR_NOOP("ESD")},
+		#endif
+		#ifdef USE_JACK
+			{DEVICE_JACK, QT_TR_NOOP("JACK")},
+		#endif
+		#ifdef OSS_SUPPORT
+			{DEVICE_OSS, QT_TR_NOOP("OSS")},
+		#endif
+		#if	defined(USE_SDL) && !defined(ADM_WIN32)
+			{DEVICE_SDL, QT_TR_NOOP("SDL")},
+		#endif
+		#ifdef ADM_WIN32
+			{DEVICE_WIN32, QT_TR_NOOP("Win32")},
+		#endif
+			{DEVICE_DUMMY, QT_TR_NOOP("None")}
+		};
+
         diaElemMenu menuAudio(&newdevice,QT_TR_NOOP("_Audio output:"), sizeof(audioEntries)/sizeof(diaMenuEntry),audioEntries,"");
                 
 #ifdef ALSA_SUPPORT

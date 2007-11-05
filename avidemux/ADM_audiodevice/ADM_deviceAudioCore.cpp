@@ -15,131 +15,86 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
+
+#ifdef __APPLE__
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <errno.h>
-  
-#include "fourcc.h" 
- 
-#ifdef __APPLE__
-#include "default.h"
 #include <pthread.h>
-
-#include "ADM_toolkit/toolkit.hxx"
-#include <CoreServices/CoreServices.h>
-#include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnit.h>
-#include <AudioToolbox/DefaultAudioOutput.h>
 
-#include <ADM_assert.h>
+#include "default.h"
+#include "ADM_assert.h"
 #include "ADM_audiodevice.h"
 #include "ADM_audiodevice/ADM_deviceAudioCore.h"
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME  MODULE_ADEVICE
 #include "ADM_osSupport/ADM_debug.h"
 
-static Component 		comp=NULL;
-static int16_t  		*audioBuffer=NULL;
-static uint32_t 		frameCount=0;
-static AudioUnit 		theOutputUnit;
-static uint32_t			rd_ptr=0;
-static uint32_t			wr_ptr=0;
-static pthread_mutex_t		lock;
 #define BUFFER_SIZE (2*48000)
-//_______________________________________________
-//
-//_______________________________________________
 
-static OSStatus	MyRenderer(void *inRefCon, AudioUnitRenderActionFlags inActionFlags, 
-	const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, 
-	AudioBuffer *ioData);
-static OSStatus OverloadListenerProc(	AudioDeviceID			inDevice,
-		UInt32					inChannel,
-		Boolean					isInput,
-		AudioDevicePropertyID			inPropertyID,
-		void*					inClientData);
+static Component comp = NULL;
+static int16_t audioBuffer[BUFFER_SIZE];
+static AudioUnit theOutputUnit;
+static uint32_t rd_ptr = 0;
+static uint32_t wr_ptr = 0;
+static pthread_mutex_t lock;
 
-//_______________________________________________
-//
-//_______________________________________________
-	
-OSStatus OverloadListenerProc(	AudioDeviceID			inDevice,
-		UInt32					inChannel,
-		Boolean					isInput,
-		AudioDevicePropertyID			inPropertyID,
-		void*					inClientData)
+static OSStatus MyRenderer(void *inRefCon, AudioUnitRenderActionFlags inActionFlags, 
+	const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, AudioBuffer *ioData);
+static OSStatus OverloadListenerProc(AudioDeviceID inDevice, UInt32 inChannel, Boolean isInput,
+	AudioDevicePropertyID inPropertyID, void* inClientData);
+
+OSStatus OverloadListenerProc(AudioDeviceID inDevice, UInt32 inChannel, Boolean isInput,
+	AudioDevicePropertyID inPropertyID, void* inClientData)
 {
-	printf ("* * * * * Overload detected on device playing audio\n");
+	printf ("[CoreAudio] *** Overload detected on device playing audio ***\n");
 	return noErr;
 }
-//_______________________________________________
-//
-//_______________________________________________
 
-uint8_t coreAudioDevice::setVolume(int volume)
-{
-	//TODO
-}
-
-//_______________________________________________
-//
-//_______________________________________________
+uint8_t coreAudioDevice::setVolume(int volume) {}
 
 coreAudioDevice::coreAudioDevice(void) 
 {
-	printf("Creating Darwin coreAudio device\n");
+	printf("[CoreAudio] Creating CoreAudio device\n");
 	_inUse=0;
-	pthread_mutex_init(&lock,NULL);
+	pthread_mutex_init(&lock, NULL);
 	pthread_mutex_unlock(&lock);
 }
-//_______________________________________________
-//
-//_______________________________________________
-uint8_t  coreAudioDevice::stop(void) 
+
+uint8_t coreAudioDevice::stop(void) 
 {
-	if(audioBuffer)
-	{
-		delete [] audioBuffer;
-		audioBuffer=NULL;
-	}
-	if(_inUse)
-	{
+	if (_inUse)
 		verify_noerr(AudioOutputUnitStop(theOutputUnit));
-	}
+
 	// Clean up
 	CloseComponent(theOutputUnit);
 	_inUse=0;
-    	return 1;
+
+	return 1;
 }
-//_______________________________________________
-//
-//_______________________________________________
 
-
-
-OSStatus	MyRenderer(	void 				*inRefCon, 
-				AudioUnitRenderActionFlags 	inActionFlags, 
-				const AudioTimeStamp 		*inTimeStamp, 
-				UInt32 				inBusNumber, 
-				AudioBuffer  			*ioData)
+OSStatus MyRenderer(void *inRefCon, AudioUnitRenderActionFlags inActionFlags, const AudioTimeStamp *inTimeStamp, 
+	UInt32 inBusNumber, AudioBuffer *ioData)
 {
 	pthread_mutex_lock(&lock);
-	uint32_t nb_sample=ioData->mDataByteSize>>1;
-	uint32_t left=0;
-	uint8_t *in,*out;
+	uint32_t nb_sample = ioData->mDataByteSize >> 1;
+	uint32_t left = 0;
+	uint8_t *in, *out;
 
-	in=(uint8_t *)&audioBuffer[rd_ptr];
-	out=(uint8_t *)ioData->mData;
-	aprintf("Audio Core: Fill : rd %lu wr:%lu nb asked:%lu \n",rd_ptr,wr_ptr,nb_sample);
+	in = (uint8_t*)&audioBuffer[rd_ptr];
+	out = (uint8_t*)ioData->mData;
+	aprintf("[CoreAudio] Fill: rd %lu, wr %lu, nb asked %lu\n", rd_ptr, wr_ptr, nb_sample);
+
 	if(wr_ptr>rd_ptr)
 	{
-		left=wr_ptr-rd_ptr-1;	
+		left=wr_ptr-rd_ptr-1;
+
 		if(left>nb_sample)
 		{
 			memcpy(out,in,nb_sample*2);
 			rd_ptr+=nb_sample;
 		}
+
 		else
 		{
 			memcpy(out,in,left*2);
@@ -168,113 +123,89 @@ OSStatus	MyRenderer(	void 				*inRefCon,
 			rd_ptr=nb_sample;	
 		}
 	}
+
 	pthread_mutex_unlock(&lock);
 	return 0;
 }
-//_______________________________________________
-//
-//
-//_______________________________________________
+
+#define CHECK_RESULT(msg) \
+    if (err != noErr) \
+	{ \
+		printf("[CoreAudio] Failed to initialise CoreAudio: " msg "\n"); \
+        return 0; \
+    }
+
 uint8_t coreAudioDevice::init(uint8_t channels, uint32_t fq) 
 {
-_channels = channels;
-OSStatus 		err;
-ComponentDescription 	desc;
-AudioUnitInputCallback 	input;
-AudioStreamBasicDescription streamFormat;
-AudioDeviceID 		theDevice;
-UInt32			sz=0;
-UInt32			kFramesPerSlice=512; 
+	_channels = channels;
 
-	desc.componentType = 'aunt';
+	OSStatus err;
+	ComponentDescription desc;
+	AudioUnitInputCallback input;
+	AudioStreamBasicDescription streamFormat;
+	AudioDeviceID theDevice;
+
+	desc.componentType = kAudioUnitComponentType;
 	desc.componentSubType = kAudioUnitSubType_Output;
 	desc.componentManufacturer = kAudioUnitID_DefaultOutput;
 	desc.componentFlags = 0;
 	desc.componentFlagsMask = 0;
-		
-	comp= FindNextComponent(NULL, &desc);
+
+	comp = FindNextComponent(NULL, &desc);
+
 	if (comp == NULL)
 	{
-		printf("coreAudio: Cannot find component\n");
+		printf("[CoreAudio] Failed to find component\n");
 		return 0;
 	}
-		
+
 	err = OpenAComponent(comp, &theOutputUnit);
-	if(err)
-	{
-		printf("coreAudio: Cannot open component\n");
-		return 0;
-	}
-	// Initialize it
-	verify_noerr(AudioUnitInitialize(theOutputUnit));
+	CHECK_RESULT("OpenAComponent")
+
+	err = AudioUnitInitialize(theOutputUnit);
+	CHECK_RESULT("AudioUnitInitialize")
 	
 	// Set up a callback function to generate output to the output unit
-#if 1
 	input.inputProc = MyRenderer;
 	input.inputProcRefCon = NULL;
 	
-	verify_noerr(AudioUnitSetProperty(theOutputUnit, 
+	err = AudioUnitSetProperty(theOutputUnit, 
 					kAudioUnitProperty_SetInputCallback, 
 					kAudioUnitScope_Global,
 					0,
 					&input, 
-					sizeof(input)));
-#endif
-	streamFormat.mSampleRate = fq;		
-	streamFormat.mFormatID = kAudioFormatLinearPCM;	
-	streamFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger 
-								| kLinearPCMFormatFlagIsBigEndian
-								| kLinearPCMFormatFlagIsPacked;
+					sizeof(input));
+	CHECK_RESULT("AudioUnitSetProperty [SetInputCallback]")
 
-	streamFormat.mBytesPerPacket = channels * sizeof (UInt16);	
-	streamFormat.mFramesPerPacket = 1;	
-	streamFormat.mBytesPerFrame = channels * sizeof (UInt16);		
-	streamFormat.mChannelsPerFrame = channels;	
-	streamFormat.mBitsPerChannel = sizeof (UInt16) * 8;	
+	streamFormat.mSampleRate = fq;
+	streamFormat.mFormatID = kAudioFormatLinearPCM;
+	streamFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
+
+	streamFormat.mBytesPerPacket = channels * sizeof (UInt16);
+	streamFormat.mFramesPerPacket = 1;
+	streamFormat.mBytesPerFrame = channels * sizeof (UInt16);
+	streamFormat.mChannelsPerFrame = channels;
+	streamFormat.mBitsPerChannel = sizeof (UInt16) * 8;
 	
-	verify_noerr(AudioUnitSetProperty(
-		theOutputUnit,
+	err = AudioUnitSetProperty(theOutputUnit,
 		kAudioUnitProperty_StreamFormat,
 		kAudioUnitScope_Input,
 		0,
 		&streamFormat,
-		sizeof(AudioStreamBasicDescription)));
+		sizeof(streamFormat));
+	CHECK_RESULT("AudioUnitSetProperty [StreamFormat]")
 	
-	printf("Rendering source:\n\t");
-	printf ("SampleRate=%f,", streamFormat.mSampleRate);
-	printf ("BytesPerPacket=%ld,", streamFormat.mBytesPerPacket);
-	printf ("FramesPerPacket=%ld,", streamFormat.mFramesPerPacket);
-	printf ("BytesPerFrame=%ld,", streamFormat.mBytesPerFrame);
-	printf ("BitsPerChannel=%ld,", streamFormat.mBitsPerChannel);
-	printf ("ChannelsPerFrame=%ld\n", streamFormat.mChannelsPerFrame);
+	printf("[CoreAudio] Rendering source:\n");
+	printf("[CoreAudio] \tSampleRate = %f,\n", streamFormat.mSampleRate);
+	printf("[CoreAudio] \tBytesPerPacket = %ld,\n", streamFormat.mBytesPerPacket);
+	printf("[CoreAudio] \tFramesPerPacket = %ld,\n", streamFormat.mFramesPerPacket);
+	printf("[CoreAudio] \tBytesPerFrame = %ld,\n", streamFormat.mBytesPerFrame);
+	printf("[CoreAudio] \tBitsPerChannel = %ld,\n", streamFormat.mBitsPerChannel);
+	printf("[CoreAudio] \tChannelsPerFrame = %ld\n", streamFormat.mChannelsPerFrame);
 
-	sz=sizeof (theDevice);
-	verify_noerr(AudioUnitGetProperty 
-		(theOutputUnit, kAudioOutputUnitProperty_CurrentDevice, 0, 0, &theDevice, &sz));
-	sz = sizeof (kFramesPerSlice);
-	verify_noerr(AudioDeviceSetProperty(theDevice, 0, 0, false,
-		kAudioDevicePropertyBufferFrameSize, sz, &kFramesPerSlice));
-
-	sz = sizeof (kFramesPerSlice);
-	verify_noerr(AudioDeviceGetProperty(theDevice, 0, false, 
-		kAudioDevicePropertyBufferFrameSize, &sz, &kFramesPerSlice));
-
-	verify_noerr (AudioDeviceAddPropertyListener(theDevice, 0, false,
-		kAudioDeviceProcessorOverload, OverloadListenerProc, 0));
-
-	printf ("size of the device's buffer = %ld frames\n", kFramesPerSlice);
-	
-	frameCount=0;
-	
-	audioBuffer=new int16_t[BUFFER_SIZE]; // between hald a sec and a sec should be enough :)
-	
     return 1;
 }
 
-//_______________________________________________
-//
-//
-//_______________________________________________
 uint8_t coreAudioDevice::play(uint32_t len, float *data)
  {
  	// First put stuff into the buffer
@@ -287,22 +218,20 @@ uint8_t coreAudioDevice::play(uint32_t len, float *data)
 
 	// Check we have room left
 	if(wr_ptr>=rd_ptr)
-	{
 		left=BUFFER_SIZE-(wr_ptr-rd_ptr);
-	}
 	else
-	{
 		left=rd_ptr-wr_ptr;
-	}
+
 	if(len+1>left)
 	{
-		printf("AudioCore:Buffer full!\n");
+		printf("[CoreAudio] Buffer full!\n");
 		pthread_mutex_unlock(&lock);
 		return 0;
 	}
 
 	// We have room left, copy it
 	src=(uint8_t *)&audioBuffer[wr_ptr];
+
 	if(wr_ptr+len<BUFFER_SIZE)
 	{
 		memcpy(src,data,len*2);
@@ -317,18 +246,15 @@ uint8_t coreAudioDevice::play(uint32_t len, float *data)
 	}
 	//aprintf("AudioCore: Putting %lu bytes rd:%lu wr:%lu \n",len*2,rd_ptr,wr_ptr);
 	pthread_mutex_unlock(&lock);	
- 	if(!frameCount)
-	{
-		_inUse=1;
-		verify_noerr(AudioOutputUnitStart(theOutputUnit));
-	}
+
+	_inUse=1;
+	verify_noerr(AudioOutputUnitStart(theOutputUnit));
+
 	return 1;
 }
 #else
-void dummy_ac_func( void);
-void dummy_ac_func( void)
- {
+void dummy_ac_func(void);
+void dummy_ac_func(void)
+{
 }
-
 #endif
-

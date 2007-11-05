@@ -34,8 +34,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
-#include <ADM_assert.h>
+
+#include "ADM_assert.h"
 #include "config.h"
 
 #include "default.h"
@@ -44,7 +44,6 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-
 
 #include "GUI_render.h"
 
