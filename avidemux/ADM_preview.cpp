@@ -87,7 +87,13 @@ static uint32_t  rdrWindowHZoomed=0;
 
 /*************************************/
 extern ADM_Composer *video_body;
+/**
 
+*/
+ADMImage *admPreview::getBuffer(void)
+{
+    return rdrImage;
+}
 /**
       \fn admPreview::setMainDimension
       \brief Update width & height of input video

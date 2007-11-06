@@ -158,24 +158,23 @@ uint8_t  countLightPixels(int darkness)
 //**********************************************************************
 
 static const int  sliceOrder[8]={3,4,2,5,1,6,0,7};
-
-static int sliceScanNotBlack(int darkness, int maxnonb, int sliceNum)
+/**
+        \fn sliceScanNotBlack
+        \brief The image is split into 8 slices, returns if the given slice is black or not
+*/
+static int sliceScanNotBlack(int darkness, int maxnonb, int sliceNum,ADMImage *img)
 {
 
-  return 0;
-#warning FIXME
-#warning FIXME
-#warning FIXME
-#if 0
-    uint32_t width = avifileinfo->width;
-    uint32_t height = avifileinfo->height>>3;
+
+    uint32_t width = img->_width;
+    uint32_t height = img->_height>>3;
     uint32_t sz = width * height ;    
 
     uint8_t *buff,*start;
 
     int cnt4=0;
 
-    start=rdr_decomp_buffer->data+ sz*sliceNum;
+    start=img->data+ sz*sliceNum;
     buff=start+sz;
 
     while(--buff>start)
@@ -187,16 +186,18 @@ static int sliceScanNotBlack(int darkness, int maxnonb, int sliceNum)
           return(1);
       }
     }
-    //printf("Slice : %d count:%d max:%d\n",sliceNum,cnt4,maxnonb);
     return(0);
-#endif
 
 }
-uint8_t  fastIsNotBlack(int darkness)
+/**
+    \fn fastIsNotBlack
+    \brief Quickly check if the frame is black or not
+*/
+uint8_t  fastIsNotBlack(int darkness,ADMImage *img)
 {
 
-    uint32_t width = avifileinfo->width;
-    uint32_t height = avifileinfo->height;    
+    uint32_t width = img->_width;
+    uint32_t height = img->_height;    
     uint32_t maxnonb=(width* height)>>8;
     
         maxnonb>>=3;
@@ -204,11 +205,11 @@ uint8_t  fastIsNotBlack(int darkness)
         // Scan 2 & 3 first, if still good, go on
         for(uint32_t i=0;i<6;i++)
         {
-                if(sliceScanNotBlack(darkness,maxnonb,sliceOrder[i])) return 1;
+                if(sliceScanNotBlack(darkness,maxnonb,sliceOrder[i],img)) return 1;
         }
         // The slice 0 & 7 are particular and we admit twice as much
-        if(sliceScanNotBlack(darkness,maxnonb*2,0)) return 1;
-        if(sliceScanNotBlack(darkness,maxnonb*2,7)) return 1;
+        if(sliceScanNotBlack(darkness,maxnonb*2,0,img)) return 1;
+        if(sliceScanNotBlack(darkness,maxnonb*2,7,img)) return 1;
 
     return(0);
 }
@@ -222,26 +223,32 @@ void GUI_NextPrevBlackFrame(int dir)
    uint32_t flags;
    uint16_t reresh_count=0;
    uint32_t orgFrame;
-   uint32_t r=1; 
-#if 0
-    if (playing)
+   uint32_t r=1;
+  if (playing)
 		return;
     if (! avifileinfo)
        return;
+
+    ADMImage *buffer=admPreview::getBuffer();
+    if(!buffer) return;
 
    const int darkness=40;
 
    DIA_working *work=new DIA_working(QT_TR_NOOP("Seeking"));
    orgFrame=curframe;
+   int total;
+    // Avoid it being 0
+    if(dir=1) total=avifileinfo->nb_frames-curframe+1;
+        else total=curframe+1;
    while(1)
    {
-
+        int current=abs(curframe-orgFrame);
       f=curframe+dir;
-      if(work->update(f,avifileinfo->nb_frames)) break;
+      if(work->update(current,total)) break;
 
       if((f==0 && dir==-1)|| (f==avifileinfo->nb_frames-1&&dir==1)) break;
 
-     if( !video_body->getUncompressedFrame(f ,rdr_decomp_buffer,&flags))
+     if( !video_body->getUncompressedFrame(f ,buffer,&flags))
        {
           r=0;
           break;
@@ -253,11 +260,11 @@ void GUI_NextPrevBlackFrame(int dir)
     }
         curframe=f;
 
-        if(!fastIsNotBlack(darkness)) break;
+        if(!fastIsNotBlack(darkness,buffer)) break;
         reresh_count++;
         if(reresh_count>100)
         {
-                update_status_bar(rdr_decomp_buffer);
+                update_status_bar();
                 reresh_count=0;
         }       
    }
@@ -265,13 +272,11 @@ void GUI_NextPrevBlackFrame(int dir)
    if(!r)
    {
       curframe=orgFrame;
-      video_body->getUncompressedFrame(orgFrame ,rdr_decomp_buffer);
    }
-    admPreview::update( curframe,rdr_decomp_buffer) ;
-    update_status_bar(rdr_decomp_buffer);
+    admPreview::update( curframe) ;
+    update_status_bar();
 
    return ;
-#endif
 }
 uint8_t A_ListAllBlackFrames(char *name)
 {
