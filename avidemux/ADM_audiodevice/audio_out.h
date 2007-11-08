@@ -35,7 +35,7 @@ typedef enum
 typedef struct 
 {
 	AUDIO_DEVICE id;
-	char	     *name;
+	const char	     *name;
 }DEVICELIST;
 #define MKADID(x) {DEVICE_##x,#x}
 static const DEVICELIST audioDeviceList[]=
