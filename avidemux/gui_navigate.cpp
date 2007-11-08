@@ -278,12 +278,12 @@ void GUI_NextPrevBlackFrame(int dir)
 
    return ;
 }
+/**
+    \fn A_ListAllBlackFrames
+    \brief Scan for all black frames and output that in a separate (text) file
+*/
 uint8_t A_ListAllBlackFrames(char *name)
 {
-  return 0;
-#if 0
-// Print a list of all black frames
-//_____________________________________________________________
     uint32_t f;
     uint32_t flags;
     uint32_t startframe;
@@ -300,7 +300,8 @@ uint8_t A_ListAllBlackFrames(char *name)
         return 0;
     if ( !avifileinfo )
         return 0;
-
+   ADMImage *buffer=admPreview::getBuffer();
+    if(!buffer) return 0;
    
     if ( !outfile )
         return 0;
@@ -320,14 +321,14 @@ uint8_t A_ListAllBlackFrames(char *name)
     for (f=0; f<avifileinfo->nb_frames; f++) {
        if( work->update( 100 * f / avifileinfo->nb_frames ) ) 
             break;
-        if ( !video_body->getUncompressedFrame(f,rdr_decomp_buffer,&flags) ) {
-            curframe=0;
-            video_body->getUncompressedFrame(0,rdr_decomp_buffer);
+        if ( !video_body->getUncompressedFrame(f,buffer,&flags) ) 
+        {
             break;
         }
 
         curframe=f;
-        if ( !fastIsNotBlack(darkness) ) {
+        if ( !fastIsNotBlack(darkness,buffer) ) 
+        {
             frame2time(curframe,avifileinfo->fps1000,&hh,&mm,&ss,&ms);
             printf("\tBlack frame: frame %d  time %02d:%02d:%02d.%03d\n", curframe, hh, mm, ss, ms);
             fprintf(fd, "\tBlack frame: frame %d  time %02d:%02d:%02d.%03d\n", curframe, hh, mm, ss, ms);
@@ -335,7 +336,7 @@ uint8_t A_ListAllBlackFrames(char *name)
         reresh_count++;
         if(reresh_count>100)
         {
-                update_status_bar(rdr_decomp_buffer);
+                update_status_bar();
                 reresh_count=0;
         }
     }
@@ -343,16 +344,8 @@ uint8_t A_ListAllBlackFrames(char *name)
     printf("** done **\n\n");
     fclose(fd);
     delete work;
-    curframe=startframe;
-    if ( !video_body->getUncompressedFrame(curframe,rdr_decomp_buffer,&flags) ) {
-        curframe=0;
-        video_body->getUncompressedFrame(0,rdr_decomp_buffer);
-    }
-     admPreview::update( curframe,rdr_decomp_buffer) ;
-     update_status_bar(rdr_decomp_buffer);
-
+    GUI_GoToFrame(startframe);
     return 1;
-#endif
 }
 //**********************************************************************
 
