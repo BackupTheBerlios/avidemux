@@ -129,7 +129,11 @@ uint8_t flvHeader::open(char *name)
   {
     _isvideopresent=1;
     printf("[FLV] Video flag\n");
-  }else return 0;
+  }else 
+    {
+    GUI_Info_HIG(ADM_LOG_INFO,"Warning","This FLV file says it has no video.\nI will assume it has and try to continue");
+    _isvideopresent=1;
+    }   
   if(flags & 4) // Audio
   {
     _isaudiopresent=1;
