@@ -1,212 +1,199 @@
-##########################################################
-# main cmake file for avidemux
-# Derived from the one available in sim-im & kde4
-##########################################################
 MESSAGE("#####################################")
 MESSAGE("Configure Started")
 MESSAGE("#####################################")
-PROJECT(Avidemux2)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4.4)
-SET(CMAKE_COLOR_MAKEFILE ON)
+MESSAGE("")
 
-# where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
+CMAKE_MINIMUM_REQUIRED(VERSION 2.4.6 FATAL_ERROR)
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-# XMingw ?
-OPTION(XMINGW FALSE)
-if(XMINGW)
-MESSAGE(STATUS "Xmingw set, forcing win32 target")
-SET(WIN32 1)
-endif(XMINGW)
 
-#**************************************************
-# MESSAGE
-#**************************************************
-SET(CMAKE_C_FLAGS $ENV{CFLAGS})
-SET(CMAKE_CXX_FLAGS $ENV{CXXFLAGS})
+PROJECT(Avidemux)
 
-MESSAGE("EXTRA Cflags:${CMAKE_C_FLAGS}")
-MESSAGE("EXTRA CXXflags:${CMAKE_CXX_FLAGS}")
-#*************************************************
-include(UsePkgConfig)
-include(MacroEnsureOutOfSourceBuild)
-include(CheckCXXCompilerFlag)
+IF (${Avidemux_SOURCE_DIR} MATCHES ${Avidemux_BINARY_DIR})
+	MESSAGE("Please do an out-of-tree build:")
+	MESSAGE("rm CMakeCache.txt; mkdir build; cd build; cmake ..; make")
+	MESSAGE(FATAL_ERROR "in-tree-build detected")
+ENDIF (${Avidemux_SOURCE_DIR} MATCHES ${Avidemux_BINARY_DIR})
 
-#**************************************************
+INCLUDE(CheckCCompilerFlag)
+INCLUDE(CheckCXXCompilerFlag)
+INCLUDE(admConfigHelper)
+
+MESSAGE("")
+
+########################################
+# Global options
+########################################
+OPTION(XMINGW "" OFF)
+OPTION(VERBOSE "" OFF)
+OPTION(LATE_BINDING "" OFF)
+
+IF (XMINGW)
+	SET(WIN32 1)
+ENDIF (XMINGW)
+
+IF (LATE_BINDING)
+	SET(USE_LATE_BINDING 1)
+ENDIF (LATE_BINDING)
+
+########################################
+# Avidemux OS specific tweaks
+########################################
+INCLUDE(admDetermineSystem)
+
+IF (ADM_OS_WINDOWS)
+	SET(CYG_MANGLING 1)
+	SET(ADM_WIN32 1)		# needs to be removed one day...
+	ADD_DEFINITIONS(-mms-bitfields -mno-cygwin)
+ENDIF (ADM_OS_WINDOWS)
+
+IF (ADM_OS_DARWIN)
+	SET(CMAKE_INCLUDE_PATH "/opt/local/include ${CMAKE_INCLUDE_PATH}")
+	SET(CMAKE_LIBRARY_PATH "/opt/local/lib ${CMAKE_LIBRARY_PATH}")
+
+	SET(CYG_MANGLING 1)
+	SET(ADM_BSD_FAMILY 1)
+ENDIF (ADM_OS_DARWIN)
+
+IF (ADM_OS_LINUX)
+	SET(USE_JOG 1)			# jog shuttle is only available on Linux due to its interface
+ENDIF (ADM_OS_LINUX)
+
+########################################
+# Standard Avidemux defines
+########################################
+SET(VERSION 2.5)
+
+SET(HAVE_BUILTIN_VECTOR 1)
+SET(HAVE_AUDIO 1)
+
+SET(USE_MP3 1)
+SET(USE_AC3 1)
+SET(USE_FFMPEG 1)
+SET(USE_MJPEG 1)
+
+# ARCH_XXX need to be removed from Avidemux code one day and made library specific...
+IF (ADM_CPU_X86)
+	SET(ARCH_X86 1)
+	SET(ARCH_X86_32 1)
+ELSEIF (ADM_CPU_X86_64)
+	SET(ARCH_X86 1)
+	SET(ARCH_X86_64 1)
+	SET(ARCH_64_BITS 1)
+ENDIF (ADM_CPU_X86)
+
+# LibMad
+IF (ADM_CPU_X86)
+	SET(FPM_INTEL 1)
+ELSEIF (ADM_CPU_X86_64)
+	SET(FPM_DEFAULT 1)
+ENDIF (ADM_CPU_X86)
+
+# Libavcodec
+INCLUDE(admSetLavcodecFlags)
+
+# LibMpeg2Dec
+SET(ACCEL_DETECT 1)
+
+########################################
 # Subversion
-#**************************************************
-if(NOT NO_SVN AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND EXISTS "${CMAKE_SOURCE_DIR}/.svn")
-	MESSAGE(STATUS "<Checking for Subversion>")
-	MESSAGE(STATUS "<***********************>")
-	include(FindSubversion)
+########################################
+OPTION(SVN "" ON)
+
+IF (SVN AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND EXISTS "${CMAKE_SOURCE_DIR}/.svn")
+	MESSAGE(STATUS "Checking for Subversion")
+	MESSAGE(STATUS "***********************")
 
 	FIND_PACKAGE(Subversion)
-	IF(Subversion_FOUND)
+
+	IF (Subversion_FOUND)
 		Subversion_WC_INFO(${PROJECT_SOURCE_DIR} Project)
-		MESSAGE(STATUS "Current revision is ${Project_WC_REVISION}")
+		MESSAGE(STATUS "  revision: ${Project_WC_REVISION}")
 		SET(ADM_SUBVERSION ${Project_WC_REVISION})
-	ELSE(Subversion_FOUND)
+	ELSE (Subversion_FOUND)
 		MESSAGE(STATUS "Could not find Subversion")
-	ENDIF(Subversion_FOUND)
-ENDIF(NOT NO_SVN AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND EXISTS "${CMAKE_SOURCE_DIR}/.svn")
+	ENDIF (Subversion_FOUND)
+	
+	MESSAGE("")
+ENDIF (SVN AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND EXISTS "${CMAKE_SOURCE_DIR}/.svn")
 
-IF(NOT Subversion_FOUND)
+IF (NOT Subversion_FOUND)
 	SET(ADM_SUBVERSION 0)
-ENDIF(NOT Subversion_FOUND)
+ENDIF (NOT Subversion_FOUND)
 
-#**************************************************
-# PKG Config
-#**************************************************
-MESSAGE(STATUS "<Checking for PKG-CONFIG>")
-MESSAGE(STATUS "<***********************>")
-if(NOT PKGCONFIG_EXECUTABLE)
-             MESSAGE(FATAL_ERROR "Could not find pkg-config")
-endif(NOT PKGCONFIG_EXECUTABLE)
-MESSAGE(STATUS "OK ${PKGCONFIG_EXECUTABLE}")
+########################################
+# Check for libraries
+########################################
+# Define internal flags for GTK+ and Qt4 builds.  These are turned off
+# if a showstopper is found.  CLI is automatically assumed as possible
+# since it uses the minimum set of required libraries and CMake will 
+# fail if these aren't met.
+SET(ADM_UI_GTK 1)
+SET(ADM_UI_QT4 1)
 
-#**************************************************
-# libxml2
-#**************************************************
-MESSAGE(STATUS "<Checking for LibXML2>")
-MESSAGE(STATUS "<*********************>")
-include(FindLibXml2)
-if(NOT LIBXML2_FOUND)
-  MESSAGE(FATAL_ERROR "Could not find Libxml2")
-endif(NOT LIBXML2_FOUND)
-MESSAGE(STATUS "LibXML2 OK")
+INCLUDE(admCheckRequiredLibs)
+INCLUDE(admCheckUserInterfaceLibs)
+INCLUDE(admCheckVideoCodecLibs)
+INCLUDE(admCheckAudioCodecLibs)
+INCLUDE(admCheckAudioDeviceLibs)
+INCLUDE(admCheckMiscLibs)
 
-#**************************************************
-# Search for FREETYPE
-#**************************************************
-MESSAGE(STATUS "<Checking for FreeType through PKG-CONFIG>")
-MESSAGE(STATUS "<****************************************>")
-if(NO_FREETYPE)
-message(status "<disabled per request>")
-else(NO_FREETYPE)
-PKGCONFIG(freetype2 FT_INCLUDE FT_LIB FT_LDFLAGS FT_CFLAGS)
+########################################
+# Check functions and includes
+########################################
+MESSAGE(STATUS "Checking system headers")
+MESSAGE(STATUS "***********************")
 
-IF(NOT FT_INCLUDE)
-    MESSAGE(STATUS "Could not find Freetype ")
-ELSE(NOT FT_INCLUDE)
-    SET(FT_FOUND TRUE)
-    MESSAGE(STATUS "LDFLAGS <${FT_LDFLAGS}>")
-    MESSAGE(STATUS "LIBS <${FT_LIB}>")
-    MESSAGE(STATUS OK)
-    MESSAGE(STATUS "FreeType Found ("${FT_CFLAGS} ${FT_INCLUDE}")")
-    
-ENDIF(NOT FT_INCLUDE)
-endif(NO_FREETYPE)
-#**************************************************
-# Search for  X11 (not on windows)
-#**************************************************
-if(NOT WIN32)
-        MESSAGE(STATUS "<Checking for X11>")
-        MESSAGE(STATUS "<******************************>")
-        include(FindX11)
-        if(NOT X11_FOUND)
-             MESSAGE(FATAL_ERROR "Could not find X11")
-        endif(NOT X11_FOUND)
-        MESSAGE(STATUS OK)
-endif(NOT WIN32)
-#**************************************************
-# Search for GLIB through PKG-Config
-#**************************************************
-MESSAGE(STATUS "<Checking for GLIB>")
-MESSAGE(STATUS "<******************************>")
-PKGCONFIG(glib-2.0 GLIB_INCLUDE GLIB_LIB GLIB_LDFLAGS GLIB_CFLAGS)
+INCLUDE(CheckIncludeFiles)
+INCLUDE(CheckFunctionExists)
 
-IF(NOT GLIB_INCLUDE)
-    MESSAGE(STATUS "Could not find GLIB - cannot compile avidemux2_gtk here")
-ELSE(NOT GLIB_INCLUDE)
-    SET(GLIB_FOUND,TRUE)
-    MESSAGE(STATUS OK)
-    MESSAGE("GLIB Found ("${GLIB_CFLAGS}")")
-    
-ENDIF(NOT GLIB_INCLUDE)
-#**************************************************
-# Search for GTK through PKG-Config
-#**************************************************
-MESSAGE(STATUS "<Checking for GTK>")
-MESSAGE(STATUS "<******************************>")
-if(NO_GTK)
-message(status "<disabled per request>")
-else(NO_GTK)
-PKGCONFIG(gtk+-2.0 GTK_INCLUDE GTK_LIB GTK_LDFLAGS GTK_CFLAGS)
+CHECK_FUNCTION_EXISTS(gettimeofday HAVE_GETTIMEOFDAY)
 
-IF(NOT GTK_CFLAGS)
-    MESSAGE(STATUS "Could not find GTK - cannot compile avidemux2_gtk here")
-ELSE(NOT GTK_CFLAGS)
-    SET(GTK_FOUND TRUE)
-    MESSAGE(STATUS OK)
-ENDIF(NOT GTK_CFLAGS)
-endif(NO_GTK)
-#**************************************************
-# Search for Gthread through PKG-Config
-#**************************************************
-MESSAGE(STATUS "<Checking for Gthread>")
-MESSAGE(STATUS "<******************************>")
-PKGCONFIG(gthread-2.0 GTHREAD_INCLUDE GTHREAD_LIB GTHREAD_LDFLAGS GTHREAD_CFLAGS)
+CHECK_INCLUDE_FILES(inttypes.h   HAVE_INTTYPES_H)	# internal use, mpeg2enc, mplex
+CHECK_INCLUDE_FILES(stdint.h     HAVE_STDINT_H)		# internal use, mpeg2enc, mplex
+CHECK_INCLUDE_FILES(sys/types.h  HAVE_SYS_TYPES_H)	# mad, mpeg2enc
+CHECK_INCLUDE_FILES(unistd.h     HAVE_UNISTD_H)		# internal use, ass, mad
+CHECK_INCLUDE_FILES(malloc.h     HAVE_MALLOC_H)		# libavcodec, libavutil, libpostproc, libswscale, mplex
 
-IF(NOT GTHREAD_CFLAGS)
-    MESSAGE(STATUS "Could not find GTHREAD")
-    SET(GTK_FOUND FALSE)
-ELSE(NOT GTHREAD_CFLAGS)
-    SET(GTHREAD_LDFLAGS,${GTHREAD_LDFLAGS})
-    MESSAGE(STATUS "OK ${GTHREAD_LDFLAGS}")
-ENDIF(NOT GTHREAD_CFLAGS)
-#**************************************************
-# Search for QT4 
-#**************************************************
-MESSAGE(STATUS "<Checking for QT4>")
-MESSAGE(STATUS "<******************************>")
-if(NO_QT4)
-message(status "<disabled per request>")
-else(NO_QT4)
-include(FindQt4)
-if(QT4_FOUND AND MINGW)
-if(XMINGW) # Cross compile ?
-        SET(QTXM /rot2/qt_4.3)
-        #
-	SET(QT_QMAKE_EXECUTABLE qmake)
-	SET(QT_UIC_EXECUTABLE uic-qt4)
-	SET(QT_MOC_EXECUTABLE moc-qt4)
-	SET(QT_RCC_EXECUTABLE rcc)
-	SET(QT_QTGUI_LIBRARY QtGui4 ) # FIXME
-        SET(QT_QTCORE_LIBRARY QtCore4 ) # FIXME
+MESSAGE("")
 
-        SET(CMAKE_CXX_FLAGS "-I${QTXM}/include ${CMAKE_CXX_FLAGS}")
-        LINK_DIRECTORIES(${QTXM}/bin)
-        LINK_DIRECTORIES(${QTXM}/lib)
+########################################
+# Compiler Flags
+########################################
+IF (NOT CMAKE_BUILD_TYPE)
+	SET(CMAKE_BUILD_TYPE "Release")
+ENDIF (NOT CMAKE_BUILD_TYPE)
 
-else(XMINGW)
-	MESSAGE(STATUS "** MINGW ** OVERRIDING PATH FOR QT4 You may have to edit CMakeLists.txt!!!")
-	SET(QT_QMAKE_EXECUTABLE qmake)
-	SET(QT_UIC_EXECUTABLE uic)
-	SET(QT_MOC_EXECUTABLE moc)
-	SET(QT_RCC_EXECUTABLE rcc)
-endif(XMINGW)
-endif(QT4_FOUND AND MINGW)
-endif(NO_QT4)
+IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	SET(ADM_DEBUG 1)
+	ADD_DEFINITIONS(-DADM_DEBUG)
+ENDIF(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
-# do config checks
-include(ConfigureChecks.cmake)
+add_definitions(-D_FILE_OFFSET_BITS=64 -D_LARGE_FILES)
+add_definitions(-DHAVE_CONFIG_H)
 
-# create config.h
-CONFIGURE_FILE(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/avidemux ${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_utilities/ ${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_lavutil)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_lavcodec)
 
-include_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/avidemux ${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries)
-include_directories(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_utilities/ ${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_lavutil)
-include_directories(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_lavcodec  )
+########################################
+# Print Summary
+########################################
+IF (VERBOSE)
+	INCLUDE(adm_log)
+	MESSAGE("")
+ENDIF (VERBOSE)
 
-#**********************************************
-# Some CFLAGS
-#**********************************************
-add_definitions (-D_FILE_OFFSET_BITS=64 -D_LARGE_FILES)
-add_definitions( -DHAVE_CONFIG_H )
+INCLUDE(admConfigSummary)
+MESSAGE("")
 
+########################################
+# Generate config.h
+########################################
+CONFIGURE_FILE("${CMAKE_MODULE_PATH}/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config.h")
+MESSAGE(STATUS "config.h generated")
+
+########################################
+# Directories to build
+########################################
 ADD_SUBDIRECTORY(avidemux)
 ADD_SUBDIRECTORY(po)
-
-###############################
-# Summary
-###############################
-include(conf_summary)

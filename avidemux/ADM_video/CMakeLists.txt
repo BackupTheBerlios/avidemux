@@ -17,7 +17,9 @@ ADM_vidEqualizer.cpp
 ADM_vidNull.cpp          
 )
 ADD_LIBRARY(ADM_video STATIC ${ADM_video_SRCS})
-if(FT_FOUND)
-add_definitions(${FT_CFLAGS})
-endif(FT_FOUND)
+
+if(USE_FREETYPE)
+	include_directories(${FREETYPE2_INCLUDE_DIRS})
+endif(USE_FREETYPE)
+
 include_directories(../ADM_inputs)

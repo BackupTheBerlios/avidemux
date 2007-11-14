@@ -24,18 +24,6 @@ MACRO (add_libs_all_targets _libName)
 	endif(QT4_FOUND)
 ENDMACRO (add_libs_all_targets _libName)
 
-MACRO (add_link_flags _target _flg)
-	GET_TARGET_PROPERTY(_flags ${_target} LINK_FLAGS)
-
-	if (_flags)
-		set(_flags "${_flags} ${_flg}")
-	else (_flags)
-		set(_flags "${_flg}")
-	endif (_flags)
-
-	SET_TARGET_PROPERTIES(${_target} PROPERTIES LINK_FLAGS "${_flags}")
-ENDMACRO (add_link_flags)
-
 MACRO (add_ldflags_all_targets _libName)
 	add_link_flags(avidemux2_cli ${_libName})
 
@@ -47,18 +35,6 @@ MACRO (add_ldflags_all_targets _libName)
 		add_link_flags(avidemux2_qt4 ${_libName})
 	endif(QT4_FOUND)
 ENDMACRO (add_ldflags_all_targets _libName)
-
-MACRO (add_compile_flags _target _flg)
-	GET_SOURCE_FILE_PROPERTY(_flags ${_target} COMPILE_FLAGS)
-
-	if (_flags)
-		set(_flags "${_flags} ${_flg}")
-	else (_flags)
-		set(_flags "${_flg}")
-	endif (_flags)
-   
-	SET_SOURCE_FILES_PROPERTIES(${_target} PROPERTIES COMPILE_FLAGS "${_flags}")   
-ENDMACRO (add_compile_flags)
 
 ########################################################
 # Our exectuables
@@ -192,9 +168,9 @@ if (ADM_DEBUG AND FIND_LEAKS)
 	SET(ADM_LIBRARIES ${ADM_LIBRARIES} ADM_nvwa)
 endif (ADM_DEBUG AND FIND_LEAKS)
 
-if (ADM_OS_APPLE AND USE_SDL)
+if (ADM_OS_DARWIN AND USE_SDL)
 	SET(ADM_LIBRARIES ${ADM_LIBRARIES} ADM_libsdl)
-endif (ADM_OS_APPLE AND USE_SDL)
+endif (ADM_OS_DARWIN AND USE_SDL)
 
 FOREACH(_current ${ADM_LIBRARIES})
 	add_libs_all_targets(${_current})
@@ -244,54 +220,52 @@ add_libs_all_targets(ADM_utilities)
 # Add external libs
 ###########################################
 #iconv
-if(NEEED_LIBICONV)
-	add_libs_all_targets(iconv)
-endif(NEEED_LIBICONV)
+add_libs_all_targets("${LIBICONV_LIBRARY_DIR}")
 
 #gettext
-if(ADM_GETTEXT_LIB)
-	INCLUDE_DIRECTORIES(${ADM_GETTEXT_INCLUDE})
-	TARGET_LINK_LIBRARIES(avidemux2_cli ${ADM_GETTEXT_LIB})
+if (GETTEXT_FOUND)
+	INCLUDE_DIRECTORIES(${GETTEXT_INCLUDE_DIR})
+	TARGET_LINK_LIBRARIES(avidemux2_cli "${GETTEXT_LIBRARY_DIR}")
 
 	if(GTK_FOUND)
-		TARGET_LINK_LIBRARIES(avidemux2_gtk ${ADM_GETTEXT_LIB})
+		TARGET_LINK_LIBRARIES(avidemux2_gtk "${GETTEXT_LIBRARY_DIR}")
 	endif(GTK_FOUND)
-endif(ADM_GETTEXT_LIB)
+endif (GETTEXT_FOUND)
 
 #freetype
 if(USE_FREETYPE)
-	add_libs_all_targets(${FT_LDFLAGS})
+	add_libs_all_targets("${FREETYPE2_LDFLAGS}")
 endif(USE_FREETYPE)
 
 #fontconfig
 if(USE_FONTCONFIG)
-	add_libs_all_targets(fontconfig)
+	add_libs_all_targets("${FONTCONFIG_LIBRARY_DIR}")
 endif(USE_FONTCONFIG)
 
 # png
 if(USE_PNG)
-	TARGET_LINK_LIBRARIES(avidemux2_cli png)
+	TARGET_LINK_LIBRARIES(avidemux2_cli ${PNG_LIBRARIES})
 	
 	if(GTK_FOUND)
-		TARGET_LINK_LIBRARIES(avidemux2_gtk png)
+		TARGET_LINK_LIBRARIES(avidemux2_gtk ${PNG_LIBRARIES})
 	endif(GTK_FOUND)
 	
 	if (QT4_FOUND)
-		if (ADM_OS_APPLE AND NOT QT_USE_FRAMEWORKS)
-			TARGET_LINK_LIBRARIES(avidemux2_qt4 png)
-		elseif (NOT ADM_OS_APPLE)
-			TARGET_LINK_LIBRARIES(avidemux2_qt4 png)
-		endif (ADM_OS_APPLE AND NOT QT_USE_FRAMEWORKS)
+		if (ADM_OS_DARWIN AND NOT QT_USE_FRAMEWORKS)
+			TARGET_LINK_LIBRARIES(avidemux2_qt4 ${PNG_LIBRARIES})
+		elseif (NOT ADM_OS_DARWIN)
+			TARGET_LINK_LIBRARIES(avidemux2_qt4 ${PNG_LIBRARIES})
+		endif (ADM_OS_DARWIN AND NOT QT_USE_FRAMEWORKS)
 	endif (QT4_FOUND)
 endif(USE_PNG)
 
 # Xml2
-add_libs_all_targets(xml2)
+add_libs_all_targets("${LIBXML2_LIBRARIES}")
 
 #XVideo 
 if(USE_XV)
 	add_libs_all_targets("${X11_LIBRARIES}")
-	add_libs_all_targets(Xv)
+	add_libs_all_targets("{$XVIDEO_LIBRARY}")
 endif(USE_XV)
 
 # SDL
@@ -311,63 +285,63 @@ endif(ALSA_FOUND)
 
 # ESD
 if(USE_ESD)
-	add_libs_all_targets(esd)
+	add_libs_all_targets("${ESD_LIBRARY}")
 endif(USE_ESD)
 
 # JACK
 if(USE_JACK)
-	add_libs_all_targets(jack)
+	add_libs_all_targets("${JACK_LIBRARY_DIR}")
 endif(USE_JACK)
 
 # libAMRNB
 if(USE_AMR_NB AND NOT USE_LATE_BINDING)
-	add_libs_all_targets(amrnb)
+	add_libs_all_targets("${AMRNB_LIBRARY_DIR}")
 endif(USE_AMR_NB AND NOT USE_LATE_BINDING)
 
 #libdts
 if(USE_LIBDCA AND NOT USE_LATE_BINDING)
-	add_libs_all_targets(dts)
+	add_libs_all_targets("${LIBDCA_LIBRARY_DIR}")
 endif(USE_LIBDCA AND NOT USE_LATE_BINDING)
 
 # Lame
 if(HAVE_LIBMP3LAME)
-	add_libs_all_targets(mp3lame)
+	add_libs_all_targets("${LAME_LIBRARY_DIR}")
 endif(HAVE_LIBMP3LAME)
 
 # Vorbis
 if(USE_VORBIS)
-	add_libs_all_targets(vorbis)
-	add_libs_all_targets(vorbisenc)
+	add_libs_all_targets("${VORBIS_LIBRARY_DIR}")
+	add_libs_all_targets("${VORBISENC_LIBRARY_DIR}")
 endif(USE_VORBIS)
 
 #faac
 if(USE_FAAC)
-	add_libs_all_targets(faac)
+	add_libs_all_targets("${FAAC_LIBRARY_DIR}")
 endif(USE_FAAC)
 
 #aften
 if(USE_AFTEN)
-	add_libs_all_targets(aften)
+	add_libs_all_targets("${AFTEN_LIBRARY_DIR}")
 endif(USE_AFTEN)
 
 #faad
 if(USE_FAAD)
-	add_libs_all_targets(faad)
+	add_libs_all_targets("${FAAD_LIBRARY_DIR}")
 endif(USE_FAAD)
 
 #libsamplerate
 if(USE_SRC)
-	add_libs_all_targets(samplerate)
+	add_libs_all_targets("${SRC_LIBRARY_DIR}")
 endif(USE_SRC)
 
 # xvid
 if(USE_XVID_4)
-	add_libs_all_targets(xvidcore)
+	add_libs_all_targets("${XVID_LIBRARY_DIR}")
 endif(USE_XVID_4)
 
 # x264
 if(USE_X264)
-	add_libs_all_targets(x264)
+	add_libs_all_targets("${X264_LIBRARY_DIR}")
 endif(USE_X264)
 
 ###########################################
@@ -394,7 +368,6 @@ endif(QT4_FOUND)
 # Win32
 ########################
 IF (ADM_OS_WINDOWS)
-	add_libs_all_targets(z)
 	add_libs_all_targets(ADM_osSupport)
 	add_libs_all_targets(pthreadGC2)
 	add_libs_all_targets(winmm)
@@ -411,16 +384,15 @@ ENDIF (ADM_OS_WINDOWS)
 ########################
 # MacOsX
 ########################
-if (ADM_OS_APPLE)
-	add_libs_all_targets(z)
+if (ADM_OS_DARWIN)
 	add_libs_all_targets("-framework CoreServices -framework CoreAudio -framework AudioUnit")
-endif (ADM_OS_APPLE)
+endif (ADM_OS_DARWIN)
 
 ########################
 # all
 ########################
 SDLify(main.cpp)
-add_compile_flags(main.cpp "-DADM_SUBVERSION=${ADM_SUBVERSION}")
+add_source_compile_flags(main.cpp "-DADM_SUBVERSION=${ADM_SUBVERSION}")
 
 ###############
 # INSTALL

@@ -45,11 +45,13 @@ ADM_vidParticle.cpp
 
 )
 ADD_LIBRARY(ADM_videoFilter STATIC ${ADM_videoFilter_SRCS})
-if(FT_FOUND)
-add_definitions(${FT_CFLAGS})
-endif(FT_FOUND)
+
+if(USE_FREETYPE)
+	include_directories(${FREETYPE2_INCLUDE_DIRS})
+endif(USE_FREETYPE)
+
 include_directories(../ADM_inputs)
 
-IF (ADM_OS_APPLE AND ADM_DEBUG)
+IF (ADM_OS_DARWIN AND ADM_DEBUG)
 	SET_SOURCE_FILES_PROPERTIES(ADM_vidYadif_asm.c PROPERTIES COMPILE_FLAGS "-O2")
-ENDIF (ADM_OS_APPLE AND ADM_DEBUG)
+ENDIF (ADM_OS_DARWIN AND ADM_DEBUG)

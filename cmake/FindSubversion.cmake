@@ -61,20 +61,27 @@ IF(Subversion_SVN_EXECUTABLE)
   SET(Subversion_FOUND TRUE)
 
   MACRO(Subversion_WC_INFO dir prefix)
-    SET(MESSAGES_ENV_VAR $ENV{LC_MESSAGES})
-    SET(ENV{LC_MESSAGES} "C")
-
     EXECUTE_PROCESS(COMMAND ${Subversion_SVN_EXECUTABLE} --version
       WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
       OUTPUT_VARIABLE Subversion_VERSION_SVN
       OUTPUT_STRIP_TRAILING_WHITESPACE)
     MESSAGE(STATUS "Getting svn version from ${dir}")
-    EXECUTE_PROCESS(COMMAND ${Subversion_SVN_EXECUTABLE} info . 
-      WORKING_DIRECTORY ${dir}
-      OUTPUT_VARIABLE ${prefix}_WC_INFO
-      ERROR_VARIABLE Subversion_svn_info_error
-      RESULT_VARIABLE Subversion_svn_info_result
-      OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# Old svn info call
+#    EXECUTE_PROCESS(COMMAND ${Subversion_SVN_EXECUTABLE} info . 
+#      WORKING_DIRECTORY ${dir}
+#      OUTPUT_VARIABLE ${prefix}_WC_INFO
+#      ERROR_VARIABLE Subversion_svn_info_error
+#      RESULT_VARIABLE Subversion_svn_info_result
+#      OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# New svn info --xml call
+      EXECUTE_PROCESS(COMMAND ${Subversion_SVN_EXECUTABLE} info --xml . 
+        WORKING_DIRECTORY ${dir}
+        OUTPUT_VARIABLE ${prefix}_WC_INFO_XML
+        ERROR_VARIABLE Subversion_svn_info_error
+        RESULT_VARIABLE Subversion_svn_info_result
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     IF(NOT ${Subversion_svn_info_result} EQUAL 0)
       MESSAGE(SEND_ERROR "Command \"${Subversion_SVN_EXECUTABLE} info ${dir}\" failed with output:\n${Subversion_svn_info_error}")
@@ -82,16 +89,30 @@ IF(Subversion_SVN_EXECUTABLE)
 
       STRING(REGEX REPLACE "^(.*\n)?svn, version ([.0-9]+).*"
         "\\2" Subversion_VERSION_SVN "${Subversion_VERSION_SVN}")
-      STRING(REGEX REPLACE "^(.*\n)?URL: ([^\n]+).*"
-        "\\2" ${prefix}_WC_URL "${${prefix}_WC_INFO}")
-      STRING(REGEX REPLACE "^(.*\n)?Revision: ([^\n]+).*"
-        "\\2" ${prefix}_WC_REVISION "${${prefix}_WC_INFO}")
-      STRING(REGEX REPLACE "^(.*\n)?Last Changed Author: ([^\n]+).*"
-        "\\2" ${prefix}_WC_LAST_CHANGED_AUTHOR "${${prefix}_WC_INFO}")
-      STRING(REGEX REPLACE "^(.*\n)?Last Changed Rev: ([^\n]+).*"
-        "\\2" ${prefix}_WC_LAST_CHANGED_REV "${${prefix}_WC_INFO}")
-      STRING(REGEX REPLACE "^(.*\n)?Last Changed Date: ([^\n]+).*"
-        "\\2" ${prefix}_WC_LAST_CHANGED_DATE "${${prefix}_WC_INFO}")
+
+# Old REGEX REPLACE tests, working with non licalized versions of svn :
+#      STRING(REGEX REPLACE "^(.*\n)?URL: ([^\n]+).*"
+#        "\\2" ${prefix}_WC_URL "${${prefix}_WC_INFO}")
+#      STRING(REGEX REPLACE "^(.*\n)?Revision: ([^\n]+).*"
+#        "\\2" ${prefix}_WC_REVISION "${${prefix}_WC_INFO}")
+#      STRING(REGEX REPLACE "^(.*\n)?Last Changed Author: ([^\n]+).*"
+#        "\\2" ${prefix}_WC_LAST_CHANGED_AUTHOR "${${prefix}_WC_INFO}")
+#      STRING(REGEX REPLACE "^(.*\n)?Last Changed Rev: ([^\n]+).*"
+#        "\\2" ${prefix}_WC_LAST_CHANGED_REV "${${prefix}_WC_INFO}")
+#      STRING(REGEX REPLACE "^(.*\n)?Last Changed Date: ([^\n]+).*"
+#        "\\2" ${prefix}_WC_LAST_CHANGED_DATE "${${prefix}_WC_INFO}")
+
+# New REGEX REPLACE tests, working with the xml output on all versions :
+      STRING(REGEX REPLACE "(.*)<url>(.*)</url>(.*)"
+        "\\2" ${prefix}_WC_URL "${${prefix}_WC_INFO_XML}")
+      STRING(REGEX REPLACE "(.*)<entry(.*)revision=\"(.*)\">(.*)"
+        "\\3" ${prefix}_WC_REVISION "${${prefix}_WC_INFO_XML}")
+      STRING(REGEX REPLACE "(.*)<commit(.*)revision=\"(.*)\">(.*)<author>(.*)</author>(.*)<date>(.*)</date>(.*)</commit>(.*)"
+        "\\5" ${prefix}_WC_LAST_CHANGED_AUTHOR "${${prefix}_WC_INFO_XML}")
+      STRING(REGEX REPLACE "(.*)<commit(.*)revision=\"(.*)\">(.*)<author>(.*)</author>(.*)<date>(.*)</date>(.*)</commit>(.*)"
+        "\\3" ${prefix}_WC_LAST_CHANGED_REV "${${prefix}_WC_INFO_XML}")
+      STRING(REGEX REPLACE "(.*)<commit(.*)revision=\"(.*)\">(.*)<author>(.*)</author>(.*)<date>(.*)</date>(.*)</commit>(.*)"
+        "\\7" ${prefix}_WC_LAST_CHANGED_DATE "${${prefix}_WC_INFO_XML}")
 
     ENDIF(NOT ${Subversion_svn_info_result} EQUAL 0)
 
@@ -106,8 +127,6 @@ IF(Subversion_SVN_EXECUTABLE)
     IF(NOT ${Subversion_svn_log_result} EQUAL 0)
       MESSAGE(SEND_ERROR "Command \"${Subversion_SVN_EXECUTABLE} log -r BASE ${dir}\" failed with output:\n${Subversion_svn_log_error}")
     ENDIF(NOT ${Subversion_svn_log_result} EQUAL 0)
-
-    SET($ENV{LC_MESSAGES} MESSAGES_ENV_VAR)
   ENDMACRO(Subversion_WC_INFO)
 
 ENDIF(Subversion_SVN_EXECUTABLE)

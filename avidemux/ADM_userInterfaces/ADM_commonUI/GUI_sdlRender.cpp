@@ -31,8 +31,6 @@ extern "C" {
 #undef HAVE_INTTYPES_H
 #undef HAVE_MALLOC_H
 #undef HAVE_STDINT_H
-#undef HAVE_STDLIB_H
-#undef HAVE_STRING_H
 #undef HAVE_SYS_TYPES_H
 #include "SDL.h"
 #include "SDL_syswm.h"
