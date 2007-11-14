@@ -265,7 +265,7 @@ add_libs_all_targets("${LIBXML2_LIBRARIES}")
 #XVideo 
 if(USE_XV)
 	add_libs_all_targets("${X11_LIBRARIES}")
-	add_libs_all_targets("{$XVIDEO_LIBRARY}")
+	add_libs_all_targets("${XVIDEO_LIBRARY_DIR}")
 endif(USE_XV)
 
 # SDL
@@ -285,7 +285,7 @@ endif(ALSA_FOUND)
 
 # ESD
 if(USE_ESD)
-	add_libs_all_targets("${ESD_LIBRARY}")
+	add_libs_all_targets("${ESD_LIBRARY_DIR}")
 endif(USE_ESD)
 
 # JACK

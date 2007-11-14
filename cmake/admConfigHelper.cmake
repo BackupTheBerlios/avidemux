@@ -3,7 +3,7 @@ INCLUDE(CheckLibraryExists)		# required for FIND_HEADER_AND_LIB macro
 MACRO(PRINT_LIBRARY_INFO libraryName libraryDetected compilerFlags linkerFlags)
 	IF (${libraryDetected})
 		MESSAGE(STATUS "Found ${libraryName}")
-		
+
 		IF (VERBOSE)
 			MESSAGE(STATUS "Compiler Flags: ${compilerFlags}")
 			MESSAGE(STATUS "Linker Flags  : ${linkerFlags}")
@@ -15,9 +15,9 @@ ENDMACRO(PRINT_LIBRARY_INFO)
 
 
 MACRO(SDLify _source)
-	if(SDL_FOUND)
-        SET_SOURCE_FILES_PROPERTIES(${_source} PROPERTIES COMPILE_FLAGS "-I${SDL_INCLUDE_DIR}")
-	endif(SDL_FOUND)
+	IF (SDL_FOUND)
+		SET_SOURCE_FILES_PROPERTIES(${_source} PROPERTIES COMPILE_FLAGS "-I${SDL_INCLUDE_DIR}")
+	ENDIF (SDL_FOUND)
 ENDMACRO(SDLify)
 
 # ARGV2 = library to check
@@ -26,8 +26,8 @@ ENDMACRO(SDLify)
 MACRO(FIND_HEADER_AND_LIB prefix headerFile)
 	IF (NOT DEFINED ${prefix}_FOUND)
 		SET(${prefix}_FOUND 0 CACHE INTERNAL "")
-		SET(PROCEED 1)
-		
+		SET(_proceed 1)
+
 		IF (NOT ${headerFile} STREQUAL "")
 			FIND_PATH(${prefix}_INCLUDE_DIR ${headerFile})
 			MARK_AS_ADVANCED(${prefix}_INCLUDE_DIR)
@@ -35,12 +35,12 @@ MACRO(FIND_HEADER_AND_LIB prefix headerFile)
 			IF (${prefix}_INCLUDE_DIR)
 				MESSAGE(STATUS "Found ${headerFile}")
 			ELSE (${prefix}_INCLUDE_DIR)
-				SET(PROCEED 0)
+				SET(_proceed 0)
 				MESSAGE("Could not find ${headerFile}")
 			ENDIF (${prefix}_INCLUDE_DIR)
 		ENDIF (NOT ${headerFile} STREQUAL "")
-		
-		IF (PROCEED AND NOT ${ARGV2} STREQUAL "")
+
+		IF (_proceed AND NOT ${ARGV2} STREQUAL "")
 			FIND_LIBRARY(${prefix}_LIBRARY_DIR ${ARGV2})
 			MARK_AS_ADVANCED(${prefix}_LIBRARY_DIR)
 
@@ -64,9 +64,9 @@ MACRO(FIND_HEADER_AND_LIB prefix headerFile)
 			ELSE (${prefix}_LIBRARY_DIR)
 				MESSAGE(STATUS "Cound not find ${ARGV2} library")
 			ENDIF (${prefix}_LIBRARY_DIR)
-		ELSE (PROCEED AND NOT ${ARGV2} STREQUAL "")
-			SET(${prefix}_FOUND 1 CACHE INTERNAL "")
-		ENDIF (PROCEED AND NOT ${ARGV2} STREQUAL "")
+		ELSE (_proceed AND NOT ${ARGV2} STREQUAL "")
+			SET(${prefix}_FOUND ${_proceed} CACHE INTERNAL "")
+		ENDIF (_proceed AND NOT ${ARGV2} STREQUAL "")
 	ENDIF (NOT DEFINED ${prefix}_FOUND)
 ENDMACRO(FIND_HEADER_AND_LIB)
 
@@ -74,7 +74,7 @@ ENDMACRO(FIND_HEADER_AND_LIB)
 MACRO (ADM_COMPILE _file _def _include _lib _varToSet _output)
 	IF (NOT DEFINED ${_varToSet}_COMPILED)
 		SET(${_varToSet}_COMPILED 1 CACHE INTERNAL "")
-		
+
 		TRY_COMPILE(${_varToSet}
 			  ${CMAKE_BINARY_DIR}
 			  ${CMAKE_SOURCE_DIR}/cmake_compile_check/${_file}
@@ -133,7 +133,7 @@ MACRO (add_source_compile_flags _target _flg)
 	GET_SOURCE_FILE_PROPERTY(_flags ${_target} COMPILE_FLAGS)
 
 	append_flags("${_flags}" "${_flg}")
-   
+
 	SET_SOURCE_FILES_PROPERTIES(${_target} PROPERTIES COMPILE_FLAGS "${_flags}")   
 ENDMACRO (add_source_compile_flags)
 
@@ -141,6 +141,7 @@ MACRO (add_target_compile_flags _target _flg)
 	GET_TARGET_PROPERTY(_flags ${_target} COMPILE_FLAGS)
 
 	append_flags("${_flags}" "${_flg}")
-   
+
 	SET_TARGET_PROPERTIES(${_target} PROPERTIES COMPILE_FLAGS "${_flags}")
+
 ENDMACRO (add_target_compile_flags)
