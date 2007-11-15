@@ -3,7 +3,7 @@ MESSAGE("Configure Started")
 MESSAGE("#####################################")
 MESSAGE("")
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4.6 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7 FATAL_ERROR)
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 PROJECT(Avidemux)
@@ -42,20 +42,17 @@ INCLUDE(admDetermineSystem)
 
 IF (ADM_OS_WINDOWS)
 	SET(CYG_MANGLING 1)
-	SET(ADM_WIN32 1)		# needs to be removed one day...
+	SET(ADM_WIN32 1)	# needs to be removed one day...
 	ADD_DEFINITIONS(-mms-bitfields -mno-cygwin)
 ENDIF (ADM_OS_WINDOWS)
 
 IF (ADM_OS_DARWIN)
-	SET(CMAKE_INCLUDE_PATH "/opt/local/include ${CMAKE_INCLUDE_PATH}")
-	SET(CMAKE_LIBRARY_PATH "/opt/local/lib ${CMAKE_LIBRARY_PATH}")
-
 	SET(CYG_MANGLING 1)
 	SET(ADM_BSD_FAMILY 1)
 ENDIF (ADM_OS_DARWIN)
 
 IF (ADM_OS_LINUX)
-	SET(USE_JOG 1)			# jog shuttle is only available on Linux due to its interface
+	SET(USE_JOG 1)		# jog shuttle is only available on Linux due to its interface
 ENDIF (ADM_OS_LINUX)
 
 ########################################

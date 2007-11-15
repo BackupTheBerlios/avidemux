@@ -1,5 +1,3 @@
-INCLUDE(CheckLibraryExists)		# required for FIND_HEADER_AND_LIB macro
-
 MACRO(PRINT_LIBRARY_INFO libraryName libraryDetected compilerFlags linkerFlags)
 	IF (${libraryDetected})
 		MESSAGE(STATUS "Found ${libraryName}")
@@ -22,7 +20,7 @@ ENDMACRO(SDLify)
 
 # ARGV2 = library to check
 # ARGV3 = function to check
-# ARVG4 = CMAKE_REQUIRED_FLAGS
+# ARVG4 = extra required libs
 MACRO(FIND_HEADER_AND_LIB prefix headerFile)
 	IF (NOT DEFINED ${prefix}_FOUND)
 		SET(${prefix}_FOUND 0 CACHE INTERNAL "")
@@ -48,12 +46,7 @@ MACRO(FIND_HEADER_AND_LIB prefix headerFile)
 				MESSAGE(STATUS "Found ${ARGV2} library")
 				
 				IF (NOT ${ARGV3} STREQUAL "")
-					SET(CMAKE_REQUIRED_FLAGS_BACKUP "${CMAKE_REQUIRED_FLAGS}")
-					SET(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${ARGV4}")
-
-					CHECK_LIBRARY_EXISTS(${ARGV2} ${ARGV3} ${prefix}_LIBRARY_DIR ${prefix}_FUNCTION_FOUND)
-
-					SET(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS_BACKUP}")
+					ADM_CHECK_FUNCTION_EXISTS(${ARGV3} "${${prefix}_LIBRARY_DIR}" ${prefix}_FUNCTION_FOUND "${ARGV4}")
 
 					IF (${prefix}_FUNCTION_FOUND)
 						SET(${prefix}_FOUND 1 CACHE INTERNAL "")
@@ -78,11 +71,27 @@ MACRO (ADM_COMPILE _file _def _include _lib _varToSet _output)
 		TRY_COMPILE(${_varToSet}
 			  ${CMAKE_BINARY_DIR}
 			  ${CMAKE_SOURCE_DIR}/cmake_compile_check/${_file}
-			  CMAKE_FLAGS -DINCLUDE_DIRECTORIES=${_include} -DCOMPILE_DEFINITIONS=${_def} -DLINK_LIBRARIES=${_lib}
-			  COMPILE_DEFINITIONS "${_cflags}"
+			  CMAKE_FLAGS "-DINCLUDE_DIRECTORIES:STRING=${_include}" "-DLINK_LIBRARIES:STRING=${_lib}"
+			  COMPILE_DEFINITIONS ${_def}
 			  OUTPUT_VARIABLE ${_output})
 	ENDIF (NOT DEFINED ${_varToSet}_COMPILED)
 ENDMACRO (ADM_COMPILE)
+
+
+#ARGV3 = extra libraries
+#ARGV4 = extra compile flags
+MACRO (ADM_CHECK_FUNCTION_EXISTS _function _lib _varToSet)
+	SET(CHECK_FUNCTION_DEFINE "-DCHECK_FUNCTION_EXISTS=${_function}" ${ARGV4})
+	SET(CHECK_FUNCTION_LIB ${_lib} ${ARGV3})
+	
+	ADM_COMPILE(CheckFunctionExists.c "${CHECK_FUNCTION_DEFINE}" "" "${CHECK_FUNCTION_LIB}" ${_varToSet} OUTPUT)
+
+	IF (${_varToSet})
+		MESSAGE(STATUS "Found ${_function} in ${_lib}")
+	ELSE (${_varToSet})
+		MESSAGE(STATUS "Could not find ${_function} in ${_lib}")
+	ENDIF (${_varToSet})	
+ENDMACRO (ADM_CHECK_FUNCTION_EXISTS)
 
 
 MACRO (CHECK_CFLAGS_REQUIRED _file _cflags _include _lib _varToSet)

@@ -1,7 +1,7 @@
 ########################################
 # ALSA
 ########################################
-IF (ADM_OS_LINIX)
+IF (ADM_OS_LINUX)
 	OPTION(ALSA "" ON)
 
 	MESSAGE(STATUS "Checking for ALSA")
@@ -13,7 +13,7 @@ IF (ADM_OS_LINIX)
 		IF (ALSA_FOUND)
 			ALSA_VERSION_STRING(alsaVersion)
 
-			MESSAGE("  version: ${alsaVersion}")
+			MESSAGE(STATUS "  version: ${alsaVersion}")
 			PRINT_LIBRARY_INFO("ALSA" ALSA_FOUND "${_ALSA_INCLUDE_DIR}" "${ASOUND_LIBRARY}")
 
 			SET(ALSA_SUPPORT 1)
@@ -25,7 +25,7 @@ IF (ADM_OS_LINIX)
 	MESSAGE("")
 ELSE (ADM_OS_LINUX)
 	SET(ALSA_CAPABLE FALSE)
-ENDIF (ADM_OS_LINIX)
+ENDIF (ADM_OS_LINUX)
 
 ########################################
 # aRts
