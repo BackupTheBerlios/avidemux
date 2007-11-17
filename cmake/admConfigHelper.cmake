@@ -44,7 +44,7 @@ MACRO(FIND_HEADER_AND_LIB prefix headerFile)
 
 			IF (${prefix}_LIBRARY_DIR)
 				MESSAGE(STATUS "Found ${ARGV2} library")
-				
+
 				IF (NOT ${ARGV3} STREQUAL "")
 					ADM_CHECK_FUNCTION_EXISTS(${ARGV3} "${${prefix}_LIBRARY_DIR}" ${prefix}_FUNCTION_FOUND "${ARGV4}")
 
@@ -83,7 +83,7 @@ ENDMACRO (ADM_COMPILE)
 MACRO (ADM_CHECK_FUNCTION_EXISTS _function _lib _varToSet)
 	SET(CHECK_FUNCTION_DEFINE "-DCHECK_FUNCTION_EXISTS=${_function}" ${ARGV4})
 	SET(CHECK_FUNCTION_LIB ${_lib} ${ARGV3})
-	
+
 	ADM_COMPILE(CheckFunctionExists.c "${CHECK_FUNCTION_DEFINE}" "" "${CHECK_FUNCTION_LIB}" ${_varToSet} OUTPUT)
 
 	IF (${_varToSet})
@@ -97,7 +97,7 @@ ENDMACRO (ADM_CHECK_FUNCTION_EXISTS)
 MACRO (CHECK_CFLAGS_REQUIRED _file _cflags _include _lib _varToSet)
 	IF (NOT DEFINED ${_varToSet}_CFLAGS_CHECKED)
 		SET(${_varToSet}_CFLAGS_CHECKED 1 CACHE INTERNAL "")
-		
+
 		ADM_COMPILE(${_file} ${_cflags} ${_include} ${_lib} ${_varToSet}_COMPILE_WITH logwith)
 		ADM_COMPILE(${_file} "" ${_include} ${_lib} ${_varToSet}_COMPILE_WITHOUT logwithout)
 
@@ -123,20 +123,12 @@ MACRO (CHECK_CFLAGS_REQUIRED _file _cflags _include _lib _varToSet)
 ENDMACRO (CHECK_CFLAGS_REQUIRED)
 
 MACRO (append_flags _flags _varToAppend)
-	if (_flags)
+	IF (_flags)
 		set(_flags "${_flags} ${_varToAppend}")
-	else (_flags)
+	ELSE (_flags)
 		set(_flags "${_varToAppend}")
-	endif (_flags)
+	ENDIF (_flags)
 ENDMACRO (append_flags)
-
-MACRO (add_link_flags _target _flg)
-	GET_TARGET_PROPERTY(_flags ${_target} LINK_FLAGS)
-
-	append_flags("${_flags}" "${_flg}")
-
-	SET_TARGET_PROPERTIES(${_target} PROPERTIES LINK_FLAGS "${_flags}")
-ENDMACRO (add_link_flags)
 
 MACRO (add_source_compile_flags _target _flg)
 	GET_SOURCE_FILE_PROPERTY(_flags ${_target} COMPILE_FLAGS)
@@ -154,3 +146,11 @@ MACRO (add_target_compile_flags _target _flg)
 	SET_TARGET_PROPERTIES(${_target} PROPERTIES COMPILE_FLAGS "${_flags}")
 
 ENDMACRO (add_target_compile_flags)
+
+MACRO (add_target_link_flags _target _flg)
+	GET_TARGET_PROPERTY(_flags ${_target} LINK_FLAGS)
+
+	append_flags("${_flags}" "${_flg}")
+
+	SET_TARGET_PROPERTIES(${_target} PROPERTIES LINK_FLAGS "${_flags}")
+ENDMACRO (add_target_link_flags)

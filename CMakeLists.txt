@@ -43,7 +43,6 @@ INCLUDE(admDetermineSystem)
 IF (ADM_OS_WINDOWS)
 	SET(CYG_MANGLING 1)
 	SET(ADM_WIN32 1)	# needs to be removed one day...
-	ADD_DEFINITIONS(-mms-bitfields -mno-cygwin)
 ENDIF (ADM_OS_WINDOWS)
 
 IF (ADM_OS_DARWIN)
@@ -91,6 +90,12 @@ INCLUDE(admSetLavcodecFlags)
 # LibMpeg2Dec
 SET(ACCEL_DETECT 1)
 
+IF (NOT CMAKE_BUILD_TYPE)
+	SET(CMAKE_BUILD_TYPE "Release")
+ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	SET(ADM_DEBUG 1)
+ENDIF (NOT CMAKE_BUILD_TYPE)
+
 ########################################
 # Subversion
 ########################################
@@ -127,6 +132,8 @@ ENDIF (NOT Subversion_FOUND)
 SET(ADM_UI_GTK 1)
 SET(ADM_UI_QT4 1)
 
+SET(MSG_DISABLE_OPTION "Disabled per request")
+
 INCLUDE(admCheckRequiredLibs)
 INCLUDE(admCheckUserInterfaceLibs)
 INCLUDE(admCheckVideoCodecLibs)
@@ -152,25 +159,6 @@ CHECK_INCLUDE_FILES(unistd.h     HAVE_UNISTD_H)		# internal use, ass, mad
 CHECK_INCLUDE_FILES(malloc.h     HAVE_MALLOC_H)		# libavcodec, libavutil, libpostproc, libswscale, mplex
 
 MESSAGE("")
-
-########################################
-# Compiler Flags
-########################################
-IF (NOT CMAKE_BUILD_TYPE)
-	SET(CMAKE_BUILD_TYPE "Release")
-ENDIF (NOT CMAKE_BUILD_TYPE)
-
-IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	SET(ADM_DEBUG 1)
-	ADD_DEFINITIONS(-DADM_DEBUG)
-ENDIF(CMAKE_BUILD_TYPE STREQUAL "Debug")
-
-add_definitions(-D_FILE_OFFSET_BITS=64 -D_LARGE_FILES)
-add_definitions(-DHAVE_CONFIG_H)
-
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/avidemux ${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries)
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_utilities/ ${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_lavutil)
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_lavcodec)
 
 ########################################
 # Print Summary
