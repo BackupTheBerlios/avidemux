@@ -16,7 +16,7 @@
  ***************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
-#  include <config.h>
+#include "config.h"
 /*******************THIS IS NOT USED ANYMORE********************/
 /*******************THIS IS NOT USED ANYMORE********************/
 /*******************THIS IS NOT USED ANYMORE********************/
@@ -28,14 +28,13 @@
 /*******************THIS IS NOT USED ANYMORE********************/
 
 #include <string.h>
-
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "math.h"
+#include <math.h>
 #include "default.h"
 
-#include "../gui_action.hxx"
+#include "gui_action.hxx"
 extern void HandleAction(Action act);  
 // when keys are pressed
 // We have to duplicate the ALT ... shortcut

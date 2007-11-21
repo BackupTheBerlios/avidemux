@@ -31,18 +31,18 @@
 #include <sys/param.h>
 #endif
 #ifdef __FreeBSD__
-          #include <sys/types.h>
+	#include <sys/types.h>
 #endif
 #include <stdlib.h>
 #include <string.h>
 
-#include "math.h"
-#include <ADM_assert.h>
+#include <math.h>
+#include "ADM_assert.h"
 
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
 #include "fourcc.h"
-#include "ADM_nuv/ADM_nuv.h"
+#include "ADM_nuv.h"
 
 //_______________________________________________________
 //

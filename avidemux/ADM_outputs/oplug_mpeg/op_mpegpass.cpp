@@ -27,31 +27,31 @@
 #include "ADM_osSupport/ADM_threads.h"
 #define WIN32_CLASH
 #include "avi_vars.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "ADM_audiofilter/audioprocess.hxx"
 
-#include "DIA_encoding.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_encoding.h"
 
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_outputfmt.h"
-#include "ADM_lavformat/ADM_lavformat.h"
+#include "ADM_libraries/ADM_lavformat/ADM_lavformat.h"
 
-#include "ADM_lvemux/ADM_muxer.h"
+#include "ADM_libraries/ADM_lvemux/ADM_muxer.h"
 
 // To have access to low level infos 
 #include "ADM_codecs/ADM_mpeg.h"
 #include "ADM_lavcodec.h"
 #include "ADM_codecs/ADM_ffmp43.h"
-#include "ADM_mpegdemuxer/dmx_mpegstartcode.h"
+#include "ADM_inputs/ADM_mpegdemuxer/dmx_mpegstartcode.h"
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encCopy.h"
 
-#include "ADM_mplex/ADM_mthread.h"
+#include "ADM_libraries/ADM_mplex/ADM_mthread.h"
 #include "ADM_toolkit/ADM_audioQueue.h"
 
 static uint8_t lookupSeqEnd(ADMBitstream *bitstream,uint32_t *position);

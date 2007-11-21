@@ -22,7 +22,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "ADM_utilities/default.h"
+#include "default.h"
 
 #include "ADM_colorspace/colorspace.h"
 
@@ -30,7 +30,7 @@
 #include "ADM_codecs/ADM_png.h"
 
 #include "png.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #define PNG_PTR ((png_structp)png_ptr)
 #define INFO_PTR ((png_infop)info_ptr)

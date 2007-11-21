@@ -2,9 +2,9 @@
 #ifndef DMX_HEADER
 #define DMX_HEADER
 
-#include "ADM_mpegdemuxer/dmx_io.h"
-#include "ADM_mpegdemuxer/dmx_demuxer.h"
-#include "ADM_mpegdemuxer/dmx_audio.h"
+#include "dmx_io.h"
+#include "dmx_demuxer.h"
+#include "dmx_audio.h"
 
 typedef struct dmxIndex
 {

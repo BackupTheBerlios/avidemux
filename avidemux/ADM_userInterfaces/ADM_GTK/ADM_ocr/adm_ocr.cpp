@@ -34,9 +34,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "gtk/gtk.h"
-#include <ADM_assert.h>
+#include <gtk/gtk.h>
 
+#include "ADM_assert.h"
 
 #include "fourcc.h"
 #include "avio.hxx"
@@ -57,19 +57,17 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 
-
 #include "ADM_toolkit/filesel.h"
 
 #include "ADM_colorspace/colorspace.h"
 
 #include "ADM_videoFilter/ADM_vobsubinfo.h"
-
 #include "ADM_videoFilter/ADM_vidVobSub.h"
-#include "ADM_leftturn.h"
+#include "ADM_ocr/ADM_leftturn.h"
 #include "DIA_enter.h"
 
-#include "ADM_ocr.h"
-#include "ADM_ocrInternal.h"
+#include "ADM_ocr/ADM_ocr.h"
+#include "ADM_ocr/ADM_ocrInternal.h"
 /******************************/
 
 #define TESTSUB "/home/fx/usbstick/subs/vts_01_0.idx"

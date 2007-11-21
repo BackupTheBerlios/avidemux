@@ -29,7 +29,7 @@
 #include"ADM_filter/video_filters.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 #include "ADM_vidConvolution.hxx"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 
 BUILD_CREATE(mean_create,AVDMFastVideoMean);

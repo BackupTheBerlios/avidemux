@@ -29,7 +29,7 @@
 #include <ctype.h>
 
 #include "avi_vars.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "gui_action.hxx"
 #include "ADM_encoder/ADM_vidEncode.hxx"
@@ -41,7 +41,7 @@
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME  MODULE_COMMANDLINE
 #include "ADM_osSupport/ADM_debug.h"
-#include "ADM_utilities/avidemutils.h"
+#include "ADM_libraries/ADM_utilities/avidemutils.h"
 
 #include "ADM_filter/vidVCD.h"
 

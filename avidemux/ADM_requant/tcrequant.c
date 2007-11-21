@@ -58,10 +58,10 @@
 #include "default.h"
 #include "tcrequant.h"
 
-#include "../ADM_osSupport/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_TCREQUANT
-#include "../ADM_osSupport/ADM_debug.h"
-#include "../ADM_assert.h"
+#include "ADM_osSupport/ADM_debug.h"
+#include "ADM_assert.h"
 
 // / MEANX
  void mixDump_c(uint8_t *p, uint32_t l);

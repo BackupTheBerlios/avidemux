@@ -14,21 +14,17 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
 
-
 #include <time.h>
 #include <sys/time.h>
 #include <pthread.h>
 #define WIN32_CLASH
-#include "avi_vars.h"
-
-
 #include "avi_vars.h"
 #include "prototype.h"
 #include "ADM_toolkit/toolkit.hxx"
@@ -41,20 +37,20 @@
 //#include "ADM_codecs/ADM_divxEncode.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
-#include "oplug_avi/op_aviwrite.hxx"
-#include "oplug_avi/op_avisave.h"
-#include "oplug_avi/op_savecopy.h"
-#include "oplug_mp4/oplug_mp4.h"
-#include "oplug_flv/oplug_flv.h"
+#include "ADM_outputs/oplug_avi/op_aviwrite.hxx"
+#include "ADM_outputs/oplug_avi/op_avisave.h"
+#include "ADM_outputs/oplug_avi/op_savecopy.h"
+#include "ADM_outputs/oplug_mp4/oplug_mp4.h"
+#include "ADM_outputs/oplug_flv/oplug_flv.h"
 #include "ADM_encoder/adm_encoder.h"
 
-#include "oplug_avi/op_saveprocess.h"
-#include "oplug_avi/op_savesmart.hxx"
+#include "ADM_outputs/oplug_avi/op_saveprocess.h"
+#include "ADM_outputs/oplug_avi/op_savesmart.hxx"
 #include "ADM_filter/video_filters.h"
 
 #include "ADM_toolkit/filesel.h"
-#include "GUI_ui.h"
-#include "oplug_mpegFF/oplug_vcdff.h"
+#include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
+#include "ADM_outputs/oplug_mpegFF/oplug_vcdff.h"
 
 static uint8_t  A_SaveAudioNVideo(const char *name);
  extern int A_SaveUnpackedVop(const char *name);

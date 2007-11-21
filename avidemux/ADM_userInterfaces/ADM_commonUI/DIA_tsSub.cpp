@@ -14,27 +14,26 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-# include "config.h"
+#include "config.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
-# include <math.h>
 #include "ADM_lavcodec.h"
 #include "default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
 #include "DIA_factory.h"
-#include "ADM_mpegdemuxer/dmx_mpegstartcode.h"
-#include "ADM_mpegdemuxer/dmx_demuxerTS.h"
+#include "ADM_inputs/ADM_mpegdemuxer/dmx_mpegstartcode.h"
+#include "ADM_inputs/ADM_mpegdemuxer/dmx_demuxerTS.h"
 
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_ffmp43.h"
-
 
 /**
       \fn DIA_tsSubs

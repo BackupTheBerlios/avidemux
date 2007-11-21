@@ -18,8 +18,8 @@
 #include <string.h>
 #include <math.h>
 
-#include <ADM_assert.h>
-#include "ADM_utilities/default.h"
+#include "ADM_assert.h"
+#include "default.h"
 
 #include "audioprocess.hxx"
 #include "audioeng_process.h"
@@ -30,7 +30,7 @@
 
 extern "C"
 {
-#include "ADM_libtwolame/twolame.h"
+#include "ADM_libraries/ADM_libtwolame/twolame.h"
 }
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_AUDIO_FILTER

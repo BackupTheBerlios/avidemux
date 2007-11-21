@@ -27,10 +27,9 @@
 #include <string.h>
 #include "ADM_lavcodec.h"
 #include "ADM_assert.h"
+
 #include "default.h"
-
 #include "fourcc.h"
-
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
@@ -38,10 +37,6 @@
 #include "ADM_video/ADM_vidCommonFilter.h"
 #include "ADM_filter/video_filters.h"
 #include "ADM_colorspace/ADM_rgb.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
-
-#include "DIA_factory.h"
-
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_vidDvbSub.h"

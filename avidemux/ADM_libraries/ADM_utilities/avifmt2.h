@@ -72,7 +72,7 @@ typedef struct _avistdindex_chunk {
  #define AVI_B_FRAME		 0x4000	 // hopefully it is not used..
 #endif
 
-#include "../ADM_audio/ADM_audiodef.h"
+#include "../../ADM_audio/ADM_audiodef.h"
 
 void Endian_AviMainHeader(MainAVIHeader *m);
 void Endian_BitMapInfo( BITMAPINFOHEADER *b);

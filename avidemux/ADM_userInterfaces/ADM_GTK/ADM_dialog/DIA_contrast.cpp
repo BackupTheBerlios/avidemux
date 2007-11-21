@@ -25,7 +25,6 @@
 #include <sys/time.h>
 #include <math.h>
 
-
 #include "fourcc.h"
 #include "avio.hxx"
 
@@ -38,10 +37,10 @@
 #include "ADM_videoFilter/ADM_vidContrast.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_colorspace/ADM_rgb.h"
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
-#include <ADM_assert.h>
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "ADM_assert.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flyContrast.h"
 

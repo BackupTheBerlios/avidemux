@@ -26,7 +26,6 @@
 #include <math.h>
 #include <unistd.h>
 
-
 #include <time.h>
 #include <sys/time.h>
 #include <pthread.h>
@@ -47,8 +46,8 @@
 
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
-#include "oplug_avi/op_aviwrite.hxx"
-#include "oplug_avi/op_avisave.h"
+#include "op_aviwrite.hxx"
+#include "op_avisave.h"
 #include "GUI_mux.h"
 
 uint32_t muxSize=4090;
@@ -58,7 +57,7 @@ extern int muxParam;
 
 
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-#include "DIA_factory.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 const char *getStrFromAudioCodec( uint32_t codec);
 //_________________________
 uint8_t ADM_aviUISetMuxer(  void )

@@ -1,7 +1,7 @@
 #ifndef ADM_GUI_UI_H
 #define ADM_GUI_UI_H
 
-#include "../ADM_editor/ADM_outputfmt.h"
+#include "ADM_editor/ADM_outputfmt.h"
 
 void UI_updateFrameCount(uint32_t curFrame);
 void UI_setFrameCount(uint32_t curFrame,uint32_t total);

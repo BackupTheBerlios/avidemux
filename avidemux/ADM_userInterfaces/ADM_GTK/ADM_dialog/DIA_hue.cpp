@@ -18,7 +18,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -28,9 +28,9 @@
 #include <math.h>
 
 #include "default.h"
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "default.h"
 

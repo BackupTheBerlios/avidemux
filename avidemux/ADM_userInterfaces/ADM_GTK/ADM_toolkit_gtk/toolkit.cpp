@@ -27,7 +27,7 @@
 #endif
 
 #include "avi_vars.h"
-#include "ADM_misc.h"
+#include "ADM_osSupport/ADM_misc.h"
 
 
 GtkWidget *GUI_PixmapButtonDefault(GdkWindow * window, const gchar ** xpm,

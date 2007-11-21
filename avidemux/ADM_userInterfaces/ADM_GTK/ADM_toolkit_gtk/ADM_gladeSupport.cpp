@@ -3,7 +3,7 @@
  */
 
 
-#  include <config.h>
+#include "config.h"
 
 
 #include <string.h>
@@ -11,10 +11,10 @@
 
 #include <gtk/gtk.h>
 
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "ADM_gladeSupport.h"
 
 #include "default.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "xpm/play.xpm"
 #include "xpm/stop.xpm"
 #include "xpm/forward.xpm"

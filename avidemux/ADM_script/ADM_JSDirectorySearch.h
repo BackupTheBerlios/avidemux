@@ -2,10 +2,11 @@
 #define _ADM_JSDIRECTORYSEARCH_H
 
 #pragma once
-#include <config.h>
+
+#include "config.h"
 
 // Spidermonkey
-#include <jsapi.h>
+#include "ADM_libraries/ADM_smjs/jsapi.h"
 #include "DirectorySearch.h"
 
 class ADM_JSDirectorySearch

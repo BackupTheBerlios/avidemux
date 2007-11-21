@@ -22,7 +22,7 @@ Handle dialog factory element : Thread Count
 #include <QSpinBox>
 
 #include "default.h"
-#include "ADM_commonUI/DIA_factory.h"
+#include "../ADM_commonUI/DIA_factory.h"
 
 extern const char* shortkey(const char*);
 

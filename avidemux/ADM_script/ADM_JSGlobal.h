@@ -3,7 +3,7 @@
 
 // Spidermonkey
 
-#include <jsapi.h>
+#include "ADM_libraries/ADM_smjs/jsapi.h"
 #include <pthread.h>
 #define WIN32_CLASH
 // javscript debugging helper

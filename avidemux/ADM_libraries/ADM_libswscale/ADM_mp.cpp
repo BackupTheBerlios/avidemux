@@ -20,21 +20,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "../../ADM_assert.h"
 
+#include "ADM_assert.h"
 #include "fourcc.h"
 #include "avio.hxx"
-#include "ADM_utilities/default.h"
+#include "default.h"
 
 #if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 extern "C" {
-#include "ADM_lavcodec/avcodec.h"
+#include "ADM_libraries/ADM_lavcodec/avcodec.h"
 }
 #endif
 
-#include "ADM_lavutil/avutil.h"
-#include "../ADM_libswscale/swscale.h"
-#include "../../ADM_osSupport/ADM_cpuCap.h"
+#include "ADM_libraries/ADM_lavutil/avutil.h"
+#include "ADM_libraries/ADM_libswscale/swscale.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 
 #include "ADM_mp.h"
 

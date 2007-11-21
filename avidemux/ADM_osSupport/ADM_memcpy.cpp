@@ -1,7 +1,3 @@
-
-
-
-
 /* Adapted from Xine /Mplayer to avidemx2 */
 /*
  * Copyright (C) 2001-2004 the xine project
@@ -43,12 +39,10 @@
 
 #include "default.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
+
 extern "C"
 {
-        #include "ADM_lavcodec/dsputil_cpu.h"
-
-
-
+#include "ADM_libraries/ADM_lavcodec/dsputil_cpu.h"
 #include "ADM_assert.h"
 
 adm_fast_memcpy myAdmMemcpy=NULL;

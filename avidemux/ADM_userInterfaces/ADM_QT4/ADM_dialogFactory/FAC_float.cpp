@@ -13,7 +13,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <config.h>
+#include "config.h"
 
 
 #include <string.h>
@@ -27,7 +27,7 @@
 #include <QLabel>
 
 #include "default.h"
-#include "ADM_commonUI/DIA_factory.h"
+#include "../ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
 
 extern const char *shortkey(const char *);

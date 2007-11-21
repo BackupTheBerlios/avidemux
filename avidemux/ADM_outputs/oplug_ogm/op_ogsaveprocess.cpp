@@ -24,8 +24,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
-
-
 #include <time.h>
 #include <sys/time.h>
 
@@ -37,17 +35,13 @@
 //#include "avilist.h"
 
 #include "ADM_video/ADM_genvideo.hxx"
-
 #include "ADM_filter/video_filters.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
-
-
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 
 #include "default.h"
-
-#include "oplug_ogm/op_ogsave.h"
+#include "op_ogsave.h"
 
 #define aprintf printf
 

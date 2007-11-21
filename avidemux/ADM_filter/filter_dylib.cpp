@@ -32,7 +32,7 @@
 #include <dlfcn.h>
 #endif
 
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "fourcc.h"
 #include "avio.hxx"

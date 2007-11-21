@@ -20,8 +20,7 @@
 #include "default.h"
 
 #include "ADM_lavcodec.h"
-#include "ADM_utilities/default.h"
-#include "ADM_utilities/fourcc.h"
+#include "fourcc.h"
 
 #include "ADM_colorspace/colorspace.h"
 

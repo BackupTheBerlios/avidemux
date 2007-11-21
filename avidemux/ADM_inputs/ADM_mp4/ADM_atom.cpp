@@ -21,17 +21,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
+#include <math.h>
 
-#include "math.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
 
-
 #include "fourcc.h"
-#include "ADM_mp4/ADM_atom.h"
+#include "ADM_atom.h"
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_3GP
 #include "ADM_osSupport/ADM_debug.h"

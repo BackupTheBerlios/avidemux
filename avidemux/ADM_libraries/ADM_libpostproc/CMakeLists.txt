@@ -1,20 +1,11 @@
-################################
-#
-################################
-include(AdmLib)
 SET(ADM_LIB ADM_libpostproc)
-#
+
 SET(${ADM_LIB}_SRCS 
-postprocess.c
-)
+	postprocess.c)
 
-ADD_LIBRARY(${ADM_LIB} STATIC ${${ADM_LIB}_SRCS})
-ADD_ADM_LIB(${ADM_LIB} ADM_libraries)
-
-
-################################
-add_definitions(-I.. -DHAVE_AV_CONFIG_H  -O3 -I../.. -I../ADM_lavutil -Drestrict=__restrict__ -fomit-frame-pointer)
+ADD_ADM_LIB_ALL_TARGETS(${ADM_LIB} ${${ADM_LIB}_SRCS})
+ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-I.. -DHAVE_AV_CONFIG_H  -O3 -I../.. -I../ADM_lavutil -Drestrict=__restrict__ -fomit-frame-pointer")
 
 IF(ARCH_X86_64)
-add_definitions(-msse)
+	ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-msse")
 ENDIF(ARCH_X86_64)

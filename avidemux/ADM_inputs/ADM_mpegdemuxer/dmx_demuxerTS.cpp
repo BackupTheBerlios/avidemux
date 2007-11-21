@@ -35,11 +35,11 @@
 #include <math.h>
 
 #include "default.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 //#define TS_VERBOSE 1
 
-#include "ADM_mpegdemuxer/dmx_mpegstartcode.h"
+#include "../ADM_mpegdemuxer/dmx_mpegstartcode.h"
 #include "dmx_demuxerTS.h"
 uint8_t         dmx_demuxerTS::changePid(uint32_t newpid,uint32_t newpes)
 {

@@ -47,15 +47,13 @@ extern "C" {
 
 #include "ADM_assert.h" 
 
-
-#include "oplug_avi/op_aviwrite.hxx"
-#include "oplug_avi/op_avisave.h"
-#include "oplug_avi/op_savesmart.hxx"
+#include "op_aviwrite.hxx"
+#include "op_avisave.h"
+#include "op_savesmart.hxx"
 
 #ifdef USE_FFMPEG		
 #include "ADM_codecs/ADM_ffmpeg.h"		
 #endif
-
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_SAVE_AVI

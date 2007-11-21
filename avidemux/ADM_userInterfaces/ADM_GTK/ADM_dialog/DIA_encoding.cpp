@@ -7,7 +7,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <config.h>
+#include "config.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -22,10 +22,10 @@
 #include "default.h"
 #include "prefs.h"
 
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 

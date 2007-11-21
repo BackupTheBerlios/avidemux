@@ -13,7 +13,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <config.h>
+#include "config.h"
 
 
 #include <string.h>
@@ -30,7 +30,7 @@
 
 #include "default.h"
 #include "prefs.h"
-#include "ADM_commonUI/DIA_factory.h"
+#include "../ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
 #include "ADM_toolkit/filesel.h"
 extern const char *shortkey(const char *);

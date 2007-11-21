@@ -13,19 +13,18 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
+#include <math.h>
 
-#include "math.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
 #include "prefs.h"
 
 #include "fourcc.h"
-#include "ADM_openDML/ADM_openDML.h"
+#include "ADM_openDML.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "DIA_working.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
 
 #include "ADM_osSupport/ADM_debugID.h"

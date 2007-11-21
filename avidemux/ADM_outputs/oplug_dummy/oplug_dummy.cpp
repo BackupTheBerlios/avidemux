@@ -33,10 +33,9 @@ extern "C" {
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_codecs/ADM_codec.h"
@@ -44,16 +43,16 @@ extern "C" {
 
 #include "ADM_codecs/ADM_ffmpeg.h"
 #include "ADM_encoder/adm_encffmpeg.h"
-#include "oplug_mpegFF/oplug_vcdff.h"
+#include "../oplug_mpegFF/oplug_vcdff.h"
 
-#include "DIA_encoding.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_encoding.h"
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-#include "ADM_lavformat/ADM_lavformat.h"
-#include "ADM_utilities/fourcc.h"
+#include "ADM_libraries/ADM_lavformat/ADM_lavformat.h"
+#include "fourcc.h"
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
-#include "ADM_mplex/ADM_mthread.h"
+#include "ADM_libraries/ADM_mplex/ADM_mthread.h"
 #include "ADM_toolkit/ADM_audioQueue.h"
 
 #include "ADM_osSupport/ADM_debugID.h"

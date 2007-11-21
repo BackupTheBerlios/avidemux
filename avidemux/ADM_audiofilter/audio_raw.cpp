@@ -23,10 +23,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include <math.h>
 
-#include "ADM_utilities/default.h"
+#include "default.h"
 
 
 #include "audioprocess.hxx"

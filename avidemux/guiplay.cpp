@@ -26,9 +26,7 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include "config.h"
 #include "prefs.h"
-
 #include "fourcc.h"
 #include "avi_vars.h"
 #include "ADM_assert.h" 
@@ -44,7 +42,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 #include "gtkgui.h"
-#include "GUI_render.h"
+#include "ADM_userInterfaces/ADM_commonUI/GUI_render.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
 

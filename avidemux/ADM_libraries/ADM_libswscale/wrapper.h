@@ -2,7 +2,7 @@
 
 	Replacement for assert
 */
-#include "../../ADM_assert.h"
+#include "ADM_assert.h"
 //******************
 #undef malloc
 #undef realloc

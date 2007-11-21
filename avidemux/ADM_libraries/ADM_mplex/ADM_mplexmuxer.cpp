@@ -30,26 +30,22 @@
 #include <sys/stat.h>
 #include <pthread.h>
 #define WIN32_CLASH
+
 #include "interact.hpp"
 
 #undef malloc
 #undef realloc
 #undef free
-#include <ADM_assert.h>
 
+#include "ADM_assert.h"
 #include "default.h"
 #include "ADM_toolkit/toolkit.hxx"
-
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audio/ADM_a52info.h"
-
-//#include "ADM_codecs/ADM_codec.h"
 #include "avifmt.h"
 #include "avifmt2.h"
 #include "ADM_editor/ADM_Video.h"
-
-#include "ADM_lavformat/ADM_lavformat.h"
-
+#include "ADM_libraries/ADM_lavformat/ADM_lavformat.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_LAVFORMAT

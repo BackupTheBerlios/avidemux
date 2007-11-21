@@ -20,23 +20,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 
+#include "ADM_assert.h"
 #include "config.h"
 #include "fourcc.h"
 #include "avio.hxx"
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_inpics/ADM_pics.h"
-#include "ADM_nuv/ADM_nuv.h"
-#include "ADM_h263/ADM_h263.h"
+#include "ADM_inputs/ADM_inpics/ADM_pics.h"
+#include "ADM_inputs/ADM_nuv/ADM_nuv.h"
+#include "ADM_inputs/ADM_h263/ADM_h263.h"
 //#include "ADM_3gp/ADM_3gp.h"
-#include "ADM_mp4/ADM_mp4.h"
-#include "ADM_avsproxy/ADM_avsproxy.h"
+#include "ADM_inputs/ADM_mp4/ADM_mp4.h"
+#include "ADM_inputs/ADM_avsproxy/ADM_avsproxy.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-#include "ADM_mpegdemuxer/dmx_identify.h"
+#include "ADM_inputs/ADM_mpegdemuxer/dmx_identify.h"
 #include "ADM_assert.h"
 
 DMX_TYPE dmxIdentify(const char *name);

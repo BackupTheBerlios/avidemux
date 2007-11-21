@@ -22,15 +22,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
-
 #include <math.h>
-#include <ADM_assert.h>
+
+#include "ADM_assert.h"
 #include "default.h"
 #include "avifmt.h"
 #include "avifmt2.h"
-#include "oplug_ogm/op_ogpage.h"
+#include "op_ogpage.h"
 
 #define min(a,b) (a>b)?b:a
 extern void memcpyswap(uint8_t *dest, uint8_t *src, uint32_t size);

@@ -42,11 +42,11 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
-#include "oplug_avi/op_aviwrite.hxx"
-#include "oplug_avi/op_avisave.h"
+#include "op_aviwrite.hxx"
+#include "op_avisave.h"
 
 #include "ADM_encoder/adm_encoder.h"
-#include "oplug_avi/op_saveprocess.h"
+#include "op_saveprocess.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_SAVE_AVI

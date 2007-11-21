@@ -21,7 +21,7 @@
 */
 
 /* Stub code to interface with Shell_NotifyIcon */
-#include <config.h>
+#include "config.h"
 #ifdef ADM_WIN32
 #include <windows.h>
 #include <wingdi.h>

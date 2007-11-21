@@ -29,7 +29,7 @@
 #include "avio.hxx"
 #include "config.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 
 #include "ADM_editor/ADM_edit.hxx"

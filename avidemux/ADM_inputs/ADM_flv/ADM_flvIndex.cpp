@@ -20,11 +20,11 @@
 
 #include <string.h>
 
-#include "math.h"
+#include <math.h>
 
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "fourcc.h"
 #include "ADM_toolkit/toolkit.hxx"

@@ -22,13 +22,12 @@
 
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
-#include <ADM_assert.h>
-
+#include "ADM_assert.h"
 
 #include "fourcc.h"
-#include "ADM_h263/ADM_h263.h"
+#include "ADM_h263.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_h263/bitsRead.h"
+#include "bitsRead.h"
 
 
 typedef struct cb

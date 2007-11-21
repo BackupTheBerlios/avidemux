@@ -20,10 +20,10 @@
  ***************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include <string.h>
 #include <math.h>
-#include "ADM_utilities/default.h"
+#include "default.h"
 #include "config.h"
 #ifdef USE_MJPEG
 #include "ADM_colorspace/colorspace.h"

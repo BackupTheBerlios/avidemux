@@ -1,15 +1,12 @@
-
-
 #include <string.h>
 #include <stdio.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-
 #include "avi_vars.h"
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
-# include <config.h>
+#include "ADM_gladeSupport.h"
+#include "config.h"
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \

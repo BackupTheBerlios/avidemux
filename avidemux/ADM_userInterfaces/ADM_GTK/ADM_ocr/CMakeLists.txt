@@ -1,18 +1,8 @@
-################################
-#
-################################
-include(AdmLib)
 SET(ADM_LIB ADM_ocrGtk)
-#
+
 SET(${ADM_LIB}_SRCS
-adm_ocr.cpp
-adm_editglyph.cpp
-)
-ADD_LIBRARY(${ADM_LIB} STATIC ${${ADM_LIB}_SRCS})
-ADD_ADM_LIB(${ADM_LIB} ADM_libraries)
+	adm_ocr.cpp
+	adm_editglyph.cpp)
 
-
-################################
-ADD_definitions(${GTK_CFLAGS})
-include_directories(.. ../../../ADM_ocr)
-include_directories(../../../ADM_inputs)
+ADD_ADM_LIB_GTK_TARGET(${ADM_LIB} ${${ADM_LIB}_SRCS})
+ADD_CFLAGS_GTK_TARGET(${ADM_LIB} ${GTK_CFLAGS})

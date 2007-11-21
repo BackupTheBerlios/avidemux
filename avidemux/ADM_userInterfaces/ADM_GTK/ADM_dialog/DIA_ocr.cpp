@@ -3,7 +3,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#  include <config.h>
+#  include "config.h"
 #endif
 
 #include <sys/types.h>
@@ -15,9 +15,9 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 
 GtkWidget*
 DIA_ocr (void)

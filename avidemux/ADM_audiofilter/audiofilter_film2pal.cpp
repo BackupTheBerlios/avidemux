@@ -20,7 +20,7 @@
 #include <string.h>
 #include <math.h>
 
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "avifmt.h"
 #include "avifmt2.h"

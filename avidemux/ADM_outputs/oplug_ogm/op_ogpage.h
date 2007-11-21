@@ -13,7 +13,7 @@
 #ifndef OP_OGM
 #define OP_OHM
 
-#include "ADM_ogm/ADM_oghead.h"
+#include "ADM_inputs/ADM_ogm/ADM_oghead.h"
 
 #define MAX_OGM_PAGESIZE (64*1024)
 

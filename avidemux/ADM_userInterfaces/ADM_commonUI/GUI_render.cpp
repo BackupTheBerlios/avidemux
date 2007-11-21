@@ -19,21 +19,19 @@
  ***************************************************************************/
 
 #include "default.h"
-
 #include "ADM_assert.h"
+#include "GUI_render.h"
+#include "GUI_accelRender.h"
 
-#include "ADM_commonUI/GUI_render.h"
-
-#include "ADM_commonUI/GUI_accelRender.h"
 #ifdef USE_XV
-#include "ADM_commonUI/GUI_xvRender.h"
+#include "GUI_xvRender.h"
 #endif
+
 #ifdef USE_SDL
-#include "ADM_commonUI/GUI_sdlRender.h"
+#include "GUI_sdlRender.h"
 #endif
 
-
-#include "../prefs.h"
+#include "prefs.h"
 #include "../../ADM_colorspace/ADM_rgb.h"
 
 

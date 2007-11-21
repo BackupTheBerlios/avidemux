@@ -25,48 +25,42 @@
 #include <string.h>
 #include <math.h>
 #include <pthread.h>
+
 #define WIN32_CLASH
+
 #ifdef USE_FFMPEG
 extern "C" {
 #include "ADM_lavcodec.h"
-};
+}
+
 #include "avi_vars.h"
 #include "prototype.h"
 
-
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 
-
 #include "ADM_encoder/ADM_vidEncode.hxx"
-
 #include "ADM_encoder/adm_encoder.h"
-//#include "ADM_codecs/ADM_divxEncode.h"
-//#include "ADM_encoder/adm_encdivx.h"
 
 #include "ADM_codecs/ADM_ffmpeg.h"
 #include "ADM_encoder/adm_encffmpeg.h"
 #include "ADM_encoder/adm_encmpeg2enc.h"
 #include "ADM_encoder/adm_encRequant.h"
-#include "oplug_mpegFF/oplug_vcdff.h"
+#include "../oplug_mpegFF/oplug_vcdff.h"
 
-#include "DIA_encoding.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_encoding.h"
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-#include "ADM_lavformat/ADM_lavformat.h"
+#include "ADM_libraries/ADM_lavformat/ADM_lavformat.h"
 
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
 #include "ADM_osSupport/ADM_threads.h"
-#include "ADM_mplex/ADM_mthread.h"
-#warning REMOVE unistd
-#include "unistd.h"
-
-
+#include "ADM_libraries/ADM_mplex/ADM_mthread.h"
 
 static uint8_t *_buffer=NULL,*_outbuffer=NULL;
 static void  end (void);

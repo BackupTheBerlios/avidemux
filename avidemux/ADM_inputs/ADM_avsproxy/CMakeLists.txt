@@ -1,5 +1,4 @@
-
 SET(ADM_avsproxy_SRCS 
-ADM_avsproxy.cpp  ADM_avsproxy_net.cpp)
-ADD_LIBRARY(ADM_avsproxy STATIC ${ADM_avsproxy_SRCS})
-include_directories(..)
+	ADM_avsproxy.cpp  ADM_avsproxy_net.cpp)
+
+ADD_ADM_LIB_ALL_TARGETS(ADM_avsproxy ${ADM_avsproxy_SRCS})

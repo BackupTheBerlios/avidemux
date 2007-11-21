@@ -29,10 +29,10 @@
 #include "config.h"
 
 #include "avi_vars.h"
-#include "ADM_misc.h"
+#include "ADM_osSupport/ADM_misc.h"
 
-# include <config.h>
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
+# include "config.h"
+#include "ADM_gladeSupport.h"
 #include "toolkit_gtk.h"
 #include "ADM_assert.h"
 #include "prefs.h"

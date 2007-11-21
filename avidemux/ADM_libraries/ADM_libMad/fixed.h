@@ -21,7 +21,7 @@
 
 # ifndef LIBMAD_FIXED_H
 # define LIBMAD_FIXED_H
-#include "../ADM_utilities/default.h"
+#include "default.h"
 #define mad_fixed_t     int32_t
 #define mad_fixed64hi_t int32_t
 #define mad_fixed64lo_t uint32_t

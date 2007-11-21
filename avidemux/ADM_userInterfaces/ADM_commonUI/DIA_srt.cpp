@@ -20,7 +20,7 @@
 #include <iconv.h>
 
 #include "default.h"
-#include "ADM_commonUI/GUI_render.h"
+#include "GUI_render.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "DIA_flyDialog.h"
 

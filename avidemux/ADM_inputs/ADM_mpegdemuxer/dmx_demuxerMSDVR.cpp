@@ -22,11 +22,11 @@
 #include <math.h>
 
 #include "default.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "dmx_demuxerMSDVR.h"
 
-#include "ADM_asf/ADM_asfPacket.h"
-#include "ADM_asf/ADM_asf.h"
+#include "../ADM_asf/ADM_asfPacket.h"
+#include "../ADM_asf/ADM_asf.h"
 
 #define PARSER ((asfPacket *)aParser)
 // ******************************************************

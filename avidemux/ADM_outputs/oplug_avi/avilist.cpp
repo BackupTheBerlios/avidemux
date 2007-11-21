@@ -35,7 +35,7 @@
 #include "avifmt.h"
 #include "avifmt2.h"
 #include "avio.hxx"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "fourcc.h"
 #include "subchunk.h"

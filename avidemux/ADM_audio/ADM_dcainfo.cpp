@@ -16,9 +16,9 @@
 #include "ADM_audio/ADM_dcainfo.h"
 extern "C"
 {
-#include "ADM_lavutil/common.h"
-#include "ADM_lavutil/bswap.h"
-#include "ADM_lavcodec/bitstream.h"
+#include "ADM_libraries/ADM_lavutil/common.h"
+#include "ADM_libraries/ADM_lavutil/bswap.h"
+#include "ADM_libraries/ADM_lavcodec/bitstream.h"
 
 }
 #include "ADM_assert.h"

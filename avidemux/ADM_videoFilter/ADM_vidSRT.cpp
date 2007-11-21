@@ -20,15 +20,10 @@
 #include <math.h>
 #include <iconv.h>
 
-
 #ifdef USE_FREETYPE
 
 #include "ADM_osSupport/ADM_misc.h"
-
 #include "ADM_toolkit/toolkit.hxx"
-
-
-
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 

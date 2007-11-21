@@ -13,8 +13,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- #include "config.h"
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "config.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 
 GtkWidget		*create_filterMain (void);
 GtkListStore 	*storeMainFilter;

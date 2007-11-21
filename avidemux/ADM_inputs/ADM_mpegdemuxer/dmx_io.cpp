@@ -26,7 +26,7 @@
 #include <math.h>
 
 #include "default.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "dmx_io.h"
 

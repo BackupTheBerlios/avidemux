@@ -21,15 +21,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
-
 #include <math.h>
 #include <time.h>
 #include <sys/time.h>
 
-
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "fourcc.h"
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"
@@ -41,12 +38,11 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
-
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 
 #include "default.h"
-#include "oplug_ogm/op_ogsave.h"
+#include "op_ogsave.h"
 
 //_______________________________________________
 uint8_t ogmSave(const char  *name)

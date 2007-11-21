@@ -18,13 +18,11 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
 #include <math.h>
-
-
 
 #ifdef USE_FFMPEG
 extern "C"
@@ -32,17 +30,18 @@ extern "C"
 #include "ADM_lavcodec.h"
 };
 #endif
-#include "ADM_utilities/default.h"
+
+#include "default.h"
+
 #ifdef BIG_ENDIAN
 #undef BIG_ENDIAN
 #endif
 
-
 #include "ADM_colorspace/colorspace.h"
+
 #ifdef USE_XX_XVID
 #include "xvid.h"
 #endif
-
 
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_mjpeg.h"
@@ -51,7 +50,7 @@ extern "C"
 #include "ADM_codecs/ADM_uyvy.h"
 #include "ADM_codecs/ADM_xvideco.h"
 
-#include "ADM_utilities/fourcc.h"
+#include "fourcc.h"
 
 #ifdef USE_FFMPEG
 #include "ADM_codecs/ADM_ffmp43.h"
@@ -64,10 +63,11 @@ extern "C"
 #ifdef USE_THEORA
 #include "ADM_codecs/ADM_theora_dec.h"
 #endif
+
 #include "ADM_codecs/ADM_mpeg.h"
 #include "ADM_codecs/ADM_png.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "prefs.h"
 
 extern uint8_t GUI_Question (char *);

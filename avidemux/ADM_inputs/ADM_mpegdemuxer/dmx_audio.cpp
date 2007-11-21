@@ -30,7 +30,7 @@
 #include "ADM_audio/aviaudio.hxx"
 
 #include "fourcc.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_osSupport/ADM_debugID.h"

@@ -13,9 +13,9 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 #include "default.h"
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 
 static GtkWidget	*create_aboutdialog1 (void);
 uint8_t DIA_about( void )

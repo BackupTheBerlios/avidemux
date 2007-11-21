@@ -39,13 +39,11 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
-
-
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
-#include "oplug_avi/op_aviwrite.hxx"
-#include "oplug_avi/op_avisave.h"
-#include "oplug_avi/op_savecopy.h"
+#include "op_aviwrite.hxx"
+#include "op_avisave.h"
+#include "op_savecopy.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_SAVE_AVI

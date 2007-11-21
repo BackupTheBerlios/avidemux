@@ -26,10 +26,9 @@
 #include <math.h>
 
 #include "default.h"
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
-
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"

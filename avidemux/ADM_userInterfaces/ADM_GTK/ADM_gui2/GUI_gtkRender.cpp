@@ -25,16 +25,16 @@
 #include <gdk/gdkx.h>
 #endif
 
-#include "../ADM_assert.h"
-#include "../ADM_osSupport/ADM_misc.h"
+#include "ADM_assert.h"
+#include "ADM_osSupport/ADM_misc.h"
 
-#include "ADM_commonUI/GUI_render.h"
-#include "ADM_commonUI/GUI_accelRender.h"
+#include "../ADM_commonUI/GUI_render.h"
+#include "../ADM_commonUI/GUI_accelRender.h"
 
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 
-#include "../../../ADM_colorspace/ADM_rgb.h"
-#include "../../../ADM_libraries/ADM_libswscale/ADM_mp.h"
+#include "ADM_colorspace/ADM_rgb.h"
+#include "ADM_libraries/ADM_libswscale/ADM_mp.h"
 
 void GUI_gtk_grow_off(int onff);
 

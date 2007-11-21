@@ -17,14 +17,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
-
-#include "math.h"
+#include <math.h>
 
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "fourcc.h"
 #include "ADM_toolkit/toolkit.hxx"
@@ -32,7 +30,7 @@
 #include "ADM_flv.h"
 
 // Borrowed from lavformt/flv.h
-#include "ADM_lavformat/flv.h"
+#include "ADM_libraries/ADM_lavformat/flv.h"
 // Borrowed from lavformt/flv.h    
 
 uint32_t ADM_UsecFromFps1000(uint32_t fps1000);

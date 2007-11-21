@@ -23,7 +23,7 @@
 #include "avifmt2.h"
 #include "fourcc.h"
 
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 void fourCC::print(uint32_t fourcc)
 {
     char s[5];

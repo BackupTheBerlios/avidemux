@@ -36,7 +36,7 @@
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 #include "ADM_vidParticle.h"
-#include "DIA_flyDialog.h" // for MenuMapping
+#include "ADM_userInterfaces/ADM_commonUI/DIA_flyDialog.h" // for MenuMapping
 
 FILE * ADMVideoParticle::outfp = 0;
 uint32_t ADMVideoParticle::last_frame_written = 0xffffffff;

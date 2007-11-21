@@ -17,9 +17,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "math.h"
+#include <math.h>
 #include <errno.h>
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "default.h"
 #include "ADM_avsproxy_internal.h"
 #include "ADM_avsproxy.h"

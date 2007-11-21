@@ -23,28 +23,25 @@
 #include <string.h>
 #include <errno.h>
 
-
 #include "fourcc.h"
 #include "avio.hxx"
 #include "ADM_osSupport/ADM_quota.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_inpics/ADM_pics.h"
 
-#include "ADM_nuv/ADM_nuv.h"
-#include "ADM_h263/ADM_h263.h"
+#include "ADM_inputs/ADM_inpics/ADM_pics.h"
+#include "ADM_inputs/ADM_nuv/ADM_nuv.h"
+#include "ADM_inputs/ADM_h263/ADM_h263.h"
 
 #include "ADM_toolkit/toolkit.hxx"
-
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_encoder/adm_encConfig.h"
-//#include "ADM_gui2/GUI_ui.h"
-#include "ADM_assert.h"
 #include "prefs.h"
 #include "avi_vars.h"
+
 // Ugly but sooo usefull
 extern uint32_t frameStart,frameEnd;
 static uint32_t edFrameStart,edFrameEnd;

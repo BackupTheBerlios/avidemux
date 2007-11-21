@@ -22,15 +22,12 @@
 #include <math.h>
 
 #include "default.h"
-#include <ADM_assert.h>
-
+#include "ADM_assert.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
 #include "fourcc.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
-
-
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_MPEG
@@ -238,8 +235,8 @@ int     audio,video;
         return 1;
 }
 /* ****************************************************** */
-#include "ADM_asf/ADM_asfPacket.h"
-#include "ADM_asf/ADM_asf.h"
+#include "../ADM_asf/ADM_asfPacket.h"
+#include "../ADM_asf/ADM_asf.h"
 
 #define PROBE_BUF 32000
 #define MAX_MSVDR_STREAMS 6

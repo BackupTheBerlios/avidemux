@@ -30,7 +30,7 @@
 
 #ifdef ALSA_SUPPORT
 #include <alsa/asoundlib.h>
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "default.h"
 

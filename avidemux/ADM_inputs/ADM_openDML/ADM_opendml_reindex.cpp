@@ -16,11 +16,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
+#include <math.h>
 
-#include "math.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
+
 #ifdef ADM_DEBUG
 //	#define ODML_INDEX_VERBOSE
 #endif
@@ -28,11 +28,10 @@
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
 
-
 #include "fourcc.h"
-#include "ADM_openDML/ADM_openDML.h"
+#include "ADM_openDML.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "DIA_working.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_ODML

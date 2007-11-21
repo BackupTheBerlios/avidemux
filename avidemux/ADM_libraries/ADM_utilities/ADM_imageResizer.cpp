@@ -24,10 +24,10 @@
 
 #if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 extern "C" {
-#include "ADM_lavcodec/avcodec.h"
+#include "ADM_libraries/ADM_lavcodec/avcodec.h"
 }
 #endif
-#include "ADM_libswscale/swscale.h"
+#include "ADM_libraries/ADM_libswscale/swscale.h"
 
 ADMImageResizer::ADMImageResizer(uint32_t ow, uint32_t oh, uint32_t dw, uint32_t dh)
 {

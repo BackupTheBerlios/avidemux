@@ -1,17 +1,7 @@
-################################
-#
-################################
-include(AdmLib)
 SET(ADM_LIB ADM_gui2Gtk)
-#
+
 SET(${ADM_LIB}_SRCS
-GUI_bindings.cpp  GUI_gtkRender.cpp  GUI_keymap.cpp  GUI_main2.cpp
-)
-ADD_LIBRARY(${ADM_LIB} STATIC ${${ADM_LIB}_SRCS})
-ADD_ADM_LIB(${ADM_LIB} ADM_libraries)
+	GUI_bindings.cpp  GUI_gtkRender.cpp  GUI_keymap.cpp  GUI_main2.cpp)
 
-
-################################
-ADD_definitions(${GTK_CFLAGS})
-include_directories(.. ../..)
-#/../ADM_osSupport ../../../ADM_inputs)
+ADD_ADM_LIB_GTK_TARGET(${ADM_LIB} ${${ADM_LIB}_SRCS})
+ADD_CFLAGS_GTK_TARGET(${ADM_LIB} ${GTK_CFLAGS})

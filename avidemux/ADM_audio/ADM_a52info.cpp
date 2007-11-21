@@ -13,7 +13,7 @@
 #include "config.h"
 #include <stdio.h>
 #include "default.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "ADM_audio/ADM_a52info.h"
 
 #define A52_CHANNEL 0

@@ -27,7 +27,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 //#include "ADM_video/ADM_vidRotate.h"
 #include "ADM_filter/video_filters.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
         
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 

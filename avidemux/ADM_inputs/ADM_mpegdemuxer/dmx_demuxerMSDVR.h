@@ -7,7 +7,7 @@
 #define MAX_MSDVR_BUFFER (65*1024) // should be safe enough
 #define MAX_MSDVR_STREAM 50       // should be enough too :)
 
-#include "ADM_mpegdemuxer/dmx_mpegstartcode.h"
+#include "dmx_mpegstartcode.h"
 /*
         A bit of explanation here.
         The demuxer will take each packet and lookup what it is

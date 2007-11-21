@@ -24,9 +24,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-
 #include "avi_vars.h"
-#include "GUI_ui.h"
+#include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_assert.h"
 
@@ -35,7 +34,6 @@
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "gui_action.hxx"
-
 
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_filter/vidVCD.h"

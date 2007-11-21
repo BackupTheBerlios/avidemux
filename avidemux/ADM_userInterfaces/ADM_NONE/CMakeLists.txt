@@ -1,6 +1,6 @@
-ADD_LIBRARY(ADM_UI_None STATIC ui_support.cpp)
+ADD_ADM_LIB_CLI_TARGET(ADM_UI_None ui_support.cpp)
 
-add_subdirectory(ADM_dialog)
-add_subdirectory(ADM_dialogFactory)
-add_subdirectory(ADM_filters)
-add_subdirectory(ADM_gui2)
+ADD_SUBDIRECTORY(ADM_dialog)
+ADD_SUBDIRECTORY(ADM_dialogFactory)
+ADD_SUBDIRECTORY(ADM_filters)
+ADD_SUBDIRECTORY(ADM_gui2)

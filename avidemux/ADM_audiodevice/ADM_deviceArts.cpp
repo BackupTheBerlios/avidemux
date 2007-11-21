@@ -21,7 +21,7 @@
 #ifdef USE_ARTS
 #include <artsc.h>
 
-#include <ADM_assert.h>  
+#include "ADM_assert.h"  
 #include "ADM_audiodevice.h"
 #include  "ADM_audiodevice/ADM_deviceoss.h"
 #include  "ADM_audiodevice/ADM_deviceArts.h"

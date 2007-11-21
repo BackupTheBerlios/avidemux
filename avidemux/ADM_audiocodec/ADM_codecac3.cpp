@@ -17,9 +17,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 #include <math.h>
 
+#include "ADM_assert.h"
 #include "config.h"
 #include "fourcc.h"
 #include "ADM_audio/aviaudio.hxx"
@@ -31,8 +31,8 @@
 
 #ifdef USE_AC3
 extern "C" {
-#include "ADM_liba52/a52.h"
-#include "ADM_liba52/mm_accel.h"
+#include "ADM_libraries/ADM_liba52/a52.h"
+#include "ADM_libraries/ADM_liba52/mm_accel.h"
 };
 
 #define AC3_HANDLE ((a52_state_t *)ac3_handle)

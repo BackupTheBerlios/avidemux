@@ -21,7 +21,7 @@ Swap each line  (shift up for odd, down for even)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "config.h"
 #include "fourcc.h"

@@ -38,7 +38,7 @@ GUI part of resize.
 #include "ADM_resizebis.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 
 static int getResizeParams(uint32_t * w, uint32_t * h, uint32_t * algo,uint32_t w,uint32_t h,uint32_t fps);

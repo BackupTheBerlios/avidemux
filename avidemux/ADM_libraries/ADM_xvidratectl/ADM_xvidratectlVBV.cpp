@@ -12,7 +12,7 @@
 //
 //	Reuse some of Peter Cheat predictor model
 //
-#include <config.h>
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -25,7 +25,7 @@
 #define MODULE_NAME  MODULE_XVID_RCTL
 #include "ADM_osSupport/ADM_debug.h"
 
-#include "ADM_xvidratectl/ADM_ratecontrol.h"
+#include "ADM_ratecontrol.h"
 
 ADM_newXvidRcVBV::ADM_newXvidRcVBV(uint32_t fps1000, char *logname) : ADM_ratecontrol(fps1000,logname)
 {

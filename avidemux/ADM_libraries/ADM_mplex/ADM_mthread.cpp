@@ -13,32 +13,28 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
 #include <math.h>
 #include <pthread.h>
+
 #define WIN32_CLASH
+
 #include "default.h"
 
 #include "ADM_toolkit/toolkit.hxx"
-#include <ADM_assert.h>
-
+#include "ADM_assert.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-
 #include "ADM_encoder/ADM_vidEncode.hxx"
-
 #include "ADM_encoder/adm_encoder.h"
-#include "../../ADM_userInterfaces/ADM_commonUI/DIA_encoding.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_encoding.h"
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-
-#include "ADM_encoder/ADM_vidEncode.hxx"
-
 #include "ADM_osSupport/ADM_threads.h"
-#include "ADM_lavformat/ADM_lavformat.h"
+#include "ADM_libraries/ADM_lavformat/ADM_lavformat.h"
 #include "ADM_mthread.h"
 
 admMutex accessMutex("accessMutex_MT_muxer");

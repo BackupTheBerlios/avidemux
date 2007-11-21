@@ -35,7 +35,7 @@ extern "C"{
 #if defined( ARCH_X86)  || defined(ARCH_X86_64)
 extern "C" 
 {
-#include "ADM_lavcodec/dsputil_cpu.h"
+#include "ADM_libraries/ADM_lavcodec/dsputil_cpu.h"
 }
 #endif
 

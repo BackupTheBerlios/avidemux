@@ -57,7 +57,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define RTJ_YUV422 1
 #define RTJ_RGB8   2
 
-#include "ADM_nuv/ADM_rtGlob.h"
+#include "ADM_inputs/ADM_nuv/ADM_rtGlob.h"
 
 class RTjpeg : public baseRT
 {

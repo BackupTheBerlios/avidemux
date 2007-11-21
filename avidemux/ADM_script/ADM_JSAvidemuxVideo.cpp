@@ -10,7 +10,7 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#include <config.h>
+#include "config.h"
 #include <stdlib.h>
 #include "ADM_JSAvidemuxVideo.h"
 #include "ADM_JSGlobal.h"

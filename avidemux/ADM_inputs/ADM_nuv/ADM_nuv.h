@@ -24,8 +24,8 @@
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_audio/aviaudio.hxx"
 
-#include "ADM_nuv/nuppel.h"
-#include "ADM_nuv/RTjpegN.h"
+#include "ADM_inputs/ADM_nuv/nuppel.h"
+#include "ADM_inputs/ADM_nuv/RTjpegN.h"
 
 typedef struct nuvIndex
 {

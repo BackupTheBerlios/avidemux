@@ -24,9 +24,7 @@
 #include <math.h>
 
 #include "ADM_toolkit/filesel.h"
-
 #include "ADM_assert.h"
-
 #include "prototype.h"
 #include "ADM_audiodevice/audio_out.h"
 #include "ADM_audio/aviaudio.hxx"
@@ -34,13 +32,13 @@
 #include "gui_action.hxx"
 #include "gtkgui.h"
 #include "ADM_toolkit/toolkit.hxx"
-//#include "ADM_toolkit/toolkit_gtk.h"
-#include "GUI_render.h"
-#include "DIA_working.h"
+#include "ADM_userInterfaces/ADM_commonUI/GUI_render.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-#include "DIA_busy.h"
-#include "GUI_ui.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_busy.h"
+#include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
+
 extern void    UI_purge(void );
 //____________________________________
 

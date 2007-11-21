@@ -21,18 +21,17 @@
 
 #include "config.h"
 #include "default.h"
-
 # include "prefs.h"
-#include "ADM_audiodevice/audio_out.h"
 
+#include "ADM_audiodevice/audio_out.h"
 #include "ADM_assert.h"
 #include "GUI_render.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 #ifdef ADM_WIN32
-#include "ADM_userInterfaces/ADM_commonUI/GUI_sdlRender.h"
+#include "GUI_sdlRender.h"
 #endif
 
 extern void 		AVDM_audioPref( void );

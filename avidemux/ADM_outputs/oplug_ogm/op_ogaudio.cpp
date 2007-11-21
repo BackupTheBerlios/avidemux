@@ -20,9 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
-
 #include <math.h>
 #include <time.h>
 #include <sys/time.h>
@@ -30,23 +28,21 @@
 #include "config.h"
 #include "fourcc.h"
 #include "avi_vars.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "subchunk.h"
 //#include "avilist.h"
 
 #include "ADM_video/ADM_genvideo.hxx"
-
 #include "ADM_filter/video_filters.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
-
 
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_audio/ADM_a52info.h"
 
-#include "oplug_ogm/op_ogsave.h"
+#include "op_ogsave.h"
 
 // should be enougth, at 500 kbps / 25 fps -> 3kbyte per slice
 #define OGM_AUDIO_BUFFER 64000

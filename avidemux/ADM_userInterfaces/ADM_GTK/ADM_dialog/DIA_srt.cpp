@@ -26,7 +26,6 @@
 #include <math.h>
 #include <iconv.h>
 
-
 #include "fourcc.h"
 #include "avio.hxx"
 
@@ -36,8 +35,6 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
 
-
-
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 
@@ -45,9 +42,9 @@
 class ADMfont;
 #include "ADM_videoFilter/ADM_vidSRT.h"
 
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 
 #include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_colorspace/colorspace.h"
@@ -56,7 +53,7 @@ class ADMfont;
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
 
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flySrtPos.h"
 

@@ -2,13 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "config.h"
 #include "fourcc.h"
 #include "avio.hxx"
 #include "default.h"
-#include "math.h"
+#include <math.h>
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_image.h"

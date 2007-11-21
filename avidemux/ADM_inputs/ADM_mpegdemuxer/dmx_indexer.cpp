@@ -23,7 +23,7 @@
 
 #include "default.h"
 #include "prefs.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 
 #include "ADM_toolkit/toolkit.hxx"

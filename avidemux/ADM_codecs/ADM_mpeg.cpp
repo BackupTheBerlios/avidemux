@@ -26,14 +26,15 @@
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
+
 #if  defined( __FreeBSD__ ) || defined(__APPLE__)
 #include <sys/types.h>
 #endif
-#include <stdlib.h>
 
+#include <stdlib.h>
 #include <string.h>
-//#include <math.h>
-#include "ADM_utilities/default.h"
+
+#include "default.h"
 #include "avifmt.h"
 #include "avifmt2.h"
 #include "fourcc.h"
@@ -45,14 +46,14 @@
 
 extern "C"
 {
-#include "ADM_libMpeg2Dec/video_out.h"
+#include "ADM_libraries/ADM_libMpeg2Dec/video_out.h"
 #undef free
 #undef alloc
 #undef realloc
 
-#include "ADM_libMpeg2Dec/mpeg2.h"
-#include "ADM_libMpeg2Dec/mpeg2_internal.h"
-#include <ADM_assert.h>
+#include "ADM_libraries/ADM_libMpeg2Dec/mpeg2.h"
+#include "ADM_libraries/ADM_libMpeg2Dec/mpeg2_internal.h"
+#include "ADM_assert.h"
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_CODEC
 #include "ADM_osSupport/ADM_debug.h"

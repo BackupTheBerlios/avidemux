@@ -24,40 +24,25 @@
 #include <sys/stat.h>
 #include <errno.h>
 
-
 #include "fourcc.h"
 #include "ADM_osSupport/ADM_quota.h"
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "subchunk.h"
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
-
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encConfig.h"
-
-
-
-
-#include "fourcc.h"
-#include "avi_vars.h"
-#include "ADM_toolkit/toolkit.hxx"
-#include "subchunk.h"
-
-
 #include "ADM_audiofilter/audioprocess.hxx"
-
-#include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-
-
-#include "ADM_libmpeg2enc/ADM_mpeg2enc.h"
+#include "ADM_libraries/ADM_libmpeg2enc/ADM_mpeg2enc.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"
-
+#include "adm_encmpeg2enc.h"
+#include "ADM_libraries/ADM_xvidratectl/ADM_ratecontrol.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_ENCODER
@@ -67,11 +52,6 @@
 #warning FIXME: Duplicate define with mpeg2enc -> bad
 #define MPEG_PREFILL 5
 
-#include "ADM_encoder/adm_encConfig.h"
-#include "ADM_encoder/ADM_vidEncode.hxx"
-
-#include "adm_encmpeg2enc.h"
-#include "ADM_xvidratectl/ADM_ratecontrol.h"
 static ADM_newXvidRcVBV *_xrc = NULL;
 extern uint32_t ADM_computeBitrate(uint32_t fps1000, uint32_t nbFrame, uint32_t sizeInMB);
 

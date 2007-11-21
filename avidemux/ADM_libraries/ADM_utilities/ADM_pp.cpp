@@ -24,7 +24,7 @@
 
 
 #include "ADM_lavcodec.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "default.h"
 

@@ -9,11 +9,10 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
 
+#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_assert.h" 
-
 #include "default.h"
 
 //___________________________________

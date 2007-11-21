@@ -29,7 +29,7 @@
 
 //MEANX
 #define ADM_LEGACY_PROGGY
-#include "../../ADM_assert.h"
+#include "ADM_assert.h"
 // /MEANX
 
     

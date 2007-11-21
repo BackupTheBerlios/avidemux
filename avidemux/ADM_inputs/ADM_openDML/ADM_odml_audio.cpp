@@ -26,7 +26,7 @@ It is an fopen/fwrite lookalike interface to chunks
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include <math.h>
 #ifdef ADM_WIN32
 #include <io.h>
@@ -35,11 +35,10 @@ It is an fopen/fwrite lookalike interface to chunks
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
 #include "fourcc.h"
-#include "ADM_openDML/ADM_openDML.h"
+#include "ADM_openDML.h"
 #include "ADM_audio/aviaudio.hxx"
-#include "ADM_openDML/ADM_odml_audio.h"
+#include "ADM_odml_audio.h"
 #include "ADM_audiocodec/ADM_audiocodec.h"
-
 
 //___________________________________
 //

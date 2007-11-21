@@ -174,8 +174,17 @@ MESSAGE("")
 ########################################
 # Generate config.h
 ########################################
-CONFIGURE_FILE("${CMAKE_MODULE_PATH}/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config.h")
-MESSAGE(STATUS "config.h generated")
+SET(CONFIG_HEADER_TYPE ADM_BUILD_CLI)
+CONFIGURE_FILE("${CMAKE_MODULE_PATH}/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config/cli/config.h")
+MESSAGE(STATUS "CLI config.h generated")
+
+SET(CONFIG_HEADER_TYPE ADM_BUILD_GTK)
+CONFIGURE_FILE("${CMAKE_MODULE_PATH}/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config/gtk/config.h")
+MESSAGE(STATUS "GTK config.h generated")
+
+SET(CONFIG_HEADER_TYPE ADM_BUILD_QT4)
+CONFIGURE_FILE("${CMAKE_MODULE_PATH}/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config/qt4/config.h")
+MESSAGE(STATUS "QT4 config.h generated")
 
 ########################################
 # Directories to build

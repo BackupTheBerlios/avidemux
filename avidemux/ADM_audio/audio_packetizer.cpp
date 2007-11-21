@@ -22,7 +22,7 @@ Split a stream into packet(s)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include <math.h>
 #ifdef ADM_WIN32
 #include <io.h>

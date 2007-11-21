@@ -37,7 +37,7 @@
 #define __LZO_IN_MINILZO
 #include "config.h"
 #ifdef MINILZO_HAVE_CONFIG_H
-#  include <config.h>
+#  include "config.h"
 #endif
 
 #undef LZO_HAVE_CONFIG_H

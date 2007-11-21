@@ -23,17 +23,16 @@
  ***************************************************************************/
 #include "config.h"
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "math.h"
-#include <ADM_assert.h>
+#include <math.h>
 
+#include "ADM_assert.h"
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
 #include "fourcc.h"
-#include "ADM_mp4/ADM_mp4.h"
+#include "ADM_mp4.h"
 //_______________________________________________________
 //
 //

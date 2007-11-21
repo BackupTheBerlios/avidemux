@@ -12,13 +12,13 @@
 #include <gtk/gtk.h>
 
 #include "config.h"
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "default.h"
 
 //___________________________________
 #include "avi_vars.h"
 #include "prefs.h"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 //___________________________________
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \

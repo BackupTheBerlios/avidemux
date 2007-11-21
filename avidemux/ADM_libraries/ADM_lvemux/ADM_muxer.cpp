@@ -26,22 +26,18 @@
 #include <time.h>
 #include <sys/time.h>
 
-
 #include "default.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_audiofilter/audioprocess.hxx"
-#include "ADM_lvemux/ADM_muxer.h"
+#include "ADM_muxer.h"
 #include "ADM_audio/ADM_a52info.h"
 
-
 extern "C" {
-	#include "ADM_lvemux/mux_out.h"
+	#include "mux_out.h"
 };
-#include <ADM_assert.h>
 
-
-
+#include "ADM_assert.h"
 
 MpegMuxer::MpegMuxer( void )
 {

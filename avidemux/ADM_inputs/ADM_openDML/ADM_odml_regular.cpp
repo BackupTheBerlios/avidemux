@@ -17,10 +17,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
-#include "math.h"
-
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #ifdef ADM_DEBUG
 	//#define ODML_INDEX_VERBOSE
@@ -29,9 +28,8 @@
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
 
-
 #include "fourcc.h"
-#include "ADM_openDML/ADM_openDML.h"
+#include "ADM_openDML.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_osSupport/ADM_debugID.h"

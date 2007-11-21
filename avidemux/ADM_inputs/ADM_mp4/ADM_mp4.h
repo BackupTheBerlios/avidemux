@@ -24,7 +24,7 @@
 
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_audio/aviaudio.hxx"
-#include "ADM_mp4/ADM_atom.h"
+#include "ADM_inputs/ADM_mp4/ADM_atom.h"
 
 
 class MPsampleinfo

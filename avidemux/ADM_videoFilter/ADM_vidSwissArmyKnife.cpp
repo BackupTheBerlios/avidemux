@@ -46,7 +46,7 @@
 #include "ADM_vidSwissArmyKnife.h"
 #include "ADM_vidParticle.h" // for ImageTool
 #include "ADM_vidComputeAverage.h" // for ADMVideoComputeAverage::FileHeader
-#include "DIA_flyDialog.h" // for MenuMapping
+#include "ADM_userInterfaces/ADM_commonUI/DIA_flyDialog.h" // for MenuMapping
 
 static const int MAX_PIXEL_LUMA = 255;
 

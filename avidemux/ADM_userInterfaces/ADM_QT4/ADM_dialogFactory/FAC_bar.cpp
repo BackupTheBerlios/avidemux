@@ -13,7 +13,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <config.h>
+#include "config.h"
 
 
 #include <string.h>
@@ -28,7 +28,7 @@
 #include <QProgressBar>
 
 #include "default.h"
-#include "ADM_commonUI/DIA_factory.h"
+#include "../ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
 
 

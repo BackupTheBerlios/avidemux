@@ -3,10 +3,11 @@
 
 #pragma once
 
+#include "config.h"
+
 // Spidermonkey
-#include <jsapi.h>
+#include "ADM_libraries/ADM_smjs/jsapi.h"
 #include "ADM_AvidemuxAudio.h"
-#include <config.h>
 
 class ADM_JSAvidemuxAudio
 {

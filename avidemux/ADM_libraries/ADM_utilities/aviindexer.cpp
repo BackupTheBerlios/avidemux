@@ -22,7 +22,7 @@
 
 #include <string.h>
 //#include <sstream>
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include <math.h>
 #include "avio.hxx"
 #include "fourcc.h"

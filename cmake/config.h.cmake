@@ -1,5 +1,9 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
+#define ADM_BUILD_CLI 1
+#define ADM_BUILD_GTK 2
+#define ADM_BUILD_QT4 3
+
 /* Jog Shuttle */
 #cmakedefine USE_JOG
 
@@ -93,9 +97,6 @@
 /* Using GCC 2.9x.x */
 #cmakedefine GCC_2_95_X
 
-/* gettext package name */
-#cmakedefine GETTEXT_PACKAGE
-
 /* AltiVec for mpeg2enc */
 #cmakedefine HAVE_ALTIVEC
 
@@ -108,8 +109,10 @@
 /* FontConfig detected */
 #cmakedefine HAVE_FONTCONFIG
 
+#if ${CONFIG_HEADER_TYPE} == ADM_BUILD_CLI || ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #cmakedefine HAVE_GETTEXT
+#endif
 
 /* Define to 1 if you have the `gettimeofday' function. */
 #cmakedefine HAVE_GETTIMEOFDAY
@@ -213,8 +216,10 @@
 /* use x264 encoder */
 #cmakedefine USE_X264
 
+#if !defined(__APPLE__) || (defined(__APPLE__) && ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK)
 /* XVideo detected */
 #cmakedefine USE_XV
+#endif
 
 /* use Xvid 1.x API */
 #cmakedefine USE_XVID_4
@@ -223,7 +228,7 @@
 #cmakedefine USE_XX_XVID
 
 /* Version number of package */
-#define  VERSION "${VERSION}"
+#define VERSION "${VERSION}"
 
 /* Big endian CPU - SPARC or PowerPC */
 #cmakedefine WORDS_BIGENDIAN

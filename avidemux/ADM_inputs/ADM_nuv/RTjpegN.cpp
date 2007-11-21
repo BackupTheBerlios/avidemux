@@ -25,10 +25,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 #include <inttypes.h>
-#include "config.h"
 
+#include "config.h"
+#include "ADM_assert.h"
 #include "RTjpegN.h"
 
 #ifdef MMX
@@ -45,7 +45,7 @@ static mmx_t RTjpeg_zero;
 //#define SHOWBLOCK 1
 #define BETTERCOMPRESSION 1
 /// MEANX
-#include "../../ADM_assert.h"
+#include "ADM_assert.h"
 /// /MEANX
     
 static const unsigned char RTjpeg_ZZ[64]={

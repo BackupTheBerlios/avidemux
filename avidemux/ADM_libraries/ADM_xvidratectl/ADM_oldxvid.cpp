@@ -16,11 +16,9 @@
 #include <string.h>
 #include <math.h>
 
-
 #include "avi_vars.h"
-#include <ADM_assert.h>
-#include "ADM_xvidratectl/ADM_ratecontrol.h"
-//static vbr_control_t mpegvbr;
+#include "ADM_assert.h"
+#include "ADM_ratecontrol.h"
 
 ADM_ratecontrol::ADM_ratecontrol(uint32_t fps1000, char *logname)
 {

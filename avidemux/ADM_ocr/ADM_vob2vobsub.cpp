@@ -22,7 +22,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,8 +44,8 @@
 #include "ADM_audiofilter/audioprocess.hxx"
 
 #include "ADM_toolkit/filesel.h"
-#include "ADM_mpegdemuxer/dmx_demuxer.h"
-#include "ADM_mpegdemuxer/dmx_demuxerPS.h"
+#include "ADM_inputs/ADM_mpegdemuxer/dmx_demuxer.h"
+#include "ADM_inputs/ADM_mpegdemuxer/dmx_demuxerPS.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 #define ADM_VOBSUB_NO_PADDING
 static int vobsub_parse_ifo(const char *const name, 

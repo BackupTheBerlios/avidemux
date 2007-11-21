@@ -10,12 +10,12 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-# include <config.h>
+# include "config.h"
 
 #include "default.h"
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 
 #include "prefs.h"
 static GtkWidget	*create_dialog1 (void);

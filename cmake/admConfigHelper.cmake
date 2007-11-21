@@ -18,6 +18,7 @@ MACRO(SDLify _source)
 	ENDIF (SDL_FOUND)
 ENDMACRO(SDLify)
 
+
 # ARGV2 = library to check
 # ARGV3 = function to check
 # ARVG4 = extra required libs
@@ -29,7 +30,7 @@ MACRO(FIND_HEADER_AND_LIB prefix headerFile)
 		IF (NOT ${headerFile} STREQUAL "")
 			FIND_PATH(${prefix}_INCLUDE_DIR ${headerFile})
 			MARK_AS_ADVANCED(${prefix}_INCLUDE_DIR)
-		
+
 			IF (${prefix}_INCLUDE_DIR)
 				MESSAGE(STATUS "Found ${headerFile}")
 			ELSE (${prefix}_INCLUDE_DIR)
@@ -103,7 +104,7 @@ MACRO (CHECK_CFLAGS_REQUIRED _file _cflags _include _lib _varToSet)
 
 		IF (${_varToSet}_COMPILE_WITH AND NOT ${_varToSet}_COMPILE_WITHOUT)
 			SET(${_varToSet} 1 CACHE INTERNAL "")
-			
+
 			IF (VERBOSE)
 				MESSAGE(STATUS "(${_cflags}) required")
 			ENDIF (VERBOSE)
@@ -122,35 +123,84 @@ MACRO (CHECK_CFLAGS_REQUIRED _file _cflags _include _lib _varToSet)
 	ENDIF (NOT DEFINED ${_varToSet}_CFLAGS_CHECKED)
 ENDMACRO (CHECK_CFLAGS_REQUIRED)
 
-MACRO (append_flags _flags _varToAppend)
-	IF (_flags)
-		set(_flags "${_flags} ${_varToAppend}")
-	ELSE (_flags)
-		set(_flags "${_varToAppend}")
-	ENDIF (_flags)
-ENDMACRO (append_flags)
 
-MACRO (add_source_compile_flags _target _flg)
+MACRO (APPEND_FLAGS _flags _varToAppend)
+	IF (${_flags})
+		SET(${_flags} "${${_flags}} ${_varToAppend}")
+	ELSE (${_flags})
+		SET(${_flags} "${_varToAppend}")
+	ENDIF (${_flags})
+ENDMACRO (APPEND_FLAGS)
+
+
+#ARGV1 = flags
+MACRO (ADD_SOURCE_CFLAGS _target)
 	GET_SOURCE_FILE_PROPERTY(_flags ${_target} COMPILE_FLAGS)
 
-	append_flags("${_flags}" "${_flg}")
+	FOREACH (_flg ${ARGN})
+		APPEND_FLAGS(_flags "${_flg}")
+	ENDFOREACH (_flg ${ARGN})
 
 	SET_SOURCE_FILES_PROPERTIES(${_target} PROPERTIES COMPILE_FLAGS "${_flags}")   
-ENDMACRO (add_source_compile_flags)
+ENDMACRO (ADD_SOURCE_CFLAGS)
 
-MACRO (add_target_compile_flags _target _flg)
+
+MACRO (ADD_TARGET_CFLAGS _target)
 	GET_TARGET_PROPERTY(_flags ${_target} COMPILE_FLAGS)
 
-	append_flags("${_flags}" "${_flg}")
+	FOREACH (_flg ${ARGN})
+		APPEND_FLAGS(_flags "${_flg}")
+	ENDFOREACH (_flg ${ARGN})
 
 	SET_TARGET_PROPERTIES(${_target} PROPERTIES COMPILE_FLAGS "${_flags}")
+ENDMACRO (ADD_TARGET_CFLAGS)
 
-ENDMACRO (add_target_compile_flags)
 
-MACRO (add_target_link_flags _target _flg)
-	GET_TARGET_PROPERTY(_flags ${_target} LINK_FLAGS)
+MACRO (ADD_CFLAGS_GTK_TARGET _target)
+	IF (ADM_UI_GTK)
+		ADD_TARGET_CFLAGS(${_target}_gtk ${ARGN})
+	ENDIF (ADM_UI_GTK)
+ENDMACRO (ADD_CFLAGS_GTK_TARGET)
 
-	append_flags("${_flags}" "${_flg}")
 
-	SET_TARGET_PROPERTIES(${_target} PROPERTIES LINK_FLAGS "${_flags}")
-ENDMACRO (add_target_link_flags)
+MACRO (ADD_CFLAGS_QT4_TARGET _target)
+	IF (ADM_UI_QT4)
+		ADD_TARGET_CFLAGS(${_target}_qt4 ${ARGN})
+	ENDIF (ADM_UI_QT4)
+ENDMACRO (ADD_CFLAGS_QT4_TARGET)
+
+
+MACRO (ADD_CFLAGS_ALL_TARGETS _target)
+	ADD_TARGET_CFLAGS(${_target}_cli ${ARGN})
+	ADD_CFLAGS_GTK_TARGET(${_target} ${ARGN})
+	ADD_CFLAGS_QT4_TARGET(${_target} ${ARGN})
+ENDMACRO (ADD_CFLAGS_ALL_TARGETS)
+
+
+MACRO (ADD_ADM_LIB_CLI_TARGET _libName)
+	ADD_LIBRARY(${_libName}_cli STATIC ${ARGN})
+	ADD_TARGET_CFLAGS(${_libName}_cli "-I${CMAKE_BINARY_DIR}/config/cli")
+ENDMACRO (ADD_ADM_LIB_CLI_TARGET)
+
+
+MACRO (ADD_ADM_LIB_GTK_TARGET _libName)
+	IF (ADM_UI_GTK)
+		ADD_LIBRARY(${_libName}_gtk STATIC ${ARGN})
+		ADD_TARGET_CFLAGS(${_libName}_gtk "-I${CMAKE_BINARY_DIR}/config/gtk")
+	ENDIF (ADM_UI_GTK)
+ENDMACRO (ADD_ADM_LIB_GTK_TARGET)
+
+
+MACRO (ADD_ADM_LIB_QT4_TARGET _libName)
+	IF (ADM_UI_QT4)
+		ADD_LIBRARY(${_libName}_qt4 STATIC ${ARGN})
+		ADD_TARGET_CFLAGS(${_libName}_qt4 "-I${CMAKE_BINARY_DIR}/config/qt4")
+	ENDIF (ADM_UI_QT4)
+ENDMACRO (ADD_ADM_LIB_QT4_TARGET)
+
+
+MACRO (ADD_ADM_LIB_ALL_TARGETS _libName)
+	ADD_ADM_LIB_CLI_TARGET(${_libName} ${ARGN})
+	ADD_ADM_LIB_GTK_TARGET(${_libName} ${ARGN})
+	ADD_ADM_LIB_QT4_TARGET(${_libName} ${ARGN})
+ENDMACRO (ADD_ADM_LIB_ALL_TARGETS)

@@ -21,14 +21,14 @@
 // #include "avio.hxx"
 // #include "fourcc.h"
 
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
 
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \

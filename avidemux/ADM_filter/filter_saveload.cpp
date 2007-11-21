@@ -32,7 +32,7 @@
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_osSupport/ADM_quota.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"

@@ -31,7 +31,7 @@
 #include <libxml/tree.h>
 #include <libxml/parser.h>
 #endif
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #undef free
 extern char *ADM_getBaseDir(void);

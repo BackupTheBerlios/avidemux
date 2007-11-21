@@ -14,12 +14,12 @@ ADM_vidCached.cpp
 ADM_vidMPdelogo.cpp      
 ADM_vidClean.cpp        
 ADM_vidEqualizer.cpp  
-ADM_vidNull.cpp          
-)
-ADD_LIBRARY(ADM_video STATIC ${ADM_video_SRCS})
+ADM_vidNull.cpp)
 
-if(USE_FREETYPE)
-	include_directories(${FREETYPE2_INCLUDE_DIRS})
-endif(USE_FREETYPE)
+ADD_ADM_LIB_ALL_TARGETS(ADM_video ${ADM_video_SRCS})
 
-include_directories(../ADM_inputs)
+IF (USE_FREETYPE)
+	ADD_CFLAGS_ALL_TARGETS(ADM_video ${FREETYPE2_CFLAGS})
+ENDIF (USE_FREETYPE)
+
+ADD_CFLAGS_ALL_TARGETS(ADM_video "-I../ADM_inputs")

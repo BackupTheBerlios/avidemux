@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "config.h"
 #include "ADM_editor/ADM_Video.h"
 vidHeader::~vidHeader ()

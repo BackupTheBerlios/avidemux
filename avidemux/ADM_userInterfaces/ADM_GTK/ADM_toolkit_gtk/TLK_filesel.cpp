@@ -27,7 +27,7 @@
 #include <dirent.h>
 
 #include "avi_vars.h"
-#include "ADM_misc.h"
+#include "ADM_osSupport/ADM_misc.h"
 #include "ADM_assert.h"
 
 #include "ADM_toolkit/filesel.h"
@@ -35,8 +35,8 @@
 #include "prefs.h"
 #define TH_READ 1
 #define TH_WRITE 2
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
+#include "toolkit_gtk_include.h"
+#include "toolkit_gtk.h"
 
 extern char * actual_workbench_file;
 

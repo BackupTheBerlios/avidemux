@@ -19,8 +19,8 @@
 #include <string.h>
 #include <math.h>
 
-#include <ADM_assert.h>
-#include "ADM_utilities/default.h"
+#include "ADM_assert.h"
+#include "default.h"
 
 #include "audioprocess.hxx"
 

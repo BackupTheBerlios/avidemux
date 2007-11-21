@@ -21,9 +21,9 @@
 #include <string.h>
 #include <math.h>
 
-#include "ADM_utilities/default.h"
+#include "default.h"
 
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #ifdef USE_THEORA
 #include "ADM_colorspace/colorspace.h"

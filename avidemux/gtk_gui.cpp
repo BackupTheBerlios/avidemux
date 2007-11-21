@@ -27,7 +27,6 @@
 #include <glib.h>
     
 #include "ADM_lavcodec.h"
-
 #include "fourcc.h"
 #include "avi_vars.h"
 #include "ADM_assert.h"
@@ -42,31 +41,27 @@
 #include "gui_action.hxx"
 #include "gtkgui.h"
 //#include "ADM_gui/GUI_vars.h"
-#include "oplug_avi/GUI_mux.h"
-#include "oplug_mpegFF/oplug_vcdff.h"
+#include "ADM_outputs/oplug_avi/GUI_mux.h"
+#include "ADM_outputs/oplug_mpegFF/oplug_vcdff.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"
 #include "ADM_encoder/adm_encConfig.h"
-#include "GUI_render.h"
-#include "GUI_ui.h"
+#include "ADM_userInterfaces/ADM_commonUI/GUI_render.h"
+#include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_audiodevice/audio_out.h"
 
-#include "DIA_busy.h"
-#include "DIA_working.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_busy.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_enter.h"
 
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-#include "DIA_enter.h"
-
 #include "ADM_encoder/ADM_vidEncode.hxx"
-
-
 #include "ADM_codecs/ADM_ffmpeg.h"
 
-#include "ADM_libmpeg2enc/ADM_mpeg2enc.h"
-
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "ADM_libraries/ADM_libmpeg2enc/ADM_mpeg2enc.h"
 
 void A_handleSecondTrack (int tracktype);
 int A_delete(uint32_t start, uint32_t end);

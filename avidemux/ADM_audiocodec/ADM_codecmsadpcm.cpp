@@ -226,5 +226,3 @@ int16_t *run16;
         return 1;
   
 }
-
-// EOF

@@ -1,14 +1,7 @@
-################################
-#
-################################
-include(AdmLib)
 SET(ADM_LIB ADM_nvwa)
-#
-SET(${ADM_LIB}_SRCS 
-debug_new.cpp
-)
-ADD_LIBRARY(${ADM_LIB} STATIC ${${ADM_LIB}_SRCS})
-ADD_ADM_LIB(${ADM_LIB} ADM_libraries)
-ADD_DEFINITIONS(-D_DEBUG_NEW_ERROR_ACTION=NULL)
 
-################################
+SET(${ADM_LIB}_SRCS 
+	debug_new.cpp)
+
+ADD_ADM_LIB_ALL_TARGETS(${ADM_LIB} ${${ADM_LIB}_SRCS})
+ADD_CFLAGS_ALL_TARGETS(-D_DEBUG_NEW_ERROR_ACTION=NULL)

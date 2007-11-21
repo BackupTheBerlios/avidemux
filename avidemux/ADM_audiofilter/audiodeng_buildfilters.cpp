@@ -18,10 +18,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 #include <math.h>
 
-#include "ADM_utilities/default.h"
+#include "ADM_assert.h"
+#include "default.h"
 
 #include "ADM_audiofilter/audiofilter_limiter_param.h"
 #include "ADM_audiofilter/audiofilter_normalize_param.h"

@@ -11,7 +11,7 @@
 //
 //
 
-#include <config.h>
+#include "config.h"
 
 
 #include <string.h>
@@ -19,20 +19,18 @@
 #include "default.h"
 
 #include <gtk/gtk.h>
-
-
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-# include <math.h>
+#include <math.h>
 
-
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "default.h"
 
 #include "ADM_video/ADM_vidCNR2_param.h"
+
 static GtkWidget        *create_dialog1 (void);
 
 #define CHECK_GET(x,y) {param->y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}

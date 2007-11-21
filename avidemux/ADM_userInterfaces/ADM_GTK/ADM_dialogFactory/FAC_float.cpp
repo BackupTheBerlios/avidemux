@@ -13,22 +13,18 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <config.h>
-
+#include "config.h"
 
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
 
 #include "default.h"
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
-#include "ADM_commonUI/DIA_factory.h"
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "../ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
-
-
-
 
 diaElemFloat::diaElemFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, 
                             ELEM_TYPE_FLOAT min, ELEM_TYPE_FLOAT max,const char *tip)

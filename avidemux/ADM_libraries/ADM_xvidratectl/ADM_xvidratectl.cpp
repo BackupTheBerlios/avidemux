@@ -43,7 +43,7 @@
 	to fight most common problems without user's knowladge */
 #define SMART_OVERFLOW_SETTING
 #define VBV
-#include <config.h>
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -93,7 +93,7 @@
 #define INVARIANT_HEADER_PART_PVOP 2 /* factor 0.5f   */
 #define INVARIANT_HEADER_PART_BVOP 8 /* factor 0.125f */
 
-#include "ADM_xvidratectl/ADM_ratecontrol.h"
+#include "ADM_ratecontrol.h"
 
 /*****************************************************************************
  * Structures

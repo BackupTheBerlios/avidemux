@@ -38,7 +38,7 @@ extern "C" {
 
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_colorspace/ADM_rgb.h"
-#include "ADM_commonUI/GUI_render.h"
+#include "GUI_render.h"
 
 #include "GUI_accelRender.h"
 #include "GUI_sdlRender.h"

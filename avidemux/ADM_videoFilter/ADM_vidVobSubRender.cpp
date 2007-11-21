@@ -48,38 +48,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 
+#include "ADM_assert.h"
 #include "config.h"
 #include "fourcc.h"
 #include "avio.hxx"
 #include "config.h"
 #include "avi_vars.h"
 
-
-
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-
-
 #include "ADM_toolkit/filesel.h"
-
 #include "ADM_colorspace/colorspace.h"
-
 #include "ADM_vobsubinfo.h"
-
 #include "ADM_vidVobSub.h"
 
 #if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 extern "C" {
-#include "ADM_lavcodec/avcodec.h"
+#include "ADM_libraries/ADM_lavcodec/avcodec.h"
 }
 #endif
 
-#include "../ADM_lavutil/avutil.h"
-#include "ADM_libswscale/swscale.h"
+#include "ADM_libraries/ADM_lavutil/avutil.h"
+#include "ADM_libraries/ADM_libswscale/swscale.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
 
 #include "ADM_osSupport/ADM_debugID.h"

@@ -217,7 +217,7 @@ bool getWindowsVersion(char* version)
 
 			if (hKernel)
 			{
-				typedef bool (*funcGetProductInfo)(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t*);
+				typedef bool (__stdcall *funcGetProductInfo)(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t*);
 				funcGetProductInfo pGetProductInfo = (funcGetProductInfo)GetProcAddress(hKernel, "GetProductInfo"); 
 
 				if (pGetProductInfo)

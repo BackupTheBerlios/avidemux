@@ -51,22 +51,22 @@
 #include <sys/param.h>
 #endif
 #ifdef __FreeBSD__
-          #include <sys/types.h>
+	#include <sys/types.h>
 #endif
 #include <stdlib.h>
 #include <string.h>
 
-#include "math.h"
+#include <math.h>
 
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
 
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #include "fourcc.h"
-#include "ADM_nuv/ADM_nuv.h"
-#include "ADM_nuv/nuppel.h"
-#include "ADM_nuv/minilzo.h"
+#include "ADM_nuv.h"
+#include "nuppel.h"
+#include "minilzo.h"
 /*
 extern "C"
 {
@@ -74,8 +74,7 @@ extern "C"
 #include "ADM_nuv/RTjpegN.h"
 }*/
 
-#include "ADM_nuv/RTjpegN.h"
-
+#include "RTjpegN.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
@@ -85,7 +84,7 @@ extern "C"
 #include "ADM_osSupport/ADM_debug.h"
 
 #include "prefs.h"
-#include "DIA_working.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 
 	#define DXFIELD(x) ((rtfileheader *)_nuv_header)->x
 	#define DX(x) printf(" "#x" :%d\n",DXFIELD(x));

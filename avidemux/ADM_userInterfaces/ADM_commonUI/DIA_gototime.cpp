@@ -17,7 +17,7 @@
 #include "default.h"
 #include "ADM_osSupport/ADM_misc.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 
 uint8_t DIA_gotoTime(uint16_t *hh, uint16_t *mm, uint16_t *ss)

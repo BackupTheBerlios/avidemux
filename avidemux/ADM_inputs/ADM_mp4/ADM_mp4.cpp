@@ -56,18 +56,15 @@ version 2 media descriptor :
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
+#include <math.h>
 
-#include "math.h"
-
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
 
-
 #include "fourcc.h"
-#include "ADM_mp4/ADM_mp4.h"
+#include "ADM_mp4.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_codecs/ADM_codec.h"
 

@@ -17,9 +17,9 @@
 #include <string.h>
 #include <math.h>
 
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
-#include "ADM_utilities/default.h"
+#include "default.h"
 
 #include "audioeng_process.h"
 #include "audiofilter_sox.h"

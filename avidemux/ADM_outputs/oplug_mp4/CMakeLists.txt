@@ -1,3 +1,3 @@
-
 SET(ADM_oplug_mp4_SRCS oplug_mp4.cpp)
-ADD_LIBRARY(oplug_mp4 STATIC ${ADM_oplug_mp4_SRCS})
+
+ADD_ADM_LIB_ALL_TARGETS(oplug_mp4 ${ADM_oplug_mp4_SRCS})

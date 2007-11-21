@@ -21,11 +21,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 
 #define MINUS_ONE 0xffffffff
 
-#include "ADM_ogm/ADM_ogm.h"
+#include "ADM_ogm.h"
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_OGM_AUDIO
 #include "ADM_osSupport/ADM_debug.h"

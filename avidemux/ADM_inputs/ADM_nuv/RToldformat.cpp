@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
+#include "ADM_assert.h"
 #include <math.h>
 #include "config.h"
 #include <default.h>
@@ -31,7 +31,7 @@ typedef int32_t __s32;
 
 #include "ADM_rtGlob.h"
 extern "C" {
-	#include "ADM_nuv/RTjpeg.h"
+	#include "RTjpeg.h"
 };
 
  	int 		baseRT::SetSize(int *w, int *h)

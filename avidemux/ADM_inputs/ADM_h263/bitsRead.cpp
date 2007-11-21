@@ -18,17 +18,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "math.h"
+#include <math.h>
 
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
-#include <ADM_assert.h>
-
+#include "ADM_assert.h"
 
 #include "fourcc.h"
-#include "ADM_h263/ADM_h263.h"
-#include "ADM_h263/bitsRead.h"
+#include "ADM_h263.h"
+#include "bitsRead.h"
 
 #include "bitsRead.h"
 const int mask[9]={

@@ -25,8 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <config.h>
-
+#include "config.h"
 
 #include "RTjpeg.h"
 
@@ -34,7 +33,7 @@
 #include "mmx.h"
 #endif
 /// MEANX
-#include "../../ADM_assert.h"
+#include "ADM_assert.h"
 /// /MEANX
     
 void RTjpeg_color_init(void);

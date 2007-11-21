@@ -45,14 +45,14 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 
-#include "GUI_render.h"
+#include "ADM_userInterfaces/ADM_commonUI/GUI_render.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_PREVIEW
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_libraries/ADM_libswscale/ADM_mp.h"
+#include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
 
-#include "GUI_ui.h"
 #define MAX(a,b) ( (a)>(b) ? (a) : (b) )
 
 extern FILTER  videofilters[MAX_FILTER];
