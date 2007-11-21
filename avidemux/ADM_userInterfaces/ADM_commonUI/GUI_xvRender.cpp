@@ -26,8 +26,6 @@
 //#define VERBOSE_XV
 
 #ifdef USE_XV
-
-
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <sys/ipc.h>
@@ -36,11 +34,10 @@
 #include <X11/extensions/Xvlib.h>
 #include <X11/extensions/XShm.h>
 
-
 #include "default.h"
 
 #include "ADM_colorspace/colorspace.h"
-#include "ADM_commonUI//GUI_render.h"
+#include "GUI_render.h"
 
 #include "GUI_accelRender.h"
 #include "GUI_xvRender.h"

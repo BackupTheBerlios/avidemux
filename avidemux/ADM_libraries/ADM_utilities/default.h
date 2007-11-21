@@ -82,14 +82,8 @@ typedef unsigned char ADM_filename ;
  * Standard gettext macros.
  */
 #ifdef HAVE_GETTEXT
-#  include <libintl.h>
-#  undef _
-#else
-#  define textdomain(String) (String)
-#  define gettext(String) (String)
-#  define dgettext(Domain,Message) (Message)
-#  define dcgettext(Domain,Message,Type) (Message)
-#  define bindtextdomain(Domain,Directory) (Domain)
+	#include <libintl.h>
+	#undef _
 #endif
 
 extern const char* translate(const char *__domainname, const char *__msgid);
