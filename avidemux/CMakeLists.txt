@@ -60,7 +60,15 @@ ENDIF (ADM_UI_QT4)
 
 SDLify(main.cpp)
 ADD_SOURCE_CFLAGS(main.cpp "-DADM_SUBVERSION=${ADM_SUBVERSION}")
-ADD_SOURCE_CFLAGS(gtk_gui.cpp "${GLIB_CFLAGS}")
+ADD_SOURCE_CFLAGS(gtk_gui.cpp ${GLIB_CFLAGS})
+
+IF (USE_AMR_NB)
+	ADD_SOURCE_CFLAGS(main.cpp -I${AMRNB_INCLUDE_DIR})
+ENDIF (USE_AMR_NB)
+
+IF (USE_LIBDCA)
+	ADD_SOURCE_CFLAGS(main.cpp -I${LIBDCA_INCLUDE_DIR})
+ENDIF (USE_LIBDCA)
 
 ########################################
 # Compile and link general subdirs

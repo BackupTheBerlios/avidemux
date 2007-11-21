@@ -3,3 +3,8 @@ SET(ADM_encoder_SRCS
 	adm_encCopy.cpp    adm_encdivx.cpp    adm_encffmpeg.cpp   adm_encmpeg2enc.cpp  adm_encRequant.cpp  adm_encXvid4.cpp  adm_encyv12.cpp)
 
 ADD_ADM_LIB_ALL_TARGETS(ADM_encoder ${ADM_encoder_SRCS})
+
+IF (USE_XVID_4)
+	ADD_SOURCE_CFLAGS(adm_encxvid.cpp -I${XVID_INCLUDE_DIR})
+	ADD_SOURCE_CFLAGS(adm_encXvid4.cpp -I${XVID_INCLUDE_DIR})
+ENDIF (USE_XVID_4)

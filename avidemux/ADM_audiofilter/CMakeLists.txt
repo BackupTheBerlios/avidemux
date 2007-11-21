@@ -6,3 +6,19 @@ SET(ADMaudiofilter_SRCS
 	audioencoder_lame.cpp       audioeng_buff.cpp          audiofilter_dolby.cpp          audiofilter_sox.cpp)
 	
 ADD_ADM_LIB_ALL_TARGETS(ADM_audiofilter ${ADMaudiofilter_SRCS})
+
+IF (USE_AFTEN)
+	ADD_SOURCE_CFLAGS(audioencoder_aften.cpp -I${AFTEN_INCLUDE_DIR})
+ENDIF (USE_AFTEN)
+
+IF (USE_FAAC)
+	ADD_SOURCE_CFLAGS(audioencoder_faac.cpp -I${FAAC_INCLUDE_DIR})
+ENDIF (USE_FAAC)
+
+IF (HAVE_LIBMP3LAME)
+	ADD_SOURCE_CFLAGS(audioencoder_lame.cpp -I${LAME_INCLUDE_DIR})
+ENDIF (HAVE_LIBMP3LAME)
+
+IF (USE_VORBIS)
+	ADD_SOURCE_CFLAGS(audioencoder_vorbis.cpp -I${VORBIS_INCLUDE_DIR})
+ENDIF (USE_VORBIS)
