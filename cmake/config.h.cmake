@@ -27,8 +27,10 @@
 /* Build for Windows 32bits */
 #cmakedefine ADM_WIN32
 
+#if ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK || ${CONFIG_HEADER_TYPE} == ADM_BUILD_QT4
 /* use ALSA as possible audio device */
 #cmakedefine ALSA_SUPPORT
+#endif
 
 /* AMR_NB */
 #cmakedefine AMR_NB
@@ -162,11 +164,15 @@
 /* Tell avidemux to use libamrnb */
 #cmakedefine USE_AMR_NB
 
+#if ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK || ${CONFIG_HEADER_TYPE} == ADM_BUILD_QT4
 /* aRts detected */
 #cmakedefine USE_ARTS
+#endif
 
+#if ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK || ${CONFIG_HEADER_TYPE} == ADM_BUILD_QT4
 /* ESD detected */
 #cmakedefine USE_ESD
+#endif
 
 /* Jack detected */
 #cmakedefine USE_JACK
@@ -207,8 +213,10 @@
 /* use libsamplerate */
 #cmakedefine USE_SRC
 
+#if ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK || ${CONFIG_HEADER_TYPE} == ADM_BUILD_QT4
 /* SDL detected */
 #cmakedefine USE_SDL
+#endif
 
 /* Vorbis detected */
 #cmakedefine USE_VORBIS
@@ -216,7 +224,7 @@
 /* use x264 encoder */
 #cmakedefine USE_X264
 
-#if !defined(__APPLE__) || (defined(__APPLE__) && ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK)
+#if (!defined(__APPLE__) && (${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK || ${CONFIG_HEADER_TYPE} == ADM_BUILD_QT4)) || (defined(__APPLE__) && ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK)
 /* XVideo detected */
 #cmakedefine USE_XV
 #endif
