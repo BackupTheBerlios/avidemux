@@ -3,8 +3,14 @@ MACRO(PRINT_LIBRARY_INFO libraryName libraryDetected compilerFlags linkerFlags)
 		MESSAGE(STATUS "Found ${libraryName}")
 
 		IF (VERBOSE)
-			MESSAGE(STATUS "Compiler Flags: ${compilerFlags}")
-			MESSAGE(STATUS "Linker Flags  : ${linkerFlags}")
+			SET(_compilerFlags "")
+			APPEND_FLAGS(_compilerFlags ${compilerFlags})
+
+			SET(_linkerFlags "")
+			APPEND_FLAGS(_linkerFlags ${linkerFlags})
+
+			MESSAGE(STATUS "Compiler Flags:${_compilerFlags}")
+			MESSAGE(STATUS "Linker Flags  :${_linkerFlags}")
 		ENDIF (VERBOSE)
 	ELSE (${libraryDetected})
 		MESSAGE(${ARGV4} "Could not find ${libraryName}")
@@ -124,34 +130,28 @@ MACRO (CHECK_CFLAGS_REQUIRED _file _cflags _include _lib _varToSet)
 ENDMACRO (CHECK_CFLAGS_REQUIRED)
 
 
-MACRO (APPEND_FLAGS _flags _varToAppend)
-	IF (${_flags})
-		SET(${_flags} "${${_flags}} ${_varToAppend}")
-	ELSE (${_flags})
-		SET(${_flags} "${_varToAppend}")
-	ENDIF (${_flags})
+MACRO (APPEND_FLAGS _flags)
+	IF (NOT ${_flags})
+		SET(${_flags} "")
+	ENDIF (NOT ${_flags})
+
+	FOREACH (_flag ${ARGN})
+		SET(${_flags} "${${_flags}} ${_flag}")
+	ENDFOREACH (_flag ${ARGN})
 ENDMACRO (APPEND_FLAGS)
 
 
 #ARGV1 = flags
 MACRO (ADD_SOURCE_CFLAGS _target)
 	GET_SOURCE_FILE_PROPERTY(_flags ${_target} COMPILE_FLAGS)
-
-	FOREACH (_flg ${ARGN})
-		APPEND_FLAGS(_flags "${_flg}")
-	ENDFOREACH (_flg ${ARGN})
-
+	APPEND_FLAGS(_flags ${ARGN})
 	SET_SOURCE_FILES_PROPERTIES(${_target} PROPERTIES COMPILE_FLAGS "${_flags}")   
 ENDMACRO (ADD_SOURCE_CFLAGS)
 
 
 MACRO (ADD_TARGET_CFLAGS _target)
 	GET_TARGET_PROPERTY(_flags ${_target} COMPILE_FLAGS)
-
-	FOREACH (_flg ${ARGN})
-		APPEND_FLAGS(_flags "${_flg}")
-	ENDFOREACH (_flg ${ARGN})
-
+	APPEND_FLAGS(_flags ${ARGN})
 	SET_TARGET_PROPERTIES(${_target} PROPERTIES COMPILE_FLAGS "${_flags}")
 ENDMACRO (ADD_TARGET_CFLAGS)
 
@@ -204,3 +204,11 @@ MACRO (ADD_ADM_LIB_ALL_TARGETS _libName)
 	ADD_ADM_LIB_GTK_TARGET(${_libName} ${ARGN})
 	ADD_ADM_LIB_QT4_TARGET(${_libName} ${ARGN})
 ENDMACRO (ADD_ADM_LIB_ALL_TARGETS)
+
+
+MACRO (ADD_TARGET_LDFLAGS _target)
+	SET(_flags)
+	APPEND_FLAGS(_flags ${ARGN})
+
+	TARGET_LINK_LIBRARIES(${_target} ${_flags})
+ENDMACRO (ADD_TARGET_LDFLAGS)
