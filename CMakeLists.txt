@@ -14,7 +14,6 @@ IF (${Avidemux_SOURCE_DIR} MATCHES ${Avidemux_BINARY_DIR})
 	MESSAGE(FATAL_ERROR "in-tree-build detected")
 ENDIF (${Avidemux_SOURCE_DIR} MATCHES ${Avidemux_BINARY_DIR})
 
-INCLUDE(CheckCCompilerFlag)
 INCLUDE(CheckCXXCompilerFlag)
 INCLUDE(admConfigHelper)
 

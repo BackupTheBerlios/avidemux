@@ -64,22 +64,30 @@ ENDIF (GETTEXT_FOUND)
 ########################################
 SET(ADM_EXE_SRCS ADM_preview.cpp  gtk_gui.cpp  gui_autodrive.cpp  GUI_jobs.cpp  gui_navigate.cpp  guiplay.cpp  gui_savenew.cpp  main.cpp  gui_action.cpp)
 
-ADD_EXECUTABLE(avidemux2_cli ${ADM_EXE_SRCS})
+IF (ADM_OS_DARWIN)
+	SET(ADM_EXE_SRCS ${ADM_EXE_SRCS} ${CMAKE_SOURCE_DIR}/avidemux/xpm/avidemux.icns)
+ENDIF (ADM_OS_DARWIN)
+
+ADD_EXECUTABLE(avidemux2_cli MACOSX_BUNDLE ${ADM_EXE_SRCS})
 ADD_TARGET_CFLAGS(avidemux2_cli "-I${CMAKE_BINARY_DIR}/config/cli")
 
 IF (ADM_UI_GTK)
-	ADD_EXECUTABLE(avidemux2_gtk ${ADM_EXE_SRCS})
+	ADD_EXECUTABLE(avidemux2_gtk MACOSX_BUNDLE ${ADM_EXE_SRCS})
 	ADD_TARGET_CFLAGS(avidemux2_gtk "-I${CMAKE_BINARY_DIR}/config/gtk")
 ENDIF (ADM_UI_GTK)
 
 IF (ADM_UI_QT4)
-	ADD_EXECUTABLE(avidemux2_qt4 ${ADM_EXE_SRCS})
+	ADD_EXECUTABLE(avidemux2_qt4 MACOSX_BUNDLE ${ADM_EXE_SRCS})
 	ADD_TARGET_CFLAGS(avidemux2_qt4 "-I${CMAKE_BINARY_DIR}/config/qt4")
 ENDIF (ADM_UI_QT4)
 
 SDLify(main.cpp)
 ADD_SOURCE_CFLAGS(main.cpp "-DADM_SUBVERSION=${ADM_SUBVERSION}")
 ADD_SOURCE_CFLAGS(gtk_gui.cpp ${GLIB_CFLAGS})
+
+IF (ADM_OS_DARWIN)
+	SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/avidemux/xpm/avidemux.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+ENDIF (ADM_OS_DARWIN)
 
 IF (USE_AMR_NB)
 	ADD_SOURCE_CFLAGS(main.cpp -I${AMRNB_INCLUDE_DIR})
@@ -430,6 +438,18 @@ ENDIF (ADM_OS_WINDOWS)
 
 IF (ADM_OS_DARWIN)
 	ADD_LIB_ALL_TARGETS("-framework CoreServices -framework CoreAudio -framework AudioUnit")
+
+	SET(ADM_OSX_VERSION "${VERSION}")
+
+	IF (Subversion_FOUND)
+		SET(ADM_OSX_VERSION "${ADM_OSX_VERSION} (r${ADM_SUBVERSION})")
+	ENDIF (Subversion_FOUND)
+
+	SET(MACOSX_BUNDLE_ICON_FILE avidemux.icns)
+	SET(MACOSX_BUNDLE_INFO_STRING "Avidemux ${ADM_OSX_VERSION}")
+	SET(MACOSX_BUNDLE_LONG_VERSION_STRING "${ADM_OSX_VERSION}") 
+	SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${ADM_OSX_VERSION}")
+	SET(MACOSX_BUNDLE_VERSION "${ADM_OSX_VERSION}")
 ENDIF (ADM_OS_DARWIN)
 
 ###########################################

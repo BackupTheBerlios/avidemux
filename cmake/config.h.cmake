@@ -75,8 +75,8 @@
 #cmakedefine CONFIG_TG2_MUXER
 #cmakedefine CONFIG_TGP_MUXER
 
-#cmakedefine ENABLE_MMX ${ENABLE_MMX}
-#cmakedefine ENABLE_THREADS ${ENABLE_THREADS}
+#define ENABLE_MMX ${ENABLE_MMX}
+#define ENABLE_THREADS ${ENABLE_THREADS}
 #cmakedefine HAVE_FAST_UNALIGNED
 #cmakedefine HAVE_LRINTF
 #cmakedefine HAVE_MMX
