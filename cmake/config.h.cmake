@@ -197,6 +197,8 @@
 
 /* libdca detected */
 #cmakedefine USE_LIBDCA
+#cmakedefine USE_LIBDCA_002
+#cmakedefine USE_LIBDCA_005
 
 /* Libxml2 is available */
 #cmakedefine USE_LIBXML2

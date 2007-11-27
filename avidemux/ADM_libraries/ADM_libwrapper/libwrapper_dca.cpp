@@ -9,11 +9,20 @@ ADM_LibWrapperDca::ADM_LibWrapperDca() : ADM_LibWrapper()
 {
 #ifdef USE_LATE_BINDING
 #ifdef ADM_WIN32
-	char* libname = "libdts.dll";
+#ifdef USE_LIBDCA_002
+	const char* libname = "libdts.dll";
 #else
-	char* libname = "libdts.so";	// ???
-#endif
+	const char* libname = "libdca-0.dll";
+#endif	// USE_LIBDCA_002
+#else
+#ifdef USE_LIBDCA_002
+	const char* libname = "libdts.so";	// ???
+#else
+	const char* libname = "libdca-0.so";	// ???
+#endif	// USE_LIBDCA_002
+#endif	// ADM_WIN32
 
+#ifdef USE_LIBDCA_002
 	initialised = (loadLibrary(libname) && getSymbols(7, 
 		&func_dts_block, "dts_block", 
 		&func_dts_blocks_num, "dts_blocks_num", 
@@ -23,8 +32,18 @@ ADM_LibWrapperDca::ADM_LibWrapperDca() : ADM_LibWrapper()
 		&func_dts_samples, "dts_samples", 
 		&func_dts_syncinfo, "dts_syncinfo"));
 #else
+	initialised = (loadLibrary(libname) && getSymbols(7, 
+		&func_dts_block, "dca_block", 
+		&func_dts_blocks_num, "dca_blocks_num", 
+		&func_dts_frame, "dca_frame", 
+		&func_dts_free, "dca_free", 
+		&func_dts_init, "dca_init",
+		&func_dts_samples, "dca_samples", 
+		&func_dts_syncinfo, "dca_syncinfo"));
+#endif	// USE_LIBDCA_002
+#else
 	initialised = true;
-#endif	
+#endif	// USE_LATE_BINDING
 }
 
 ADM_LibWrapperDca::~ADM_LibWrapperDca() {}
