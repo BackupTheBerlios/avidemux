@@ -4,7 +4,7 @@ MESSAGE("#####################################")
 MESSAGE("")
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7 FATAL_ERROR)
-SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
 
 PROJECT(Avidemux)
 
@@ -174,15 +174,15 @@ MESSAGE("")
 # Generate config.h
 ########################################
 SET(CONFIG_HEADER_TYPE ADM_BUILD_CLI)
-CONFIGURE_FILE("${CMAKE_MODULE_PATH}/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config/cli/config.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/cmake/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config/cli/config.h")
 MESSAGE(STATUS "CLI config.h generated")
 
 SET(CONFIG_HEADER_TYPE ADM_BUILD_GTK)
-CONFIGURE_FILE("${CMAKE_MODULE_PATH}/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config/gtk/config.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/cmake/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config/gtk/config.h")
 MESSAGE(STATUS "GTK config.h generated")
 
 SET(CONFIG_HEADER_TYPE ADM_BUILD_QT4)
-CONFIGURE_FILE("${CMAKE_MODULE_PATH}/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config/qt4/config.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/cmake/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config/qt4/config.h")
 MESSAGE(STATUS "QT4 config.h generated")
 
 ########################################

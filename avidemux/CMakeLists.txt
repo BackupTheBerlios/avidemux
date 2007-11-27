@@ -1,16 +1,18 @@
 ########################################
 # Macros
 ########################################
-MACRO (ADD_ADMLIB_ALL_TARGETS _libName)
-	TARGET_LINK_LIBRARIES(avidemux2_cli ${_libName}_cli)
-  
-	IF (ADM_UI_GTK)
-		TARGET_LINK_LIBRARIES(avidemux2_gtk ${_libName}_gtk)
-	ENDIF (ADM_UI_GTK)
-	
-	IF (ADM_UI_QT4)
-		TARGET_LINK_LIBRARIES(avidemux2_qt4 ${_libName}_qt4)
-	ENDIF (ADM_UI_QT4)
+MACRO (ADD_ADMLIB_ALL_TARGETS)
+	FOREACH (_libName ${ARGV})
+		TARGET_LINK_LIBRARIES(avidemux2_cli ${_libName}_cli)
+
+		IF (ADM_UI_GTK)
+			TARGET_LINK_LIBRARIES(avidemux2_gtk ${_libName}_gtk)
+		ENDIF (ADM_UI_GTK)
+
+		IF (ADM_UI_QT4)
+			TARGET_LINK_LIBRARIES(avidemux2_qt4 ${_libName}_qt4)
+		ENDIF (ADM_UI_QT4)
+	ENDFOREACH (_libName ${ARGV})
 ENDMACRO (ADD_ADMLIB_ALL_TARGETS)
 
 
@@ -88,7 +90,7 @@ IF (ADM_OS_WINDOWS)
 	STRING(REPLACE "." "," PRODUCTVERSION ${PRODUCTVERSION_STRING})
 	SET(PRODUCTVERSION "${PRODUCTVERSION},0,0")
 
-	CONFIGURE_FILE("${CMAKE_MODULE_PATH}/admWin32.rc.in" ${CMAKE_CURRENT_BINARY_DIR}/admWin32.rc IMMEDIATE)
+	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/cmake/admWin32.rc.in" ${CMAKE_CURRENT_BINARY_DIR}/admWin32.rc IMMEDIATE)
 	ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/admWin32.obj COMMAND windres.exe -i ${CMAKE_CURRENT_BINARY_DIR}/admWin32.rc -o ${CMAKE_CURRENT_BINARY_DIR}/admWin32.obj -O coff --define VS_VERSION_INFO=1)
 
 	SET(ADM_EXE_SRCS ${ADM_EXE_SRCS} "${CMAKE_CURRENT_BINARY_DIR}/admWin32.obj")
@@ -160,9 +162,7 @@ SET(ADM_OUTPUTS
 	oplug_flv
 	oplug_dummy)
 
-FOREACH(_current ${ADM_OUTPUTS})
-	ADD_ADMLIB_ALL_TARGETS(${_current})
-ENDFOREACH(_current ${ADM_OUTPUTS})
+ADD_ADMLIB_ALL_TARGETS(${ADM_OUTPUTS})
 
 ###########################################
 # Construct ADM_inputs
@@ -183,9 +183,7 @@ SET(ADM_INPUTS
 	ADM_flv
 	ADM_amv)
 
-FOREACH(_current ${ADM_INPUTS})
-	ADD_ADMLIB_ALL_TARGETS(${_current})
-ENDFOREACH(_current ${ADM_INPUTS})
+ADD_ADMLIB_ALL_TARGETS(${ADM_INPUTS})
 
 #########################################
 # Tails
@@ -227,17 +225,15 @@ SET(ADM_LIBRARIES
 	ADM_libpostproc
 	ADM_colorspace)
 
+ADD_ADMLIB_ALL_TARGETS(${ADM_LIBRARIES})
+
 IF (USE_FREETYPE)
-	SET(ADM_LIBRARIES ${ADM_LIBRARIES} ADM_libass)
+	ADD_ADMLIB_ALL_TARGETS(ADM_libass)
 ENDIF (USE_FREETYPE)
 
 IF (ADM_DEBUG AND FIND_LEAKS)
-	SET(ADM_LIBRARIES ${ADM_LIBRARIES} ADM_nvwa)
+	ADD_ADMLIB_ALL_TARGETS(ADM_nvwa)
 ENDIF (ADM_DEBUG AND FIND_LEAKS)
-
-FOREACH(_current ${ADM_LIBRARIES})
-	ADD_ADMLIB_ALL_TARGETS(${_current})
-ENDFOREACH(_current ${ADM_SUBDIR})
 
 IF (ADM_OS_DARWIN AND USE_SDL)
 	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_libsdl_gtk)
@@ -249,37 +245,40 @@ ENDIF (ADM_OS_DARWIN AND USE_SDL)
 ###########################################
 ADD_SUBDIRECTORY(ADM_userInterfaces)
 
-TARGET_LINK_LIBRARIES(avidemux2_cli ADM_UI_None_cli)
-TARGET_LINK_LIBRARIES(avidemux2_cli ADM_commonUI_cli)
-TARGET_LINK_LIBRARIES(avidemux2_cli ADM_ocr_cli)
-TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogNone_cli)
-TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogFactoryNone_cli)
-TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogFiltersNone_cli)
-TARGET_LINK_LIBRARIES(avidemux2_cli ADM_dialogGuiNone_cli)
+TARGET_LINK_LIBRARIES(avidemux2_cli
+	ADM_UI_None_cli
+	ADM_commonUI_cli
+	ADM_ocr_cli
+	ADM_dialogNone_cli
+	ADM_dialogFactoryNone_cli
+	ADM_dialogFiltersNone_cli
+	ADM_dialogGuiNone_cli)
 
 IF (ADM_UI_GTK)
-	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_UI_GTK_gtk)
-	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_commonUI_gtk)
-	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_ocr_gtk)
-	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_ocrGtk_gtk)
-	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_dialogGtk_gtk)
-	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_filtersGtk_gtk)
-	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_dialogFactoryGtk_gtk)
-	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_gui2Gtk_gtk)
-	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_toolkitGtk_gtk)
-	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_commonUI_gtk)
+	TARGET_LINK_LIBRARIES(avidemux2_gtk
+		ADM_UI_GTK_gtk
+		ADM_commonUI_gtk
+		ADM_ocr_gtk
+		ADM_ocrGtk_gtk
+		ADM_dialogGtk_gtk
+		ADM_filtersGtk_gtk
+		ADM_dialogFactoryGtk_gtk
+		ADM_gui2Gtk_gtk
+		ADM_toolkitGtk_gtk
+		ADM_commonUI_gtk)
 ENDIF (ADM_UI_GTK)
 
 IF (ADM_UI_QT4)
-	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_UI_QT4_qt4)
-	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_commonUI_qt4)
-	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_ocr_qt4)
-	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_ocrQt4_qt4)
-	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_dialogQt4_qt4)
-	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_dialogFactoryQt4_qt4)
-	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_guiQt4_qt4)
-	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_filtersQt4_qt4)
-	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_commonUI_qt4)
+	TARGET_LINK_LIBRARIES(avidemux2_qt4
+		ADM_UI_QT4_qt4
+		ADM_commonUI_qt4
+		ADM_ocr_qt4
+		ADM_ocrQt4_qt4
+		ADM_dialogQt4_qt4
+		ADM_dialogFactoryQt4_qt4
+		ADM_guiQt4_qt4
+		ADM_filtersQt4_qt4
+		ADM_commonUI_qt4)
 ENDIF (ADM_UI_QT4)
 
 ADD_ADMLIB_ALL_TARGETS(ADM_utilities)
