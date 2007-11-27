@@ -39,7 +39,6 @@ MACRO (ADD_LDFLAGS_ALL_TARGETS)
 	ENDIF (ADM_UI_QT4)
 ENDMACRO (ADD_LDFLAGS_ALL_TARGETS)
 
-
 ########################################
 # Definitions and Includes
 ########################################
@@ -50,23 +49,55 @@ IF (ADM_DEBUG)
 	ADD_DEFINITIONS(-DADM_DEBUG)
 ENDIF (ADM_DEBUG)
 
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/avidemux)		# ADM_assert.h, prefs.h
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_utilities)		# default.h, fourcc.h
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_lavutil)
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/avidemux/ADM_libraries/ADM_lavcodec)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})		# ADM_assert.h, prefs.h
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_utilities)		# default.h, fourcc.h
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_lavutil)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_lavcodec)
 
 IF (GETTEXT_FOUND)
 	INCLUDE_DIRECTORIES(${GETTEXT_INCLUDE_DIR})
 ENDIF (GETTEXT_FOUND)
 
 ########################################
+# Embed resources for executables
+########################################
+IF (ADM_OS_DARWIN)
+	# add icon
+	SET(ADM_EXE_SRCS ${ADM_EXE_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/xpm/avidemux.icns)
+	SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/xpm/avidemux.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
+	# bundle version info
+	SET(ADM_OSX_VERSION "${VERSION}")
+
+	IF (Subversion_FOUND)
+		SET(ADM_OSX_VERSION "${ADM_OSX_VERSION} (r${ADM_SUBVERSION})")
+	ENDIF (Subversion_FOUND)
+
+	SET(MACOSX_BUNDLE_ICON_FILE avidemux.icns)
+	SET(MACOSX_BUNDLE_INFO_STRING "Avidemux ${ADM_OSX_VERSION}")
+	SET(MACOSX_BUNDLE_LONG_VERSION_STRING "${ADM_OSX_VERSION}") 
+	SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${ADM_OSX_VERSION}")
+	SET(MACOSX_BUNDLE_VERSION "${ADM_OSX_VERSION}")
+ENDIF (ADM_OS_DARWIN)
+
+IF (ADM_OS_WINDOWS)
+	# add icon and version info
+	SET(FILEVERSION_STRING "${VERSION}.0.${ADM_SUBVERSION}")
+	SET(PRODUCTVERSION_STRING "${VERSION}")
+	STRING(REPLACE "." "," FILEVERSION ${FILEVERSION_STRING})
+	STRING(REPLACE "." "," PRODUCTVERSION ${PRODUCTVERSION_STRING})
+	SET(PRODUCTVERSION "${PRODUCTVERSION},0,0")
+
+	CONFIGURE_FILE("${CMAKE_MODULE_PATH}/admWin32.rc.in" ${CMAKE_CURRENT_BINARY_DIR}/admWin32.rc IMMEDIATE)
+	ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/admWin32.obj COMMAND windres.exe -i ${CMAKE_CURRENT_BINARY_DIR}/admWin32.rc -o ${CMAKE_CURRENT_BINARY_DIR}/admWin32.obj -O coff --define VS_VERSION_INFO=1)
+
+	SET(ADM_EXE_SRCS ${ADM_EXE_SRCS} "${CMAKE_CURRENT_BINARY_DIR}/admWin32.obj")
+ENDIF (ADM_OS_WINDOWS)
+
+########################################
 # Our exectuables
 ########################################
-SET(ADM_EXE_SRCS ADM_preview.cpp  gtk_gui.cpp  gui_autodrive.cpp  GUI_jobs.cpp  gui_navigate.cpp  guiplay.cpp  gui_savenew.cpp  main.cpp  gui_action.cpp)
-
-IF (ADM_OS_DARWIN)
-	SET(ADM_EXE_SRCS ${ADM_EXE_SRCS} ${CMAKE_SOURCE_DIR}/avidemux/xpm/avidemux.icns)
-ENDIF (ADM_OS_DARWIN)
+SET(ADM_EXE_SRCS ${ADM_EXE_SRCS} ADM_preview.cpp  gtk_gui.cpp  gui_autodrive.cpp  GUI_jobs.cpp  gui_navigate.cpp  guiplay.cpp  gui_savenew.cpp  main.cpp  gui_action.cpp)
 
 ADD_EXECUTABLE(avidemux2_cli MACOSX_BUNDLE ${ADM_EXE_SRCS})
 ADD_TARGET_CFLAGS(avidemux2_cli "-I${CMAKE_BINARY_DIR}/config/cli")
@@ -84,10 +115,6 @@ ENDIF (ADM_UI_QT4)
 SDLify(main.cpp)
 ADD_SOURCE_CFLAGS(main.cpp "-DADM_SUBVERSION=${ADM_SUBVERSION}")
 ADD_SOURCE_CFLAGS(gtk_gui.cpp ${GLIB_CFLAGS})
-
-IF (ADM_OS_DARWIN)
-	SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/avidemux/xpm/avidemux.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-ENDIF (ADM_OS_DARWIN)
 
 IF (USE_AMR_NB)
 	ADD_SOURCE_CFLAGS(main.cpp -I${AMRNB_INCLUDE_DIR})
@@ -429,7 +456,15 @@ ENDIF (ADM_UI_QT4)
 IF (ADM_OS_WINDOWS)
 	ADD_ADMLIB_ALL_TARGETS(ADM_osSupport)
 	ADD_LIB_ALL_TARGETS(pthreadGC2 winmm wsock32 imagehlp)
-	ADD_LIB_ALL_TARGETS("-mno-cygwin -mwinmm -mwindows ${CMAKE_SOURCE_DIR}/avidemux/xpm/adm.o -Wl,--export-all-symbols")
+	ADD_LIB_ALL_TARGETS("-mno-cygwin -Wl,--export-all-symbols")
+
+	IF (ADM_UI_GTK)
+		ADD_TARGET_LDFLAGS(avidemux2_gtk "-mwindows")
+	ENDIF (ADM_UI_GTK)
+
+	IF (ADM_UI_QT4)
+		ADD_TARGET_LDFLAGS(avidemux2_qt4 "-mwindows")
+	ENDIF (ADM_UI_QT4)
 
 	IF (CMAKE_BUILD_TYPE STREQUAL "Release")
 		ADD_LIB_ALL_TARGETS("-Wl,-s")
@@ -438,18 +473,6 @@ ENDIF (ADM_OS_WINDOWS)
 
 IF (ADM_OS_DARWIN)
 	ADD_LIB_ALL_TARGETS("-framework CoreServices -framework CoreAudio -framework AudioUnit")
-
-	SET(ADM_OSX_VERSION "${VERSION}")
-
-	IF (Subversion_FOUND)
-		SET(ADM_OSX_VERSION "${ADM_OSX_VERSION} (r${ADM_SUBVERSION})")
-	ENDIF (Subversion_FOUND)
-
-	SET(MACOSX_BUNDLE_ICON_FILE avidemux.icns)
-	SET(MACOSX_BUNDLE_INFO_STRING "Avidemux ${ADM_OSX_VERSION}")
-	SET(MACOSX_BUNDLE_LONG_VERSION_STRING "${ADM_OSX_VERSION}") 
-	SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${ADM_OSX_VERSION}")
-	SET(MACOSX_BUNDLE_VERSION "${ADM_OSX_VERSION}")
 ENDIF (ADM_OS_DARWIN)
 
 ###########################################
