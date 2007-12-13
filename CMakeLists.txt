@@ -104,6 +104,7 @@ IF (SVN AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND EXISTS "${CMAKE_SOURCE_DIR
 	MESSAGE(STATUS "Checking for Subversion")
 	MESSAGE(STATUS "***********************")
 
+	SET(Subversion_FIND_REQUIRED OFF)
 	FIND_PACKAGE(Subversion)
 
 	IF (Subversion_FOUND)
