@@ -14,7 +14,10 @@
 
 #if defined(ADM_WIN32)
 #include <pthread.h>
-#elif !defined(__APPLE__)
+#elif defined(__APPLE__)
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#else
 #include <string.h>
 #include <sched.h>
 #endif
@@ -182,7 +185,16 @@ int ADM_cpu_num_processors(void)
 {
 #if defined(ADM_WIN32)
     return pthread_num_processors_np();
-#elif !defined(__APPLE__)
+#elif defined(__APPLE__)
+    int np;
+
+    size_t length = sizeof(np);
+
+    if (sysctlbyname("hw.ncpu", &np, &length, NULL, 0))
+        np = 1;
+
+    return np;
+#else
     unsigned int bit;
     int np;
 
@@ -194,7 +206,5 @@ int ADM_cpu_num_processors(void)
         np += (((uint8_t *)&p_aff)[bit / 8] >> (bit % 8)) & 1;
 
     return np;
-#else
-    return 1;
 #endif
 }
