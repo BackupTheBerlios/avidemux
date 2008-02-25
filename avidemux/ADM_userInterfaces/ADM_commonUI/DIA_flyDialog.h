@@ -40,10 +40,14 @@ struct MenuMapping
     const diaMenuEntry * menu;
 };
 
+typedef float gfloat;
+
 class ADM_flyDialog
 {
   protected:
           uint32_t _w,_h, _zoomW, _zoomH;
+          float _zoom;
+          uint32_t _zoomChangeCount;
           AVDMGenericVideoStream *_in;
   
           ADMImage *_yuvBuffer;
@@ -55,7 +59,7 @@ class ADM_flyDialog
 		  ResizeMethod _resizeMethod;
 		  ADMImageResizer *_resizer;
 
-  virtual void postInit(void);
+  virtual void postInit(uint8_t reInit);
 		  float calcZoomFactor(void);
           void copyYuvFinalToRgb(void);
           void copyYuvScratchToRgb(void);
@@ -67,6 +71,7 @@ class ADM_flyDialog
                               const MenuMapping * menu_mapping,
                               uint32_t menu_mapping_count);
   public:
+          void recomputeSize(void);
           uint32_t getMenuValue (const MenuMapping * mm);
           const MenuMapping * lookupMenu (const char * widgetName,
                                           const MenuMapping * menu_mapping,
@@ -76,6 +81,7 @@ class ADM_flyDialog
           void    *_slider; // widget
           void    *_canvas; // Drawing zone
           ColYuvRgb *_rgb;
+
           /* Filter dependant */
   virtual uint8_t    process(void)=0;
   virtual uint8_t    download(void)=0;
@@ -91,11 +97,16 @@ class ADM_flyDialog
           uint8_t  isRgbInverted(void);
   virtual uint8_t  update(void) {};
           uint8_t  cleanup(void);
+  virtual uint8_t  cleanup2(void);
+
+#ifdef USE_JOG
+  static void jogDial (void * my_data, signed short offset);
+  static void jogRing (void * my_data, gfloat angle);
+#endif
 
           ADM_flyDialog(uint32_t width, uint32_t height, AVDMGenericVideoStream *in,
                              void *canvas, void *slider, int yuv, ResizeMethod resizeMethod);
   virtual ~ADM_flyDialog(void);
-
 };
 
 #endif

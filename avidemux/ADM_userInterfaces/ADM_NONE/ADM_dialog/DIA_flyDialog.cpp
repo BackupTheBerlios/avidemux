@@ -42,6 +42,10 @@ uint8_t     ADM_flyDialog::sliderSet(uint32_t value)
 {
   return 1; 
 }
+uint8_t ADM_flyDialog::cleanup2(void)
+{
+  return 1; 
+}
 
 
 //EOF

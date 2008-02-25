@@ -24,8 +24,11 @@ typedef struct
 {
     void *display;
     int  window;
-  
-}GUI_WindowInfo;
+	int x;
+	int y;
+	int width;
+	int height;
+} GUI_WindowInfo;
 
 typedef enum 
 {

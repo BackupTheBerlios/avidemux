@@ -18,8 +18,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#ifndef __ASS_H__
-#define __ASS_H__
+#ifndef ASS_H
+#define ASS_H
 
 #include "ass_types.h"
 
@@ -85,6 +85,7 @@ void ass_set_use_margins(ass_renderer_t* priv, int use);
 void ass_set_aspect_ratio(ass_renderer_t* priv, double ar);
 void ass_set_font_scale(ass_renderer_t* priv, double font_scale);
 void ass_set_hinting(ass_renderer_t* priv, ass_hinting_t ht);
+void ass_set_line_spacing(ass_renderer_t* priv, double line_spacing);
 
 /**
  * \brief set font lookup defaults
@@ -161,6 +162,8 @@ void ass_process_codec_private(ass_track_t* track, char *data, int size);
  * \param duration duration of the event (milliseconds)
 */
 void ass_process_chunk(ass_track_t* track, char *data, int size, long long timecode, long long duration);
+
+char* read_file_recode(char* fname, char* codepage, int* size);
 
 /**
  * \brief Read subtitles from file.

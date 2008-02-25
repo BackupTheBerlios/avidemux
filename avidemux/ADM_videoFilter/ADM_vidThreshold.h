@@ -47,16 +47,18 @@ class ADMVideoThreshold : public AVDMGenericVideoStream
                                                ADMImage *data,uint32_t *flags);
 
      virtual uint8_t 	configure (AVDMGenericVideoStream *instream);
-     virtual char 		   *printConf(void);
+     virtual char *     printConf(void);
      virtual uint8_t 	getCoupledConf (CONFcouple **couples);
 
-     static uint8_t computeLookupTable (THRESHOLD_PARAM * param,
-                                        uint8_t lookup_table [256]);
+     uint8_t computeLookupTable (THRESHOLD_PARAM * param);
+
      static void doThreshold (ADMImage * from, ADMImage * to,
-                              uint8_t * lookup_table, uint32_t pixelcount);
+                              ADMVideoThreshold * thresholdp,
+                              uint32_t pixelcount);
 };
 
 uint8_t DIA_threshold (AVDMGenericVideoStream *in,
+                       ADMVideoThreshold * thresholdp,
                        THRESHOLD_PARAM * param);
 
 #endif

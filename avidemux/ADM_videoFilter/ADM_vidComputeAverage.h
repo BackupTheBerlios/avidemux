@@ -97,6 +97,11 @@ class  ADMVideoComputeAverage : public AVDMGenericVideoStream
                most_recent_frame (0)
          {
          }
+
+        ~PersistentInfo ()
+        {
+            delete [] sums;
+        }
      };
 
      typedef std::map <CONFcouple *, PersistentInfo *> PImap;

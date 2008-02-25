@@ -78,7 +78,7 @@ ADMVideoComputeAverage::ADMVideoComputeAverage(AVDMGenericVideoStream *in,CONFco
     }
     else
     {
-        _param->start_frame = 1;
+        _param->start_frame = 0;
         _param->end_frame = -1;
         _param->output_file = ADM_strdup ("");
         _param->bias = 128;
@@ -296,12 +296,10 @@ uint8_t ADMVideoComputeAverage::getFrameNumberNoAlloc (uint32_t frame, uint32_t 
         return 0;
     ADMImage * image = _uncompressed;
 
-    uint32_t start_frame = _param->start_frame - 1;
+    uint32_t start_frame = _param->start_frame;
     uint32_t end_frame = _param->end_frame;
     if (int32_t (end_frame) < 0)
         end_frame = int32_t (num_frames) + int32_t (end_frame); // 0-based, thus -1 = last frame
-    else
-        --end_frame;
 
     if (!myInfo->sums
         || myInfo->width != _info.width || myInfo->height != _info.height
@@ -356,7 +354,7 @@ uint8_t ADMVideoComputeAverage::getFrameNumberNoAlloc (uint32_t frame, uint32_t 
         uint32_t half_frame_count = frame_count / 2;
         if (debug & 2)
             printf ("Including frame %u of %u, now have %u (%u - %u)\n",
-                    curr_frame + 1, num_frames, frame_count, start_frame, end_frame);
+                    curr_frame, num_frames, frame_count, start_frame, end_frame);
 
         if (_param->display_mode == DISPLAYMODE_AVERAGE)
         {
@@ -403,7 +401,7 @@ uint8_t ADMVideoComputeAverage::getFrameNumberNoAlloc (uint32_t frame, uint32_t 
         uint32_t half_frame_count = frame_count / 2;
         if (debug & 2)
             printf ("Using %u frame(s) (%u - %u) worth of average on frame %u of %u\n",
-                    frame_count, start_frame, end_frame, curr_frame + 1, num_frames);
+                    frame_count, start_frame, end_frame, curr_frame, num_frames);
 
         if (frame_count == 0)
         {

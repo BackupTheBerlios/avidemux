@@ -186,12 +186,12 @@ ADM_RENDER_TYPE render;
 uint8_t r=0;
 	ADM_assert(!accel_mode);
         
+#if !defined ADM_WIN32 && !defined(__APPLE__)
 	// First check if local
 	// We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
 	// in that case we do not even try to use accel
 	
-	// Win32 does not have display
-#ifndef ADM_WIN32	
+	// Win32 and Mac/Qt4 don't have DISPLAY
 	displ=getenv("DISPLAY");
 	if(!displ)
 	{

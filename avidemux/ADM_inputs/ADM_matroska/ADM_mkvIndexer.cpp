@@ -303,7 +303,7 @@ int mkvHeader::searchTrackFromTid(uint32_t tid)
 uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
 {
   uint64_t fileSize,len,bsize;
-  uint32_t alen,vlen;
+  uint64_t alen,vlen;
   uint64_t id;
   ADM_MKV_TYPE type;
   const char *ss;
@@ -390,7 +390,7 @@ uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
 uint8_t   mkvHeader::indexClusters(ADM_ebml_file *parser)
 {
   uint64_t fileSize,len,bsize;
-  uint32_t alen,vlen;
+  uint64_t alen,vlen;
   uint64_t id;
   ADM_MKV_TYPE type;
   const char *ss;
@@ -445,6 +445,7 @@ uint8_t   mkvHeader::indexClusters(ADM_ebml_file *parser)
            _nbClusters++;
        }
        segment.seek( _clusters[seekme].pos+ _clusters[seekme].size);
+       //printf("Position :%u %u MB\n", _clusters[seekme].pos+ _clusters[seekme].size,( _clusters[seekme].pos+ _clusters[seekme].size)>>20);
    }
    delete work;
    printf("[MKV] Found %u clusters\n",_nbClusters);

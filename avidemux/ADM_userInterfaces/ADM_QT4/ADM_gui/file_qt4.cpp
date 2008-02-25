@@ -22,7 +22,6 @@
 #include "prefs.h"
 #include "ADM_assert.h"
     
-extern QWidget *QuiMainWindows;
 static void GUI_FileSelSelect(const char *label, char **name, uint32_t access) ;
 
 //****************************************************************************************************
@@ -88,9 +87,15 @@ void GUI_FileSelSelect(const char *label, char **name, uint32_t access)
         }
   }
   QString fileName;
-    if(access)  fileName=QFileDialog::getSaveFileName(QuiMainWindows,label,str);
-        else    fileName=QFileDialog::getOpenFileName(QuiMainWindows,label,str);
-                
+  QFileDialog::Options options = 0;
+
+#if defined(__APPLE__)
+   options |= QFileDialog::DontUseNativeDialog;
+#endif
+
+   if(access)  fileName=QFileDialog::getSaveFileName(NULL, label, str, NULL, NULL, options);
+       else    fileName=QFileDialog::getOpenFileName(NULL, label, str, NULL, NULL, options);
+
   if(!fileName.isNull() )
   {
     const char *s=fileName.toUtf8().constData();
@@ -113,10 +118,15 @@ void GUI_FileSelSelect(const char *label, char **name, uint32_t access)
 uint8_t FileSel_SelectWrite(const char *title,char *target,uint32_t max, const char *source)
 {
   char *dir=NULL,*tmpname=NULL;
-   QString fileName;
- 
-  fileName=QFileDialog::getSaveFileName(QuiMainWindows,title,source);
-                
+  QString fileName;
+  QFileDialog::Options options = 0;
+
+#if defined(__APPLE__)
+  options |= QFileDialog::DontUseNativeDialog;
+#endif
+
+  fileName=QFileDialog::getSaveFileName(NULL, title, source, NULL, NULL, options);
+
   if(!fileName.isNull() )
   {
     const char *s=fileName.toUtf8().constData();
@@ -138,10 +148,15 @@ uint8_t FileSel_SelectWrite(const char *title,char *target,uint32_t max, const c
 uint8_t FileSel_SelectRead(const char *title,char *target,uint32_t max, const char *source)
 {
   char *dir=NULL,*tmpname=NULL;
-   QString fileName;
- 
-  fileName=QFileDialog::getOpenFileName(QuiMainWindows,title,source);
-                
+  QString fileName;
+  QFileDialog::Options options = 0;
+
+#if defined(__APPLE__)
+  options |= QFileDialog::DontUseNativeDialog;
+#endif
+
+  fileName = QFileDialog::getOpenFileName(NULL, title, source, NULL, NULL, options);
+
   if(!fileName.isNull() )
   {
     const char *s=fileName.toUtf8().constData();
@@ -168,9 +183,14 @@ uint8_t FileSel_SelectDir(const char *title,char *target,uint32_t max, const cha
    char *dir=NULL,*tmpname=NULL;
   
    QString fileName;
- 
-  fileName=QFileDialog::getExistingDirectory(QuiMainWindows,title,source);
-                
+   QFileDialog::Options options = QFileDialog::ShowDirsOnly;
+
+#if defined(__APPLE__)
+   options |= QFileDialog::DontUseNativeDialog;
+#endif
+
+   fileName=QFileDialog::getExistingDirectory(NULL, title, source, options);
+
   if(!fileName.isNull() )
   {
     const char *s=fileName.toUtf8().constData();

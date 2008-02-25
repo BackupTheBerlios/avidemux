@@ -1211,7 +1211,7 @@ void Multiplexor::Multiplex()
 				++underruns;
 				if( underruns > 10  )
 				{
-					mjpeg_error_exit1("Too many frame drops -exiting" );
+					//mjpeg_error_exit1("Too many frame drops -exiting" );
 				}
 			}
             if( despatch->nsec > 50 &&
@@ -1310,7 +1310,7 @@ void Multiplexor::Multiplex()
 
     if( underruns> 0 )
 	{
-		mjpeg_error_exit1( "MUX STATUS: Frame data under-runs detected!" );
+		mjpeg_info( "MUX STATUS: Frame data under-runs detected!" ); // MEANX was exit
 	}
 	else
 	{

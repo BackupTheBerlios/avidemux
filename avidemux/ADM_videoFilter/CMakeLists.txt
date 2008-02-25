@@ -40,7 +40,8 @@ SET(ADM_videoFilter_SRCS
 	ADM_vidComputeAverage.cpp
 	ADM_vidSwissArmyKnife.cpp
 	ADM_vidThreshold.cpp
-	ADM_vidParticle.cpp)
+	ADM_vidParticle.cpp
+	ADM_vidEraser.cpp)
 
 ADD_ADM_LIB_ALL_TARGETS(ADM_videoFilter ${ADM_videoFilter_SRCS})
 

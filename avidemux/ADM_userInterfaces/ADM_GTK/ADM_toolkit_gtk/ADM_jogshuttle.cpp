@@ -52,9 +52,6 @@ using std::ifstream;
 #include "jogshuttle.h"
 #include "ADM_jogshuttle.h"
 #include "ADM_image.h"
-#include "gtkgui.h"
-
-GtkWidget * lookup_jog_shuttle_widget (void); // GUI_bindings.cpp
 
 /// PhysicalJogShuttle
 
@@ -79,7 +76,6 @@ PhysicalJogShuttle & PhysicalJogShuttle::getInstance()
 /** Constructor
  */
 PhysicalJogShuttle::PhysicalJogShuttle() :
-    _callback (0),
     input_ (-1),
     monitorTag_ (-1),
     _modifier_code (0),
@@ -191,6 +187,18 @@ PhysicalJogShuttle::~PhysicalJogShuttle ()
     }
 }
 
+void PhysicalJogShuttle::NoButtonCB (void *, unsigned short, Action)
+{
+}
+
+void PhysicalJogShuttle::NoJogDialCB (void *, signed short)
+{
+}
+
+void PhysicalJogShuttle::NoShuttleRingCB (void *, gfloat)
+{
+}
+
 /// A static wrappper for the GDK input handler callback
 void PhysicalJogShuttle::inputCallback (gpointer data, gint source,
                                         GdkInputCondition condition)
@@ -234,34 +242,37 @@ void PhysicalJogShuttle::stop()
         media_ctrl_close (&_ctrl);
 }
 
-#if 0
 /** Register callback
  
-    Register an interest in getting notification when buttons are pressed
-    
-    \param callback Function to call
+    Register an interest in getting notification when buttons are pressed or
+    the jog dial or shuttle ring are manipulated
 */
-void PhysicalJogShuttle::registerCallback (void * user, JogShuttleCallback callback)
+void PhysicalJogShuttle::registerCBs (void * their_data,
+                                      ButtonCallback button_cb,
+                                      JogDialCallback jogdial_cb,
+                                      ShuttleRingCallback shuttlering_cb)
 {
-    if (_callback)
-        g_warning ("PhysicalJogShuttle::registerCallback - already registered\n");
-    _callback = callback;
-    _callbackdata = user;
+    cbstack.push (Callbacks (their_data, button_cb, jogdial_cb, shuttlering_cb));
 }
 
 /** Deregister callback
  
     Deregister an interest in getting notification when buttons are pressed
-    
-    \param callback Function to stop calling
 */
-void PhysicalJogShuttle::deregisterCallback ()
+void PhysicalJogShuttle::deregisterCBs (void * their_data)
 {
-    if (_callback == NULL)
-        g_warning( "PhysicalJogShuttle::deregisterCallback - not registered\n");
-    _callback = 0;
+    if (cbstack.empty())
+        g_warning( "PhysicalJogShuttle::deregister (callback) - none registered\n");
+    else
+    {
+        // if the data doesn't match, we could in theory search down the stack
+        // to see if someone skipped a deregister() call.  But more than one
+        // may have passed NULL as the data...
+        if (their_data != cbstack.top().their_data)
+            g_warning( "PhysicalJogShuttle::deregister (callback) - data doesn't match!!\n");
+        cbstack.pop();
+    }
 }
-#endif
 
 struct media_ctrl_key *PhysicalJogShuttle::getKeyset ()
 {
@@ -281,49 +292,35 @@ void PhysicalJogShuttle::jog (int offs)
 {
     gdk_threads_enter();
     // printf ("jog %d\n", offs);
-    if (offs < 0)
-        GUI_PrevFrame (uint32_t (-offs));
-    else
-        GUI_NextFrame (uint32_t (offs));
+
+    if (!cbstack.empty())
+    {
+        Callbacks & cb = cbstack.top();
+        if (cb.jogdial_cb)
+            cb.jogdial_cb (cb.their_data, offs);
+    }
+
     gdk_threads_leave();
 }
 
 /** Handle movement of the shuttle ring.
  
-    \param angle A number from -15 to +15 that specifies a direction and speed.
+    \param angle A number from -1.0 to +1.0 that specifies a direction and speed.
 */
 void PhysicalJogShuttle::shuttle (gfloat angle)
 {
     gdk_threads_enter();
     // printf ("shuttle %f\n", angle);
-    GtkWidget * jsw = lookup_jog_shuttle_widget();
-    if (jsw)
-        jog_shuttle_set_value (jsw, angle);
+
+    if (!cbstack.empty())
+    {
+        Callbacks & cb = cbstack.top();
+        if (cb.shuttlering_cb)
+            cb.shuttlering_cb (cb.their_data, angle);
+    }
+
     gdk_threads_leave();
 }
-
-// This is part of a hack to allow the user to attach the Play and Stop
-// actions to buttons.  The problem is that once we launch the Play action,
-// HandleAction() doesn't return to its caller until avidemux stops playing,
-// so if HandleAction() is called directly from the event handler, there is no
-// way for the Stop button to be seen until something else has already stopped
-// it.  However, if we have the event handler just set up a timer, which
-// launches the play action, it's only the timer that is locked up, and since
-// we only use the timer for the Play action (and not any of the other
-// buttons), then everything (including the Stop button) works just fine.
-// A GTK expert might know of a better way to solve this problem, but I'm not
-// convinced that one exists in current GTK (2.10 on my FC7 system, but we
-// need to support older ones, too).
-
-gint
-on_PlayButtonHackTimer (gpointer data)
-{
-   gdk_threads_enter();
-   HandleAction (ACT_PlayAvi);
-   gdk_threads_leave();
-   return 0;
-}
-
 
 /** Handle key press
  
@@ -346,6 +343,15 @@ void PhysicalJogShuttle::button (struct media_ctrl_event *ev)
     // Note: the modifier stuff is carried over from kino, but not currently
     // in use here.  I've left it here just in case someone decides to enable
     // it some day.  However, it doesn't seem to work the way I would expect.
+    // Probably the best thing would be to implement full modifier support
+    // wherein the standard keyboard modifiers work (Shift, Control, Alt,
+    // Meta, etc.) and (ideally) you can also select buttons on the device to
+    // act as true modifiers (that is, they work like the
+    // Shift/Control/etc. keys), rather than the hackish thing that is
+    // half-implemented here.  Or maybe it's easier on the user to have it be
+    // a button-sequence thing where you hit the "modifier" and then the other
+    // button, and don't have to hold one down.  I suppose the best thing
+    // would be to give the user the option...
 
     /* 
        Release may need to clear a modifier key
@@ -356,63 +362,49 @@ void PhysicalJogShuttle::button (struct media_ctrl_event *ev)
         return;
     }
 
-    /* Do a callback or action based command */
-    if (_callback != 0)
-    {
-        /* This is a key press - if there are no modifier, make sure that
-           this is saved */
-        if (_modifier_code == 0)
-            _modifier_code = ev->index + 1;
+    /* This is a key press - if there are no modifiers, make sure that
+       this is saved */
+    if (_modifier_code == 0)
+        _modifier_code = ev->code;
 
-        if (_modifier_code != ev->index + 1)
-        {
-            first = _modifier_code - 1;
-            second = ev->index + 1;
-        }
-        else
-        {
-            first = ev->index; /* Same as modifier */
-            second = 0;
-        }
-        _callback (_callbackdata, first, second);
+    if (_modifier_code != ev->code)
+    {
+        first = _modifier_code;
+        second = ev->code;
     }
     else
     {
-        /* This is a key press - if there are no modifier, make sure that
-           this is saved */
-        if (_modifier_code == 0)
-            _modifier_code = ev->code;
-
-        if (_modifier_code != ev->code)
-        {
-            first = _modifier_code;
-            second = ev->code;
-        }
-        else
-        {
-            first = ev->code; /* Same as modifier */
-            second = 0;
-        }
-		
-        gdk_threads_enter();
-
-        ButtonActionIter it = button_action_map.find (first);
-        if (it != button_action_map.end())
-        {
-            if (show_buttons)
-                printf ("button pressed: %d -> %s\n",
-                        first, getActionName (it->second));
-            // hack alert: see comment for on_PlayButtonHackTimer(), above
-            if (it->second == ACT_PlayAvi)
-                g_timeout_add (10, on_PlayButtonHackTimer, NULL);
-            else
-                HandleAction (it->second);
-        }
-        else if (show_buttons)
-            printf ("button pressed: %d (not mapped)\n", first);
-
-        gdk_threads_leave();
+        first = ev->code; /* Same as modifier */
+        second = 0;
     }
+		
+    gdk_threads_enter();
+
+    ButtonActionIter it = button_action_map.find (first);
+    Action actn;
+    const char * name;
+    if (it == button_action_map.end())
+    {
+        actn = ACT_INVALID;
+        name = "(not mapped)";
+    }
+    else
+    {
+        actn = it->second;
+        name = getActionName (actn);
+    }
+
+    if (show_buttons)
+        printf ("button pressed: %d -> %d: %s\n", first, actn, name);
+
+    if (!cbstack.empty())
+    {
+        Callbacks & cb = cbstack.top();
+        if (cb.button_cb)
+            cb.button_cb (cb.their_data, first, actn);
+    }
+
+    gdk_threads_leave();
 }
 
 

@@ -354,7 +354,7 @@ uint32_t b;
 			VAL_SET(mS);
 			gtk_widget_set_sensitive(WID(spinbuttonQuant),0);
 			gtk_widget_set_sensitive(WID(entryEntry),1);
-			gtk_label_set_text(GTK_LABEL(WID(label11)),QT_TR_NOOP("Target size (MBytes):"));
+			gtk_label_set_text(GTK_LABEL(WID(label11)),QT_TR_NOOP("Target video size (MB):"));
 			break;
                 case COMPRESS_2PASS_BITRATE:
 			HIST_SET(3);
@@ -752,23 +752,23 @@ create_dialog1 (void)
 
   menu1 = gtk_menu_new ();
 
-  one_pass_cbr1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Single pass - bitrate"));
+  one_pass_cbr1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Single Pass - Bitrate"));
   gtk_widget_show (one_pass_cbr1);
   gtk_container_add (GTK_CONTAINER (menu1), one_pass_cbr1);
 
-  one_pass_quantizer1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Single pass - quantizer"));
+  one_pass_quantizer1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Single Pass - Quantizer"));
   gtk_widget_show (one_pass_quantizer1);
   gtk_container_add (GTK_CONTAINER (menu1), one_pass_quantizer1);
 
-  two_pass1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Two pass, final size"));
+  two_pass1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Two Pass - Video Size"));
   gtk_widget_show (two_pass1);
   gtk_container_add (GTK_CONTAINER (menu1), two_pass1);
 
-  two_pass__average_bitrate1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Two pass, average bitrate"));
+  two_pass__average_bitrate1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Two Pass - Average Bitrate"));
   gtk_widget_show (two_pass__average_bitrate1);
   gtk_container_add (GTK_CONTAINER (menu1), two_pass__average_bitrate1);
 
-  same_qz_as_input1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Same Qz as input"));
+  same_qz_as_input1 = gtk_menu_item_new_with_mnemonic (QT_TR_NOOP("Same Quantizer as Input"));
   gtk_widget_show (same_qz_as_input1);
   gtk_container_add (GTK_CONTAINER (menu1), same_qz_as_input1);
 

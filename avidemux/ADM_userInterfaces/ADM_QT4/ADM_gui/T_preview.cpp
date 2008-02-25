@@ -35,7 +35,9 @@
 #include <QPainter>
 #include <QImage>
 /* Probably on unix/X11 ..*/
-#if !defined(ADM_WIN32) && !defined(__APPLE__)
+#ifdef __APPLE__
+#include <Carbon/Carbon.h>
+#elif !defined(ADM_WIN32)
 #include <QX11Info>
 #endif
 #include "avio.hxx"
@@ -188,7 +190,16 @@ void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo)
 {
 #if defined(ADM_WIN32)
 	xinfo->display=videoWindow->winId();
-#elif !defined(__APPLE__)
+#elif defined(__APPLE__)
+	QWidget* widget = videoWindow->parentWidget();
+
+	xinfo->display = HIViewGetWindow(HIViewRef(widget->winId()));
+	xinfo->window = 0;
+	xinfo->x = widget->x();
+	xinfo->y = widget->parentWidget()->height() - (widget->y() + displayH);
+	xinfo->width = displayW;
+	xinfo->height = displayH;
+#else
     const QX11Info &info=videoWindow->x11Info();
     xinfo->display=info.display();
     xinfo->window=videoWindow->winId();

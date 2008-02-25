@@ -8,7 +8,7 @@ SUBDIRS = ADM_dialog  ADM_gui  ADM_filters ADM_dialogFactory ADM_ocr
 
 
 
-qclean:
+clean:
 	rm -f ui_*.h AT_*.cpp AQ_*.cpp  *.moc
 	rm -f */ui_*.h */AT_*.cpp */AQ_*.cpp  */*.moc
 

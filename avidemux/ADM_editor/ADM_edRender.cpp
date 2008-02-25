@@ -219,6 +219,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 		
 	}
 	// No b frame...
+        
       	 if(!decodeCache(relframe,ref, result))			
 			{
 				printf("Editor: Cannot read ip frame %lu\n",relframe);
@@ -370,7 +371,7 @@ ADMImage *tmpImage=NULL;
 uint8_t refOnly=0;
 uint32_t left,ww;
 ADMCompressedImage img;
-        
+        aprintf("decodeCache : Frame %u\n",frame);
         img.data=compBuffer;
         img.cleanup(frame);
 	 if (!_videos[seg]._aviheader->getFrameNoAlloc (frame,&img))

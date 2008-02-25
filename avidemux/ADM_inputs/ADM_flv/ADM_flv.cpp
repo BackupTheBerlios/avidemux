@@ -152,7 +152,7 @@ uint8_t flvHeader::open(char *name)
   if(_isaudiopresent) 
     audioTrack=new flvTrak(50);
   else
-    videoTrack=NULL;
+    audioTrack=NULL;
   // Loop
   while(pos<fileSize-14)
   {
@@ -168,7 +168,11 @@ uint8_t flvHeader::open(char *name)
     {
       case FLV_TAG_TYPE_AUDIO:
           {
-            if(!_isaudiopresent) break;
+            if(!_isaudiopresent) 
+            {
+                audioTrack=new flvTrak(50);
+                _isaudiopresent=1; /* Damn  lying headers...*/
+            };
             uint8_t flags=read8();
             int of=1+4+3+3+1+4;
             remaining--;

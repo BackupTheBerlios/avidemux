@@ -81,7 +81,7 @@ default_mjpeg_log_handler(log_level_t level, const char message[])
     fprintf(stderr, "**ERROR: [%s] %s\n", ids, message);
     break;
   case LOG_DEBUG:
-    fprintf(stderr, "--DEBUG: [%s] %s\n", ids, message);
+    //fprintf(stderr, "--DEBUG: [%s] %s\n", ids, message);
     break;
   case LOG_WARN:
     fprintf(stderr, "++ WARN: [%s] %s\n", ids, message);
@@ -183,10 +183,12 @@ mjpeg_debug(const char format[], ...)
 void
 mjpeg_info(const char format[], ...)
 {
+#if 0
   va_list args;
   va_start (args, format);
   mjpeg_logv(LOG_INFO, format, args);
   va_end (args);
+#endif
 }
 
 void

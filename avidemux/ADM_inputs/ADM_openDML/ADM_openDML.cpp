@@ -270,7 +270,7 @@ uint32_t rd;
 			fseeko(_fd,_Tracks[i].strh.offset,SEEK_SET);
 			if(_Tracks[i].strh.size!=sizeof(_videostream))
 			{
-				printf("Mmm(1) we have a bogey here, size mismatch : %lu \n",_Tracks[i].strh.size);
+				printf("Mmm(1) we have a bogey here, size mismatch : %"LLU"\n",_Tracks[i].strh.size);
 				printf("expected %d\n",sizeof(_videostream));
 				if(_Tracks[i].strh.size<sizeof(_videostream)-8) // RECT is not mandatory
 				{
@@ -352,7 +352,7 @@ uint32_t rd;
                                         fseeko(_fd,_Tracks[run].strh.offset,SEEK_SET);
                                         if(_Tracks[run].strh.size != sizeof(_audiostream))
                                         {
-                                                printf("Mmm(2) we have a bogey here, size mismatch : %u \n",_Tracks[run].strh.size);
+                                                printf("Mmm(2) we have a bogey here, size mismatch : %"LLU"\n",_Tracks[run].strh.size);
                                                 printf("expected %d\n",sizeof(_audiostream));
                                                 if(_Tracks[run].strh.size<sizeof(_audiostream)-8)
                                                 {
@@ -487,7 +487,7 @@ uint32_t count=0;
 			if(_Tracks[i].strh.size!=sizeof(tmp))
 			{
 				
-				printf("Mmm(3) we have a bogey here, size mismatch : %lu \n",_Tracks[i].strh.size);
+				printf("Mmm(3) we have a bogey here, size mismatch : %"LLU"\n",_Tracks[i].strh.size);
 				printf("expected %d\n",sizeof(tmp));
 				if(_Tracks[i].strh.size<sizeof(tmp)-8)
 				{

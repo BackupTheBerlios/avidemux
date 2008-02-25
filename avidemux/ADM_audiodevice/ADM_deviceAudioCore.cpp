@@ -39,8 +39,8 @@ static uint32_t rd_ptr = 0;
 static uint32_t wr_ptr = 0;
 static pthread_mutex_t lock;
 
-static OSStatus MyRenderer(void *inRefCon, AudioUnitRenderActionFlags inActionFlags, 
-	const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, AudioBuffer *ioData);
+static OSStatus MyRenderer(void *inRefCon, AudioUnitRenderActionFlags *inActionFlags,
+	const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList *ioData);
 static OSStatus OverloadListenerProc(AudioDeviceID inDevice, UInt32 inChannel, Boolean isInput,
 	AudioDevicePropertyID inPropertyID, void* inClientData);
 
@@ -73,16 +73,16 @@ uint8_t coreAudioDevice::stop(void)
 	return 1;
 }
 
-OSStatus MyRenderer(void *inRefCon, AudioUnitRenderActionFlags inActionFlags, const AudioTimeStamp *inTimeStamp, 
-	UInt32 inBusNumber, AudioBuffer *ioData)
+OSStatus MyRenderer(void *inRefCon, AudioUnitRenderActionFlags *inActionFlags, const AudioTimeStamp *inTimeStamp,
+	UInt32 inBusNumber, UInt32 inChannel, AudioBufferList *ioData)
 {
 	pthread_mutex_lock(&lock);
-	uint32_t nb_sample = ioData->mDataByteSize >> 1;
+	uint32_t nb_sample = ioData->mBuffers[0].mDataByteSize >> 1;
 	uint32_t left = 0;
 	uint8_t *in, *out;
 
 	in = (uint8_t*)&audioBuffer[rd_ptr];
-	out = (uint8_t*)ioData->mData;
+	out = (uint8_t*)ioData->mBuffers[0].mData;
 	aprintf("[CoreAudio] Fill: rd %lu, wr %lu, nb asked %lu\n", rd_ptr, wr_ptr, nb_sample);
 
 	if(wr_ptr>rd_ptr)
@@ -141,13 +141,13 @@ uint8_t coreAudioDevice::init(uint8_t channels, uint32_t fq)
 
 	OSStatus err;
 	ComponentDescription desc;
-	AudioUnitInputCallback input;
+	AURenderCallbackStruct input;
 	AudioStreamBasicDescription streamFormat;
 	AudioDeviceID theDevice;
 
-	desc.componentType = kAudioUnitComponentType;
-	desc.componentSubType = kAudioUnitSubType_Output;
-	desc.componentManufacturer = kAudioUnitID_DefaultOutput;
+	desc.componentType = kAudioUnitType_Output;
+	desc.componentSubType = kAudioUnitSubType_HALOutput;
+	desc.componentManufacturer = kAudioUnitManufacturer_Apple;
 	desc.componentFlags = 0;
 	desc.componentFlagsMask = 0;
 
@@ -170,7 +170,7 @@ uint8_t coreAudioDevice::init(uint8_t channels, uint32_t fq)
 	input.inputProcRefCon = NULL;
 	
 	err = AudioUnitSetProperty(theOutputUnit, 
-					kAudioUnitProperty_SetInputCallback, 
+					kAudioUnitProperty_SetRenderCallback,
 					kAudioUnitScope_Global,
 					0,
 					&input, 

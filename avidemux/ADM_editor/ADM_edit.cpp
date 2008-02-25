@@ -300,7 +300,7 @@ UNUSED_ARG(mode);
               ret = _videos[_nb_video]._aviheader->open(name); 
               if(!ret)
               {
-                delete _videos[_nb_video]._aviheader;;
+                delete _videos[_nb_video]._aviheader;
                 printf("Trying mpeg\n"); 
                 goto thisIsMpeg; 
               }
@@ -341,7 +341,7 @@ UNUSED_ARG(mode);
 thisIsMpeg:
     	// look if the idx exists
 	char tmpname[256];
-	ADM_assert(strlen(name)+5<256);;
+	ADM_assert(strlen(name)+5<256);
 	strcpy(tmpname,name);
 	strcat(tmpname,".idx");
         if(ADM_fileExist(tmpname))
@@ -414,7 +414,7 @@ thisIsMpeg:
      snprintf(str,512,QT_TR_NOOP("Attempt to open %s failed!"), name);
       str[512] = '\0';
       GUI_Error_HIG(str,NULL);
-      delete _videos[_nb_video]._aviheader;;
+      delete _videos[_nb_video]._aviheader;
       return 0;
    }
 
@@ -436,7 +436,7 @@ thisIsMpeg:
                  (strlen(str)?" are ":" is ") );
          str[512] = '\0';
          GUI_Error_HIG(str,QT_TR_NOOP("You cannot mix different video dimensions yet. Using the partial video filter later, will not work around this problem. The workaround is:\n1.) \"resize\" / \"add border\" / \"crop\" each stream to the same resolution\n2.) concatinate them together"));
-         delete _videos[_nb_video]._aviheader;;
+         delete _videos[_nb_video]._aviheader;
          return 0;
       }
    }
@@ -507,7 +507,7 @@ float duration;
 	duration*=1000;			// duration in seconds
 	duration*=_wavinfo->frequency;  	// In sample
 	_videos[_nb_video]._audio_duration=(uint64_t)floor(duration);
-        printf("[Editor] Duration in seconds : %u , in samples : %u\n",_videos[_nb_video]._audio_duration/_wavinfo->frequency,_videos[_nb_video]._audio_duration);
+        printf("[Editor] Duration in seconds: %"LLU", in samples: %"LLU"\n",_videos[_nb_video]._audio_duration/_wavinfo->frequency,_videos[_nb_video]._audio_duration);
 
     }
 
@@ -532,7 +532,7 @@ float duration;
   //
   _segments[_nb_segment]._reference = _nb_video;
   _segments[_nb_segment]._audio_size = _videos[_nb_video]._audio_size;
-  _segments[_nb_segment]._audio_duration =_videos[_nb_video]._audio_duration;;
+  _segments[_nb_segment]._audio_duration =_videos[_nb_video]._audio_duration;
   _segments[_nb_segment]._audio_start = 0;
   _segments[_nb_segment]._start_frame = 0;
   _segments[_nb_segment]._nb_frames   =   _videos[_nb_video]._nb_video_frames ;
@@ -864,6 +864,13 @@ uint8_t ADM_Composer::cleanup (void)
   _nb_segment = 0;
   _nb_video = 0;
   _total_frames = 0;
+
+	if(_scratch)
+	{
+		delete _scratch;
+		_scratch=NULL;
+	}
+
   return 1;
 }
 /*

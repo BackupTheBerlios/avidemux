@@ -45,10 +45,12 @@ static FILTER_PARAM swapParam={0,{""}};
 SCRIPT_CREATE(separatefield_script,AVDMVideoSeparateField,swapParam);
 SCRIPT_CREATE(mergefield_script,AVDMVideoMergeField,swapParam);
 SCRIPT_CREATE(stackfield_script,AVDMVideoStackField,swapParam);
+SCRIPT_CREATE(hzstackfield_script,AVDMVideoHzStackField,swapParam);
 SCRIPT_CREATE(unstackfield_script,AVDMVideoUnStackField,swapParam);
 
 BUILD_CREATE(separatefield_create,AVDMVideoSeparateField);
 BUILD_CREATE(mergefield_create,AVDMVideoMergeField);
+BUILD_CREATE(hzstackfield_create,AVDMVideoHzStackField);
 BUILD_CREATE(stackfield_create,AVDMVideoStackField);
 BUILD_CREATE(unstackfield_create,AVDMVideoUnStackField);
 
@@ -196,7 +198,7 @@ UNUSED_ARG(setup);
 }
 
 // ___ destructor_____________
-AVDMVideoStackField::AVDMVideoStackField()
+AVDMVideoStackField::~AVDMVideoStackField()
 {
  		delete _uncompressed;
 		_uncompressed=NULL;
@@ -222,7 +224,64 @@ ADMImage *ptr1,*ptr2;
 }
 
 /****/
-//_______________________Stack Fields_______________________
+
+//*************************************************************
+//_______________________Hz Stack Fields_______________________
+
+char *AVDMVideoHzStackField::printConf( void )
+{
+        static char buf[50];
+        sprintf((char *)buf," Hz Stack fields");
+        return buf;
+}
+
+//_______________________________________________________________
+AVDMVideoHzStackField::AVDMVideoHzStackField(	AVDMGenericVideoStream *in,CONFcouple *setup)
+{
+UNUSED_ARG(setup);
+        _in=in;
+        memcpy(&_info,_in->getInfo(),sizeof(_info));
+        _info.width<<=1;
+        _info.height>>=1;
+        _uncompressed=new ADMImage(in->getInfo()->width,in->getInfo()->height);	
+}
+
+// ___ destructor_____________
+AVDMVideoHzStackField::~AVDMVideoHzStackField()
+{
+        delete _uncompressed;
+        _uncompressed=NULL;
+}
+
+/*
+        Put fields side by side	
+*/
+static void fCopy(uint8_t *d, uint8_t *sr, uint32_t w, uint32_t sstride,uint32_t dstride,uint32_t h)
+{
+
+}
+uint8_t AVDMVideoHzStackField::getFrameNumberNoAlloc(uint32_t frame,
+                            uint32_t *len,
+                            ADMImage *data,
+                            uint32_t *flags)
+{
+uint32_t ref,ref2;
+ADMImage *ptr1,*ptr2;
+        if(frame>=_info.nb_frames) return 0;
+        if(!_in->getFrameNumberNoAlloc(frame, len, _uncompressed, flags)) return 0;
+
+        uint32_t pg=_info.width*_info.height;
+        // Duplicate _uncompressed
+        memcpy(YPLANE(data),YPLANE(_uncompressed),pg);
+        memcpy(UPLANE(data),UPLANE(_uncompressed),pg>>2);
+        memcpy(VPLANE(data),VPLANE(_uncompressed),pg>>2);
+
+
+        return 1;
+}
+
+/****/
+//_______________________UnStack Fields_______________________
 
 char *AVDMVideoUnStackField::printConf( void )
 {
@@ -232,7 +291,7 @@ char *AVDMVideoUnStackField::printConf( void )
         return buf;
 }
 
-//_______________________________________________________________
+//______________________Unstack Fields_________________________________________
 AVDMVideoUnStackField::AVDMVideoUnStackField(       AVDMGenericVideoStream *in,CONFcouple *setup)
 {
 UNUSED_ARG(setup);
@@ -243,12 +302,12 @@ UNUSED_ARG(setup);
 }
 
 // ___ destructor_____________
-AVDMVideoUnStackField::AVDMVideoUnStackField()
+AVDMVideoUnStackField::~AVDMVideoUnStackField()
 {
                 delete _uncompressed;
                 _uncompressed=NULL;
 }
-
+//*************************************************************
 /**
         Interleave frame*2 and frame*2+1
 */

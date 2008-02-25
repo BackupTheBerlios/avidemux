@@ -22,10 +22,30 @@ class flyParticle : public ADM_flyDialog
 {
   
   private:
-    PARTICLE_PARAM param;
     const MenuMapping * menu_mapping;
     uint32_t menu_mapping_count;
     bool input_buffer_valid;
+    PARTICLE_PARAM saved_param;
+    PARTICLE_PARAM * live_param;
+    AVDMGenericVideoStream * source;
+
+  public:
+    PARTICLE_PARAM param;
+
+    uint16_t this_filter_index;
+
+    // HERE: This should probably be moved up into ADM_flyDialog:
+
+    enum PreviewMode
+    {
+        PREVIEWMODE_INVALID = 0, // never use
+        PREVIEWMODE_EARLIER_FILTER,
+        PREVIEWMODE_THIS_FILTER,
+        PREVIEWMODE_LATER_FILTER
+    };
+
+  private:
+    PreviewMode preview_mode;
 
   public:
     uint8_t    process(void);
@@ -36,22 +56,53 @@ class flyParticle : public ADM_flyDialog
     flyParticle (uint32_t width, uint32_t height,
                  AVDMGenericVideoStream * in,
                  void * canvas, void * slider, void * dialog,
-                 const PARTICLE_PARAM * in_param,
+                 ADMVideoParticle * particlep,
+                 PARTICLE_PARAM * in_param,
                  const MenuMapping * menu_mapping,
                  uint32_t menu_mapping_count)
         : ADM_flyDialog (width, height, in, canvas, slider, 1, RESIZE_AUTO),
-          param (*in_param),
           menu_mapping (menu_mapping),
           menu_mapping_count (menu_mapping_count),
-          input_buffer_valid (false)
+          input_buffer_valid (false),
+          saved_param (*in_param),
+          live_param (in_param),
+          source (particlep),
+          param (*in_param),
+          this_filter_index (0),
+          preview_mode (PREVIEWMODE_THIS_FILTER)
     {
         _cookie = dialog;
         setupMenus (in_param, menu_mapping, menu_mapping_count);
     };
 
+    uint8_t sliderChanged (void);
+
+    void pushParam ()
+    {
+        *live_param = param;
+    }
+
+    // no longer used
     void getParam (PARTICLE_PARAM * outputParam)
     {
         *outputParam = param;
+    }
+
+    void restoreParam ()
+    {
+        *live_param = saved_param;
+    }
+
+    AVDMGenericVideoStream * getSource () const
+    {
+        return source;
+    }
+
+    void changeSource (AVDMGenericVideoStream * in, PreviewMode mode)
+    {
+        source = in;
+        preview_mode = mode;
+        sliderChanged();
     }
 
     ADMImage * getInputImage ()
@@ -88,6 +139,11 @@ class flyParticle : public ADM_flyDialog
     {
         ADM_flyDialog::getMenuValues (&param, menu_mapping,
                                       menu_mapping_count);
+    }
+
+    float getZoom () const
+    {
+        return _zoom;
     }
 };
 

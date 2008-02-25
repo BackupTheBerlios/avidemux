@@ -73,11 +73,13 @@ static targetFmt DVDHD1={352, 720, 576, 480};
 static targetFmt PSP={480, 480, 272, 272};
 static targetFmt PSPH264={720, 720, 480, 480};
 static targetFmt IPOD={320, 320, 240, 240};
+static targetFmt IPOD640={640, 640, 480, 480};
+
 /* Dont forget to update DIA_resizeWiz if you change something here */
 
-targetFmt *allFormats[7]={&VCD,&SVCD,&DVD,&DVDHD1,&PSP,&PSPH264,&IPOD};
+targetFmt *allFormats[]={&VCD,&SVCD,&DVD,&DVDHD1,&PSP,&PSPH264,&IPOD,&IPOD640};
 extern AVDMGenericVideoStream *createResampleFps(AVDMGenericVideoStream *in,uint32_t targetfps1000);
-#define ARME(x) format=RESWIZ_##x;
+#define ARME(x) format=RESWIZ_##x
 
 uint8_t setVCD (void)
 {

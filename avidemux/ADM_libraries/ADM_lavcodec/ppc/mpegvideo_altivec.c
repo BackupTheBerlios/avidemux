@@ -23,8 +23,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "../dsputil.h"
-#include "../mpegvideo.h"
+#include "dsputil.h"
+#include "mpegvideo.h"
 
 #include "gcc_fixes.h"
 
@@ -515,7 +515,7 @@ POWERPC_PERF_START_COUNT(altivec_dct_unquantize_h263_num, 1);
         }else
             qadd = 0;
         i = 1;
-        nCoeffs= 63; //does not allways use zigzag table
+        nCoeffs= 63; //does not always use zigzag table
     } else {
         i = 0;
         nCoeffs= s->intra_scantable.raster_end[ s->block_last_index[n] ];
@@ -523,17 +523,17 @@ POWERPC_PERF_START_COUNT(altivec_dct_unquantize_h263_num, 1);
 
     {
       register const_vector signed short vczero = (const_vector signed short)vec_splat_s16(0);
-      short __attribute__ ((aligned(16))) qmul8[] =
+      DECLARE_ALIGNED_16(short, qmul8[]) =
           {
             qmul, qmul, qmul, qmul,
             qmul, qmul, qmul, qmul
           };
-      short __attribute__ ((aligned(16))) qadd8[] =
+      DECLARE_ALIGNED_16(short, qadd8[]) =
           {
             qadd, qadd, qadd, qadd,
             qadd, qadd, qadd, qadd
           };
-      short __attribute__ ((aligned(16))) nqadd8[] =
+      DECLARE_ALIGNED_16(short, nqadd8[]) =
           {
             -qadd, -qadd, -qadd, -qadd,
             -qadd, -qadd, -qadd, -qadd

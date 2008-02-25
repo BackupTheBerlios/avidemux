@@ -70,6 +70,7 @@ typedef enum
                 VF_DECIMATE,
                 VF_MSMOOTH,
                 VF_STACKFIELD,
+                VF_HZSTACKFIELD,
                 VF_WHIRL,
                 VF_EQUALIZER,
                 VF_VOBSUB,
@@ -100,6 +101,7 @@ typedef enum
                 VF_DVBSUB,
                 VF_LOGO,
                 VF_COMPUTEAVERAGE,
+                VF_ERASER,
                 VF_SWISSARMYKNIFE,
                 VF_THRESHOLD,
                 VF_PARTICLELIST,
@@ -170,7 +172,10 @@ AVDMGenericVideoStream *getLastVideoFilter( void );
 AVDMGenericVideoStream *getFirstVideoFilter( uint32_t frameStart, uint32_t nbFrame);
 AVDMGenericVideoStream *getFirstVideoFilter( void);
 AVDMGenericVideoStream *getFirstCurrentVideoFilter( void);
-  
+FILTER * getCurrentVideoFilterList (uint32_t * count);
+const FILTER_ENTRY * filterGetEntryFromTag (VF_FILTERS tag);
+const char * filterGetNameFromTag(VF_FILTERS tag);
+
   void	filterSetPostProc( void );
   
 #ifdef USE_LIBXML2

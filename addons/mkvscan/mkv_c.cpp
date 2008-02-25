@@ -49,12 +49,20 @@ int main(int argc, char *argv[])
         ebml->skip(len);
         continue;
       }
-      printf("Found Tag : %x (%s)\n",id,ss);
+      uint64_t w=ebml->tell();
+      printf("Found Tag : %x (%s) at 0x%x size %d end at 0x%x\n",id,ss,w,len,w+len);
       if(type==ADM_MKV_TYPE_CONTAINER)
       {
-        uint64_t w=ebml->tell();
         ADM_mkvWalk(ebml,len);
-        ebml->seek(w+len);
+        if(ebml->tell() > w+len)
+        {
+                        printf("*** WARNING INCORRECT CONTAINER SIZE : %d vs real size %d\n",len,ebml->tell()-w);
+        }
+        else
+        {
+                printf(">Seeking from 0x%x to  0x%x (size %d)\n",w,w+len,len);
+                ebml->seek(w+len);
+        }
       }else
         ebml->skip(len);
   }
@@ -84,7 +92,7 @@ void ADM_mkvWalk(ADM_ebml_file *working, uint32_t size)
         son.skip(len);
         continue;
       }
-      recTab();printf("at 0x%llx, Found Tag : %x (%s) type %d (%s) size %d\n",pos,id,ss,type,ADM_mkvTypeAsString(type),len);
+      recTab();printf("at 0x%llx, Found Tag : %x (%s) type %d (%s) size %d, start at 0x%x end at 0x%x\n",pos,id,ss,type,ADM_mkvTypeAsString(type),len,working->tell(),working->tell()+len);
       uint32_t val;
       switch(type)
       {

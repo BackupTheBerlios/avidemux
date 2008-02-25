@@ -181,6 +181,7 @@ void on_action (gui_act action)
         CONFcouple *coup;
         videofilters[nb_active_filter].filter =
             filterCreateFromTag (tag, NULL, videofilters[nb_active_filter - 1].filter);
+        videofilters[nb_active_filter].tag = tag;
         if(!videofilters[nb_active_filter].filter->
                     configure (videofilters[nb_active_filter - 1].filter))
         {
@@ -188,7 +189,6 @@ void on_action (gui_act action)
             break;
         }
         videofilters[nb_active_filter].filter->getCoupledConf (&coup);
-        videofilters[nb_active_filter].tag = tag;
         videofilters[nb_active_filter].conf = coup;
         nb_active_filter++;
         updateFilterList ();
@@ -401,6 +401,8 @@ createFilterDialog (void)
 #define CALLME(x,y) gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x), y)
 
 	//CALLME (toolbuttonAdd, A_ADD);
+        // Each of these triggers the following message:
+        // Gtk-CRITICAL **: gtk_box_pack_end: assertion `child->parent == NULL' failed
         CALLME (buttonRemove,		A_REMOVE);
         CALLME (buttonProperties,	A_CONFIGURE);
         CALLME (buttonUp, 		A_UP);

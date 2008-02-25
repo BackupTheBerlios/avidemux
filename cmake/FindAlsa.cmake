@@ -22,10 +22,11 @@ FIND_LIBRARY(ASOUND_LIBRARY asound)
 check_library_exists(asound snd_seq_create_simple_port ${ASOUND_LIBRARY} HAVE_LIBASOUND2)
 if(HAVE_LIBASOUND2)
     message(STATUS "Found ALSA: ${ASOUND_LIBRARY}")
+    set(ALSA_FOUND HAVE_LIBASOUND2)
 else(HAVE_LIBASOUND2)
     message(STATUS "ALSA not found")
 endif(HAVE_LIBASOUND2)
-set(ALSA_FOUND HAVE_LIBASOUND2)
+
 
 MACRO(ALSA_VERSION_STRING _result)
     # check for version in alsa/version.h

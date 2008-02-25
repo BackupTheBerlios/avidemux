@@ -125,7 +125,7 @@ uint8_t fileParser::open( const char *filename,FP_TYPE *multi )
                 fseeko( _fd[0], 0, SEEK_SET );
                 _sizeFdCumul[0]=0;
                 _size=_sizeFd[0];
-                printf( " file: %s, size: %u \n", filename, _sizeFd[0] );
+                printf( " file: %s, size: %"LLU"\n", filename, _sizeFd[0] );
                 printf( " found 1 files \n" );
                 printf( "Done \n" );
                 return 1;
@@ -182,7 +182,7 @@ uint8_t fileParser::open( const char *filename,FP_TYPE *multi )
                         buffer_sizeFd[count] = ftello( buffer_fd[count] );
                         fseeko( buffer_fd[count], 0, SEEK_SET );
 
-                        printf( " file %d: %s, size: %u \n", (count + 1), followup, buffer_sizeFd[count] );
+                        printf( " file %d: %s, size: %"LLU"\n", (count + 1), followup, buffer_sizeFd[count] );
 
                         // increase number
                         number[decimals - 1] = number[decimals - 1] + 1;
@@ -295,7 +295,7 @@ uint8_t fileParser::setpos(uint64_t o)
                                                   return 1;
                                         }
                         }
-                        printf("\n cannot seek to %llu !\n",o);
+                        printf("\n cannot seek to %"LLU"\n",o);
                         return 0;               
 }
 //

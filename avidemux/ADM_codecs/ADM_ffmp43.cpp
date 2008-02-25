@@ -405,6 +405,11 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
       out->_colorspace = ADM_COLOR_YUV422;
       break;
 
+    case PIX_FMT_YUV444P:
+    case PIX_FMT_YUVJ444P:
+      out->_colorspace = ADM_COLOR_YUV444;
+      break;
+
     case PIX_FMT_YUV420P:
     case PIX_FMT_YUVJ420P:
       // Default is YV12 or I420
@@ -412,15 +417,15 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
       // we do it or not
       out->_colorspace = ADM_COLOR_YV12;
       break;
-      break;
+
     case PIX_FMT_RGBA32:
       out->_colorspace = ADM_COLOR_RGB32A;
       break;
     case PIX_FMT_RGB555:
-      out->_colorspace = ADM_COLOR_BGR555;
+      out->_colorspace = ADM_COLOR_RGB555;
       break;
     default:
-      printf ("\n[lavc] Unhandled colorspace: %d\n", _context->pix_fmt);
+      printf ("[lavc] Unhandled colorspace: %d\n", _context->pix_fmt);
       return 0;
     }
     clonePic (&_frame, out);
@@ -590,6 +595,15 @@ decoderFFWMV3::decoderFFWMV3 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):d
   WRAP_Open (CODEC_ID_WMV3);
 
 }
+
+decoderFFVC1::decoderFFVC1(uint32_t w, uint32_t h, uint32_t l, uint8_t * d) : decoderFF(w, h)
+{
+  _context->extradata = (uint8_t *) d;
+  _context->extradata_size = (int) l;
+
+  WRAP_Open (CODEC_ID_VC1);
+}
+
 decoderFFcyuv::decoderFFcyuv (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,
 	   h)
 {

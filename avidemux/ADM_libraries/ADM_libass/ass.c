@@ -271,6 +271,14 @@ static int process_event_tail(ass_track_t* track, ass_event_t* event, char* str,
 	char* format = strdup(track->event_format);
 	char* q = format; // format scanning pointer
 
+	if (track->n_styles == 0) {
+		// add "Default" style to the end
+		// will be used if track does not contain a default style (or even does not contain styles at all)
+		int sid = ass_alloc_style(track);
+		track->styles[sid].Name = strdup("Default");
+		track->styles[sid].FontName = strdup("Arial");
+	}
+
 	for (i = 0; i < n_ignored; ++i) {
 		NEXT(q, tname);
 	}
@@ -323,13 +331,13 @@ void process_force_style(ass_track_t* track) {
 	if (!list) return;
 	
 	for (fs = list; *fs; ++fs) {
-		eq = strchr(*fs, '=');
+		eq = strrchr(*fs, '=');
 		if (!eq)
 			continue;
 		*eq = '\0';
 		token = eq + 1;
 
-		dt = strchr(*fs, '.');
+		dt = strrchr(*fs, '.');
 		if (dt) {
 			*dt = '\0';
 			style = *fs;
@@ -697,7 +705,6 @@ static int process_text(ass_track_t* track, char* str)
 void ass_process_codec_private(ass_track_t* track, char *data, int size)
 {
 	char* str = malloc(size + 1);
-	int sid;
 
 	memcpy(str, data, size);
 	str[size] = '\0';
@@ -705,12 +712,6 @@ void ass_process_codec_private(ass_track_t* track, char *data, int size)
 	process_text(track, str);
 	free(str);
 
-	// add "Default" style to the end
-	// will be used if track does not contain a default style (or even does not contain styles at all)
-	sid = ass_alloc_style(track);
-	track->styles[sid].Name = strdup("Default");
-	track->styles[sid].FontName = strdup("Arial");
-	
 	if (!track->event_format) {
 		// probably an mkv produced by ancient mkvtoolnix
 		// such files don't have [Events] and Format: headers
@@ -982,17 +983,9 @@ ass_track_t* ass_read_memory(ass_library_t* library, char* buf, size_t bufsize, 
 	return track;
 }
 
-/**
- * \brief Read subtitles from file.
- * \param library libass library object
- * \param fname file name
- * \param codepage recode buffer contents from given codepage
- * \return newly allocated track
-*/ 
-ass_track_t* ass_read_file(ass_library_t* library, char* fname, char* codepage)
+char* read_file_recode(char* fname, char* codepage, int* size)
 {
 	char* buf;
-	ass_track_t* track;
 	size_t bufsize;
 	
 	buf = read_file(fname, &bufsize);
@@ -1007,6 +1000,26 @@ ass_track_t* ass_read_file(ass_library_t* library, char* fname, char* codepage)
 	if (!buf)
 		return 0;
 #endif
+	*size = bufsize;
+	return buf;
+}
+
+/**
+ * \brief Read subtitles from file.
+ * \param library libass library object
+ * \param fname file name
+ * \param codepage recode buffer contents from given codepage
+ * \return newly allocated track
+*/ 
+ass_track_t* ass_read_file(ass_library_t* library, char* fname, char* codepage)
+{
+	char* buf;
+	ass_track_t* track;
+	size_t bufsize;
+
+	buf = read_file_recode(fname, codepage, &bufsize);
+	if (!buf)
+		return 0;
 	track = parse_memory(library, buf);
 	free(buf);
 	if (!track)

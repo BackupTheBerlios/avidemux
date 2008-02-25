@@ -2,7 +2,7 @@ SET(ADM_LIB ADM_lavcodec)
 
 SET(${ADM_LIB}_SRCS 
 	adpcm.c 	allcodecs.c 	cyuv.c 	dsputil.c 	dv.c 
-	error_resilience.c 		fdctref.c 	fft.c 	h263.c 	h263dec.c 	huffyuv.c 	imgconvert.c 
+	error_resilience.c 		fft.c 	h263.c 	h263dec.c 	huffyuv.c 	imgconvert.c 
 	jfdctfst.c 	jfdctint.c 	jrevdct.c 	mace.c 	mdct.c 	 	mjpeg.c 
 	motion_est.c 	mpeg12.c 	mpegaudio.c 	mpegaudiodec.c 	mpegvideo.c 	msmpeg4.c 	 
 	pcm.c 	ratecontrol.c 	raw.c 	resample.c 	rv10.c 	simple_idct.c 	svq1.c 
@@ -39,6 +39,14 @@ IF(ARCH_X86)
 		i386/idct_mmx_xvid.c i386/fft_3dn2.c 
 		i386/snowdsp_mmx.c i386/fft_3dn.c)
 ENDIF(ARCH_X86)
+
+IF (BUILD_ALTIVEC)
+	SET(${ADM_LIB}_SRCS  ${${ADM_LIB}_SRCS}
+		ppc/dsputil_altivec.c  ppc/dsputil_ppc.c  ppc/fdct_altivec.c  ppc/fft_altivec.c  ppc/float_altivec.c  ppc/gmc_altivec.c
+		ppc/h264_altivec.c  ppc/idct_altivec.c  ppc/int_altivec.c  ppc/mpegvideo_altivec.c  ppc/mpegvideo_ppc.c
+		ppc/snow_altivec.c  ppc/vc1dsp_altivec.c
+	)
+ENDIF (BUILD_ALTIVEC)
 
 ADD_ADM_LIB_ALL_TARGETS(${ADM_LIB} ${${ADM_LIB}_SRCS})
 ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-I../ADM_lavutil -DHAVE_AV_CONFIG_H -Drestrict=__restrict__ -fomit-frame-pointer -include ffconf.h")

@@ -485,6 +485,11 @@ uint8_t asfHeader::getHeaders(void)
             ADM_assert(_nbAudioTrack<ASF_MAX_AUDIO_TRACK);
             trk->streamIndex=sid;
             s->read((uint8_t *)&(trk->wavHeader),sizeof(WAVHeader));
+
+		#ifdef ADM_BIG_ENDIAN
+			Endian_WavHeader(&(trk->wavHeader));
+		#endif
+
             trk->extraDataLen=s->read16();
             printf("Extension :%u bytes\n",trk->extraDataLen);
             if(trk->extraDataLen)
@@ -555,6 +560,11 @@ uint8_t asfHeader::loadVideo(asfChunk *s)
             printf("Pic Height %04d\n",h);
             printf(" BMP size  %04d (%04d)\n",x,sizeof(BITMAPINFOHEADER));
             s->read((uint8_t *)&_video_bih,sizeof(BITMAPINFOHEADER));
+
+		#ifdef ADM_BIG_ENDIAN
+			Endian_BitMapInfo(&_video_bih);
+		#endif
+
             _videostream.dwScale=1000;
             _videostream.dwRate=30000;
 

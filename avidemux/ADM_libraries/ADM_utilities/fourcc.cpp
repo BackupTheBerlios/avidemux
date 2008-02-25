@@ -55,7 +55,11 @@ char *fourCC::tostring(uint32_t fourcc)
     static char s[5];
     s[4] = 0;
 
-    *(uint32_t *) s = fourcc;
+	s[3]=((fourcc & 0xff000000)>>24)&0xff;
+	s[2]=((fourcc & 0xff0000)>>16)&0xff;
+	s[1]=((fourcc & 0xff00)>>8)&0xff;
+	s[0]=((fourcc & 0xff)>>0)&0xff;
+
     return s;
 }
 char *fourCC::tostringBE(uint32_t fourcc)

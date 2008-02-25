@@ -64,10 +64,10 @@ class  ADM_Qbitrate : public QWidget
   
   add(CBR,CBR,QT_TR_NOOP("Constant Bitrate"));
   add(CQ,CQ,QT_TR_NOOP("Constant Quality"));
-  add(SAME,SAME,QT_TR_NOOP("Same Quantizer as input"));
+  add(SAME,SAME,QT_TR_NOOP("Same Quantizer as Input"));
   add(AQ,AQ,QT_TR_NOOP("Average Quantizer"));
-  add(2PASS,2PASS,QT_TR_NOOP("Two pass-filesize"));
-  add(2PASS_BR,2PASS_BITRATE,QT_TR_NOOP("Two pass-Avg bitrate"));
+  add(2PASS,2PASS,QT_TR_NOOP("Two Pass - Video Size"));
+  add(2PASS_BR,2PASS_BITRATE,QT_TR_NOOP("Two Pass - Average Bitrate"));
   
            combo->show();
            
@@ -157,7 +157,7 @@ void ADM_Qbitrate::comboChanged(int i)
     switch(mode)
   {
     case COMPRESS_CBR: //CBR
-          P(QT_TR_NOOP("Bitrate (kb/s)"));
+          P(QT_TR_NOOP("Target bitrate (kb/s)"));
           M(0,20000);
           S(compress->bitrate);
           break; 
@@ -167,12 +167,12 @@ void ADM_Qbitrate::comboChanged(int i)
           S(compress->qz);
           break;
     case COMPRESS_2PASS : // 2pass Filesize
-          P(QT_TR_NOOP("FileSize (MB)"));
+          P(QT_TR_NOOP("Target video size (MB)"));
           M(1,8000);
           S(compress->finalsize);
           break;
     case COMPRESS_2PASS_BITRATE : // 2pass Avg
-          P(QT_TR_NOOP("Average Br (kb/s)"));
+          P(QT_TR_NOOP("Average bitrate (kb/s)"));
           M(0,20000);
           S(compress->avg_bitrate);
           break;

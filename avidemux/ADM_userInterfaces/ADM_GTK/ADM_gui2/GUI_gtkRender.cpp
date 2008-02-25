@@ -21,6 +21,11 @@
 #ifdef ADM_WIN32
 #define WIN32_CLASH
 #include <gdk/gdkwin32.h>
+#elif defined(__APPLE__)
+extern "C"
+{
+	int getMainNSWindow(void);
+}
 #else
 #include <gdk/gdkx.h>
 #endif
@@ -40,6 +45,10 @@ void GUI_gtk_grow_off(int onff);
 
 extern GtkWidget *getDrawWidget(void);
 extern uint8_t UI_getPhysicalScreenSize(uint32_t *w, uint32_t *h);
+
+#ifdef ENABLE_WINDOW_SIZING_HACK
+extern int maxWindowWidth, maxWindowHeight; // from GUI_bindings.cpp
+#endif
 
 ColYuvRgb rgbConverter(640,480);
 uint32_t lastW,lastH;
@@ -97,13 +106,83 @@ void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo)
         GtkWidget *widget=(GtkWidget *)draw;
           
         win = gtk_widget_get_parent_window(widget);
-#ifndef ADM_WIN32
-        xinfo->window=	GDK_WINDOW_XWINDOW(widget->window);
-        xinfo->display= GDK_WINDOW_XDISPLAY(win);
+
+#ifdef ADM_WIN32
+		xinfo->display = (void*)GDK_WINDOW_HWND(widget->window);
+#elif defined(__APPLE__)
+		int windowWidth, windowHeight;
+		int x, y;
+
+		gdk_drawable_get_size(win, &windowWidth, &windowHeight);
+		gdk_window_get_position(widget->window, &x, &y);
+
+		xinfo->display = 0;
+		xinfo->window = getMainNSWindow();
+		xinfo->x = x;
+		xinfo->y = windowHeight - (y + lastH);
+		xinfo->width = lastW;
+		xinfo->height = lastH;
 #else
-        xinfo->display=	(void*)GDK_WINDOW_HWND(widget->window);
+		xinfo->window = GDK_WINDOW_XWINDOW(widget->window);
+		xinfo->display = GDK_WINDOW_XDISPLAY(win);
 #endif
 }
+
+#ifdef ENABLE_WINDOW_SIZING_HACK
+
+// This version depends on GUI_bindings.cpp providing maxWindowWidth and maxWindowHeight.
+
+// Calculate the zoom ratio required to fit the whole image on the screen.
+float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight)
+{
+    int windowWidth, windowHeight;
+    int drawingWidth, drawingHeight;
+    int reqWidth, reqHeight;
+    uint32_t screenWidth, screenHeight;
+	
+    gtk_window_get_size(window, &windowWidth, &windowHeight);
+    GtkRequisition size_req;
+    gtk_widget_size_request (drawingArea, &size_req);
+    drawingWidth = size_req.width;
+    drawingHeight = size_req.height;
+    gtk_widget_get_size_request(drawingArea, &reqWidth, &reqHeight);
+
+    // Take borders and captions into consideration (GTK doesn't seem to
+    // support this so we'll have to guess)
+    windowWidth += 10;
+    windowHeight += 10;
+
+    // Take drawing area out of the equation, how much extra do we need for additional controls?
+    // and then how much does that leave us for the image?
+    uint32_t availableWidth = maxWindowWidth - (windowWidth - drawingWidth);
+    uint32_t availableHeight = maxWindowHeight - (windowHeight - drawingHeight);
+
+    float ratio;
+    // Calculate zoom ratio
+    if (imageWidth > availableWidth || imageHeight > availableHeight)
+    {
+        float wratio = (imageWidth <= availableWidth) ? 1
+                       : (float (availableWidth) / float (imageWidth));
+        float hratio = (imageHeight <= availableHeight) ? 1
+                       : (float (availableHeight) / float (imageHeight));
+        if (wratio < hratio)
+            ratio = wratio;
+        else
+            ratio = hratio;
+    }
+    else
+        ratio = 1;
+
+    printf ("UI_calcZoomToFitScreen(): max %dx%d, win %dx%d, drawarea %dx%d (%dx%d), "
+            "available %dx%d, image %dx%d, scale %.6f\n",
+            maxWindowWidth, maxWindowHeight, windowWidth, windowHeight,
+            drawingWidth, drawingHeight, reqWidth, reqHeight,
+            availableWidth, availableHeight, imageWidth, imageHeight, ratio);
+
+    return ratio;
+}
+
+#else
 
 // Calculate the zoom ratio required to fit the whole image on the screen.
 float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight)
@@ -140,6 +219,8 @@ float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t
 	else
 		return 1;
 }
+
+#endif
 
 // GTK doesn't centre the window correctly.  Use this function to centre windows with a canvas that is yet to resized.
 void UI_centreCanvasWindow(GtkWindow *window, GtkWidget *canvas, int newCanvasWidth, int newCanvasHeight)

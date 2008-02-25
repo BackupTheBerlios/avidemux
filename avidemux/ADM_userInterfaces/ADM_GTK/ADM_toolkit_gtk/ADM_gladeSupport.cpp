@@ -96,7 +96,7 @@ name2xpm iconTranslation[]=
 	{A_ICON_XPM,"xpm_prevblack.xpm",(void *)        xpm_prevblack},
         {A_ICON_XPM,"avidemux_icon.xpm",(void *)        avidemux_icon_xpm},
         {A_ICON_XPM,"xpm_prevblack.xpm",(void *)        xpm_prevblack},
-        {A_ICON_PNG,"gnome-calculator.xpm",(void *)     gnome_calculator},
+        {A_ICON_PNG,"gnome-calculator.png",(void *)     gnome_calculator},
         {A_ICON_PNG,"gnome-calculator_small.xpm",(void *) gnome_calculator_small},
         {A_ICON_PNG,"preview.png",(void *) preview},
         {A_ICON_PNG,"output.png",(void *) output},

@@ -227,7 +227,7 @@ ADM_ebml::~ADM_ebml()
 //*******************************************
 //***********FILE IO PART *******************
 //*******************************************
-ADM_ebml_file::ADM_ebml_file(ADM_ebml_file *father,uint32_t size)
+ADM_ebml_file::ADM_ebml_file(ADM_ebml_file *father,uint64_t size)
 {
   _close=0;
   _size=size;
@@ -317,7 +317,7 @@ uint8_t ADM_ebml_file::finished(void)
   \fn find
   \brief Search for the tag given and returns the corresponding atom
 */
- uint8_t ADM_ebml_file::find(ADM_MKV_SEARCHTYPE search,MKV_ELEM_ID  prim,MKV_ELEM_ID second,uint32_t *len,uint32_t rewind)
+ uint8_t ADM_ebml_file::find(ADM_MKV_SEARCHTYPE search,MKV_ELEM_ID  prim,MKV_ELEM_ID second,uint64_t *len,uint32_t rewind)
 {
   uint64_t id,pos;
   ADM_MKV_TYPE type;
@@ -354,7 +354,7 @@ uint8_t ADM_ebml_file::finished(void)
   \fn find
   \brief Search for the tag given and returns the corresponding atom
 */
-uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint32_t *len,uint32_t rewind)
+uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint64_t *len,uint32_t rewind)
 {
   uint64_t id,alen;
   ADM_MKV_TYPE type;
@@ -381,7 +381,7 @@ uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint32_t *len,uint32_t rewin
           vprintf("Found Tag : %x (%s)\n",id,ss);
           if(id==prim)
           {
-            *len=(uint32_t )alen;
+            *len=alen;
             return 1;
           }else
             skip(alen);

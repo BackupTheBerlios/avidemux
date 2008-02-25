@@ -23,20 +23,11 @@
 #include <assert.h>
 #include <math.h>
 #include <inttypes.h>
-#ifdef HAVE_UNISTD_H
-// avoid warnings due to different definition of this in freetype headers
-#define WE_DO_HAVE_UNISTD_H
-#undef HAVE_UNISTD_H
-#endif
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_STROKER_H
 #include FT_GLYPH_H
 #include FT_SYNTHESIS_H
-#ifdef WE_DO_HAVE_UNISTD_H
-#undef HAVE_UNISTD_H
-#define HAVE_UNISTD_H
-#endif
 
 #include "mputils.h"
 
@@ -1326,7 +1317,6 @@ static void get_bitmap_glyph(glyph_info_t* info)
 /**
  * This function goes through text_info and calculates text parameters.
  * The following text_info fields are filled:
- *   n_lines
  *   height
  *   lines[].height
  *   lines[].asc
@@ -1353,6 +1343,7 @@ static void measure_text(void)
 				max_desc = cur->desc;
 		}
 	}
+	text_info.height += (text_info.n_lines - 1) * double_to_d6(global_settings->line_spacing);
 }
 
 /**
@@ -1483,7 +1474,7 @@ static void wrap_lines_smart(int max_text_width)
 			int height = text_info.lines[cur_line - 1].desc + text_info.lines[cur_line].asc;
 			cur_line ++;
 			pen_shift_x = - cur->pos.x;
-			pen_shift_y += d6_to_int(height) + global_settings->line_spacing;
+			pen_shift_y += d6_to_int(height + double_to_d6(global_settings->line_spacing));
 			mp_msg(MSGT_ASS, MSGL_DBG2, "shifting from %d to %d by (%d, %d)\n", i, text_info.length - 1, pen_shift_x, pen_shift_y);
 		}
 		cur->pos.x += pen_shift_x;
@@ -2070,6 +2061,11 @@ void ass_set_hinting(ass_renderer_t* priv, ass_hinting_t ht)
 		priv->settings.hinting = ht;
 		ass_reconfigure(priv);
 	}
+}
+
+void ass_set_line_spacing(ass_renderer_t* priv, double line_spacing)
+{
+	priv->settings.line_spacing = line_spacing;
 }
 
 int ass_set_fonts(ass_renderer_t* priv, const char* default_font, const char* default_family)

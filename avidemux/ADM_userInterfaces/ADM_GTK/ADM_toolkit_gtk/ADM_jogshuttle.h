@@ -25,6 +25,8 @@
 #define JOGSHUTTLE_H
 
 #include <map>
+#include <stack>
+#include <vector>
 
 #include <gtk/gtk.h>
 #ifdef USE_JOG
@@ -42,7 +44,7 @@ typedef void (* JogShuttleCallback) (void *, unsigned short, unsigned short);
 /**
  * Class to encapsulate an abstract JogShuttle device.
  * 
- * This class is used by the kino core to interact with a JogShuttle
+ * This class was used by the kino core to interact with a JogShuttle
  * device.  (Also used by the preference dialog for configuration).
  * It depends on the GDK input system, and uses the libmediactrl stuff
  * to translate different (more or less broken) devices events into
@@ -51,13 +53,44 @@ typedef void (* JogShuttleCallback) (void *, unsigned short, unsigned short);
 
 class PhysicalJogShuttle
 { 
-private: 
+public:
+    typedef void (* ButtonCallback) (void * your_data,
+                                     unsigned short raw_button,
+                                     Action gui_action);
+    typedef void (* JogDialCallback) (void * your_data,
+                                      signed short offset); // typ. -1 or +1
+    typedef void (* ShuttleRingCallback) (void * your_data,
+                                          gfloat angle); // -1.0 to 0 to +1.0
+
+    static void NoButtonCB (void *, unsigned short, Action);
+    static void NoJogDialCB (void *, signed short);
+    static void NoShuttleRingCB (void *, gfloat);
+
+private:
     /** Singleton pattern. */
     static PhysicalJogShuttle *_instance; 
-    /** Placeholder for callbacks. */
-    JogShuttleCallback _callback; 
-    /** Any client supplied callbackdata is here. */
-    void * _callbackdata;
+
+    struct Callbacks
+    {
+        void * their_data;
+        ButtonCallback button_cb;
+        JogDialCallback jogdial_cb;
+        ShuttleRingCallback shuttlering_cb;
+
+        Callbacks (void * their_data,
+                   ButtonCallback button_cb,
+                   JogDialCallback jogdial_cb,
+                   ShuttleRingCallback shuttlering_cb)
+            : their_data (their_data),
+              button_cb (button_cb),
+              jogdial_cb (jogdial_cb),
+              shuttlering_cb (shuttlering_cb)
+        {
+        }
+    };
+
+    typedef std::stack <Callbacks, std::vector <Callbacks> > CallbackStack;
+    CallbackStack cbstack;
 
 protected:
     static void inputCallback (gpointer data, gint source,
@@ -70,8 +103,11 @@ public:
     bool start();
     void stop();
     static PhysicalJogShuttle & getInstance();
-    void registerCallback (void * user, JogShuttleCallback callback);
-    void deregisterCallback();
+    void registerCBs (void * your_data,
+                      ButtonCallback button_cb,
+                      JogDialCallback jogdial_cb,
+                      ShuttleRingCallback shuttlering_cb);
+    void deregisterCBs (void * your_data);
     struct media_ctrl_key *getKeyset();
 
 private:

@@ -10,24 +10,25 @@
 #include <string.h>
 #include "ADM_assert.h"
 #include <math.h>
-#include <math.h>
-#include <iconv.h>
-#include "config.h"
 
+#include "ADM_assert.h"
+#include "config.h"
 
 #include "fourcc.h"
 #include "avio.hxx"
-
 #include "avi_vars.h"
 
 #include "ADM_toolkit/toolkit.hxx"
-
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
-#include "ADM_assert.h" 
-
 #include "ADM_encoder/ADM_vidEncode.hxx"
-
 #include "ADM_codecs/ADM_x264param.h"
+
+#ifdef USE_X264
+extern "C"
+{
+#include "x264.h"
+}
+#endif
 /**
       \fn DIA_x264
       \brief Dialog for x264 codec settings
@@ -62,19 +63,30 @@ int code;
                 ,{5,    QT_TR_NOOP("5  - High (Default)")}
                 ,{6,    QT_TR_NOOP("6  - Very High")}
                 ,{7,    QT_TR_NOOP("6B - Very High (RDO on Bframes)")}
-                ,{8,    QT_TR_NOOP("7 - Ultra High")}
+                ,{8,    QT_TR_NOOP("7  - Ultra High")}
                 ,{9,    QT_TR_NOOP("7B - Ultra High (RDO on Bframes)")}};
 
                             
         diaElemMenu parition(PX(PartitionDecision),QT_TR_NOOP("Partition Decision"),10,partitionM);
         
          diaMenuEntry meM[] = {
-                             {0,    QT_TR_NOOP("Diamond search")},
-                             {1,    QT_TR_NOOP("Hexagonal search")},
-                             {2,    QT_TR_NOOP("Uneven multi hexagon")},
-                             {3,    QT_TR_NOOP("Exhaustive search")}}
-                             ;
-         diaElemMenu      me(PX(Method),QT_TR_NOOP("VHQ Mode"),4,meM);
+                             {0,    QT_TR_NOOP("Diamond Search")},
+                             {1,    QT_TR_NOOP("Hexagonal Search")},
+                             {2,    QT_TR_NOOP("Uneven Multi-hexagon")},
+                             {3,    QT_TR_NOOP("Exhaustive Search")}
+#if X264_BUILD >= 58
+							 ,{4, QT_TR_NOOP("Hadamard Exhaustive Search")}
+#endif
+							 };
+
+         diaElemMenu      me(PX(Method),QT_TR_NOOP("VHQ Mode"),
+ #if X264_BUILD >= 58
+			 5
+#else
+			 4
+#endif
+			 ,meM);
+
          diaElemUInteger  rframe(PX(MaxRefFrames),QT_TR_NOOP("Max Ref Frames"),0,15);
          diaElemUInteger  range(PX(Range),QT_TR_NOOP("Max B Frames"),0,64);
          diaElemToggle    chromaMe(PX(ChromaME),QT_TR_NOOP("Chroma ME"));
@@ -149,7 +161,7 @@ int code;
            
           /* End of tabs */
         diaElemTabs *tabs[4]={&tabMain,&tabMotion,&tabMisc,&tabTransform};
-        if( diaFactoryRunTabs(QT_TR_NOOP("X264 Configuration"),4,tabs))
+        if( diaFactoryRunTabs(QT_TR_NOOP("x264 Configuration"),4,tabs))
 	{
            memcpy(config->extraSettings,&localParam,sizeof(localParam));
            return 1;

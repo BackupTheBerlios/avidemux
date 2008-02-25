@@ -277,7 +277,7 @@ double d;
 dmx_demuxer *demuxer=_run->demuxer;
 
         if(!demuxer->getAllPTS(stats)) return 0;
-        qfprintf(_run->fd,"# Video 1st PTS : %07u\n",firstPts);
+        qfprintf(_run->fd,"# Video 1st PTS : %07"LLU"\n",firstPts);
         if(firstPts==ADM_NO_PTS) return 1;
         for(int i=1;i<_run->nbTrack;i++)
         {
@@ -292,7 +292,7 @@ dmx_demuxer *demuxer=_run->demuxer;
                         d=firstPts; // it is in 90 khz tick
                         d-=stats[i];
                         d/=90.;
-                        qfprintf(_run->fd,"# track %d PTS : %07u ",i,stats[i]);
+                        qfprintf(_run->fd,"# track %d PTS : %07"LLU" ",i,stats[i]);
                         qfprintf(_run->fd," delta=%04d ms\n",(int)d);
                 }
 
@@ -318,7 +318,7 @@ uint64_t stats[_run->nbTrack];
         for(uint32_t i=0;i<_run->nbPushed;i++) 
         {
 
-                qfprintf(_run->fd,"%c:%08"LLX",%05x",
+                qfprintf(_run->fd,"%c:%08"LLX",%05"LLX,
                         Type[_frames[i].type],
                         _frames[i].abs,
                         _frames[i].rel);

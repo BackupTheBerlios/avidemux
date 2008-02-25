@@ -25,10 +25,30 @@ class flySwissArmyKnife : public ADM_flyDialog
     ADMVideoSwissArmyKnife * sakp;
     const MenuMapping * menu_mapping;
     uint32_t menu_mapping_count;
+    ADMImage * lookaheadimage;
+    SWISSARMYKNIFE_PARAM saved_param;
+    SWISSARMYKNIFE_PARAM * live_param;
+    AVDMGenericVideoStream * source;
 
   public:
     SWISSARMYKNIFE_PARAM param;
 
+    // HERE: A lot of this should probably be moved up into ADM_flyDialog
+
+    uint16_t this_filter_index;
+
+    enum PreviewMode
+    {
+        PREVIEWMODE_INVALID = 0, // never use
+        PREVIEWMODE_EARLIER_FILTER,
+        PREVIEWMODE_THIS_FILTER,
+        PREVIEWMODE_LATER_FILTER
+    };
+
+  private:
+    PreviewMode preview_mode;
+
+  public:
     uint8_t    process(void);
     uint8_t    download(void);
     uint8_t    upload(void);
@@ -38,14 +58,20 @@ class flySwissArmyKnife : public ADM_flyDialog
                        AVDMGenericVideoStream * in,
                        void * canvas, void * slider, void * dialog,
                        ADMVideoSwissArmyKnife * sakp,
-                       const SWISSARMYKNIFE_PARAM * in_param,
+                       SWISSARMYKNIFE_PARAM * in_param,
                        const MenuMapping * menu_mapping,
                        uint32_t menu_mapping_count)
         : ADM_flyDialog (width, height, in, canvas, slider, 1, RESIZE_AUTO),
           sakp (sakp),
-          param (*in_param),
           menu_mapping (menu_mapping),
-          menu_mapping_count (menu_mapping_count)
+          menu_mapping_count (menu_mapping_count),
+          lookaheadimage (NULL),
+          saved_param (*in_param),
+          live_param (in_param),
+          source (sakp),
+          param (*in_param),
+          this_filter_index (0),
+          preview_mode (PREVIEWMODE_THIS_FILTER)
     {
         _cookie = dialog;
         setupMenus (in_param, menu_mapping, menu_mapping_count);
@@ -53,11 +79,39 @@ class flySwissArmyKnife : public ADM_flyDialog
         //         "in_param %p, &param %p\n", in_param, &param);
     };
 
+    ~flySwissArmyKnife ()
+    {
+        delete lookaheadimage;
+    }
+
     uint8_t sliderChanged (void);
 
+    void pushParam ()
+    {
+        *live_param = param;
+    }
+
+    // no longer used
     void getParam (SWISSARMYKNIFE_PARAM * outputParam)
     {
         *outputParam = param;
+    }
+
+    void restoreParam ()
+    {
+        *live_param = saved_param;
+    }
+
+    AVDMGenericVideoStream * getSource () const
+    {
+        return source;
+    }
+
+    void changeSource (AVDMGenericVideoStream * in, PreviewMode mode)
+    {
+        source = in;
+        preview_mode = mode;
+        sliderChanged();
     }
 
     ADMImage * getInputImage ()
@@ -80,6 +134,11 @@ class flySwissArmyKnife : public ADM_flyDialog
     {
         ADM_flyDialog::getMenuValues (&param, menu_mapping,
                                       menu_mapping_count);
+    }
+
+    float getZoom () const
+    {
+        return _zoom;
     }
 
     void updateConfigDescription (bool do_download);

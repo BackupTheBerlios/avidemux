@@ -104,10 +104,13 @@ void Endian_AviStreamHeader(AVIStreamHeader *s)
 		SWAP32(fccType);
 		SWAP32(fccHandler);
 		SWAP32(dwFlags);
+		SWAP32(dwInitialFrames);
 		SWAP32(dwScale);
 		SWAP32(dwRate);
 		SWAP32(dwStart);
 		SWAP32(dwLength);
+		SWAP32(dwSuggestedBufferSize);
+		SWAP32(dwQuality);
 		SWAP32(dwSampleSize);
 	#undef SWAP32
 

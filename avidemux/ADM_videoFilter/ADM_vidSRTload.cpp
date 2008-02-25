@@ -450,8 +450,10 @@ uint32_t done=0;
   	}
 	// Get the amound of utf16...
 	done=(ADM_RAW-sout)>>1;
-// For Win32 and Mac we swap le and be
-#if defined(ADM_WIN32) || defined(__APPLE__)
+
+#if defined(ADM_WIN32) || defined(ADM_BSD_FAMILY)
+	// For Win32 and BSD we swap le and be
+
        ADM_GLYPH_T glyph;
        for(uint32_t w=0;w<done;w++)
        {

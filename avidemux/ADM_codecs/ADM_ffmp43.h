@@ -230,6 +230,17 @@ public:
   decoderFFWMV3 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d);
 
 };
+
+class decoderFFVC1:public decoderFF
+{
+protected:
+
+
+public:
+  decoderFFVC1 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d);
+
+};
+
 class decoderFFV1:public decoderFF
 {
 protected:

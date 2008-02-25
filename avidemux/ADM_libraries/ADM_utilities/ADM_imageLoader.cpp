@@ -32,6 +32,8 @@
 #include "ADM_codecs/ADM_png.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/bitmap.h"
+#include "ADM_editor/ADM_edit.hxx"
+
 //**********************************
 static ADMImage *createImageFromFile_jpeg(const char *filename);
 static ADMImage *createImageFromFile_Bmp(const char *filename);
@@ -261,7 +263,7 @@ ADMImage *createImageFromFile_Bmp(const char *filename)
 ADMImage *createImageFromFile_Bmp2(const char *filename)
 {
     
-	BITMAPHEADER bmph;
+	BITMAPINFOHEADER bmph;
     uint8_t fcc_tab[4];
     uint32_t offset;
     FILE *fd=NULL;
@@ -280,14 +282,14 @@ ADMImage *createImageFromFile_Bmp2(const char *filename)
  #ifdef ADM_BIG_ENDIAN
  	    Endian_BitMapInfo(&bmph);
  #endif
- 	    if (bmph.compressionScheme != 0) 
+ 	    if (bmph.biCompression != 0) 
  	    {
  	    	printf("[imageLoader] BMP2:Cannot handle compressed bmp\n");
  	    	fclose(fd);
  	    	return NULL;
  	    }
- 	    w = bmph.width;
- 	    h = bmph.height;
+ 	    w = bmph.biWidth;
+ 	    h = bmph.biHeight;
  	    printf("[imageLoader] BMP2 W: %d H: %d offset : %d\n", w, h, offset);
 // Load the binary coded image
  	fseek(fd,offset,SEEK_SET);
@@ -358,7 +360,6 @@ ADM_IMAGE_TYPE ADM_identidyImageFile(const char *filename,uint32_t *w,uint32_t *
 		    uint8_t fcc_tab[4];
 		    FILE *fd;
 		    uint32_t off,tag,count,size;
-		    BITMAPHEADER bmph;
 
 		    // 1- identity the file type
 		    //
@@ -428,7 +429,8 @@ ADM_IMAGE_TYPE ADM_identidyImageFile(const char *filename,uint32_t *w,uint32_t *
 		    // BMP2?
 		    if (fcc_tab[0] == 'B' && fcc_tab[1] == 'M') 
 		    {
-		    	  
+		    	    BITMAPINFOHEADER bmph;
+
 		     	    fseek(fd, 10, SEEK_SET);
 		     	    fread(fcc_tab, 4, 1, fd);
 		     	    // size, width height follow as int32 
@@ -436,14 +438,14 @@ ADM_IMAGE_TYPE ADM_identidyImageFile(const char *filename,uint32_t *w,uint32_t *
 		     #ifdef ADM_BIG_ENDIAN
 		     	    Endian_BitMapInfo(&bmph);
 		     #endif
-		     	    if (bmph.compressionScheme != 0) 
+		     	    if (bmph.biCompression != 0) 
 		     	    {
 		     	    	printf("[imageIdentify] BMP2:Cannot handle compressed bmp\n");
 		     	    	fclose(fd);
 		     	    	return ADM_IMAGE_UNKNOWN;
 		     	    }
-		     	    *w = bmph.width;
-		     	    *h = bmph.height;
+		     	    *w = bmph.biWidth;
+		     	    *h = bmph.biHeight;
 	     	    	fclose(fd);
 	     	    	return ADM_IMAGE_BMP2;
 		    }

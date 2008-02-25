@@ -18,11 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
-#include <math.h>
-
-
 
 #include "default.h"
 
@@ -32,58 +28,101 @@
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_rgb16.h"
 
-
-decoderRGB16::decoderRGB16 (uint32_t w, uint32_t h,uint32_t rgb):decoders (w, h)
+decoderRGB16::decoderRGB16(uint32_t w, uint32_t h, uint32_t rgb, uint32_t bpp) : decoders (w, h)
 {
-  isRgb=rgb;
-}
-decoderRGB16::~decoderRGB16 ()
-{
+	isRgb = rgb;
+	_bpp = bpp;
 
+	decoded = new uint8_t[_bpp * w * h];
 }
 
-
-uint8_t
-  decoderRGB16::uncompress (ADMCompressedImage * in, ADMImage * out)
+decoderRGB16::~decoderRGB16()
 {
-  int xx;
-  xx = _w * _h;
+	delete[] decoded;
+}
 
-  
-    out->flags = AVI_KEY_FRAME;
+uint8_t decoderRGB16::uncompress(ADMCompressedImage * in, ADMImage * out)
+{
+	int xx = _w * _h;
+	int lineSize = (_w * (_bpp / 8) + 3) & ~3;
+	ADM_colorspace colorspace;
+	int i, j;
+	uint8_t *src = in->data;
+	uint8_t *dst = decoded;
 
-  // We dont do much here ...
+	switch (_bpp)
+	{
+		case 16:
+			// FIXME - 16-bit could use a BGR555 or BGR565 colour mask
+			colorspace = ADM_COLOR_BGR555;
+			break;
+		case 24:
+		case 32:
+			if(isRgb)
+				colorspace = ADM_COLOR_RGB24;
+			else
+				colorspace = ADM_COLOR_BGR24;
 
-  if (in->dataLength == (3 * xx))  // rgb 24 ?
-    {
-      if(isRgb)
-        out->_colorspace =(ADM_colorspace)( ADM_COLOR_RGB24 | ADM_COLOR_BACKWARD);
-      else
-        out->_colorspace = (ADM_colorspace)( ADM_COLOR_BGR24| ADM_COLOR_BACKWARD);
-      out->_planeStride[0] = 3 * _w;
-    }
-  else if (in->dataLength  == (4 * xx))
-    {
-      if(isRgb)
-        out->_colorspace = (ADM_colorspace)( ADM_COLOR_RGB32A | ADM_COLOR_BACKWARD );
-      else
-        out->_colorspace = (ADM_colorspace)( ADM_COLOR_BGR32A| ADM_COLOR_BACKWARD);
-      out->_planeStride[0] = 4 * _w;
-    }
-        else if(in->dataLength==2*xx) // RGB16
-        {
-        				out->_colorspace =(ADM_colorspace)(ADM_COLOR_RGB16 |ADM_COLOR_BACKWARD );
-                        out->_planeStride[0] = 2 * _w;
-        }
-  else
-    return 0;
+			break;
+		default:
+			printf("bpp %d not supported\n", _bpp);
+			return 0;
+	}
 
-  ADM_assert (out->_isRef);
-  out->_planes[0] = in->data;
-  out->_planes[1] = NULL;
-  out->_planes[2] = NULL;
-  out->_planeStride[1] = 0;
-  out->_planeStride[2] = 0;
-  return 1;
+	if (_bpp == 32)
+	{
+		for(i = 0; i < _h; i++)
+		{
+			uint8_t *buf = src;
+			uint8_t *ptr = dst;
+
+			for(j = 0; j < _w; j++)
+			{
+				ptr[0] = buf[0];
+				ptr[1] = buf[1];
+				ptr[2] = buf[2];
+				ptr += 3;
+				buf += 4;
+			}
+
+			src += lineSize;
+			dst += _w * 3;
+		}
+	}
+	else
+	{
+		memcpy(decoded, in->data, lineSize * _h);
+
+		if (lineSize == _w * _bpp)
+		{
+			// no extra junk in scanlines so copy as is
+			memcpy(decoded, in->data, lineSize * _h);
+		}
+		else
+		{
+			// strip extra junk from scanlines (due to 4 byte alignment)
+			for(i = 0; i < _h; i++)
+			{
+				memcpy(dst, src, _w * (_bpp / 8));
+				src += lineSize;
+				dst += _w * (_bpp / 8);
+			}
+		}
+	}
+
+	ADM_assert(out->_isRef);
+
+	out->flags = AVI_KEY_FRAME;
+	out->_colorspace = (ADM_colorspace)(colorspace | ADM_COLOR_BACKWARD);
+
+	out->_planes[0] = decoded;
+	out->_planes[1] = NULL;
+	out->_planes[2] = NULL;
+
+	out->_planeStride[0] = (_bpp / 8) * _w;
+	out->_planeStride[1] = 0;
+	out->_planeStride[2] = 0;
+
+	return 1;
 }
 //EOF

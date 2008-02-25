@@ -5236,7 +5236,7 @@ msgstr "_Zoom 1:4"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_gui2/GUI_main2.cpp:568
 msgid "Z_oom 1:2"
-msgstr "Zoom _1:1"
+msgstr "Z_oom 1:2"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_gui2/GUI_main2.cpp:575
 msgid "Zoom _1:1"

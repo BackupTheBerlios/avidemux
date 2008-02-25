@@ -39,6 +39,7 @@ extern adm_fast_memcpy myAdmMemcpy;
 #define fopen   ADM_fopen
 #define fclose  ADM_fclose
 
+#ifndef __APPLE__
 #ifndef ADM_LEGACY_PROGGY
   #define malloc #error
   #define realloc #error
@@ -56,6 +57,7 @@ extern adm_fast_memcpy myAdmMemcpy;
   #define strdup ADM_strdup
   #define calloc ADM_calloc
 #endif
+#endif    // __APPLE__
 #ifdef __cplusplus
 }
 #endif

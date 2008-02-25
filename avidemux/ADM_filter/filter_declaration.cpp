@@ -95,6 +95,10 @@ printf(  "*********************\n");
 	REGISTERX("separatefields",QT_TR_NOOP("Separate fields"),QT_TR_NOOP("Each field becomes full picture, half sized."),VF_SEPARATEFIELDS,1, separatefield_create,separatefield_script);
 	REGISTERX("mergefield",QT_TR_NOOP("Merge fields"),QT_TR_NOOP("Merge two pictures as if they were two fields."),VF_MERGEFIELDS,1,mergefield_create,mergefield_script);
 
+
+        REGISTERX("hzstackfield",QT_TR_NOOP("Hz Stack fields"),QT_TR_NOOP("Put botj fields side by side."),VF_HZSTACKFIELD,1,hzstackfield_create,hzstackfield_script);
+        
+
 	REGISTERX("stackfield",QT_TR_NOOP("Stack fields"),QT_TR_NOOP("Put two fields on top of one another."),VF_STACKFIELD,1,stackfield_create,stackfield_script);
         REGISTERX("unstackfield",QT_TR_NOOP("Unstack fields"),QT_TR_NOOP("Interleave top and bottom part of the picture."),VF_UNSTACK_FIELD,1,unstackfield_create,unstackfield_script);
 	
@@ -180,6 +184,7 @@ printf(  "*********************\n");
             QT_TR_NOOP("Create a video made of 6 mini windows, very useful to do DVD menus."),
             VF_ANIMATED,1,animated_create,animated_script);
 	REGISTERX("computeaverage",QT_TR_NOOP("Compute Average"),QT_TR_NOOP("Compute average luma value for each pixel throughout all frames, and save to file"),VF_COMPUTEAVERAGE,1,computeaverage_create,computeaverage_script);
+	REGISTERX("eraser",QT_TR_NOOP("Eraser"),QT_TR_NOOP("\"Erase\" arbitrary areas of each frame"),VF_ERASER,1,eraser_create,eraser_script);
 	REGISTERX("swissarmyknife",QT_TR_NOOP("Swiss Army Knife"),QT_TR_NOOP("Apply operation like P'=P*A, P-A, P+A, etc. using a convolution, rolling average, image from file, or constant"),VF_SWISSARMYKNIFE,1,swissarmyknife_create,swissarmyknife_script);
 	REGISTERX("threshold",QT_TR_NOOP("Threshold"),QT_TR_NOOP("Force too-bright/too-dim pixels to 0 and the rest to 255 or vice-versa"),VF_THRESHOLD,1,threshold_create,threshold_script);
 	REGISTERX("particlelist",QT_TR_NOOP("Particle List"),QT_TR_NOOP("Identify 'particles' (groups of pixels)"),VF_PARTICLELIST,1,particle_create,particle_script);

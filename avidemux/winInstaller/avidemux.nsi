@@ -187,6 +187,8 @@ Section "Core files (required)" SecCore
     File ..\..\..\avidemux_2.4_build\vorbisenc.dll
     File ..\..\..\avidemux_2.4_build\xmltok.dll
     File ..\..\..\avidemux_2.4_build\xvidcore.dll
+    SetOutPath $INSTDIR\etc\fonts
+    File /r ..\..\..\avidemux_2.4_build\etc\fonts\*
     WriteRegStr HKLM "${REGKEY}\Components" "Core files (required)" 1
 SectionEnd
 
@@ -201,9 +203,11 @@ SectionGroup /e "User interfaces" SecGrpUI
 
     Section GTK+ SecUiGtk
         SectionIn 1 2
-        SetOutPath $INSTDIR\etc
         SetOverwrite on
-        File /r ..\..\..\avidemux_2.4_build\etc\*
+        SetOutPath $INSTDIR\etc\gtk-2.0
+        File /r ..\..\..\avidemux_2.4_build\etc\gtk-2.0\*
+        SetOutPath $INSTDIR\etc\pango
+        File /r ..\..\..\avidemux_2.4_build\etc\pango\*
         SetOutPath $INSTDIR\lib\gtk-2.0
         File /r ..\..\..\avidemux_2.4_build\lib\gtk-2.0\*
         SetOutPath $INSTDIR\share\themes
@@ -468,7 +472,8 @@ Section /o un.GTK+ UnSecUiGtk
     Delete /REBOOTOK $INSTDIR\avidemux2_gtk.exe
     RmDir /r /REBOOTOK $INSTDIR\share\themes
     RmDir /r /REBOOTOK $INSTDIR\lib\gtk-2.0
-    RmDir /r /REBOOTOK $INSTDIR\etc
+    RmDir /r /REBOOTOK $INSTDIR\etc\gtk-2.0
+    RmDir /r /REBOOTOK $INSTDIR\etc\pango
     DeleteRegValue HKLM "${REGKEY}\Components" GTK+
 SectionEnd
 
@@ -511,6 +516,7 @@ Section /o "un.Core files (required)" UnSecCore
     Delete /REBOOTOK "$INSTDIR\Change Log.html"
     Delete /REBOOTOK "$INSTDIR\stdout.txt"
     Delete /REBOOTOK "$INSTDIR\stderr.txt"
+    RmDir /r /REBOOTOK $INSTDIR\etc\fonts
     DeleteRegValue HKLM "${REGKEY}\Components" Avidemux
     
     RmDir /REBOOTOK $INSTDIR\share\gettext
@@ -535,7 +541,8 @@ Section /o "un.Desktop" UnSecDesktop
 SectionEnd
 
 Section un.post UnSecUninstaller
-	RmDir /REBOOTOK $INSTDIR\i18n
+    RmDir /REBOOTOK $INSTDIR\etc
+    RmDir /REBOOTOK $INSTDIR\i18n
     RmDir /REBOOTOK $INSTDIR\lib\locale
     RmDir /REBOOTOK $INSTDIR\lib
     RmDir /REBOOTOK $INSTDIR\share\locale

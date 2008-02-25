@@ -54,9 +54,8 @@ if(!codec) {GUI_Alert(QT_TR_NOOP("Internal error opening codec"#x));ADM_assert(0
 uint8_t ffmpegEncoder::stopEncoder(void)
 {
     printf("[lavc] stopEncoder (%x)\n",_context);
-    if (_init)
+    if (_context)
     {
-        _init = 0;
         avcodec_close (_context);
         ADM_dealloc (_context);
         _context = NULL;

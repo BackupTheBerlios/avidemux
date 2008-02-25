@@ -48,6 +48,14 @@ extern "C" {
 #include "prefs.h"
 #endif
 
+#ifdef __APPLE__
+extern "C"
+{
+	void initSdlCocoaView(void* parent, int x, int y, int width, int height, bool carbonParent);
+	void destroyCocoaView(void);
+}
+#endif
+
 //******************************************
 static uint8_t sdl_running=0;
 static SDL_Overlay *sdl_overlay=NULL;
@@ -77,6 +85,10 @@ uint8_t sdlAccelRender::end( void)
         if(sdl_running)
         {
                 SDL_QuitSubSystem(SDL_INIT_VIDEO);
+
+#ifdef __APPLE__
+				destroyCocoaView();
+#endif
         }
         if(decoded)
         {
@@ -91,6 +103,14 @@ uint8_t sdlAccelRender::end( void)
 uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 {
 	printf("[SDL] Initialising video subsystem\n");
+
+#ifdef __APPLE__
+	if (window->width > w && window->height > h)
+	{
+		printf("[SDL] Disabling acceleration.  Zoom increase not supported on Mac\n");
+		return 0;
+	}
+#endif
 
 	int bpp;
 	int flags;
@@ -108,11 +128,11 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
     }
 
     // Hack to get SDL to use GTK window, ugly but works
-#if !defined(CONFIG_DARWIN) && !defined(ADM_WIN32)
+#if !defined(ADM_WIN32) && !defined(__APPLE__)
 	char SDL_windowhack[32];
-    int winid=(int)window->window;
+    int winId=(int)window->window;
 
-    sprintf(SDL_windowhack,"SDL_WINDOWID=%ld",winid);
+    sprintf(SDL_windowhack,"SDL_WINDOWID=%ld",winId);
     putenv(SDL_windowhack);
 #endif
 
@@ -123,6 +143,19 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 
         return 0;
     }
+
+    // Do it twice as the 1st time does not work
+    // Hack to get SDL to use GTK window, ugly but works
+#if !defined(ADM_WIN32) && !defined(__APPLE__)
+    putenv(SDL_windowhack);
+    SDL_QuitSubSystem(SDL_INIT_VIDEO);
+    if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) 
+    {
+                printf("[SDL] FAILED initialising video subsystem\n");
+                printf("[SDL] ERROR: %s\n", SDL_GetError());
+                return 0;
+    }
+#endif
 
     sdl_running=1;
     flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE | SDL_NOFRAME;
@@ -139,7 +172,27 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 	putenv(origin);
 #endif
 
-    sdl_display= SDL_SetVideoMode( w*2, h*2,  bpp, flags );
+#ifdef __APPLE__
+	void* parent;
+
+	if (window->display)
+		// Carbon parent (Qt4)
+		parent = window->display;
+	else
+		// Cocoa parent (GTK)
+		parent = (void*)window->window;
+
+	if (parent)
+		// Create Cocoa view and attach to Carbon window using custom Objective-C function.
+		// It's a retarded way of doing things but that's what Apple has imposed...
+		initSdlCocoaView(parent, window->x, window->y, window->width, window->height, (window->display != NULL));
+
+	// SDL will resize our Cocoa window to width and height passed to SetVideoMode.
+	// This is fine until we use zoomed views so pass window dimensions instead.
+	sdl_display= SDL_SetVideoMode(window->width, window->height, bpp, flags);
+#else
+	sdl_display= SDL_SetVideoMode( w, h,  bpp, flags );
+#endif
 
     if (!sdl_display)
     {

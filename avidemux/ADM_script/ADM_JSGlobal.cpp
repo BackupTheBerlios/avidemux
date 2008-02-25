@@ -27,8 +27,16 @@ FILE *fd = fopen(report->filename,"rb");
 		fclose(fd);
 	}
 	if( strncmp(buf,"//AD",4) ){
+            if (report->filename || report->lineno)
 		GUI_Error_HIG("Spidermonkey ECMAScript Error",
-		              "Not an ECMAScript file. Try open it with 'File' -> 'Open...'");
+		              "%s: line %d:\nMsg: %s\n"
+                              "Not an ECMAScript file. Try open it with 'File' -> 'Open...'",
+                              report->filename,
+                              report->lineno,
+                              message);
+            else
+		GUI_Error_HIG("Spidermonkey ECMAScript Error",
+                              "Not an ECMAScript file. Try open it with 'File' -> 'Open...'");
 	}else{
 		GUI_Error_HIG("Spidermonkey ECMAScript Error", 
 			"%s: line %d:\nMsg: %s\n",
@@ -36,6 +44,11 @@ FILE *fd = fopen(report->filename,"rb");
 			report->lineno,
 			message);
 	}
+        fprintf(stderr, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  Spidermonkey ECMAScript Error\n");
+        if (report->filename || report->lineno)
+            fprintf(stderr, "\t%s: line %d:\n\tMsg: %s\n",
+                   report->filename, report->lineno, message);
+
         if(quiet)
                 GUI_Quiet();
 

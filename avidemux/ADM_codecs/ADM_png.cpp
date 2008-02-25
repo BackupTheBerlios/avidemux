@@ -43,7 +43,7 @@ static void user_read_data (png_structp png_ptr, png_bytep data, png_size_t leng
 void decoderPng::recalc (void)
 {
   int mul;
-  if (colorspace == ADM_COLOR_BGR24)
+  if (colorspace == ADM_COLOR_RGB24)
     mul = 3;
 
   else
@@ -57,7 +57,7 @@ decoderPng::decoderPng (uint32_t w, uint32_t h):decoders (w, h)
 {
   rows = NULL;
   decoded = NULL;
-  colorspace = ADM_COLOR_BGR24;
+  colorspace = ADM_COLOR_RGB24;
 
   //****************************
   // Prepare the decoded buffer*
@@ -115,27 +115,27 @@ gain2:
   io.cur = 0;
   png_read_png (PNG_PTR, INFO_PTR, PNG_TRANSFORM_IDENTITY, NULL);
 
-  // Check if it is 24 or 32 bits BGR 
+  // Check if it is 24 or 32 bits RGB 
   bpp = png_get_bit_depth (PNG_PTR, INFO_PTR);
 //   printf("Bpp:%u\n",bpp);
   // if needed we change colorspace 
   colortype = png_get_color_type (PNG_PTR, INFO_PTR);
   // 
-  if (colorspace == ADM_COLOR_BGR24 && colortype == PNG_COLOR_TYPE_RGB_ALPHA)	// BGR32
+  if (colorspace == ADM_COLOR_RGB24 && colortype == PNG_COLOR_TYPE_RGB_ALPHA)	// RGB32
     {
 
       // Switch to 32 bits
-      colorspace = ADM_COLOR_BGR32A;
+      colorspace = ADM_COLOR_RGB32A;
       recalc ();
       goto gain2;
     }
 
-  else if (colorspace == ADM_COLOR_BGR32A && colortype == PNG_COLOR_TYPE_RGB)
+  else if (colorspace == ADM_COLOR_RGB32A && colortype == PNG_COLOR_TYPE_RGB)
 
     {
 
       // Switch to 24 bits
-      colorspace = ADM_COLOR_BGR24;
+      colorspace = ADM_COLOR_RGB24;
       recalc ();
       goto gain2;
     }
@@ -143,7 +143,7 @@ gain2:
   out->_planes[0] = decoded;
   out->_planes[1] = NULL;
   out->_planes[2] = NULL;
-  if (colorspace == ADM_COLOR_BGR32A)
+  if (colorspace == ADM_COLOR_RGB32A)
     out->_planeStride[0] = _w * 4;
 
   else

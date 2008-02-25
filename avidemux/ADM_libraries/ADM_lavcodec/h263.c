@@ -3123,7 +3123,7 @@ static inline int mpeg4_is_resync(MpegEncContext *s){
     int v= show_bits(&s->gb, 16);
 
     // MEANX if( s->workaround_bugs&FF_BUG_NO_PADDING){
-    if(s->lavc_build==4655) // Breaks multithreaded decoding meanx
+    if(s->lavc_build==4655 || s->xvid_build ) // Breaks multithreaded decoding meanx
     {
     #if 0
     #undef printf

@@ -119,7 +119,7 @@ uint8_t picHeader::open(char *inname)
     uint8_t fcc_tab[4];
     FILE *fd;
     char *end;
-    uint32_t w = 0, h = 0;
+    uint32_t w = 0, h = 0, bpp = 0;
 
     // 1- identity the file type
     //
@@ -193,7 +193,7 @@ char realstring[250];
 
     for (uint32_t i = 0; i < MAX_ACCEPTED_OPEN_FILE; i++) {
 	sprintf(realname, realstring, name, i + _first);
-	printf("\n %lu : %s", i, realname);
+	printf("\n %lu : %s\n", i, realname);
 	fd = fopen(realname, "rb");
 	if (fd == NULL)
 	    break;
@@ -247,6 +247,7 @@ char realstring[250];
 	    _offset = bmph.size + 14;
 	    w = bmph.width;
 	    h = bmph.height;
+		bpp = bmph.numBitsPerPlane;
 	}
 	break;
 
@@ -316,7 +317,8 @@ char realstring[250];
 	    }
 	    w = bmph.biWidth;
 	    h = bmph.biHeight;
-	    printf("W: %d H: %d offset : %d\n", w, h, _offset);
+		bpp = bmph.biBitCount;
+	    printf("W: %d H: %d offset: %d\n", w, h, _offset);
 	}
 
 	break;
@@ -356,7 +358,10 @@ char realstring[250];
     _mainaviheader.dwMicroSecPerFrame = 40000;;	// 25 fps hard coded
     _videostream.fccType = fourCC::get((uint8_t *) "vids");
 
-    _video_bih.biBitCount = 24;
+	if (bpp)
+		_video_bih.biBitCount = bpp;
+	else
+		_video_bih.biBitCount = 24;
 
     _videostream.dwLength = _mainaviheader.dwTotalFrames = _nb_file;
     _videostream.dwInitialFrames = 0;

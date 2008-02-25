@@ -44,6 +44,7 @@
 #include "../ADM_toolkit_gtk/gtkmarkscale.h"
 #include "../ADM_toolkit_gtk/jogshuttle.h"
 #include "../ADM_toolkit_gtk/ADM_jogshuttle.h"
+#include "gtkgui.h"
 
 uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h);
 
@@ -79,7 +80,7 @@ static void volumeChange( void );
 static char     *customNames[ADM_MAC_CUSTOM_SCRIPT];
 static uint32_t ADM_nbCustom=0;
 // Needed for DND
-extern void A_openAvi (char *name);
+// extern int A_openAvi (char *name);
 extern void A_appendAvi (char *name);
 
 
@@ -202,6 +203,104 @@ buttonCallBack_S buttonCallback[]=
   
 };
 
+#ifdef ENABLE_WINDOW_SIZING_HACK
+
+// This is a hack to empirically determine the largest window for which there
+// is room on the screen, allowing for panels and such.  There doesn't seem to
+// be any way to query GTK for this information, so we create a window,
+// maximize it and make it visible, wait for the real configure event that
+// comes after it is actually maximized, and record the size that it had in
+// that event.  That size is what we take to be the largest window that will
+// fit.  We use that information later to calculate how much (and whether or
+// not) to scale down the preview video in flyDialogs, via
+// UI_calcZoomToFitScreen() in GUI_gtkRender.cpp.
+
+int maxWindowWidth = -1;
+int maxWindowHeight = -1;
+
+gboolean tmpwin_configured (GtkWidget * widget, GdkEventConfigure * event,
+                            gpointer user_data)
+{
+    printf ("tmpwin_configured: now %dx%d @ +%d+%d\n",
+            event->width, event->height, event->x, event->y);
+
+    // it always seems to get two events, one at a 200x200 dimension and then
+    // the one at the maximized dimensions.  An alternate approach here would
+    // be to ignore the first configure event and use the 2nd.  Yet another
+    // way would be to do the maximize call here on the first event...
+
+    if (event->width > 200)
+    {
+        maxWindowWidth = event->width;
+        maxWindowHeight = event->height;
+        gtk_widget_destroy (widget);
+    }
+
+    return TRUE;
+}
+
+void do_tmpwin_hack (void)
+{
+    GtkWidget * tmpwin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    g_signal_connect (GTK_OBJECT (tmpwin), "configure-event",
+                      GTK_SIGNAL_FUNC (tmpwin_configured),
+                      gpointer (tmpwin));
+    gtk_window_maximize (GTK_WINDOW(tmpwin));
+    gtk_widget_show (tmpwin);
+}
+
+#endif
+
+// This is part of a hack to allow the user to attach the Play and Stop
+// actions to buttons.  The problem is that once we launch the Play action,
+// HandleAction() doesn't return to its caller until avidemux stops playing,
+// so if HandleAction() is called directly from the event handler, there is no
+// way for the Stop button to be seen until something else has already stopped
+// it.  However, if we have the event handler just set up a timer, which
+// launches the play action, it's only the timer that is locked up, and since
+// we only use the timer for the Play action (and not any of the other
+// buttons), then everything (including the Stop button) works just fine.
+// A GTK expert might know of a better way to solve this problem, but I'm not
+// convinced that one exists in current GTK (2.10 on my FC7 system, but we
+// need to support older ones, too).
+
+static gboolean on_PlayButtonHackTimer (gpointer data)
+{
+    gdk_threads_enter();
+    HandleAction (ACT_PlayAvi);
+    gdk_threads_leave();
+    return FALSE;
+}
+
+void jogButton (void *, unsigned short /* raw_button */, Action gui_action)
+{
+    // hack alert: see comment for on_PlayButtonHackTimer(), above
+    if (gui_action == ACT_PlayAvi)
+        g_timeout_add (10, on_PlayButtonHackTimer, NULL);
+    else if (gui_action != ACT_INVALID)
+        HandleAction (gui_action);
+}
+
+void jogDial (void *, signed short offset) // offset usually -1 or +1
+{
+    if (offset < 0)
+        GUI_PrevFrame (uint32_t (-offset));
+    else
+        GUI_NextFrame (uint32_t (offset));
+}
+
+GtkWidget * lookup_jog_shuttle_widget (void)
+{
+    return lookup_widget(guiRootWindow,"jogg");
+}
+
+void jogRing (void *, gfloat angle) // angle is -1.0 to 0 to +1.0
+{
+    GtkWidget * jsw = lookup_jog_shuttle_widget();
+    if (jsw)
+        jog_shuttle_set_value (jsw, angle);
+}
+
 ///
 ///	Create main window and bind to it
 ///
@@ -213,6 +312,10 @@ uint32_t w,h;
 		guiRootWindow=create_mainWindow();
 		
 		if(!guiRootWindow) return 0;
+
+#ifdef ENABLE_WINDOW_SIZING_HACK
+                do_tmpwin_hack();
+#endif
 
 		gtk_register_dialog(guiRootWindow);
 					
@@ -232,6 +335,7 @@ uint32_t w,h;
                 GUI_gtk_grow_off(1);
 #ifdef USE_JOG
                 physical_jog_shuttle = &(PhysicalJogShuttle::getInstance());
+                physical_jog_shuttle->registerCBs (NULL, jogButton, jogDial, jogRing);
 #endif 
 	return ret;
 }
@@ -243,6 +347,7 @@ void destroyGUI(void)
 	for(int i=0;i<ADM_nbCustom;i++)
 		delete(customNames[i]);
 #ifdef USE_JOG
+        physical_jog_shuttle->deregisterCBs (NULL);
         delete physical_jog_shuttle;
 #endif
 }
@@ -586,11 +691,6 @@ int32_t UI_readJog(void)
         val=val*100;
         return (int32_t )val;
         
-}
-
-GtkWidget * lookup_jog_shuttle_widget (void)
-{
-    return lookup_widget(guiRootWindow,"jogg");
 }
 
 void UI_setTitle(const char *name)
@@ -1091,7 +1191,7 @@ void DNDDataReceived( GtkWidget *widget, GdkDragContext *dc,
                }
                else
                {
-                    fileReadWrite(A_openAvi, 0, (char*)filename);
+                    fileReadWrite(reinterpret_cast <void (*)(char *)> (A_openAvi), 0, (char*)filename);
                }
       ADM_dealloc(names[i]); 
     }

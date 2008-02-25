@@ -212,6 +212,13 @@ AVDMGenericVideoStream *getFirstVideoFilter( void)
 
 }
 
+FILTER * getCurrentVideoFilterList (uint32_t * count)
+{
+    if (count)
+        *count = nb_active_filter;
+    return videofilters;
+}
+
 //
 //	Parse the list of active filters, delete them et recreate them with (new ?) configuration
 //
@@ -288,20 +295,25 @@ AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, A
 
 
 */
+const FILTER_ENTRY * filterGetEntryFromTag (VF_FILTERS tag)
+{
+    ADM_assert(tag!=VF_INVALID);
+    for(unsigned int i=0;i<allfilters.size();i++)
+    {
+        if(tag==allfilters[i].tag)
+        {
+            return &(allfilters[i]);
+        }
+    }
+    ADM_assert(0);
+    return NULL;                      
+}
+
 const char  *filterGetNameFromTag(VF_FILTERS tag)
 {
-
-                        ADM_assert(tag!=VF_INVALID);
-                        for(unsigned int i=0;i<allfilters.size();i++)
-                                {
-                                        if(tag==allfilters[i].tag)
-                                                {
-                                                        return allfilters[i].name;
-                                                        
-                                                }
-                                }
-                        ADM_assert(0);
-                        return NULL;                      
+    const FILTER_ENTRY * entry = filterGetEntryFromTag (tag);
+    ADM_assert(entry);
+    return entry->name;
 }
 /*____________________________________
 	Save and load current set of filters

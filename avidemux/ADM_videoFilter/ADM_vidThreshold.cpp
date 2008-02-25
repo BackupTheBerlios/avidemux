@@ -39,15 +39,16 @@ SCRIPT_CREATE(threshold_script,ADMVideoThreshold,thresholdParam);
 
 BUILD_CREATE(threshold_create,ADMVideoThreshold);
 
-ADMVideoThreshold::ADMVideoThreshold(AVDMGenericVideoStream *in,CONFcouple *couples)
+ADMVideoThreshold::ADMVideoThreshold (AVDMGenericVideoStream *in,
+                                      CONFcouple *couples)
 			
 {
     printf ("ADMVideoThreshold ctor (%p)\n", this);
     _in = in;
-    memcpy(&_info,in->getInfo(),sizeof(_info));
+    memcpy (&_info,in->getInfo(),sizeof(_info));
     _info.encoding = 1;
     _uncompressed = new ADMImage(_in->getInfo()->width, _in->getInfo()->height);
-    ADM_assert(_uncompressed);
+    ADM_assert (_uncompressed);
     _param = new THRESHOLD_PARAM;
     if (couples)
     {
@@ -64,11 +65,10 @@ ADMVideoThreshold::ADMVideoThreshold(AVDMGenericVideoStream *in,CONFcouple *coup
         _param->debug = 0;
     }
 
-    computeLookupTable (_param, lookup_table);
+    computeLookupTable (_param);
 }
 
-uint8_t ADMVideoThreshold::computeLookupTable (THRESHOLD_PARAM * param,
-                                               uint8_t lookup_table [256])
+uint8_t ADMVideoThreshold::computeLookupTable (THRESHOLD_PARAM * param)
 {
     uint8_t changed = false;
 
@@ -123,19 +123,19 @@ uint8_t	ADMVideoThreshold::getCoupledConf( CONFcouple **couples)
     CSET(debug);
 
     return 1;
-
 }
 
-uint8_t ADMVideoThreshold::configure(AVDMGenericVideoStream *in)
+uint8_t ADMVideoThreshold::configure (AVDMGenericVideoStream *in)
 {
-    uint8_t ret = DIA_threshold (_in, _param);
+    uint8_t ret = DIA_threshold (_in, this, _param);
     if (ret == 1)
     {
-        computeLookupTable (_param, lookup_table);
+        computeLookupTable (_param);
         return ret;
     }
     else if (ret == 0) // 0 = cancel
     {
+        computeLookupTable (_param);
         return ret;
     }
     else
@@ -164,7 +164,7 @@ uint8_t ADMVideoThreshold::configure(AVDMGenericVideoStream *in)
 
     if (ret) // 0 = cancel
     {
-        computeLookupTable (_param, lookup_table);
+        computeLookupTable (_param);
     }
 
     return ret;
@@ -234,20 +234,20 @@ uint8_t ADMVideoThreshold::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
     memset (UPLANE (data), 128, planesize >> 2);
     memset (VPLANE (data), 128, planesize >> 2);
 
-    data->copyInfo(image);
+    data->copyInfo (image);
     return 1;
 }	                           
 
 // This is used by the preview code for the configuration dialog.
 
 void ADMVideoThreshold::doThreshold (ADMImage * from, ADMImage * to,
-                                     uint8_t * lookup_table,
+                                     ADMVideoThreshold * thresholdp,
                                      uint32_t pixelcount)
 {
     uint8_t * currp = YPLANE (from) + pixelcount;
     uint8_t * destp = YPLANE (to) + pixelcount;
     uint32_t pixremaining = pixelcount + 1;
-    uint8_t * table = lookup_table;
+    const uint8_t * table = thresholdp->lookup_table;
 
     while (--pixremaining)
     {

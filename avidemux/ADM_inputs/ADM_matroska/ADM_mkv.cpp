@@ -39,7 +39,7 @@ uint8_t mkvHeader::open(char *name)
  
   ADM_ebml_file ebml;
   uint64_t id,len;
-  uint32_t alen;
+  uint64_t alen;
   ADM_MKV_TYPE type;
   const char *ss;
   

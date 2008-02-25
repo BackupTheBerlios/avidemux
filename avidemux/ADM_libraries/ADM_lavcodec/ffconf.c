@@ -14,7 +14,7 @@ int main(void)
     DECLARE_DECODER(DNXHD, dnxhd);
     DECLARE_DECODER(FOURXM, fourxm);
     DECLARE_DECODER(FRAPS, fraps);
-    DECLARE_DECODER(H263I, h263i);
+	DECLARE_DECODER(H263, h263);
     DECLARE_DECODER(H264, h264);
     DECLARE_DECODER(INDEO2, indeo2);
     DECLARE_DECODER(INDEO3, indeo3);
@@ -131,7 +131,7 @@ int main(void)
     DECLARE_DECODER (FLASHSV, flashsv);
     DECLARE_DECODER (GIF, gif);
     DECLARE_DECODER (H261, h261);
-    DECLARE_DECODER (H263, h263);
+	DECLARE_DECODER (H263I, h263i);
     DECLARE_DECODER (JPEGLS, jpegls);
     DECLARE_DECODER (PNG, png);
     DECLARE_DECODER (QTRLE, qtrle);
@@ -331,7 +331,15 @@ printf("#define ENABLE_ARMV4L      0\n");
 printf("#define ENABLE_MLIB      0\n");
 printf("#define ENABLE_SPARC      0\n");
 printf("#define ENABLE_ALPHA      0\n");
+
+// Hack so CMake and autoconf don't need to be changed
+printf("#include \"config.h\"\n");
+printf("#ifdef ARCH_POWERPC\n");
+printf("#define ENABLE_POWERPC      1\n");
+printf("#else\n");
 printf("#define ENABLE_POWERPC      0\n");
+printf("#endif\n");
+
 printf("#define ENABLE_MMI      0\n");
 printf("#define ENABLE_SH4      0\n");
 printf("#define ENABLE_BFIN      0\n");

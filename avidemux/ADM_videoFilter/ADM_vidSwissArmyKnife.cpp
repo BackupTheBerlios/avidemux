@@ -52,12 +52,12 @@ static const int MAX_PIXEL_LUMA = 255;
 
 static FILTER_PARAM swissArmyKnifeParam =
 {
-    15,
+    16,
     { "tool", "input_type", "input_file", "load_bias",              // 4
       "load_multiplier", "input_constant", "memory_constant_alpha", // + 3 = 7
-      "init_start_frame", "init_end_frame", "init_by_rolling",      // + 3 = 10
-      "bias", "result_bias", "result_multiplier",                   // + 3 = 13
-      "histogram_frame_interval", "debug"                           // + 2 = 15
+      "lookahead_n_frames", "init_start_frame", "init_end_frame",   // + 3 = 10
+      "init_by_rolling", "bias", "result_bias",                     // + 3 = 13
+      "result_multiplier", "histogram_frame_interval", "debug"      // + 3 = 16
     }
 };
 
@@ -93,14 +93,13 @@ SCRIPT_CREATE(swissarmyknife_script,ADMVideoSwissArmyKnife,swissArmyKnifeParam);
 
 BUILD_CREATE(swissarmyknife_create,ADMVideoSwissArmyKnife);
 
-ADMVideoSwissArmyKnife::ADMVideoSwissArmyKnife(AVDMGenericVideoStream *in,CONFcouple *couples)
-			
+ADMVideoSwissArmyKnife::ADMVideoSwissArmyKnife (AVDMGenericVideoStream *in, CONFcouple *couples)
 {
     _in = in;
-    memcpy(&_info, in->getInfo(), sizeof(_info));
+    memcpy (&_info, in->getInfo(), sizeof(_info));
     _info.encoding = 1;
-    _uncompressed = new ADMImage(_in->getInfo()->width, _in->getInfo()->height);
-    ADM_assert(_uncompressed);
+    _uncompressed = new ADMImage (_in->getInfo()->width, _in->getInfo()->height);
+    ADM_assert (_uncompressed);
     _param = new SWISSARMYKNIFE_PARAM;
 
     if (couples)
@@ -108,7 +107,7 @@ ADMVideoSwissArmyKnife::ADMVideoSwissArmyKnife(AVDMGenericVideoStream *in,CONFco
         GET(tool);
         GET(input_type);
 
-		char* tmp;
+        char* tmp;
         GET2(input_file, tmp);
         GET(load_bias);
         GET(load_multiplier);
@@ -116,6 +115,7 @@ ADMVideoSwissArmyKnife::ADMVideoSwissArmyKnife(AVDMGenericVideoStream *in,CONFco
         GET(input_constant);
 
         GET(memory_constant_alpha);
+        GET(lookahead_n_frames);
         GET(init_start_frame);
         GET(init_end_frame);
         GET(init_by_rolling);
@@ -140,9 +140,10 @@ ADMVideoSwissArmyKnife::ADMVideoSwissArmyKnife(AVDMGenericVideoStream *in,CONFco
 
         _param->input_constant = 0;
 
-        _param->init_start_frame = 1;
-        _param->init_end_frame = 100;
         _param->memory_constant_alpha = 1.0 / _param->init_end_frame;
+        _param->lookahead_n_frames = 0;
+        _param->init_start_frame = 0;
+        _param->init_end_frame = 99;
         _param->init_by_rolling = false;
 
         _param->bias = 128;
@@ -206,8 +207,8 @@ ADMVideoSwissArmyKnife::ADMVideoSwissArmyKnife(AVDMGenericVideoStream *in,CONFco
 uint8_t	ADMVideoSwissArmyKnife::getCoupledConf (CONFcouple **couples)
 {
 
-    ADM_assert(_param);
-    *couples = new CONFcouple(swissArmyKnifeParam.nb);
+    ADM_assert (_param);
+    *couples = new CONFcouple (swissArmyKnifeParam.nb);
 
     // This is a hack to work around the fact that the ctor & dtor get called
     // too often.  The right solution would be to arrange for the filter
@@ -240,6 +241,7 @@ uint8_t	ADMVideoSwissArmyKnife::getCoupledConf (CONFcouple **couples)
     CSET(input_constant);
 
     CSET(memory_constant_alpha);
+    CSET(lookahead_n_frames);
     CSET(init_start_frame);
     CSET(init_end_frame);
     CSET(init_by_rolling);
@@ -315,7 +317,7 @@ uint8_t ADMVideoSwissArmyKnife::configure (AVDMGenericVideoStream *in)
         ADM_assert (ret == 255); // 255 = whizzy dialog not implemented
     }
 
-	char* file = ADM_strdup(_param->input_file.c_str());
+    char * file = ADM_strdup (_param->input_file.c_str());
 
     diaElemFile input_file
         (0, &file,
@@ -338,7 +340,11 @@ uint8_t ADMVideoSwissArmyKnife::configure (AVDMGenericVideoStream *in)
     diaElemFloat memory_constant_alpha
         (&(_param->memory_constant_alpha),
          QT_TR_NOOP("Memory constant _alpha\n"
-           "(where A = (1-alpha)*A + alpha*curr_frame):"),
+           "(where A = (1-alpha)*A + alpha*(curr_frame + lookahead)):"),
+         0, 0x7fffffff);
+    diaElemUInteger lookahead_n_frames
+        (&(_param->lookahead_n_frames),
+         QT_TR_NOOP("Look ahead _N frames:"),
          0, 0x7fffffff);
     diaElemUInteger init_start_frame
         (&(_param->init_start_frame),
@@ -373,10 +379,11 @@ uint8_t ADMVideoSwissArmyKnife::configure (AVDMGenericVideoStream *in)
 
     diaElem * elems[] = { &tool, &input_type, &input_file, &load_bias,
                           &load_multiplier, &input_constant,
-                          &memory_constant_alpha, &init_start_frame,
-                          &init_end_frame, &init_by_rolling,
-                          &bias, &result_bias, &result_multiplier,
-                          &histogram_frame_interval, &debug };
+                          &memory_constant_alpha, &lookahead_n_frames,
+                          &init_start_frame, &init_end_frame,
+                          &init_by_rolling, &bias, &result_bias,
+                          &result_multiplier, &histogram_frame_interval,
+                          &debug };
 
     ret = diaFactoryRun (QT_TR_NOOP("Swiss Army Knife Configuration"),
                          sizeof (elems) / sizeof (diaElem *), elems);
@@ -386,8 +393,8 @@ uint8_t ADMVideoSwissArmyKnife::configure (AVDMGenericVideoStream *in)
         myInfo->histogram_data_invalid = true;
     }
 
-	_param->input_file = file;
-	delete[] file;
+    _param->input_file = file;
+    delete[] file;
 
     return ret;
 }
@@ -450,6 +457,7 @@ char * ADMVideoSwissArmyKnife::getConf (SWISSARMYKNIFE_PARAM * param,
         input_file = "**** no file selected ****";
 
     const char * space = forDialog ? " " : "";
+    char * cptr;
 
     switch (param->input_type)
     {
@@ -483,10 +491,15 @@ char * ADMVideoSwissArmyKnife::getConf (SWISSARMYKNIFE_PARAM * param,
         break;
     case INPUT_ROLLING_AVERAGE:
         sprintf (inputstr, "A");
-        sprintf (where, " (where each frame, A=(A*(1-alpha))+(P*alpha), "
-                 "alpha%s=%s%.6f)",
-                 space, space, param->memory_constant_alpha);
-        if (param->init_start_frame)
+        cptr = where + sprintf (where, " (where each frame, "
+                                "A=(A*(1-alpha))+(P*alpha), alpha%s=%s%.6f",
+                                space, space, param->memory_constant_alpha);
+        if (param->lookahead_n_frames)
+            sprintf (cptr, ", P = pixel from %d frames ahead)",
+                     param->lookahead_n_frames);
+        else
+            strcpy (cptr, ")");
+        if (param->init_start_frame <= param->init_end_frame)
             sprintf (moreinfo, ", initial A = %s avg of frames %u - %u",
                      param->init_by_rolling ? "rolling" : "straight",
                      param->init_start_frame, param->init_end_frame);
@@ -497,7 +510,7 @@ char * ADMVideoSwissArmyKnife::getConf (SWISSARMYKNIFE_PARAM * param,
         break;
     }
 
-    char * cptr = conf;
+    cptr = conf;
 
     bool result_is_scaled
         = (param->result_bias != 0.0 || param->result_multiplier != 1.0);
@@ -935,6 +948,117 @@ void ADMVideoSwissArmyKnife::computeRollingAverage (ADMImage * image,
         }
 
         *--destp = result;
+    }
+
+    if (param->debug & 2)
+    {
+        if (satlow || sathigh)
+            printf ("    Saturated %d low, %d high\n", satlow, sathigh);
+    }
+}
+
+//============================================================================
+
+// This one is used in the lookahead case; it takes the additional parameter
+// supplying the lookahead frame.
+
+template <typename Oper, typename Histo>
+void ADMVideoSwissArmyKnife::computeRollingAverage (ADMImage * image,
+                                                    ADMImage * lookaheadimage,
+                                                    ADMImage * data,
+                                                    uint32_t planesize,
+                                                    SWISSARMYKNIFE_PARAM * param,
+                                                    int32_t bias,
+                                                    const Oper & op_in,
+                                                    const Histo & histogram_in)
+{
+    // We make local copies of the functors so that the calls below to
+    // record_input() and record_output() (for the histogram) and operator()
+    // (for the op) are accessing stack data rather than incurring yet another
+    // indirection.  When it's per-pixel, every little bit helps!
+
+    Histo histogram = histogram_in;
+    Oper op = op_in;
+
+    float alpha = param->memory_constant_alpha;
+    float oneminusalpha = 1 - alpha;
+
+    // HERE: for speed, we do luma (Y plane) only.  However, some
+    // users might want chroma, too... we should make that
+    // an option or something.
+
+    uint8_t * currp = YPLANE (image) + planesize;
+    uint8_t * destp = YPLANE (data) + planesize;
+    float * bgp = myInfo->bg + planesize;
+    uint32_t pixremaining = planesize + 1;
+
+    uint32_t sathigh = 0;
+    uint32_t satlow = 0;
+
+    if (lookaheadimage)
+    {
+        uint8_t * aheadp = YPLANE (lookaheadimage) + planesize;
+
+        while (--pixremaining)
+        {
+            int32_t P = *--currp;
+            histogram.record_input (P);
+
+            float A = *--bgp;
+            *bgp = (A * oneminusalpha) + (*--aheadp * alpha);
+
+            int32_t result = op (P, A) + bias;
+
+            histogram.record_output (result);
+
+            if (result & 0xffffff00)
+            {
+                if (result < 0)
+                {
+                    result = 0;
+                    satlow++;
+                }
+                else // if (result > 255)
+                {
+                    result = 255;
+                    sathigh++;
+                }
+            }
+
+            *--destp = result;
+        }
+    }
+    else
+    {
+        while (--pixremaining)
+        {
+            int32_t P = *--currp;
+            histogram.record_input (P);
+
+            float A = *--bgp;
+            // no update of background - the lookahead is looking past the
+            // end of the video
+
+            int32_t result = op (P, A) + bias;
+
+            histogram.record_output (result);
+
+            if (result & 0xffffff00)
+            {
+                if (result < 0)
+                {
+                    result = 0;
+                    satlow++;
+                }
+                else // if (result > 255)
+                {
+                    result = 255;
+                    sathigh++;
+                }
+            }
+
+            *--destp = result;
+        }
     }
 
     if (param->debug & 2)
@@ -1395,15 +1519,42 @@ uint8_t ADMVideoSwissArmyKnife::getFrameNumberNoAlloc(uint32_t frame,
 
     uint32_t planesize = _info.width * _info.height;
     uint32_t size = (planesize * 3) >> 1;
+    ADMImage * lookaheadimage;
+
+    if (_param->lookahead_n_frames)
+    {
+        if (myInfo->bg_lab_size != planesize)
+        {
+            delete myInfo->bg_lab;
+            myInfo->bg_lab_size = planesize;
+            myInfo->bg_lab = new ADMImage (_info.width, _info.height);
+        }
+
+        if (frame + _param->lookahead_n_frames >= _info.nb_frames)
+            lookaheadimage = 0;
+        else if (!_in->getFrameNumberNoAlloc (frame
+                                              + _param->lookahead_n_frames,
+                                              len, myInfo->bg_lab, flags))
+            return 0;
+        else
+            lookaheadimage = myInfo->bg_lab;
+    }
+    else
+        lookaheadimage = 0;
+
+    // printf ("%s\n", getConf (_param, true));
+
     *len = size;
 
-    uint8_t ret = doSwissArmyKnife (_uncompressed, data, _in, this, _param,
+    uint8_t ret = doSwissArmyKnife (_uncompressed, lookaheadimage,
+                                    data, _in, this, _param,
                                     _info.width, _info.height);
     return ret;
 }
 
 uint8_t
 ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
+                                          ADMImage * lookaheadimage,
                                           ADMImage * data,
                                           AVDMGenericVideoStream * in,
                                           ADMVideoSwissArmyKnife * sak,
@@ -1675,6 +1826,7 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
         if (!myInfo->bg
             || myInfo->bg_x != width || myInfo->bg_y != height
             || myInfo->bg_mca != param->memory_constant_alpha
+            || myInfo->bg_lanf != param->lookahead_n_frames
             || myInfo->bg_isf != param->init_start_frame
             || myInfo->bg_ief != param->init_end_frame
             || myInfo->bg_ibr != param->init_by_rolling)
@@ -1690,24 +1842,25 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
             myInfo->histogram_data_invalid = true;
 
             myInfo->bg_mca = param->memory_constant_alpha;
+            myInfo->bg_lanf = param->lookahead_n_frames;
             myInfo->bg_isf = param->init_start_frame;
             myInfo->bg_ief = param->init_end_frame;
             myInfo->bg_ibr = param->init_by_rolling;
 
-            if (myInfo->bg_isf && myInfo->bg_isf <= myInfo->bg_ief)
+            if (myInfo->bg_isf <= myInfo->bg_ief)
             {
                 uint32_t do_frames = myInfo->bg_ief - myInfo->bg_isf + 1;
 
-                uint32_t firstframe = myInfo->bg_isf - 1;
-                uint32_t lastframe = myInfo->bg_ief - 1;
+                uint32_t firstframe = myInfo->bg_isf;
+                uint32_t lastframe = myInfo->bg_ief;
                 const ADV_Info & info = sak->getInfo();
                 if (lastframe >= info.nb_frames)
                 {
                     lastframe = info.nb_frames - 1;
-                    if (firstframe > info.nb_frames)
+                    if (firstframe >= info.nb_frames)
                     {
                         firstframe = lastframe - do_frames + 1;
-                        if (firstframe > info.nb_frames)
+                        if (firstframe >= info.nb_frames)
                             firstframe = 0;
                     }
                     do_frames = lastframe - firstframe + 1;
@@ -1720,7 +1873,7 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
                         myInfo->bg_ibr ? "rolling average over"
                         : "straight average of",
                         do_frames, myInfo->bg_x, myInfo->bg_y,
-                        firstframe + 1, lastframe + 1, myInfo->bg_mca);
+                        firstframe, lastframe, myInfo->bg_mca);
 
                 ADMImage aimage (myInfo->bg_x, myInfo->bg_y);
 
@@ -1728,6 +1881,22 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
                 // users might want chroma, too... we should make that an option
                 // or something.  (...in which case bg should be big enough for
                 // all three planes.)
+
+
+//***************************************************************************
+//***************************************************************************
+//***************************************************************************
+
+                // HERE: issue: if we are not starting at the first frame,
+                // then I think that "in->getFrameNumberNoAlloc(framenum)"
+                // will give us framenum+frame_at_which_we_are_starting!!
+                // not sure this matters a lot in practice right now, but it
+                // might matter more if users start using a start frame > 1 to
+                // get a good fore/aft ratio...
+
+//***************************************************************************
+//***************************************************************************
+//***************************************************************************
 
                 if (myInfo->bg_ibr)
                 {
@@ -1870,6 +2039,21 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
     {
         tool += TOOL_ADD_SCALING;
     }
+
+    // It might look like the following switches could be collapsed
+    // significantly if we just used a pointer to the functor objects,
+    // assigning the appropriate operation, histogram functor, etc., and then
+    // using fewer cases.  The problem is that to get the fastest possible
+    // code (important since we're talking about per-pixel operations here),
+    // the tool functor object (e.g., OpPequalsAminusP) needs to be
+    // instantiated inline in the call to the operation template (e.g.,
+    // convolve(), computeRollingAverage(), etc.) so that the functor code can
+    // be inlined.  If we passed an object through a pointer or reference,
+    // we'd have much smaller code (both source and binary), but it would also
+    // be much slower because every pixel would have to traverse the pointer.
+    // So in this case we are buying performance at the cost of a bunch of big
+    // messy switches in the source plus massive template code expansion in
+    // the output.  It's worth it.
 
     if (doingConvolution)
     {
@@ -2032,7 +2216,7 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
             return 0;
         }
     }
-    else if (doingRollingAvg)
+    else if (doingRollingAvg && param->lookahead_n_frames == 0)
     {
         switch (tool)
         {
@@ -2216,6 +2400,220 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
             break;
         case TOOL_MAX_P_A_SCALED_WITH_HISTOGRAM:
             sak->computeRollingAverage (image, data, planesize, param, bias,
+                                        OpPequalsMaxPA_Scaled (rbias, rmultiplier),
+                                        *histogram);
+            break;
+
+        default:
+            fprintf (stderr, "SwissArmyKnife: unknown operation (tool) %d!\n",
+                     param->tool);
+            return 0;
+        }
+    }
+    else if (doingRollingAvg)
+    {
+        switch (tool)
+        {
+        case TOOL_A:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsA(), HistogramNull());
+            break;
+        case TOOL_P: // HERE: we could optimize this if we wanted to
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsP(), HistogramNull());
+            break;
+        case TOOL_P_MINUS_A:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsPminusA(), HistogramNull());
+            break;
+        case TOOL_A_MINUS_P:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsAminusP(), HistogramNull());
+            break;
+        case TOOL_P_PLUS_A:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsPplusA(), HistogramNull());
+            break;
+        case TOOL_P_TIMES_A:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsPtimesA(), HistogramNull());
+            break;
+        case TOOL_P_DIVBY_A:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsPdivByA(), HistogramNull());
+            break;
+        case TOOL_A_DIVBY_P:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsAdivByP(), HistogramNull());
+            break;
+        case TOOL_MIN_P_A:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsMinPA(), HistogramNull());
+            break;
+        case TOOL_MAX_P_A:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsMaxPA(), HistogramNull());
+            break;
+
+        case TOOL_A_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsA(), *histogram);
+            break;
+        case TOOL_P_WITH_HISTOGRAM: // HERE: we could optimize this if we wanted to
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsP(), *histogram);
+            break;
+        case TOOL_P_MINUS_A_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsPminusA(), *histogram);
+            break;
+        case TOOL_A_MINUS_P_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsAminusP(), *histogram);
+            break;
+        case TOOL_P_PLUS_A_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsPplusA(), *histogram);
+            break;
+        case TOOL_P_TIMES_A_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsPtimesA(), *histogram);
+            break;
+        case TOOL_P_DIVBY_A_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsPdivByA(), *histogram);
+            break;
+        case TOOL_A_DIVBY_P_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsAdivByP(), *histogram);
+            break;
+        case TOOL_MIN_P_A_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsMinPA(), *histogram);
+            break;
+        case TOOL_MAX_P_A_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias, OpPequalsMaxPA(), *histogram);
+            break;
+
+        case TOOL_A_SCALED:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsA_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
+            break;
+        case TOOL_P_SCALED: // HERE_SCALED: we could optimize this if we wanted to
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsP_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
+            break;
+        case TOOL_P_MINUS_A_SCALED:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsPminusA_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
+            break;
+        case TOOL_A_MINUS_P_SCALED:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsAminusP_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
+            break;
+        case TOOL_P_PLUS_A_SCALED:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsPplusA_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
+            break;
+        case TOOL_P_TIMES_A_SCALED:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsPtimesA_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
+            break;
+        case TOOL_P_DIVBY_A_SCALED:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsPdivByA_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
+            break;
+        case TOOL_A_DIVBY_P_SCALED:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsAdivByP_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
+            break;
+        case TOOL_MIN_P_A_SCALED:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsMinPA_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
+            break;
+        case TOOL_MAX_P_A_SCALED:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsMaxPA_Scaled (rbias, rmultiplier),
+                                        HistogramNull());
+            break;
+
+        case TOOL_A_SCALED_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsA_Scaled (rbias, rmultiplier),
+                                        *histogram);
+            break;
+        case TOOL_P_SCALED_WITH_HISTOGRAM: // HERE: we could optimize this if we wanted to
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsP_Scaled (rbias, rmultiplier),
+                                        *histogram);
+            break;
+        case TOOL_P_MINUS_A_SCALED_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsPminusA_Scaled (rbias, rmultiplier),
+                                        *histogram);
+            break;
+        case TOOL_A_MINUS_P_SCALED_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsAminusP_Scaled (rbias, rmultiplier),
+                                        *histogram);
+            break;
+        case TOOL_P_PLUS_A_SCALED_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsPplusA_Scaled (rbias, rmultiplier),
+                                        *histogram);
+            break;
+        case TOOL_P_TIMES_A_SCALED_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsPtimesA_Scaled (rbias, rmultiplier),
+                                        *histogram);
+            break;
+        case TOOL_P_DIVBY_A_SCALED_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsPdivByA_Scaled (rbias, rmultiplier),
+                                        *histogram);
+            break;
+        case TOOL_A_DIVBY_P_SCALED_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsAdivByP_Scaled (rbias, rmultiplier),
+                                        *histogram);
+            break;
+        case TOOL_MIN_P_A_SCALED_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
+                                        OpPequalsMinPA_Scaled (rbias, rmultiplier),
+                                        *histogram);
+            break;
+        case TOOL_MAX_P_A_SCALED_WITH_HISTOGRAM:
+            sak->computeRollingAverage (image, lookaheadimage, data, planesize,
+                                        param, bias,
                                         OpPequalsMaxPA_Scaled (rbias, rmultiplier),
                                         *histogram);
             break;

@@ -84,6 +84,7 @@ extern void getUIDescription(char*);
 #ifdef ADM_WIN32
 extern EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, void* pEstablisherFrame, struct _CONTEXT* pContextRecord, void* pDispatcherContext);
 extern bool getWindowsVersion(char* version);
+extern void redirectStdoutToFile(void);
 #else
 extern void installSigHandler(void);
 #endif
@@ -110,6 +111,10 @@ extern int check_leaks();
 
 int main(int argc, char *argv[])
 {
+#ifdef ADM_WIN32
+	redirectStdoutToFile();
+#endif
+
 #if defined(ADM_DEBUG) && defined(FIND_LEAKS)
 	new_progname = argv[0];
 #endif

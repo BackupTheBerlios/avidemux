@@ -457,21 +457,26 @@ IF (ADM_OS_WINDOWS)
 	ADD_LIB_ALL_TARGETS(pthreadGC2 winmm wsock32 imagehlp)
 	ADD_LIB_ALL_TARGETS("-mno-cygwin -Wl,--export-all-symbols")
 
+	ADD_TARGET_LDFLAGS(avidemux2_cli "-Wl,-subsystem,console")
+	
 	IF (ADM_UI_GTK)
 		ADD_TARGET_LDFLAGS(avidemux2_gtk "-mwindows")
 	ENDIF (ADM_UI_GTK)
-
+	
 	IF (ADM_UI_QT4)
 		ADD_TARGET_LDFLAGS(avidemux2_qt4 "-mwindows")
 	ENDIF (ADM_UI_QT4)
 
 	IF (CMAKE_BUILD_TYPE STREQUAL "Release")
-		ADD_LIB_ALL_TARGETS("-Wl,-s")
+		ADD_LDFLAGS_ALL_TARGETS("-Wl,-s")
 	ENDIF (CMAKE_BUILD_TYPE STREQUAL "Release")
 ENDIF (ADM_OS_WINDOWS)
 
 IF (ADM_OS_DARWIN)
-	ADD_LIB_ALL_TARGETS("-framework CoreServices -framework CoreAudio -framework AudioUnit")
+	ADD_LIB_ALL_TARGETS("-framework CoreServices -framework CoreAudio -framework AudioUnit -framework Carbon -framework Cocoa")
+
+	# for Leopard but it doesn't hurt Tiger
+	add_libs_all_targets("-Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib")
 ENDIF (ADM_OS_DARWIN)
 
 ###########################################

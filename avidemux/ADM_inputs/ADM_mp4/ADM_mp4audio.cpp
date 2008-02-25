@@ -39,10 +39,11 @@
 //_______________________________________________________
 
 // MP4Audio::MP4Audio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *incoming,uint32_t extraLen,uint8_t *extraData,uint32_t duration)
-MP4Audio::MP4Audio(FILE *fd,MP4Track *track)
+MP4Audio::MP4Audio(const char *name,MP4Track *track)
 {
 	_nb_chunks=track->nbIndex;
-	_fd=fd;
+	_fd=fopen(name,"rb");
+        ADM_assert(_fd);
 	_current_index=0;
 	_abs_position=0;
 	_rel_position=0;
@@ -213,6 +214,11 @@ MP4Audio::~MP4Audio()
 	// nothing special to do...
 	delete _wavheader;
 	_wavheader=NULL;
+        if(_fd)
+        {
+            fclose(_fd);
+            _fd=NULL;
+        }
 }
 //_______________________________________________________
 uint8_t MP4Audio::getNbChunk(uint32_t *ch)

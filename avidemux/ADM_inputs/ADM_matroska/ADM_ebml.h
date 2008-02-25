@@ -53,7 +53,7 @@ class ADM_ebml_file : public ADM_ebml
                 uint32_t  _close;
   public: 
                             ADM_ebml_file();
-                            ADM_ebml_file(ADM_ebml_file *father,uint32_t size);
+                            ADM_ebml_file(ADM_ebml_file *father,uint64_t size);
                             ~ADM_ebml_file();
                     uint8_t open(const char *fn);
        
@@ -64,8 +64,8 @@ class ADM_ebml_file : public ADM_ebml
                     uint8_t   finished(void);
                     uint64_t  getFileSize(void) {return _size;};
                     uint8_t   find(ADM_MKV_SEARCHTYPE search,
-                                        MKV_ELEM_ID  prim,MKV_ELEM_ID second,uint32_t *len,uint32_t rewind=1);
-                    uint8_t   simplefind(MKV_ELEM_ID  prim,uint32_t *len,uint32_t rewind=1);
+                                        MKV_ELEM_ID  prim,MKV_ELEM_ID second,uint64_t *len,uint32_t rewind=1);
+                    uint8_t   simplefind(MKV_ELEM_ID  prim,uint64_t *len,uint32_t rewind=1);
                     uint64_t remaining(void);
 };
 

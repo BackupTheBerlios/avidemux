@@ -14,7 +14,7 @@
 
 #if defined(ADM_WIN32)
 #include <pthread.h>
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(ADM_BSD_FAMILY)
 #include <sys/types.h>
 #include <sys/sysctl.h>
 #else
@@ -35,7 +35,7 @@ extern "C"{
 }
 
 
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
 extern "C" 
 {
 #include "ADM_libraries/ADM_lavcodec/dsputil_cpu.h"
@@ -63,7 +63,7 @@ extern "C"
 	myCpuMask=0xffffffff;
 	prefs->get(FEATURE_CPU_CAPS,&myCpuMask);
 
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)	
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
 int rval = 0;
  int eax, ebx, ecx, edx;
  int max_std_level, max_ext_level, std_caps=0, ext_caps=0;
@@ -144,20 +144,29 @@ int rval = 0;
 }
 
 /************************************************************************/
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
 #include "ADM_libraries/ADM_libMpeg2Dec/mpeg2_cpu.h"
+#endif
+
 int ADM_mpeg2dec_mm_support(void)
 {
 int rval=0;
+
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
 #undef MATCH
 #define MATCH(x,y) if(CpuCaps::myCpuCaps & CpuCaps::myCpuMask & ADM_CPU_##x) rval|=MPEG2_ACCEL_X86_##x;
 	
 	MATCH(MMX,MMX);
 	MATCH(MMXEXT,MMXEXT);
 	MATCH(3DNOW,3DNOW);
+#endif
+
 	return rval;
 }
 //******************************************************
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
 #include "ADM_lavcodec.h"
+#endif
 /**
  * 		\fn lavcodec_mm_support
  * 		\brief Give lavcodec CPU supported ( FF_MM_MMX)
@@ -165,9 +174,11 @@ int rval=0;
 int ADM_lavcodec_mm_support(void)
 {
 int rval=0;
+
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
 #undef MATCH
 #define MATCH(x,y) if(CpuCaps::myCpuCaps &  CpuCaps::myCpuMask & ADM_CPU_##x) rval|=MM_##x;
-	
+
 	MATCH(MMX,MMX);
 	MATCH(MMXEXT,MMXEXT);
 	MATCH(SSE,SSE);
@@ -176,6 +187,8 @@ int rval=0;
 	MATCH(SSSE3,SSSE3);
 	MATCH(3DNOW,3DNOW);
 	MATCH(3DNOWEXT,3DNOWEXT);
+#endif
+
 	return rval;
 }
 // EOF
@@ -185,7 +198,7 @@ int ADM_cpu_num_processors(void)
 {
 #if defined(ADM_WIN32)
     return pthread_num_processors_np();
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(ADM_BSD_FAMILY)
     int np;
 
     size_t length = sizeof(np);

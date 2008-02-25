@@ -98,7 +98,7 @@ protected:
 		
 		
 public:
-					MP4Audio(FILE *fd,MP4Track *trak);
+					MP4Audio(const char *name,MP4Track *trak);
 // MP4Index *idx,
 // 						uint32_t nbchunk, FILE * fd,WAVHeader *incoming,
 // 						uint32_t extraLen,uint8_t *extraData,uint32_t duration);

@@ -191,7 +191,15 @@ uint8_t aviWrite::writeVideoHeader( uint8_t *extra, uint32_t extraLen )
       _videostream.fccType = fourCC::get ((uint8_t *) "vids");
       _bih.biSize=sizeof(_bih)+extraLen;
 	// MOD Feb 2005 by GMV: video super index length
-	uint32_t odml_super_idx_size=24+odml_nbrof_index*16;
+	uint32_t odml_video_super_idx_size;
+        if(doODML!=NORMAL)
+        {
+            
+            odml_video_super_idx_size=24+odml_default_nbrof_index*16;
+        }else
+        {
+            odml_video_super_idx_size=24+odml_indexes[0].odml_nbrof_index*16;
+        }
 	// END MOD Feb 2005 by GMV
 #ifdef ADM_BIG_ENDIAN
 	// in case of Little endian, do the usual swap crap
@@ -205,7 +213,7 @@ uint8_t aviWrite::writeVideoHeader( uint8_t *extra, uint32_t extraLen )
   	setStreamInfo (_file, (uint8_t *) &as,
 		  (uint8_t *)&b,sizeof(BITMAPINFOHEADER),
 		// MOD Feb 2005 by GMV: ODML support
-		odml_super_idx_size,0,
+		odml_video_super_idx_size,0,
 		// END MOD Feb 2005 by GMV
 		  extra,extraLen, 	 
 		 0x1000);
@@ -213,7 +221,7 @@ uint8_t aviWrite::writeVideoHeader( uint8_t *extra, uint32_t extraLen )
   	setStreamInfo (_file, (uint8_t *) &_videostream,
 		  (uint8_t *)&_bih,sizeof(BITMAPINFOHEADER),
 		// MOD Feb 2005 by GMV: ODML support
-		odml_super_idx_size,0,
+		odml_video_super_idx_size,0,
 		// END MOD Feb 2005 by GMV
 		  extra,extraLen, 	 
 		 0x1000);
@@ -246,7 +254,10 @@ static 	uint32_t aacBitrate[16]=
 	16000, 12000, 11025,  8000,
 	0,     0,     0,     0 
 };
+/**
+        \fn WriteAudioHeader
 
+*/
 uint8_t aviWrite::writeAudioHeader (	AVDMGenericAudioStream * stream, AVIStreamHeader *header
 // MOD Feb 2005 by GMV: ODML support
 ,uint8_t	odml_stream_nbr
@@ -254,7 +265,7 @@ uint8_t aviWrite::writeAudioHeader (	AVDMGenericAudioStream * stream, AVIStreamH
 )
 {
 // MOD Feb 2005 by GMV: audio super index length
-uint32_t odml_super_idx_size=24+odml_nbrof_index*16;
+uint32_t odml_audio_super_idx_size;;
 // END MOD Feb 2005 by GMV
 WAVHeader wav;
 // pre compute some headers with extra data in...
@@ -265,7 +276,13 @@ uint8_t *extra=NULL;
 uint32_t extraLen=0;
      
 	if(!stream) return 1;
-
+        if(doODML!=NORMAL)
+        {
+            odml_audio_super_idx_size=24+odml_default_nbrof_index*16;
+        }else
+        {
+            odml_audio_super_idx_size=24+odml_indexes[odml_stream_nbr].odml_nbrof_index*16;
+        }
 	memset(wmaheader,0,12);
 	memset(&mp3vbr,0,sizeof(mp3vbr));
 
@@ -422,7 +439,7 @@ uint32_t extraLen=0;
 		(uint8_t *) &as,
 		  (uint8_t *)&w,sizeof(WAVHeader),
 		// MOD Feb 2005 by GMV: ODML support
-		odml_super_idx_size,odml_stream_nbr,
+		odml_audio_super_idx_size,odml_stream_nbr,
 		// END MOD Feb 2005 by GMV
 		  extra,extraLen, 	 
 		 0x1000);
@@ -431,7 +448,7 @@ uint32_t extraLen=0;
 			(uint8_t *) header,
 	 		(uint8_t *) &wav, sizeof (WAVHeader),
 			// MOD Feb 2005 by GMV: ODML support
-			odml_super_idx_size,odml_stream_nbr,
+			odml_audio_super_idx_size,odml_stream_nbr,
 			// END MOD Feb 2005 by GMV
 			extra,extraLen, 0x1000);
 #endif
@@ -560,8 +577,8 @@ uint32_t is;
 
 		aprintf("\nnumber of frames per index: %lu\n",odml_index_size);
 		// get number or indexes per stream
-		odml_nbrof_index=(long)ceil((double)nb_frame/(double)odml_index_size);
-		aprintf("\nnumber of indexes per stream: %lu\n",odml_nbrof_index);
+		odml_default_nbrof_index=(long)ceil((double)nb_frame/(double)odml_index_size);
+		aprintf("\nnumber of indexes per stream: %lu\n",odml_default_nbrof_index);
 		// init some other values
 		odml_header_fpos=0;
 		odml_riff_fpos[0]=0;odml_riff_fpos[1]=0;odml_riff_fpos[2]=0;odml_riff_fpos[3]=0;
@@ -570,10 +587,13 @@ uint32_t is;
 		// create odml index data structure
 		odml_indexes=(odml_super_index_t*) ADM_alloc (sizeof(odml_super_index_t) * odml_nbrof_streams); // super index list
 		memset(odml_indexes,0,sizeof(odml_super_index_t) * odml_nbrof_streams);
-		for(int a=0;a<odml_nbrof_streams;++a){	// for each stream -> one super index
-			odml_indexes[a].odml_index= (odml_index_t*) ADM_alloc (sizeof(odml_index_t) * odml_nbrof_index); // index list
-			memset(odml_indexes[a].odml_index,0,sizeof(odml_index_t) * odml_nbrof_index);
-			for(int b=0;b<odml_nbrof_index;++b){	// for each index
+		for(int a=0;a<odml_nbrof_streams;++a)
+                {	// for each stream -> one super index
+                        odml_indexes[a].odml_nbrof_index=odml_default_nbrof_index;
+			odml_indexes[a].odml_index= (odml_index_t*) ADM_alloc (sizeof(odml_index_t) * odml_default_nbrof_index); // index list
+			memset(odml_indexes[a].odml_index,0,sizeof(odml_index_t) * odml_default_nbrof_index);
+			for(int b=0;b<odml_default_nbrof_index;++b)
+                        {	// for each index
 				odml_indexes[a].odml_index[b].index=(odml_index_data_t*) ADM_alloc (sizeof(odml_index_data_t) * odml_index_size);	// index data
 				memset(odml_indexes[a].odml_index[b].index,0,sizeof(odml_index_data_t) * odml_index_size);
 				odml_indexes[a].odml_index[b].nEntriesInUse=0;	// (redundant)
@@ -582,6 +602,10 @@ uint32_t is;
 			odml_indexes[a].index_count=0;
 		}
 	}
+            else
+        {
+            odml_default_nbrof_index=16;
+        }
 	// END MOD Feb 2005 by GMV
 	
   //___________________
@@ -711,39 +735,42 @@ uint8_t aviWrite::setEnd (void)
 
 
 // MOD Feb 2005 by GMV: do not write idx1 in case of ODML
-if(doODML!=NORMAL){
-// END MOD Feb 2005 by GMV
-  printf ("\n writing %lu index parts", curindex);
-  printf ("\n received %lu video parts", vframe);
-
-// Updating compared to what has been really written
-//
-
-  // Write index  
-  LAll->Write32 ("idx1");
-  LAll->Write32 (curindex * 16);
-
-  for (uint32_t i = 0; i < curindex; i++)
-    {
-      LAll->Write32 (myindex[i].fcc);
-      LAll->Write32 (myindex[i].flags);
-      LAll->Write32 (myindex[i].offset);	// abs position
-      LAll->Write32 (myindex[i].len);
+    if(doODML!=NORMAL)
+    {  // Regular index
+            // END MOD Feb 2005 by GMV
+            printf ("\n writing %lu index parts", curindex);
+            printf ("\n received %lu video parts", vframe);
+            
+            // Updating compared to what has been really written
+            //
+            
+            // Write index  
+            LAll->Write32 ("idx1");
+            LAll->Write32 (curindex * 16);
+            
+            for (uint32_t i = 0; i < curindex; i++)
+                {
+                LAll->Write32 (myindex[i].fcc);
+                LAll->Write32 (myindex[i].flags);
+                LAll->Write32 (myindex[i].offset);	// abs position
+                LAll->Write32 (myindex[i].len);
+                }
+            // MOD Feb 2005 by GMV: do not write idx1 in case of ODML
     }
-// MOD Feb 2005 by GMV: do not write idx1 in case of ODML
-}
 // END MOD Feb 2005 by GMV
   // Close movie
-
-
+#ifndef MOVINDEX
   LAll->End ();
-  delete
-    LAll;
+  delete    LAll;
   LAll = NULL;
+#endif
+
+
  printf ("\n Updating headers...\n");
 
 // MOD Feb 2005 by GMV: ODML header and index
-	if(doODML==NORMAL){
+	if(doODML==NORMAL)
+        {
 		odml_write_sindex(0, "00dc");	// video super index
 		if(odml_nbrof_streams>1)odml_write_sindex(1,"01wb");	// audio super index
 		if(odml_nbrof_streams>2)odml_write_sindex(2,"02wb");	// audio super index (dual)
@@ -771,7 +798,11 @@ if(doODML!=NORMAL){
 	}
 	odml_destroy_index();		
 // END MOD Feb 2005 by GMV
-
+#ifdef MOVINDEX
+  LAll->End ();
+  delete    LAll;
+  LAll = NULL;
+#endif
 
 // MOD Feb 2005 by GMV: set number or frames in first riff
   //_mainheader.dwTotalFrames = vframe;
@@ -817,7 +848,7 @@ uint8_t aviWrite::setStreamInfo (ADMFile * fo,
 
   AviList * alist;
   uint8_t * junk;
-  uint32_t junklen;
+  int32_t junklen;
 
   alist = new AviList ("LIST", fo);
 
@@ -840,7 +871,12 @@ uint8_t aviWrite::setStreamInfo (ADMFile * fo,
 
   alist->WriteChunk ((uint8_t *) "strf", infolen+extraLen, buf);
 
-  junklen = maxxed - sizeof (AVIStreamHeader) - infolen-extraLen;
+    // compute junkLen, it might also hold the oldml superindex
+    uint32_t consumed=odml_headerlen*4;
+  junklen = (consumed+maxxed-1)/maxxed;
+  junklen=junklen*maxxed;
+  
+  printf("[ODML] using ODML placeholder of size %u bytes\n",junklen);
   junk = (uint8_t *) ADM_alloc (junklen);
   ADM_assert (junk);
   memset (junk,0, junklen);
@@ -850,12 +886,20 @@ uint8_t aviWrite::setStreamInfo (ADMFile * fo,
   
   if(junklen>len)
   	memcpy(junk,"Avidemux",len);	
-  
+
+  if(doODML!=NO)
+  {
+    odml_indexes[odml_stream_nbr].fpos=_file->tell();
+    odml_indexes[odml_stream_nbr].pad=junklen;
+  }
   alist->WriteChunk ((uint8_t *) "JUNK", junklen, junk);
   ADM_dealloc (junk);
 
   // MOD Feb 2005 by GMV: ODML header
-  odml_write_dummy_chunk(alist, &odml_indexes[odml_stream_nbr].fpos, odml_headerlen);
+// MOVEINDEX
+#ifndef MOVINDEX
+  //odml_write_dummy_chunk(alist, &odml_indexes[odml_stream_nbr].fpos, odml_headerlen);
+#endif
   // END MOD Feb 2005 by GMV
 
   alist->End ();
@@ -878,13 +922,17 @@ uint32_t pos;
 }
 
 // MOD Feb 2005 by GMV:  ODML functions
+/**
+        \fn odml_destroy_index
+*/
 void aviWrite::odml_destroy_index(void){
 	// destroy odml index data structure
 	if(doODML!=NO){
 		if(odml_indexes){
 			for(int a=0;a<odml_nbrof_streams;++a){
 				if(odml_indexes[a].odml_index){
-					for(int b=0;b<odml_nbrof_index;++b){
+					for(int b=0;b<odml_indexes[a].odml_nbrof_index;++b)
+                                        {
 						if(odml_indexes[a].odml_index[b].index)
 							ADM_dealloc (odml_indexes[a].odml_index[b].index);
 					}
@@ -910,17 +958,49 @@ void aviWrite::odml_write_dummy_chunk(AviList* alist, uint64_t* fpos, uint32_t s
 		ADM_dealloc (dummy);
 	}
 }
+/**
+        \fn reallocIndeces
+*/
+void aviWrite::reallocIndeces( odml_super_index_t *idx)
+{
+    uint32_t nw,old;
+    odml_index_t   *newindex;
+    odml_index_t *oldindex;
+            old=idx->odml_nbrof_index;
+            nw=old*2;
+            printf("Increasing # of indeces from %d to %d\n",old,nw);
+            oldindex=idx->odml_index;
+            newindex=(odml_index_t *)ADM_alloc(sizeof(odml_index_t)*nw);
+            memset(newindex,0,sizeof(odml_index_t)*nw);
+            memcpy(newindex,oldindex,old*sizeof(odml_index_t));
+            idx->odml_index=newindex;
+            ADM_dealloc(oldindex);
+            idx->odml_nbrof_index=nw;
+            // Now fill in the new
+            uint32_t lineSize=sizeof(odml_index_data_t) * odml_index_size;
+             for(int b=old;b<nw;++b)
+                        {	// for each index, alloc
+                            newindex[b].index=(odml_index_data_t*) ADM_alloc (lineSize);
+                            memset(newindex[b].index,0,lineSize);
+                            newindex[b].nEntriesInUse=0;	// (redundant)
+                        }
+
+}
+
+
+/**
+        \fn odml_index_frame
+*/
 bool aviWrite::odml_index_frame(int stream_nbr, uint32_t data_size, bool keyFrame){
 	if(doODML!=NO){
 //		ADM_assert(!stream_nbr<odml_nbrof_streams);
 		odml_super_index_t* sidx=odml_indexes+stream_nbr;	// access to super index
-		if(sidx->odml_index[sidx->index_count].nEntriesInUse==odml_index_size){	// new index needed?
-			if(sidx->index_count<odml_nbrof_index-1)	// can index counter be increased?
-				++(sidx->index_count);	// increment index counter
-			else{
-				aprintf("\nindexes full!!\n");
-				return false;
-			}
+		if(sidx->odml_index[sidx->index_count].nEntriesInUse==odml_index_size)
+                {	// new index needed?
+			if(sidx->index_count>=sidx->odml_nbrof_index-1)	// can index counter be increased?
+                                reallocIndeces(sidx);
+                        ++(sidx->index_count);	// increment index counter
+			
 			// handle possible riff break
 			odml_riff_break(data_size+8); // data size + fcc + size info (padding is handled in odml_riff_break)
 			// write placeholder
@@ -942,27 +1022,57 @@ bool aviWrite::odml_index_frame(int stream_nbr, uint32_t data_size, bool keyFram
 	}
 	return true;
 }
-void aviWrite::odml_write_sindex(int stream_nbr, char* stream_fcc){
+void aviWrite::odml_write_sindex(int stream_nbr, char* stream_fcc)
+{
+        
 	// Warning: This changes the file position
-	if(doODML==NORMAL){
-		_file->seek(odml_indexes[stream_nbr].fpos);
-		aprintf("\nwriting super index at file pos %Lu\n",odml_indexes[stream_nbr].fpos);
+	if(doODML==NORMAL)
+                {
+                    uint32_t startAt=odml_indexes[stream_nbr].fpos;
+                    uint32_t pad=odml_indexes[stream_nbr].pad; 
+                    uint32_t endAt=startAt+pad+8;
+#ifndef MOVINDEX
+		_file->seek(startAt);
+#endif
+		aprintf("\nwriting super index at file pos %Lu, total available size %u\n",odml_indexes[stream_nbr].fpos,pad);
 		AviList* LIndex =  new AviList("JUNK", _file);	// abused writing aid (don't call Begin or End; the fcc is unused until 'Begin')
+                uint32_t nbEntries=odml_indexes[stream_nbr].index_count+1;
 		LIndex->Write32("indx");			// 4cc
-		LIndex->Write32(24+odml_nbrof_index*16);	// size
+		LIndex->Write32(24+nbEntries*16);	// size
 		LIndex->Write16(4);				// wLongsPerEntry
 		LIndex->Write8(0);				// bIndexSubType
 		LIndex->Write8(0);				// bIndexType (AVI_INDEX_OF_INDEXES)
-		LIndex->Write32(odml_indexes[stream_nbr].index_count+1);// nEntriesInUse
+		LIndex->Write32(nbEntries);// nEntriesInUse
 		LIndex->Write32(stream_fcc);			// dwChunkId;
-		LIndex->Write32((uint32_t)0);LIndex->Write32((uint32_t)0);LIndex->Write32((uint32_t)0);// reserved
-		for(uint32_t a=0;a<=odml_indexes[stream_nbr].index_count;++a){	// for each chunk index
-			LIndex->Write64(odml_indexes[stream_nbr].odml_index[a].fpos);	//absolute file position
-			LIndex->Write32(32 + 8 * odml_index_size);	// complete index chunk size
-			LIndex->Write32(odml_indexes[stream_nbr].odml_index[a].nEntriesInUse);	// duration
-			aprintf("\nstream %lu, index %lu EntriesInUse:%lu\n",stream_nbr, a ,odml_indexes[stream_nbr].odml_index[a].nEntriesInUse);
+		LIndex->Write32((uint32_t)0);
+                LIndex->Write32((uint32_t)0);
+                LIndex->Write32((uint32_t)0);// reserved
+		for(uint32_t a=0;a<nbEntries;++a)
+                {	// for each chunk index
+                        uint64_t pos;
+                        pos=odml_indexes[stream_nbr].odml_index[a].fpos;
+                        LIndex->Write64(pos);	//absolute file position
+                        LIndex->Write32(32 + 8 * odml_index_size);	// complete index chunk size
+                        LIndex->Write32(odml_indexes[stream_nbr].odml_index[a].nEntriesInUse);	// duration
+                        aprintf("\nstream %lu, index %lu Position: %lu  EntriesInUse:%lu\n",stream_nbr, a ,pos,
+                        odml_indexes[stream_nbr].odml_index[a].nEntriesInUse);
 		}
+                uint32_t at=LIndex->Tell();
+                
+                int32_t junkLen=endAt-at-8;
+                ADM_assert(junkLen>=9);
+                printf("Padding ODML index with junk of size %d, total padding %lu\n",junkLen, odml_indexes[stream_nbr].pad);
 		delete LIndex;
+// Now create out junk chunk if needed, to padd the odml
+                AviList *Junk=new AviList("JUNK",_file);
+                uint8_t *zz=new uint8_t[junkLen];
+                if(junkLen>9) strcpy((char *)zz,"Avidemux");
+                Junk->WriteChunk ((uint8_t *)"JUNK", junkLen, zz);
+                delete [] zz;
+                ADM_assert(endAt==Junk->Tell());
+                delete Junk;
+                
+                
 	}	
 }
 bool aviWrite::odml_write_index(int stream_nbr, char* stream_fcc, char* index_fcc){	// write index

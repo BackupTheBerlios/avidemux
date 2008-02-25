@@ -327,7 +327,7 @@ uint8_t    MP4Header::open(char *name)
         if(nbAudioTrack) _isaudiopresent=1; // Still needed ?
         for(int audio=0;audio<nbAudioTrack;audio++)
         {
-            _audioTracks[audio]=new MP4Audio(_fd,&(_tracks[1+audio]));   
+            _audioTracks[audio]=new MP4Audio(name,&(_tracks[1+audio]));   
             
         }
         fseek(_fd,0,SEEK_SET);

@@ -45,9 +45,9 @@ uint8_t DIA_builtin(void)
 {
   uint32_t altivec=0,mad=0,a52dec=0,xvid4=0,X264=0,freetype=0,esd=0,arts=0,vorbis=0,win32=0;
   uint32_t faac=0,faad=0,libdca=0,aften=0,libamrnb=0,lame=0,sdl=0,oss=0,xvideo=0,x86=0,x86_64=0,alsa=0;
-  uint32_t powerpc=0,gettext=0,fontconfig=0;
+  uint32_t adm_powerpc=0,adm_gettext=0,adm_fontconfig=0;
 #ifdef USE_FONTCONFIG
-  fontconfig=1;
+  adm_fontconfig=1;
 #endif
 #ifdef USE_ALTIVEC
         altivec=1;
@@ -119,10 +119,10 @@ uint8_t DIA_builtin(void)
 	x86_64=1;
 #endif
 #ifdef ARCH_POWERPC
-	powerpc=1;
+	adm_powerpc=1;
 #endif
 #ifdef HAVE_GETTEXT
-	gettext=1;
+	adm_gettext=1;
 #endif
     
 	diaElemFrame videoFrame(QT_TR_NOOP("Video Codecs"));
@@ -155,16 +155,16 @@ uint8_t DIA_builtin(void)
 
 	diaElemNotch tArts(arts, QT_TR_NOOP("aRts"));
 	diaElemNotch tEsd(esd, QT_TR_NOOP("ESD"));
-        diaElemNotch tFontConfig(fontconfig, QT_TR_NOOP("Fontconfig"));
+        diaElemNotch tFontConfig(adm_fontconfig, QT_TR_NOOP("Fontconfig"));
 	diaElemNotch tFreetype(freetype, QT_TR_NOOP("FreeType 2"));
-	diaElemNotch tGettext(gettext, QT_TR_NOOP("gettext"));
+	diaElemNotch tGettext(adm_gettext, QT_TR_NOOP("Gettext"));
         diaElemNotch tAlsa(alsa, QT_TR_NOOP("ALSA"));
 	diaElemNotch tOss(oss, QT_TR_NOOP("OSS"));
 	diaElemNotch tSdl(sdl, QT_TR_NOOP("SDL"));
 	diaElemNotch tXvideo(xvideo, QT_TR_NOOP("XVideo"));
 
 	diaElemNotch tAltivec(altivec, QT_TR_NOOP("AltiVec"));
-	diaElemNotch tPowerPc(powerpc, QT_TR_NOOP("PowerPC"));
+	diaElemNotch tPowerPc(adm_powerpc, QT_TR_NOOP("PowerPC"));
 	diaElemNotch tX86(x86, QT_TR_NOOP("x86"));
 	diaElemNotch tX86_64(x86_64, QT_TR_NOOP("x86-64"));
 

@@ -39,6 +39,7 @@ struct SWISSARMYKNIFE_PARAM
     float input_constant;
 
     float    memory_constant_alpha;
+    uint32_t lookahead_n_frames;
     uint32_t init_start_frame;
     uint32_t init_end_frame;
     uint32_t init_by_rolling;
@@ -100,6 +101,9 @@ protected:
 
         float *       bg;
         float         bg_mca;
+        ADMImage *    bg_lab; // lookahead buffer
+        uint32_t      bg_lab_size;
+        uint32_t      bg_lanf;
         uint32_t      bg_isf;
         uint32_t      bg_ief;
         uint32_t      bg_x;
@@ -133,6 +137,9 @@ protected:
 
               bg (0),
               bg_mca (0),
+              bg_lab (0),
+              bg_lab_size (0),
+              bg_lanf (0),
               bg_isf (0),
               bg_ief (0),
               bg_x (0),
@@ -151,11 +158,12 @@ protected:
 
         ~PersistentInfo ()
         {
-            delete image_int;
-            delete image_float;
-            delete bg;
-            delete histogram_input_data;
-            delete histogram_output_data;
+            delete [] image_int;
+            delete [] image_float;
+            delete [] bg;
+            delete bg_lab;
+            delete [] histogram_input_data;
+            delete [] histogram_output_data;
         }
     };
 
@@ -260,6 +268,7 @@ public:
     static char * getConf (SWISSARMYKNIFE_PARAM * param, bool forDialog);
 
     static uint8_t doSwissArmyKnife (ADMImage * from_image,
+                                     ADMImage * lookaheadimage,
                                      ADMImage * to_image,
                                      AVDMGenericVideoStream * in,
                                      ADMVideoSwissArmyKnife * sak,
@@ -270,6 +279,15 @@ private:
 
     template <typename Oper, typename Histo>
     void computeRollingAverage (ADMImage * image, ADMImage * data,
+                                uint32_t planesize,
+                                SWISSARMYKNIFE_PARAM * param,
+                                int32_t bias,
+                                const Oper & op_in,
+                                const Histo & histogram_in);
+
+    template <typename Oper, typename Histo>
+    void computeRollingAverage (ADMImage * image, ADMImage * lookaheadimage,
+                                ADMImage * data,
                                 uint32_t planesize,
                                 SWISSARMYKNIFE_PARAM * param,
                                 int32_t bias,

@@ -23,7 +23,7 @@
 #include "DIA_flyDialog.h"
 #include "DIA_flyDialogQt4.h"
 
-void ADM_flyDialog::postInit()
+void ADM_flyDialog::postInit(uint8_t reInit)
 {
 	QWidget *graphicsView = ((ADM_QCanvas*)_canvas)->parentWidget();
 	QSlider  *slider=(QSlider *)_slider;
@@ -63,6 +63,10 @@ uint8_t     ADM_flyDialog::sliderSet(uint32_t value)
   return 1; 
 }
 uint8_t  ADM_flyDialog::isRgbInverted(void)
+{
+  return 1; 
+}
+uint8_t ADM_flyDialog::cleanup2(void)
 {
   return 1; 
 }

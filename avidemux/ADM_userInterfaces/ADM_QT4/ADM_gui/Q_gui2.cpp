@@ -239,6 +239,12 @@ MainWindow::MainWindow() : QMainWindow()
 	this->setStatusBar(0);
 	this->adjustSize();
 
+#if defined(__APPLE__) && defined(USE_SDL)
+	ui.actionAbout_avidemux->setMenuRole(QAction::NoRole);
+	ui.actionPreferences->setMenuRole(QAction::NoRole);
+	ui.actionQuit->setMenuRole(QAction::NoRole);
+#endif
+
 	// Preview modes
 	QActionGroup *groupPreviewModes = new QActionGroup(this);
 

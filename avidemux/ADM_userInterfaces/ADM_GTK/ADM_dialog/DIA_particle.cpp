@@ -39,6 +39,10 @@
 #include "DIA_flyDialog.h"
 #include "DIA_flyParticle.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h" // for diaElemMenu etc.
+#include "ADM_filter/video_filters.h"
+
+#undef _
+#define _(_s) QT_TR_NOOP(_s)
 
 /********************************************************************/
 static GtkWidget *create_particle_dialog (void);
@@ -55,10 +59,23 @@ static gboolean previewButtonEvent (GtkWidget *,
     if (event->type != GDK_BUTTON_PRESS)
         return FALSE;
 
-    uint32_t x = static_cast <uint32_t> (event->x);
-    uint32_t y = static_cast <uint32_t> (event->y);
-
     flyParticle * myFly = static_cast <flyParticle *> (data);
+
+    uint32_t x, y;
+
+    float zoom = myFly->getZoom();
+    if (zoom == 1.0)
+    {
+        x = static_cast <uint32_t> (event->x);
+        y = static_cast <uint32_t> (event->y);
+    }
+    else
+    {
+        zoom = 1 / zoom;
+        x = static_cast <uint32_t> (event->x * zoom + .5);
+        y = static_cast <uint32_t> (event->y * zoom + .5);
+    }
+
     ADMImage * image = event->button == 1
         ? myFly->getInputImage() : myFly->getOutputImage();
 
@@ -139,6 +156,8 @@ static void browse_button_clicked (GtkButton *, gpointer user_data)
 {
     flyParticle * myDialog = static_cast <flyParticle *> (user_data);
 
+    myDialog->getMenuValues();  // so we know the output format
+
     // First, determine a default output file if we don't already have an
     // output file.
 
@@ -147,7 +166,9 @@ static void browse_button_clicked (GtkButton *, gpointer user_data)
     const int MAX_SEL = 2048;
     char buffer [MAX_SEL + 1];
     const char * lastfilename;
-    const char * defaultSuffix = "pts";
+    const char * defaultSuffix
+        = (myDialog->param.output_format
+           == ADMVideoParticle::OUTPUTFMT_FORMAT_AB_ODU) ? "csv" : "pts";
     if ((!filename || !*filename)
         && prefs->get (LASTFILES_FILE1, (ADM_filename **)&lastfilename))
     {
@@ -178,7 +199,62 @@ static void browse_button_clicked (GtkButton *, gpointer user_data)
 
 /********************************************************************/
 
+static void previewOutputMenuChange (GtkComboBox * combo, gpointer user_data)
+{
+    flyParticle * myFly = static_cast <flyParticle *> (user_data);
+    uint32_t index = gtk_combo_box_get_active (combo);
+    uint32_t filter_count;
+    FILTER * filters = getCurrentVideoFilterList (&filter_count);
+    FILTER * filter = filters + index;
+    VF_FILTERS tag = filter->tag;
+
+
+    gchar * activestr = gtk_combo_box_get_active_text (combo);
+
+    printf ("user selected preview of #%d = %s (%d) @%p (was %p)\n",
+            index, activestr, tag, filter->filter, myFly->getSource());
+
+    if (strncmp (activestr, "XX ", 3) == 0)
+    {
+        printf ("selected preview source has different dimensions - "
+                "forcing selection to current filter\n");
+        gtk_combo_box_set_active (combo, myFly->this_filter_index);
+    }
+    else
+    {
+        flyParticle::PreviewMode mode;
+        if (index == myFly->this_filter_index)
+            mode = flyParticle::PREVIEWMODE_THIS_FILTER;
+        else if (index > myFly->this_filter_index)
+            mode = flyParticle::PREVIEWMODE_LATER_FILTER;
+        else // if (index < myFly->this_filter_index)
+            mode = flyParticle::PREVIEWMODE_EARLIER_FILTER;
+
+        myFly->changeSource (filter->filter, mode);
+    }
+
+    g_free (activestr);
+}
+
+/********************************************************************/
+
+static gboolean preview_video_configured (GtkWidget * widget,
+                                          GdkEventConfigure * event,
+                                          gpointer user_data)
+{
+    fprintf (stderr, "preview_configured: now %dx%d @ +%d+%d\n",
+             event->width, event->height, event->x, event->y);
+
+    flyParticle * myFly = static_cast <flyParticle *> (user_data);
+    myFly->recomputeSize();
+
+    return FALSE;
+}
+
+/********************************************************************/
+
 uint8_t DIA_particle (AVDMGenericVideoStream *in,
+                      ADMVideoParticle * particlep,
                       PARTICLE_PARAM * param,
                       const MenuMapping * menu_mapping,
                       uint32_t menu_mapping_count)
@@ -204,8 +280,13 @@ uint8_t DIA_particle (AVDMGenericVideoStream *in,
     flyParticle * myDialog
         = new flyParticle (width, height, in,
                            WID(previewVideo), WID(previewSlider),
-                           GTK_DIALOG(dialog), param,
+                           GTK_DIALOG(dialog), particlep, param,
                            menu_mapping, menu_mapping_count);
+
+    g_signal_connect (GTK_OBJECT (WID(previewVideo)), "configure-event",
+                      GTK_SIGNAL_FUNC (preview_video_configured),
+                      gpointer (myDialog));
+
     myDialog->upload();
     myDialog->sliderChanged();
 
@@ -239,15 +320,67 @@ uint8_t DIA_particle (AVDMGenericVideoStream *in,
                       gpointer(myDialog));
 #endif
 
+    GtkWidget * previewOutputMenu = WID(previewOutputMenu);
+    uint32_t filter_count;
+    FILTER * filters = getCurrentVideoFilterList (&filter_count);
+    int32_t active = -1;
+
+    // The " + (active < 0)" below is a bit of a hack.  We know that in
+    // on_action() in gui_filtermanager.cpp, case A_ADD, the new filter-to-be
+    // is added to the filter list without incrementing nb_active_filter yet.
+    // So if we get to the end of the list and haven't yet found the filter
+    // that we're configuring, we know it's a new one and therefore that it is
+    // one past the apparent end of the list.  It's not a clean solution, but
+    // it seems like the cleanEST solution.
+
+    for (uint32_t i = 0; i < filter_count + (active < 0); i++)
+    {
+        const char * name
+            = (i == 0) ? "(input)" : filterGetNameFromTag (filters [i].tag);
+        bool free_name = false;
+                                   
+        FILTER * filter = filters + i;
+        AVDMGenericVideoStream * source = filter->filter;
+        uint32_t w = source->getInfo()->width;
+        uint32_t h = source->getInfo()->height;
+        if (w != width || h != height)
+        {
+            name = g_strconcat ("XX ", name, " XX", NULL);
+            free_name = true;
+        }
+
+        printf ("filter [%d] = %s (%d) @ %p; %dx%d\n",
+                i, name, filter->tag, source, w, h);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (previewOutputMenu), name);
+        if (filter->filter == myDialog->getSource())
+        {
+            gtk_combo_box_set_active (GTK_COMBO_BOX (previewOutputMenu), i);
+            printf ("\tfilter [%d] is being configured now\n", i);
+            active = i;
+        }
+
+        if (free_name)
+            g_free (const_cast <char *> (name));
+    }
+
+    ADM_assert (active >= 0);
+    myDialog->this_filter_index = active;
+
+    g_signal_connect (GTK_OBJECT(previewOutputMenu), "changed",
+                      GTK_SIGNAL_FUNC(previewOutputMenuChange),
+                      gpointer(myDialog));
+
     uint8_t ret = 0;
     int response = gtk_dialog_run(GTK_DIALOG(dialog));
 
     if (response == GTK_RESPONSE_OK)
     {
         myDialog->download();
-        myDialog->getParam (param);
+        myDialog->pushParam();
         ret = 1;
     }
+    else
+        myDialog->restoreParam();
 
     gtk_unregister_dialog(dialog);
     gtk_widget_destroy(dialog);
@@ -278,6 +411,10 @@ uint8_t flyParticle::upload (void)
         (GTK_SPIN_BUTTON(WID(topCropSpinButton)), param.top_crop);
     gtk_spin_button_set_value
         (GTK_SPIN_BUTTON(WID(bottomCropSpinButton)), param.bottom_crop);
+    gtk_spin_button_set_value
+        (GTK_SPIN_BUTTON(WID(cameraNumberSpinButton)), param.camera_number);
+    gtk_spin_button_set_value
+        (GTK_SPIN_BUTTON(WID(debugSpinButton)), param.debug);
 
     lock--;
     return 1;
@@ -342,7 +479,7 @@ create_particle_dialog (void)
   GtkWidget *particle_dialog;
   GtkWidget *dialogVbox;
   GtkWidget *dialogHbox;
-  GtkWidget *allButButtonsVbox;
+  GtkWidget *allButButtonsHbox;
   GtkWidget *settingsOuterHbox;
   GtkWidget *settingsOuterVbox;
   GtkWidget *minAreaHbox;
@@ -394,14 +531,15 @@ create_particle_dialog (void)
   GtkWidget *previewOutputMenu;
   GtkWidget *previewSlider;
   GtkWidget *previewVideo;
-  GtkWidget *previewDisabled;
   GtkWidget *previewLabel;
   GtkWidget *dialogButtonBox;
   GtkWidget *cancelButton;
   GtkWidget *okButton;
 
   particle_dialog = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (particle_dialog), QT_TR_NOOP("Particle Detection"));
+  //                                                NO NEED TO "FIX" THAT _("...")!!
+  //                                                see handy macro near top of file.
+  gtk_window_set_title (GTK_WINDOW (particle_dialog), _("Particle Detection"));
   gtk_window_set_type_hint (GTK_WINDOW (particle_dialog), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialogVbox = GTK_DIALOG (particle_dialog)->vbox;
@@ -411,24 +549,24 @@ create_particle_dialog (void)
   gtk_widget_show (dialogHbox);
   gtk_box_pack_start (GTK_BOX (dialogVbox), dialogHbox, TRUE, TRUE, 0);
 
-  allButButtonsVbox = gtk_vbox_new (FALSE, 12);
-  gtk_widget_show (allButButtonsVbox);
-  gtk_box_pack_start (GTK_BOX (dialogHbox), allButButtonsVbox, TRUE, TRUE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (allButButtonsVbox), 8);
+  allButButtonsHbox = gtk_hbox_new (FALSE, 12);
+  gtk_widget_show (allButButtonsHbox);
+  gtk_box_pack_start (GTK_BOX (dialogHbox), allButButtonsHbox, TRUE, TRUE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (allButButtonsHbox), 8);
 
   settingsOuterHbox = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (settingsOuterHbox);
-  gtk_box_pack_start (GTK_BOX (allButButtonsVbox), settingsOuterHbox, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (allButButtonsHbox), settingsOuterHbox, FALSE, TRUE, 0);
 
   settingsOuterVbox = gtk_vbox_new (FALSE, 12);
   gtk_widget_show (settingsOuterVbox);
-  gtk_box_pack_start (GTK_BOX (settingsOuterHbox), settingsOuterVbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (settingsOuterHbox), settingsOuterVbox, FALSE, TRUE, 0);
 
   minAreaHbox = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (minAreaHbox);
-  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), minAreaHbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), minAreaHbox, FALSE, TRUE, 0);
 
-  minAreaLabel = gtk_label_new_with_mnemonic (QT_TR_NOOP("Mi_nimum area for a particle to be detected:    "));
+  minAreaLabel = gtk_label_new_with_mnemonic (_("Mi_nimum area for a particle to be detected:    "));
   gtk_widget_show (minAreaLabel);
   gtk_box_pack_start (GTK_BOX (minAreaHbox), minAreaLabel, FALSE, FALSE, 0);
 
@@ -440,9 +578,9 @@ create_particle_dialog (void)
 
   maxAreaHbox = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (maxAreaHbox);
-  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), maxAreaHbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), maxAreaHbox, FALSE, TRUE, 0);
 
-  maxAreaLabel = gtk_label_new_with_mnemonic (QT_TR_NOOP("Ma_ximum area for a particle to be detected:   "));
+  maxAreaLabel = gtk_label_new_with_mnemonic (_("Ma_ximum area for a particle to be detected:   "));
   gtk_widget_show (maxAreaLabel);
   gtk_box_pack_start (GTK_BOX (maxAreaHbox), maxAreaLabel, FALSE, FALSE, 0);
 
@@ -454,13 +592,13 @@ create_particle_dialog (void)
 
   aboveCropSeparator = gtk_hseparator_new ();
   gtk_widget_show (aboveCropSeparator);
-  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), aboveCropSeparator, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), aboveCropSeparator, FALSE, TRUE, 0);
 
   leftCropHbox = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (leftCropHbox);
-  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), leftCropHbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), leftCropHbox, FALSE, TRUE, 0);
 
-  leftCropLabel = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Left side crop (ignore this many pixels on the left):        "));
+  leftCropLabel = gtk_label_new_with_mnemonic (_("_Left side crop (ignore this many pixels on the left):        "));
   gtk_widget_show (leftCropLabel);
   gtk_box_pack_start (GTK_BOX (leftCropHbox), leftCropLabel, FALSE, FALSE, 0);
 
@@ -472,9 +610,9 @@ create_particle_dialog (void)
 
   rightCropHbox = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (rightCropHbox);
-  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), rightCropHbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), rightCropHbox, FALSE, TRUE, 0);
 
-  rightCropLabel = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Right side crop (ignore this many pixels on the right):     "));
+  rightCropLabel = gtk_label_new_with_mnemonic (_("_Right side crop (ignore this many pixels on the right):     "));
   gtk_widget_show (rightCropLabel);
   gtk_box_pack_start (GTK_BOX (rightCropHbox), rightCropLabel, FALSE, FALSE, 0);
 
@@ -486,9 +624,9 @@ create_particle_dialog (void)
 
   topCropHbox = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (topCropHbox);
-  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), topCropHbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), topCropHbox, FALSE, TRUE, 0);
 
-  topCropLabel = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Top crop (ignore this many pixels on the top):                  "));
+  topCropLabel = gtk_label_new_with_mnemonic (_("_Top crop (ignore this many pixels on the top):                  "));
   gtk_widget_show (topCropLabel);
   gtk_box_pack_start (GTK_BOX (topCropHbox), topCropLabel, FALSE, FALSE, 0);
 
@@ -500,9 +638,9 @@ create_particle_dialog (void)
 
   bottomCropHbox = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (bottomCropHbox);
-  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), bottomCropHbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), bottomCropHbox, FALSE, TRUE, 0);
 
-  bottomCropLabel = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Bottom crop (ignore this many pixels on the bottom):   "));
+  bottomCropLabel = gtk_label_new_with_mnemonic (_("_Bottom crop (ignore this many pixels on the bottom):   "));
   gtk_widget_show (bottomCropLabel);
   gtk_box_pack_start (GTK_BOX (bottomCropHbox), bottomCropLabel, FALSE, FALSE, 0);
 
@@ -514,13 +652,13 @@ create_particle_dialog (void)
 
   belowCropSeparator = gtk_hseparator_new ();
   gtk_widget_show (belowCropSeparator);
-  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), belowCropSeparator, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), belowCropSeparator, FALSE, TRUE, 0);
 
   outputFormatHbox = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (outputFormatHbox);
-  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), outputFormatHbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), outputFormatHbox, FALSE, TRUE, 0);
 
-  outputFormatLabel = gtk_label_new_with_mnemonic (QT_TR_NOOP("Output _Format:   "));
+  outputFormatLabel = gtk_label_new_with_mnemonic (_("Output _Format:   "));
   gtk_widget_show (outputFormatLabel);
   gtk_box_pack_start (GTK_BOX (outputFormatHbox), outputFormatLabel, FALSE, FALSE, 0);
 
@@ -530,9 +668,9 @@ create_particle_dialog (void)
 
   outputFileHbox = gtk_hbox_new (FALSE, 5);
   gtk_widget_show (outputFileHbox);
-  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), outputFileHbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), outputFileHbox, FALSE, TRUE, 0);
 
-  outputFileLabel = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Output File:"));
+  outputFileLabel = gtk_label_new_with_mnemonic (_("_Output File:"));
   gtk_widget_show (outputFileLabel);
   gtk_box_pack_start (GTK_BOX (outputFileHbox), outputFileLabel, FALSE, FALSE, 0);
 
@@ -542,15 +680,15 @@ create_particle_dialog (void)
   gtk_entry_set_invisible_char (GTK_ENTRY (outputFileEntry), 8226);
   gtk_entry_set_width_chars (GTK_ENTRY (outputFileEntry), 40);
 
-  outputFileBrowseButton = gtk_button_new_with_mnemonic (QT_TR_NOOP("_Browse..."));
+  outputFileBrowseButton = gtk_button_new_with_mnemonic (_("_Browse..."));
   gtk_widget_show (outputFileBrowseButton);
   gtk_box_pack_start (GTK_BOX (outputFileHbox), outputFileBrowseButton, FALSE, FALSE, 0);
 
   cameraNumberHbox = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (cameraNumberHbox);
-  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), cameraNumberHbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), cameraNumberHbox, FALSE, TRUE, 0);
 
-  cameraNumberLabel = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Camera Number for output file:      "));
+  cameraNumberLabel = gtk_label_new_with_mnemonic (_("_Camera Number for output file:      "));
   gtk_widget_show (cameraNumberLabel);
   gtk_box_pack_start (GTK_BOX (cameraNumberHbox), cameraNumberLabel, FALSE, FALSE, 0);
 
@@ -562,9 +700,9 @@ create_particle_dialog (void)
 
   debugHbox = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (debugHbox);
-  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), debugHbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (settingsOuterVbox), debugHbox, FALSE, TRUE, 0);
 
-  debugLabel = gtk_label_new_with_mnemonic (QT_TR_NOOP("_Debugging settings (bits):   "));
+  debugLabel = gtk_label_new_with_mnemonic (_("_Debugging settings (bits):   "));
   gtk_widget_show (debugLabel);
   gtk_box_pack_start (GTK_BOX (debugHbox), debugLabel, FALSE, FALSE, 0);
 
@@ -576,7 +714,7 @@ create_particle_dialog (void)
 
   previewVboxOuter = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (previewVboxOuter);
-  gtk_box_pack_start (GTK_BOX (allButButtonsVbox), previewVboxOuter, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (allButButtonsHbox), previewVboxOuter, TRUE, TRUE, 0);
 
   previewFrame = gtk_frame_new (NULL);
   gtk_widget_show (previewFrame);
@@ -596,9 +734,8 @@ create_particle_dialog (void)
   gtk_box_pack_start (GTK_BOX (previewVbox), previewControlHbox, TRUE, TRUE, 0);
 
   previewOutputMenu = gtk_combo_box_new_text ();
+  gtk_widget_show (previewOutputMenu);
   gtk_box_pack_start (GTK_BOX (previewControlHbox), previewOutputMenu, FALSE, TRUE, 0);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (previewOutputMenu), QT_TR_NOOP("Swiss Army Knife output"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (previewOutputMenu), QT_TR_NOOP("Final output"));
 
   previewSlider = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 99, 1, 1, 0)));
   gtk_widget_show (previewSlider);
@@ -608,13 +745,10 @@ create_particle_dialog (void)
   previewVideo = gtk_drawing_area_new ();
   gtk_widget_show (previewVideo);
   gtk_box_pack_start (GTK_BOX (previewVbox), previewVideo, TRUE, TRUE, 0);
-  gtk_widget_set_size_request (previewVideo, -1, 300);
+  gtk_widget_set_size_request (previewVideo, 30, 30);
   gtk_widget_set_events (previewVideo, GDK_BUTTON1_MOTION_MASK | GDK_BUTTON_PRESS_MASK);
 
-  previewDisabled = gtk_drawing_area_new ();
-  gtk_box_pack_start (GTK_BOX (previewVbox), previewDisabled, TRUE, TRUE, 0);
-
-  previewLabel = gtk_label_new (QT_TR_NOOP("Preview"));
+  previewLabel = gtk_label_new (_("Preview"));
   gtk_widget_show (previewLabel);
   gtk_frame_set_label_widget (GTK_FRAME (previewFrame), previewLabel);
 
@@ -646,7 +780,7 @@ create_particle_dialog (void)
   GLADE_HOOKUP_OBJECT_NO_REF (particle_dialog, particle_dialog, "particle_dialog");
   GLADE_HOOKUP_OBJECT_NO_REF (particle_dialog, dialogVbox, "dialogVbox");
   GLADE_HOOKUP_OBJECT (particle_dialog, dialogHbox, "dialogHbox");
-  GLADE_HOOKUP_OBJECT (particle_dialog, allButButtonsVbox, "allButButtonsVbox");
+  GLADE_HOOKUP_OBJECT (particle_dialog, allButButtonsHbox, "allButButtonsHbox");
   GLADE_HOOKUP_OBJECT (particle_dialog, settingsOuterHbox, "settingsOuterHbox");
   GLADE_HOOKUP_OBJECT (particle_dialog, settingsOuterVbox, "settingsOuterVbox");
   GLADE_HOOKUP_OBJECT (particle_dialog, minAreaHbox, "minAreaHbox");
@@ -690,7 +824,6 @@ create_particle_dialog (void)
   GLADE_HOOKUP_OBJECT (particle_dialog, previewOutputMenu, "previewOutputMenu");
   GLADE_HOOKUP_OBJECT (particle_dialog, previewSlider, "previewSlider");
   GLADE_HOOKUP_OBJECT (particle_dialog, previewVideo, "previewVideo");
-  GLADE_HOOKUP_OBJECT (particle_dialog, previewDisabled, "previewDisabled");
   GLADE_HOOKUP_OBJECT (particle_dialog, previewLabel, "previewLabel");
   GLADE_HOOKUP_OBJECT_NO_REF (particle_dialog, dialogButtonBox, "dialogButtonBox");
   GLADE_HOOKUP_OBJECT (particle_dialog, cancelButton, "cancelButton");

@@ -38,7 +38,7 @@ AC_CANONICAL_HOST
 dnl Perform program name transformation
 AC_ARG_PROGRAM
 dnl Automake doc recommends to do this only here. (Janos)
-AM_INIT_AUTOMAKE(avidemux,"2.4.0")
+AM_INIT_AUTOMAKE(avidemux,"2.4.1")
 ADM_SUBVERSION="0"
 
 if [[ -f .svn/entries ]]; then
@@ -1419,10 +1419,10 @@ AC_DEFINE(HAVE_THREADS,1,[HAVE_THREADS])
 AC_DEFINE(ENABLE_THREADS,1,[ENABLE_THREADS])
 
 AC_ARG_ENABLE([ssse3],
-	[AC_HELP_STRING([--disable-ssse3], [disable SSSE3 extensions [default=no]])],
-	[disable_ssse3=${enableval}], [disable_ssse3=no])
+	[AC_HELP_STRING([--enable-ssse3], [disable SSSE3 extensions [default=yes]])],
+	[enable_ssse3=${enableval}], [enable_ssse3=yes])
 
-if test "x$disable_ssse3" = "xno"; then
+if test "x$enable_ssse3" = "xyes"; then
 	AC_DEFINE(HAVE_SSSE3, 1, [use SSSE3 extensions with libavcodec])
 fi
 

@@ -77,13 +77,16 @@
 	}odml_index_t;
 	typedef struct{		// super index data
 		uint64_t fpos;	// super index chunk position in the file
+                uint32_t pad;   // Available size to put the superindex
 		uint32_t index_count;	// current index number
+                uint32_t odml_nbrof_index;
 		odml_index_t* odml_index;	// array of indexes [number of indexes per stream]
 	}odml_super_index_t;
 	odml_super_index_t* odml_indexes;	// array of super indexes [number of streams]
 	int odml_nbrof_streams;	// number of streams
 	int odml_index_size;	// number of frames per index chunk
-	int odml_nbrof_index;	// number of indexes per stream
+	//int odml_nbrof_index;	// number of indexes per stream
+        int odml_default_nbrof_index;
 	uint64_t odml_header_fpos;	// file position of the odml header
 	uint64_t odml_riff_fpos[4];	// file positions of AVIX-RIFF start (since RIFFs will be a little smaller than 1GB there will be 4 below 4GB)
 	int odml_riff_count;	// current odml riff number
@@ -95,7 +98,7 @@
 	bool odml_write_index(int stream_nbr, char* stream_fcc, char* index_fcc);	// write index
 	void odml_riff_break(uint32_t len);	// advance to the next riff if required; len = chunk size to be written (incl. 4cc and size info) without padding
 	// END MOD Feb 2005 by GMV
- 
+        void reallocIndeces( odml_super_index_t *idx);
 public:
 		aviWrite(void);	
 	// MOD Feb 2005 by GMV: ODML support

@@ -19,9 +19,9 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
 
 #include "default.h"
@@ -197,6 +197,8 @@ uint8_t r,g,b,a;
         }
 #endif
 #if  defined( ADM_BIG_ENDIAN)
+	if (!_inverted)
+	{
         uint8_t r,g,b,a;
         uint8_t *ptr=target;
         int pel=h*w;
@@ -212,6 +214,7 @@ uint8_t r,g,b,a;
               ptr[3]=r;
               ptr+=4;
         }
+	}
 #endif
      
         return 1;
@@ -262,18 +265,20 @@ uint8_t r,g,b,a;
             }
      }
 #endif
-#if  defined( ADM_BIG_ENDIAN)
-        uint8_t r,g,b,a;
-        uint8_t *ptr=target;
-        int pel=h*w;
-        for(int yy=0;yy<th;yy++)
-                {
-                  *ptr=target+(startx*4)+(starty+yy)*totalW*4;;
-                  invertRGB(ptr,tw);
-                }
-        
+
+#if defined(ADM_BIG_ENDIAN)
+     uint8_t r, g, b, a;
+     uint8_t *ptr = target;
+     int pel = h * w;
+
+     for (int yy = 0; yy < th; yy++)
+     {
+          ptr = target + (startx * 4) + (starty + yy) * totalW * 4;
+          ADM_RGBA2BGRA(ptr, tw);
+     }
 #endif
-  return 1;
+
+     return 1;
  }
 
  
@@ -501,11 +506,12 @@ int c=0;
                 case ADM_COLOR_RGB24:c=PIX_FMT_RGB24;break;
                 case ADM_COLOR_RGB555:c=PIX_FMT_RGB555;break;
                 case ADM_COLOR_BGR555:c=PIX_FMT_BGR555;break;
-                case ADM_COLOR_BGR32A:c=PIX_FMT_BGRA;break;
+                case ADM_COLOR_BGR32A:c=PIX_FMT_BGR32;break;
                 case ADM_COLOR_RGB32A:c=TARGET_COLORSPACE;break;
                 case ADM_COLOR_RGB16:c=PIX_FMT_RGB565;break;
-                case ADM_COLOR_YUV422:c=PIX_FMT_YUV422P;break;
                 case ADM_COLOR_YUV411:c=PIX_FMT_YUV411P;break;
+				case ADM_COLOR_YUV422:c=PIX_FMT_YUV422P;break;
+				case ADM_COLOR_YUV444:c=PIX_FMT_YUV444P;break;
                 default: ADM_assert(0);
     }
          _context=(void *)sws_getContext(
@@ -527,85 +533,80 @@ uint8_t COL_Generic2YV12::clean(void)
                 _context=NULL; 
                 return 1;  
 }
+
 uint8_t COL_Generic2YV12::transform(uint8_t **planes, uint32_t *strides,uint8_t *target)
 {
- uint8_t *srd[3];
-        uint8_t *dst[3];
-        int ssrc[3];
-        int ddst[3];
-        int mul=0;
+	uint8_t *srd[3];
+	uint8_t *dst[3];
+	int ssrc[3];
+	int ddst[3];
+	int mul = 0;
+	uint32_t page = w * h;
 
-        ADM_assert(_context);
+	ADM_assert(_context);
 
-        uint32_t page;
+	if(_colorspace & ADM_COLOR_IS_YUV)
+	{
+		srd[0] = planes[0];
+		srd[1] = planes[2];
+		srd[2] = planes[1];
+		ssrc[0] = strides[0];
+		ssrc[1] = strides[2];
+		ssrc[2] = strides[1];
 
-        page=w*h;
-     
-        if(_colorspace & ADM_COLOR_IS_YUV)
-        {
-                srd[0]=planes[0];
-                srd[1]=planes[1];
-                srd[2]=planes[2];
+		dst[0] = target;
+		dst[2] = target + page;
+		dst[1] = target + ((page * 5) >> 2);
+		ddst[0] = w;
+		ddst[1] = ddst[2] = w >> 1;
 
-                ssrc[0]=strides[0];
-                ssrc[1]=strides[1];
-                ssrc[2]=strides[2];
+		sws_scale((SwsContext *)_context, srd, ssrc, 0, h, dst, ddst);
 
-        
-                dst[0]=target;
-                dst[1]=target+page;
-                dst[2]=target+((page*5)>>2);
-                ddst[0]=w;
-                ddst[1]=ddst[2]=w>>1;
-                sws_scale((SwsContext *)_context,srd,ssrc,0,h,dst,ddst);
-                return 1;
-        }
-        // Else RGB like colorspace
-        switch(_colorspace&0x7FFF )
-        {
-                case ADM_COLOR_RGB16:  
-                case ADM_COLOR_RGB555:  
-                case ADM_COLOR_BGR555:
-                                        mul=2;
-                        break;
-                case ADM_COLOR_BGR24:
-                case ADM_COLOR_RGB24:  mul=3;
-                        break;
-                case ADM_COLOR_BGR32A:
-                case ADM_COLOR_RGB32A:  mul=4;
-                        break;
-                default: ADM_assert(0);
-        }
-        srd[0]=planes[0];
-        srd[1]=0;
-        srd[2]=0;
+		return 1;
+	}
 
-        ssrc[0]=mul*w;
-        if(strides)
-        {
-          if(strides[0]>ssrc[0]) ssrc[0]=strides[0]; 
-        }
-        ssrc[1]=0;
-        ssrc[2]=0;
+	// Else RGB colorspace
+	switch (_colorspace & 0x7FFF)
+	{
+		case ADM_COLOR_RGB16:
+		case ADM_COLOR_RGB555:
+		case ADM_COLOR_BGR555:
+			mul = 2;
+			break;
+		case ADM_COLOR_BGR24:
+		case ADM_COLOR_RGB24:
+			mul = 3;
+			break;
+		case ADM_COLOR_BGR32A:
+		case ADM_COLOR_RGB32A:
+			mul = 4;
+			break;
+		default:
+			ADM_assert(0);
+	}
 
-        dst[0]=target;
-        dst[1]=target+page;
-        dst[2]=target+((page*5)>>2);
-        ddst[0]=w;
-        ddst[1]=ddst[2]=w>>1;
-        if(_backward && (_colorspace==ADM_COLOR_BGR24 ||_colorspace==ADM_COLOR_RGB16 ||  _colorspace==ADM_COLOR_BGR32A || _colorspace==ADM_COLOR_RGB32A || 
-                    _colorspace==ADM_COLOR_RGB24))
-        {
-                ssrc[0]=-mul*w;
-                srd[0]=planes[0]+mul*w*(h-1);
-                dst[1]=target+page;
-                dst[2]=target+((page*5)>>2);
-        }
-        sws_scale((SwsContext *)_context,srd,ssrc,0,h,dst,ddst);
-     
-        return 1;
+	srd[0] = planes[0];
+	srd[1] = srd[2] = 0;
+	ssrc[0] = mul * w;
+	ssrc[1] = ssrc[2] = 0;
+
+	if(strides && strides[0] > ssrc[0])
+		ssrc[0] = strides[0];
+
+	dst[0] = target;
+	dst[2] = target + page;
+	dst[1] = target + ((page * 5) >> 2);
+	ddst[0] = w;
+	ddst[1] = ddst[2] = w >> 1;
+
+	if(_backward)
+	{
+		ssrc[0] = -mul * w;
+		srd[0] = planes[0] + mul * w * (h - 1);
+	}
+
+	sws_scale((SwsContext *)_context, srd, ssrc, 0, h, dst, ddst);
+
+	return 1;
 }
-//***************************************************
-//***************************************************
-//***************************************************
 //EOF

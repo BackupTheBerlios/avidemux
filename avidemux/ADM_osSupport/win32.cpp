@@ -13,6 +13,7 @@
 #include "ADM_assert.h" 
 
 uint8_t win32_netInit(void);
+extern char *ADM_getBaseDir(void);
 
 void ADM_usleep(unsigned long us)
 {
@@ -425,5 +426,60 @@ void getWorkingArea(uint32_t *width, uint32_t *height)
 		*width = monitorInfo.rcWork.right - monitorInfo.rcWork.left;
 		*height = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
 	}
+}
+
+void redirectStdoutToFile(void)
+{
+	// Don't redirect stdout and stderr if SDL hasn't already hijacked it.
+	// This allows us to optionally compile all EXEs as console applications
+	// so the output can be printed to the terminal for debugging purposes.
+
+#ifdef USE_SDL
+	// Close SDL generated logs
+	fclose(stdout);
+	fclose(stderr);
+
+	// Briefly redirect to console
+	freopen("CON", "w", stdout);
+	freopen("CON", "w", stderr);
+
+	// Remove SDL logs to avoid confusion
+	char path[MAX_PATH];
+	char stdoutPath[MAX_PATH];
+	char stderrPath[MAX_PATH];
+	DWORD pathlen = GetModuleFileName(NULL, path, MAX_PATH);
+
+	while (pathlen > 0 && path[pathlen] != '\\')
+		pathlen--;
+
+	path[pathlen] = '\0';
+
+	strcpy(stdoutPath, path);
+	strcat(stdoutPath, "\\stdout.txt");
+	strcpy(stderrPath, path);
+	strcat(stderrPath, "\\stderr.txt");
+
+	remove(stdoutPath);
+	remove(stderrPath);
+
+	// Redirect output to log file in the user's profile directory
+	const char* logFile = "admlog.txt";
+	char* baseDir = ADM_getBaseDir();
+	char *logPath = new char[strlen(baseDir) + 2 + strlen(logFile)];
+	FILE* stream;
+
+	strcpy(logPath, baseDir);
+	strcat(logPath, "/");
+	strcat(logPath, logFile);
+
+	stream = freopen(logPath, "w", stdout);
+	*stderr = *stream;
+
+	// Line buffering
+	setvbuf(stdout, NULL, _IOLBF, BUFSIZ); 
+	setvbuf(stderr, NULL, _IOLBF, BUFSIZ);
+
+	delete[] logPath;
+#endif
 }
 #endif

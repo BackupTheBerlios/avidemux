@@ -212,6 +212,7 @@ void translate_contour_hid_event(struct media_ctrl *ctrl, struct input_event *ev
                         // and 1.  But I'm going to do it in a way that leaves
                         // the remaining values proportionate.
 				
+			//printf("Shuttle raw: %d\n", cv);
 			if ( cv == ctrl->lastshu ) return;
 			ctrl->lastshu = cv;
 				
@@ -376,7 +377,7 @@ void media_ctrl_read_event(struct media_ctrl *ctrl, struct media_ctrl_event *me)
 
 int probe_device(struct media_ctrl *mc, const char * devname)
 {
-	short devinfo[4];
+	struct input_id devinfo;
 	int i = 0;
 	  
         /* suck out the name information 
@@ -396,12 +397,15 @@ int probe_device(struct media_ctrl *mc, const char * devname)
 	}
 	
 	do {
-		if ( supported_devices[i].vendor == devinfo[1] 
-			&& supported_devices[i].product == devinfo[2] ) {
+		if ( supported_devices[i].vendor == devinfo.vendor
+			&& supported_devices[i].product == devinfo.product ) {
 				
 			mc->device = &supported_devices[i];
-			printf("Success on %s: %s: %s\n",
-                               devname, name, mc->device->name);
+			printf("Success on %s: %s = %s (bus %04x vendor %04x "
+                               "product %04x version %04x)\n",
+                               devname, name, mc->device->name,
+                               devinfo.bustype, devinfo.vendor,
+                               devinfo.product, devinfo.version);
 			// mc->fd = fd;
 			// mc->translate = mc->device.translate_function;
 			// mc = malloc(sizeof(struct media_ctrl));
@@ -416,7 +420,10 @@ int probe_device(struct media_ctrl *mc, const char * devname)
 	
 	} while ( supported_devices[++i].vendor != 0 );
 			
-        printf("Not interested in %s: %s\n", devname, name);
+        printf("Not interested in %s: %s (bus %04x vendor %04x "
+               "product %04x version %04x)\n",
+               devname, name, devinfo.bustype, devinfo.vendor,
+               devinfo.product, devinfo.version);
 	return 0;
 }
 

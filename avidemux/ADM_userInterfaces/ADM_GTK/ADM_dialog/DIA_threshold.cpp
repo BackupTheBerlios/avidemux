@@ -36,6 +36,10 @@
 #include "ADM_assert.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flyThreshold.h"
+#include "ADM_filter/video_filters.h"
+
+#undef _
+#define _(_s) QT_TR_NOOP(_s)
 
 /********************************************************************/
 static GtkWidget *create_threshold_dialog (void);
@@ -58,10 +62,23 @@ static gboolean previewButtonEvent (GtkWidget * widget,
     if (event->type != GDK_BUTTON_PRESS)
         return FALSE;
 
-    uint32_t x = static_cast <uint32_t> (event->x);
-    uint32_t y = static_cast <uint32_t> (event->y);
-
     flyThreshold * myFly = static_cast <flyThreshold *> (data);
+
+    uint32_t x, y;
+
+    float zoom = myFly->getZoom();
+    if (zoom == 1.0)
+    {
+        x = static_cast <uint32_t> (event->x);
+        y = static_cast <uint32_t> (event->y);
+    }
+    else
+    {
+        zoom = 1 / zoom;
+        x = static_cast <uint32_t> (event->x * zoom + .5);
+        y = static_cast <uint32_t> (event->y * zoom + .5);
+    }
+
     ADMImage * image = event->button == 1
         ? myFly->getInputImage() : myFly->getOutputImage();
 
@@ -116,7 +133,62 @@ static gboolean previewButtonEvent (GtkWidget * widget,
 
 /********************************************************************/
 
-uint8_t DIA_threshold (AVDMGenericVideoStream *in, THRESHOLD_PARAM * param)
+static void previewOutputMenuChange (GtkComboBox * combo, gpointer user_data)
+{
+    flyThreshold * myFly = static_cast <flyThreshold *> (user_data);
+    uint32_t index = gtk_combo_box_get_active (combo);
+    uint32_t filter_count;
+    FILTER * filters = getCurrentVideoFilterList (&filter_count);
+    FILTER * filter = filters + index;
+    VF_FILTERS tag = filter->tag;
+
+    gchar * activestr = gtk_combo_box_get_active_text (combo);
+
+    printf ("user selected preview of #%d = %s (%d) @%p (was %p)\n",
+            index, activestr, tag, filter->filter, myFly->getSource());
+
+    if (strncmp (activestr, "XX ", 3) == 0)
+    {
+        printf ("selected preview source has different dimensions - "
+                "forcing selection to current filter\n");
+        gtk_combo_box_set_active (combo, myFly->this_filter_index);
+    }
+    else
+    {
+        flyThreshold::PreviewMode mode;
+        if (index == myFly->this_filter_index)
+            mode = flyThreshold::PREVIEWMODE_THIS_FILTER;
+        else if (index > myFly->this_filter_index)
+            mode = flyThreshold::PREVIEWMODE_LATER_FILTER;
+        else // if (index < myFly->this_filter_index)
+            mode = flyThreshold::PREVIEWMODE_EARLIER_FILTER;
+
+        myFly->changeSource (filter->filter, mode);
+    }
+
+    g_free (activestr);
+}
+
+/********************************************************************/
+
+static gboolean preview_video_configured (GtkWidget * widget,
+                                          GdkEventConfigure * event,
+                                          gpointer user_data)
+{
+    fprintf (stderr, "preview_configured: now %dx%d @ +%d+%d\n",
+             event->width, event->height, event->x, event->y);
+
+    flyThreshold * myFly = static_cast <flyThreshold *> (user_data);
+    myFly->recomputeSize();
+
+    return FALSE;
+}
+
+/********************************************************************/
+
+uint8_t DIA_threshold (AVDMGenericVideoStream *in,
+                       ADMVideoThreshold * thresholdp,
+                       THRESHOLD_PARAM * param)
 {
     // Allocate space for preview video
     uint32_t width = in->getInfo()->width;
@@ -130,7 +202,12 @@ uint8_t DIA_threshold (AVDMGenericVideoStream *in, THRESHOLD_PARAM * param)
 
     myDialog = new flyThreshold (width, height, in,
                                  WID(previewVideo), WID(previewSlider),
-                                 param);
+                                 thresholdp, param);
+
+    g_signal_connect (GTK_OBJECT (WID(previewVideo)), "configure-event",
+                      GTK_SIGNAL_FUNC (preview_video_configured),
+                      gpointer (myDialog));
+
     myDialog->upload();
     myDialog->sliderChanged();
 
@@ -161,15 +238,67 @@ uint8_t DIA_threshold (AVDMGenericVideoStream *in, THRESHOLD_PARAM * param)
                      gpointer(myDialog));
 #endif
 
+    GtkWidget * previewOutputMenu = WID(previewOutputMenu);
+    uint32_t filter_count;
+    FILTER * filters = getCurrentVideoFilterList (&filter_count);
+    int32_t active = -1;
+
+    // The " + (active < 0)" below is a bit of a hack.  We know that in
+    // on_action() in gui_filtermanager.cpp, case A_ADD, the new filter-to-be
+    // is added to the filter list without incrementing nb_active_filter yet.
+    // So if we get to the end of the list and haven't yet found the filter
+    // that we're configuring, we know it's a new one and therefore that it is
+    // one past the apparent end of the list.  It's not a clean solution, but
+    // it seems like the cleanEST solution.
+
+    for (uint32_t i = 0; i < filter_count + (active < 0); i++)
+    {
+        const char * name
+            = (i == 0) ? "(input)" : filterGetNameFromTag (filters [i].tag);
+        bool free_name = false;
+                                   
+        FILTER * filter = filters + i;
+        AVDMGenericVideoStream * source = filter->filter;
+        uint32_t w = source->getInfo()->width;
+        uint32_t h = source->getInfo()->height;
+        if (w != width || h != height)
+        {
+            name = g_strconcat ("XX ", name, " XX", NULL);
+            free_name = true;
+        }
+
+        printf ("filter [%d] = %s (%d) @ %p; %dx%d\n",
+                i, name, filter->tag, source, w, h);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (previewOutputMenu), name);
+        if (filter->filter == myDialog->getSource())
+        {
+            gtk_combo_box_set_active (GTK_COMBO_BOX (previewOutputMenu), i);
+            printf ("\tfilter [%d] is being configured now\n", i);
+            active = i;
+        }
+
+        if (free_name)
+            g_free (const_cast <char *> (name));
+    }
+
+    ADM_assert (active >= 0);
+    myDialog->this_filter_index = active;
+
+    g_signal_connect (GTK_OBJECT(previewOutputMenu), "changed",
+                      GTK_SIGNAL_FUNC(previewOutputMenuChange),
+                      gpointer(myDialog));
+
     uint8_t ret = 0;
     int response = gtk_dialog_run(GTK_DIALOG(dialog));
 
     if (response == GTK_RESPONSE_OK)
     {
         myDialog->download();
-        myDialog->getParam (param);
+        myDialog->pushParam();
         ret = 1;
     }
+    else
+        myDialog->restoreParam();
 
     gtk_unregister_dialog(dialog);
     gtk_widget_destroy(dialog);
@@ -396,13 +525,8 @@ create_threshold_dialog (void)
   gtk_box_pack_start (GTK_BOX (previewVbox), previewControlHbox, TRUE, TRUE, 0);
 
   previewOutputMenu = gtk_combo_box_new_text ();
-#ifdef ORIGINAL_CODE_GENERATED_BY_GLADE
-  // temporarily (?) disable this until it's actually implemented
   gtk_widget_show (previewOutputMenu);
-#endif
   gtk_box_pack_start (GTK_BOX (previewControlHbox), previewOutputMenu, FALSE, TRUE, 0);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (previewOutputMenu), QT_TR_NOOP("Threshold output"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (previewOutputMenu), QT_TR_NOOP("Final output"));
 
   previewSlider = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 99, 1, 1, 1)));
   gtk_widget_show (previewSlider);
@@ -412,7 +536,7 @@ create_threshold_dialog (void)
   previewVideo = gtk_drawing_area_new ();
   gtk_widget_show (previewVideo);
   gtk_box_pack_start (GTK_BOX (previewVbox), previewVideo, TRUE, TRUE, 0);
-  gtk_widget_set_size_request (previewVideo, -1, 300);
+  gtk_widget_set_size_request (previewVideo, 30, 30);
   gtk_widget_set_events (previewVideo, GDK_BUTTON1_MOTION_MASK | GDK_BUTTON_PRESS_MASK);
 
   previewLabel = gtk_label_new (QT_TR_NOOP("Preview"));
