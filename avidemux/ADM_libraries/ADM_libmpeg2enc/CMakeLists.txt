@@ -11,16 +11,15 @@ fdct_mmx.cc           ioio.c                mblock_sumsq_mmx.cc         mpegcons
 fdctref.cc            macroblock.cc         motion.cc                   predcomp_mmx.cc  putmpg.cc         ratectl.cc       ADM_mpe2enc.cpp
 )
 
-IF (BUILD_ALTIVEC)
+IF (ADM_CPUCAP_ALTIVEC)
 	SET(${ADM_LIB}_SRCS ${${ADM_LIB}_SRCS}
 		altivec/add_pred.c   altivec/amber.c  altivec/benchmark.c  altivec/bsad.c  altivec/bsumsq.c  altivec/bsumsq_sub22.c  altivec/build_sub22_mests.c
 		altivec/build_sub44_mests.c  altivec/detect.c  altivec/fdct.c  altivec/fdct_idct.c  altivec/field_dct_best.c  altivec/find_best_one_pel.c
 		altivec/idct.c  altivec/iquant_intra.c  altivec/iquant_non_intra.c  altivec/motion.c  altivec/pred_comp.c  altivec/quant_non_intra.c
 		altivec/quant_weight_coeff_sum.c  altivec/quantize.c  altivec/sad_00.c  altivec/sad_01.c  altivec/sad_10.c  altivec/sad_11.c
 		altivec/sub_mean_reduction.c  altivec/sub_mean_reduction_ppc.S  altivec/sub_pred.c  altivec/subsample_image.c  altivec/sumsq.c
-		altivec/sumsq_sub22.c  altivec/variance.c
-	)
-ENDIF (BUILD_ALTIVEC)
+		altivec/sumsq_sub22.c  altivec/variance.c)
+ENDIF (ADM_CPUCAP_ALTIVEC)
 
 ADD_ADM_LIB_ALL_TARGETS(${ADM_LIB} ${${ADM_LIB}_SRCS})
 ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-I${CMAKE_CURRENT_SOURCE_DIR}")

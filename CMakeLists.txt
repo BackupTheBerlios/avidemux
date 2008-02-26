@@ -73,6 +73,19 @@ ELSEIF (ADM_CPU_X86_64)
 	SET(ARCH_X86 1)
 	SET(ARCH_X86_64 1)
 	SET(ARCH_64_BITS 1)
+ELSEIF (ADM_CPU_PPC)
+	SET(ADM_BIG_ENDIAN 1)
+	SET(WORDS_BIGENDIAN 1)
+
+	OPTION(ALTIVEC ""  ON)
+
+	IF (ALTIVEC)
+		SET(ADM_CPUCAP_ALTIVEC 1)
+		SET(ARCH_PPC 1)
+		SET(ARCH_POWERPC 1)
+		SET(USE_ALTIVEC 1)
+		SET(HAVE_ALTIVEC 1)
+	ENDIF (ALTIVEC)
 ENDIF (ADM_CPU_X86)
 
 # LibMad
@@ -80,6 +93,8 @@ IF (ADM_CPU_X86)
 	SET(FPM_INTEL 1)
 ELSEIF (ADM_CPU_X86_64)
 	SET(FPM_DEFAULT 1)
+ELSEIF (ADM_CPU_PPC)
+	SET(FPM_PPC 1)
 ENDIF (ADM_CPU_X86)
 
 # Libavcodec
@@ -93,6 +108,19 @@ IF (NOT CMAKE_BUILD_TYPE)
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	SET(ADM_DEBUG 1)
 ENDIF (NOT CMAKE_BUILD_TYPE)
+
+###########################################
+# CPU Specific
+###########################################
+IF (ADM_CPUCAP_ALTIVEC)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mabi=altivec -maltivec")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mabi=altivec -maltivec")
+
+	IF (ADM_OS_APPLE)
+		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -faltivec -force_cpusubtype_ALL")
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -faltivec -force_cpusubtype_ALL")
+	ENDIF (ADM_OS_APPLE)
+ENDIF (ADM_CPUCAP_ALTIVEC)
 
 ########################################
 # Subversion
@@ -156,6 +184,10 @@ CHECK_INCLUDE_FILES(stdint.h     HAVE_STDINT_H)		# internal use, mpeg2enc, mplex
 CHECK_INCLUDE_FILES(sys/types.h  HAVE_SYS_TYPES_H)	# mad, mpeg2enc
 CHECK_INCLUDE_FILES(unistd.h     HAVE_UNISTD_H)		# internal use, ass, mad
 CHECK_INCLUDE_FILES(malloc.h     HAVE_MALLOC_H)		# libavcodec, libavutil, libpostproc, libswscale, mplex
+
+IF (ADM_CPUCAP_ALTIVEC)
+	CHECK_INCLUDE_FILES(altivec.h    HAVE_ALTIVEC_H)	# libavcodec, libpostproc, libswscale, mpeg2dec, mpeg2enc
+ENDIF (ADM_CPUCAP_ALTIVEC)
 
 MESSAGE("")
 

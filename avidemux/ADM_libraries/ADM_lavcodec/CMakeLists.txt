@@ -40,13 +40,12 @@ IF(ARCH_X86)
 		i386/snowdsp_mmx.c i386/fft_3dn.c)
 ENDIF(ARCH_X86)
 
-IF (BUILD_ALTIVEC)
+IF (ADM_CPUCAP_ALTIVEC)
 	SET(${ADM_LIB}_SRCS  ${${ADM_LIB}_SRCS}
 		ppc/dsputil_altivec.c  ppc/dsputil_ppc.c  ppc/fdct_altivec.c  ppc/fft_altivec.c  ppc/float_altivec.c  ppc/gmc_altivec.c
 		ppc/h264_altivec.c  ppc/idct_altivec.c  ppc/int_altivec.c  ppc/mpegvideo_altivec.c  ppc/mpegvideo_ppc.c
-		ppc/snow_altivec.c  ppc/vc1dsp_altivec.c
-	)
-ENDIF (BUILD_ALTIVEC)
+		ppc/snow_altivec.c  ppc/vc1dsp_altivec.c)
+ENDIF (ADM_CPUCAP_ALTIVEC)
 
 ADD_ADM_LIB_ALL_TARGETS(${ADM_LIB} ${${ADM_LIB}_SRCS})
 ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-I../ADM_lavutil -DHAVE_AV_CONFIG_H -Drestrict=__restrict__ -fomit-frame-pointer -include ffconf.h")
