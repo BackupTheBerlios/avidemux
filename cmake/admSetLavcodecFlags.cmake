@@ -31,10 +31,30 @@ IF (ADM_CPU_X86_64)
 	SET(HAVE_FAST_64BIT 1)
 ENDIF (ADM_CPU_X86_64)
 
-IF (NOT NO_SSSE3)
-	SET(HAVE_SSSE3 1)
-ENDIF (NOT NO_SSSE3)
-
 IF (ADM_OS_DARWIN)
 	SET(CONFIG_DARWIN 1)
 ENDIF (ADM_OS_DARWIN)
+
+########################################
+# Check GCC support for SSSE3
+########################################
+MESSAGE(STATUS "Checking GCC support for SSSE3")
+MESSAGE(STATUS "******************************")
+
+IF (ADM_CPU_X86 OR ADM_CPU_X86_64)
+	ADM_COMPILE(ssse3_check.cpp "" "" "" SSSE3_SUPPORTED outputSsse3Test)
+
+	IF (SSSE3_SUPPORTED)
+		SET(HAVE_SSSE3 1)
+		
+		MESSAGE(STATUS "GCC supports SSSE3")
+	ELSE (SSSE3_SUPPORTED)
+		MESSAGE(STATUS "GCC doesn't support SSSE3")
+
+		IF (VERBOSE)
+			MESSAGE("Error Message: ${outputSsse3Test}")
+		ENDIF (VERBOSE)	
+	ENDIF (SSSE3_SUPPORTED)
+ENDIF (ADM_CPU_X86 OR ADM_CPU_X86_64)
+
+MESSAGE("")
