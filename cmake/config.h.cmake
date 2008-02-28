@@ -226,7 +226,7 @@
 /* use x264 encoder */
 #cmakedefine USE_X264
 
-#if (!defined(__APPLE__) && (${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK || ${CONFIG_HEADER_TYPE} == ADM_BUILD_QT4)) || (defined(__APPLE__) && ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK)
+#if ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK || ${CONFIG_HEADER_TYPE} == ADM_BUILD_QT4
 /* XVideo detected */
 #cmakedefine USE_XV
 #endif

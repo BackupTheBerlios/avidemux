@@ -23,7 +23,7 @@ MESSAGE("*********************")
 MESSAGE("***    SUMMARY    ***")
 MESSAGE("*********************")
 ADM_DISPLAY("GTK+      " ADM_UI_GTK)
-ADM_DISPLAY("Qt4       " ADM_UI_QT4)
+ADM_DISPLAY("Qt 4      " ADM_UI_QT4)
 
 MESSAGE("***  Video Codec  ***")
 ADM_DISPLAY("x264      " USE_X264)

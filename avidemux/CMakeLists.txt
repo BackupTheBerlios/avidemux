@@ -335,15 +335,21 @@ IF (USE_XV)
 		TARGET_LINK_LIBRARIES(avidemux2_gtk ${XVIDEO_LIBRARY_DIR})
 	ENDIF (ADM_UI_GTK)
 
-	IF (ADM_UI_QT4 AND NOT ADM_OS_DARWIN)
+	IF (ADM_UI_QT4)
 		TARGET_LINK_LIBRARIES(avidemux2_qt4 ${X11_LIBRARIES})
 		TARGET_LINK_LIBRARIES(avidemux2_qt4 ${XVIDEO_LIBRARY_DIR})
-	ENDIF (ADM_UI_QT4 AND NOT ADM_OS_DARWIN)
+	ENDIF (ADM_UI_QT4)
 ENDIF (USE_XV)
 
 # SDL
 IF (USE_SDL)
-	ADD_LIB_ALL_TARGETS("${SDL_LIBRARY}")
+	IF (ADM_UI_GTK)
+		TARGET_LINK_LIBRARIES(avidemux2_gtk ${SDL_LIBRARY})
+	ENDIF (ADM_UI_GTK)
+
+	IF (ADM_UI_QT4)
+		TARGET_LINK_LIBRARIES(avidemux2_qt4 ${SDL_LIBRARY})
+	ENDIF (ADM_UI_QT4)
 ENDIF (USE_SDL)
 
 # aRts
@@ -476,7 +482,7 @@ IF (ADM_OS_DARWIN)
 	ADD_LIB_ALL_TARGETS("-framework CoreServices -framework CoreAudio -framework AudioUnit -framework Carbon -framework Cocoa")
 
 	# for Leopard but it doesn't hurt Tiger
-	add_libs_all_targets("-Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib")
+	ADD_LIB_ALL_TARGETS("-Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib")
 ENDIF (ADM_OS_DARWIN)
 
 ###########################################

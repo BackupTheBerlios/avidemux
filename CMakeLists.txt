@@ -118,10 +118,10 @@ IF (ADM_CPUCAP_ALTIVEC)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mabi=altivec -maltivec")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mabi=altivec -maltivec")
 
-	IF (ADM_OS_APPLE)
-		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -faltivec -force_cpusubtype_ALL")
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -faltivec -force_cpusubtype_ALL")
-	ENDIF (ADM_OS_APPLE)
+	IF (ADM_OS_DARWIN)
+		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -faltivec")
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -faltivec")
+	ENDIF (ADM_OS_DARWIN)
 ENDIF (ADM_CPUCAP_ALTIVEC)
 
 ########################################
@@ -187,9 +187,9 @@ CHECK_INCLUDE_FILES(sys/types.h  HAVE_SYS_TYPES_H)	# mad, mpeg2enc
 CHECK_INCLUDE_FILES(unistd.h     HAVE_UNISTD_H)		# internal use, ass, mad
 CHECK_INCLUDE_FILES(malloc.h     HAVE_MALLOC_H)		# libavcodec, libavutil, libpostproc, libswscale, mplex
 
-IF (ADM_CPUCAP_ALTIVEC)
+IF (ADM_CPUCAP_ALTIVEC AND NOT ADM_OS_DARWIN)
 	CHECK_INCLUDE_FILES(altivec.h    HAVE_ALTIVEC_H)	# libavcodec, libpostproc, libswscale, mpeg2dec, mpeg2enc
-ENDIF (ADM_CPUCAP_ALTIVEC)
+ENDIF (ADM_CPUCAP_ALTIVEC AND NOT ADM_OS_DARWIN)
 
 MESSAGE("")
 

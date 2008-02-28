@@ -1,25 +1,4 @@
 ########################################
-# X11
-########################################
-IF (ADM_OS_LINUX OR ADM_OS_DARWIN)
-	MESSAGE(STATUS "Checking for X11")
-	MESSAGE(STATUS "****************")
-
-	FIND_PACKAGE(X11)
-	PRINT_LIBRARY_INFO("X11" X11_FOUND "${X11_INCLUDE_DIR}" "${X11_LIBRARIES}")
-
-	IF (NOT X11_FOUND)
-		SET(ADM_UI_GTK 0)
-
-		IF (ADM_OS_LINUX)
-			SET(ADM_UI_QT4 0)
-		ENDIF (ADM_OS_LINUX)
-	ENDIF (NOT X11_FOUND)
-
-	MESSAGE("")
-ENDIF (ADM_OS_LINUX OR ADM_OS_DARWIN)
-
-########################################
 # GLib
 ########################################
 MESSAGE(STATUS "Checking for GLib")
@@ -78,13 +57,13 @@ MESSAGE("")
 ########################################
 OPTION(QT4 "" ON)
 
-MESSAGE(STATUS "Checking for QT4")
-MESSAGE(STATUS "****************")
+MESSAGE(STATUS "Checking for Qt 4")
+MESSAGE(STATUS "*****************")
 
 IF (QT4)
 	FIND_PACKAGE(Qt4)	
 	STRING(REGEX REPLACE "[\\]" "/" QT_INCLUDES "${QT_INCLUDES}")	# backslashes aren't taken care of properly on Windows
-	PRINT_LIBRARY_INFO("Qt4" QT4_FOUND "${QT_INCLUDES} ${QT_DEFINITIONS}" "${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY}")
+	PRINT_LIBRARY_INFO("Qt 4" QT4_FOUND "${QT_INCLUDES} ${QT_DEFINITIONS}" "${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY}")
 
 	MARK_AS_ADVANCED(LRELEASE_EXECUTABLE)
 	MARK_AS_ADVANCED(QT_MKSPECS_DIR)
