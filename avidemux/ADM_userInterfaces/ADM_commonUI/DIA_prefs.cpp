@@ -305,7 +305,7 @@ char     *globalGlyphName=NULL;
 		#ifdef USE_ARTS
 			{DEVICE_ARTS, QT_TR_NOOP("aRts")},
 		#endif
-		#ifdef CONFIG_DARWIN
+		#ifdef __APPLE__
 			{DEVICE_COREAUDIO, QT_TR_NOOP("Core Audio")},
 		#endif
 		#ifdef USE_ESD

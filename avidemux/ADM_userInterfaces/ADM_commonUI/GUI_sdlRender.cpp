@@ -256,12 +256,7 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
         printf("[SDL] Overlay created; type: %d, planes: %d, pitch: %d\n", sdl_overlay->hw_overlay, sdl_overlay->planes, sdl_overlay->pitches[0]);
 
         if(!sdl_overlay->hw_overlay)
-        {
             printf("[SDL] Hardware acceleration disabled\n");
-        #ifdef CONFIG_DARWIN
-            printf("[SDL] ** Darwin**\n");
-        #endif
-        }
 
         if(!useYV12) color->reset(w,h);
 
