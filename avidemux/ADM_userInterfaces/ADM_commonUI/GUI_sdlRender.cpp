@@ -44,7 +44,7 @@ extern "C" {
 #include "GUI_sdlRender.h"
 #include "ADM_assert.h"
 
-#ifdef ADM_WIN32
+#ifdef __WIN32
 #include "prefs.h"
 #endif
 
@@ -61,7 +61,7 @@ static uint8_t sdl_running=0;
 static SDL_Overlay *sdl_overlay=NULL;
 static SDL_Surface *sdl_display=NULL;
 static SDL_Rect disp;
-#ifdef ADM_WIN32
+#ifdef __WIN32
 HWND sdlWin32;
 #endif
 static ColBase *color=NULL;
@@ -128,7 +128,7 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
     }
 
     // Hack to get SDL to use GTK window, ugly but works
-#if !defined(ADM_WIN32) && !defined(__APPLE__)
+#if !defined(__WIN32) && !defined(__APPLE__)
 	char SDL_windowhack[32];
     int winId=(int)window->window;
 
@@ -146,7 +146,7 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 
     // Do it twice as the 1st time does not work
     // Hack to get SDL to use GTK window, ugly but works
-#if !defined(ADM_WIN32) && !defined(__APPLE__)
+#if !defined(__WIN32) && !defined(__APPLE__)
     putenv(SDL_windowhack);
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
     if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) 
@@ -161,7 +161,7 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
     flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE | SDL_NOFRAME;
     bpp= SDL_VideoModeOK( w, h,  32, flags );
 
-#ifdef ADM_WIN32
+#ifdef __WIN32
 	// SDL window is created and displayed before we get a chance to set the parent.
 	// Therefore, align the SDL overlay with the client area before it is displayed.
 	POINT screenPoint = {};
@@ -204,7 +204,7 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 
     SDL_LockSurface(sdl_display);
 
-#ifdef ADM_WIN32
+#ifdef __WIN32
 	struct SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
 
@@ -281,7 +281,7 @@ static void interleave(uint8_t *dst,uint8_t *src,int width, int stride, int line
 }
 uint8_t sdlAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h,renderZoom zoom)
 {
-#ifdef ADM_WIN32
+#ifdef __WIN32
 	// DirectX playback doesn't refresh correctly if the parent window is moved.
 	// Detect when the parent window has moved and force a coordinate update.
 	if (strcmp(getenv("SDL_VIDEODRIVER"), "directx") == 0)
@@ -369,7 +369,7 @@ void initSdl(void)
 
     printf("[SDL] Version: %u.%u.%u\n",SDL_Linked_Version()->major, SDL_Linked_Version()->minor, SDL_Linked_Version()->patch);
 
-#ifdef ADM_WIN32
+#ifdef __WIN32
 	uint32_t videoDevice = RENDER_LAST;
 
 	if(!prefs->get(DEVICE_VIDEODEVICE, &videoDevice) || videoDevice != RENDER_DIRECTX)

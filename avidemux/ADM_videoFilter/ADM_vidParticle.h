@@ -95,8 +95,8 @@ class ADMVideoParticle : public AVDMGenericVideoStream
 //////////////////////////////////////////////////////////////////////////////
 
 #include <list>
-#include <vector>
-#include <iostream>
+//#include <vector>
+//#include <iostream>
 #include <iterator>
 
 class PixelLoc
@@ -136,8 +136,8 @@ public:
     static const PixelLoc INVALID;
 };
 
-typedef std::vector <PixelLoc> PixelLocVec;
-
+//typedef std::vector <PixelLoc> PixelLocVec;
+/*
 inline std::ostream &
 operator << (std::ostream & s, const PixelLoc & pl)
 {
@@ -153,7 +153,7 @@ operator << (std::ostream & s, const PixelLocVec & theList)
     s << "]";
     return s;
 }
-
+*/
 class ImageTool;
 
 #ifdef OLD_PARTICLE_WEDGE_SCHEME
@@ -244,7 +244,7 @@ class Particle_Old
         void trim_to_edge ();
     };
 
-    typedef std::vector <Wedge> WedgeVec;
+    //typedef std::vector <Wedge> WedgeVec;
 
     struct WedgePair
     {
@@ -286,7 +286,7 @@ private:
 
     PixelLocVec outline;
     PixelLocVec white_pixels;
-    WedgeVec wedges;
+    //WedgeVec wedges;
     WedgePairVec wedge_pairs;
 
 public:
@@ -438,7 +438,7 @@ class Particle
         };
     };
 
-    typedef std::vector <Wedge> WedgeVec;
+    //typedef std::vector <Wedge> WedgeVec;
 
     struct WedgePair
     {
@@ -470,7 +470,7 @@ class Particle
         };
     };
 
-    typedef std::vector <WedgePair> WedgePairVec;
+    //typedef std::vector <WedgePair> WedgePairVec;
 
 public:
     uint16_t minx, maxx; // bounding box x
@@ -505,10 +505,10 @@ private:
     double half_wedge_arc;
     BestFit best_fit;
 
-    PixelLocVec outline;
-    PixelLocVec white_pixels;
-    WedgeVec wedges;
-    WedgePairVec wedge_pairs;
+    //PixelLocVec outline;
+    //PixelLocVec white_pixels;
+    //WedgeVec wedges;
+    //WedgePairVec wedge_pairs;
 
 public:
     Particle ()
@@ -533,10 +533,10 @@ private:
         wedge_interval = -1;
         half_wedge_arc = -1;
         best_fit = BestFit();
-        outline.clear();
-        white_pixels.clear();
-        wedges.clear();
-        wedge_pairs.clear();
+        //outline.clear();
+        //white_pixels.clear();
+        //wedges.clear();
+        //wedge_pairs.clear();
         debug = a_debug;
     }
 
@@ -555,7 +555,7 @@ private:
             miny = y;
         if (y > maxy)
             maxy = y;
-        white_pixels.push_back (PixelLoc (x, y));
+        //white_pixels.push_back (PixelLoc (x, y));
     }
 
     void computeCentroid ()
@@ -579,18 +579,18 @@ public:
 
     const WedgePair & getMinDist () const
     {
-        WedgePairVec::const_iterator wit = wedge_pairs.begin();
+/*        WedgePairVec::const_iterator wit = wedge_pairs.begin();
 #if 0
         while (!wit->total_distance)
             ++wit;
 #endif
-        return *wit;
+        return *wit; */
     }
 
     const WedgePair & getMaxDist () const
     {
-        WedgePairVec::const_iterator wit = wedge_pairs.end();
-        return *--wit;
+        /*WedgePairVec::const_iterator wit = wedge_pairs.end();
+        return *--wit; */
     }
 
     float getMinDistance () const
@@ -820,11 +820,11 @@ public:
 
     // implementation is in ADM_vidSwissArmyKnife.cpp - nothing else uses it
     // (currently).
-
+/*
     template <class Oper, class Histo>
     void convolve (const std::vector <float> & kernel,
                    uint32_t kw, uint32_t kh, int32_t bias, const Oper & op,
-                   const Histo & histogram_in);
+                   const Histo & histogram_in); */
 
     void setDebug (uint32_t newDebug)
     {

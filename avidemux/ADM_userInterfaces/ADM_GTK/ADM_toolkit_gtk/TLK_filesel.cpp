@@ -349,7 +349,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 	                                ** you cannot overwrite segment data files, all files are kept open and
 	                                ** are detected here
 	                                */
-#ifndef ADM_WIN32
+#ifndef __WIN32
 					if( stat(name,&buf) == -1 ){
 						fprintf(stderr,"stat(%s) failed\n",name);
 						return;
@@ -461,7 +461,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 	{
 
                         selected_filename= (gchar *) 	gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-#ifdef ADM_WIN32
+#ifdef __WIN32
                         if (*(selected_filename + strlen(selected_filename) - 1) == '\\'){
 #else			
                         if (*(selected_filename + strlen(selected_filename) - 1) == '/'){

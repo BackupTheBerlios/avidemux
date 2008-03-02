@@ -8,7 +8,7 @@
 ADM_LibWrapperAmrnb::ADM_LibWrapperAmrnb() : ADM_LibWrapper()
 {
 #ifdef USE_LATE_BINDING
-#ifdef ADM_WIN32
+#ifdef __WIN32
 	char* libname = "libamrnb-2.dll";
 #else
 	char* libname = "libamrnb-2.so";	// ???

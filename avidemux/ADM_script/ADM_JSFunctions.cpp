@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifndef ADM_WIN32
+#ifndef __MINGW32__
 #include <sys/wait.h>
 #include <sys/param.h>
 #endif
@@ -313,7 +313,7 @@ char *n;
         *rval=STRING_TO_JSVAL(JS_NewStringCopyZ(cx,n));
         return JS_TRUE;
 }
-#ifdef ADM_WIN32
+#ifdef __MINGW32__
 
 JSBool systemExecute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
@@ -373,14 +373,14 @@ JSBool systemExecute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 
         enterLock();
 	// clear file descriptor table of forked process and fork
-#if defined( __linux__) || defined(__macosx__) || defined(__APPLE__)
+#if defined( __linux__) || defined(__macosx__) || defined(__APPLE__) || defined(__CYGWIN__)
 	pid_t pidRtn = fork();
 #elif defined(__FreeBSD__) || defined(__OpenBSD__)
 	pid_t pidRtn = rfork(RFPROC|RFCFDG);
 #endif
 	if(pidRtn == 0)
 	{// begin child process
-#if defined( __linux__) || defined(__macosx__) || defined(__APPLE__)
+#if defined( __linux__) || defined(__macosx__) || defined(__APPLE__) || defined(__CYGWIN__)
 		close(STDIN_FILENO);
 		close(STDOUT_FILENO);
 		close(STDERR_FILENO);
@@ -416,7 +416,7 @@ JSBool systemExecute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 	return JS_TRUE;
 }// end systemExecute
 #endif
-#ifdef ADM_WIN32
+#ifdef __MINGW32__
 
 JSBool systemInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {

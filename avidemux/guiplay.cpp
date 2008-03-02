@@ -309,7 +309,7 @@ void ComputePreload(void)
 //_______________________________________
 {
     uint32_t latency, one_sec;
-    uint32_t small;
+    uint32_t small_;
     uint32_t channels;
 
     wavbuf = 0;
@@ -367,11 +367,11 @@ void ComputePreload(void)
     uint32_t fill=0;
     while(fill<one_sec)
     {
-      if (!(small = playback->fill(one_sec-fill, wavbuf,&status)))
+      if (!(small_ = playback->fill(one_sec-fill, wavbuf,&status)))
       {
         break;
       }
-    fill+=small;
+    fill+=small_;
     }
     dauds += fill/channels;  // In sample
     AVDM_AudioPlay(wavbuf, fill);

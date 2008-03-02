@@ -1,18 +1,16 @@
 #include "config.h"
-#ifdef ADM_WIN32
-#include "windows.h"
-#include "winbase.h"
-#include "io.h"
-#include "winsock2.h"
-#define WIN32_CLASH
+
+#ifdef __MINGW32__
+#include <windows.h>
+#include <winbase.h>
+#include <io.h>
+#include <winsock2.h>
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif
-
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,10 +30,10 @@
 
 uint8_t avsHeader::bindMe(uint32_t port)
 {
- #ifndef ADM_WIN32
- mySocket = socket(PF_INET, SOCK_STREAM, 0);
- #else
+ #ifdef __MINGW32__
  mySocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+ #else
+ mySocket = socket(PF_INET, SOCK_STREAM, 0);
  #endif
     if(mySocket==-1)
     {
@@ -64,10 +62,10 @@ uint8_t avsHeader::close(void)
     if(mySocket)
     {
         int er;
-#ifndef ADM_WIN32        
-        er=shutdown(mySocket,SHUT_RDWR);
+#ifdef __MINGW32__
+		er=shutdown(mySocket,SD_BOTH);
 #else
-        er=shutdown(mySocket,SD_BOTH);
+        er=shutdown(mySocket,SHUT_RDWR);
 #endif
         if(er) printf("[avsProxy]Error when socket shutdown  %d (socket %d)\n",er,mySocket);
         mySocket=0;

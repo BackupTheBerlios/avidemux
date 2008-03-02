@@ -29,7 +29,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <pthread.h>
-#define WIN32_CLASH
 
 #include "interact.hpp"
 

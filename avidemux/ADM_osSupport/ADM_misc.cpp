@@ -23,7 +23,7 @@
 #include <time.h>
 #include <math.h>
 #include <string.h>
-#ifndef ADM_WIN32
+#ifndef __WIN32
 #include <unistd.h>
 #endif
 //#include <gtk/gtk.h>
@@ -298,7 +298,7 @@ void TLK_getDate(ADM_date *date)
 
 bool shutdown(void)
 {
-#ifdef ADM_WIN32
+#ifdef __WIN32
 	return (shutdown_win32() == 0);
 #else
 	return (system("shutdown -P 0") == 0);

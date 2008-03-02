@@ -7,7 +7,7 @@ class ADM_LibWrapper
 		void* hinstLib;
 		bool initialised;
 
-	#ifdef ADM_WIN32
+	#ifdef __WIN32
 		virtual char* formatMessage(uint32_t msgCode);
 	#endif
 

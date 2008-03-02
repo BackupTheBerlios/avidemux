@@ -17,8 +17,7 @@
  ***************************************************************************/
 #include "config.h"
 
-#if defined( USE_ESD ) && !defined(ADM_WIN32)
-
+#if defined(USE_ESD)
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -27,7 +26,6 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <esd.h>
- 
 
 #include "default.h"
 #include "ADM_audiodevice.h"

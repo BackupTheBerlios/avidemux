@@ -41,12 +41,16 @@ INCLUDE(admDetermineSystem)
 
 IF (ADM_OS_WINDOWS)
 	SET(CYG_MANGLING 1)
-	SET(ADM_WIN32 1)	# needs to be removed one day...
 ENDIF (ADM_OS_WINDOWS)
 
 IF (ADM_OS_DARWIN)
 	SET(CYG_MANGLING 1)
 ENDIF (ADM_OS_DARWIN)
+
+IF (CYGWIN)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mwin32")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwin32")
+ENDIF (CYGWIN)
 
 IF (ADM_OS_LINUX)
 	SET(USE_JOG 1)		# jog shuttle is only available on Linux due to its interface

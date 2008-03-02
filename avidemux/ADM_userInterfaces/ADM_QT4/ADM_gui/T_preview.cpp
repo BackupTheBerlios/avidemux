@@ -37,9 +37,10 @@
 /* Probably on unix/X11 ..*/
 #ifdef __APPLE__
 #include <Carbon/Carbon.h>
-#elif !defined(ADM_WIN32)
+#elif !defined(__WIN32)
 #include <QX11Info>
 #endif
+
 #include "avio.hxx"
 
 #include "ADM_colorspace/ADM_rgb.h"
@@ -188,7 +189,7 @@ void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
 */
 void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo)
 {
-#if defined(ADM_WIN32)
+#if defined(__WIN32)
 	xinfo->display=videoWindow->winId();
 #elif defined(__APPLE__)
 	QWidget* widget = videoWindow->parentWidget();

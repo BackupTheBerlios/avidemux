@@ -38,7 +38,7 @@
 
 //#define OPENDML_VERBOSE
 
-#if defined( ADM_WIN32) || defined(ARCH_X86_64)
+#if defined( __WIN32) || defined(ARCH_X86_64)
 	#define PPACKED __attribute__ ((packed, gcc_struct))
 #else
 	#define PPACKED 
@@ -242,7 +242,7 @@ _cntue:
 		fcc=read32();
 		len=read32();
                 aprintf("subindex : %lu size %lu (%lx)",i,len,len); 
-#ifdef ADM_WIN32
+#ifdef __WIN32
                 aprintf("Seeking to %I64x\n",superEntries[i].offset);
 #else                             
                 aprintf("Seeking to %llx\n",superEntries[i].offset);
@@ -254,7 +254,7 @@ _cntue:
 			printf("Problem reading secondary index (%u/%u) trying to continue \n",i,masterIndex.nbEntryInUse);
 			return 1;
 		}	
-#ifdef ADM_WIN32                
+#ifdef __WIN32                
                 aprintf("Base : %I64x\n",second.base);
 #else                                
 		aprintf("Base : %llx\n",second.base);
@@ -277,7 +277,7 @@ _cntue:
 					(*index)[count].intra=0;
 				else 
 					(*index)[count].intra=AVI_KEY_FRAME;
-#ifdef ADM_WIN32
+#ifdef __WIN32
                                 aprintf("Frame.off : %I64x, size %I64x\n",
                                         _idx[count].offset,
                                         _idx[count].size);

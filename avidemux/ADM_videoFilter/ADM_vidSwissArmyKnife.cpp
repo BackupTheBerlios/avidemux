@@ -778,7 +778,7 @@ private:
 };
 
 //============================================================================
-
+/*
 template <typename Oper, typename Histo>
 void ImageTool::convolve (const std::vector <float> & kernel,
                           uint32_t kw, uint32_t kh, int32_t bias,
@@ -886,7 +886,7 @@ void ImageTool::convolve (const std::vector <float> & kernel,
             printf ("    Saturated %d low, %d high\n", satlow, sathigh);
     }
 }
-
+*/
 //============================================================================
 
 template <typename Oper, typename Histo>
@@ -1614,7 +1614,7 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
         }
     }
 
-    FloatVector & kernel = myInfo->kernel;
+    //FloatVector & kernel = myInfo->kernel;
     uint32_t & kernel_w = myInfo->kernel_w;
     uint32_t & kernel_h = myInfo->kernel_h;
 
@@ -1626,7 +1626,7 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
 
         if (doingConvolution)
         {
-            kernel.clear();
+            //kernel.clear();
             kernel_w = 0;
             kernel_h = 0;
 
@@ -1671,7 +1671,7 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
                 return 0;
             }
 #endif
-
+/*
             copy (istream_iterator <float> (inputStream),
                   istream_iterator <float> (),
                   back_inserter (kernel));
@@ -1709,7 +1709,7 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
                 }
                 if (count % kernel_w)
                     printf ("[incomplete?!]\n");
-            }
+            } */
         }
         else // file image (not convolution)
         {
@@ -2057,157 +2057,157 @@ ADMVideoSwissArmyKnife::doSwissArmyKnife (ADMImage * image,
 
     if (doingConvolution)
     {
-        if (kernel.empty())
+        /*if (kernel.empty())
         {
             fprintf (stderr, "No convolution kernel loaded - can't do "
                      "convolution!\n");
             return 0;
-        }
+        }*/
 
         switch (tool)
         {
         case TOOL_A:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsA(), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsA(), HistogramNull());
             break;
         case TOOL_P: // HERE: we could optimize this if we wanted to
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsP(), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsP(), HistogramNull());
             break;
         case TOOL_P_MINUS_A:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPminusA(), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPminusA(), HistogramNull());
             break;
         case TOOL_A_MINUS_P:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsAminusP(), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsAminusP(), HistogramNull());
             break;
         case TOOL_P_PLUS_A:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPplusA(), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPplusA(), HistogramNull());
             break;
         case TOOL_P_TIMES_A:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPtimesA(), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPtimesA(), HistogramNull());
             break;
         case TOOL_P_DIVBY_A:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPdivByA(), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPdivByA(), HistogramNull());
             break;
         case TOOL_A_DIVBY_P:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsAdivByP(), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsAdivByP(), HistogramNull());
             break;
         case TOOL_MIN_P_A:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsMinPA(), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsMinPA(), HistogramNull());
             break;
         case TOOL_MAX_P_A:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsMaxPA(), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsMaxPA(), HistogramNull());
             break;
 
         case TOOL_A_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsA(), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsA(), *histogram);
             break;
         case TOOL_P_WITH_HISTOGRAM: // HERE: we could optimize this if we wanted to
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsP(), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsP(), *histogram);
             break;
         case TOOL_P_MINUS_A_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPminusA(), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPminusA(), *histogram);
             break;
         case TOOL_A_MINUS_P_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsAminusP(), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsAminusP(), *histogram);
             break;
         case TOOL_P_PLUS_A_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPplusA(), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPplusA(), *histogram);
             break;
         case TOOL_P_TIMES_A_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPtimesA(), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPtimesA(), *histogram);
             break;
         case TOOL_P_DIVBY_A_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPdivByA(), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsPdivByA(), *histogram);
             break;
         case TOOL_A_DIVBY_P_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsAdivByP(), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsAdivByP(), *histogram);
             break;
         case TOOL_MIN_P_A_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsMinPA(), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsMinPA(), *histogram);
             break;
         case TOOL_MAX_P_A_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsMaxPA(), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias, OpPequalsMaxPA(), *histogram);
             break;
 
         case TOOL_A_SCALED:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsA_Scaled (rbias, rmultiplier), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsA_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_P_SCALED: // HERE_SCALED: we could optimize this if we wanted to
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsP_Scaled (rbias, rmultiplier), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsP_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_P_MINUS_A_SCALED:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPminusA_Scaled (rbias, rmultiplier), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsPminusA_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_A_MINUS_P_SCALED:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsAminusP_Scaled (rbias, rmultiplier), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsAminusP_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_P_PLUS_A_SCALED:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPplusA_Scaled (rbias, rmultiplier), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsPplusA_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_P_TIMES_A_SCALED:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPtimesA_Scaled (rbias, rmultiplier), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsPtimesA_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_P_DIVBY_A_SCALED:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPdivByA_Scaled (rbias, rmultiplier), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsPdivByA_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_A_DIVBY_P_SCALED:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsAdivByP_Scaled (rbias, rmultiplier), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsAdivByP_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_MIN_P_A_SCALED:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsMinPA_Scaled (rbias, rmultiplier), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsMinPA_Scaled (rbias, rmultiplier), HistogramNull());
             break;
         case TOOL_MAX_P_A_SCALED:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsMaxPA_Scaled (rbias, rmultiplier), HistogramNull());
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsMaxPA_Scaled (rbias, rmultiplier), HistogramNull());
             break;
 
         case TOOL_A_SCALED_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsA_Scaled (rbias, rmultiplier), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsA_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_P_SCALED_WITH_HISTOGRAM: // HERE: we could optimize this if we wanted to
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsP_Scaled (rbias, rmultiplier), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsP_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_P_MINUS_A_SCALED_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPminusA_Scaled (rbias, rmultiplier), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsPminusA_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_A_MINUS_P_SCALED_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsAminusP_Scaled (rbias, rmultiplier), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsAminusP_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_P_PLUS_A_SCALED_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPplusA_Scaled (rbias, rmultiplier), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsPplusA_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_P_TIMES_A_SCALED_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPtimesA_Scaled (rbias, rmultiplier), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsPtimesA_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_P_DIVBY_A_SCALED_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsPdivByA_Scaled (rbias, rmultiplier), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsPdivByA_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_A_DIVBY_P_SCALED_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsAdivByP_Scaled (rbias, rmultiplier), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsAdivByP_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_MIN_P_A_SCALED_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsMinPA_Scaled (rbias, rmultiplier), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsMinPA_Scaled (rbias, rmultiplier), *histogram);
             break;
         case TOOL_MAX_P_A_SCALED_WITH_HISTOGRAM:
-            imtool.convolve (kernel, kernel_w, kernel_h, bias,
-                             OpPequalsMaxPA_Scaled (rbias, rmultiplier), *histogram);
+            //imtool.convolve (kernel, kernel_w, kernel_h, bias,
+                             //OpPequalsMaxPA_Scaled (rbias, rmultiplier), *histogram);
             break;
 
         default:

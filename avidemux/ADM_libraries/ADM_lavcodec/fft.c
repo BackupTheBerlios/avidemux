@@ -75,7 +75,7 @@ int ff_fft_init(FFTContext *s, int nbits, int inverse)
                 /* 3DNow! for K6-2/3 */
                 s->fft_calc = ff_fft_calc_3dn;
             }
-#ifndef ADM_WIN32	// GRUNTSTER
+#ifndef __WIN32	// GRUNTSTER
 			else if (has_vectors & MM_SSE) {
                 /* SSE for P3/P4 */
                 s->imdct_calc = ff_imdct_calc_sse;

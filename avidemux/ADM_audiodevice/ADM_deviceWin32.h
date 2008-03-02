@@ -9,7 +9,7 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#ifdef ADM_WIN32
+#ifdef __WIN32
 
 class win32AudioDevice : public audioDevice
 {

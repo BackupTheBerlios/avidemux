@@ -34,7 +34,7 @@
 
 #include "config.h"
 #include <pthread.h>
-#define WIN32_CLASH
+
 #include "avifmt.h"
 #include "avifmt2.h"
 #include "ADM_audio/aviaudio.hxx"

@@ -1,7 +1,6 @@
 #ifndef __AVI_VARS
 #define __AVI_VARS
 #include "default.h"
-#include <assert.h>
 #include "fourcc.h"
 #include "ADM_editor/ADM_edit.hxx"
 //----------------------
@@ -16,7 +15,7 @@
 #if (defined( HAVE_LIBESD) && defined(HAVE_ESD_H)) || \
  defined(OSS_SUPPORT) || defined (USE_ARTS) || \
   defined(USE_SDL) || defined(CONFIG_DARWIN) || \
-  defined(ADM_WIN32) || defined(ALSA_SUPPORT)
+  defined(__WIN32) || defined(ALSA_SUPPORT)
   
 #define HAVE_AUDIO
 #endif

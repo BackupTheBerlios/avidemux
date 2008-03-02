@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 
-#ifndef ADM_WIN32
+#ifndef __WIN32
 #include <unistd.h>
 #endif
 
@@ -192,7 +192,7 @@ gint r;
 */
 uint8_t UI_getPhysicalScreenSize(uint32_t *w, uint32_t *h)
 {
-#ifdef ADM_WIN32
+#ifdef __WIN32
 	getWorkingArea(w, h);
 #else
 	static int inited = 0;

@@ -20,8 +20,6 @@
 #include <math.h>
 #include <pthread.h>
 
-#define WIN32_CLASH
-
 #include "default.h"
 
 #include "ADM_toolkit/toolkit.hxx"

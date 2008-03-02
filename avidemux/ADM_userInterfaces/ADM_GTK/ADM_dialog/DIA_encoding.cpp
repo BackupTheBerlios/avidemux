@@ -43,7 +43,7 @@ static gint on_destroy_abort(GtkObject * object, gpointer user_data);
 static void DIA_stop( void);
 static void change_priority(void);
 
-#ifndef ADM_WIN32
+#ifndef __WIN32
 static void shutdown_toggled(void);
 #endif
 
@@ -66,7 +66,7 @@ uint32_t useTray=0;
         
         gtk_register_dialog(dialog);
 
-	#ifndef ADM_WIN32
+	#ifndef __WIN32
 		// check for root privileges
 		if (getuid() != 0)
 		{
@@ -94,7 +94,7 @@ uint32_t useTray=0;
 
 		prefs->get(PRIORITY_ENCODING,&priority);
 
-	#ifndef ADM_WIN32
+	#ifndef __WIN32
 		// check for root privileges
 		if (getuid() == 0)
 		{
@@ -151,7 +151,7 @@ void DIA_stop( void)
 
 void change_priority(void)
 {
-#ifndef ADM_WIN32
+#ifndef __WIN32
 	if (getuid() != 0)
 	{
 		gtk_signal_disconnect_by_func(GTK_OBJECT(WID(combobox_priority)), GTK_SIGNAL_FUNC(change_priority), NULL);
@@ -171,7 +171,7 @@ void change_priority(void)
 	setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
 }
 
-#ifndef ADM_WIN32
+#ifndef __WIN32
 void shutdown_toggled(void)
 {
 	if (getuid() != 0)

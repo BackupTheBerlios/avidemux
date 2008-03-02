@@ -22,7 +22,7 @@
 
 #include "ADM_video/ADM_cache.h"
 
-#include <vector>
+//#include <vector>
 #include <string>
 
 #include <sys/time.h>
@@ -76,7 +76,7 @@ protected:
     // configure() method.  This would allow the objects to maintain a
     // persistent state in a more straightforward way.
 
-    typedef std::vector <float> FloatVector;
+    //typedef std::vector <float> FloatVector;
 
     class PersistentInfo
     {
@@ -85,7 +85,7 @@ protected:
         CONFcouple *  oldConf;
         uint32_t      refCount;
 
-        FloatVector   kernel;
+        //FloatVector   kernel;
         uint32_t      kernel_w;
         uint32_t      kernel_h;
 

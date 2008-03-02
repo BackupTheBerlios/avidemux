@@ -370,8 +370,8 @@ uint8_t  ADMImage::saveAsBmp(const char *filename)
   
   sz = _width* _height * 3;
 
-  bmfh.xHotspot = bmfh.yHotspot = 0;
-  bmfh.offsetToBits = sizeof (bmfh) + sizeof (bmph);
+  bmfh.bfReserved1 = bmfh.bfReserved2 = 0;
+  bmfh.bfOffBits = sizeof (bmfh) + sizeof (bmph);
 //_________________________________________
   bmph.biSize = sizeof (bmph);
   bmph.biWidth = _width;

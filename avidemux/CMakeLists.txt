@@ -460,7 +460,14 @@ ENDIF (ADM_UI_QT4)
 ###########################################
 IF (ADM_OS_WINDOWS)
 	ADD_ADMLIB_ALL_TARGETS(ADM_osSupport)
-	ADD_LIB_ALL_TARGETS(pthreadGC2 winmm wsock32 imagehlp)
+	
+	IF (MINGW)
+		ADD_LIB_ALL_TARGETS(imagehlp wsock32 pthreadGC2)
+	ELSEIF (CYGWIN)
+		ADD_LIB_ALL_TARGETS(pthread cygwin)
+	ENDIF (MINGW)
+	
+	ADD_LIB_ALL_TARGETS(winmm)
 	ADD_LIB_ALL_TARGETS("-mno-cygwin -Wl,--export-all-symbols")
 
 	ADD_TARGET_LDFLAGS(avidemux2_cli "-Wl,-subsystem,console")

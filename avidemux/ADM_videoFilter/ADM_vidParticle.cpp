@@ -18,7 +18,7 @@
 #include <math.h>
 #include <algorithm>
 #include <string>
-#include <vector>
+//#include <vector>
 using namespace std;
 
 #include "default.h"
@@ -547,7 +547,7 @@ PixelOffset ImageTool::aheadOffset [ImageTool::DIRECTION_COUNT] =
 
 uint8_t ImageTool::autoOutline (uint32_t x, uint32_t y)
 {
-    my_particle.init (debug);
+/*    my_particle.init (debug);
     PixelLocVec & outline = my_particle.outline;
 
     static int needbar = 1;
@@ -1070,7 +1070,7 @@ uint8_t ImageTool::autoOutline (uint32_t x, uint32_t y)
     }
 
 #endif // ? OLD_PARTICLE_WEDGE_SCHEME
-
+*/
     return 1;
 }
 

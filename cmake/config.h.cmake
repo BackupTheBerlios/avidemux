@@ -24,9 +24,6 @@
 /* Sparc workstations */
 #cmakedefine ADM_SPARC
 
-/* Build for Windows 32bits */
-#cmakedefine ADM_WIN32
-
 #if ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK || ${CONFIG_HEADER_TYPE} == ADM_BUILD_QT4
 /* use ALSA as possible audio device */
 #cmakedefine ALSA_SUPPORT
@@ -253,7 +250,7 @@
 #cmakedefine ADM_CPU_X86
 #cmakedefine ADM_CPU_X86_64
 
-#ifdef ADM_OS_WINDOWS
+#ifdef __MINGW32__
 #define rindex strrchr
 #define index strchr
 #define ftello ftello64

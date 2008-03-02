@@ -30,7 +30,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "DIA_factory.h"
 
-#ifdef ADM_WIN32
+#ifdef __WIN32
 #include "GUI_sdlRender.h"
 #endif
 
@@ -261,7 +261,7 @@ char     *globalGlyphName=NULL;
                              ,{RENDER_XV,   QT_TR_NOOP("XVideo (best)"),NULL}
 #endif
 #ifdef USE_SDL
-#ifdef ADM_WIN32
+#ifdef __WIN32
                              ,{RENDER_SDL,      QT_TR_NOOP("SDL (GDI)"),NULL}
 							 ,{RENDER_DIRECTX,      QT_TR_NOOP("SDL (DirectX)"),NULL}
 #else
@@ -317,10 +317,10 @@ char     *globalGlyphName=NULL;
 		#ifdef OSS_SUPPORT
 			{DEVICE_OSS, QT_TR_NOOP("OSS")},
 		#endif
-		#if	defined(USE_SDL) && !defined(ADM_WIN32)
+		#if	defined(USE_SDL) && !defined(__WIN32)
 			{DEVICE_SDL, QT_TR_NOOP("SDL")},
 		#endif
-		#ifdef ADM_WIN32
+		#ifdef __WIN32
 			{DEVICE_WIN32, QT_TR_NOOP("Win32")},
 		#endif
 			{DEVICE_DUMMY, QT_TR_NOOP("None")}
@@ -353,7 +353,7 @@ char     *globalGlyphName=NULL;
      
         // Filter path
         if( prefs->get(FILTERS_AUTOLOAD_PATH, &filterPath) != RC_OK )
-#ifndef ADM_WIN32
+#ifndef __WIN32
                filterPath = ADM_strdup("/tmp");
 #else
                filterPath = ADM_strdup("c:\\");
@@ -518,7 +518,7 @@ char     *globalGlyphName=NULL;
                 // Alternate mp3 tag (haali)
                 prefs->set(FEATURE_ALTERNATE_MP3_TAG,alternate_mp3_tag);
 
-			#if defined(ADM_WIN32) && defined(USE_SDL)
+			#if defined(__WIN32) && defined(USE_SDL)
 				// Initialise SDL again as driver may have changed
 				initSdl();
 			#endif

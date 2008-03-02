@@ -186,7 +186,7 @@ ADM_RENDER_TYPE render;
 uint8_t r=0;
 	ADM_assert(!accel_mode);
         
-#if !defined ADM_WIN32 && !defined(__APPLE__)
+#if !defined __WIN32 && !defined(__APPLE__)
 	// First check if local
 	// We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
 	// in that case we do not even try to use accel
@@ -236,7 +236,7 @@ uint8_t r=0;
 
 #if defined(USE_SDL)
 			case RENDER_SDL:
-#ifdef ADM_WIN32
+#ifdef __WIN32
 			case RENDER_DIRECTX:
 #endif
 				accel_mode=new sdlAccelRender();

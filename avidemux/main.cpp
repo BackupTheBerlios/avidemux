@@ -23,10 +23,8 @@
 
 #include "default.h"
 
-#ifdef ADM_WIN32
-#define WIN32_CLASH
+#ifdef __MINGW32__
 #include <windows.h>
-#include <wingdi.h>
 #include <excpt.h>
 #endif
 
@@ -81,12 +79,15 @@ extern void ADM_memStatInit( void );
 extern void ADM_memStatEnd( void );
 extern void getUIDescription(char*);
 
-#ifdef ADM_WIN32
+#ifdef __MINGW32__
 extern EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, void* pEstablisherFrame, struct _CONTEXT* pContextRecord, void* pDispatcherContext);
-extern bool getWindowsVersion(char* version);
-extern void redirectStdoutToFile(void);
 #else
 extern void installSigHandler(void);
+#endif
+
+#ifdef __WIN32
+extern bool getWindowsVersion(char* version);
+extern void redirectStdoutToFile(void);
 #endif
 
 extern uint8_t  quotaInit(void);
@@ -111,7 +112,7 @@ extern int check_leaks();
 
 int main(int argc, char *argv[])
 {
-#ifdef ADM_WIN32
+#ifdef __WIN32
 	redirectStdoutToFile();
 #endif
 
@@ -119,7 +120,7 @@ int main(int argc, char *argv[])
 	new_progname = argv[0];
 #endif
 
-#ifndef ADM_WIN32
+#ifndef __MINGW32__
 	// thx smurf uk :)
     installSigHandler();
 #endif
@@ -148,7 +149,7 @@ int main(int argc, char *argv[])
 
 	printf("Build Target: ");
 
-#if defined(ADM_WIN32)
+#if defined(__WIN32)
 	printf("Microsoft Windows");
 #elif defined(__APPLE__)
 	printf("Apple");
@@ -170,7 +171,7 @@ int main(int argc, char *argv[])
 	getUIDescription(uiDesc);
 	printf("User Interface: %s\n", uiDesc);
 
-#ifdef ADM_WIN32
+#ifdef __WIN32
 	char version[250];
 
 	if (getWindowsVersion(version))
@@ -198,7 +199,7 @@ int main(int argc, char *argv[])
 
 	atexit(onexit);
 
-#ifdef ADM_WIN32
+#ifdef __MINGW32__
     win32_netInit();
 #endif
 
@@ -256,7 +257,7 @@ int main(int argc, char *argv[])
     else
 		ADM_assert(0); 
 
-#ifdef ADM_WIN32
+#ifdef __MINGW32__
 	__try1(exceptionHandler);
 #endif
 

@@ -23,13 +23,12 @@
 
 #include <unistd.h>
 
-#ifdef WIN32
+#ifdef __MINGW32__
 #include <glib.h>
 #endif
 
 #include "default.h"
 #include "ADM_misc.h"
-
 
 #include "ADM_toolkit/filesel.h"
 #include "ADM_toolkit/toolkit.hxx"
@@ -42,26 +41,24 @@
 
 size_t ADM_fread (void *ptr, size_t size, size_t n, FILE *sstream)
 {
-  return fread(ptr,size,n,sstream); 
-  
+  return fread(ptr,size,n,sstream);
 }
 
 size_t ADM_fwrite (void *ptr, size_t size, size_t n, FILE *sstream)
 {
-  return fwrite(ptr,size,n,sstream); 
-  
+  return fwrite(ptr,size,n,sstream);
 }
 FILE  *ADM_fopen (const char *file, const char *mode)
 {
   FILE *f;
 
-#ifndef ADM_WIN32
-  return fopen(file,mode); 
-#else
+#ifdef __MINGW32__
   gchar *retval = g_locale_from_utf8 (file, -1, NULL, NULL, NULL);
   f=fopen(retval,mode);
   g_free (retval);
-  return f;  
+  return f;
+#else
+  return fopen(file,mode); 
 #endif
 }
 
@@ -76,7 +73,7 @@ static char customdir[1024]={0};
 int baseDirDone=0;
 int jobDirDone=0;
 int customDirDone=0;
-#ifdef ADM_WIN32
+#ifdef __WIN32
 const char *ADM_DIR_NAME="\\avidemux";
 #else
 const char *ADM_DIR_NAME="/.avidemux";
@@ -95,7 +92,7 @@ char *ADM_getCustomDir(void)
   char *rootDir;
   rootDir=ADM_getBaseDir();
   strncpy(customdir,rootDir,1023);
-#if defined(ADM_WIN32)
+#if defined(__WIN32)
   strcat(customdir,"\\custom"); 
 #else
   strcat(customdir,"/custom");
@@ -119,7 +116,7 @@ char *ADM_getJobDir(void)
   char *rootDir;
   rootDir=ADM_getBaseDir();
   strncpy(jobdir,rootDir,1023);
-#if defined(ADM_WIN32)
+#if defined(__WIN32)
   strcat(jobdir,"\\jobs"); 
 #else
   strcat(jobdir,"/jobs");
@@ -143,7 +140,7 @@ char *home;
 //
         if(baseDirDone) return basedir;
 // Get the base directory
-#if defined(ADM_WIN32)
+#if defined(__WIN32)
         if( ! (home=getenv("USERPROFILE")) )
         {
           GUI_Error_HIG(QT_TR_NOOP("Oops"),QT_TR_NOOP("can't determine $USERPROFILE."));
@@ -192,7 +189,7 @@ DIR *dir=NULL;
                   closedir(dir);
                   return 1;
               }
-#if defined(ADM_WIN32)
+#ifdef __MINGW32__
                 if(mkdir(dirname))
                 {
                     printf("Oops: mkdir failed on %s\n",dirname);   
@@ -297,14 +294,14 @@ char *PathCanonize(const char *tmpname)
 	{
 		out=new char [strlen(path)+2];
 		strcpy(out,path);
-#ifndef ADM_WIN32		
+#ifndef __WIN32		
 		strcat(out,"/");
 #else
 		strcat(out,"\\");
 #endif	
 		printf("\n Canonizing null string ??? (%s)\n",out);
 	}else if(tmpname[0]=='/'
-#if defined(ADM_WIN32)
+#if defined(__WIN32)
 		|| tmpname[1]==':'
 #endif	
 	
@@ -316,7 +313,7 @@ char *PathCanonize(const char *tmpname)
 	}else{
 		out=new char[strlen(path)+strlen(tmpname)+6];
 		strcpy(out,path);
-#ifndef ADM_WIN32		
+#ifndef __WIN32		
 		strcat(out,"/");
 #else
 		strcat(out,"\\");
@@ -335,7 +332,7 @@ void		PathStripName(char *str)
 		int len=strlen(str);
 		if(len<=1) return;
 		len--;
-#ifndef ADM_WIN32		
+#ifndef __WIN32		
 		while( *(str+len)!='/' && len)
 #else
 	while( *(str+len)!='\\' && len)
@@ -354,7 +351,7 @@ const char *GetFileName(const char *str)
 {
 	char *filename;
         char *filename2;
-#ifndef ADM_WIN32		
+#ifndef __WIN32		
 	filename = strrchr(str, '/');
         
 #else

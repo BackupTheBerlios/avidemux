@@ -17,7 +17,6 @@
 
 #include "default.h"
 
-#ifndef ADM_WIN32 
 #ifdef USE_ARTS
 #include <artsc.h>
 
@@ -119,5 +118,4 @@ void dummy_art_func( void);
 void dummy_art_func( void)
  {
 }
-#endif
 #endif

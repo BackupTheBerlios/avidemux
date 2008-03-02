@@ -21,7 +21,7 @@
 #ifndef __AVIFMT2__
 #define __AVIFMT2__
 
-#if !defined( WIN32_CLASH) || !defined(ADM_WIN32)
+#ifndef _WINGDI_
 typedef struct
 {
     uint32_t 		biSize;
@@ -36,11 +36,12 @@ typedef struct
     uint32_t 		biClrUsed;
     uint32_t 		biClrImportant;
 } BITMAPINFOHEADER, *PBITMAPINFOHEADER, *LPBITMAPINFOHEADER;
+
 typedef struct {
 	BITMAPINFOHEADER bmiHeader;
 	int	bmiColors[1];
 } BITMAPINFO, *LPBITMAPINFO;
-#endif //win32clash
+#endif // _WINGDI_
 
 void printBih(BITMAPINFOHEADER *bi);
 /* Borrowed from vdub

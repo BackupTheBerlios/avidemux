@@ -12,7 +12,7 @@
 #include "config.h"
 #include <stdio.h>
 
-#if defined(ADM_WIN32)
+#if defined(__MINGW32__)
 #include <pthread.h>
 #elif defined(__APPLE__) || defined(ADM_BSD_FAMILY)
 #include <sys/types.h>
@@ -196,7 +196,7 @@ int rval=0;
 // Stolen from x264
 int ADM_cpu_num_processors(void)
 {
-#if defined(ADM_WIN32)
+#if defined(__MINGW32__)
     return pthread_num_processors_np();
 #elif defined(__APPLE__) || defined(ADM_BSD_FAMILY)
     int np;
@@ -207,7 +207,7 @@ int ADM_cpu_num_processors(void)
         np = 1;
 
     return np;
-#else
+#elif defined(__unix__) && !defined(__CYGWIN__)
     unsigned int bit;
     int np;
 
@@ -219,5 +219,7 @@ int ADM_cpu_num_processors(void)
         np += (((uint8_t *)&p_aff)[bit / 8] >> (bit % 8)) & 1;
 
     return np;
+#else
+	return 1;
 #endif
 }

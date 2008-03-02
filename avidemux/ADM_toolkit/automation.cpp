@@ -22,7 +22,7 @@
 #include <stdlib.h>
 //#include <glib.h>
 #include <signal.h>
-#ifndef ADM_WIN32
+#ifndef __WIN32
 #include <unistd.h>
 #endif
 #include <math.h>

@@ -9,7 +9,7 @@ void initGetText(void)
 {
 	char *local = setlocale(LC_ALL, "");
 
-#ifdef ADM_WIN32
+#ifdef __WIN32
 	bindtextdomain("avidemux", "./share/locale");
 #else
 	bindtextdomain("avidemux", ADMLOCALE);
@@ -31,7 +31,7 @@ void initGetText(void)
 	if(local)
 		printf("[Locale] Textdomain is now %s\n", local);
 
-#ifndef ADM_WIN32
+#ifndef __WIN32
 	printf("[Locale] Files for %s appear to be in %s\n","avidemux", ADMLOCALE);
 #endif
 	printf("[Locale] Test: %s\n\n", dgettext("avidemux", "_File"));

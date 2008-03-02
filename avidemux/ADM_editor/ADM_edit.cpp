@@ -22,19 +22,12 @@
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <unistd.h>
-#include <pthread.h>
-#define WIN32_CLASH
-//#include <unistd.h>
-#ifdef ADM_WIN32
-#include "sys/stat.h"
-#endif
-#ifdef ADM_BSD_FAMILY
-#include "sys/stat.h"
-#endif
-#include "ADM_assert.h"
 
-#include "config.h"
+#if defined(__MINGW32__) || defined(ADM_BSD_FAMILY)
+#include <sys/stat.h>
+#endif
+
+#include "ADM_assert.h"
 #include "fourcc.h"
 #include "avio.hxx"
 #include "ADM_editor/ADM_edit.hxx"
@@ -358,7 +351,7 @@ thisIsMpeg:
                     printf("Filesystem is writable\n");
 		}else if( errno == EROFS ){
 		  char *tmpdir = getenv("TMPDIR");
-#ifdef ADM_WIN32
+#ifdef __WIN32
                         printf("Filesystem is not writable, looking for somewhere else\n");
 			if( !tmpdir )
 				tmpdir = "c:";

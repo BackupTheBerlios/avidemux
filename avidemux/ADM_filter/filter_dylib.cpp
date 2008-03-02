@@ -17,12 +17,9 @@
 
 //#define USE_EDLL
 
-
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#define WIN32_CLASH
-#ifdef ADM_WIN32
+
+#ifdef __MINGW32__
 #include <windows.h> 
 #ifdef USE_EDLL
 #include "edll/edll.h"
@@ -32,25 +29,19 @@
 #include <dlfcn.h>
 #endif
 
+#include "default.h"
 #include "ADM_assert.h"
-
-#include "fourcc.h"
-#include "avio.hxx"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
-#include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-#include "ADM_video/ADM_vidPartial.h"
-#include "avi_vars.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_PREVIEW
 #include "ADM_osSupport/ADM_debug.h"
-#include "ADM_osSupport/ADM_quota.h"
 
-#ifdef ADM_WIN32
+#ifdef __MINGW32__
 #ifdef USE_EDLL
 #define TYPEOFHANDLE     edll_module *
 #define OPENLIB(x)       edll_open(x)

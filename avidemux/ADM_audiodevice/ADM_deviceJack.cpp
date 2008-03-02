@@ -7,12 +7,10 @@
 
 #include "config.h"
 
-#if defined(USE_JACK) && !defined(ADM_WIN32)
-
+#if defined(USE_JACK)
 #include <unistd.h>
 #include <stdio.h>
 #include <stdint.h>
-
 
 #include "default.h"
 #include "ADM_audiodevice.h"

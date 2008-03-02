@@ -40,15 +40,12 @@
 
 extern AVDMGenericAudioStream *currentaudiostream;
 
-
-#ifndef ADM_WIN32
-#ifdef ADM_BSD_FAMILY
-                #define POW10(x) powf(10.0,x)
+#ifdef __WIN32
+#define POW10(x)   pow(10,x)
+#elif defined(ADM_BSD_FAMILY)
+#define POW10(x) powf(10.0,x)
 #else
-                #define POW10(x)  pow10f(x)
-#endif
-#else
-                #define POW10(x)   pow(10,x)
+#define POW10(x)  pow10f(x)
 #endif
 
 #define LINEAR_TO_DB(x) (20.*log10(x))

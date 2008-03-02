@@ -18,8 +18,8 @@
 #include "default.h"
 
 #include <gtk/gtk.h>
-#ifdef ADM_WIN32
-#define WIN32_CLASH
+
+#ifdef __WIN32
 #include <gdk/gdkwin32.h>
 #elif defined(__APPLE__)
 extern "C"
@@ -107,7 +107,7 @@ void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo)
           
         win = gtk_widget_get_parent_window(widget);
 
-#ifdef ADM_WIN32
+#ifdef __WIN32
 		xinfo->display = (void*)GDK_WINDOW_HWND(widget->window);
 #elif defined(__APPLE__)
 		int windowWidth, windowHeight;

@@ -74,7 +74,7 @@ FILE *qfopen(const char *path, const char *mode){
 	while( !FD ){
 		FD = fopen (path,mode);
 		if( !FD && (errno == ENOSPC 
-#ifndef ADM_WIN32
+#ifndef __MINGW32__
 || errno == EDQUOT
 #endif
 ) ){
@@ -157,7 +157,7 @@ ssize_t qwrite(int fd, const void *buf, size_t numbytes){
 			continue;
 		}
 		if( rc == -1 && (errno == ENOSPC 
-#ifndef ADM_WIN32
+#ifndef __MINGW32__
 || errno == EDQUOT
 #endif
 ) ){

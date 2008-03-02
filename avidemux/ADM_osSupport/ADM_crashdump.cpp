@@ -20,20 +20,17 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <default.h>
 #include <unistd.h>
-
 #include <math.h>
-#include "ADM_assert.h"
 
-#if defined(ADM_WIN32)
-#define WIN32_CLASH
+#ifdef __MINGW32__
 #include <windows.h>
 #include <excpt.h>
 #include <imagehlp.h>
 #endif
 
 #include "default.h"
+#include "ADM_assert.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 #include "ADM_editor/ADM_edit.hxx"
@@ -56,7 +53,7 @@ void ADM_backTrack(int lineno,const char *file)
 	GUI_Error_HIG("Fatal Error",bfr);
 	assert(0);
 }
-#elif defined(WIN32)
+#elif defined(__MINGW32__)
 typedef struct STACK_FRAME
 {
     STACK_FRAME* ebp;	// address of the calling function frame
@@ -249,7 +246,11 @@ EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, 
 }
 #else
 #include <signal.h>
+
+#ifndef __CYGWIN__
 #include <execinfo.h>
+#endif
+
 void sig_segfault_handler(int signo);
 void installSigHandler()
 {
@@ -369,6 +370,8 @@ void ADM_backTrack(int lineno,const char *file)
      int count, i;
       
      saveCrashProject();
+
+#ifndef __CYGWIN__
       printf("\n*********** BACKTRACK **************\n");
       count = backtrace(stack, 20);
       functions = backtrace_symbols(stack, count);
@@ -391,7 +394,8 @@ void ADM_backTrack(int lineno,const char *file)
       const char *title="Crash BackTrace";
       if(lineno) title="Assert failed";
       diaFactoryRun(title,count+1,(diaElem **)txt);
-      
+#endif __CYGWIN__
+
       //
      printf("Memory stat:\n");
      ADMImage_stat();

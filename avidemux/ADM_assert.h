@@ -62,7 +62,7 @@ extern adm_fast_memcpy myAdmMemcpy;
 }
 #endif
 // Compatibility with fprintf etc.. with long long & win32
-#ifdef ADM_WIN32
+#ifdef __WIN32
         #define LLX "I64x"
         #define LLU "I64u"
         

@@ -53,10 +53,10 @@ static const DEVICELIST audioDeviceList[]=
 #ifdef __APPLE__
 	MKADID(COREAUDIO),
 #endif
-#if	defined(USE_SDL) && !defined(ADM_WIN32)	
+#if	defined(USE_SDL) && !defined(__WIN32)	
 	MKADID(SDL),
 #endif	
-#ifdef ADM_WIN32	
+#ifdef __WIN32	
 	MKADID(WIN32),
 #endif	
 #ifdef USE_ESD	

@@ -1,18 +1,19 @@
 #include "config.h"
 
-#ifdef ADM_WIN32
-#define WIN32_CLASH
+#ifdef __WIN32
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <windows.h>
+
+#ifdef __MINGW32__
+#include <winsock2.h>
+#endif
 
 #include "default.h" 
 #include "ADM_misc.h"
-#include "windows.h"
-#include "io.h"
-#include "winsock2.h"
 #include "ADM_assert.h" 
 
-uint8_t win32_netInit(void);
 extern char *ADM_getBaseDir(void);
 
 void ADM_usleep(unsigned long us)
@@ -20,20 +21,25 @@ void ADM_usleep(unsigned long us)
 	Sleep(us/1000);
 }
 
+#ifdef __MINGW32__
 uint8_t win32_netInit(void)
 {
-WSADATA wsaData;
+	WSADATA wsaData;
 	int iResult;
-		printf("Initializing WinSock\n");
-		iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-		if (iResult != NO_ERROR)
-		{
-			printf("Error at WSAStartup()\n");
-			return 0;
-		}	
-		printf("WinSock ok\n");
-		return 1;
+
+	printf("Initializing WinSock\n");
+	iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+
+	if (iResult != NO_ERROR)
+	{
+		printf("Error at WSAStartup()\n");
+		return 0;
+	}	
+
+	printf("WinSock ok\n");
+	return 1;
 }
+#endif
 
 #ifndef HAVE_GETTIMEOFDAY
 extern "C"
@@ -57,7 +63,7 @@ void gettimeofday(struct timeval *p, void *tz)
 
 	return;
 }
-#endif
+#endif	// HAVE_GETTIMEOFDAY
 
 int getpriority(int which, int who)
 {
@@ -480,6 +486,6 @@ void redirectStdoutToFile(void)
 	setvbuf(stderr, NULL, _IOLBF, BUFSIZ);
 
 	delete[] logPath;
-#endif
+#endif	// USE_SDL
 }
-#endif
+#endif	// __WIN32

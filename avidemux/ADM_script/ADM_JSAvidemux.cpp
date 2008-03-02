@@ -10,32 +10,19 @@
 //
 //
 #include "config.h"
-#include <stdlib.h>
+
 #include <math.h>
-#include <pthread.h>
-#define WIN32_CLASH
-#include "ADM_JSAvidemux.h"
+
 #include "default.h"
+#include "ADM_JSAvidemux.h"
+#include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "../ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
-#include "ADM_editor/ADM_outputfmt.h"
-#include "ADM_audiofilter/audioeng_buildfilters.h"
-#include "adm_scanner.h" 
-#include "avi_vars.h"
-#include "gui_action.hxx"
-#include "ADM_encoder/ADM_vidEncode.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_encoder/adm_encoder.h"
-#include "ADM_encoder/adm_encConfig.h"
-#include "ADM_editor/ADM_outputfmt.h"
-#include "../ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
-#include "ADM_filter/video_filters.h"
 #include "ADM_script/ADM_container.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_SCRIPT
 #include "ADM_osSupport/ADM_debug.h"
-
 
 extern int A_openAvi (char *name);
 extern int A_Save (const char *name);

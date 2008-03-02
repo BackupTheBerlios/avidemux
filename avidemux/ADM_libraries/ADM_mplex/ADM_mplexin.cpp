@@ -17,9 +17,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <errno.h>
-#ifdef ADM_WIN32
-#include <io.h>
-#endif
+
 #include "interact.hpp"
 
 #undef malloc
@@ -63,7 +61,7 @@ int FileOutputStream::Open()
   char msg[512];
    while( !(strm = fopen( cur_filename, "wb" )) ){
       if( errno == ENOSPC
-#ifndef ADM_WIN32
+#ifndef __MINGW32__
                           || errno == EDQUOT
 #endif
                                              ){
@@ -129,7 +127,7 @@ FileOutputStream::Write( uint8_t *buf, unsigned int len )
          continue;
       }
       if( rc == -1 && (errno == ENOSPC
-#ifndef ADM_WIN32
+#ifndef __MINGW32__
                                        || errno == EDQUOT
 #endif
                                                           ) ){

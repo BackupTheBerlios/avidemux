@@ -16,8 +16,7 @@
  ***************************************************************************/
 #include "config.h"
 
-#if defined( OSS_SUPPORT ) && !defined(ADM_WIN32)
-
+#ifdef OSS_SUPPORT
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

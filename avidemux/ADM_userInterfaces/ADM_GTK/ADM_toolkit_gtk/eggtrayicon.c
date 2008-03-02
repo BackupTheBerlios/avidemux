@@ -18,7 +18,7 @@
  * Boston, MA 02111-1307, USA.
  */
 #include "config.h"
-#ifndef ADM_WIN32
+#ifndef __WIN32
 
 #include <gtk/gtk.h>
 #include <gtk/gtkversion.h>

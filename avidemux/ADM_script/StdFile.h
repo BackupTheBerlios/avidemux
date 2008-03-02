@@ -23,7 +23,7 @@ at amistry@am-productions.biz
 
 using namespace std;
 
-#ifdef ADM_WIN32
+#ifdef __WIN32
 	const char DIRECTORY_DELIMITOR = '\\';
 #else
 	const char DIRECTORY_DELIMITOR = '/';

@@ -5,7 +5,7 @@
 
 #include "ADM_libraries/ADM_smjs/jsapi.h"
 #include <pthread.h>
-#define WIN32_CLASH
+
 // javscript debugging helper
 void printJSError(JSContext *cx, const char *message, JSErrorReport *report);
 bool SpidermonkeyInit();
@@ -19,7 +19,7 @@ void *StartThreadSpidermonkey(void *pData);
 #else
 #define JSVAR(a,b,c) extern a b
 #endif
-#if defined( ADM_WIN32) && defined(JSDECLARE)
+#if defined( __MINGW32__) && defined(JSDECLARE)
  pthread_t g_pThreadSpidermonkey ;
 #else
 JSVAR( pthread_t, g_pThreadSpidermonkey , 0);

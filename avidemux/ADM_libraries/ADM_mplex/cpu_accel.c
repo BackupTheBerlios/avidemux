@@ -348,7 +348,7 @@ void *bufalloc( size_t size )
 #endif		
 	}
 		
-#ifdef ADM_WIN32	// GRUNTSTER
+#ifdef __MINGW32__	// GRUNTSTER
 	pgsize = 4096;
 #else
 	pgsize = sysconf(_SC_PAGESIZE);

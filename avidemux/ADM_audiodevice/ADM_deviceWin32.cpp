@@ -12,7 +12,7 @@
 
 #include "config.h"
 
-#ifdef ADM_WIN32
+#ifdef __WIN32
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>

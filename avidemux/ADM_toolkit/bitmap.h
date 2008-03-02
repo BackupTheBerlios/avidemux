@@ -42,11 +42,13 @@ typedef struct BITMAPHEADER
 */
 } BITMAPHEADER;
 
+#ifndef _WINGDI_
 typedef struct BITMAPFILEHEADER
 {
-   uint16_t    type;
-	 uint32_t    size;
-   int16_t     xHotspot;
-   int16_t     yHotspot;
-   uint32_t    offsetToBits;
+   uint16_t    bfType;
+   uint32_t    bfSize;
+   int16_t     bfReserved1;
+   int16_t     bfReserved2;
+   uint32_t    bfOffBits;
 }  BITMAPFILEHEADER;
+#endif
