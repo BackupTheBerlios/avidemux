@@ -22,13 +22,8 @@ MESSAGE("")
 ########################################
 # Global options
 ########################################
-OPTION(XMINGW "" OFF)
 OPTION(VERBOSE "" OFF)
 OPTION(LATE_BINDING "" OFF)
-
-IF (XMINGW)
-	SET(WIN32 1)
-ENDIF (XMINGW)
 
 IF (LATE_BINDING)
 	SET(USE_LATE_BINDING 1)
@@ -44,10 +39,10 @@ IF (CYGWIN)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwin32")
 ENDIF (CYGWIN)
 
-IF (UNIX)
+IF (UNIX AND NOT APPLE)
 	# jog shuttle is only available on Linux due to its interface
 	SET(USE_JOG 1)
-ENDIF (UNIX)
+ENDIF (UNIX AND NOT APPLE)
 
 ########################################
 # Standard Avidemux defines

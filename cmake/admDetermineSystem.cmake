@@ -9,20 +9,29 @@
 INCLUDE(CMakeDetermineSystem)
 INCLUDE(TestBigEndian)
 
-IF (APPLE)
+MESSAGE(STATUS "Checking GCC support")
+MESSAGE(STATUS "********************")
+
+########################################
+# Check OS support
+########################################
+ADM_COMPILE(bsd_check.cpp "" "" "" BSD_SUPPORTED outputBsdTest)
+
+IF (BSD_SUPPORTED)
 	SET(ADM_BSD_FAMILY 1)
-ELSEIF (UNIX)
-	IF (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-		SET(ADM_BSD_FAMILY 1)
-	ENDIF (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-ENDIF (APPLE)
+
+	MESSAGE(STATUS "Check if GCC is BSD family - Yes")
+ELSE (BSD_SUPPORTED)
+	MESSAGE(STATUS "Check if GCC is BSD family - No")
+
+	IF (VERBOSE)
+		MESSAGE("Error Message: ${outputBsdTest}")
+	ENDIF (VERBOSE)
+ENDIF (BSD_SUPPORTED)
 
 ########################################
 # Check CPU support
 ########################################
-MESSAGE(STATUS "Checking GCC support")
-MESSAGE(STATUS "********************")
-
 # x86_64
 ADM_COMPILE(cpu_x86-64_check.cpp "" "" "" X86_64_SUPPORTED outputx86_64Test)
 
