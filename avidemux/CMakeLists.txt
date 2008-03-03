@@ -63,7 +63,7 @@ ENDIF (GETTEXT_FOUND)
 ########################################
 # Embed resources for executables
 ########################################
-IF (ADM_OS_DARWIN)
+IF (APPLE)
 	# add icon
 	SET(ADM_EXE_SRCS ${ADM_EXE_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/xpm/avidemux.icns)
 	SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/xpm/avidemux.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
@@ -80,9 +80,9 @@ IF (ADM_OS_DARWIN)
 	SET(MACOSX_BUNDLE_LONG_VERSION_STRING "${ADM_OSX_VERSION}") 
 	SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${ADM_OSX_VERSION}")
 	SET(MACOSX_BUNDLE_VERSION "${ADM_OSX_VERSION}")
-ENDIF (ADM_OS_DARWIN)
+ENDIF (APPLE)
 
-IF (ADM_OS_WINDOWS)
+IF (WIN32)
 	# add icon and version info
 	SET(FILEVERSION_STRING "${VERSION}.0.${ADM_SUBVERSION}")
 	SET(PRODUCTVERSION_STRING "${VERSION}")
@@ -94,7 +94,7 @@ IF (ADM_OS_WINDOWS)
 	ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/admWin32.obj COMMAND windres.exe -i ${CMAKE_CURRENT_BINARY_DIR}/admWin32.rc -o ${CMAKE_CURRENT_BINARY_DIR}/admWin32.obj -O coff --define VS_VERSION_INFO=1)
 
 	SET(ADM_EXE_SRCS ${ADM_EXE_SRCS} "${CMAKE_CURRENT_BINARY_DIR}/admWin32.obj")
-ENDIF (ADM_OS_WINDOWS)
+ENDIF (WIN32)
 
 ########################################
 # Our exectuables
@@ -235,10 +235,10 @@ IF (ADM_DEBUG AND FIND_LEAKS)
 	ADD_ADMLIB_ALL_TARGETS(ADM_nvwa)
 ENDIF (ADM_DEBUG AND FIND_LEAKS)
 
-IF (ADM_OS_DARWIN AND USE_SDL)
+IF (APPLE AND USE_SDL)
 	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_libsdl_gtk)
 	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_libsdl_qt4)
-ENDIF (ADM_OS_DARWIN AND USE_SDL)
+ENDIF (APPLE AND USE_SDL)
 
 ###########################################
 # Construct ADM_userInterface
@@ -317,11 +317,11 @@ IF (USE_PNG)
 	ENDIF (ADM_UI_GTK)
 	
 	IF (ADM_UI_QT4)
-		IF (ADM_OS_DARWIN AND NOT QT_USE_FRAMEWORKS)
+		IF (APPLE AND NOT QT_USE_FRAMEWORKS)
 			TARGET_LINK_LIBRARIES(avidemux2_qt4 ${PNG_LIBRARIES})
-		ELSEIF (NOT ADM_OS_DARWIN)
+		ELSEIF (NOT APPLE)
 			TARGET_LINK_LIBRARIES(avidemux2_qt4 ${PNG_LIBRARIES})
-		ENDIF (ADM_OS_DARWIN AND NOT QT_USE_FRAMEWORKS)
+		ENDIF (APPLE AND NOT QT_USE_FRAMEWORKS)
 	ENDIF (ADM_UI_QT4)
 ENDIF (USE_PNG)
 
@@ -458,7 +458,7 @@ ENDIF (ADM_UI_QT4)
 ###########################################
 # OS Specific
 ###########################################
-IF (ADM_OS_WINDOWS)
+IF (WIN32)
 	ADD_ADMLIB_ALL_TARGETS(ADM_osSupport)
 	
 	IF (MINGW)
@@ -483,14 +483,14 @@ IF (ADM_OS_WINDOWS)
 	IF (CMAKE_BUILD_TYPE STREQUAL "Release")
 		ADD_LDFLAGS_ALL_TARGETS("-Wl,-s")
 	ENDIF (CMAKE_BUILD_TYPE STREQUAL "Release")
-ENDIF (ADM_OS_WINDOWS)
+ENDIF (WIN32)
 
-IF (ADM_OS_DARWIN)
+IF (APPLE)
 	ADD_LIB_ALL_TARGETS("-framework CoreServices -framework CoreAudio -framework AudioUnit -framework Carbon -framework Cocoa")
 
 	# for Leopard but it doesn't hurt Tiger
 	ADD_LIB_ALL_TARGETS("-Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib")
-ENDIF (ADM_OS_DARWIN)
+ENDIF (APPLE)
 
 ###########################################
 # Install

@@ -14,7 +14,7 @@ at amistry@am-productions.biz
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#ifdef __unix__
+#if defined(__unix__) || defined(__APPLE__)
 int CDirectorySearch::_findnext(unsigned long int hDir,_finddata_t *pfdData)
 {// begin _findnext
 	if(!hDir || hDir == 0xFFFFFFFF)

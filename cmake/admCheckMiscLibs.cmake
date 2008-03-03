@@ -120,7 +120,7 @@ MESSAGE("")
 ########################################
 # XVideo
 ########################################
-IF (ADM_OS_LINUX)
+IF (UNIX AND NOT APPLE)
 	OPTION(XVIDEO "" ON)
 
 	IF (XVIDEO)
@@ -136,6 +136,6 @@ IF (ADM_OS_LINUX)
 
 		MESSAGE("")
 	ENDIF (XVIDEO)
-ELSE (ADM_OS_LINUX)
+ELSE (UNIX AND NOT APPLE)
 	SET(XVIDEO_CAPABLE FALSE)
-ENDIF (ADM_OS_LINUX)
+ENDIF (UNIX AND NOT APPLE)

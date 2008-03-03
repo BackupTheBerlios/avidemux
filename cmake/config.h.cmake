@@ -84,9 +84,6 @@
 #cmakedefine HAVE_SSSE3
 #cmakedefine CONFIG_DARWIN
 
-/* Name mangling */
-#cmakedefine CYG_MANGLING
-
 /* Mad */
 #cmakedefine FPM_DEFAULT
 #cmakedefine FPM_INTEL
@@ -242,10 +239,6 @@
 
 /* use Nvwa memory leak detector */
 #cmakedefine FIND_LEAKS
-
-#cmakedefine ADM_OS_DARWIN
-#cmakedefine ADM_OS_LINUX
-#cmakedefine ADM_OS_WINDOWS
 
 #cmakedefine ADM_CPU_X86
 #cmakedefine ADM_CPU_X86_64

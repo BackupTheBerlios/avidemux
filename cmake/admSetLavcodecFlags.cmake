@@ -36,30 +36,27 @@ ELSE (ADM_CPU_X86 OR ADM_CPU_X86_64)
 	SET(ENABLE_MMX 0)
 ENDIF (ADM_CPU_X86 OR ADM_CPU_X86_64)
 
-IF (ADM_OS_DARWIN)
+IF (APPLE)
 	SET(CONFIG_DARWIN 1)
-ENDIF (ADM_OS_DARWIN)
+ENDIF (APPLE)
 
 ########################################
 # Check GCC support for SSSE3
 ########################################
 IF (ADM_CPU_X86 OR ADM_CPU_X86_64)
-	MESSAGE(STATUS "Checking GCC support for SSSE3")
-	MESSAGE(STATUS "******************************")
-
-	ADM_COMPILE(ssse3_check.cpp "" "" "" SSSE3_SUPPORTED outputSsse3Test)
+	ADM_COMPILE(cpu_ssse3_check.cpp "" "" "" SSSE3_SUPPORTED outputSsse3Test)
 
 	IF (SSSE3_SUPPORTED)
 		SET(HAVE_SSSE3 1)
 
-		MESSAGE(STATUS "GCC supports SSSE3")
+		MESSAGE(STATUS "Check if GCC supports SSSE3 - Yes")
 	ELSE (SSSE3_SUPPORTED)
-		MESSAGE(STATUS "GCC doesn't support SSSE3")
+		MESSAGE(STATUS "Check if GCC supports SSSE3 - No")
 
 		IF (VERBOSE)
 			MESSAGE("Error Message: ${outputSsse3Test}")
 		ENDIF (VERBOSE)	
 	ENDIF (SSSE3_SUPPORTED)
-
-	MESSAGE("")
 ENDIF (ADM_CPU_X86 OR ADM_CPU_X86_64)
+
+MESSAGE("")

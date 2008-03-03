@@ -9,9 +9,9 @@ DIA_animated.cpp      DIA_ocr.cpp DIA_tsSub.cpp
 DIA_flyEq2.cpp        DIA_flv1.cpp            DIA_flyThreshold.cpp DIA_flyParticle.cpp DIA_flyEraser.cpp DIA_flySwissArmyKnife.cpp
 )
 
-IF (ADM_OS_DARWIN)
+IF (APPLE)
 	SET(${ADM_LIB}_SRCS ${${ADM_LIB}_SRCS} GUI_sdlRenderHelper.m)
-ENDIF (ADM_OS_DARWIN)
+ENDIF (APPLE)
 
 ADD_ADM_LIB_ALL_TARGETS(${ADM_LIB} ${${ADM_LIB}_SRCS})
 

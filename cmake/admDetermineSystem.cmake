@@ -1,47 +1,93 @@
-# - determine CPU and Operating System
-#  ADM_CPU_X86      - x86 CPU architecture was detected
-#  ADM_CPU_X86_64   - x86-64 CPU architecture was detected
-#  ADM_OS_DARWIN    - Mac OS X was detected
-#  ADM_OS_LINUX     - Linux was detected
-#  ADM_OS_WINDOWS   - Microsoft Windows was detected
+# Determine CPU and Operating System for GCC
+#  ADM_BSD_FAMILY        - BSD family operating system was detected
+#  ADM_CPU_ALTIVEC       - PowerPC CPU with AltiVec architecture was detected
+#  ADM_CPU_PPC           - PowerPC CPU architecture was detected
+#  ADM_CPU_X86           - x86 CPU architecture was detected
+#  ADM_CPU_X86_64        - x86-64 CPU architecture was detected
+#  CMAKE_WORDS_BIGENDIAN - big endian CPU detected
 
 INCLUDE(CMakeDetermineSystem)
 INCLUDE(TestBigEndian)
 
-# override detected processor for cross-compilation purposes
-IF (CROSS_SYSTEM_PROCESSOR)
-	SET(CROSS_SYSTEM_PROCESSOR ${CROSS_SYSTEM_PROCESSOR} CACHE INTERNAL "")
-	SET(CMAKE_SYSTEM_PROCESSOR ${CROSS_SYSTEM_PROCESSOR})
-ENDIF (CROSS_SYSTEM_PROCESSOR)
-
-IF (WIN32)
-	SET(ADM_OS_WINDOWS 1)
-ELSEIF (APPLE AND UNIX)
-	SET(ADM_OS_DARWIN 1)
+IF (APPLE)
 	SET(ADM_BSD_FAMILY 1)
 ELSEIF (UNIX)
-	SET(ADM_OS_LINUX 1)
-	
 	IF (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
 		SET(ADM_BSD_FAMILY 1)
 	ENDIF (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-ENDIF (WIN32)
+ENDIF (APPLE)
 
-IF (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i386" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i586" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i686")
-	SET(ADM_CPU_X86 1)
-ELSEIF (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "amd64")
+########################################
+# Check CPU support
+########################################
+MESSAGE(STATUS "Checking GCC support")
+MESSAGE(STATUS "********************")
+
+# x86_64
+ADM_COMPILE(cpu_x86-64_check.cpp "" "" "" X86_64_SUPPORTED outputx86_64Test)
+
+IF (X86_64_SUPPORTED)
 	SET(ADM_CPU_X86_64 1)
-ELSEIF (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ppc" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "powerpc" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "Power Macintosh")
-	SET(ADM_CPU_PPC 1)
-ENDIF (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i386" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i586" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i686")
+
+	MESSAGE(STATUS "Check if GCC is x86 64-bit - Yes")
+ELSE (X86_64_SUPPORTED)
+	MESSAGE(STATUS "Check if GCC is x86 64-bit - No")
+
+	IF (VERBOSE)
+		MESSAGE("Error Message: ${outputx86_64Test}")
+	ENDIF (VERBOSE)
+
+	# x86
+	ADM_COMPILE(cpu_x86_check.cpp "" "" "" X86_SUPPORTED outputX86Test)
+
+	IF (X86_SUPPORTED)
+		SET(ADM_CPU_X86 1)
+
+		MESSAGE(STATUS "Check if GCC is x86 32-bit - Yes")
+	ELSE (X86_SUPPORTED)
+		MESSAGE(STATUS "Check if GCC is x86 32-bit - No")
+
+		IF (VERBOSE)
+			MESSAGE("Error Message: ${outputX86Test}")
+		ENDIF (VERBOSE)
+
+		# PowerPC
+		ADM_COMPILE(cpu_ppc_check.cpp "" "" "" POWERPC_SUPPORTED outputPowerPcTest)
+
+		IF (POWERPC_SUPPORTED)
+			SET(ADM_CPU_PPC 1)
+
+			SET(ADM_ALTIVEC_FLAGS "-mabi=altivec -maltivec")
+
+			IF (APPLE)
+				SET(ADM_ALTIVEC_FLAGS "${ADM_ALTIVEC_FLAGS} -faltivec")
+			ENDIF (APPLE)
+
+			MESSAGE(STATUS "Check if GCC is PowerPC - Yes")	
+			ADM_COMPILE(cpu_altivec_check.cpp "${ADM_ALTIVEC_FLAGS}" "" "" ALTIVEC_SUPPORTED outputAltivecTest)
+
+			IF (ALTIVEC_SUPPORTED)
+				SET(ADM_CPU_ALTIVEC 1)
+				MESSAGE(STATUS "Check if GCC is AltiVec - Yes")
+			ELSE (ALTIVEC_SUPPORTED)
+				MESSAGE(STATUS "Check if GCC is AltiVec - No")
+
+				IF (VERBOSE)
+					MESSAGE("Error Message: ${outputAltivecTest}")
+				ENDIF (VERBOSE)
+			ENDIF (ALTIVEC_SUPPORTED)
+		ELSE (POWERPC_SUPPORTED)
+			MESSAGE(STATUS "Check if GCC is PowerPC - No")
+
+			IF (VERBOSE)
+				MESSAGE("Error Message: ${outputPowerPcTest}")
+			ENDIF (VERBOSE)
+		ENDIF (POWERPC_SUPPORTED)
+	ENDIF (X86_SUPPORTED)
+ENDIF (X86_64_SUPPORTED)
 
 TEST_BIG_ENDIAN(CMAKE_WORDS_BIGENDIAN)
-MESSAGE("")
-
-IF (NOT ADM_OS_DARWIN AND NOT ADM_OS_WINDOWS AND NOT ADM_OS_LINUX)
-	MESSAGE(FATAL_ERROR "Operating System not supported (${CMAKE_SYSTEM_NAME})")
-ENDIF (NOT ADM_OS_DARWIN AND NOT ADM_OS_WINDOWS AND NOT ADM_OS_LINUX)
 
 IF (NOT ADM_CPU_X86 AND NOT ADM_CPU_X86_64 AND NOT ADM_CPU_PPC)
-	MESSAGE(FATAL_ERROR "CPU not supported (${CMAKE_SYSTEM_PROCESSOR})")
+	MESSAGE(FATAL_ERROR "CPU not supported")
 ENDIF (NOT ADM_CPU_X86 AND NOT ADM_CPU_X86_64 AND NOT ADM_CPU_PPC)

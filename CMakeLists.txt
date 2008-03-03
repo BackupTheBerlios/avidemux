@@ -39,22 +39,15 @@ ENDIF (LATE_BINDING)
 ########################################
 INCLUDE(admDetermineSystem)
 
-IF (ADM_OS_WINDOWS)
-	SET(CYG_MANGLING 1)
-ENDIF (ADM_OS_WINDOWS)
-
-IF (ADM_OS_DARWIN)
-	SET(CYG_MANGLING 1)
-ENDIF (ADM_OS_DARWIN)
-
 IF (CYGWIN)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mwin32")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwin32")
 ENDIF (CYGWIN)
 
-IF (ADM_OS_LINUX)
-	SET(USE_JOG 1)		# jog shuttle is only available on Linux due to its interface
-ENDIF (ADM_OS_LINUX)
+IF (UNIX)
+	# jog shuttle is only available on Linux due to its interface
+	SET(USE_JOG 1)
+ENDIF (UNIX)
 
 ########################################
 # Standard Avidemux defines
@@ -78,15 +71,17 @@ ELSEIF (ADM_CPU_X86_64)
 	SET(ARCH_X86_64 1)
 	SET(ARCH_64_BITS 1)
 ELSEIF (ADM_CPU_PPC)
-	OPTION(ALTIVEC ""  ON)
+	SET(ARCH_POWERPC 1)
 
-	IF (ALTIVEC)
-		SET(ADM_CPUCAP_ALTIVEC 1)
+	IF (ADM_CPU_ALTIVEC)
 		SET(ARCH_PPC 1)
-		SET(ARCH_POWERPC 1)
 		SET(USE_ALTIVEC 1)
 		SET(HAVE_ALTIVEC 1)
-	ENDIF (ALTIVEC)
+
+		IF (NOT APPLE)
+			SET(HAVE_ALTIVEC_H 1)
+		ENDIF (NOT APPLE)
+	ENDIF (ADM_CPU_ALTIVEC)
 ENDIF (ADM_CPU_X86)
 
 IF (CMAKE_WORDS_BIGENDIAN)
@@ -118,15 +113,10 @@ ENDIF (NOT CMAKE_BUILD_TYPE)
 ###########################################
 # CPU Specific
 ###########################################
-IF (ADM_CPUCAP_ALTIVEC)
-	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mabi=altivec -maltivec")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mabi=altivec -maltivec")
-
-	IF (ADM_OS_DARWIN)
-		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -faltivec")
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -faltivec")
-	ENDIF (ADM_OS_DARWIN)
-ENDIF (ADM_CPUCAP_ALTIVEC)
+IF (ADM_CPU_ALTIVEC)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ADM_ALTIVEC_FLAGS}")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ADM_ALTIVEC_FLAGS}")
+ENDIF (ADM_CPU_ALTIVEC)
 
 ########################################
 # Subversion
@@ -190,10 +180,6 @@ CHECK_INCLUDE_FILES(stdint.h     HAVE_STDINT_H)		# internal use, mpeg2enc, mplex
 CHECK_INCLUDE_FILES(sys/types.h  HAVE_SYS_TYPES_H)	# mad, mpeg2enc
 CHECK_INCLUDE_FILES(unistd.h     HAVE_UNISTD_H)		# internal use, ass, mad
 CHECK_INCLUDE_FILES(malloc.h     HAVE_MALLOC_H)		# libavcodec, libavutil, libpostproc, libswscale, mplex
-
-IF (ADM_CPUCAP_ALTIVEC AND NOT ADM_OS_DARWIN)
-	CHECK_INCLUDE_FILES(altivec.h    HAVE_ALTIVEC_H)	# libavcodec, libpostproc, libswscale, mpeg2dec, mpeg2enc
-ENDIF (ADM_CPUCAP_ALTIVEC AND NOT ADM_OS_DARWIN)
 
 MESSAGE("")
 

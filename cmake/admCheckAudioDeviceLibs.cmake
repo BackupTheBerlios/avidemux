@@ -1,7 +1,7 @@
 ########################################
 # ALSA
 ########################################
-IF (ADM_OS_LINUX)
+IF (UNIX AND NOT APPLE)
 	OPTION(ALSA "" ON)
 
 	MESSAGE(STATUS "Checking for ALSA")
@@ -23,39 +23,39 @@ IF (ADM_OS_LINUX)
 	ENDIF (ALSA)
 
 	MESSAGE("")
-ELSE (ADM_OS_LINUX)
+ELSE (UNIX AND NOT APPLE)
 	SET(ALSA_CAPABLE FALSE)
-ENDIF (ADM_OS_LINUX)
+ENDIF (UNIX AND NOT APPLE)
 
 ########################################
 # aRts
 ########################################
-IF (ADM_OS_LINUX)
+IF (UNIX)
 	OPTION(ARTS "" ON)
-	
+
 	MESSAGE(STATUS "Checking for aRts")
 	MESSAGE(STATUS "*****************")
 
 	IF (ARTS)
 		FIND_PACKAGE(Arts)
 		PRINT_LIBRARY_INFO("aRts" ARTS_FOUND "${ARTS_CFLAGS}" "${ARTS_LDFLAGS}")
-		
+
 		IF (ARTS_FOUND)
 			SET(USE_ARTS 1)
 		ENDIF (ARTS_FOUND)
 	ELSE (ARTS)
 		MESSAGE("${MSG_DISABLE_OPTION}")
 	ENDIF (ARTS)
-		
+
 	MESSAGE("")
-ELSE (ADM_OS_LINUX)
+ELSE (UNIX)
 	SET(ARTS_CAPABLE FALSE)
-ENDIF (ADM_OS_LINUX)
+ENDIF (UNIX)
 
 ########################################
 # ESD
 ########################################
-IF (ADM_OS_LINUX)
+IF (UNIX)
 	OPTION(ESD "" ON)
 
 	MESSAGE(STATUS "Checking for ESD")
@@ -73,14 +73,14 @@ IF (ADM_OS_LINUX)
 	ENDIF (ESD)
 
 	MESSAGE("")
-ELSE (ADM_OS_LINUX)
+ELSE (UNIX)
 	SET(ESD_CAPABLE FALSE)
-ENDIF (ADM_OS_LINUX)
+ENDIF (UNIX)
 
 ########################################
 # JACK
 ########################################
-IF (ADM_OS_LINUX OR ADM_OS_DARWIN)
+IF (UNIX)
 	OPTION(JACK "" ON)
 
 	MESSAGE(STATUS "Checking for JACK")
@@ -96,11 +96,11 @@ IF (ADM_OS_LINUX OR ADM_OS_DARWIN)
 	ELSE (JACK)
 		MESSAGE("${MSG_DISABLE_OPTION}")
 	ENDIF (JACK)
-	
+
 	MESSAGE("")
-ELSE (ADM_OS_LINUX OR ADM_OS_DARWIN)
+ELSE (UNIX)
 	SET(JACK_CAPABLE FALSE)
-ENDIF (ADM_OS_LINUX OR ADM_OS_DARWIN)
+ENDIF (UNIX)
 
 ########################################
 # Secret Rabbit Code
@@ -115,19 +115,19 @@ IF (JACK_FOUND)
 	IF (SRC_FOUND)
 		SET(USE_SRC 1)
 	ENDIF (SRC_FOUND)
-	
+
 	MESSAGE("")
 ENDIF (JACK_FOUND)
 
 ########################################
 # OSS
 ########################################
-IF (ADM_OS_LINUX)
+IF (UNIX AND NOT APPLE)
 	OPTION(OSS "" ON)
-	
+
 	MESSAGE(STATUS "Checking for OSS")
 	MESSAGE(STATUS "****************")
-	
+
 	IF (OSS)
 		FIND_HEADER_AND_LIB(OSS sys/soundcard.h)
 		PRINT_LIBRARY_INFO("OSS" OSS_FOUND "${OSS_INCLUDE_DIR}" "")
@@ -138,8 +138,8 @@ IF (ADM_OS_LINUX)
 	ELSE (OSS)
 		MESSAGE("${MSG_DISABLE_OPTION}")
 	ENDIF (OSS)
-	
+
 	MESSAGE("")
-ELSE (ADM_OS_LINUX)
+ELSE (UNIX AND NOT APPLE)
 	SET(OSS_CAPABLE FALSE)
-ENDIF (ADM_OS_LINUX)
+ENDIF (UNIX AND NOT APPLE)

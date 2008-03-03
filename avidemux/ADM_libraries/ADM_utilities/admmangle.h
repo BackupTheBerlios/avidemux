@@ -1,14 +1,28 @@
 // Symbol mangling for asm
-// is different on win32
 // Shamelessly borrowed from lavcodec
-
-#ifdef CYG_MANGLING // CYGWIN
-	#define Mangle(x) "_" #x
-	#define MANGLE(x) "_" #x
-#else
-	#define Mangle(x) #x
-	#define MANGLE(x) #x
+#if ( defined(__PIC__) || defined(__pic__) ) && ! defined(PIC)
+#    define PIC
 #endif
+
+// Use rip-relative addressing if compiling PIC code on x86-64.
+#if defined(__MINGW32__) || defined(__CYGWIN__) || defined(__DJGPP__) || \
+    defined(__OS2__) || (defined (__OpenBSD__) && !defined(__ELF__))
+#    if defined(ARCH_X86_64) && defined(PIC)
+#        define MANGLE(a) "_" #a"(%%rip)"
+#    else
+#        define MANGLE(a) "_" #a
+#    endif
+#else
+#    if defined(ARCH_X86_64) && defined(PIC)
+#        define MANGLE(a) #a"(%%rip)"
+#    elif defined(__APPLE__)
+#        define MANGLE(a) "_" #a
+#    else
+#        define MANGLE(a) #a
+#    endif
+#endif
+
+#define Mangle MANGLE
 
 #define ADM_ALIGN16 ".p2align 4\n"
 /* Regiter renaming */
