@@ -141,7 +141,7 @@ void
 wrapToolButton(GtkWidget * wid, gpointer user_data)
 {
         gui_act action;
-#ifdef ARCH_64_BITS
+#ifdef ADM_CPU_64BIT
 #define TPE long long int
 	long long int dummy;
 #else

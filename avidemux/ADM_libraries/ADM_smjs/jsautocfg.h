@@ -22,7 +22,7 @@
 #define JS_BYTES_PER_DOUBLE 8L
 #define JS_BYTES_PER_DWORD  8L
 
-#ifdef ARCH_64_BITS
+#ifdef ADM_CPU_64BIT
 #define JS_BYTES_PER_LONG   8L
 #define JS_BYTES_PER_WORD   8L
 #define JS_BITS_PER_LONG    64L

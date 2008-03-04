@@ -49,7 +49,7 @@ uint8_t DIA_builtin(void)
 #ifdef USE_FONTCONFIG
   adm_fontconfig=1;
 #endif
-#ifdef USE_ALTIVEC
+#ifdef ADM_CPU_ALTIVEC
         altivec=1;
 #endif
 #ifdef USE_MP3
@@ -112,13 +112,13 @@ uint8_t DIA_builtin(void)
 #ifdef USE_XV
 	xvideo=1;
 #endif
-#ifdef ARCH_X86
+#ifdef ADM_CPU_X86
 	x86=1;
 #endif
-#ifdef ARCH_X86_64
+#ifdef ADM_CPU_X86_64
 	x86_64=1;
 #endif
-#ifdef ARCH_POWERPC
+#ifdef ADM_CPU_PPC
 	adm_powerpc=1;
 #endif
 #ifdef HAVE_GETTEXT

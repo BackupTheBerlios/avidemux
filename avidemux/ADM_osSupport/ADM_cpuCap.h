@@ -51,7 +51,3 @@ public:
 
 
 };
-
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64)) && defined(HAVE_BUILTIN_VECTOR)
-#define USE_SSE 1
-#endif

@@ -422,7 +422,7 @@ yv12_setup_fbuf (vo_instance_t * _instance, uint8_t ** buf, void **id)
 {
   uint8_t *all;
   uint32_t page, img;
-#ifdef ARCH_64_BITS
+#ifdef ADM_CPU_64BIT
   uint64_t i;
   i = (uint64_t) id;
 

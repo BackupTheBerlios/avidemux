@@ -4,11 +4,15 @@
 #define ADM_BUILD_GTK 2
 #define ADM_BUILD_QT4 3
 
+#cmakedefine ADM_CPU_64BIT
+#cmakedefine ADM_CPU_ALTIVEC
+#cmakedefine ADM_CPU_PPC
+#cmakedefine ADM_CPU_X86
+#cmakedefine ADM_CPU_X86_32
+#cmakedefine ADM_CPU_X86_64
+
 /* Jog Shuttle */
 #cmakedefine USE_JOG
-
-/* MPEG2DEC */
-#cmakedefine ACCEL_DETECT
 
 /* Big endian CPU - SPARC or PowerPC */
 #cmakedefine ADM_BIG_ENDIAN
@@ -21,9 +25,6 @@
 
 #cmakedefine HAVE_AUDIO
 
-/* Sparc workstations */
-#cmakedefine ADM_SPARC
-
 #if ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK || ${CONFIG_HEADER_TYPE} == ADM_BUILD_QT4
 /* use ALSA as possible audio device */
 #cmakedefine ALSA_SUPPORT
@@ -31,9 +32,6 @@
 
 /* AMR_NB */
 #cmakedefine AMR_NB
-
-/* X86_64 AMD64 assembly */
-#cmakedefine ARCH_64_BITS
 
 /* Enable PowerPC optim */
 #cmakedefine ARCH_POWERPC
@@ -84,23 +82,11 @@
 #cmakedefine HAVE_SSSE3
 #cmakedefine CONFIG_DARWIN
 
-/* Mad */
-#cmakedefine FPM_DEFAULT
-#cmakedefine FPM_INTEL
-#cmakedefine FPM_PPC
-#cmakedefine FPM_SPARC
-
-/* Using GCC 2.9x.x */
-#cmakedefine GCC_2_95_X
-
 /* AltiVec for mpeg2enc */
 #cmakedefine HAVE_ALTIVEC
 
 /* Enable AltiVec by default */
 #cmakedefine HAVE_ALTIVEC_H
-
-/* Enable AltiVec by default */
-#cmakedefine HAVE_BUILTIN_VECTOR
 
 /* FontConfig detected */
 #cmakedefine HAVE_FONTCONFIG
@@ -145,12 +131,8 @@
 
 /* use Aften AC3 encoder */
 #cmakedefine USE_AFTEN
-
-/* Use Aften 0.07 */
-#cmakedefine USE_AFTEN_07
-
-/* Use Aften 0.08 */
-#cmakedefine USE_AFTEN_08
+#cmakedefine USE_AFTEN_07	// 0.07
+#cmakedefine USE_AFTEN_08	// 0.0.8
 
 /* AltiVec for mpeg2enc */
 #cmakedefine USE_ALTIVEC
@@ -239,9 +221,6 @@
 
 /* use Nvwa memory leak detector */
 #cmakedefine FIND_LEAKS
-
-#cmakedefine ADM_CPU_X86
-#cmakedefine ADM_CPU_X86_64
 
 #ifdef __MINGW32__
 #define rindex strrchr

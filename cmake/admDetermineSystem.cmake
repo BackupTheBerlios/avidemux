@@ -1,9 +1,11 @@
 # Determine CPU and Operating System for GCC
 #  ADM_BSD_FAMILY        - BSD family operating system was detected
+#  ADM_CPU_64BIT         - 64-bit CPU was detected
 #  ADM_CPU_ALTIVEC       - PowerPC CPU with AltiVec architecture was detected
 #  ADM_CPU_PPC           - PowerPC CPU architecture was detected
 #  ADM_CPU_X86           - x86 CPU architecture was detected
-#  ADM_CPU_X86_64        - x86-64 CPU architecture was detected
+#  ADM_CPU_X86_32        - x86 32-bit CPU architecture was detected
+#  ADM_CPU_X86_64        - x86 64-bit CPU architecture was detected
 #  CMAKE_WORDS_BIGENDIAN - big endian CPU detected
 
 MACRO (PERFORM_SYSTEM_TEST testFile testName testSupportedVarName)
@@ -89,16 +91,19 @@ ENDIF (UNIX_SUPPORTED)
 ########################################
 # Check CPU support
 ########################################
-PERFORM_SYSTEM_TEST(cpu_x86-64_check.cpp "x86-64" X86_64_SUPPORTED)
+PERFORM_SYSTEM_TEST(cpu_x86-64_check.cpp "x86 64-bit" X86_64_SUPPORTED)
 
 IF (X86_64_SUPPORTED)
+	SET(ADM_CPU_X86 1)
 	SET(ADM_CPU_X86_64 1)
+	SET(ADM_CPU_64BIT 1)
 ELSE (X86_64_SUPPORTED)
-	PERFORM_SYSTEM_TEST(cpu_x86_check.cpp "x86" X86_SUPPORTED)
+	PERFORM_SYSTEM_TEST(cpu_x86_check.cpp "x86 32-bit" X86_32_SUPPORTED)
 
-	IF (X86_SUPPORTED)
+	IF (X86_32_SUPPORTED)
 		SET(ADM_CPU_X86 1)
-	ELSE (X86_SUPPORTED)
+		SET(ADM_CPU_X86_32 1)
+	ELSE (X86_32_SUPPORTED)
 		PERFORM_SYSTEM_TEST(cpu_ppc_check.cpp "PowerPC" POWERPC_SUPPORTED)
 
 		IF (POWERPC_SUPPORTED)
@@ -110,17 +115,17 @@ ELSE (X86_64_SUPPORTED)
 				SET(ADM_ALTIVEC_FLAGS "${ADM_ALTIVEC_FLAGS} -faltivec")
 			ENDIF (APPLE)
 
-			PERFORM_SYSTEM_TEST(cpu_altivec_check.cpp "AltiVec" ALTIVEC_SUPPORTED)
+			PERFORM_SYSTEM_TEST(cpu_altivec_check.cpp "AltiVec" ALTIVEC_SUPPORTED "${ADM_ALTIVEC_FLAGS}")
 
 			IF (ALTIVEC_SUPPORTED)
 				SET(ADM_CPU_ALTIVEC 1)
 			ENDIF (ALTIVEC_SUPPORTED)
 		ENDIF (POWERPC_SUPPORTED)
-	ENDIF (X86_SUPPORTED)
+	ENDIF (X86_32_SUPPORTED)
 ENDIF (X86_64_SUPPORTED)
 
 TEST_BIG_ENDIAN(CMAKE_WORDS_BIGENDIAN)
 
-IF (NOT ADM_CPU_X86 AND NOT ADM_CPU_X86_64 AND NOT ADM_CPU_PPC)
+IF (NOT ADM_CPU_X86_32 AND NOT ADM_CPU_X86_64 AND NOT ADM_CPU_PPC)
 	MESSAGE(FATAL_ERROR "CPU not supported")
-ENDIF (NOT ADM_CPU_X86 AND NOT ADM_CPU_X86_64 AND NOT ADM_CPU_PPC)
+ENDIF (NOT ADM_CPU_X86_32 AND NOT ADM_CPU_X86_64 AND NOT ADM_CPU_PPC)

@@ -5,3 +5,4 @@ SET(${ADM_LIB}_SRCS
 	cpu_accel.c  decode.c     idct_alpha.c  idct.c          idct_mmx.c   motion_comp_altivec.c  motion_comp_mlib.c  slice.c)
 
 ADD_ADM_LIB_ALL_TARGETS(${ADM_LIB} ${${ADM_LIB}_SRCS})
+ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-DACCEL_DETECT")
