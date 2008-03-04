@@ -80,6 +80,28 @@ IF (APPLE)
 	SET(MACOSX_BUNDLE_LONG_VERSION_STRING "${ADM_OSX_VERSION}") 
 	SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${ADM_OSX_VERSION}")
 	SET(MACOSX_BUNDLE_VERSION "${ADM_OSX_VERSION}")
+
+	# include translation files in bundle
+	# this isn't the cleanest approach but there's not much we can do until the po directory is under the avidemux directory
+	FILE(GLOB PO_FILES ${CMAKE_SOURCE_DIR}/po/*.po)
+
+	FOREACH(_file ${PO_FILES})
+		GET_FILENAME_COMPONENT(_filename ${_file} NAME_WE)
+		SET(_mofile "${CMAKE_BINARY_DIR}/po/${_filename}/avidemux.mo")
+
+		SET(MO_FILES ${MO_FILES} ${_mofile})
+		SET_SOURCE_FILES_PROPERTIES(${_mofile} PROPERTIES GENERATED TRUE MACOSX_PACKAGE_LOCATION "Resources/locale/${_filename}/LC_MESSAGES")
+	ENDFOREACH(_file)
+
+	FILE(GLOB TS_FILES ${CMAKE_SOURCE_DIR}/po/*.ts)
+
+	FOREACH(_file ${TS_FILES})
+		GET_FILENAME_COMPONENT(_filename ${_file} NAME_WE)
+		SET(_qmfile "${CMAKE_BINARY_DIR}/po/${_filename}.qm")
+
+		SET(QM_FILES ${QM_FILES} ${_qmfile})
+		SET_SOURCE_FILES_PROPERTIES(${_qmfile} PROPERTIES GENERATED TRUE MACOSX_PACKAGE_LOCATION "Resources/locale")
+	ENDFOREACH(_file)
 ENDIF (APPLE)
 
 IF (WIN32)
@@ -101,17 +123,20 @@ ENDIF (WIN32)
 ########################################
 SET(ADM_EXE_SRCS ${ADM_EXE_SRCS} ADM_preview.cpp  gtk_gui.cpp  gui_autodrive.cpp  GUI_jobs.cpp  gui_navigate.cpp  guiplay.cpp  gui_savenew.cpp  main.cpp  gui_action.cpp)
 
-ADD_EXECUTABLE(avidemux2_cli MACOSX_BUNDLE ${ADM_EXE_SRCS})
+ADD_EXECUTABLE(avidemux2_cli MACOSX_BUNDLE ${ADM_EXE_SRCS} ${MO_FILES})
 ADD_TARGET_CFLAGS(avidemux2_cli "-I${CMAKE_BINARY_DIR}/config/cli")
+ADD_DEPENDENCIES(avidemux2_cli mofiles)
 
 IF (ADM_UI_GTK)
-	ADD_EXECUTABLE(avidemux2_gtk MACOSX_BUNDLE ${ADM_EXE_SRCS})
+	ADD_EXECUTABLE(avidemux2_gtk MACOSX_BUNDLE ${ADM_EXE_SRCS} ${MO_FILES})
 	ADD_TARGET_CFLAGS(avidemux2_gtk "-I${CMAKE_BINARY_DIR}/config/gtk")
+	ADD_DEPENDENCIES(avidemux2_gtk mofiles)
 ENDIF (ADM_UI_GTK)
 
 IF (ADM_UI_QT4)
-	ADD_EXECUTABLE(avidemux2_qt4 MACOSX_BUNDLE ${ADM_EXE_SRCS})
+	ADD_EXECUTABLE(avidemux2_qt4 MACOSX_BUNDLE ${ADM_EXE_SRCS} ${QM_FILES})
 	ADD_TARGET_CFLAGS(avidemux2_qt4 "-I${CMAKE_BINARY_DIR}/config/qt4")
+	ADD_DEPENDENCIES(avidemux2_qt4 qmfiles)
 ENDIF (ADM_UI_QT4)
 
 SDLify(main.cpp)
@@ -331,12 +356,10 @@ ADD_LIB_ALL_TARGETS("${LIBXML2_LIBRARIES}")
 # XVideo
 IF (USE_XV)
 	IF (ADM_UI_GTK)
-		TARGET_LINK_LIBRARIES(avidemux2_gtk ${X11_LIBRARIES})
 		TARGET_LINK_LIBRARIES(avidemux2_gtk ${XVIDEO_LIBRARY_DIR})
 	ENDIF (ADM_UI_GTK)
 
 	IF (ADM_UI_QT4)
-		TARGET_LINK_LIBRARIES(avidemux2_qt4 ${X11_LIBRARIES})
 		TARGET_LINK_LIBRARIES(avidemux2_qt4 ${XVIDEO_LIBRARY_DIR})
 	ENDIF (ADM_UI_QT4)
 ENDIF (USE_XV)

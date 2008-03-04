@@ -53,7 +53,11 @@ void loadTranslator(void)
 {
 	printf("\n[Locale] Locale: %s\n", QLocale::system().name().toUtf8().constData());
 
+#ifdef __APPLE__
+	QString appdir = QCoreApplication::applicationDirPath() + "/../Resources/locale/";
+#else
 	QString appdir = QCoreApplication::applicationDirPath() + "/i18n/";
+#endif
 
 	loadTranslation(&qtTranslator, appdir + "qt_" + QLocale::system().name());
 	loadTranslation(&avidemuxTranslator, appdir + "avidemux_" + QLocale::system().name());

@@ -30,7 +30,7 @@ IF (LATE_BINDING)
 ENDIF (LATE_BINDING)
 
 ########################################
-# Avidemux OS specific tweaks
+# Avidemux system specific tweaks
 ########################################
 INCLUDE(admDetermineSystem)
 
@@ -38,6 +38,11 @@ IF (CYGWIN)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mwin32")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwin32")
 ENDIF (CYGWIN)
+
+IF (ADM_CPU_ALTIVEC)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ADM_ALTIVEC_FLAGS}")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ADM_ALTIVEC_FLAGS}")
+ENDIF (ADM_CPU_ALTIVEC)
 
 IF (UNIX AND NOT APPLE)
 	# jog shuttle is only available on Linux due to its interface
@@ -104,14 +109,6 @@ IF (NOT CMAKE_BUILD_TYPE)
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	SET(ADM_DEBUG 1)
 ENDIF (NOT CMAKE_BUILD_TYPE)
-
-###########################################
-# CPU Specific
-###########################################
-IF (ADM_CPU_ALTIVEC)
-	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ADM_ALTIVEC_FLAGS}")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ADM_ALTIVEC_FLAGS}")
-ENDIF (ADM_CPU_ALTIVEC)
 
 ########################################
 # Subversion
@@ -202,7 +199,7 @@ MESSAGE(STATUS "GTK config.h generated")
 
 SET(CONFIG_HEADER_TYPE ADM_BUILD_QT4)
 CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/cmake/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config/qt4/config.h")
-MESSAGE(STATUS "QT4 config.h generated")
+MESSAGE(STATUS "Qt4 config.h generated")
 
 ########################################
 # Directories to build
