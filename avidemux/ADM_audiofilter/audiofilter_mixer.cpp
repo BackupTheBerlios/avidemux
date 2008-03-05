@@ -551,7 +551,6 @@ uint32_t AUDMAudioFilterMixer::fill(uint32_t max,float *output,AUD_Status *statu
 
     uint32_t rd = 0;
     uint8_t *in,*out;
-    uint32_t window;
     int nbSampleMax=max/_wavHeader.channels;
     uint8_t input_channels = _previous->getInfo()->channels;
 
@@ -565,7 +564,7 @@ uint32_t AUDMAudioFilterMixer::fill(uint32_t max,float *output,AUD_Status *statu
       {
         memset(&_incomingBuffer[_head],0,sizeof(float) * input_channels);
         _tail=_head+input_channels;
-        printf("[Mixer] Warning asked %u symbols, a window is %u symbols\n",max,window);
+        printf("[Mixer] Warning asked %u symbols\n",max);
       }
       else
       {

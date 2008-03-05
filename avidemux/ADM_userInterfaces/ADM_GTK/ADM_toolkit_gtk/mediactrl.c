@@ -35,6 +35,16 @@
 #include <string.h>
 #include <errno.h>
 #include <linux/input.h>
+#include <linux/version.h>
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,0)
+struct input_id {
+        __u16 bustype;
+        __u16 vendor;
+        __u16 product;
+        __u16 version;
+};
+#endif
 
 #include "mediactrl.h"
 

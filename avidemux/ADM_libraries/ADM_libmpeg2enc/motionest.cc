@@ -2048,7 +2048,7 @@ static void dpfield_estimate(
 			16);            /* block height */
 
 	bestdp_mc->pos.x = imindmv;
-	bestdp_mc->pos.x = jmindmv;
+	bestdp_mc->pos.y = jmindmv; // Meanx : Jw patch,  Seems logical but not sure
 	*vmcp = vmc_dp;
 }
 

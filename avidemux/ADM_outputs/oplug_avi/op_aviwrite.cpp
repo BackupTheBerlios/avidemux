@@ -359,6 +359,17 @@ uint32_t extraLen=0;
 		extraLen=4;
 		}
 		break;
+#if 1		
+	case WAV_DTS:
+	case WAV_AC3: // Vista compatibility
+		 		  extra=(uint8_t *)wmaheader;
+		 		  extra[0]=0;
+		 		  extra[1]=0;
+				  extraLen=2;
+				  header->dwScale = 1;  
+				  wav.blockalign=1;	
+			break;
+#endif			
 	case WAV_MP3:							
 		  // then update VBR fields
 		  mp3vbr.cbsize = R16(12);

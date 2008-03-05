@@ -359,7 +359,7 @@ ADM_IMAGE_TYPE ADM_identidyImageFile(const char *filename,uint32_t *w,uint32_t *
 			uint32_t *fcc;
 		    uint8_t fcc_tab[4];
 		    FILE *fd;
-		    uint32_t off,tag,count,size;
+		    uint32_t off,tag=0,count,size;
 
 		    // 1- identity the file type
 		    //

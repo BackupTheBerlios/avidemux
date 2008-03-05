@@ -162,7 +162,6 @@ uint8_t avsHeader::receiveData(uint32_t *cmd, uint32_t *frame,uint32_t *payload_
 uint8_t avsHeader::sendData(uint32_t cmd,uint32_t frame, uint32_t payload_size,uint8_t *payload)
 {
         SktHeader header;
-        int rx;
         memset(&header,0,sizeof(header));
 
         header.cmd=cmd;
@@ -171,7 +170,7 @@ uint8_t avsHeader::sendData(uint32_t cmd,uint32_t frame, uint32_t payload_size,u
         header.magic=(uint32_t)MAGGIC;
         if(!txData(sizeof(header),(uint8_t *)&header))
         {
-            printf("Error in senddata: header %d/%d\n",rx,sizeof(header));
+            printf("Error in senddata: header %d\n",sizeof(header));
             return 0;
         }
         int togo=payload_size;

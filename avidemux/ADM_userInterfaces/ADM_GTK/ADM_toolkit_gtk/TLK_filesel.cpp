@@ -414,7 +414,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 
         if(rw)
         {
-                        dialog=dialog = gtk_file_chooser_dialog_new ("Save",
+                        dialog = gtk_file_chooser_dialog_new ("Save",
                                       NULL,
                                       GTK_FILE_CHOOSER_ACTION_SAVE,
                                       GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -424,7 +424,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
         }
         else
         {
-          dialog=dialog = gtk_file_chooser_dialog_new ("Open File",
+          dialog = gtk_file_chooser_dialog_new ("Open File",
                                       NULL,
                                       GTK_FILE_CHOOSER_ACTION_OPEN,
                                       GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,

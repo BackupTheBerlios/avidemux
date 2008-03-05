@@ -7,6 +7,7 @@ Copyright 2001-2005 Anish Mistry. All rights reserved.
 Note:  This file is available under a BSD license.  Contact the author
 at amistry@am-productions.biz
 */
+#include <string.h>
 #include "config.h"
 #include "DirectorySearch.h"
 

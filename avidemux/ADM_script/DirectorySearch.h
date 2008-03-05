@@ -21,6 +21,7 @@ at amistry@am-productions.biz
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <string.h>
 #endif
 #include "StdFile.h"
 

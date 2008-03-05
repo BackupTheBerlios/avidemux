@@ -131,7 +131,7 @@ cont:
 		uint32_t dflags,dlen;
 #define GET_FRAME(x,y) if(!_in->getFrameNumberNoAlloc(x, &dlen,_uncompressed[y],&dflags)) \
  {\
-				 	 	printf("Cannot get frame %lu\n",target+i);\
+				 	 	printf("Cannot get frame %lu\n",x);\
 					 	return 0;     \
 				 }
 

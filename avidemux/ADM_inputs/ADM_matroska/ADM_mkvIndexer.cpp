@@ -127,7 +127,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
 */
 uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t clusterTimeCodeMs)
 {
-  int lacing,nbLaces,entryFlags;
+  int lacing,nbLaces,entryFlags=0;
   //
   uint64_t tail=parser->tell()+len;
   // Read Track id 
@@ -147,6 +147,7 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t cluste
       uint8_t flags=parser->readu8();
       uint32_t remaining=tail-parser->tell();
       lacing=((flags>>1)&3);
+        // entryFlags ???
       //if(track) printf("This round %lld total:%lld\n",tail-parser->tell(),    _tracks[track]._sizeInBytes);
       switch(lacing)
       {

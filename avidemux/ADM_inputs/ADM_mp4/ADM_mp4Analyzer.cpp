@@ -640,7 +640,8 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
         
                                             offset=8+len;
                                             printf("\navcC numOfPictureParSets  :%x\n", MKD8(offset++));
-                                            len=MKD16(offset++);
+                                            len=MKD16(offset);
+                                            offset++;
                                             printf("avcC Pic len              :%x\n",len);
                                             mixDump(VDEO.extraData+offset,len);
                                             left=0;

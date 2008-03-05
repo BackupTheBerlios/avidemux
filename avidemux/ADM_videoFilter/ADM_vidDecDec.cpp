@@ -912,6 +912,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		//return src;
 		//memcpy(data,src,*len);
 
+                GETFRAME(useframe, src); // MEANX : not sure (jw detected a problem here)
 		data->duplicate(src);
 		vidCache->unlockAll();		
 		return 1; // return src;			

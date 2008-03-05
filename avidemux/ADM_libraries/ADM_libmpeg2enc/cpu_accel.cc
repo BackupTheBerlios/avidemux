@@ -46,7 +46,7 @@ static int x86_accel (void)
 {
    int32_t eax, ebx, ecx, edx;
    int32_t AMD;
-   int32_t caps;
+   int32_t caps=0;
 
    if(CpuCaps::hasMMX()) caps |=ACCEL_X86_MMX;
    if(CpuCaps::hasMMXEXT()) caps |=ACCEL_X86_MMXEXT;
