@@ -37,7 +37,7 @@
 
 #include"ADM_vidField.h"
 
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 //	#define DEBUG_DEINT 1
 //	#define MMX_TRACE 1
 	#include "ADM_video/mmx_macros.h"
@@ -94,7 +94,7 @@ int32_t val,x,y;
                       }
            }
 }
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 void ADMVideoFields::hasMotion_MMX(uint8_t *p,uint8_t *c,
 									uint8_t *n,
 									uint8_t *e,

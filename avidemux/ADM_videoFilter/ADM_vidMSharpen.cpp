@@ -303,7 +303,7 @@ int wh ,ww,hh;
   int val;
 
   // Vertical only for now      
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
   if(CpuCaps::hasMMX())
   {
   int off;

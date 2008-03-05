@@ -41,13 +41,13 @@
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
-#if  defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86_64
 #define COUNTER long int
 #else
 #define COUNTER int
 #endif
 
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 static void ProcessCPlane_mmxe(unsigned char *source,
 				   unsigned char *prev,
 				   unsigned char* dest,
@@ -147,7 +147,7 @@ AVDMVideoVlad::AVDMVideoVlad(  AVDMGenericVideoStream *in,CONFcouple *couples)
 
 	ProcessYPlane = ProcessYPlane_C;
 	ProcessCPlane = ProcessCPlane_C;
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 #if 0
 // Check
 	if(CpuCaps::hasMMXEXT() && (_info.width&7) == 0)
@@ -271,7 +271,7 @@ void ProcessCPlane_C( unsigned char *source,
 	} while(++i < 0);
 }
 
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 void ProcessYPlane_mmxe( unsigned char *source,
 				    unsigned char *prev,
 				    unsigned char* dest,

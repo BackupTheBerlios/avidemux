@@ -26,7 +26,7 @@
 #include "avio.hxx"
 #include "default.h"
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 extern "C" {
 #include "ADM_libraries/ADM_lavcodec/avcodec.h"
 }
@@ -49,14 +49,14 @@ int                       flags=0;
 
                            flags=SWS_BILINEAR;
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
                 
                 #define ADD(x,y) if( CpuCaps::has##x()) flags|=SWS_CPU_CAPS_##y;
                 ADD(MMX,MMX);           
                 ADD(3DNOW,3DNOW);
                 ADD(MMXEXT,MMX2);
-#endif  
-#ifdef USE_ALTIVEC
+#endif
+#ifdef ADM_CPU_ALTIVEC
                 flags|=SWS_CPU_CAPS_ALTIVEC;
 #endif
 

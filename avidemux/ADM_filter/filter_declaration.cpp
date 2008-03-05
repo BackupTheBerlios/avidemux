@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ADM_assert.h"
+
 #include "ADM_assert.h"
 
 #include "config.h"
@@ -130,7 +130,7 @@ printf(  "*********************\n");
 	REGISTERX("mpdenoise3d",QT_TR_NOOP("MPlayer denoise3d"),QT_TR_NOOP("Reduce noise, smooth image, increase compressibility."),VF_MPLLQD3D,1,MPD3Dlow_create,MPD3Dlow_script);
 	REGISTERX("mphqdenoise3d",QT_TR_NOOP("MPlayer hqdn3d"),QT_TR_NOOP("High quality version of denoise3d. Slower but more precise."),VF_MPLHQD3D,1,MPD3D_create,MPD3D_script);
 	REGISTERX("fluxsmooth",QT_TR_NOOP("FluxSmooth"),QT_TR_NOOP("Spatio-temporal cleaner by Ross Thomas."),VF_FLUXSMOOTH,1,fluxsmooth_create,fluxsmooth_script);
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
     	REGISTERX("temporalcleaner",QT_TR_NOOP("Temporal Cleaner"),QT_TR_NOOP("Vlad59's Avisynth port of Jim Casaburi's denoiser."),VF_VLADSMOOTH,1,vladsmooth_create,vladsmooth_script);
 #endif
 	REGISTERX("denoise",QT_TR_NOOP("Denoise"),QT_TR_NOOP("Port of Transcode DNR."),VF_DENOISE,1,denoise_create,denoise_script);

@@ -38,7 +38,7 @@
 
 //#define OPENDML_VERBOSE
 
-#if defined( __WIN32) || defined(ARCH_X86_64)
+#if defined( __WIN32) || defined(ADM_CPU_X86_64)
 	#define PPACKED __attribute__ ((packed, gcc_struct))
 #else
 	#define PPACKED 

@@ -25,7 +25,7 @@
 #include "mjpeg_types.h"
 #include "simd.h"
 #include "predict_ref.h"
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef HAVE_X86CPU
 void pred_comp_mmxe(
 	uint8_t *src,
 	uint8_t *dst,

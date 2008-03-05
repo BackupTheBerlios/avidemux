@@ -26,7 +26,7 @@
 
 #include "default.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 extern "C" {
 #include "ADM_libraries/ADM_lavcodec/avcodec.h"
 }
@@ -215,7 +215,7 @@ uint8_t COL_RGB24_to_YV12_revert(uint32_t w,uint32_t h,uint8_t *rgb, uint8_t *yu
 	int flags = SWS_SPLINE;
 	struct SwsContext *context=NULL;
 	
-	#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+	#ifdef ADM_CPU_X86
 		#define ADD(x, y) if (CpuCaps::has##x()) flags |= SWS_CPU_CAPS_##y;
 
 		ADD(MMX,MMX);
@@ -223,7 +223,7 @@ uint8_t COL_RGB24_to_YV12_revert(uint32_t w,uint32_t h,uint8_t *rgb, uint8_t *yu
 		ADD(MMXEXT,MMX2);
 	#endif
 
-	#ifdef USE_ALTIVEC
+	#ifdef ADM_CPU_ALTIVEC
 	    flags |= SWS_CPU_CAPS_ALTIVEC;
 	#endif
 	    context = sws_getContext(w, h,
@@ -252,7 +252,7 @@ uint8_t COL_RGB24_to_YV12(uint32_t w,uint32_t h,uint8_t *rgb, uint8_t *yuv)
 	int flags = SWS_SPLINE;
 	struct SwsContext *context=NULL;
 	
-	#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+	#ifdef ADM_CPU_X86
 		#define ADD(x, y) if (CpuCaps::has##x()) flags |= SWS_CPU_CAPS_##y;
 
 		ADD(MMX,MMX);
@@ -260,7 +260,7 @@ uint8_t COL_RGB24_to_YV12(uint32_t w,uint32_t h,uint8_t *rgb, uint8_t *yuv)
 		ADD(MMXEXT,MMX2);
 	#endif
 
-	#ifdef USE_ALTIVEC
+	#ifdef ADM_CPU_ALTIVEC
 	    flags |= SWS_CPU_CAPS_ALTIVEC;
 	#endif
 	    context = sws_getContext(w, h,

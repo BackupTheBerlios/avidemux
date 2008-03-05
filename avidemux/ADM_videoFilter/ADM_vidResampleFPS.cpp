@@ -173,7 +173,7 @@ uint8_t ADMVideoResampleFPS::getCoupledConf( CONFcouple **couples)
                 CSET(use_linear);
                 return 1;
 }
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 static uint64_t low,high;
 static void blendMMX(uint8_t *src, uint8_t *src2, uint8_t *dst, uint8_t alpha, uint8_t beta,uint32_t count)
 {
@@ -321,7 +321,7 @@ uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
         
       count = page;
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
         if(CpuCaps::hasMMX())
                 blendMMX(in1,in2,out,lowweight,highweight,(count*3)>>1);
         else

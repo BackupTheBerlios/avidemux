@@ -9,7 +9,7 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#if defined(ARCH_X86_64) ||defined(ARCH_X86)
+#ifdef ADM_CPU_X86
 
 #define CHECK_Z(x) {if(CpuCaps::myCpuCaps & ADM_CPU_##x & CpuCaps::myCpuMask) return 1; else return 0;} 
 

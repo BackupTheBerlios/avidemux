@@ -65,7 +65,7 @@ typedef void lutMeType(oneSetting *par, unsigned char *dst, unsigned char *src, 
 			lutMeType *lutMe=apply_lut;
 			
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 	        if(CpuCaps::hasMMX())
 	        {
 	        		lutMe=affine_1d_MMX;

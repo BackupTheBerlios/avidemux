@@ -29,7 +29,7 @@ SET(${ADM_LIB}_SRCS
 	dvbsub.c xiph.c
 	sp5xdec.c nellymoserdec.c)
 
-IF(ARCH_X86)
+IF(ADM_CPU_X86)
 	SET(${ADM_LIB}_SRCS  ${${ADM_LIB}_SRCS}
 		i386/cputest.c
 		i386/mpegvideo_mmx.c     i386/vp3dsp_mmx.c 
@@ -38,7 +38,7 @@ IF(ARCH_X86)
 		i386/fft_sse.c i386/vp3dsp_sse2.c  
 		i386/idct_mmx_xvid.c i386/fft_3dn2.c 
 		i386/snowdsp_mmx.c i386/fft_3dn.c)
-ENDIF(ARCH_X86)
+ENDIF(ADM_CPU_X86)
 
 IF (ADM_CPU_ALTIVEC)
 	SET(${ADM_LIB}_SRCS  ${${ADM_LIB}_SRCS}
@@ -57,3 +57,7 @@ ENDIF (ADM_DEBUG)
 IF (USE_AMR_NB)
 	ADD_SOURCE_CFLAGS(amr.c -I${AMRNB_INCLUDE_DIR})
 ENDIF (USE_AMR_NB)
+
+INCLUDE(admLibavcodec)
+GET_LAVC_CFLAGS(LAVC_CFLAGS)
+ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "${LAVC_CFLAGS}")

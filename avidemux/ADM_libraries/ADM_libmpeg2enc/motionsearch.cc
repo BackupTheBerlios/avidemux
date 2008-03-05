@@ -39,7 +39,7 @@
  * and verification.
  */
 #define STATIC static
-#if defined( HAVE_ALTIVEC ) && defined(USE_ALTIVEC)
+#ifdef HAVE_ALTIVEC
 //#include "altivec/altivec_motion.h"
 #  if ALTIVEC_TEST_MOTION
 #    undef STATIC
@@ -49,7 +49,7 @@
 
 
 
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef HAVE_X86CPU
 #include "mmxsse_motion.h"
 #endif
 
@@ -996,7 +996,7 @@ void init_motion_search(void)
 	pbuild_sub44_mests = build_sub44_mests;
 	psubsample_image = subsample_image;
 
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef HAVE_X86CPU
 	printf("[Mpeg2enc]Enabling mmx motion search\n");
 	enable_mmxsse_motion(0);
 #endif

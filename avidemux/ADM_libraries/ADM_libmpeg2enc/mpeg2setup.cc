@@ -1187,7 +1187,7 @@ void init_encoder(mpeg2parm *param,Mpeg2Settings *opt)
 	opt->enc_width = 16*mb_width;
 	opt->enc_height = 16*mb_height;
 
-#if defined( HAVE_ALTIVEC) && defined(USE_ALTIVEC)
+#ifdef HAVE_ALTIVEC
 	/* Pad opt->phy_width to 64 so that the rowstride of 4*4
 	 * sub-sampled data will be a multiple of 16 (ideal for AltiVec)
 	 * and the rowstride of 2*2 sub-sampled data will be a multiple

@@ -1,5 +1,5 @@
 #include <config.h>
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef HAVE_X86CPU
 #include <math.h>
 #include <unistd.h>
 #include "mjpeg_types.h"

@@ -63,7 +63,7 @@
 #include "simd.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
 
-#if defined( HAVE_ALTIVEC) && defined(USE_ALTIVEC)
+#ifdef HAVE_ALTIVEC
 void enable_altivec_quantization(int op);//t->mpeg1);
 #endif
 
@@ -473,7 +473,7 @@ void init_quantizer(void)
 {
   pquant_weight_coeff_sum = quant_weight_coeff_sum;
   piquant_non_intra = iquant_non_intra;
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef HAVE_X86CPU
         if(CpuCaps::hasMMX())
         {
                 printf("[Mpeg2enc]Using MMX quant non intra\n");

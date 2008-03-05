@@ -127,7 +127,7 @@ xvid4_init (void)
 
   printf ("[xvid] SIMD supported: (%x)\n", xvid_gbl_info.cpu_flags);
 #define CPUF(x) if(xvid_gbl_info.cpu_flags  & XVID_CPU_##x) printf("\t\t"#x"\n");
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
   CPUF (MMX);
   CPUF (MMXEXT);
   CPUF (SSE);
@@ -135,7 +135,7 @@ xvid4_init (void)
   CPUF (3DNOW);
   CPUF (3DNOWEXT);
 #endif
-#ifdef USE_ALTIVEC
+#ifdef ADM_CPU_ALTIVEC
   CPUF (ALTIVEC);
 #endif
 

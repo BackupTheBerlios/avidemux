@@ -39,7 +39,7 @@
 #include "format_codes.h"
 #include "mpegconsts.h"
 #include "fastintfns.h"
-#if defined( HAVE_ALTIVEC) && defined(USE_ALTIVEC)
+#ifdef HAVE_ALTIVEC
 /* needed for ALTIVEC_BENCHMARK and print_benchmark_statistics() */
 //#include "../utils/altivec/altivec_conf.h"
 #endif

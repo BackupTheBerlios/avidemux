@@ -274,7 +274,7 @@ ADMImage	*image,*next,*prev;
 	nextp += src_pitch;
 	destp += dst_pitch;
 
-	#if (defined( ARCH_X86)  || defined(ARCH_X86_64)) && defined(ASM_FLUX)
+	#if defined(ADM_CPU_X86) && defined(ASM_FLUX)
         if(CpuCaps::hasMMX())
         {
 		DoFilter_MMX(currp, prevp, nextp, src_pitch,
@@ -402,7 +402,7 @@ void ADMVideoFlux::DoFilter_C(
 	ADM_assert(ycnt == 0);
 
 }
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 /*
 	__asm movq mm2, mm0 \
 	__asm movq mm3, mm1 \

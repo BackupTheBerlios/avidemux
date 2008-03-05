@@ -9,7 +9,7 @@
 #include "default.h"
 #include "admmangle.h"
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 
 
 #define LOAD4(mem,dst) \

@@ -70,7 +70,7 @@ Skip factor=2
 		mm2 contains 4 bytes of n
 */
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64)) && defined(ASM_ILACING)
+#if defined(ADM_CPU_X86) && defined(ASM_ILACING)
 
 static uint32_t      ADMVideo_interlaceCount_MMX( uint8_t *src ,uint32_t w, uint32_t h);
 static uint8_t *_l_p=NULL;
@@ -111,7 +111,7 @@ static uint32_t      ADMVideo_interlaceCount_C( uint8_t *src ,uint32_t w, uint32
 
 uint32_t      ADMVideo_interlaceCount( uint8_t *src ,uint32_t w, uint32_t h)
 {
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64)) && defined(ASM_ILACING)  
+#if defined(ADM_CPU_X86) && defined(ASM_ILACING)  
         if(CpuCaps::hasMMX())
                 return ADMVideo_interlaceCount_MMX(src,w,h);
         else
@@ -120,7 +120,7 @@ uint32_t      ADMVideo_interlaceCount( uint8_t *src ,uint32_t w, uint32_t h)
 
 }
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64)) && defined(ASM_ILACING)  
+#if defined(ADM_CPU_X86) && defined(ASM_ILACING)  
 uint32_t      ADMVideo_interlaceCount_MMX( uint8_t *src ,uint32_t w, uint32_t h)
 {
 uint32_t m=0,y,x;

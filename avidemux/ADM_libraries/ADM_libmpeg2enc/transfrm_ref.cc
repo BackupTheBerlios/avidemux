@@ -58,11 +58,11 @@
 #include "cpu_accel.h"
 #include "simd.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
-#if defined( HAVE_ALTIVEC ) && defined(USE_ALTIVEC)
+#ifdef HAVE_ALTIVEC
 //#include "../utils/altivec/altivec_transform.h"
 #endif
 
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef HAVE_X86CPU
 
 	void add_pred_mmx (uint8_t *pred, uint8_t *cur,
 						  int lx, int16_t *blk) ;
@@ -192,7 +192,7 @@ void init_transform(void)
 {
 
 	// By default use C implementation
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef HAVE_X86CPU
                 if(CpuCaps::hasSSE())
                 {
 		  pfdct = mp2_fdct_sse;
@@ -224,7 +224,7 @@ void init_transform(void)
 		psub_pred = sub_pred;
 		pfield_dct_best = field_dct_best;
                 printf("[Mpeg2enc] C idct/fdct\n");
-#if !defined( ARCH_X86)  && !defined(ARCH_X86_64)
+#ifndef HAVE_X86CPU
 		printf("Because not X86 Arch\n");
 #endif
                 }
@@ -254,7 +254,7 @@ void init_transform(void)
 		pfield_dct_best = field_dct_best;
 	}
 
-#if defined( HAVE_ALTIVEC) && defined(USE_ALTIVEC)
+#ifdef HAVE_ALTIVEC
 	if (flags > 0)
 	{
 #if ALTIVEC_TEST_TRANSFORM

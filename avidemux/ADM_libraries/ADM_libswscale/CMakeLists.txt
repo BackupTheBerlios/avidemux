@@ -1,7 +1,9 @@
 SET(ADM_LIB ADM_libswscale)
+SET(${ADM_LIB}_SRCS swscale.c yuv2rgb.c rgb2rgb.c ADM_mp.cpp)
 
-SET(${ADM_LIB}_SRCS 
-	swscale.c yuv2rgb.c rgb2rgb.c yuv2rgb_altivec.c ADM_mp.cpp)
+IF (ADM_CPU_ALTIVEC)
+	SET(${ADM_LIB}_SRCS ${${ADM_LIB}_SRCS} yuv2rgb_altivec.c)
+ENDIF (ADM_CPU_ALTIVEC)
 	
 ADD_ADM_LIB_ALL_TARGETS(${ADM_LIB} ${${ADM_LIB}_SRCS})
 ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-DCONFIG_GPL -fomit-frame-pointer")
@@ -13,3 +15,7 @@ IF (APPLE)
 		ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-O2")
 	ENDIF (ADM_DEBUG)
 ENDIF (APPLE)
+
+INCLUDE(admLibavcodec)
+GET_LAVC_CFLAGS(LAVC_CFLAGS)
+ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "${LAVC_CFLAGS}")

@@ -7,13 +7,13 @@
 // Use rip-relative addressing if compiling PIC code on x86-64.
 #if defined(__MINGW32__) || defined(__CYGWIN__) || defined(__DJGPP__) || \
     defined(__OS2__) || (defined (__OpenBSD__) && !defined(__ELF__))
-#    if defined(ARCH_X86_64) && defined(PIC)
+#    if defined(ADM_CPU_X86_64) && defined(PIC)
 #        define MANGLE(a) "_" #a"(%%rip)"
 #    else
 #        define MANGLE(a) "_" #a
 #    endif
 #else
-#    if defined(ARCH_X86_64) && defined(PIC)
+#    if defined(ADM_CPU_X86_64) && defined(PIC)
 #        define MANGLE(a) #a"(%%rip)"
 #    elif defined(__APPLE__)
 #        define MANGLE(a) "_" #a
@@ -26,7 +26,7 @@
 
 #define ADM_ALIGN16 ".p2align 4\n"
 /* Regiter renaming */
-#ifdef ARCH_X86_64
+#ifdef ADM_CPU_X86_64
 #define REG_a  "rax" 
 #define REGa    rax 
 #define REGb    rbx 

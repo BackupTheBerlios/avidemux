@@ -110,7 +110,7 @@ quote of the day:
 */
 
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 
 
 /* for small memory blocks (<256 bytes) this version is faster */
@@ -379,7 +379,7 @@ static void * mmx2_memcpy(void * to, const void * from, size_t len)
 static void *linux_kernel_memcpy(void *to, const void *from, size_t len) {
   return linux_kernel_memcpy_impl(to,from,len);
 }
-#endif /* ARCH_X86 */
+#endif /* ADM_CPU_X86 */
 
 static struct {
   char *name;
@@ -392,22 +392,20 @@ static struct {
 {
   { NULL, NULL, 0, 0 },
   { "libc memcpy()", memcpy, 0, 0 },
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
   { "linux kernel memcpy()", linux_kernel_memcpy, 0, 0 },
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
   { "MMX optimized memcpy()", mmx_memcpy, 0, MM_MMX },
   { "MMXEXT optimized memcpy()", mmx2_memcpy, 0, MM_MMXEXT },
   { "SSE optimized memcpy()", sse_memcpy, 0, MM_MMXEXT|MM_SSE },
-#endif
-#endif /* ARCH_X86 */
-#if 0 && defined (ARCH_PPC) && !defined (HOST_OS_DARWIN)
+#endif /* ADM_CPU_X86 */
+#if 0 && defined (ADM_CPU_PPC) && !defined (__APPLE__)
   { "ppcasm_memcpy()", ppcasm_memcpy, 0, 0 },
   { "ppcasm_cacheable_memcpy()", ppcasm_cacheable_memcpy, 0, MM_ACCEL_PPC_CACHE32 },
-#endif /* ARCH_PPC && !HOST_OS_DARWIN */
+#endif /* ADM_CPU_PPC && !__APPLE__ */
   { NULL, NULL, 0, 0 }
 };
 
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 static unsigned long long int rdtsc(void)
 {
   unsigned long long int x;
@@ -459,14 +457,14 @@ uint8_t ADM_InitMemcpy(void)
   int               config_flags = 0;
 #undef memcpy
         myAdmMemcpy=memcpy;
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
         if(CpuCaps::hasMMX())
                 myAdmMemcpy=mmx_memcpy;
 #endif
 #if 0
 	probe(memcpy,"libc");
 	probe(linux_kernel_memcpy,"kernel");
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 	if(CpuCaps::hasMMX()) probe(mmx_memcpy,"mmx");
 	if(CpuCaps::hasMMXEXT()) probe(mmx_memcpy,"mmxext");
 	if(CpuCaps::hasSSE()) probe(sse_memcpy,"sse");

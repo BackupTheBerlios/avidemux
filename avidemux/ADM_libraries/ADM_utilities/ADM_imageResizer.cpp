@@ -22,7 +22,7 @@
 #include "ADM_image.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 extern "C" {
 #include "ADM_libraries/ADM_lavcodec/avcodec.h"
 }
@@ -60,7 +60,7 @@ void ADMImageResizer::init(uint32_t ow, uint32_t oh, uint32_t dw, uint32_t dh, i
 
 	int flags = SWS_SPLINE;
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 	#define ADD(x, y) if (CpuCaps::has##x()) flags |= SWS_CPU_CAPS_##y;
 
 	ADD(MMX,MMX);
@@ -68,7 +68,7 @@ void ADMImageResizer::init(uint32_t ow, uint32_t oh, uint32_t dw, uint32_t dh, i
 	ADD(MMXEXT,MMX2);
 #endif
 
-#ifdef USE_ALTIVEC
+#ifdef ADM_CPU_ALTIVEC
     flags |= SWS_CPU_CAPS_ALTIVEC;
 #endif
 

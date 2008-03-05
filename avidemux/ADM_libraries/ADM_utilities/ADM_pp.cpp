@@ -63,7 +63,7 @@ char stringFQ[60];
 		{
 		uint32_t ppCaps=0;
 		
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 		
 	#define ADD(x,y) if( CpuCaps::has##x()) ppCaps|=PP_CPU_CAPS_##y;
 		
@@ -71,7 +71,7 @@ char stringFQ[60];
 		ADD(3DNOW,3DNOW);
 		ADD(MMXEXT,MMX2);
 #endif		
-#ifdef HAVE_ALTIVEC
+#ifdef ADM_CPU_ALTIVEC
 		ppCaps|=PP_CPU_CAPS_ALTIVEC;
 #endif	
 			pp->ppContext=pp_get_context(pp->w, pp->h, ppCaps

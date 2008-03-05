@@ -6,7 +6,7 @@
 #include "ADM_osSupport/ADM_cpuCap.h"
 void enable_mmxsse_motion(int cpucap)
 {
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef HAVE_X86CPU
 	if(CpuCaps::hasMMXEXT())  /* AMD MMX or SSE... */
 	{
                 printf( "[Mpeg2enc] MMXE motion \n");

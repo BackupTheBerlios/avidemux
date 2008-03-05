@@ -57,7 +57,7 @@ void 		*my_memcpy_pic(uint8_t * dst, uint8_t * src, int bytesPerLine, int height
 						int dstStride, int srcStride);
 unsigned int 	hash_pic(unsigned char *img, int w, int h, int stride);
 static void 	block_diffs_C(struct metrics *m, unsigned char *old, unsigned char *nw, int os, int ns);
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 void block_diffs_MMX(struct metrics *m, unsigned char *old, unsigned char *ew, int os, int ns);
 #endif
 static void 	diff_planes(struct metrics *m, unsigned char *old, unsigned char *nw, int w, int h, int os, int ns);

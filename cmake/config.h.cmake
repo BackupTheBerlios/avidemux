@@ -14,7 +14,7 @@
 /* Jog Shuttle */
 #cmakedefine USE_JOG
 
-/* Big endian CPU - SPARC or PowerPC */
+/* Big endian CPU */
 #cmakedefine ADM_BIG_ENDIAN
 
 #define PACKAGE   "avidemux"
@@ -32,21 +32,6 @@
 
 /* AMR_NB */
 #cmakedefine AMR_NB
-
-/* Enable PowerPC optim */
-#cmakedefine ARCH_POWERPC
-
-/* AltiVec for libmpeg2 */
-#cmakedefine ARCH_PPC
-
-/* post proc */
-#cmakedefine ARCH_X86
-
-/* X86_32 assembly */
-#cmakedefine ARCH_X86_32
-
-/* X86_64 AMD64 assembly */
-#cmakedefine ARCH_X86_64
 
 /* FFMPEG */
 #cmakedefine CONFIG_ENCODERS
@@ -81,12 +66,6 @@
 #cmakedefine HAVE_FAST_64BIT
 #cmakedefine HAVE_SSSE3
 #cmakedefine CONFIG_DARWIN
-
-/* AltiVec for mpeg2enc */
-#cmakedefine HAVE_ALTIVEC
-
-/* Enable AltiVec by default */
-#cmakedefine HAVE_ALTIVEC_H
 
 /* FontConfig detected */
 #cmakedefine HAVE_FONTCONFIG
@@ -133,9 +112,6 @@
 #cmakedefine USE_AFTEN
 #cmakedefine USE_AFTEN_07	// 0.07
 #cmakedefine USE_AFTEN_08	// 0.0.8
-
-/* AltiVec for mpeg2enc */
-#cmakedefine USE_ALTIVEC
 
 /* Tell avidemux to use libamrnb */
 #cmakedefine USE_AMR_NB
@@ -216,7 +192,7 @@
 /* Version number of package */
 #define VERSION "${VERSION}"
 
-/* Big endian CPU - SPARC or PowerPC */
+/* Big endian CPU */
 #cmakedefine WORDS_BIGENDIAN
 
 /* use Nvwa memory leak detector */

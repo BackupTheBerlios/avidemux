@@ -23,7 +23,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 extern "C" {
 #include "ADM_libraries/ADM_lavcodec/avcodec.h"
 }

@@ -29,7 +29,7 @@
 
 #include "colorspace.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 extern "C" {
 #include "ADM_libraries/ADM_lavcodec/avcodec.h"
 }
@@ -47,11 +47,11 @@ extern "C" {
         clean();  \
     }
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))		
+#ifdef ADM_CPU_X86
 		#define ADD(x,y) if( CpuCaps::has##x()) flags|=SWS_CPU_CAPS_##y;
 #define FLAGS()		ADD(MMX,MMX);				ADD(3DNOW,3DNOW);		ADD(MMXEXT,MMX2);
 #else
-#ifdef USE_ALTIVEC
+#ifdef ADM_CPU_ALTIVEC
 #define FLAGS() flags|=SWS_CPU_CAPS_ALTIVEC;
 #else
 #define FLAGS()
@@ -125,7 +125,7 @@ void COL_init(void)
 */
 static void ADM_RGBA2BGRA(uint8_t *ptr, uint32_t howmuch)
 {
-#if ((defined( ARCH_X86)  || defined(ARCH_X86_64)))
+#ifdef ADM_CPU_X86
     __asm__(
                         "1: mov            (%0),%%eax \n"
                         "bswap          %%eax \n"

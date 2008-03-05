@@ -54,7 +54,7 @@
 #define MAX3(a,b,c) MAX(MAX(a,b),c)
 
 //===========================================================================//
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 extern "C"
 {
 void filter_line_mmx2(int mode, uint8_t *dst, const uint8_t *prev, const uint8_t *cur, const uint8_t *next, int w, int refs, int parity);
@@ -401,7 +401,7 @@ void filter_plane(int mode, uint8_t *dst, int dst_stride, const uint8_t *prev0, 
 void (*filter_line)(int mode, uint8_t *dst, const uint8_t *prev, const uint8_t *cur, const uint8_t *next, int w, int refs, int parity);
 	int y;
 	filter_line = filter_line_c;
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 	if (CpuCaps::hasMMXEXT()) 
 		filter_line = filter_line_mmx2;
 #endif
@@ -421,7 +421,7 @@ void (*filter_line)(int mode, uint8_t *dst, const uint8_t *prev, const uint8_t *
         }
         memcpy(dst + (h-1)*dst_stride, cur0 + (h-1)*refs, w);
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 	if (CpuCaps::hasMMXEXT()) 
 		asm volatile("emms");
 #endif

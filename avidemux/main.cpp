@@ -157,11 +157,11 @@ int main(int argc, char *argv[])
 	printf("Linux");
 #endif
 
-#if defined(ARCH_X86_32)
+#if defined(ADM_CPU_X86_32)
 	printf(" (x86)");
-#elif defined(ARCH_X86_64)
+#elif defined(ADM_CPU_X86_64)
 	printf(" (x86-64)");
-#elif defined(ARCH_POWERPC)
+#elif defined(ADM_CPU_PPC)
 	printf(" (PowerPC)");
 #endif
 

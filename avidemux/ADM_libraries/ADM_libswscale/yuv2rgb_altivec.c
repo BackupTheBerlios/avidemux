@@ -80,7 +80,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "config.h"
-#ifdef USE_ALTIVEC
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -966,4 +966,3 @@ altivec_yuv2packedX (SwsContext *c,
     }
 
 }
-#endif //MEANX

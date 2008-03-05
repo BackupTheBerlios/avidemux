@@ -98,7 +98,7 @@ int luminance_mean_MMX(uint8_t *frame, int w, int h );
 
 int luminance_mean(uint8_t *frame, int w, int h )
 {
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef HAVE_X86CPU
         if(CpuCaps::hasMMX()) return luminance_mean_MMX(frame,w,h);
 #endif
         luminance_mean_C(frame,w,h);
@@ -121,14 +121,14 @@ int luminance_mean_C(uint8_t *frame, int w, int h )
 	sum=sum/(w*h);
 	return sum;
 }
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef HAVE_X86CPU
 // MEANX
 // code borrowed from ffmpeg by means
 
 static int pix_sum16_mmx(uint8_t * pix, int line_size)
 {
     const int h=16;
-#ifdef ARCH_X86_64
+#ifdef HAVE_X86_64_CPU
     long int rline_size=line_size;
     long int sum;
     long int index= -line_size*h;

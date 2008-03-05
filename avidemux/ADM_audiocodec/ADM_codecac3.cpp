@@ -43,7 +43,7 @@ ADM_AudiocodecAC3::ADM_AudiocodecAC3( uint32_t fourcc, WAVHeader *info) :   ADM_
     ADM_assert(fourcc==WAV_AC3);
     ac3_handle=NULL;
     ac3_sample=NULL;
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 #define CHK(x,y) if(CpuCaps::has##x()) flags|=MM_ACCEL_X86_##y;
     CHK(MMX,MMX);
     CHK(3DNOW,3DNOW);

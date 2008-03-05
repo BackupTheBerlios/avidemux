@@ -24,7 +24,7 @@
  */
  
 #include <config.h>
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef HAVE_X86CPU
 #include "mjpeg_types.h"
 #include "mmx.h"
 

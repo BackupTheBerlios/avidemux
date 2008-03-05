@@ -40,7 +40,7 @@ ADM_AudiocodecDCA::ADM_AudiocodecDCA( uint32_t fourcc, WAVHeader *info) :   ADM_
     ADM_assert(fourcc==WAV_DTS);
     dts_handle=NULL;
     
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 #define CHK(x,y) if(CpuCaps::has##x()) flags|=MM_ACCEL_X86_##y;
     CHK(MMX,MMX);
     CHK(3DNOW,3DNOW);

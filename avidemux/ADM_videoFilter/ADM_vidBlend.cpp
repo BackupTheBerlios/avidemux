@@ -39,7 +39,7 @@
 
 #include "admmangle.h"
 
-#ifdef ARCH_X86_64
+#ifdef ADM_CPU_X86_64
 static int64_t _l_w,_l_h;
 #else
  static int32_t _l_w,_l_h;
@@ -79,7 +79,7 @@ uint32_t x,y;
                  }
               }
 }
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 void ADMVideoFields::blend_MMX(uint8_t *p,uint8_t *c,
 																							uint8_t *n,
 																							uint8_t *e,

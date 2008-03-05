@@ -29,7 +29,7 @@
 #include <math.h>
 #include <string.h>
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef HAVE_X86CPU
 
 #include "syntaxparams.h"
 #include "mjpeg_logging.h"

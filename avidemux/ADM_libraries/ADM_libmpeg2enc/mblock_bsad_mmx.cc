@@ -21,7 +21,7 @@
 #include <config.h>
 #include <stdio.h>
 #include "mjpeg_types.h"
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef HAVE_X86CPU
 #include "mmx.h"
 
 // These rely on mm7 being zero

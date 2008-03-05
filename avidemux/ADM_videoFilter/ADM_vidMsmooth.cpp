@@ -32,9 +32,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ADM_assert.h"
 
-#include "config.h"
+#if defined(ADM_CPU_ALTIVEC) && !defined(__APPLE__)
+#include <altivec.h>
+#endif
+
+#include "ADM_assert.h"
 #include "fourcc.h"
 #include "avio.hxx"
 #include "avi_vars.h"
@@ -42,7 +45,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include"ADM_video/ADM_cache.h"
+#include "ADM_video/ADM_cache.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
@@ -53,9 +56,6 @@
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
-#ifdef HAVE_ALTIVEC_H
-#include "altivec.h"
-#endif
 #if 0
 #undef aprintf
 #define aprintf printf
@@ -84,10 +84,10 @@ extern void 	BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,
 extern  void 	DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
 
 static void Blur_C(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h) ;
-#ifdef HAVE_ALTIVEC
+#ifdef ADM_CPU_ALTIVEC
 void Blur_Altivec(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h);
 #endif
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 void Blur_MMX(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h);
 #endif
 class Msmooth : public AVDMGenericVideoStream
@@ -392,7 +392,7 @@ done:
 }
 
 
-#ifdef HAVE_ALTIVEC
+#ifdef ADM_CPU_ALTIVEC
 #define vecbyte vector unsigned char
 #define vect16 vector unsigned short
 
@@ -485,7 +485,7 @@ int16_t  v16[8];
 }
 #endif
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 //______________________
 void Blur_MMX(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h)
 {
@@ -603,7 +603,7 @@ void  Msmooth::EdgeMaskYV12(const unsigned char *srcp, unsigned char *blurp, uns
 	int y1, y2, y3, y4;
 
 	/* Blur the source image prior to detail detection. */
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 		//printf("MMX\n");
 	if(CpuCaps::hasMMX())
 	{
@@ -612,7 +612,7 @@ void  Msmooth::EdgeMaskYV12(const unsigned char *srcp, unsigned char *blurp, uns
 	}
 	else
 	#endif
-	#ifdef HAVE_ALTIVEC
+	#ifdef ADM_CPU_ALTIVEC
 	#define ISALIGNED(x) (!( ((long long)x)&15 ))
 		if( ISALIGNED(srcp) && ISALIGNED(blurp) && ISALIGNED(workp) && ISALIGNED(maskp) && !(src_pitch&15))
 		{

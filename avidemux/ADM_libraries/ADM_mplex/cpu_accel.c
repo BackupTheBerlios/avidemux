@@ -75,7 +75,7 @@ static char *parse_next(char **, const char *);
 /* Some miscelaneous stuff to allow checking whether SSE instructions cause
    illegal instruction errors.
 */
-
+#if !defined(__MINGW32__)
 static sigjmp_buf sigill_recover;
 
 static RETSIGTYPE sigillhandler(int sig )
@@ -84,11 +84,12 @@ static RETSIGTYPE sigillhandler(int sig )
 }
 
 typedef RETSIGTYPE (*__sig_t)(int);
+#endif
 
 static int testsseill()
 {
 	int illegal;
-#if defined(__CYGWIN__)
+#if defined(__CYGWIN__) || defined(__MINGW32__)
 	/* SSE causes a crash on CYGWIN, apparently.
 	   Perhaps the wrong signal is being caught or something along
 	   those line ;-) or maybe SSE itself won't work...

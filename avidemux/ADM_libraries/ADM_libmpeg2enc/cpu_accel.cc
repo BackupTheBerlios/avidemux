@@ -28,7 +28,7 @@
 #include "default.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
 
-#if defined( HAVE_ALTIVEC ) && defined(USE_ALTIVEC)
+#ifdef HAVE_ALTIVEC
 int detect_altivec(){};
 #endif
 
@@ -40,7 +40,7 @@ int detect_altivec(){};
 
 
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef HAVE_X86CPU
 
 static int x86_accel (void)
 {
@@ -57,7 +57,7 @@ static int x86_accel (void)
 #endif   
 int cpu_accel (void)
 {
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef HAVE_X86CPU
     static int got_accel = 0;
     static int accel;
 
@@ -68,7 +68,7 @@ int cpu_accel (void)
 
     return accel;
 #endif
-#if defined( HAVE_ALTIVEC) && defined(USE_ALTIVEC)
+#ifdef HAVE_ALTIVEC
     return detect_altivec();
 #else
     return 0;

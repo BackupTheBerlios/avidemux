@@ -221,7 +221,7 @@ int a1,a2,a3,a4,sum,delta;
                 }
         return 1;
 }
-#if defined (ARCH_X86 ) || defined (ARCH_X86_64 )
+#ifdef ADM_CPU_X86
 static uint8_t tinyRestoreMMX(uint8_t *dst, uint8_t *srcP, uint8_t *src,uint8_t *srcN,uint8_t *srcNN,uint32_t w, uint32_t h)
 {
 
@@ -291,7 +291,7 @@ uint32_t ww,hh;
 uint8_t *s1,*s2,*d1;
 int a1,a2,t1;
 
-#if defined (ARCH_X86 ) || defined (ARCH_X86_64 )
+#ifdef ADM_CPU_X86
         if(CpuCaps::hasMMX())
         {
               tinyRestoreMMX(YPLANE(tgt),YPLANE(srcP),YPLANE(src),YPLANE(srcN),YPLANE(srcNN),tgt->_width,tgt->_height);

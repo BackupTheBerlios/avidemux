@@ -118,7 +118,7 @@ uint8_t ADMVideoFields::hasMotion(ADMImage *image)
            e2=_motionmask2+w; 	
   //___________________ C version of motion detection ________________________
        // other line
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64)) && defined(ASM_DEINT)
+#if defined(ADM_CPU_X86) && defined(ASM_DEINT)
        if(CpuCaps::hasMMX())  
       	hasMotion_MMX(p,c,n,e,e2);
        else
@@ -200,7 +200,7 @@ uint8_t ADMVideoFields::doBlend(ADMImage *src,ADMImage *dst)
 		n++;
 		c++;
 	}
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64)) && defined(ASM_BLEND)
+#if defined(ADM_CPU_X86) && defined(ASM_BLEND)
        if(CpuCaps::hasMMX())               
               blend_MMX(p,c,n,e2,f);
         else

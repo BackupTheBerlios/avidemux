@@ -34,7 +34,7 @@
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 extern "C" {
 #include "ADM_libraries/ADM_lavcodec/avcodec.h"
 }
@@ -131,7 +131,7 @@ int                       flags=0;
                 flags=SWS_BICUBIC;
 
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
                 
                 #define ADD(x,y) if( CpuCaps::has##x()) flags|=SWS_CPU_CAPS_##y;
                 ADD(MMX,MMX);           

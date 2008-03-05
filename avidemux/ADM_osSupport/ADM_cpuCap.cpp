@@ -35,7 +35,7 @@ extern "C"{
 }
 
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 extern "C" 
 {
 #include "ADM_libraries/ADM_lavcodec/dsputil_cpu.h"
@@ -63,7 +63,7 @@ extern "C"
 	myCpuMask=0xffffffff;
 	prefs->get(FEATURE_CPU_CAPS,&myCpuMask);
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 int rval = 0;
  int eax, ebx, ecx, edx;
  int max_std_level, max_ext_level, std_caps=0, ext_caps=0;
@@ -144,7 +144,7 @@ int rval = 0;
 }
 
 /************************************************************************/
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 #include "ADM_libraries/ADM_libMpeg2Dec/mpeg2_cpu.h"
 #endif
 
@@ -152,7 +152,7 @@ int ADM_mpeg2dec_mm_support(void)
 {
 int rval=0;
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 #undef MATCH
 #define MATCH(x,y) if(CpuCaps::myCpuCaps & CpuCaps::myCpuMask & ADM_CPU_##x) rval|=MPEG2_ACCEL_X86_##x;
 	
@@ -164,7 +164,7 @@ int rval=0;
 	return rval;
 }
 //******************************************************
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 #include "ADM_lavcodec.h"
 #endif
 /**
@@ -175,7 +175,7 @@ int ADM_lavcodec_mm_support(void)
 {
 int rval=0;
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#ifdef ADM_CPU_X86
 #undef MATCH
 #define MATCH(x,y) if(CpuCaps::myCpuCaps &  CpuCaps::myCpuMask & ADM_CPU_##x) rval|=MM_##x;
 

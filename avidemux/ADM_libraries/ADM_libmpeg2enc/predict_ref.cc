@@ -59,7 +59,7 @@
 #include <stdio.h>
 
 
-#if defined( HAVE_ALTIVEC) && defined(USE_ALTIVEC)
+#ifdef HAVE_ALTIVEC
 #include "altivec/altivec_predict.h"
 #endif
 
@@ -301,7 +301,7 @@ void init_predict(void)
                 printf("[Mpeg2enc] C predict (NO ACCEL)\n");
 	}
 
-#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#ifdef HAVE_X86CPU
 	else if(cpucap & ACCEL_X86_MMXEXT ) /* AMD MMX or SSE... */
 	{
                 printf("[Mpeg2enc] MMXE predict\n");
@@ -313,7 +313,7 @@ void init_predict(void)
 		ppred_comp = pred_comp_mmx;
 	}
 #endif
-#if defined( HAVE_ALTIVEC) && defined(USE_ALTIVEC)
+#ifdef HAVE_ALTIVEC
     else
 	{
 #  if ALTIVEC_TEST_PREDICT

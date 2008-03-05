@@ -65,7 +65,7 @@
 #include "ADM_vobsubinfo.h"
 #include "ADM_vidVobSub.h"
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+#ifdef ADM_CPU_X86
 extern "C" {
 #include "ADM_libraries/ADM_lavcodec/avcodec.h"
 }
