@@ -18,8 +18,16 @@
  * Boston, MA 02111-1307, USA.
  */
 #include "config.h"
-#ifndef __WIN32
 
+#ifndef __WIN32
+#ifndef HAVE_GTK_X11
+#include <gtk/gtk.h>
+
+void *adm_new_systray(GdkPixbuf *pixbufA[], int nb, char *name) {}
+void adm_delete_systray(void *systray) {}
+void adm_change_tooltip(void *systray, const char *tips) {}
+void adm_changeIcon_systray(void) {}
+#else
 #include <gtk/gtk.h>
 #include <gtk/gtkversion.h>
 
@@ -508,6 +516,5 @@ GdkPixbuf *cur;
   	gtk_image_set_from_pixbuf( GTK_IMAGE(img), GDK_PIXBUF(cur));
 
 }
-#endif   /* not defined GUI_DISABLE_SYSTRAY */
-
-
+#endif	// HAVE_GTK_X11
+#endif	// __WIN32

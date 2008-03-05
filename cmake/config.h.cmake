@@ -45,6 +45,9 @@
 /* Define to 1 if you have the `gettimeofday' function. */
 #cmakedefine HAVE_GETTIMEOFDAY
 
+// GTK+ uses X11 framework
+#cmakedefine HAVE_GTK_X11
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #cmakedefine HAVE_INTTYPES_H
 
