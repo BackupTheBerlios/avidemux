@@ -4,24 +4,24 @@
 #define ADM_BUILD_GTK 2
 #define ADM_BUILD_QT4 3
 
+// GCC - CPU
+#cmakedefine ADM_BIG_ENDIAN
 #cmakedefine ADM_CPU_64BIT
 #cmakedefine ADM_CPU_ALTIVEC
 #cmakedefine ADM_CPU_PPC
+#cmakedefine ADM_CPU_SSSE3
 #cmakedefine ADM_CPU_X86
 #cmakedefine ADM_CPU_X86_32
 #cmakedefine ADM_CPU_X86_64
 
+// GCC - Operating System
+#cmakedefine ADM_BSD_FAMILY
+
 /* Jog Shuttle */
 #cmakedefine USE_JOG
 
-/* Big endian CPU */
-#cmakedefine ADM_BIG_ENDIAN
-
 #define PACKAGE   "avidemux"
 #define ADMLOCALE "${ADM_LOCALE}"
-
-/* BSD OS specific ifdef */
-#cmakedefine ADM_BSD_FAMILY
 
 #cmakedefine HAVE_AUDIO
 
@@ -32,40 +32,6 @@
 
 /* AMR_NB */
 #cmakedefine AMR_NB
-
-/* FFMPEG */
-#cmakedefine CONFIG_ENCODERS
-#cmakedefine CONFIG_DVVIDEO_ENCODER
-
-#cmakedefine CONFIG_DECODERS
-#cmakedefine CONFIG_DVVIDEO_DECODER
-#cmakedefine CONFIG_H263_DECODER
-#cmakedefine CONFIG_MPEG4_DECODER
-#cmakedefine CONFIG_MPEGAUDIO_HP
-#cmakedefine CONFIG_SNOW_DECODER
-#cmakedefine CONFIG_VC1_DECODER
-#cmakedefine CONFIG_WMV2_DECODER
-#cmakedefine CONFIG_WMV3_DECODER
-#cmakedefine CONFIG_ZLIB
-
-#cmakedefine CONFIG_MUXERS
-#cmakedefine CONFIG_MOV_MUXER
-#cmakedefine CONFIG_MP4_MUXER
-#cmakedefine CONFIG_PSP_MUXER
-#cmakedefine CONFIG_TG2_MUXER
-#cmakedefine CONFIG_TGP_MUXER
-
-#define ENABLE_MMX ${ENABLE_MMX}
-#define ENABLE_THREADS ${ENABLE_THREADS}
-#cmakedefine HAVE_FAST_UNALIGNED
-#cmakedefine HAVE_LRINTF
-#cmakedefine HAVE_MMX
-#cmakedefine HAVE_THREADS
-#cmakedefine RUNTIME_CPUDETECT
-
-#cmakedefine HAVE_FAST_64BIT
-#cmakedefine HAVE_SSSE3
-#cmakedefine CONFIG_DARWIN
 
 /* FontConfig detected */
 #cmakedefine HAVE_FONTCONFIG
@@ -191,9 +157,6 @@
 
 /* Version number of package */
 #define VERSION "${VERSION}"
-
-/* Big endian CPU */
-#cmakedefine WORDS_BIGENDIAN
 
 /* use Nvwa memory leak detector */
 #cmakedefine FIND_LEAKS

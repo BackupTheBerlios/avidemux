@@ -1,12 +1,13 @@
 # Determine CPU and Operating System for GCC
-#  ADM_BSD_FAMILY        - BSD family operating system was detected
-#  ADM_CPU_64BIT         - 64-bit CPU was detected
-#  ADM_CPU_ALTIVEC       - PowerPC CPU with AltiVec architecture was detected
-#  ADM_CPU_PPC           - PowerPC CPU architecture was detected
-#  ADM_CPU_X86           - x86 CPU architecture was detected
-#  ADM_CPU_X86_32        - x86 32-bit CPU architecture was detected
-#  ADM_CPU_X86_64        - x86 64-bit CPU architecture was detected
-#  CMAKE_WORDS_BIGENDIAN - big endian CPU detected
+#  ADM_BIG_ENDIAN  - big endian CPU detected
+#  ADM_BSD_FAMILY  - BSD family operating system was detected
+#  ADM_CPU_64BIT   - 64-bit CPU was detected
+#  ADM_CPU_ALTIVEC - PowerPC CPU with AltiVec architecture was detected
+#  ADM_CPU_PPC     - PowerPC CPU architecture was detected
+#  ADM_CPU_SSSE3   - x86 CPU with SSSE3 instructions was detected
+#  ADM_CPU_X86     - x86 CPU architecture was detected
+#  ADM_CPU_X86_32  - x86 32-bit CPU architecture was detected
+#  ADM_CPU_X86_64  - x86 64-bit CPU architecture was detected
 
 MACRO (PERFORM_SYSTEM_TEST testFile testName testSupportedVarName)
 	IF (${ARGC} EQUAL 4)
@@ -124,8 +125,22 @@ ELSE (X86_64_SUPPORTED)
 	ENDIF (X86_32_SUPPORTED)
 ENDIF (X86_64_SUPPORTED)
 
-TEST_BIG_ENDIAN(CMAKE_WORDS_BIGENDIAN)
+IF (ADM_CPU_X86)
+	PERFORM_SYSTEM_TEST(cpu_ssse3_check.cpp "SSSE3" SSSE3_SUPPORTED)
+
+	IF (SSSE3_SUPPORTED)
+		SET(ADM_CPU_SSSE3)
+	ENDIF (SSSE3_SUPPORTED)
+ENDIF (ADM_CPU_X86)
 
 IF (NOT ADM_CPU_X86_32 AND NOT ADM_CPU_X86_64 AND NOT ADM_CPU_PPC)
 	MESSAGE(FATAL_ERROR "CPU not supported")
 ENDIF (NOT ADM_CPU_X86_32 AND NOT ADM_CPU_X86_64 AND NOT ADM_CPU_PPC)
+
+TEST_BIG_ENDIAN(CMAKE_WORDS_BIGENDIAN)
+
+IF (CMAKE_WORDS_BIGENDIAN)
+	SET(ADM_BIG_ENDIAN 1)
+ENDIF (CMAKE_WORDS_BIGENDIAN)
+
+MESSAGE("")

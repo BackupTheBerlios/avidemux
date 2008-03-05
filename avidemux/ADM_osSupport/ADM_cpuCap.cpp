@@ -99,15 +99,15 @@ int rval = 0;
  {
      cpuid(1, eax, ebx, ecx, std_caps);
      if (std_caps & (1<<23))
-    	 myCpuCaps |= ADM_CPU_MMX;
+    	 myCpuCaps |= ADM_CPUCAP_MMX;
      if (std_caps & (1<<25))
-    	 myCpuCaps |= ADM_CPU_MMXEXT | ADM_CPU_SSE;
+    	 myCpuCaps |= ADM_CPUCAP_MMXEXT | ADM_CPUCAP_SSE;
      if (std_caps & (1<<26))
-    	 myCpuCaps |= ADM_CPU_SSE2;
+    	 myCpuCaps |= ADM_CPUCAP_SSE2;
      if (ecx & 1)
-    	 myCpuCaps |= ADM_CPU_SSE3;
+    	 myCpuCaps |= ADM_CPUCAP_SSE3;
      if (ecx & 0x00000200 )
-    	 myCpuCaps |= ADM_CPU_SSSE3;
+    	 myCpuCaps |= ADM_CPUCAP_SSSE3;
      
      
      
@@ -119,17 +119,17 @@ int rval = 0;
  {
      cpuid(0x80000001, eax, ebx, ecx, ext_caps);
      if (ext_caps & (1<<31))
-    	 myCpuCaps |= ADM_CPU_3DNOW;
+    	 myCpuCaps |= ADM_CPUCAP_3DNOW;
      if (ext_caps & (1<<30))
-    	 myCpuCaps |= ADM_CPU_3DNOWEXT;
+    	 myCpuCaps |= ADM_CPUCAP_3DNOWEXT;
      if (ext_caps & (1<<23))
-    	 myCpuCaps |= ADM_CPU_MMX;
+    	 myCpuCaps |= ADM_CPUCAP_MMX;
      if (ext_caps & (1<<22))
-    	 myCpuCaps |= ADM_CPU_MMXEXT;
+    	 myCpuCaps |= ADM_CPUCAP_MMXEXT;
      
  }
-#define CHECK(x) if(myCpuCaps & ADM_CPU_##x) { printf("\t\t"#x" detected ");\
-											if(!(myCpuMask&ADM_CPU_##x)) printf("  but disabled");printf("\n");}
+#define CHECK(x) if(myCpuCaps & ADM_CPUCAP_##x) { printf("\t\t"#x" detected ");\
+											if(!(myCpuMask&ADM_CPUCAP_##x)) printf("  but disabled");printf("\n");}
 	CHECK(MMX);
 	CHECK(3DNOW);
 	CHECK(MMXEXT);
@@ -154,7 +154,7 @@ int rval=0;
 
 #ifdef ADM_CPU_X86
 #undef MATCH
-#define MATCH(x,y) if(CpuCaps::myCpuCaps & CpuCaps::myCpuMask & ADM_CPU_##x) rval|=MPEG2_ACCEL_X86_##x;
+#define MATCH(x,y) if(CpuCaps::myCpuCaps & CpuCaps::myCpuMask & ADM_CPUCAP_##x) rval|=MPEG2_ACCEL_X86_##x;
 	
 	MATCH(MMX,MMX);
 	MATCH(MMXEXT,MMXEXT);
@@ -177,7 +177,7 @@ int rval=0;
 
 #ifdef ADM_CPU_X86
 #undef MATCH
-#define MATCH(x,y) if(CpuCaps::myCpuCaps &  CpuCaps::myCpuMask & ADM_CPU_##x) rval|=MM_##x;
+#define MATCH(x,y) if(CpuCaps::myCpuCaps &  CpuCaps::myCpuMask & ADM_CPUCAP_##x) rval|=MM_##x;
 
 	MATCH(MMX,MMX);
 	MATCH(MMXEXT,MMXEXT);

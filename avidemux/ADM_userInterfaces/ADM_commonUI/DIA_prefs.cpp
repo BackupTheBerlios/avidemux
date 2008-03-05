@@ -92,9 +92,9 @@ char     *globalGlyphName=NULL;
     DOME(4,dring);
      
 // Cpu caps
-#define CPU_CAPS(x)    	if(CpuCaps::myCpuMask & ADM_CPU_##x) caps##x=1; else caps##x=0;
+#define CPU_CAPS(x)    	if(CpuCaps::myCpuMask & ADM_CPUCAP_##x) caps##x=1; else caps##x=0;
     
-    	if(CpuCaps::myCpuMask==ADM_CPU_ALL) capsAll=1; else capsAll=0;
+    	if(CpuCaps::myCpuMask==ADM_CPUCAP_ALL) capsAll=1; else capsAll=0;
     	CPU_CAPS(MMX);
     	CPU_CAPS(MMXEXT);
     	CPU_CAPS(3DNOW);
@@ -422,12 +422,12 @@ char     *globalGlyphName=NULL;
         	// cpu caps
         		if(capsAll)
         		{
-        			CpuCaps::myCpuMask=ADM_CPU_ALL;
+        			CpuCaps::myCpuMask=ADM_CPUCAP_ALL;
         		}else
         		{
         			CpuCaps::myCpuMask=0;
 #undef CPU_CAPS
-#define CPU_CAPS(x)    	if(caps##x) CpuCaps::myCpuMask|= ADM_CPU_##x;        	    	
+#define CPU_CAPS(x)    	if(caps##x) CpuCaps::myCpuMask|= ADM_CPUCAP_##x;        	    	
         	    	CPU_CAPS(MMX);
         	    	CPU_CAPS(MMXEXT);
         	    	CPU_CAPS(3DNOW);

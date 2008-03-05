@@ -189,6 +189,7 @@ int main(void)
     DECLARE_DECODER (ADPCM_XA, adpcm_xa);
     DECLARE_DECODER (ADPCM_YAMAHA, adpcm_yamaha);
     DECLARE_DECODER (DVDSUB, dvdsub);
+	DECLARE_DECODER (LIBVORBIS, libvorbis);
 
 #define DECLARE_PARSER(a,b); printf("#define ENABLE_"#a"_PARSER 1\n"); 
     DECLARE_PARSER (H263, h263);
@@ -245,7 +246,7 @@ int main(void)
     DECLARE_ENCODER(LIBTHEORA, libtheora);
     DECLARE_ENCODER(SONIC_LS, sonic_ls);
 /* Dupe */
- DECLARE_ENCODER (ASV1, asv1);
+	DECLARE_ENCODER (ASV1, asv1);
     DECLARE_ENCODER (ASV2, asv2);
     DECLARE_ENCODER (BMP, bmp);
     DECLARE_ENCODER (FLASHSV, flashsv);
@@ -314,35 +315,82 @@ int main(void)
     DECLARE_ENCODER (ADPCM_XA, adpcm_xa);
     DECLARE_ENCODER (ADPCM_YAMAHA, adpcm_yamaha);
     DECLARE_ENCODER (DVDSUB, dvdsub);
+	DECLARE_ENCODER (LIBVORBIS, libvorbis);
 
-printf("#define ENABLE_LIBVORBIS_ENCODER        0\n");
-printf("#define ENABLE_LIBVORBIS_DECODER        0\n");
-printf("#define ENABLE_MP3_HEADER_COMPRESS_BSF  0\n");
-printf("#define ENABLE_IMX_DUMP_HEADER_BSF      0\n");
+#define DECLARE_BSF(a,b); printf("#define ENABLE_"#a"_BSF 0\n");
 
-printf("#define ENABLE_DUMP_EXTRADATA_BSF       0\n");
-printf("#define ENABLE_REMOVE_EXTRADATA_BSF     0\n");
-printf("#define ENABLE_NOISE_BSF                0\n");
-printf("#define ENABLE_MP3_HEADER_DECOMPRESS_BSF 0\n");
-printf("#define ENABLE_MJPEGA_DUMP_HEADER_BSF   0\n");
-printf("#define ENABLE_IMX_DUMP_HEADER_BSF      0\n");
-/* FIXME */
-printf("#define ENABLE_ARMV4L      0\n");
-printf("#define ENABLE_MLIB      0\n");
-printf("#define ENABLE_SPARC      0\n");
-printf("#define ENABLE_ALPHA      0\n");
+	DECLARE_BSF(MP3_HEADER_COMPRESS, mp3_header_compress);
+	DECLARE_BSF(IMX_DUMP_HEADER, imx_dump_header);
+	DECLARE_BSF(DUMP_EXTRADATA, dump_extradata);
+	DECLARE_BSF(REMOVE_EXTRADATA, remove_extradata);
+	DECLARE_BSF(NOISE, noise);
+	DECLARE_BSF(MP3_HEADER_DECOMPRESS, mp3_header_decompress);
+	DECLARE_BSF(MJPEGA_DUMP_HEADER, mjpega_dump_header);
+	DECLARE_BSF(IMX_DUMP_HEADER, imx_dump_header);
 
-// Hack so CMake and autoconf don't need to be changed
-printf("#include \"config.h\"\n");
-printf("#ifdef ARCH_POWERPC\n");
-printf("#define ENABLE_POWERPC      1\n");
-printf("#else\n");
-printf("#define ENABLE_POWERPC      0\n");
-printf("#endif\n");
+#define DECLARE_MUXER(a,b); printf("#define CONFIG_"#a"_MUXER 1\n");
 
-printf("#define ENABLE_MMI      0\n");
-printf("#define ENABLE_SH4      0\n");
-printf("#define ENABLE_BFIN      0\n");
-printf("#define ENABLE_SMALL      0\n");
-printf("#define CONFIG_SNOW_ENCODER      1\n");
+	printf("#define CONFIG_MUXERS 1\n");
+	DECLARE_MUXER(MOV, mov)
+	DECLARE_MUXER(MP4, mp4)
+	DECLARE_MUXER(PSP, psp)
+	DECLARE_MUXER(TG2, tg2)
+	DECLARE_MUXER(TGP, tgp)
+
+	printf("#define CONFIG_ENCODERS 1\n");
+	printf("#define CONFIG_DVVIDEO_ENCODER 1\n");
+	printf("#define CONFIG_SNOW_ENCODER 1\n");
+
+#define DECLARE_CONFIG_DECODER(a,b); printf("#define CONFIG_"#a"_DECODER 1\n");
+
+	printf("#define CONFIG_DECODERS 1\n");
+	DECLARE_CONFIG_DECODER(DVVIDEO, dvvideo);
+	DECLARE_CONFIG_DECODER(H263, h263);
+	DECLARE_CONFIG_DECODER(MPEG4, mpeg4);
+	DECLARE_CONFIG_DECODER(SNOW, snow);
+	DECLARE_CONFIG_DECODER(VC1, vc1);
+	DECLARE_CONFIG_DECODER(WMV2, wmv2);
+	DECLARE_CONFIG_DECODER(WMV3, wmv3);
+
+	printf("#define CONFIG_MPEGAUDIO_HP 1\n");
+	printf("#define CONFIG_ZLIB 1\n");
+
+#define ENABLE(a,b); printf("#define ENABLE_"#a" 0\n");
+
+	ENABLE(ARMV4L, armv4l);
+	ENABLE(MLIB, mlib);
+	ENABLE(SPARC, sparc);
+	ENABLE(ALPHA, alpha);
+	ENABLE(MMI, mmi);
+	ENABLE(SH4, sh4);
+	ENABLE(BFIN, bfin);
+	ENABLE(SMALL, small);
+
+	// Hack so CMake and autoconf don't need to be changed
+	printf("#ifdef ARCH_POWERPC\n");
+	printf("#define ENABLE_POWERPC 1\n");
+	printf("#else\n");
+	printf("#define ENABLE_POWERPC 0\n");
+	printf("#endif\n");
+
+	printf("#ifdef ARCH_X86\n");
+	printf("#define ENABLE_MMX 1\n");
+	printf("#define HAVE_MMX 1\n");
+	printf("#define HAVE_FAST_UNALIGNED 1\n");
+	printf("#else\n");
+	printf("#define ENABLE_MMX 0\n");
+	printf("#endif\n");
+
+	printf("#ifdef ARCH_X86_64\n");
+	printf("#define HAVE_FAST_64BIT 1\n");
+	printf("#endif\n");
+
+	printf("#ifdef __APPLE__\n");
+	printf("#define CONFIG_DARWIN 1\n");
+	printf("#endif\n");
+
+	printf("#define ENABLE_THREADS 1\n");
+	printf("#define HAVE_LRINTF 1\n");
+	printf("#define HAVE_THREADS 1\n");
+	printf("#define RUNTIME_CPUDETECT 1\n");
 }

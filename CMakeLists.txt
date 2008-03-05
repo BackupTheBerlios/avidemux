@@ -54,21 +54,18 @@ ENDIF (UNIX AND NOT APPLE)
 ########################################
 SET(VERSION 2.5)
 
+# Define internal flags for GTK+ and Qt4 builds.  These are turned off
+# if a showstopper is found.  CLI is automatically assumed as possible
+# since it uses the minimum set of required libraries and CMake will 
+# fail if these aren't met.
+SET(ADM_UI_GTK 1)
+SET(ADM_UI_QT4 1)
+
 SET(HAVE_AUDIO 1)
 SET(USE_MP3 1)
 SET(USE_AC3 1)
 SET(USE_FFMPEG 1)
 SET(USE_MJPEG 1)
-
-IF (CMAKE_WORDS_BIGENDIAN)
-	SET(ADM_BIG_ENDIAN 1)
-# needs to be made library specific
-	SET(WORDS_BIGENDIAN 1)
-ENDIF (CMAKE_WORDS_BIGENDIAN)
-
-# Libavcodec
-INCLUDE(admLibavcodec)
-SET_LAVC_CONFIG_FLAGS()
 
 IF (NOT CMAKE_BUILD_TYPE)
 	SET(CMAKE_BUILD_TYPE "Release")
@@ -106,13 +103,6 @@ ENDIF (NOT Subversion_FOUND)
 ########################################
 # Check for libraries
 ########################################
-# Define internal flags for GTK+ and Qt4 builds.  These are turned off
-# if a showstopper is found.  CLI is automatically assumed as possible
-# since it uses the minimum set of required libraries and CMake will 
-# fail if these aren't met.
-SET(ADM_UI_GTK 1)
-SET(ADM_UI_QT4 1)
-
 SET(MSG_DISABLE_OPTION "Disabled per request")
 
 INCLUDE(admCheckRequiredLibs)

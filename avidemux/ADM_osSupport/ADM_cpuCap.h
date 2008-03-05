@@ -11,7 +11,7 @@
 //
 #ifdef ADM_CPU_X86
 
-#define CHECK_Z(x) {if(CpuCaps::myCpuCaps & ADM_CPU_##x & CpuCaps::myCpuMask) return 1; else return 0;} 
+#define CHECK_Z(x) {if(CpuCaps::myCpuCaps & ADM_CPUCAP_##x & CpuCaps::myCpuMask) return 1; else return 0;} 
 
 #else
 #define         CHECK_Z(x) {return 0;}
@@ -19,19 +19,19 @@
 
 typedef enum 
 {
-        ADM_CPU_NONE   =1,
-        ADM_CPU_MMX    =1<<1,
-        ADM_CPU_MMXEXT =1<<2,
-        ADM_CPU_3DNOW  =1<<3,
-        ADM_CPU_3DNOWEXT  =1<<4,
-        ADM_CPU_SSE    =1<<5,
-        ADM_CPU_SSE2   =1<<6,
-		ADM_CPU_SSE3   =1<<7,
-		ADM_CPU_SSSE3  =1<<8,
-        ADM_CPU_ALTIVEC=1<<9,
+        ADM_CPUCAP_NONE   =1,
+        ADM_CPUCAP_MMX    =1<<1,
+        ADM_CPUCAP_MMXEXT =1<<2,
+        ADM_CPUCAP_3DNOW  =1<<3,
+        ADM_CPUCAP_3DNOWEXT  =1<<4,
+        ADM_CPUCAP_SSE    =1<<5,
+        ADM_CPUCAP_SSE2   =1<<6,
+		ADM_CPUCAP_SSE3   =1<<7,
+		ADM_CPUCAP_SSSE3  =1<<8,
+        ADM_CPUCAP_ALTIVEC=1<<9,
         
-        ADM_CPU_ALL=0xffffffff
-} ADM_CPU_CAPS;
+        ADM_CPUCAP_ALL=0xffffffff
+} ADM_CPUCAP;
 
 class CpuCaps
 {
