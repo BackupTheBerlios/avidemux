@@ -8,6 +8,7 @@
 #cmakedefine ADM_BIG_ENDIAN
 #cmakedefine ADM_CPU_64BIT
 #cmakedefine ADM_CPU_ALTIVEC
+#cmakedefine ADM_CPU_DCBZL
 #cmakedefine ADM_CPU_PPC
 #cmakedefine ADM_CPU_SSSE3
 #cmakedefine ADM_CPU_X86

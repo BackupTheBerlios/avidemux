@@ -3,6 +3,7 @@
 #  ADM_BSD_FAMILY  - BSD family operating system was detected
 #  ADM_CPU_64BIT   - 64-bit CPU was detected
 #  ADM_CPU_ALTIVEC - PowerPC CPU with AltiVec architecture was detected
+#  ADM_CPU_DCBZL   - PowerPC CPU with dcbzl instruction was detected
 #  ADM_CPU_PPC     - PowerPC CPU architecture was detected
 #  ADM_CPU_SSSE3   - x86 CPU with SSSE3 instructions was detected
 #  ADM_CPU_X86     - x86 CPU architecture was detected
@@ -109,24 +110,29 @@ ELSE (X86_64_SUPPORTED)
 
 		IF (POWERPC_SUPPORTED)
 			SET(ADM_CPU_PPC 1)
-
 			SET(ADM_ALTIVEC_FLAGS "-mabi=altivec -maltivec")
 
 			IF (APPLE)
 				SET(ADM_ALTIVEC_FLAGS "${ADM_ALTIVEC_FLAGS} -faltivec")
 			ENDIF (APPLE)
 
-			PERFORM_SYSTEM_TEST(cpu_altivec_check.cpp "AltiVec" ALTIVEC_SUPPORTED "${ADM_ALTIVEC_FLAGS}")
+			PERFORM_SYSTEM_TEST(cpu_altivec_check.cpp "AltiVec capable" ALTIVEC_SUPPORTED "${ADM_ALTIVEC_FLAGS}")
 
 			IF (ALTIVEC_SUPPORTED)
 				SET(ADM_CPU_ALTIVEC 1)
 			ENDIF (ALTIVEC_SUPPORTED)
+
+			PERFORM_SYSTEM_TEST(cpu_dcbzl_check.cpp "dcbzl capable" DCBZL_SUPPORTED)
+
+			IF (DCBZL_SUPPORTED)
+				SET(ADM_CPU_DCBZL 1)
+			ENDIF (DCBZL_SUPPORTED)
 		ENDIF (POWERPC_SUPPORTED)
 	ENDIF (X86_32_SUPPORTED)
 ENDIF (X86_64_SUPPORTED)
 
 IF (ADM_CPU_X86)
-	PERFORM_SYSTEM_TEST(cpu_ssse3_check.cpp "SSSE3" SSSE3_SUPPORTED)
+	PERFORM_SYSTEM_TEST(cpu_ssse3_check.cpp "SSSE3 capable" SSSE3_SUPPORTED)
 
 	IF (SSSE3_SUPPORTED)
 		SET(ADM_CPU_SSSE3)
