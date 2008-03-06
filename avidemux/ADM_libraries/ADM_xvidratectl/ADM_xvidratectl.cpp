@@ -49,15 +49,13 @@
 #include <errno.h>
 #include <math.h>
 #include <limits.h>
-#include "default.h"
-#include "ADM_osSupport/ADM_misc.h"
+#include "ADM_default.h"
 #include "ADM_osSupport/ADM_quota.h"
 #include "ADM_assert.h"
 #include "ADM_xvidr_internal.h"
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME  MODULE_XVID_RCTL
 #include "ADM_osSupport/ADM_debug.h"
-#include "ADM_osSupport/ADM_misc.h"
 
 // Glueing to avidemux
 #define DPRINTF(a,b, args...) aprintf(b,## args);

@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include "ADM_JSGlobal.h"
 #include "ADM_JSAvidemuxAudio.h"
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "../ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
@@ -373,7 +373,7 @@ JSBool ADM_JSAvidemuxAudio::Codec(JSContext *cx, JSObject *obj, uintN argc,
         if(JSVAL_IS_STRING(argv[0]) == false || JSVAL_IS_INT(argv[1]) == false || JSVAL_IS_INT(argv[2]) == false  ||  JSVAL_IS_STRING(argv[3]) == false  )
                 return JS_FALSE;
         char *name = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
-        LowerCase(name);
+        ADM_LowerCase(name);
         enterLock();
         // First search the codec by its name
         if(!audioCodecSetByName(name))
@@ -454,7 +454,7 @@ JSBool ADM_JSAvidemuxAudio::secondAudioTrack(JSContext *cx, JSObject *obj, uintN
                 return JS_FALSE;
         // First arg is MP3 etc...
         char *name = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
-        LowerCase(name);
+        ADM_LowerCase(name);
         // First search the codec by its name
         AudioSource source;
         if(AudioInvalid==(source=audioCodecGetFromName(name)))

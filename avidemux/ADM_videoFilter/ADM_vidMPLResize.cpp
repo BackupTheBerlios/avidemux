@@ -19,18 +19,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
-#include "ADM_assert.h"
-#include "fourcc.h"
-#include "avio.hxx"
-#include "avi_vars.h"
-
+#include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
@@ -44,7 +33,7 @@ extern "C" {
 
 #include "ADM_libraries/ADM_lavutil/avutil.h"
 #include "ADM_libraries/ADM_libswscale/swscale.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+
 #include "ADM_filter/video_filters.h"
 
 typedef struct alg

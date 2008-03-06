@@ -52,7 +52,7 @@
 #include "ADM_assert.h"
 #include "config.h"
 #include "fourcc.h"
-#include "avio.hxx"
+
 #include "config.h"
 #include "avi_vars.h"
 
@@ -73,7 +73,7 @@ extern "C" {
 
 #include "ADM_libraries/ADM_lavutil/avutil.h"
 #include "ADM_libraries/ADM_libswscale/swscale.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER

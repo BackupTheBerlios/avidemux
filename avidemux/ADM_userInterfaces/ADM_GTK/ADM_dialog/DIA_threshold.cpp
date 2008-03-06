@@ -15,25 +15,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "default.h"
-
-#include <gtk/gtk.h>
-
-#include "fourcc.h"
-#include "avio.hxx"
-
-#include "avi_vars.h"
-
-#ifdef HAVE_ENCODER
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_videoFilter/ADM_vidThreshold.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
-#include "ADM_assert.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flyThreshold.h"
 #include "ADM_filter/video_filters.h"
@@ -594,4 +581,3 @@ create_threshold_dialog (void)
   return threshold_dialog;
 }
 
-#endif

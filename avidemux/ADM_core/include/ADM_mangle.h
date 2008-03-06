@@ -1,5 +1,11 @@
-// Symbol mangling for asm
-// Shamelessly borrowed from lavcodec
+/** *************************************************************************
+    \fn ADM_mangle.h
+    \brief Handle symbol mangling & register name for inline asm
+                      
+    copyright            : (C) 2008 by mean
+    
+ ***************************************************************************/
+
 #if ( defined(__PIC__) || defined(__pic__) ) && ! defined(PIC)
 #    define PIC
 #endif
@@ -74,4 +80,3 @@
 #endif
 
 #define ASM_CONST attribute_used __attribute__ ((aligned(8)))
-

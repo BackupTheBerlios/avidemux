@@ -16,8 +16,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "default.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+#include "ADM_default.h"
+
 
 #include "ADM_assert.h"
 

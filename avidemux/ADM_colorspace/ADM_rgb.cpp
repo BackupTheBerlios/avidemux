@@ -18,17 +18,14 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "default.h"
-#include "ADM_assert.h"
-
+#include "ADM_default.h"
 #include "colorspace.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+
 #ifdef ADM_CPU_X86
 extern "C" {
 #include "ADM_libraries/ADM_lavcodec/avcodec.h"

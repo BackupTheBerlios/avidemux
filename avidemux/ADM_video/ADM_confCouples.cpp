@@ -15,10 +15,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "default.h"
+#include "ADM_default.h"
 
 #include "fourcc.h"
-#include "avio.hxx"
 #include "ADM_assert.h"
 
 #include "ADM_video/ADM_confCouple.h"

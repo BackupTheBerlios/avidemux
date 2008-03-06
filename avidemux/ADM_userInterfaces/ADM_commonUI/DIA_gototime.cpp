@@ -14,8 +14,7 @@
 #include <iconv.h>
 
 
-#include "default.h"
-#include "ADM_osSupport/ADM_misc.h"
+#include "ADM_default.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
 

@@ -26,7 +26,6 @@
 
 #include "config.h"
 #include "fourcc.h"
-#include "avio.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_video/ADM_genvideo.hxx"

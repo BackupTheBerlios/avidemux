@@ -70,7 +70,7 @@ typedef struct
 #define WAV_NELLYMOSER   9901
 #define WAV_UNKNOWN     9999
 #include "../ADM_audiocodec/ADM_audiocodec.h"
-#include "ADM_fileio.h"
+#include "ADM_osSupport/ADM_fileio.h"
 
 
 
@@ -167,7 +167,6 @@ class AVDMGenericAudioStream
 ;
 
 
-#include "indexer.hxx"
 uint8_t mpegAudioIdentify(uint8_t *ptr, uint32_t maxLookUp, WAVHeader *header, uint8_t *tokens=NULL);
 
 #endif

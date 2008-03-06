@@ -1,6 +1,6 @@
 #ifndef __AVI_VARS
 #define __AVI_VARS
-#include "default.h"
+#include "ADM_default.h"
 #include "fourcc.h"
 #include "ADM_editor/ADM_edit.hxx"
 //----------------------

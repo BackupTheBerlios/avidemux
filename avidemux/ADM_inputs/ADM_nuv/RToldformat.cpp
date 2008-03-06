@@ -11,7 +11,7 @@
 #include "ADM_assert.h"
 #include <math.h>
 #include "config.h"
-#include <default.h>
+#include "ADM_default.h"
 
 #ifndef UNUSED_ARG
 	#define UNUSED_ARG(x) if(x) {}
@@ -19,7 +19,7 @@
 
 
 #if !defined(_I386_TYPES_H) || defined(ADM_BIG_ENDIAN)
-#include "default.h"
+
 typedef uint8_t __u8;
 typedef uint16_t __u16;
 typedef uint32_t __u32;

@@ -18,7 +18,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_colorspace/ADM_rgb.h"
 
 #include "ADM_image.h"
@@ -26,7 +26,7 @@
 #include "ADM_videoFilter/ADM_vidContrast.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flyEq2.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+
 /************* COMMON PART *********************/
 uint8_t  flyEq2::update(void)
 {

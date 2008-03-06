@@ -11,20 +11,15 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
 #define Ui_Dialog Ui_workDialog
 #include "ui_working.h"
 #undef Ui_Dialog 
+#include "math.h"
+#include "ADM_default.h"
+#include "ADM_video/ADM_vidMisc.h"
 
-#include "default.h"
-#include "ADM_assert.h"
-#include "ADM_osSupport/ADM_misc.h"
 #include "DIA_working.h"
-    
+#include "ADM_video/ADM_vidMisc.h"
 extern void UI_purge(void);
 
 class workWindow : public QDialog

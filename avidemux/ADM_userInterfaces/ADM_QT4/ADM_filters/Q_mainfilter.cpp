@@ -35,7 +35,7 @@
 #undef Ui_Dialog
 #include "QStringListModel" 
 #include "QColor" 
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_toolkit/filesel.h"
 
 # include "prefs.h"
@@ -44,7 +44,7 @@
 
 #include "ADM_assert.h"
 #include "GUI_render.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"

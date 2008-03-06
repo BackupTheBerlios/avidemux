@@ -16,21 +16,16 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-
 #define Ui_Dialog Ui_srtDialog
 #include "ui_srt.h"
 #undef Ui_Dialog
 
-#include "default.h"
+#include "ADM_default.h"
+
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_colorspace/ADM_rgb.h"
-#include "ADM_assert.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flyDialogQt4.h"
 

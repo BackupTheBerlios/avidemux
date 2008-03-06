@@ -34,7 +34,7 @@
 #include <X11/extensions/Xvlib.h>
 #include <X11/extensions/XShm.h>
 
-#include "default.h"
+#include "ADM_default.h"
 
 #include "ADM_colorspace/colorspace.h"
 #include "GUI_render.h"

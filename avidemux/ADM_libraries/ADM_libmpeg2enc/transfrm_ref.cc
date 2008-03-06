@@ -47,7 +47,7 @@
  * 02111-1307, USA.
  *
  */
-
+#include "ADM_default.h"
 #include <stdio.h>
 #include "config.h"
 #include <math.h>
@@ -57,7 +57,7 @@
 #include "transfrm_ref.h"
 #include "cpu_accel.h"
 #include "simd.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+
 #ifdef HAVE_ALTIVEC
 //#include "../utils/altivec/altivec_transform.h"
 #endif

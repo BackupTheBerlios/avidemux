@@ -24,8 +24,7 @@ Split a stream into packet(s)
 #include <string.h>
 #include <math.h>
 
-#include "ADM_assert.h"
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_editor/ADM_Video.h"
 #include "fourcc.h"
 #include "aviaudio.hxx"

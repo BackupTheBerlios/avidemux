@@ -20,7 +20,7 @@
 
 # include <math.h>
 
-#include "default.h"
+#include "ADM_default.h"
 
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"

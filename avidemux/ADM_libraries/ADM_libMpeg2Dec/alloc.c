@@ -20,12 +20,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <inttypes.h>
-
+#include "ADM_default.h"
 #include "mpeg2.h"
-#include "ADM_assert.h"
 
 static void * (* malloc_hook) (unsigned size, mpeg2_alloc_t reason) = NULL;
 static int (* free_hook) (void * buf) = NULL;

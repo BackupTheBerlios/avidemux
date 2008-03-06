@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_JSGlobal.h"
 #include "ADM_JSAvidemux.h"

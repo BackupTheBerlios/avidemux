@@ -63,6 +63,8 @@
 
 #include "ADM_libraries/ADM_libmpeg2enc/ADM_mpeg2enc.h"
 
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "ADM_video/ADM_vidMisc.h"
 void A_handleSecondTrack (int tracktype);
 int A_delete(uint32_t start, uint32_t end);
 void A_saveImg (char *name);
@@ -910,7 +912,7 @@ int A_openAvi2 (char *name, uint8_t mode)
   /*
   ** we may get a relative path by cmdline
   */
-  longname = PathCanonize(name);
+  longname = ADM_PathCanonize(name);
   if (mode)
     res = video_body->addFile (longname, 1);
   else
@@ -1297,7 +1299,7 @@ void A_saveBunchJpg(char *name)
                         return;
                 }
         // Split name into base + extension
-        PathSplit(name,&name,&ext);
+        ADM_PathSplit(name,&name,&ext);
         
         src=new ADMImage(avifileinfo->width,avifileinfo->height);
         ADM_assert(src);
@@ -1338,9 +1340,9 @@ void A_saveImg (char *name)
   ADMImage image(avifileinfo->width,avifileinfo->height);
   GUI_getFrameContent(&image, curframe);
   if(image.saveAsBmp(name))
-        GUI_Info_HIG (ADM_LOG_INFO,QT_TR_NOOP("Done"),QT_TR_NOOP( "Saved \"%s\"."), GetFileName(name));
+        GUI_Info_HIG (ADM_LOG_INFO,QT_TR_NOOP("Done"),QT_TR_NOOP( "Saved \"%s\"."), ADM_GetFileName(name));
   else
-        GUI_Error_HIG (QT_TR_NOOP("BMP op failed"),QT_TR_NOOP( "Saving %s as a BMP file failed."), GetFileName(name));
+        GUI_Error_HIG (QT_TR_NOOP("BMP op failed"),QT_TR_NOOP( "Saving %s as a BMP file failed."), ADM_GetFileName(name));
 }
 
 //_____________________________________________________________
@@ -1787,7 +1789,7 @@ A_saveWorkbench (char *name)
 
 void A_parseECMAScript(const char *name){
   bool ret;
-  char *longname = PathCanonize(name);
+  char *longname = ADM_PathCanonize(name);
    if (playing){
       GUI_PlayAvi();
       curframe = 0;
@@ -2270,11 +2272,11 @@ int A_SaveWrapper(char *name)
 
         if(A_Save(name))
         {
-          GUI_Info_HIG (ADM_LOG_INFO,QT_TR_NOOP("Done"),QT_TR_NOOP( "File %s has been successfully saved."),GetFileName(name));
+          GUI_Info_HIG (ADM_LOG_INFO,QT_TR_NOOP("Done"),QT_TR_NOOP( "File %s has been successfully saved."),ADM_GetFileName(name));
         }
         else
         {
-          GUI_Error_HIG (QT_TR_NOOP("Failed"), QT_TR_NOOP("File %s was NOT saved correctly."),GetFileName(name));
+          GUI_Error_HIG (QT_TR_NOOP("Failed"), QT_TR_NOOP("File %s was NOT saved correctly."),ADM_GetFileName(name));
         }
         return 1;
 }

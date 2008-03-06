@@ -13,14 +13,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-
-#include <math.h>
-
-#include "default.h"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "../ADM_commonUI/DIA_factory.h"
-#include "ADM_assert.h"
 
 diaElemInteger::diaElemInteger(int32_t *intValue,const char *toggleTitle, int32_t min, int32_t max,const char *tip)
   : diaElem(ELEM_INTEGER)

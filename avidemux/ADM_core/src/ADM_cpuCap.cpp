@@ -9,8 +9,7 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#include "config.h"
-#include <stdio.h>
+#include "ADM_default.h"
 
 #if defined(__MINGW32__)
 #include <pthread.h>
@@ -22,10 +21,10 @@
 #include <sched.h>
 #endif
 
-#include "default.h"
-#include "admmangle.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
-#include "prefs.h"
+//#include "prefs.h"
+
+uint32_t CpuCaps::myCpuCaps=0;
+uint32_t CpuCaps::myCpuMask=0xffffffff;
 
 /* Cpu caps interface to other libs */
 extern "C"{ 
@@ -61,7 +60,7 @@ extern "C"
 	printf("[cpuCaps]Checking CPU capabilities\n");
 	myCpuCaps=0;
 	myCpuMask=0xffffffff;
-	prefs->get(FEATURE_CPU_CAPS,&myCpuMask);
+	// FIXME prefs->get(FEATURE_CPU_CAPS,&myCpuMask);
 
 #ifdef ADM_CPU_X86
 int rval = 0;

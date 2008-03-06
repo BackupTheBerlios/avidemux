@@ -1,12 +1,13 @@
-#include "config.h"
+/**
+                \fn ADM_quota.cpp
+                \brief handle out of space error when writing to files
+*/
+#define ADM_LEGACY_PROGGY
+#include "ADM_default.h"
 #include <errno.h>
-#include <string.h>
-#include <stdarg.h>
-#include <assert.h>
-
 #include "ADM_quota.h"
 
-#include "default.h"
+#undef free
 
 extern uint8_t DIA_quota(char *);
 struct qfile_t {
@@ -19,7 +20,7 @@ struct qfile_t {
 static qfile_t qfile[qfile_len];
 
 #include "ADM_toolkit/toolkit.hxx"
-//#include "ADM_misc.h"
+
          
 #ifdef USE_LIBXML2
 #include <libxml/tree.h>

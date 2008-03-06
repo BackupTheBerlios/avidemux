@@ -25,9 +25,8 @@
 #include "ADM_assert.h"
 #include <math.h>
 
-#include "default.h"
+#include "ADM_default.h"
 #include "fourcc.h"
-#include "avio.hxx"
 #include "config.h"
 
 
@@ -35,7 +34,7 @@
 //#include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "admmangle.h"
+
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 #include "ADM_vidFlux.h"

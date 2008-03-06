@@ -16,7 +16,8 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "default.h"
+#include "ADM_default.h"
+
 #include "prefs.h"
 
 #include "ADM_toolkit/toolkit.hxx"
@@ -24,7 +25,7 @@
 #include "ADM_assert.h" 
 
 #include "DIA_encoding.h"
-
+#include "ADM_video/ADM_vidMisc.h"
 DIA_encoding::DIA_encoding( uint32_t fps1000 )
 {
 uint32_t useTray=0;

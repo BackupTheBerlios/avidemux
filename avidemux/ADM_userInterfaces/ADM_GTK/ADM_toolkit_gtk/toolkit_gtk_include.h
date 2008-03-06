@@ -4,7 +4,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "avi_vars.h"
+
 #include "ADM_gladeSupport.h"
 #include "config.h"
 

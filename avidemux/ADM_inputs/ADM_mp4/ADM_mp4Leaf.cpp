@@ -24,7 +24,7 @@
 #include <math.h>
 
 #include "ADM_assert.h"
-#include "default.h"
+#include "ADM_default.h"
 #include "fourcc.h"
 #include "ADM_atom.h"
 #include "ADM_mp4Tree.h"

@@ -14,8 +14,20 @@
  ***************************************************************************/
 #ifndef ADM_TLK_GTK
 #define ADM_TLK_GTK
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <glib.h>
+#include <gdk/gdkkeysyms.h>
+#include <gtk/gtk.h>
 
-int     getRangeInMenu(GtkWidget * Menu);
+#include "ADM_default.h"
+#include "ADM_gladeSupport.h"
+#include "toolkit_gtk_include.h"
+
+
+
+uint8_t getRangeInMenu(GtkWidget * Menu);
 void    changeTextInMenu(GtkWidget *menu,int range,const char *text);
 void    UI_purge(void );
 uint8_t getSelectionNumber(uint32_t nb,GtkWidget *tree  , GtkListStore 	*store,uint32_t *number);

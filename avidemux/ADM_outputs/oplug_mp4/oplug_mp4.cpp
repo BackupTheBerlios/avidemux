@@ -24,7 +24,9 @@
 
 #include <string.h>
 #include <math.h>
-#include <pthread.h>
+
+#include "ADM_default.h"
+#include "ADM_threads.h"
 
 #ifdef USE_FFMPEG
 extern "C" {
@@ -35,7 +37,6 @@ extern "C" {
 
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_assert.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 

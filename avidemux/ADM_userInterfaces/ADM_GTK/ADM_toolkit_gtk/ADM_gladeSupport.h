@@ -7,7 +7,8 @@
 #endif
 
 #include <gtk/gtk.h>
-#include "default.h"
+#include "ADM_default.h"
+
 
 /*
  * Public Functions.

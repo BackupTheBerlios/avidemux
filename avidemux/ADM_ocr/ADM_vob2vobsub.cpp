@@ -36,7 +36,7 @@
 
 //#define TEST_V2V
 
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_assert.h"
 
@@ -47,6 +47,9 @@
 #include "ADM_inputs/ADM_mpegdemuxer/dmx_demuxer.h"
 #include "ADM_inputs/ADM_mpegdemuxer/dmx_demuxerPS.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
+
+#include "ADM_video/ADM_vidMisc.h"
+
 #define ADM_VOBSUB_NO_PADDING
 static int vobsub_parse_ifo(const char *const name, 
                      uint32_t *palette, 

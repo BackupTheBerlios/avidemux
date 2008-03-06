@@ -14,8 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -29,14 +27,23 @@
 #include <imagehlp.h>
 #endif
 
-#include "default.h"
-#include "ADM_assert.h"
+#include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
-#include "ADM_editor/ADM_edit.hxx"
-extern ADM_Composer *video_body;
 
 #define CRASH_FILE "crash.js"
+
+// Our callback to give UI formatted informations....
+static ADM_saveFunction *mysaveFunction=NULL;
+static ADM_fatalFunction *myFatalFunction=NULL;
+/**
+        \fn ADM_setCrashHook
+        \brief install crash handlers (save + display)
+*/
+void ADM_setCrashHook(ADM_saveFunction *save, ADM_fatalFunction *fatal)
+{
+        mysaveFunction=save;
+        myFatalFunction=fatal;
+}
 
 static void saveCrashProject(void);
 extern char *ADM_getBaseDir(void);
@@ -45,13 +52,19 @@ extern void A_parseECMAScript(const char *name);
 #ifdef __APPLE__
 void installSigHandler() {}
 
-void ADM_backTrack(int lineno,const char *file)
+void ADM_backTrack(const char *info,int lineno,const char *file)
 {
 	char bfr[1024];
-	saveCrashProject();
-	snprintf(bfr,1024,"Assert Failed at file %s, line %d\n",file,lineno);
-	GUI_Error_HIG("Fatal Error",bfr);
-	assert(0);
+
+	if (mysaveFunction)
+		mysaveFunction();
+
+	snprintf(bfr,1024,"%s\n file %s, line %d\n",infofile,lineno);
+
+	if(myFatalFunction)
+		myFatalFunction("Crash",bfr);
+
+	exit(-1);
 }
 #elif defined(__MINGW32__)
 typedef struct STACK_FRAME
@@ -198,13 +211,16 @@ void dumpBackTrace(void* processId)
 }
 }
 
-void ADM_backTrack(int lineno, const char *file)
+void ADM_backTrack(const char *info,int lineno,const char *file)
 {	
 	fflush(stderr);
 	fflush(stdout);
-	saveCrashProject();
 
-	GUI_Error_HIG(QT_TR_NOOP("Fatal Error"),QT_TR_NOOP("A fatal error has occurred.\n\nClick OK to generate debug information. This may take a few minutes to complete."));
+	if (mysaveFunction)
+		mysaveFunction();
+
+	if (myFatalFunction)
+		myFatalFunction("Crash", "Press OK to build crash info");
 
 	void* currentProcessId = GetCurrentProcess();
 
@@ -214,7 +230,7 @@ void ADM_backTrack(int lineno, const char *file)
 
 	printf("Assert failed at file %s, line %d\n\n",file,lineno);
 
-	exit(1);
+	exit(-1);
 }
 
 EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, void* pEstablisherFrame, struct _CONTEXT* pContextRecord, void* pDispatcherContext)
@@ -228,7 +244,11 @@ EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, 
 
 	running=1;
 
-	saveCrashProject();
+	if (mysaveFunction)
+		mysaveFunction();
+
+	if (myFatalFunction)
+		myFatalFunction("Crash", "Press OK to build crash info");
 
 	GUI_Error_HIG(QT_TR_NOOP("Fatal Error"),QT_TR_NOOP("A fatal error has occurred.\n\nClick OK to generate debug information. This may take a few minutes to complete."));
 
@@ -256,7 +276,6 @@ void installSigHandler()
 {
     signal(11, sig_segfault_handler); // show stacktrace on default
 }
-extern void ADMImage_stat( void );
 
 static int lenCount(uint8_t *start,uint8_t *end,int *d)
 {
@@ -361,93 +380,42 @@ void sig_segfault_handler(int signo)
         exit(1);
       }
       running=0; 
-      ADM_backTrack(0,"");
+      ADM_backTrack("Segfault",0,"??");
 }
-void ADM_backTrack(int lineno,const char *file)
+
+void ADM_backTrack(const char *info,int lineno,const char *file)
 {
-     void *stack[20];
-     char **functions;
-     int count, i;
-      
-     saveCrashProject();
+	char wholeStuff[2048];
+	char **functions;
+	int count, i;
+
+	wholeStuff[0]=0;
+
+	if(mysaveFunction)
+		mysaveFunction();
 
 #ifndef __CYGWIN__
-      printf("\n*********** BACKTRACK **************\n");
-      count = backtrace(stack, 20);
-      functions = backtrace_symbols(stack, count);
-      
-         for (i=0; i < count; i++) 
-         {
-            printf("Frame %2d: %s \n", i, functions[i]);
-            demangle(i,(uint8_t *)functions[i]);
-            
-         }
-      printf("*********** BACKTRACK **************\n");
-     // Now use dialogFactory
-      char bfr[30];
-      snprintf(bfr,30,"Line:%u",lineno);
-      diaElemReadOnlyText *txt[count+1];
-      txt[0]=new diaElemReadOnlyText(bfr,file);
-      
-      for(i=0;i<count;i++)
-          txt[i+1]=new diaElemReadOnlyText(functions[i],"Function:");
-      const char *title="Crash BackTrace";
-      if(lineno) title="Assert failed";
-      diaFactoryRun(title,count+1,(diaElem **)txt);
+	printf("\n*********** BACKTRACK **************\n");
+
+	count = backtrace(stack, 20);
+	functions = backtrace_symbols(stack, count);
+	sprintf(wholeStuff,"%s\n at line %d, file %s",info,lineno,file);
+
+	for (i=0; i < count; i++) 
+	{
+		printf("Frame %2d: %s \n", i, functions[i]);
+		demangle(i,(uint8_t *)functions[i]);
+		strcat(wholeStuff,functions[i]);
+		strcat(wholeStuff,"\n");
+	}
+
+	printf("*********** BACKTRACK **************\n");
+
+	if(myFatalFunction)
+		myFatalFunction("Crash", wholeStuff); // FIXME
 #endif __CYGWIN__
 
-      //
-     printf("Memory stat:\n");
-     ADMImage_stat();
-
-     exit(1); // _exit(1) ???
+	exit(-1); // _exit(1) ???
 }
 #endif
-/**
-    \fn saveCrashProject
-    \brief Try to save the current project, useful in case of crash
-*/
-void saveCrashProject(void)
-{
-  char *baseDir=ADM_getBaseDir();
-  char *name=CRASH_FILE;
-  static int crashCount=0;
-  if(crashCount) return ; // avoid endless looping
-  crashCount++;
-  char *where=new char[strlen(baseDir)+strlen(name)+2];
-  strcpy(where,baseDir);
-  strcat(where,"/");
-  strcat(where,name);
-  printf("Saving crash file to %s\n",where);
-  video_body->saveAsScript (where, NULL);
-  delete[] where;
-}
-/**
-    \fn checkCrashFile
-    \brief Check if there i a crash file
-*/
-
-void checkCrashFile(void)
-{
-  char *baseDir=ADM_getBaseDir();
-  char *name=CRASH_FILE;
-  static int crashCount=0;
-  char *where=new char[strlen(baseDir)+strlen(name)+2];
-  strcpy(where,baseDir);
-  strcat(where,"/");
-  strcat(where,name);
-  if(ADM_fileExist(where))
-  {
-    if(GUI_Confirmation_HIG(QT_TR_NOOP("Load it"),QT_TR_NOOP("Crash file"),
-       QT_TR_NOOP("I have detected a crash file. \nDo you want to load it  ?\n(It will be deleted in all cases, you should save it if you want to keep it)")))
-    {
-       A_parseECMAScript(where);
-    }
-    unlink(where);
-  }else
-  {
-    printf("No crash file (%s)\n",where); 
-  }
-  delete [] where;
-}
 //EOF

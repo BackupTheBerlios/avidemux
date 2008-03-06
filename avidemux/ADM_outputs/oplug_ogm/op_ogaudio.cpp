@@ -30,7 +30,7 @@
 #include "avi_vars.h"
 #include "ADM_assert.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "subchunk.h"
+
 //#include "avilist.h"
 
 #include "ADM_video/ADM_genvideo.hxx"

@@ -1,14 +1,19 @@
-//
-// C++ Interface: ADM_cpuCap
-//
-// Description: 
-//
-//
-// Author: mean <fixounet@free.fr>, (C) 2004
-//
-// Copyright: See COPYING file that comes with this distribution
-//
-//
+/** *************************************************************************
+    \fn ADM_cpuCap.h
+    \brief Handle cpu capabilities (MMX/SSE/...)
+                      
+    copyright            : (C) 2008 by mean
+    
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ ***************************************************************************/
+
 #ifdef ADM_CPU_X86
 
 #define CHECK_Z(x) {if(CpuCaps::myCpuCaps & ADM_CPUCAP_##x & CpuCaps::myCpuMask) return 1; else return 0;} 

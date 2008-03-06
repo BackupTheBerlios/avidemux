@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "default.h"
+#include "ADM_default.h"
 
 #ifdef USE_ARTS
 #include <artsc.h>

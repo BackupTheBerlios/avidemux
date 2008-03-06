@@ -25,24 +25,13 @@
   Ported to avidemux by mean
   Same license as original (?GPL)
 */
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <inttypes.h>
-#include <math.h>
-
-#include "ADM_assert.h"
-
-#include "admmangle.h"
-
+#include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_vidVlad.h"
+#include "ADM_video/ADM_cache.h"
 #include "ADM_filter/video_filters.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 //************************************************

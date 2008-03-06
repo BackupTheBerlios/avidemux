@@ -14,15 +14,12 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "default.h"
-
-#include "ADM_assert.h"
+#include "ADM_default.h"
 #include "ADM_colorspace/colorspace.h"
 
 #include "ADM_codecs/ADM_codec.h"

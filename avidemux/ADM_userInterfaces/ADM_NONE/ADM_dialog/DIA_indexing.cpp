@@ -7,7 +7,8 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "default.h"
+#include "ADM_default.h"
+
 #include "prefs.h"
 
 #include "ADM_toolkit/toolkit.hxx"

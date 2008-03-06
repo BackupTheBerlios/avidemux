@@ -1,30 +1,12 @@
-# include "config.h"
-
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-
-#include "default.h"
-
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_toolkit/filesel.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
-
-#include "ADM_assert.h" 
 
 #ifdef USE_XVID_4
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
 #include "ADM_codecs/ADM_xvid4param.h"
-
-
+#include "avi_vars.h"
 static xvid4EncParam localParam;
 static uint32_t mQ,mB,mS,mA;
 static GtkWidget *dialog=NULL;

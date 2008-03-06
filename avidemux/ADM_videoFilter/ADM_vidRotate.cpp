@@ -19,8 +19,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "default.h"
-#include "ADM_osSupport/ADM_misc.h"
+#include "ADM_default.h"
+
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"

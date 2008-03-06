@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "default.h"
+#include "ADM_default.h"
 #ifdef __MINGW32__
 #include <windows.h>
 #else

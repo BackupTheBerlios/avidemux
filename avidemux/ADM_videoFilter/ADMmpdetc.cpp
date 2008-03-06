@@ -16,19 +16,10 @@
 #define HAVE_DETC
 #ifdef HAVE_DETC
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-
-#include "config.h"
-
+#include "ADM_default.h"
 #include "ADM_lavcodec.h"
-
+#include "math.h"
 #include "fourcc.h"
-#include "avio.hxx"
-#include "config.h"
-#include "avi_vars.h"
 
 
 

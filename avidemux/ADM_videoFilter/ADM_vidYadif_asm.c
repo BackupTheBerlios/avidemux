@@ -6,8 +6,7 @@
 #include <inttypes.h>
 #include <math.h>
 
-#include "default.h"
-#include "admmangle.h"
+#include "ADM_default.h"
 
 #ifdef ADM_CPU_X86
 

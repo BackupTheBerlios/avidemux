@@ -4,20 +4,12 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-#include <math.h>
+#include "ADM_default.h"
 #include <iconv.h>
-#include "default.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
-#include "ADM_assert.h" 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
 

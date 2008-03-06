@@ -2,7 +2,7 @@
 
 #ifdef USE_AMR_NB
 #include <stdio.h>
-#include "default.h"
+#include "ADM_default.h"
 #include "libwrapper_amrnb.h"
 
 ADM_LibWrapperAmrnb::ADM_LibWrapperAmrnb() : ADM_LibWrapper()

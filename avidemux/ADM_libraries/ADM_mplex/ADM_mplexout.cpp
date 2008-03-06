@@ -1,5 +1,3 @@
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -11,12 +9,11 @@
 #undef malloc
 #undef realloc
 #undef free
-#include "ADM_assert.h"
 
-#include "default.h"
+#include "ADM_default.h"
+#include "ADM_threads.h"
+
 #include "ADM_toolkit/toolkit.hxx"
-
-
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_LAVFORMAT

@@ -26,7 +26,7 @@
 #include <string>
 #include "ADM_JSAvidemux.h"
 #include "ADM_JSGlobal.h"
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_outputfmt.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
@@ -490,7 +490,7 @@ JSBool pathOnly(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     return JS_FALSE;
   char *name=NULL;
   char *orgName = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
-  PathStripName(orgName);
+  ADM_PathStripName(orgName);
   /* Remove last / or last \ */
   int l=strlen(orgName);
   if(l) orgName[l-1]=0;

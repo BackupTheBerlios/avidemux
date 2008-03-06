@@ -14,21 +14,20 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
-
 #include <time.h>
 #include <sys/time.h>
-#include <pthread.h>
+
+#include "ADM_default.h"
+#include "ADM_threads.h"
 
 #include "avi_vars.h"
 #include "prototype.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_assert.h"
 
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"

@@ -34,7 +34,6 @@
 #include <math.h>
 #include "config.h"
 #include "fourcc.h"
-#include "avio.hxx"
 #include "avi_vars.h"
 
 #include "ADM_toolkit/toolkit.hxx"
@@ -45,6 +44,7 @@
 #include "ADM_filter/vidVCD.h"
 #include "prefs.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_resizeWiz.h"
+#include "ADM_video/ADM_vidMisc.h"
 //___________________________________________
 extern FILTER videofilters[MAX_FILTER];
 extern uint32_t nb_active_filter;

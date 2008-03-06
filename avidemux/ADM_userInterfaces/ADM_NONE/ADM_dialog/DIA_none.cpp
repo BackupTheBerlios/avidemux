@@ -20,7 +20,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "default.h"
+#include "ADM_default.h"
+
 #include "ADM_assert.h"
 
 #include "ADM_video/ADM_genvideo.hxx"

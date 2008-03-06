@@ -3,7 +3,7 @@
 
 #include "mmxsse_motion.h"
 #include "mjpeg_logging.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+#include "ADM_cpuCap.h"
 void enable_mmxsse_motion(int cpucap)
 {
 #ifdef HAVE_X86CPU

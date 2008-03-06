@@ -15,7 +15,6 @@
 #define TRANSFERT_BUFFER 1024*1024*10
 #define TRANSFERT_SLOT   10000
 
-#include "ADM_osSupport/ADM_threads.h"
 
 #include "ADM_toolkit/ADM_packetQueue.h"
 #endif

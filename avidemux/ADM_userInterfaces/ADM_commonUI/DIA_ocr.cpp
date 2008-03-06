@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "default.h"
+#include "ADM_default.h"
 
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
@@ -40,7 +40,6 @@
 #include "ADM_videoFilter/ADM_vobsubinfo.h"
 #include "ADM_videoFilter/ADM_vidVobSub.h"
 #include "ADM_ocr/ADM_ocr.h"
-#include "ADM_osSupport/ADM_misc.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "prefs.h"
 #include "ADM_assert.h"

@@ -18,21 +18,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
-#include <string.h>
-#include <stdio.h>
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-#include <math.h>
-
-#include "default.h"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "default.h"
+
+
 
 #include "ADM_colorspace/ADM_rgb.h"
 
@@ -42,7 +31,6 @@
 #include "DIA_flyDialog.h"
 #include "DIA_flyHue.h"
 
-#include "ADM_assert.h"
 
 static GtkWidget	*create_dialog1 (void);
 static void  		update ( void);

@@ -30,9 +30,7 @@ extern "C"
 #include "ADM_lavcodec.h"
 };
 #endif
-
-#include "default.h"
-
+#include "ADM_default.h"
 #ifdef BIG_ENDIAN
 #undef BIG_ENDIAN
 #endif

@@ -21,14 +21,13 @@
 //#include <vector>
 using namespace std;
 
-#include "default.h"
+#include "ADM_default.h"
 #include <ctype.h>
 
 #include "ADM_assert.h"
 #undef memcpy   // avoid compile errors due to macro
 #include "fourcc.h"
-#include "avio.hxx"
-#include "avi_vars.h"
+//#include "avi_vars.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"

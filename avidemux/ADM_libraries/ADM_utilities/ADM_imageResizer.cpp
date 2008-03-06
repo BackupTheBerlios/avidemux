@@ -17,10 +17,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "ADM_assert.h"
-#include "default.h"
+#include "ADM_default.h"
 
 #include "ADM_image.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
 
 #ifdef ADM_CPU_X86
 extern "C" {

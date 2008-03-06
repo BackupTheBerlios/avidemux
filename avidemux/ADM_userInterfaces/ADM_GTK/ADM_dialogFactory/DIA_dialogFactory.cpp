@@ -12,18 +12,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-
-#include "default.h"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
-#include "DIA_factory.h"
-#include "ADM_assert.h"
+#include "../ADM_commonUI/DIA_factory.h"
 
 static uint8_t  buildOneTab(GtkWidget *nb,int index, diaElemTabs *tab);
 static uint8_t  readOneTab(int index, diaElemTabs *tab);

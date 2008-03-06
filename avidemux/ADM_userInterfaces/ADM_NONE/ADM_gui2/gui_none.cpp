@@ -11,7 +11,8 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "default.h"
+#include "ADM_default.h"
+#include "ADM_misc.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "GUI_ui.h"
 #include "ADM_colorspace/ADM_rgb.h"

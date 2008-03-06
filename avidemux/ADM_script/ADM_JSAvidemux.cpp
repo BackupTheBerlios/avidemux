@@ -13,7 +13,7 @@
 
 #include <math.h>
 
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_JSAvidemux.h"
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"

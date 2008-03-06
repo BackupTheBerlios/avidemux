@@ -39,12 +39,12 @@
 #include "avifmt2.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "fourcc.h"
-#include "subchunk.h"
+
 #include "avilist.h"
 #include "op_aviwrite.hxx"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_osSupport/ADM_quota.h"
-#include "ADM_fileio.h"
+#include "ADM_osSupport/ADM_fileio.h"
 
 // MOD Feb 2005 by GMV
 #include "ADM_osSupport/ADM_debugID.h"
@@ -219,7 +219,7 @@ uint8_t aviWrite::writeVideoHeader( uint8_t *extra, uint32_t extraLen )
 		 0x1000);
 #else
   	setStreamInfo (_file, (uint8_t *) &_videostream,
-		  (uint8_t *)&_bih,sizeof(BITMAPINFOHEADER),
+		  (uint8_t *)&_bih,sizeof(ADM_BITMAPINFOHEADER),
 		// MOD Feb 2005 by GMV: ODML support
 		odml_video_super_idx_size,0,
 		// END MOD Feb 2005 by GMV
@@ -478,7 +478,7 @@ uint8_t aviWrite::saveBegin (char 	*name,
 		     MainAVIHeader 	*inmainheader, 
 		     uint32_t 		nb_frame,
 		     AVIStreamHeader * invideostream,
-		     BITMAPINFOHEADER	*bih,
+		     ADM_BITMAPINFOHEADER	*bih,
 		     uint8_t 		*videoextra,
 		     uint32_t  		videoextraLen,
 		     AVDMGenericAudioStream * inaudiostream,

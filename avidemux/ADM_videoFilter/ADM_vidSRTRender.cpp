@@ -15,16 +15,13 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "default.h"
+#include "ADM_default.h"
 
 #include <math.h>
 #include <iconv.h>
 
 
 #ifdef USE_FREETYPE
-
-#include "ADM_osSupport/ADM_misc.h"
-
 
 #include "ADM_toolkit/toolkit.hxx"
 

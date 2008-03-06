@@ -41,7 +41,7 @@ Especially AVI in our case
 
 #ifndef __AVILIST__
 #define __AVILIST__
-#include "ADM_fileio.h"
+#include "ADM_osSupport/ADM_fileio.h"
 class AviList
 {
 protected:

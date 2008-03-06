@@ -30,27 +30,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <gtk/gtk.h>
-
-#include "ADM_assert.h"
-
-#include "fourcc.h"
-#include "avio.hxx"
-#include "config.h"
-#include "avi_vars.h"
-
-//#include "unistd.h"
-
-#include "ADM_toolkit/toolkit.hxx"
-#include "../ADM_GTK/ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_GTK/ADM_toolkit_gtk/toolkit_gtk_include.h"
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_filter/video_filters.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"

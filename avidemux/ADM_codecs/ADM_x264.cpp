@@ -20,7 +20,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_codecs/ADM_codec.h"
 #ifdef USE_X264
 
@@ -29,7 +29,7 @@ extern "C"
 {
 #include "x264.h"
 };
-#include "ADM_osSupport/ADM_cpuCap.h"
+
 #include "ADM_assert.h"
 #include "avi_vars.h"
 

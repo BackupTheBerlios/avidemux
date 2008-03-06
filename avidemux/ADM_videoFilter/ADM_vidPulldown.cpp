@@ -20,25 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-
-#include "config.h"
-#include "fourcc.h"
-#include "avio.hxx"
-#include "config.h"
-#include "avi_vars.h"
-
-
+#include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidFieldUtil.h"
 #include "ADM_vidPulldown.h"
 #include "ADM_video/ADM_interlaced.h"
-#include "ADM_osSupport/TLK_clock.h"
+
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"

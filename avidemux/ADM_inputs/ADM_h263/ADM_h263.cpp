@@ -25,7 +25,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_assert.h"
 

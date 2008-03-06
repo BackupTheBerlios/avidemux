@@ -122,13 +122,13 @@ typedef AVDMGenericVideoStream *(ADM_create_from_scriptT) (AVDMGenericVideoStrea
         void              (*destroy)( AVDMGenericVideoStream *old); /* Maybe needed ...*/
         VF_FILTERS        tag;
         uint8_t           viewable;
-        char              *filtername;
-        char              *description;
+        const char        *filtername;
+        const char        *description;
         ADM_create_from_scriptT *create_from_script;
 
        FILTER_ENTRY (const char * name, ADM_createT * create, VF_FILTERS tag,
-                     uint8_t viewable, char * filtername,
-                     char * description = 0,
+                     uint8_t viewable, const char * filtername,
+                     const char * description = 0,
                      ADM_create_from_scriptT * create_from_script = 0)
            : name (name),
              create (create),
@@ -193,13 +193,13 @@ void filterSaveScriptJS(FILE *f);
 
 void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable,
                     ADM_createT  *create,
-                    char *fname);
+                    const char *fname);
                     
 void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable,
                 ADM_createT  *create,
-		char *filtername,
+                const char *filtername,
                 ADM_create_from_scriptT *create_from_script,
-                char *description);
+                const char *description);
                 
 void 		filterListAll( void );
 VF_FILTERS 	filterGetTagFromName(char *inname);

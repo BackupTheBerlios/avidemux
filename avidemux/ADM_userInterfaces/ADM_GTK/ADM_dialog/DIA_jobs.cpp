@@ -1,19 +1,4 @@
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-
-# include <math.h>
-
-# include "config.h"
-#include "default.h"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 static GtkWidget       *create_dialog1 (void);
@@ -167,7 +152,7 @@ GtkCellRenderer *renderer;
                         case COMMAND_DELETE: 
                                         sel=getSelection(jobs.dialog);
                                         if(sel>=jobs.nb) break;
-                                        if(GUI_Confirmation_HIG(QT_TR_NOOP("Sure!"),QT_TR_NOOP("Delete job"),QT_TR_NOOP("Are you sure you want to delete %s job ?"),GetFileName(jobs.name[sel])))
+                                        if(GUI_Confirmation_HIG(QT_TR_NOOP("Sure!"),QT_TR_NOOP("Delete job"),QT_TR_NOOP("Are you sure you want to delete %s job ?"),ADM_GetFileName(jobs.name[sel])))
                                         {
                                                 jobs.status[sel].status=STATUS_DELETED;
                                         }
@@ -217,7 +202,7 @@ char str1[200],str2[200],str3[200];
         {
                 sprintf(str1,"<span weight=\"heavy\"> %s </span>\n" 
                "<span size=\"smaller\" style=\"oblique\" > %s </span> "
-                ,GetFileName(jobs.name[i]),QT_TR_NOOP(StringStatus[jobs.status[i].status]));
+                ,ADM_GetFileName(jobs.name[i]),QT_TR_NOOP(StringStatus[jobs.status[i].status]));
 
                 date=&(jobs.status[i].startDate);
                 sprintf(str2,"%02d:%02d:%02d",date->hours,

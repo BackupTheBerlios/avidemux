@@ -221,7 +221,7 @@ class ADM_Composer
 			     		uint8_t 			setDecodeParam( uint32_t frame );
 	 				AVIStreamHeader 	*getVideoStreamHeader(void ) ;
 	 				MainAVIHeader 		*getMainHeader(void );
-	 				BITMAPINFOHEADER 	*getBIH(void ) ;
+	 				ADM_BITMAPINFOHEADER 	*getBIH(void ) ;
 	  				uint8_t			getVideoInfo(aviInfo *info);
 					WAVHeader 		*getAudioInfo(void )  ;
 					uint32_t 			getAudioLength(void);

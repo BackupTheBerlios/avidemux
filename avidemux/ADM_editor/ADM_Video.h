@@ -56,7 +56,7 @@ protected:
           MainAVIHeader 	_mainaviheader;
           uint8_t		_isvideopresent;
           AVIStreamHeader 	_videostream;
-          BITMAPINFOHEADER  	_video_bih;
+          ADM_BITMAPINFOHEADER  _video_bih;
           uint8_t		_isaudiopresent;
           AVIStreamHeader 	_audiostream;
           void			*_audiostreaminfo;
@@ -121,7 +121,7 @@ virtual 	uint8_t   getRawStart(uint8_t *ptr,uint32_t *len);
 // New write avi engine
           AVIStreamHeader           *getVideoStreamHeader(void ) { return &_videostream;}
           MainAVIHeader             *getMainHeader(void ) { return &_mainaviheader;}
-          BITMAPINFOHEADER          *getBIH(void ) { return &_video_bih;}
+          ADM_BITMAPINFOHEADER      *getBIH(void ) { return &_video_bih;}
 
 };
 #endif

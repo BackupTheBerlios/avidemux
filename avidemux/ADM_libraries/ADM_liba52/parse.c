@@ -21,15 +21,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <inttypes.h>
 
 //MEANX
 #define ADM_LEGACY_PROGGY
-#include "ADM_assert.h"
+#include "ADM_default.h"
 // /MEANX
 
     

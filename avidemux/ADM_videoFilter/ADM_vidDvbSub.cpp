@@ -27,8 +27,8 @@
 #include <string.h>
 #include "ADM_lavcodec.h"
 #include "ADM_assert.h"
+#include "ADM_default.h"
 
-#include "default.h"
 #include "fourcc.h"
 
 #include "ADM_toolkit/toolkit.hxx"

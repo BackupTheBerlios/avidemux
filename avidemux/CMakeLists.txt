@@ -51,8 +51,9 @@ IF (ADM_DEBUG)
 	ADD_DEFINITIONS(-DADM_DEBUG)
 ENDIF (ADM_DEBUG)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})		# ADM_assert.h, prefs.h
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_utilities)		# default.h, fourcc.h
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ADM_core/include)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_utilities)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_lavutil)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_lavcodec)
 
@@ -214,6 +215,7 @@ ADD_ADMLIB_ALL_TARGETS(${ADM_INPUTS})
 # Tails
 #########################################
 SET(ADM_TAILS
+	ADM_core
 	ADM_osSupport
 	ADM_encoder
 	ADM_toolkit
@@ -306,7 +308,7 @@ IF (ADM_UI_QT4)
 		ADM_commonUI_qt4)
 ENDIF (ADM_UI_QT4)
 
-ADD_ADMLIB_ALL_TARGETS(ADM_utilities)
+ADD_ADMLIB_ALL_TARGETS(ADM_utilities ADM_core)
 
 ###########################################
 # External libs

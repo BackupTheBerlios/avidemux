@@ -34,11 +34,11 @@
 #include "config.h"
 #include "avifmt.h"
 #include "avifmt2.h"
-#include "avio.hxx"
+
 #include "ADM_assert.h"
 
 #include "fourcc.h"
-#include "subchunk.h"
+
 #include "avilist.h"
 #include "ADM_toolkit/toolkit.hxx"
 

@@ -21,7 +21,7 @@ Handle dialog factory element : Thread Count
 #include <QButtonGroup>
 #include <QSpinBox>
 
-#include "default.h"
+#include "ADM_default.h"
 #include "../ADM_commonUI/DIA_factory.h"
 
 extern const char* shortkey(const char*);

@@ -21,18 +21,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
+#include "ADM_default.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#include "default.h"
 #include "ADM_editor/ADM_Video.h"
 #include "fourcc.h"
 #include "ADM_pics.h"
-#include "bitmap.h"
+#include "ADM_toolkit/bitmap.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_assert.h"
 #include "ADM_toolkit/filesel.h"
@@ -158,7 +157,7 @@ uint8_t picHeader::open(char *inname)
     // Then spit the name in name and extension
     char *name;
     char *extension;
-    PathSplit(inname, &name, &extension);
+    ADM_PathSplit(inname, &name, &extension);
 
 
     nnum = 1;
@@ -229,7 +228,7 @@ char realstring[250];
     switch (_type) {
     case PIC_BMP:
 	{
-	    BITMAPHEADER bmph;
+	    ADM_BITMAPINFOHEADER bmph;
 
 	    fread(&s16, 2, 1, _fd[0]);
 	    if (s16 != 0x4D42) {
@@ -240,14 +239,14 @@ char realstring[250];
 	    fread(&s32, 4, 1, _fd[0]);
 	    fread(&s32, 4, 1, _fd[0]);
 	    fread(&bmph, sizeof(bmph), 1, _fd[0]);
-	    if (bmph.compressionScheme != 0) {
+	    if (bmph.biCompression != 0) {
 		printf("\ncannot handle compressed bmp\n");
 		return 0;
 	    }
-	    _offset = bmph.size + 14;
-	    w = bmph.width;
-	    h = bmph.height;
-		bpp = bmph.numBitsPerPlane;
+	    _offset = bmph.biSize + 14;
+	    w = bmph.biWidth;
+	    h = bmph.biHeight;
+		bpp = bmph.biBitCount;
 	}
 	break;
 
@@ -297,7 +296,7 @@ char realstring[250];
 
     case PIC_BMP2:
 	{
-	    BITMAPINFOHEADER bmph;
+	    ADM_BITMAPINFOHEADER bmph;
 
 	    fseek(_fd[0], 10, SEEK_SET);
 

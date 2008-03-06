@@ -21,14 +21,15 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <pthread.h>
+
+#include "ADM_default.h"
+#include "ADM_threads.h"
+
 
 #include "interact.hpp"
 
@@ -36,8 +37,6 @@
 #undef realloc
 #undef free
 
-#include "ADM_assert.h"
-#include "default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audio/ADM_a52info.h"

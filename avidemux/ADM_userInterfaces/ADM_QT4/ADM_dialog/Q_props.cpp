@@ -11,18 +11,12 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-
 #include "ui_props.h"
-#include "default.h"
-#include "avidemutils.h"
+#include "ADM_default.h"
+#include "math.h"
 #include "avi_vars.h"
-#include "ADM_osSupport/ADM_misc.h"
+#include "avidemutils.h"
+#include "ADM_video/ADM_vidMisc.h"
 static const char *yesno[2]={QT_TR_NOOP("No"),QT_TR_NOOP("Yes")};
 extern const char *getStrFromAudioCodec( uint32_t codec);
  class propWindow : public QDialog

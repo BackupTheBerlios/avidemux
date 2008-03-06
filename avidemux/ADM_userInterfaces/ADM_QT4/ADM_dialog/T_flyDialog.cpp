@@ -12,13 +12,12 @@
 *                                                                         *
 ***************************************************************************///
 
-#include "config.h"
 
 #include <QtGui/QGraphicsView>
 #include <QtGui/QSlider>
 
-#include "default.h"
-#include "ADM_assert.h"
+#include "ADM_default.h"
+
 #include "ADM_video/ADM_genvideo.hxx"
 #include "DIA_flyDialog.h"
 #include "DIA_flyDialogQt4.h"

@@ -16,14 +16,10 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-
 #include "ui_vobsub.h"
 
-#include "default.h"
+#include "ADM_default.h"
+
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
 #include "ADM_image.h"
@@ -32,10 +28,6 @@
 
 #include "ADM_videoFilter/ADM_vobsubinfo.h"
 #include "ADM_videoFilter/ADM_vidVobSub.h"
-
-#include "ADM_assert.h"
-
-
 
 //
 //	Video is in YV12 Colorspace

@@ -14,18 +14,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
+#include "ADM_default.h"
 #include <math.h>
-
-#include "config.h"
-#include "fourcc.h"
-#include "avio.hxx"
-#include "config.h"
-#include "avi_vars.h"
-#ifdef HAVE_ENCODER
 
 
 #include "ADM_toolkit/toolkit.hxx"
@@ -209,4 +199,3 @@ ADMImage	*_current;
 }
 
 
-#endif

@@ -25,7 +25,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "default.h"
+#include "ADM_default.h"
 
 #include <math.h>
 #include <iconv.h>
@@ -34,7 +34,7 @@
 
 #ifdef USE_FREETYPE
 //#define __STDC_ISO_10646__
-#include "ADM_osSupport/ADM_misc.h"
+
 
 #include "ADM_toolkit/toolkit.hxx"
 

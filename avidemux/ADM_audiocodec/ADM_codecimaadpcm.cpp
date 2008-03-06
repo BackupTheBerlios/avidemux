@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include "config.h"
-#include "default.h"
+#include "ADM_default.h"
 #include "common.h"
 #include "bswap.h"
 #include "ADM_assert.h"

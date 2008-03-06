@@ -9,24 +9,9 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-# include "config.h"
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-
-#include "default.h"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "ADM_toolkit/toolkit.hxx"
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
-#include "ADM_assert.h" 
+#include "ADM_toolkit/toolkit.hxx"
+
 static GtkWidget	*create_dialog1 (void);
 //	Return 1 if resume, 0 if abort
 //

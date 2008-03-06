@@ -29,7 +29,6 @@
 #include "config.h"
 #include "avifmt.h"
 #include "avifmt2.h"
-#include "avio.hxx"
 #include "fourcc.h"
 //#include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiocodec/ADM_audiocodec.h"

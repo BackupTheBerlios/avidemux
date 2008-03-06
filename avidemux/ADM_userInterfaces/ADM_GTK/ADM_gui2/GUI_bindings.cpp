@@ -14,37 +14,26 @@
  *   (at your option) any later version.                                   *
  ***************************************************************************/
 
-#include "default.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-
-#include "ADM_assert.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "../ADM_commonUI/GUI_render.h"
 #include "gui_action.hxx"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_UI
 #include "ADM_osSupport/ADM_debug.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 
 #include "ADM_codecs/ADM_codec.h"
 #include "../ADM_commonUI/GUI_ui.h"
 
 #include "ADM_toolkit/filesel.h"
 #include "ADM_editor/ADM_Video.h"
-#include "ADM_osSupport/ADM_misc.h"
+
 #include "prefs.h"
 #include "../ADM_toolkit_gtk/gtkmarkscale.h"
 #include "../ADM_toolkit_gtk/jogshuttle.h"
 #include "../ADM_toolkit_gtk/ADM_jogshuttle.h"
 #include "gtkgui.h"
+#include "ADM_toolkit/toolkit.hxx"
 
 uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h);
 
@@ -635,7 +624,7 @@ void GUI_initCustom(void )
 
   for(int i=0;i<ADM_nbCustom;i++)
   {
-    go = gtk_menu_item_new_with_mnemonic (GetFileName(customNames[i]));
+    go = gtk_menu_item_new_with_mnemonic (ADM_GetFileName(customNames[i]));
     gtk_widget_show (go);
     gtk_container_add (GTK_CONTAINER (menu), go);
     rank=ACT_CUSTOM_BASE+i;
@@ -1309,17 +1298,26 @@ int UI_Init(int argc, char **argv)
     
 }
 static void trampoline(void);
+static void gtk_fatalFunction(const char *title, const char *info)
+{
+    GUI_Info_HIG(ADM_LOG_IMPORTANT,title,info);
+}
+extern void saveCrashProject(void);
 int UI_RunApp(void)
 {
     if (global_argc >= 2)
     {
       g_timeout_add(200,(GCALL *)trampoline,NULL);
     }
+    // Install our crash handler
+    ADM_setCrashHook(&saveCrashProject, &gtk_fatalFunction);
     checkCrashFile();
     gtk_main();
     gdk_threads_leave();
 
 }
+
+
 void trampoline(void)
 {
     ADM_usleep(100000); // let gtk start

@@ -19,7 +19,7 @@
 
 #include "ADM_assert.h"
 
-#include "default.h"
+#include "ADM_default.h"
 
 #include "audioeng_process.h"
 #include "audiofilter_sox.h"

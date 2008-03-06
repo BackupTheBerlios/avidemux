@@ -18,7 +18,7 @@
  *                                                                         *
  ***************************************************************************/
 
-//#include "default.h" // avi_vars.h includes this
+
 #include "avi_vars.h"
 
 #include <math.h>
@@ -39,6 +39,7 @@
 #include "ADM_userInterfaces/ADM_commonUI/DIA_busy.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
 
+#include "ADM_video/ADM_vidMisc.h"
 extern void    UI_purge(void );
 //____________________________________
 

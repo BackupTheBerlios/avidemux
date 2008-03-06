@@ -15,40 +15,38 @@
  *                                                                         *
  ***************************************************************************/
 
+#ifndef ADM_BITMAP_H
+#define ADM_BITMAP_H
 
-
-typedef struct BITMAPHEADER
+typedef struct
 {
-    uint32_t size;
-    int32_t  width;
-    int32_t  height;
-    uint16_t numBitPlanes;
-    uint16_t numBitsPerPlane;
-    uint32_t compressionScheme;
-    uint32_t sizeOfImageData;
-    uint32_t xResolution;
-    uint32_t yResolution;
-    uint32_t numColorsUsed;
-    uint32_t numImportantColors;
-/*
-    uint16_t resolutionUnits;
-    uint16_t padding;
-    uint16_t origin;
-    uint16_t halftoning;
-    uint32_t halftoningParam1;
-    uint32_t halftoningParam2;
-    uint32_t colorEncoding;
-    uint32_t identifier;
-*/
-} BITMAPHEADER;
+    uint32_t 	biSize;
+    uint32_t  	biWidth;
+    uint32_t  	biHeight;
+    uint16_t 	biPlanes;
+    uint16_t 	biBitCount;
+    uint32_t 	biCompression;
+    uint32_t 	biSizeImage;
+    uint32_t  	biXPelsPerMeter;
+    uint32_t  	biYPelsPerMeter;
+    uint32_t 	biClrUsed;
+    uint32_t 	biClrImportant;
+} ADM_BITMAPINFOHEADER;
 
-#ifndef _WINGDI_
-typedef struct BITMAPFILEHEADER
+typedef struct 
+{
+        ADM_BITMAPINFOHEADER bmiHeader;
+        int	bmiColors[1];
+} ADM_BITMAPINFO;
+
+
+typedef struct 
 {
    uint16_t    bfType;
    uint32_t    bfSize;
    int16_t     bfReserved1;
    int16_t     bfReserved2;
    uint32_t    bfOffBits;
-}  BITMAPFILEHEADER;
+}  ADM_BITMAPFILEHEADER;
+
 #endif

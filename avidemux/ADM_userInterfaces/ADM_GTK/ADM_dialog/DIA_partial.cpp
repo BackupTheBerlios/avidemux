@@ -22,18 +22,7 @@
 //
 
 
-#include "config.h"
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-#include <math.h>
-
-#include "default.h"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_video/ADM_vidPartial_param.h"

@@ -20,7 +20,7 @@
 
 #include <math.h>
 
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_assert.h"
 
@@ -130,9 +130,9 @@ entryDesc entry;
         _videostream.fccHandler=_video_bih.biCompression=entry.fcc;
         
         // if it is vfw...
-        if(fourCC::check(entry.fcc,(uint8_t *)"VFWX") && entry.extraData && entry.extraDataLen>=sizeof(BITMAPINFOHEADER))
+        if(fourCC::check(entry.fcc,(uint8_t *)"VFWX") && entry.extraData && entry.extraDataLen>=sizeof(ADM_BITMAPINFOHEADER))
         {
-          memcpy(& _video_bih,entry.extraData,sizeof(BITMAPINFOHEADER));
+          memcpy(& _video_bih,entry.extraData,sizeof(ADM_BITMAPINFOHEADER));
           delete [] _tracks[0].extraData;
           entry.extraData=NULL;
           entry.extraDataLen=0;

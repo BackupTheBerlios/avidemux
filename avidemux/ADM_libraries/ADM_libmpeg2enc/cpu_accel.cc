@@ -25,8 +25,7 @@
 #include <setjmp.h>
 #include "cpu_accel.h"
 
-#include "default.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+#include "ADM_default.h"
 
 #ifdef HAVE_ALTIVEC
 int detect_altivec(){};

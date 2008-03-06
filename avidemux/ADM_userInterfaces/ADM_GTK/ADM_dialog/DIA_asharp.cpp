@@ -21,17 +21,7 @@
 
 
 
-#include "config.h"
-
-
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-#include "default.h"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
-
 #include "ADM_colorspace/ADM_rgb.h"
 
 #include "ADM_image.h"
@@ -39,7 +29,7 @@
 #include "ADM_videoFilter/ADM_vidASharp_param.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flyAsharp.h"
-#include "ADM_assert.h"
+
 
 uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in);
 

@@ -1,23 +1,34 @@
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <ctype.h>
-#include <math.h>
-#include "default.h"
-#include "prefs.h"
-#include "default.h"
+
+
+
+
+
+
+
+
+/**
+    \fn alert_qt4
+   copyright            : (C) 2007 by mean
+    email                : Mean/fixounet@free.fr
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #include <QDialog>
 #include <QMessageBox>
 
+#include "ADM_default.h"
+#include "prefs.h"
+
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_assert.h" 
+
 
 static int beQuiet=0;
 extern QWidget *QuiMainWindows;

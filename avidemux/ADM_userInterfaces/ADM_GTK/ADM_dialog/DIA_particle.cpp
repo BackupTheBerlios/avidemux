@@ -15,12 +15,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "default.h"
-
-#include <gtk/gtk.h>
-
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "fourcc.h"
-#include "avio.hxx"
+
 #include "prefs.h"
 
 #include "avi_vars.h"
@@ -31,11 +28,8 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_videoFilter/ADM_vidParticle.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/filesel.h"
-#include "ADM_assert.h"
+
 #include "DIA_flyDialog.h"
 #include "DIA_flyParticle.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h" // for diaElemMenu etc.

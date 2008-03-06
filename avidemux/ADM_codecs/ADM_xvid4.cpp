@@ -24,7 +24,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_codecs/ADM_codec.h"
 #ifdef USE_XVID_4
 

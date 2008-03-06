@@ -23,7 +23,6 @@
 #include "ADM_assert.h"
 #include "config.h"
 #include "fourcc.h"
-#include "avio.hxx"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
@@ -80,7 +79,7 @@ void filterCleanUp( void )
 }
 void filterListAll( void )
 {
-char *name;
+const char *name;
 	printf("\nVideo filters\n");
 	for(uint32_t i=0;i<allfilters.size();i++)
 	{
@@ -95,7 +94,7 @@ char *name;
 }
 VF_FILTERS filterGetTagFromName(char *inname)
 {
-char *name;
+const char *name;
 	VF_FILTERS filter=VF_DUMMY;
 	for(uint32_t i=0;i<allfilters.size();i++)
 	{
@@ -116,7 +115,7 @@ char *name;
 }
 void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable
 		,AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *)
-		,char *filtername)
+		,const char *filtername)
 {
 //        printf ("*nb_video_filter() = %d, max %d, name = %s\n", nb_video_filter(), (MAX_FILTER-1), name);
         allfilters.push_back (FILTER_ENTRY (name, create, tag, viewable, filtername));
@@ -128,7 +127,7 @@ void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable
 }
 void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
 		,AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *)
-		,char *filtername,AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args),char *desc)
+		,const char *filtername,AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args),const char *desc)
 {
 //    printf ("nb_video_filter = %d, max %d, name = %s\n", nb_video_filter, (MAX_FILTER-1), name);
         allfilters.push_back (FILTER_ENTRY (name, create, tag, viewable,

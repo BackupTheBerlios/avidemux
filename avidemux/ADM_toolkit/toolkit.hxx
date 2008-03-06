@@ -17,7 +17,7 @@
 
 #ifndef __TOOLKIT__
 #define __TOOLKIT__
-#include "ADM_osSupport/ADM_misc.h"
+
 void            GUI_Alert(const char *alertstring);
 void            GUI_Info(const char *alertstring);
 void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format, ...);

@@ -12,25 +12,12 @@
 //
 //
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
+#include "ADM_default.h"
 #include <math.h>
-#include <math.h>
-#include <iconv.h>
-#include "config.h"
-
-
-#include "fourcc.h"
-#include "avio.hxx"
-
-#include "avi_vars.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
-#include "ADM_assert.h" 
 #include "ADM_videoFilter/ADM_vidTDeint_param.h"
 /**
       \fn DIA_tdeint

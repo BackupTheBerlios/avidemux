@@ -15,28 +15,14 @@ Indexer progress dialog
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-
-#include "config.h"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "default.h"
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_encoder/adm_encoder.h"
 #include "DIA_idx_pg.h"
-
+#include "ADM_video/ADM_vidMisc.h"
 static GtkWidget *dialog=NULL;
 static GtkWidget       *create_dialog1 (void);
 static int abted;

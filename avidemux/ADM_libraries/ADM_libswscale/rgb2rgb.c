@@ -26,19 +26,18 @@
  * under the LGPL license too
  */
 // MEANX
-#include "config.h"
+#include "ADM_default.h"
+#include "wrapper.h"
 // /MEANX
 
-#include <inttypes.h>
-#include "config.h"
 #include "rgb2rgb.h"
 #include "swscale.h"
 #include "swscale_internal.h"
 #include "x86_cpu.h"
 #include "bswap.h"
 // MEANX
-//#include "wrapper.h"
-#include "admmangle.h"
+
+
 // /MEANX
 
 #define FAST_BGR2YV12 // use 7 bit coeffs instead of 15bit

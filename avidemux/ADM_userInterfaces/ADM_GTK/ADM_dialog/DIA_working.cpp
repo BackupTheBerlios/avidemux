@@ -18,28 +18,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-
-#include "config.h"
-#include "default.h"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
+
+#include "ADM_misc.h"
+
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_CLOCKnTIMELEFT
 #include "ADM_osSupport/ADM_debug.h"
-#include "ADM_osSupport/ADM_misc.h"
+
 
 #include "DIA_working.h"
-
+#include "ADM_video/ADM_vidMisc.h"
 
 static GtkWidget	*create_dialog1 (void);
 static void on_work_abort(GtkObject * object, gpointer user_data);

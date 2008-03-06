@@ -11,24 +11,20 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
 #define Ui_Dialog Ui_encodingDialog
 #include "ui_encoding.h"
 #undef Ui_Dialog 
 
-#include "default.h"
+#include "ADM_default.h"
+
 #include "prefs.h"
-#include "ADM_assert.h"
-#include "ADM_osSupport/ADM_misc.h"
 #include "DIA_working.h"
 #include "DIA_encoding.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
-
+#include "math.h"
+#include "ADM_video/ADM_vidMisc.h"
+#include "ADM_video/ADM_vidMisc.h"
 extern void UI_purge(void);
 static int stopReq=0;
 class encodingWindow : public QDialog

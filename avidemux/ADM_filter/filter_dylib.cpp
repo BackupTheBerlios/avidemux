@@ -29,8 +29,8 @@
 #include <dlfcn.h>
 #endif
 
-#include "default.h"
 #include "ADM_assert.h"
+#include "fourcc.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"

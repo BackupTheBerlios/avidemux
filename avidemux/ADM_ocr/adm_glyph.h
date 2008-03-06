@@ -10,7 +10,7 @@
 #ifndef ADM_GLYPH_
 #define ADM_GLYPH_
 
-#include "default.h"
+#include "ADM_default.h"
 /*
     returns 1 if the line is empty
     0 if not

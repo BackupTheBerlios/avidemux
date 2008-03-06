@@ -15,13 +15,11 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "default.h"
-
-#include <gtk/gtk.h>
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include <cmath>
 
 #include "fourcc.h"
-#include "avio.hxx"
+
 
 #include "avi_vars.h"
 
@@ -31,10 +29,6 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_videoFilter/ADM_vidSwissArmyKnife.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
-#include "ADM_assert.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flySwissArmyKnife.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h" // for diaElemMenu etc.

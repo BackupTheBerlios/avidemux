@@ -24,7 +24,6 @@
 #include "ADM_assert.h"
 #include "config.h"
 #include "fourcc.h"
-#include "avio.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_inputs/ADM_inpics/ADM_pics.h"
 #include "ADM_inputs/ADM_nuv/ADM_nuv.h"

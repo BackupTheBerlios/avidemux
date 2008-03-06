@@ -20,15 +20,13 @@ Not optimised for speed at all, should take the one from ffmpeg
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "default.h"
-#include "ADM_assert.h"
+#include "ADM_default.h"
 #include "colorspace.h"
-
 
 uint8_t COL_422_YV12( uint8_t *in[3], uint32_t stride[3],  uint8_t *out,uint32_t w, uint32_t h)
 {

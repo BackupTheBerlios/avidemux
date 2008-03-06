@@ -1,7 +1,7 @@
 #ifndef _preferences_h_
 #define _preferences_h_
 
-#include "default.h"
+#include "ADM_default.h"
 
 #define RC_OK     1
 #define RC_FAILED 0

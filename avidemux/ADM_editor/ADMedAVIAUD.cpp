@@ -27,8 +27,6 @@
 
 #include "config.h"
 #include "fourcc.h"
-#include "avio.hxx"
-#include "indexer.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_editor/ADM_edAudio.hxx"
 

@@ -13,22 +13,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-#include <math.h>
-
-#include "default.h"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
-#include "ADM_assert.h" 
+
 #define CHECK_GET(x,y) {*y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
 #define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),*y);}   
 

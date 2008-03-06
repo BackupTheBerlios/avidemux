@@ -22,7 +22,7 @@
 #include "config.h"
 #include <math.h>
 
-#include "default.h"
+#include "ADM_default.h"
 #include "avifmt.h"
 #include "avifmt2.h"
 

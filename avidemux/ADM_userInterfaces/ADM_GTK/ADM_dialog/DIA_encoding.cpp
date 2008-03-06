@@ -7,31 +7,15 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-
-#include "default.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "prefs.h"
 
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 
-#include "ADM_assert.h" 
-
 #include "DIA_encoding.h"
+#include "ADM_video/ADM_vidMisc.h"
 
 static GtkWidget *dialog=NULL;
 static GtkWidget	*create_dialog1 (void);

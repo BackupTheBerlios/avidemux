@@ -1,16 +1,4 @@
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "gtk/gtk.h"
-#include "ADM_assert.h"
-
-
-#include "fourcc.h"
-#include "avio.hxx"
-#include "config.h"
-#include "avi_vars.h"
-
+#include "toolkit_gtk.h"
 //#include "unistd.h"
 
 #include "ADM_toolkit/toolkit.hxx"

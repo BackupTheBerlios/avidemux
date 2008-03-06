@@ -28,7 +28,6 @@
 #include "config.h"
 #include "avifmt.h"
 #include "avifmt2.h"
-#include "avio.hxx"
 #include "fourcc.h"
 #include "aviaudio.hxx"
 #include "prefs.h"

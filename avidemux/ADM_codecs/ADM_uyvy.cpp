@@ -21,14 +21,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "default.h"
+#include "ADM_default.h"
 #include "avifmt.h"
 #include "avifmt2.h"
 #include "fourcc.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_uyvy.h"
-#include "ADM_assert.h"
 
 uint8_t
   decoderUYVY::uncompress (ADMCompressedImage * in, ADMImage * out)

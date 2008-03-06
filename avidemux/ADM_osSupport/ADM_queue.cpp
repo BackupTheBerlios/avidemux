@@ -18,8 +18,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ADM_assert.h"
-#include "default.h"
-#include "ADM_osSupport/ADM_threads.h"
+#include "ADM_default.h"
+
 #include "ADM_queue.h"
 
 ADM_queue::ADM_queue()

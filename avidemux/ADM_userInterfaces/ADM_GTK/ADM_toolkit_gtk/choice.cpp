@@ -14,16 +14,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <math.h>
-#include <sys/time.h>
-#include <gtk/gtk.h>
-
-#include "config.h"
-
-#include "avi_vars.h"
+#include "toolkit_gtk.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 static void alert_cb_ok(void);

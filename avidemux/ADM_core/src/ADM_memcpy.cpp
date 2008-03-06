@@ -30,20 +30,15 @@
  *
  */
 
-
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "default.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+#include "ADM_default.h"
 
 extern "C"
 {
-#include "ADM_libraries/ADM_lavcodec/dsputil_cpu.h"
-#include "ADM_assert.h"
+	#include "ADM_libraries/ADM_lavcodec/dsputil_cpu.h"
 
 adm_fast_memcpy myAdmMemcpy=NULL;
 /* Original comments from mplayer (file: aclib.c)
@@ -111,7 +106,6 @@ quote of the day:
 
 
 #ifdef ADM_CPU_X86
-
 
 /* for small memory blocks (<256 bytes) this version is faster */
 #define small_memcpy(to,from,n)\
@@ -379,7 +373,7 @@ static void * mmx2_memcpy(void * to, const void * from, size_t len)
 static void *linux_kernel_memcpy(void *to, const void *from, size_t len) {
   return linux_kernel_memcpy_impl(to,from,len);
 }
-#endif /* ADM_CPU_X86 */
+#endif /* ARCH_X86 */
 
 static struct {
   char *name;
@@ -392,20 +386,22 @@ static struct {
 {
   { NULL, NULL, 0, 0 },
   { "libc memcpy()", memcpy, 0, 0 },
-#ifdef ADM_CPU_X86
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
   { "linux kernel memcpy()", linux_kernel_memcpy, 0, 0 },
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
   { "MMX optimized memcpy()", mmx_memcpy, 0, MM_MMX },
   { "MMXEXT optimized memcpy()", mmx2_memcpy, 0, MM_MMXEXT },
   { "SSE optimized memcpy()", sse_memcpy, 0, MM_MMXEXT|MM_SSE },
-#endif /* ADM_CPU_X86 */
-#if 0 && defined (ADM_CPU_PPC) && !defined (__APPLE__)
+#endif
+#endif /* ARCH_X86 */
+#if 0 && defined (ARCH_PPC) && !defined (HOST_OS_DARWIN)
   { "ppcasm_memcpy()", ppcasm_memcpy, 0, 0 },
   { "ppcasm_cacheable_memcpy()", ppcasm_cacheable_memcpy, 0, MM_ACCEL_PPC_CACHE32 },
-#endif /* ADM_CPU_PPC && !__APPLE__ */
+#endif /* ARCH_PPC && !HOST_OS_DARWIN */
   { NULL, NULL, 0, 0 }
 };
 
-#ifdef ADM_CPU_X86
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 static unsigned long long int rdtsc(void)
 {
   unsigned long long int x;
@@ -457,14 +453,14 @@ uint8_t ADM_InitMemcpy(void)
   int               config_flags = 0;
 #undef memcpy
         myAdmMemcpy=memcpy;
-#ifdef ADM_CPU_X86
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
         if(CpuCaps::hasMMX())
                 myAdmMemcpy=mmx_memcpy;
 #endif
 #if 0
 	probe(memcpy,"libc");
 	probe(linux_kernel_memcpy,"kernel");
-#ifdef ADM_CPU_X86
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 	if(CpuCaps::hasMMX()) probe(mmx_memcpy,"mmx");
 	if(CpuCaps::hasMMXEXT()) probe(mmx_memcpy,"mmxext");
 	if(CpuCaps::hasSSE()) probe(sse_memcpy,"sse");

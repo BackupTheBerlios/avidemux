@@ -2,7 +2,7 @@
 
 #ifdef USE_LIBDCA
 #include <stdio.h>
-#include "default.h"
+#include "ADM_default.h"
 #include "libwrapper_dca.h"
 
 ADM_LibWrapperDca::ADM_LibWrapperDca() : ADM_LibWrapper()

@@ -20,7 +20,7 @@
 
 # include <math.h>
 
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_videoFilter/ADM_vidAnimated_param.h"
 #include "ADM_assert.h" 
 #include "DIA_factory.h"

@@ -36,16 +36,7 @@
 //         20/07/2002 - ver 2.0  - Avisynth filter coded (from scratch)
 
 
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-
-#include "config.h"
-#include "fourcc.h"
-#include "avio.hxx"
-#include "avi_vars.h"
+#include "ADM_default.h"
 #include <math.h>
 
 #include "ADM_toolkit/toolkit.hxx"

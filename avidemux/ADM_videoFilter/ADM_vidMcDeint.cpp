@@ -21,18 +21,8 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
+#include "ADM_default.h"
 #include "ADM_lavcodec.h"
-
-#include "config.h"
-#include "fourcc.h"
-#include "avio.hxx"
-#include "config.h"
-#include "avi_vars.h"
-
 
 
 #include "ADM_toolkit/toolkit.hxx"

@@ -25,7 +25,7 @@
 #include "ADM_assert.h"
 #include <math.h>
 
-#include "default.h"
+#include "ADM_default.h"
 
 #include "audioprocess.hxx"
 //

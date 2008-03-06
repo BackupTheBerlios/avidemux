@@ -12,12 +12,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "../ADM_commonUI/DIA_factory.h"
-#include "ADM_assert.h"
 #include "ADM_toolkit/filesel.h"
 
 static void fileRead(void *w,void *p);

@@ -23,7 +23,7 @@
 
 #include "ui_ocr.h"
 
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
 #include "ADM_image.h"

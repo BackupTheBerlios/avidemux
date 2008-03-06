@@ -40,7 +40,7 @@
 #include "ADM_mpeg2enc.h"
 #include "ADM_encoder/adm_encffmatrix.h"
 
-#include "default.h"
+#include "ADM_default.h"
 #include "prefs.h"
 
 

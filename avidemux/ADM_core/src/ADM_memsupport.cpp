@@ -23,9 +23,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "default.h"
-#include "ADM_assert.h"
-#include "ADM_osSupport/ADM_threads.h"
+#include "ADM_default.h"
+#include "ADM_threads.h"
 
 #undef memalign
 #undef malloc

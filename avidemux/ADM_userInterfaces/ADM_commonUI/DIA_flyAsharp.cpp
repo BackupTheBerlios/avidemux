@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "default.h"
+#include "ADM_default.h"
 
 #include "ADM_colorspace/ADM_rgb.h"
 

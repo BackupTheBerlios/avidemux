@@ -18,13 +18,15 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
 #include <math.h>
-#include <pthread.h>
+
+#include "ADM_default.h"
+#include "ADM_threads.h"
+
 
 #ifdef USE_FFMPEG
 extern "C" {
@@ -36,7 +38,6 @@ extern "C" {
 
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_assert.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 
@@ -57,7 +58,7 @@ extern "C" {
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
-#include "ADM_osSupport/ADM_threads.h"
+
 #include "ADM_libraries/ADM_mplex/ADM_mthread.h"
 
 static uint8_t *_buffer=NULL,*_outbuffer=NULL;

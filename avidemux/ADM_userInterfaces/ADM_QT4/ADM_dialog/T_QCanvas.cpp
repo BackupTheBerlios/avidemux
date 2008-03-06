@@ -12,18 +12,11 @@
 *                                                                         *
 ***************************************************************************///
 
-#include "config.h"
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-
-
 #include <QtGui/QGraphicsView>
 #include <QtGui/QSlider>
 
-#include "default.h"
+#include "ADM_default.h"
+
 class  ADM_QCanvas : public QWidget
 {
      Q_OBJECT

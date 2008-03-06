@@ -20,13 +20,13 @@
 #include <stdio.h>
 
 #include "config.h"
-#include "default.h"
+#include "ADM_default.h"
 # include "prefs.h"
 
 #include "ADM_audiodevice/audio_out.h"
 #include "ADM_assert.h"
 #include "GUI_render.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+
 #include "ADM_toolkit/toolkit.hxx"
 #include "DIA_factory.h"
 

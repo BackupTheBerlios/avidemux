@@ -40,17 +40,7 @@
 	Donald Graft
 	neuron2@attbi.com.
 */
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-
-#include "config.h"
-#include "fourcc.h"
-#include "avio.hxx"
-#include "avi_vars.h"
-
+#include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
@@ -61,9 +51,9 @@
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
 
-#include "ADM_osSupport/ADM_cpuCap.h"
+
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
-#include "admmangle.h"
+
 
 #define PROGRESSIVE  0x00000001
 #define MAGIC_NUMBER (0xdeadbeef)

@@ -1,21 +1,8 @@
-#include "config.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_lavcodec.h"
 
-#include <string.h>
-#include <stdio.h>
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-# include <math.h>
-
-# include "config.h"
-#include "default.h"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
 
-#include "ADM_assert.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 //#include "ADM_gui/GUI_xvidparam.h"
 #include "prefs.h"

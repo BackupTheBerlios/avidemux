@@ -25,7 +25,7 @@
 #include "ADM_assert.h"
 
 
-#include "default.h"
+#include "ADM_default.h"
 
 
 #include "ADM_toolkit/toolkit.hxx"
@@ -35,8 +35,8 @@
 #include "ADM_userInterfaces/ADM_commonUI/DIA_enter.h"
 #include "ADM_video/ADM_cache.h"
 
-#include "admmangle.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+
+
 #include "ADM_vidEq2.h"
 static FILTER_PARAM Eq2Param={8,{"contrast","brightness","saturation",
                                 "gamma","gamma_weight","rgamma","ggamma","bgamma"}};

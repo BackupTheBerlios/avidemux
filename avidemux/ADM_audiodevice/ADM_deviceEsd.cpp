@@ -27,7 +27,7 @@
 #include <sys/ioctl.h>
 #include <esd.h>
 
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_audiodevice.h"
 #include "ADM_assert.h"
 #include "ADM_audiodevice/ADM_deviceoss.h"

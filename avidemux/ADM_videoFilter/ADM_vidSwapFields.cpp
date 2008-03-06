@@ -18,25 +18,13 @@ Swap each line  (shift up for odd, down for even)
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-
-#include "config.h"
-#include "fourcc.h"
-#include "avio.hxx"
-#include "config.h"
-#include "avi_vars.h"
-#ifdef HAVE_ENCODER
-
+#include "ADM_default.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidFieldUtil.h"
 #include "ADM_vidSwapFields.h"
-//static void decimate(uint8_t *src,uint8_t *target, uint32_t linessrc, uint32_t width);
 #include "ADM_filter/video_filters.h"
 
 
@@ -198,4 +186,3 @@ uint8_t AVDMVideoKeepEven::getFrameNumberNoAlloc(uint32_t frame,
       return 1;
 }
 
-#endif

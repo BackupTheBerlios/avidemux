@@ -15,20 +15,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
+#include "ADM_default.h"
 #include <math.h>
-
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-
-#include "config.h"
-#include "fourcc.h"
-#include "avio.hxx"
-#include "config.h"
-#include "avi_vars.h"
-#ifdef HAVE_ENCODER
-
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
@@ -36,9 +24,6 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_enter.h"
 #include "ADM_video/ADM_cache.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
-#include "admmangle.h"
-
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 static FILTER_PARAM ResampParam={2,{"newfps","use_linear"}};
@@ -356,4 +341,4 @@ uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
 
 
 
-#endif
+

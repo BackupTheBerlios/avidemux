@@ -21,7 +21,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "default.h"
+#include "ADM_default.h"
 #include "prefs.h"
 #include "ADM_assert.h"
 
@@ -75,7 +75,7 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
         DIA_progressIndexing *work;
         dmx_demuxer *demuxer;
 
-        char *realname=PathCanonize(mpeg);
+        char *realname=ADM_PathCanonize(mpeg);
         FILE *out;        
         DMX_TYPE mpegType;
         uint8_t  mpegTypeChar;

@@ -17,17 +17,13 @@
 *   (at your option) any later version.                                   *
 *                                                                         *
 ***************************************************************************/
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <gtk/gtk.h>
+#include "toolkit_gtk.h"
 
 #ifndef __WIN32
 #include <unistd.h>
 #endif
 
-#include "avi_vars.h"
-#include "ADM_osSupport/ADM_misc.h"
+
 
 
 GtkWidget *GUI_PixmapButtonDefault(GdkWindow * window, const gchar ** xpm,

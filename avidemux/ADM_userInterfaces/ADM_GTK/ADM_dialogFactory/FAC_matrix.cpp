@@ -13,18 +13,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-
-#include "default.h"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "../ADM_commonUI/DIA_factory.h"
-#include "ADM_assert.h"
 
 diaElemMatrix::diaElemMatrix(uint8_t *trix,const char *toggleTitle, uint32_t trixSize,const char *tip)
   : diaElem(ELEM_MATRIX)

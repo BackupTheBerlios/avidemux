@@ -11,21 +11,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "ADM_assert.h"
-#include "default.h"
+
+#include "ADM_default.h"
 
 #include "ADM_lavcodec.h"
-#include "fourcc.h"
-
 #include "ADM_colorspace/colorspace.h"
-
 #include "ADM_image.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
 
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_ffmp43.h"
@@ -217,7 +212,7 @@ ADMImage *createImageFromFile_Bmp(const char *filename)
 
 		//Retrieve width & height
 		//_______________________
-		   		BITMAPHEADER bmph;
+		   		ADM_BITMAPINFOHEADER bmph;
 
 			    fread(&s16, 2, 1, fd);
 			    if (s16 != 0x4D42) 
@@ -230,15 +225,15 @@ ADMImage *createImageFromFile_Bmp(const char *filename)
 			    fread(&s32, 4, 1, fd);
 			    fread(&s32, 4, 1, fd);
 			    fread(&bmph, sizeof(bmph), 1, fd);
-			    if (bmph.compressionScheme != 0) 
+			    if (bmph.biCompression != 0) 
 			    {
 			    	printf("[imageLoader]cannot handle compressed bmp\n");
 			    	fclose(fd);
 			    	return NULL;
 			    }
 			    
-			    w = bmph.width;
-			    h = bmph.height;
+			    w = bmph.biWidth;
+			    h = bmph.biHeight;
 			    
 			    
 			    printf("[ImageLoader] BMP %u * %u\n",w,h);
@@ -263,7 +258,7 @@ ADMImage *createImageFromFile_Bmp(const char *filename)
 ADMImage *createImageFromFile_Bmp2(const char *filename)
 {
     
-	BITMAPINFOHEADER bmph;
+	ADM_BITMAPINFOHEADER bmph;
     uint8_t fcc_tab[4];
     uint32_t offset;
     FILE *fd=NULL;
@@ -312,7 +307,7 @@ ADMImage *createImageFromFile_Bmp2(const char *filename)
 ADMImage *createImageFromFile_png(const char *filename)
 {
     
-	BITMAPHEADER bmph;
+	ADM_BITMAPINFOHEADER bmph;
     uint8_t fcc_tab[4];
     uint32_t offset,size;
     FILE *fd=NULL;
@@ -429,7 +424,7 @@ ADM_IMAGE_TYPE ADM_identidyImageFile(const char *filename,uint32_t *w,uint32_t *
 		    // BMP2?
 		    if (fcc_tab[0] == 'B' && fcc_tab[1] == 'M') 
 		    {
-		    	    BITMAPINFOHEADER bmph;
+		    	    ADM_BITMAPINFOHEADER bmph;
 
 		     	    fseek(fd, 10, SEEK_SET);
 		     	    fread(fcc_tab, 4, 1, fd);

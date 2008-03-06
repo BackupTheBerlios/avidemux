@@ -27,7 +27,7 @@
 #include <math.h>
 
 
-#include "default.h"
+#include "ADM_default.h"
 #include "aviaudio.hxx"
 #include "ADM_audio/ADM_mp3info.h"
 

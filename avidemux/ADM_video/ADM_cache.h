@@ -12,7 +12,7 @@
 
 #ifndef __ADM_CACHE__
 #define __ADM_CACHE__
-
+#include "ADM_video/ADM_genvideo.hxx"
 typedef struct vidCacheEntry
 {
 		uint32_t 	frameNum;

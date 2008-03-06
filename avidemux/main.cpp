@@ -16,18 +16,14 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "default.h"
+#include "ADM_default.h"
 
 #ifdef __MINGW32__
 #include <windows.h>
 #include <excpt.h>
 #endif
 
+#include "ADM_threads.h"
 #define __DECLARE__
 #include "avi_vars.h"
 
@@ -57,8 +53,6 @@ extern "C" {
 #include "ADM_userInterfaces/ADM_commonUI/GUI_sdlRender.h"
 #endif
 
-#include "ADM_osSupport/ADM_cpuCap.h"
-#include "ADM_osSupport/ADM_threads.h"
 
 void onexit( void );
 //extern void automation(int argc, char **argv);
@@ -102,8 +96,6 @@ bool SpidermonkeyInit(void);
 void SpidermonkeyDestroy(void);
 
 extern pthread_mutex_t g_pSpiderMonkeyMutex;
-uint32_t CpuCaps::myCpuCaps=0;
-uint32_t CpuCaps::myCpuMask=0xffffffff;
 
 #if defined(ADM_DEBUG) && defined(FIND_LEAKS)
 extern const char* new_progname;
@@ -302,3 +294,9 @@ void onexit( void )
 	check_leaks();
 #endif
 }
+extern void checkCrashFile(void);
+void dummyXref(void)
+{
+    checkCrashFile();
+}
+//EOF

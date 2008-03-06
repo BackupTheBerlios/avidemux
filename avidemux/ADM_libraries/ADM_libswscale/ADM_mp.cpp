@@ -13,18 +13,13 @@
  *                                                                         *
  ***************************************************************************/
 
-
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#include "ADM_assert.h"
+#include "ADM_default.h"
 #include "fourcc.h"
-#include "avio.hxx"
-#include "default.h"
 
 #ifdef ADM_CPU_X86
 extern "C" {
@@ -34,7 +29,7 @@ extern "C" {
 
 #include "ADM_libraries/ADM_lavutil/avutil.h"
 #include "ADM_libraries/ADM_libswscale/swscale.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+
 
 #include "ADM_mp.h"
 

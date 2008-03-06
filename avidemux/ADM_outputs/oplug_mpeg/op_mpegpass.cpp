@@ -11,8 +11,6 @@
 //
 //
 
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -20,11 +18,10 @@
 #include <sys/time.h>
 #include <errno.h>
 
-#include "default.h"
+#include "ADM_default.h"
+#include "ADM_threads.h"
 
-#include "ADM_osSupport/ADM_threads.h"
 #include "avi_vars.h"
-#include "ADM_assert.h"
 #include "ADM_audiofilter/audioprocess.hxx"
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_encoding.h"

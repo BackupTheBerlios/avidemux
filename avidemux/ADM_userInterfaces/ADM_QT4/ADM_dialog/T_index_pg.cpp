@@ -15,14 +15,6 @@ Indexer progress dialog
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <assert.h>
-
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -33,17 +25,16 @@ Indexer progress dialog
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 
-
-
-#include "default.h"
+#include "ADM_default.h"
+#include "math.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_encoder/adm_encoder.h"
 #include "DIA_idx_pg.h"
-#include "ADM_assert.h"
-
+#include "ADM_video/ADM_vidMisc.h"
+#include "ADM_video/ADM_vidMisc.h"
 extern void UI_purge( void );
 
 class Ui_iDialog

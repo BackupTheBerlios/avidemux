@@ -34,20 +34,8 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-#include <math.h>
-#include <math.h>
+#include "ADM_default.h"
 #include <iconv.h>
-#include "config.h"
-
-
-#include "fourcc.h"
-#include "avio.hxx"
-
-#include "avi_vars.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"

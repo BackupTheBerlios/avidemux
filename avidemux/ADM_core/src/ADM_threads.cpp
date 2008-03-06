@@ -12,15 +12,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
  
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ADM_assert.h"
-#include "default.h"
-#include "ADM_osSupport/ADM_threads.h"
 
+#include "ADM_default.h"
+#include "ADM_threads.h"
 
 #define THR_CHECK(x) {int r=(x);if(r) {printf("Threading error :%d %s\n", \
                       r,strerror(r));exit(0);}}

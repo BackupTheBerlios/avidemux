@@ -12,7 +12,7 @@
 
 #include "config.h"
 #include <stdio.h>
-#include "default.h"
+#include "ADM_default.h"
 #include "ADM_audio/ADM_dcainfo.h"
 extern "C"
 {

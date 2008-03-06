@@ -1,7 +1,4 @@
-#include "config.h"
-
 #ifdef __WIN32
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
@@ -10,9 +7,7 @@
 #include <winsock2.h>
 #endif
 
-#include "default.h" 
-#include "ADM_misc.h"
-#include "ADM_assert.h" 
+#include "ADM_default.h" 
 
 extern char *ADM_getBaseDir(void);
 

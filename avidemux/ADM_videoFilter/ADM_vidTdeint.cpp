@@ -39,8 +39,7 @@
 
 #include "config.h"
 #include "fourcc.h"
-#include "avio.hxx"
-#include "default.h"
+#include "ADM_default.h"
 #include <math.h>
 
 #include "ADM_toolkit/toolkit.hxx"
@@ -53,7 +52,7 @@
 #include "ADM_video/ADM_cache.h"
 #include "ADM_filter/video_filters.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_enter.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+
 
 #define min MIN
 #define max MAX

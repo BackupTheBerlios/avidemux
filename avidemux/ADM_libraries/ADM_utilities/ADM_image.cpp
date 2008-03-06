@@ -17,10 +17,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "ADM_assert.h"
-#include "default.h"
+#include "ADM_default.h"
 
 #include "ADM_image.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+
 //#include "ADM_assert.h"
 void ADMImage_stat( void );
 

@@ -9,18 +9,16 @@
 //
 //
 
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include <dirent.h>
-#include "default.h"
+
 #include <QtCore/QVariant>
 #include <QtGui/qfiledialog.h>
+#include "ADM_default.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
 #include "prefs.h"
-#include "ADM_assert.h"
+
     
 static void GUI_FileSelSelect(const char *label, char **name, uint32_t access) ;
 
@@ -74,8 +72,8 @@ void GUI_FileSelSelect(const char *label, char **name, uint32_t access)
   if(prefs->get(pref_entry,(ADM_filename **)&tmpname))
   {
      DIR *dir;
-        str=PathCanonize(tmpname);
-        PathStripName(str);
+        str=ADM_PathCanonize(tmpname);
+        ADM_PathStripName(str);
         /* LASTDIR may have gone; then do nothing and use current dir instead (implied) */
         if( (dir=opendir(str)) )
         {

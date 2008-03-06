@@ -35,9 +35,10 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_assert.h"
 #include "ADM_codecs/ADM_ffmpeg.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
-#include "prefs.h"
 
+#include "prefs.h"
+#include "ADM_video/ADM_cache.h"
+#include "ADM_video/ADM_vidMisc.h"
 //#define TEST_NOB 1
 
 extern int ADM_cpu_num_processors(void);

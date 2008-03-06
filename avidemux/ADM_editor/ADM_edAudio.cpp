@@ -30,9 +30,9 @@ to generic audio stream
 #include "config.h"
 #include "avifmt.h"
 #include "avifmt2.h"
-#include "avio.hxx"
+
 #include "fourcc.h"
-#include "indexer.hxx"
+
 //#include "aviaudio.hxx"
 
 #include "ADM_editor/ADM_edit.hxx"

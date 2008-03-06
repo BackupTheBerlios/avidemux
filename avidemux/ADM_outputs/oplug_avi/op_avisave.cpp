@@ -19,29 +19,27 @@
 * MODIFIED BY GMV 30.1.05: prepared for ODML
 */
  
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
-
 #include <time.h>
 #include <sys/time.h>
-#include <pthread.h>
+
+#include "ADM_default.h"
+#include "ADM_threads.h"
+
 
 #include "fourcc.h"
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "subchunk.h"
+
 //#include "avilist.h"
 
 #include "ADM_video/ADM_genvideo.hxx"
 
 #include "ADM_filter/video_filters.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
-
-#include "ADM_assert.h" 
 
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"

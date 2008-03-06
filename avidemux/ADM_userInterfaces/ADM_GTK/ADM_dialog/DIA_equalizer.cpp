@@ -19,27 +19,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-#include "config.h"
-
-#include <string.h>
-#include <stdio.h>
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-#include <math.h>
-
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "default.h"
+#include "avi_vars.h"
 
 #include "ADM_colorspace/ADM_rgb.h"
 
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidEqualizer.h"
-#include "ADM_assert.h"
+
 
 extern "C" {
 #include "ADM_libraries/ADM_lavcodec/avcodec.h"

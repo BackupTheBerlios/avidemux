@@ -23,7 +23,6 @@
 
 #include "config.h"
 #include "fourcc.h"
-#include "avio.hxx"
 #include "prefs.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_codecs/ADM_codec.h"

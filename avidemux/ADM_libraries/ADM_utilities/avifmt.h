@@ -8,7 +8,7 @@
  *
  ****************************************************************************/
 
-#include "default.h"
+#include "ADM_default.h"
 
 #ifndef NOAVIFMT
 

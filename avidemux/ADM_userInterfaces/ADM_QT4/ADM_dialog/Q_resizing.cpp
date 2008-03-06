@@ -11,20 +11,12 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
 #define Ui_Dialog Ui_resizeDialog
 #include "ui_resizing.h"
 #undef Ui_Dialog
+#include "math.h"
+#include "ADM_default.h"
 
-#include "default.h"
-#include "avidemutils.h"
-#include "avi_vars.h"
-#include "ADM_osSupport/ADM_misc.h"
 static double aspectRatio[2][3]={
                               {1.,0.888888,1.19}, // NTSC 1:1 4:3 16:9
                               {1.,1.066667,1.43} // PAL  1:1 4:3 16:9

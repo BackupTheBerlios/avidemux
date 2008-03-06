@@ -29,7 +29,7 @@
                 
 		MainAVIHeader	_mainheader;
 		AVIStreamHeader _videostream;
-		BITMAPINFOHEADER _bih;
+		ADM_BITMAPINFOHEADER _bih;
 		AVIStreamHeader _audio1,_audio2;
 		uint32_t nb_audio;
 		uint32_t asize;
@@ -113,7 +113,7 @@ public:
 							MainAVIHeader *mainheader,
 							uint32_t nb_frame,
 			AVIStreamHeader 	*invideostream,
-			BITMAPINFOHEADER	*bitmap,	
+			ADM_BITMAPINFOHEADER	*bitmap,	
 			uint8_t 		*videoextra,
 			uint32_t		videoextraLen,
 			AVDMGenericAudioStream 	*audiostream,
