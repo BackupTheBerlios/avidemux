@@ -205,13 +205,13 @@ uint8_t aviWrite::writeVideoHeader( uint8_t *extra, uint32_t extraLen )
 	// in case of Little endian, do the usual swap crap
 	
 	AVIStreamHeader as;
-	BITMAPINFOHEADER b;
+	ADM_BITMAPINFOHEADER b;
 	memcpy(&as,&_videostream,sizeof(as));
 	Endian_AviStreamHeader(&as);		
 	memcpy(&b,&_bih,sizeof(_bih));
 	Endian_BitMapInfo( &b );
   	setStreamInfo (_file, (uint8_t *) &as,
-		  (uint8_t *)&b,sizeof(BITMAPINFOHEADER),
+		  (uint8_t *)&b,sizeof(ADM_BITMAPINFOHEADER),
 		// MOD Feb 2005 by GMV: ODML support
 		odml_video_super_idx_size,0,
 		// END MOD Feb 2005 by GMV

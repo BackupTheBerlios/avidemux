@@ -59,7 +59,7 @@ void ADM_backTrack(const char *info,int lineno,const char *file)
 	if (mysaveFunction)
 		mysaveFunction();
 
-	snprintf(bfr,1024,"%s\n file %s, line %d\n",infofile,lineno);
+	snprintf(bfr,1024,"%s\n file %s, line %d\n", info, file, lineno);
 
 	if(myFatalFunction)
 		myFatalFunction("Crash",bfr);
@@ -386,6 +386,7 @@ void sig_segfault_handler(int signo)
 void ADM_backTrack(const char *info,int lineno,const char *file)
 {
 	char wholeStuff[2048];
+	void *stack[20];
 	char **functions;
 	int count, i;
 

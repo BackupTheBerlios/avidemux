@@ -23,7 +23,7 @@
 */
 #define MAXIMUM_SIZE 2048
 
-typedef unsigned char ADM_filename ;
+typedef unsigned char ADM_filename;
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
@@ -76,12 +76,6 @@ typedef unsigned char ADM_filename ;
 #ifdef HAVE_GETTEXT
 #  include <libintl.h>
 #  undef _
-#else
-#  define textdomain(String) (String)
-#  define gettext(String) (String)
-#  define dgettext(Domain,Message) (Message)
-#  define dcgettext(Domain,Message,Type) (Message)
-#  define bindtextdomain(Domain,Directory) (Domain)
 #endif
 
 extern const char* translate(const char *__domainname, const char *__msgid);
