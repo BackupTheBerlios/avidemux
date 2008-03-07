@@ -17,14 +17,13 @@
 #include <sys/stat.h>
 #include <errno.h>
 
+#include "ADM_default.h"
+#include "ADM_threads.h"
 #include "interact.hpp"
 
 #undef malloc
 #undef realloc
 #undef free
-
-#include "ADM_default.h"
-#include "ADM_threads.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 

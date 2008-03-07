@@ -14,23 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <unistd.h>
-#include <math.h>
-
 #include "ADM_default.h"
-
-#ifdef __WIN32
-#include <windows.h>
-#include <excpt.h>
-#include <imagehlp.h>
-#endif
-
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 #include "ADM_editor/ADM_edit.hxx"
 extern ADM_Composer *video_body;
 
