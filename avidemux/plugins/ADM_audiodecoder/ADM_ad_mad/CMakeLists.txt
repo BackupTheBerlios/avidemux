@@ -1,17 +1,15 @@
-##
-##
-##
+ADD_SUBDIRECTORY(ADM_libMad)
 
-subdirs(PREORDER ADM_libMad)
-
-
-
-include_directories(../../)
-include_directories(../../../ADM_audiocodec)
-include_directories(ADM_libMad)
-
-SET(ADM_ad_Mad_SRCS         ADM_ad_mad.cpp )
+SET(ADM_ad_Mad_SRCS ADM_ad_mad.cpp)
 
 ADD_LIBRARY(ADM_ad_Mad SHARED ${ADM_ad_Mad_SRCS})
 TARGET_LINK_LIBRARIES(ADM_ad_Mad ADM_libMad)
 
+INCLUDE(admLibMad)
+GET_MAD_CFLAGS(MAD_CFLAGS)
+
+ADD_TARGET_CFLAGS(ADM_ad_Mad ${MAD_CFLAGS})
+
+# FIXME
+ADD_TARGET_CFLAGS(ADM_ad_Mad "-I${CMAKE_BINARY_DIR}/config/cli")
+ADD_TARGET_CFLAGS(ADM_ad_Mad "-I${CMAKE_SOURCE_DIR}/avidemux/ADM_audiocodec")

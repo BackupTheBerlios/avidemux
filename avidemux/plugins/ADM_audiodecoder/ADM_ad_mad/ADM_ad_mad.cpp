@@ -18,7 +18,7 @@
 #include "ADM_ad_plugin.h"
 
 #ifdef USE_MP3
-#include "../ADM_libMad/mad.h"
+#include "ADM_libMad/mad.h"
 #define Stream ((mad_stream *)_stream)
 #define Frame ((mad_frame *)_frame)
 #define Synth ((mad_synth *)_synth)

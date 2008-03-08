@@ -1,4 +1,4 @@
-subdirs(PREORDER ADM_ad_ac3)
-subdirs(PREORDER ADM_ad_mad)
-subdirs(PREORDER ADM_ad_faad)
-subdirs(PREORDER ADM_ad_vorbis)
+ADD_SUBDIRECTORY(ADM_ad_ac3)
+ADD_SUBDIRECTORY(ADM_ad_faad)
+ADD_SUBDIRECTORY(ADM_ad_mad)
+ADD_SUBDIRECTORY(ADM_ad_vorbis)
