@@ -1,1 +1,1 @@
-subdirs(PREORDER ADM_audiodecoder)
+ADD_SUBDIRECTORY(ADM_audiodecoder)
