@@ -42,7 +42,7 @@
 extern int global_argc;
 extern char **global_argv;
 
-extern uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h);
+extern uint8_t UI_getPhysicalScreenSize(void* window, uint32_t *w,uint32_t *h);
 extern int automation(void );
 extern void HandleAction(Action a);
 extern uint32_t encoderGetNbEncoder (void);
@@ -623,15 +623,15 @@ int UI_RunApp(void)
 
 	loadTranslator();
 
-	uint32_t w, h;
-
-	UI_getPhysicalScreenSize(&w,&h);
-	printf("The screen seems to be %u x %u px\n",w,h);
-
 	MainWindow *mw = new MainWindow();
 	mw->show();
 
 	QuiMainWindows = (QWidget*)mw;
+
+	uint32_t w, h;
+
+	UI_getPhysicalScreenSize(QuiMainWindows, &w,&h);
+	printf("The screen seems to be %u x %u px\n",w,h);
 
 	UI_QT4VideoWidget(mw->ui.frame_video);  // Add the widget that will handle video display
 	UI_updateRecentMenu();

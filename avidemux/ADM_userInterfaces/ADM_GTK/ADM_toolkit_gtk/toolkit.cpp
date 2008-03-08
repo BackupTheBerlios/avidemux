@@ -24,7 +24,7 @@
 #endif
 
 
-
+extern GtkWidget *guiRootWindow;
 
 GtkWidget *GUI_PixmapButtonDefault(GdkWindow * window, const gchar ** xpm,
                                   const gchar * tooltip);
@@ -186,25 +186,21 @@ gint r;
     \fn UI_getPhysicalScreenSize
     \brief return the physical size of display in pixels
 */
-uint8_t UI_getPhysicalScreenSize(uint32_t *w, uint32_t *h)
+uint8_t UI_getPhysicalScreenSize(void *window, uint32_t *w, uint32_t *h)
 {
-#ifdef __WIN32
-	getWorkingArea(w, h);
-#else
-	static int inited = 0;
-	static int ww,hh;
+	GtkWindow* gtkWindow = (GtkWindow*)window;
+	GdkScreen *screen = gdk_screen_get_default();
 
-    if (!inited)
-    {      
-      GdkScreen* sc = gdk_screen_get_default();
-      ww = gdk_screen_get_width(sc);
-      hh = gdk_screen_get_height(sc);
-      inited = 1;
-    }
+	if (!gtkWindow)
+		gtkWindow = (GtkWindow*)guiRootWindow;
 
-    *w=ww;
-    *h=hh;
-#endif
+	int monitorNo = gdk_screen_get_monitor_at_window(screen, GTK_WIDGET(gtkWindow)->window);
+	GdkRectangle rect;
+
+	gdk_screen_get_monitor_geometry(screen, monitorNo, &rect);
+
+	*w = rect.width;
+	*h = rect.height;
 
 	return 1;
 }

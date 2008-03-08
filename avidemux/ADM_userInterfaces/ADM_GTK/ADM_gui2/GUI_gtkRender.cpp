@@ -41,7 +41,7 @@ extern "C"
 void GUI_gtk_grow_off(int onff);
 
 extern GtkWidget *getDrawWidget(void);
-extern uint8_t UI_getPhysicalScreenSize(uint32_t *w, uint32_t *h);
+extern uint8_t UI_getPhysicalScreenSize(void* window, uint32_t *w, uint32_t *h);
 
 #ifdef ENABLE_WINDOW_SIZING_HACK
 extern int maxWindowWidth, maxWindowHeight; // from GUI_bindings.cpp
@@ -191,7 +191,7 @@ float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t
 	gtk_window_get_size(window, &windowWidth, &windowHeight);
 	gtk_widget_get_size_request(drawingArea, &drawingWidth, &drawingHeight);
 
-	UI_getPhysicalScreenSize(&screenWidth, &screenHeight);
+	UI_getPhysicalScreenSize(window, &screenWidth, &screenHeight);
 
 	// Take drawing area out of the equation, how much extra do we need for additional controls?
 	windowWidth -= drawingWidth;
@@ -223,9 +223,11 @@ float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t
 void UI_centreCanvasWindow(GtkWindow *window, GtkWidget *canvas, int newCanvasWidth, int newCanvasHeight)
 {
 	int winWidth, winHeight, widgetWidth, widgetHeight;
-	uint32_t resWidth, resHeight;
+	GdkScreen *screen = gdk_screen_get_default();
+	int monitorNo = gdk_screen_get_monitor_at_window(screen, GTK_WIDGET(window->transient_parent)->window);
+	GdkRectangle rect;
 
-	UI_getPhysicalScreenSize(&resWidth, &resHeight);
+	gdk_screen_get_monitor_geometry(screen, monitorNo, &rect);
 	gtk_widget_get_size_request((GtkWidget*)canvas, &widgetWidth, &widgetHeight);
 	gtk_window_get_size(window, &winWidth, &winHeight);
 
@@ -236,6 +238,6 @@ void UI_centreCanvasWindow(GtkWindow *window, GtkWidget *canvas, int newCanvasWi
 	winWidth += 10;
 	winHeight += 40;
 
-	gtk_window_move(window, ((int)resWidth - winWidth) / 2, ((int)resHeight - winHeight) / 2);
+	gtk_window_move(window, rect.x + (rect.width - winWidth) / 2, rect.y + (rect.height - winHeight) / 2);
 }
 // EOF
