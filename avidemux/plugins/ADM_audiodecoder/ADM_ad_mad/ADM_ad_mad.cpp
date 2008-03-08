@@ -14,16 +14,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-#include <math.h>
-
-#include "config.h"
-#include "fourcc.h"
-#include "ADM_audio/aviaudio.hxx"
-#include "ADM_audiocodec/ADM_audiocodec.h"
+#include "ADM_default.h"
+#include "ADM_ad_plugin.h"
 
 #ifdef USE_MP3
 #include "../ADM_libMad/mad.h"
@@ -31,10 +23,39 @@
 #define Frame ((mad_frame *)_frame)
 #define Synth ((mad_synth *)_synth)
 
-ADM_AudiocodecMP3::ADM_AudiocodecMP3( uint32_t fourcc) :   ADM_Audiocodec(fourcc)
+#define ADM_MP3_BUFFER (48*1024)
+class ADM_AudiocodecMP3 : public     ADM_Audiocodec
+{
+	protected:
+		uint32_t _head;
+		uint32_t _tail;
+		uint8_t _buffer[ADM_MP3_BUFFER];
+		void *_stream;
+		void *_frame;
+		void *_synth;
+
+	public:
+		ADM_AudiocodecMP3(uint32_t fourcc,WAVHeader *info,uint32_t extraLength,uint8_t *extraData);
+		virtual	~ADM_AudiocodecMP3() ;
+		virtual	uint8_t beginDecompress(void);
+		virtual	uint8_t endDecompress(void);
+		virtual	uint8_t run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut);
+		virtual	uint8_t isCompressed(void) {return 1;}
+		virtual	uint8_t isDecompressable(void) {return 1;}
+};
+// Supported formats + declare our plugin
+//*******************************************************
+uint32_t Formats[]={WAV_MP3,WAV_MP2};
+DECLARE_AUDIO_DECODER(ADM_AudiocodecMP3,						// Class
+			0,0,1, 												// Major, minor,patch 
+			Formats, 											// Supported formats
+			"LibMad decoder plugin for avidemux (c) Mean\n"); 	// Desc
+//********************************************************
+
+ADM_AudiocodecMP3::ADM_AudiocodecMP3( uint32_t fourcc,WAVHeader *info,uint32_t extraLength,uint8_t *extraData) :   ADM_Audiocodec(fourcc)
 {
         if((fourcc!=WAV_MP3) && (fourcc!=WAV_MP2))
-            ADM_assert(0);
+            ADM_assert(0); 
         if(fourcc==WAV_MP2) printf("Mpeg1/2 audio codec created\n");
         _stream=(void *)ADM_alloc(sizeof( mad_stream));
         _frame=(void *)ADM_alloc(sizeof( mad_frame));

@@ -1033,7 +1033,7 @@ bool aviWrite::odml_index_frame(int stream_nbr, uint32_t data_size, bool keyFram
 	}
 	return true;
 }
-void aviWrite::odml_write_sindex(int stream_nbr, char* stream_fcc)
+void aviWrite::odml_write_sindex(int stream_nbr, const char* stream_fcc)
 {
         
 	// Warning: This changes the file position
@@ -1086,7 +1086,7 @@ void aviWrite::odml_write_sindex(int stream_nbr, char* stream_fcc)
                 
 	}	
 }
-bool aviWrite::odml_write_index(int stream_nbr, char* stream_fcc, char* index_fcc){	// write index
+bool aviWrite::odml_write_index(int stream_nbr, const char* stream_fcc, const char* index_fcc){	// write index
 	// Warning: This changes the file position
 	if(doODML==NORMAL){
 		aprintf ("\n writing %lu interleaved ODML indexes for %lu frames in stream %s", odml_indexes[stream_nbr].index_count+1, vframe, stream_fcc);

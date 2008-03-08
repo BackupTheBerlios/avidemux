@@ -19,14 +19,8 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#include <config.h>
-#include <stdio.h>
-#include <signal.h>
-#include <setjmp.h>
-#include <stdlib.h>
-#ifdef	HAVE_MALLOC_H
-#include <malloc.h>
-#endif
+#define ADM_LEGACY_PROGGY
+#include "ADM_default.h"
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>

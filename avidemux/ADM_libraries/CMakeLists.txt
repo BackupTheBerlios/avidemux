@@ -1,8 +1,6 @@
 subdirs (PREORDER ADM_lavcodec)
 subdirs (PREORDER ADM_lavformat)
 subdirs (PREORDER ADM_lavutil)
-subdirs (PREORDER ADM_liba52)
-subdirs (PREORDER ADM_libMad)
 subdirs (PREORDER ADM_libMpeg2Dec)
 subdirs (PREORDER ADM_libmpeg2enc)
 subdirs (PREORDER ADM_libswscale)

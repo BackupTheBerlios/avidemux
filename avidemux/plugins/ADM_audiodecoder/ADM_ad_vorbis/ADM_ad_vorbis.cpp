@@ -25,26 +25,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-#include <math.h>
-
-
-
-#include "fourcc.h"
-#include "ADM_audio/aviaudio.hxx"
-#include "ADM_audiocodec/ADM_audiocodec.h"
+#include "ADM_default.h"
+#include "ADM_ad_plugin.h"
 #include "ADM_audiofilter/audiofilter_channel_route.h"
 
-#ifdef USE_VORBIS
-
 #include <vorbis/codec.h>
-#include "ADM_audiocodec/ADM_vorbis.h"
+#include "ADM_ad_vorbis.h"
+
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_OGM_AUDIO
 #include "ADM_osSupport/ADM_debug.h"
@@ -52,6 +39,31 @@
 
  #define STRUCT ((oggVorbis *)_contextVoid)
  
+class ADM_vorbis : public     ADM_Audiocodec
+{
+	protected:
+		void *_contextVoid;
+
+	public:
+		ADM_vorbis(uint32_t fourcc, WAVHeader *info, uint32_t l, uint8_t *d);
+		virtual	~ADM_vorbis();
+		virtual	uint8_t run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut);
+		virtual	uint8_t isCompressed(void) {return 1;}
+		virtual	uint8_t isDecompressable(void) {return 1;}
+		virtual	uint8_t beginDecompress(void) {return 1;}
+		virtual	uint8_t endDecompress(void);
+};
+
+// Supported formats + declare our plugin
+//*******************************************************
+uint32_t Formats[]={WAV_OGG};
+DECLARE_AUDIO_DECODER(ADM_vorbis,						// Class
+			0,0,1, 												// Major, minor,patch 
+			Formats, 											// Supported formats
+			"libVorbis decoder plugin for avidemux (c) Mean\n"); 	// Desc
+//********************************************************
+
+
  ADM_vorbis::~ADM_vorbis()
  {
  	oggVorbis *o;
@@ -203,5 +215,5 @@ int	nb_synth;
         vorbis_synthesis_restart(&STRUCT->vdsp);
   	return 1;
   }
-#endif
+
 

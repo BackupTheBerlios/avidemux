@@ -21,24 +21,7 @@
 #ifndef __MJPEG_TYPES_H__
 #define __MJPEG_TYPES_H__
 
-#include <sys/types.h> /* FreeBSD, others - ssize_t */
-
-/*
- * modern CYGWIN releases have stdint/inttypes so there's no need
- * to check for it or provide typedefs/defines
-*/
-
-#if defined(HAVE_STDINT_H)
-# include <stdint.h>
-#elif defined(HAVE_INTTYPES_H)
-# include <inttypes.h>
-#else
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned int uint32_t;
-typedef unsigned long long uint64_t;
-typedef long long int int64_t;
-#endif /* HAVE_STDINT_H */
+#include "ADM_default.h"
 
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
 #define GNUC_PRINTF( format_idx, arg_idx )    \

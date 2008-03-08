@@ -86,7 +86,7 @@ extern adm_fast_memcpy myAdmMemcpy;
   #define malloc ADM_alloc
   #define realloc ADM_realloc
   #define memalign(x,y) ADM_alloc(y)
-  #define free  ADM_dealloc
+  #define free  ADM_dezalloc
   #undef strdup
   #define strdup ADM_strdup
   #define calloc ADM_calloc

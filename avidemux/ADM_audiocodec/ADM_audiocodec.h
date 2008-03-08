@@ -74,26 +74,6 @@ class ADM_AudiocodecUnknown : public     ADM_Audiocodec
 		uint8_t isDecompressable(void) {return 0;}
 };
 
-#ifdef USE_AC3
-#define ADM_AC3_BUFFER (50000*2)
-class ADM_AudiocodecAC3 : public     ADM_Audiocodec
-{
-	protected:
-		void *ac3_handle;
-		void *ac3_sample;
-		uint32_t _downmix;
-
-	public:
-		ADM_AudiocodecAC3(uint32_t fourcc, WAVHeader *info);
-		virtual	~ADM_AudiocodecAC3();
-		virtual	uint8_t beginDecompress(void);
-		virtual	uint8_t endDecompress(void);
-		virtual	uint8_t run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut);
-		virtual	uint8_t isCompressed(void) {return 1;}
-		virtual	uint8_t isDecompressable(void) {return 1;}
-
-   };
-#endif
 
 #ifdef USE_LIBDCA
 class ADM_AudiocodecDCA : public     ADM_Audiocodec
@@ -128,67 +108,7 @@ class ADM_Audiocodec8Bits : public     ADM_Audiocodec
 		virtual	uint8_t isDecompressable(void) {return 1;}
 };
 
-#ifdef USE_MP3
-#define ADM_MP3_BUFFER (48*1024)
-class ADM_AudiocodecMP3 : public     ADM_Audiocodec
-{
-	protected:
-		uint32_t _head;
-		uint32_t _tail;
-		uint8_t _buffer[ADM_MP3_BUFFER];
-		void *_stream;
-		void *_frame;
-		void *_synth;
 
-	public:
-		ADM_AudiocodecMP3(uint32_t fourcc);
-		virtual	~ADM_AudiocodecMP3() ;
-		virtual	uint8_t beginDecompress(void);
-		virtual	uint8_t endDecompress(void);
-		virtual	uint8_t run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut);
-		virtual	uint8_t isCompressed(void) {return 1;}
-		virtual	uint8_t isDecompressable(void) {return 1;}
-};
-#endif
-
-#ifdef USE_VORBIS
-class ADM_vorbis : public     ADM_Audiocodec
-{
-	protected:
-		void *_contextVoid;
-
-	public:
-		ADM_vorbis(uint32_t fourcc, WAVHeader *info, uint32_t l, uint8_t *d);
-		virtual	~ADM_vorbis();
-		virtual	uint8_t run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut);
-		virtual	uint8_t isCompressed(void) {return 1;}
-		virtual	uint8_t isDecompressable(void) {return 1;}
-		virtual	uint8_t beginDecompress(void) {return 1;}
-		virtual	uint8_t endDecompress(void);
-};
-#endif
-
-#ifdef USE_FAAD
-#define FAAD_BUFFER 2048
-class ADM_faad : public     ADM_Audiocodec
-{
-	protected:
-		uint8_t _inited;
-		void	*_instance;
-		uint8_t _buffer[FAAD_BUFFER];
-		uint32_t _inbuffer;	
-
-	public:
-		ADM_faad(uint32_t fourcc, uint32_t highEfficiency,WAVHeader *info, uint32_t l, uint8_t *d);
-		virtual	~ADM_faad();
-		virtual	void purge(void);
-		virtual	uint8_t run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut);
-		virtual	uint8_t isCompressed(void) {return 1;}
-		virtual	uint8_t isDecompressable(void) {return 1;}
-		virtual	uint8_t beginDecompress(void);
-		virtual	uint8_t endDecompress(void);
-};
-#endif
 
 #define ADMWA_BUF (4*1024*16) // 64 kB internal
 class ADM_AudiocodecWMA : public     ADM_Audiocodec

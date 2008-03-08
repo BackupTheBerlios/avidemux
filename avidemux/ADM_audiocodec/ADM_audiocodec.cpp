@@ -28,6 +28,8 @@
 #include "ADM_audiofilter/audiofilter_channel_route.h"
 #include "ADM_libraries/ADM_libwrapper/libwrapper_global.h"
 
+extern ADM_Audiocodec *ADM_ad_searchCodec(uint32_t fourcc,	WAVHeader *info,uint32_t extraLength,uint8_t *extraData);
+
 ADM_Audiocodec	*getAudioCodec(uint32_t fourcc,WAVHeader *info,uint32_t extra,uint8_t *extraData)
 {
 ADM_Audiocodec *out = NULL;
@@ -90,13 +92,6 @@ ADM_Audiocodec *out = NULL;
 					out= (ADM_Audiocodec *)new ADM_AudiocodecWav(fourcc);
 #endif					
                   		break;
-#ifdef USE_AC3
-				case WAV_AC3:
-        				printf("\n Audio codec:  AC3\n");
-
-					out= (ADM_Audiocodec *) new ADM_AudiocodecAC3(fourcc, info);
-                  break;
-#endif
 #ifdef USE_LIBDCA
                 case WAV_DTS:
 					if (dca->isAvailable())
@@ -106,36 +101,6 @@ ADM_Audiocodec *out = NULL;
 					}
 
 					break;
-#endif
-#ifdef USE_MP3
-				case WAV_MP3:
-				case WAV_MP2:
-        				printf("\n Audio codec:  MP2-3\n");
-
-					out= (ADM_Audiocodec *) new ADM_AudiocodecMP3(fourcc);
-                  break;
-#endif
-#ifdef USE_VORBIS
-				case WAV_OGG:
-						printf("\n Ogg/Vorbis \n");
-						out= (ADM_Audiocodec *) new ADM_vorbis(fourcc,info,
-								extra,extraData);
-						break;
-#endif		
-#ifdef USE_FAAD
-                                case WAV_AAC_HE:
-						printf("\n MP4 audio (HE)\n");
-						out= (ADM_Audiocodec *) new ADM_faad(fourcc,1,info,
-								extra,extraData);
-						break;
-
-				case WAV_AAC:
-				case WAV_MP4:
-                                case 0x706D:  // Weird fourcc/id code used by mencoder
-						printf("\n MP4 audio \n");
-						out= (ADM_Audiocodec *) new ADM_faad(fourcc,0,info,
-								extra,extraData);
-						break;
 #endif
 				case WAV_ULAW:
 						printf("\n ULAW codec\n");
@@ -154,6 +119,8 @@ ADM_Audiocodec *out = NULL;
                 printf("\n Audio codec:  ffQDM2\n");
                 out= (ADM_Audiocodec *) new ADM_AudiocodecWMA(fourcc,info,extra,extraData);
                 break;
+            default:
+            	out= ADM_ad_searchCodec(fourcc,info,extra,extraData);
         	}
 
 	if (out == NULL)

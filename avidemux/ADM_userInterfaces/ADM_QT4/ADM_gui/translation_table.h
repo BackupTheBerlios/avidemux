@@ -77,8 +77,7 @@ PROCESS(actionMain_toolbar,ACT_SaveCurrentWork) \
 PROCESS(actionA_V_toolbar,ACT_DUMMY)
 #endif
 
-#define LIST_OF_BUTTONS     \
-PROCESS(pushButtonVideoConf, ACT_VideoCodec)  \
+#define LIST_OF_BUTTONS     PROCESS(pushButtonVideoConf, ACT_VideoCodec)  \
 PROCESS(pushButtonVideoFilter, ACT_VideoParameter) \
 PROCESS(pushButtonAudioConf, ACT_AudioCodec) \
 PROCESS(pushButtonAudioFilter, ACT_AudioFilters) \

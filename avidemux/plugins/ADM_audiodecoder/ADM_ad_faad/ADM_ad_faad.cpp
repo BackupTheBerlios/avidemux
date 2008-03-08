@@ -15,22 +15,40 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#include "config.h"
-#ifdef USE_FAAD
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-#include <math.h>
-
-#include "fourcc.h"
-#include "ADM_audio/aviaudio.hxx"
-#include "ADM_audiocodec/ADM_audiocodec.h"
+#include "ADM_default.h"
+#include "ADM_ad_plugin.h"
 #include "ADM_audiofilter/audiofilter_channel_route.h"
 #include "faad.h"
 
+#define FAAD_BUFFER 2048
+class ADM_faad : public     ADM_Audiocodec
+{
+	protected:
+		uint8_t _inited;
+		void	*_instance;
+		uint8_t _buffer[FAAD_BUFFER];
+		uint32_t _inbuffer;	
 
-ADM_faad::ADM_faad( uint32_t fourcc ,uint32_t highEfficiency,WAVHeader *info,uint32_t l,uint8_t *d) :   ADM_Audiocodec(fourcc)
+	public:
+		ADM_faad(uint32_t fourcc, WAVHeader *info, uint32_t l, uint8_t *d);
+		virtual	~ADM_faad();
+		virtual	void purge(void);
+		virtual	uint8_t run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut);
+		virtual	uint8_t isCompressed(void) {return 1;}
+		virtual	uint8_t isDecompressable(void) {return 1;}
+		virtual	uint8_t beginDecompress(void);
+		virtual	uint8_t endDecompress(void);
+};
+// Supported formats + declare our plugin
+//*******************************************************
+uint32_t Formats[]={WAV_AAC,WAV_MP4};
+DECLARE_AUDIO_DECODER(ADM_faad,						// Class
+			0,0,1, 												// Major, minor,patch 
+			Formats, 											// Supported formats
+			"Faad2 decoder plugin for avidemux (c) Mean\n"); 	// Desc
+//********************************************************
+
+ADM_faad::ADM_faad( uint32_t fourcc ,WAVHeader *info,uint32_t l,uint8_t *d) :   ADM_Audiocodec(fourcc)
 {
 faacDecConfigurationPtr conf;
 #ifdef OLD_FAAD_PROTO
@@ -47,13 +65,7 @@ unsigned char chan;
 		// Update the field we know about
 		conf->outputFormat=FAAD_FMT_16BIT;
 		conf->defSampleRate=info->frequency;
-                if(!highEfficiency)
-                {
-		  conf->defObjectType =LC;
-                }else
-                {
-                   conf->defObjectType =HE_AAC;
-                }
+  	    conf->defObjectType =LC;
 		faacDecSetConfiguration(_instance, conf);
                 printf("[FAAD] using %u bytes of extradata\n",l);
 		// if we have some extra data, it means we can init it from it
@@ -202,4 +214,4 @@ uint8_t first=0;
 		}while(nbIn);
 		return 1;
 }
-#endif
+

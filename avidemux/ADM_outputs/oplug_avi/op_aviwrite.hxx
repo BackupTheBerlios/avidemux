@@ -94,8 +94,8 @@
 	void odml_destroy_index(void);	// deallocate index data structures
 	void odml_write_dummy_chunk(AviList* alist, uint64_t* fpos, uint32_t size);	// write a dummy chunk and get its file position
 	bool odml_index_frame(int stream_nbr, uint32_t data_size, bool keyFrame);	//index one data chunk
-	void odml_write_sindex(int stream_nbr, char* stream_fcc);	// write super index
-	bool odml_write_index(int stream_nbr, char* stream_fcc, char* index_fcc);	// write index
+	void odml_write_sindex(int stream_nbr, const char* stream_fcc);	// write super index
+	bool odml_write_index(int stream_nbr, const char* stream_fcc, const char* index_fcc);	// write index
 	void odml_riff_break(uint32_t len);	// advance to the next riff if required; len = chunk size to be written (incl. 4cc and size info) without padding
 	// END MOD Feb 2005 by GMV
         void reallocIndeces( odml_super_index_t *idx);

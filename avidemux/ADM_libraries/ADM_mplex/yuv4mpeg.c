@@ -19,13 +19,8 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-
-#include <config.h>
-
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#define ADM_LEGACY_PROGGY
+#include "ADM_default.h"
 #define INTERNAL_Y4M_LIBCODE_STUFF_QPX
 #include "yuv4mpeg.h"
 #include "yuv4mpeg_intern.h"

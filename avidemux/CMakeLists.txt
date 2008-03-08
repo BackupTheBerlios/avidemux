@@ -237,8 +237,6 @@ SET(ADM_LIBRARIES
 	ADM_lavformat
 	ADM_lavcodec
 	ADM_lavutil
-	ADM_liba52
-	ADM_libMad
 	ADM_mplex
 	ADM_libMpeg2Dec
 	ADM_libmpeg2enc
@@ -465,7 +463,11 @@ ENDIF (USE_XVID_4)
 IF (USE_X264)
 	ADD_LIB_ALL_TARGETS("${X264_LIBRARY_DIR}")
 ENDIF (USE_X264)
+###########################################
+# Plugins
+###########################################
 
+ADD_SUBDIRECTORY(plugins)
 ###########################################
 # UI Specific
 ###########################################

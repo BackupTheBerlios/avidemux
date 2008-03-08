@@ -1,16 +1,37 @@
+/** *************************************************************************
+    \fn 	ADM_dynamicLoading.cpp
+    \brief 	Wrapper for dlopen & friends  
+                      
+    copyright            : (C) 2008 by Gruntster
+    
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ ***************************************************************************/
+
 #include "config.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include "ADM_default.h"
-#ifdef __MINGW32__
+#ifdef __WIN32
 #include <windows.h>
 #else
 #include <dlfcn.h>
 #endif
 
-#include "libwrapper.h"
-
+#include "ADM_dynamicLoading.h"
+// By default the library is silent, being part of ADM_core cannot use the debug_id funcs
+#if 1
+#define aprintf(...) {}
+#else
+#define aprintf printf
+#endif
 ADM_LibWrapper::ADM_LibWrapper()
 {
 	initialised = false;
@@ -21,9 +42,9 @@ ADM_LibWrapper::~ADM_LibWrapper()
 {
 	if (hinstLib != NULL)
 	{
-		printf("Unloading library 0x%08x\n", hinstLib);
+		aprintf("Unloading library 0x%08x\n", hinstLib);
 
-	#ifdef __MINGW32__
+	#ifdef __WIN32
 		FreeLibrary((HINSTANCE) hinstLib);
 	#else
 		dlclose(hinstLib);
@@ -36,7 +57,7 @@ bool ADM_LibWrapper::isAvailable()
 	return initialised;
 }
 
-#ifdef __MINGW32__
+#ifdef __WIN32
 char* ADM_LibWrapper::formatMessage(uint32_t msgCode)
 {
 	char* lpMsgBuf;
@@ -49,21 +70,21 @@ char* ADM_LibWrapper::formatMessage(uint32_t msgCode)
 
 bool ADM_LibWrapper::loadLibrary(const char* path)
 {
-#ifdef __MINGW32__
+#ifdef __WIN32
 	hinstLib = LoadLibrary(path);
 
 	if (hinstLib == NULL)
 	{
 		char* lpMsg = formatMessage(GetLastError());
 
-		printf("Unable to load [%s]: %s\n", path, lpMsg);
+		aprintf("Unable to load [%s]: %s\n", path, lpMsg);
 		LocalFree(lpMsg);
 
 		return false;
 	}
 	else
 	{
-		printf("Loaded library %s, handle = 0x%08x\n", path, hinstLib);
+		aprintf("Loaded library %s, handle = 0x%08x\n", path, hinstLib);
 
 		return true;
 	}
@@ -72,13 +93,13 @@ bool ADM_LibWrapper::loadLibrary(const char* path)
 	
 	if (hinstLib == NULL)
 	{
-		printf("Unable to load [%s]: %s\n", path, dlerror());
+		aprintf("Unable to load [%s]: %s\n", path, dlerror());
 
 		return false;
 	}
 	else
 	{
-		printf("Loaded library %s, handle = 0x%08x\n", path, hinstLib);
+		aprintf("Loaded library %s, handle = 0x%08x\n", path, hinstLib);
 
 		return true;
 	}
@@ -87,14 +108,14 @@ bool ADM_LibWrapper::loadLibrary(const char* path)
 
 void* ADM_LibWrapper::getSymbol(const char* name)
 {
-#ifdef __MINGW32__
+#ifdef __WIN32
 	void* procAddr = (void*)GetProcAddress((HINSTANCE) hinstLib, name);
 
 	if (procAddr == NULL)
 	{
 		char* lpMsg = formatMessage(GetLastError());
 
-		printf("Unable to find symbol [%s]: %s\n", name, lpMsg);
+		aprintf("Unable to find symbol [%s]: %s\n", name, lpMsg);
 		LocalFree(lpMsg);
 	}
 
@@ -104,7 +125,7 @@ void* ADM_LibWrapper::getSymbol(const char* name)
 
 	if (procAddr == NULL)
 	{
-		printf("Unable to find symbol [%s]: %s\n", name, dlerror());
+		aprintf("Unable to find symbol [%s]: %s\n", name, dlerror());
 	}
 
 	return procAddr;
@@ -113,7 +134,7 @@ void* ADM_LibWrapper::getSymbol(const char* name)
 
 bool ADM_LibWrapper::getSymbols(int symCount, ...)
 {
-#ifdef __MINGW32__
+#ifdef __WIN32
     va_list va;
     va_start(va, symCount);
 
