@@ -946,13 +946,21 @@ static int mov_write_edts_tag(ByteIOContext *pb, MOVTrack *track)
     put_be32(pb, 0x1);
 
     put_be32(pb, av_rescale_rnd(track->trackDuration, globalTimescale, track->timescale, AV_ROUND_UP)); /* duration   ... doesn't seem to effect psp */
-
-    // MEANX : NO put_be32(pb, track->cluster[0].cts); /* first pts is cts since dts is 0 */
-      put_be32(pb, 0x00000000);
+#if 1
+    // MEANX : NO 
+    put_be32(pb, 0x00000000);
+    put_be32(pb, 0x0001);
     // /MEANX
+#else
+    put_be32(pb, track->cluster[0].cts); /* first pts is cts since dts is 0 */
+    put_be32(pb, 0x00010000);
+#endif
+    
+     
+    
 
 
-    put_be32(pb, 0x0001); // MEANX put_be32(pb, 0x00010000);
+   // MEANX 
     return 0x24;
 }
 

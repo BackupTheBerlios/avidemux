@@ -32,6 +32,26 @@ typedef enum
     CHANNEL_LAST
 } CHANNEL_CONF;
 
+#define MAX_CHANNELS 9
+
+typedef enum 
+{
+	CH_INVALID=0,
+	CH_MONO,
+	CH_FRONT_LEFT,
+	CH_FRONT_RIGHT,
+	CH_FRONT_CENTER,
+	CH_REAR_LEFT,
+	CH_REAR_RIGHT,
+	CH_REAR_CENTER,
+	CH_SIDE_LEFT,
+	CH_SIDE_RIGHT,
+	CH_LFE
+}CHANNEL_TYPE;
+// returns true if channel mapping is identical
+bool ADM_audioCompareChannelMapping(WAVHeader *wh1, WAVHeader *wh2,CHANNEL_TYPE *map1,CHANNEL_TYPE *map2);
+
+
 typedef struct
 {
   const char    *desc;

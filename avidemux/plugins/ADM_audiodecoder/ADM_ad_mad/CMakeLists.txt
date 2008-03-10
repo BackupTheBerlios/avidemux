@@ -11,5 +11,5 @@ GET_MAD_CFLAGS(MAD_CFLAGS)
 ADD_TARGET_CFLAGS(ADM_ad_Mad ${MAD_CFLAGS})
 
 # FIXME
-ADD_TARGET_CFLAGS(ADM_ad_Mad "-I${CMAKE_BINARY_DIR}/config/cli")
-ADD_TARGET_CFLAGS(ADM_ad_Mad "-I${CMAKE_SOURCE_DIR}/avidemux/ADM_audiocodec")
+INCLUDE(ad_plugin)
+ADM_audio_plugin(ADM_ad_Mad)

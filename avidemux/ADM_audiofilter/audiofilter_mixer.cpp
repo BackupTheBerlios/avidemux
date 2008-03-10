@@ -12,18 +12,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
 #include "ADM_default.h"
 
 #include "audioeng_process.h"
 #include "audiofilter_mixer.h"
-#include "audiofilter_channel_route.h"
 #include "audiofilter_dolby.h"
-
+#include <math.h>
 
 AUDMAudioFilterMixer::AUDMAudioFilterMixer(AUDMAudioFilter *instream,CHANNEL_CONF out):AUDMAudioFilter (instream)
 {
@@ -39,61 +33,61 @@ AUDMAudioFilterMixer::AUDMAudioFilterMixer(AUDMAudioFilter *instream,CHANNEL_CON
 	switch (_output) {
 		case CHANNEL_MONO:
 			_wavHeader.channels = 1;
-			ch_route.output_type[0] = CH_MONO;
+			outputChannelMapping[0] = CH_MONO;
 		break;
 		case CHANNEL_STEREO:
 			_wavHeader.channels = 2;
-			ch_route.output_type[0] = CH_FRONT_LEFT;
-			ch_route.output_type[1] = CH_FRONT_RIGHT;
+			outputChannelMapping[0] = CH_FRONT_LEFT;
+			outputChannelMapping[1] = CH_FRONT_RIGHT;
 		break;
 		case CHANNEL_2F_1R:
 			_wavHeader.channels = 3;
-			ch_route.output_type[0] = CH_FRONT_LEFT;
-			ch_route.output_type[1] = CH_FRONT_RIGHT;
-			ch_route.output_type[2] = CH_REAR_CENTER;
+			outputChannelMapping[0] = CH_FRONT_LEFT;
+			outputChannelMapping[1] = CH_FRONT_RIGHT;
+			outputChannelMapping[2] = CH_REAR_CENTER;
 		break;
 		case CHANNEL_3F:
 			_wavHeader.channels = 3;
-			ch_route.output_type[0] = CH_FRONT_LEFT;
-			ch_route.output_type[1] = CH_FRONT_RIGHT;
-			ch_route.output_type[2] = CH_FRONT_CENTER;
+			outputChannelMapping[0] = CH_FRONT_LEFT;
+			outputChannelMapping[1] = CH_FRONT_RIGHT;
+			outputChannelMapping[2] = CH_FRONT_CENTER;
 		break;
 		case CHANNEL_3F_1R:
 			_wavHeader.channels = 4;
-			ch_route.output_type[0] = CH_FRONT_LEFT;
-			ch_route.output_type[1] = CH_FRONT_RIGHT;
-			ch_route.output_type[2] = CH_REAR_CENTER;
-			ch_route.output_type[3] = CH_FRONT_CENTER;
+			outputChannelMapping[0] = CH_FRONT_LEFT;
+			outputChannelMapping[1] = CH_FRONT_RIGHT;
+			outputChannelMapping[2] = CH_REAR_CENTER;
+			outputChannelMapping[3] = CH_FRONT_CENTER;
 		break;
 		case CHANNEL_2F_2R:
 			_wavHeader.channels = 4;
-			ch_route.output_type[0] = CH_FRONT_LEFT;
-			ch_route.output_type[1] = CH_FRONT_RIGHT;
-			ch_route.output_type[2] = CH_REAR_LEFT;
-			ch_route.output_type[3] = CH_REAR_RIGHT;
+			outputChannelMapping[0] = CH_FRONT_LEFT;
+			outputChannelMapping[1] = CH_FRONT_RIGHT;
+			outputChannelMapping[2] = CH_REAR_LEFT;
+			outputChannelMapping[3] = CH_REAR_RIGHT;
 		break;
 		case CHANNEL_3F_2R:
 			_wavHeader.channels = 5;
-			ch_route.output_type[0] = CH_FRONT_LEFT;
-			ch_route.output_type[1] = CH_FRONT_RIGHT;
-			ch_route.output_type[2] = CH_REAR_LEFT;
-			ch_route.output_type[3] = CH_REAR_RIGHT;
-			ch_route.output_type[4] = CH_FRONT_CENTER;
+			outputChannelMapping[0] = CH_FRONT_LEFT;
+			outputChannelMapping[1] = CH_FRONT_RIGHT;
+			outputChannelMapping[2] = CH_REAR_LEFT;
+			outputChannelMapping[3] = CH_REAR_RIGHT;
+			outputChannelMapping[4] = CH_FRONT_CENTER;
 		break;
 		case CHANNEL_3F_2R_LFE:
 			_wavHeader.channels = 6;
-			ch_route.output_type[0] = CH_FRONT_LEFT;
-			ch_route.output_type[1] = CH_FRONT_RIGHT;
-			ch_route.output_type[2] = CH_REAR_LEFT;
-			ch_route.output_type[3] = CH_REAR_RIGHT;
-			ch_route.output_type[4] = CH_FRONT_CENTER;
-			ch_route.output_type[5] = CH_LFE;
+			outputChannelMapping[0] = CH_FRONT_LEFT;
+			outputChannelMapping[1] = CH_FRONT_RIGHT;
+			outputChannelMapping[2] = CH_REAR_LEFT;
+			outputChannelMapping[3] = CH_REAR_RIGHT;
+			outputChannelMapping[4] = CH_FRONT_CENTER;
+			outputChannelMapping[5] = CH_LFE;
 		break;
 		case CHANNEL_DOLBY_PROLOGIC:
 		case CHANNEL_DOLBY_PROLOGIC2:
 			_wavHeader.channels = 2;
-			ch_route.output_type[0] = CH_FRONT_LEFT;
-			ch_route.output_type[1] = CH_FRONT_RIGHT;
+			outputChannelMapping[0] = CH_FRONT_LEFT;
+			outputChannelMapping[1] = CH_FRONT_RIGHT;
 			DolbyInit();
 		break;
 	}
@@ -106,7 +100,14 @@ AUDMAudioFilterMixer::AUDMAudioFilterMixer(AUDMAudioFilter *instream,CHANNEL_CON
 //    printf("[mixer]Out   channels : %u : %u \n",_wavHeader.channels,ADM_channel_mixer[_output]);
 
 };
-
+/**
+ * 	\fn getChannelMapping
+ *  \brief That filter changes the channel mapping, output its own
+ */
+CHANNEL_TYPE    *AUDMAudioFilterMixer::getChannelMapping(void ) 
+{
+		return this->outputChannelMapping;
+}
 AUDMAudioFilterMixer::~AUDMAudioFilterMixer()
 {
 };
@@ -118,7 +119,7 @@ static int MCOPY(float *in,float *out,uint32_t nbSample,uint32_t chan)
     
 }
 
-static int MNto1(float *in,float *out,uint32_t nbSample,uint32_t chan)
+static int MNto1(float *in,float *out,uint32_t nbSample,uint32_t chan,CHANNEL_TYPE *chanMap)
 {
 float sum;
 int den=(chan+1)&0xfe;
@@ -135,13 +136,13 @@ int den=(chan+1)&0xfe;
     
 }
 
-static int MStereo(float *in,float *out,uint32_t nbSample,uint32_t chan)
+static int MStereo(float *in,float *out,uint32_t nbSample,uint32_t chan,CHANNEL_TYPE *chanMap)
 {
 	memset(out, 0, sizeof(float) * nbSample * 2);
 
 	for (int i = 0; i < nbSample; i++) {
 		for (int c = 0; c < chan; c++) {
-			switch (ch_route.input_type[c]) {
+			switch (chanMap[c]) {
 				case CH_MONO:
 				case CH_FRONT_CENTER:
 				case CH_REAR_CENTER:
@@ -168,13 +169,13 @@ static int MStereo(float *in,float *out,uint32_t nbSample,uint32_t chan)
 	return nbSample*2;
 }
 
-static int M2F1R(float *in,float *out,uint32_t nbSample,uint32_t chan)
+static int M2F1R(float *in,float *out,uint32_t nbSample,uint32_t chan,CHANNEL_TYPE *chanMap)
 {
 	memset(out, 0, sizeof(float) * nbSample * 3);
 
 	for (int i = 0; i < nbSample; i++) {
 		for (int c = 0; c < chan; c++) {
-			switch (ch_route.input_type[c]) {
+			switch (chanMap[c]) {
 				case CH_MONO:
 				case CH_FRONT_CENTER:
 					out[0]  += *in * 0.707;
@@ -213,13 +214,13 @@ static int M2F1R(float *in,float *out,uint32_t nbSample,uint32_t chan)
 	return nbSample * 3;
 }
 
-static int M3F(float *in,float *out,uint32_t nbSample,uint32_t chan)
+static int M3F(float *in,float *out,uint32_t nbSample,uint32_t chan,CHANNEL_TYPE *chanMap)
 {
 	memset(out, 0, sizeof(float) * nbSample * 3);
 
 	for (int i = 0; i < nbSample; i++) {
 		for (int c = 0; c < chan; c++) {
-			switch (ch_route.input_type[c]) {
+			switch (chanMap[c]) {
 				case CH_MONO:
 				case CH_FRONT_CENTER:
 				case CH_REAR_CENTER:
@@ -249,13 +250,13 @@ static int M3F(float *in,float *out,uint32_t nbSample,uint32_t chan)
 	return nbSample * 3;
 }
 
-static int M3F1R(float *in,float *out,uint32_t nbSample,uint32_t chan)
+static int M3F1R(float *in,float *out,uint32_t nbSample,uint32_t chan,CHANNEL_TYPE *chanMap)
 {
 	memset(out, 0, sizeof(float) * nbSample * 4);
 
 	for (int i = 0; i < nbSample; i++) {
 		for (int c = 0; c < chan; c++) {
-			switch (ch_route.input_type[c]) {
+			switch (chanMap[c]) {
 				case CH_MONO:
 				case CH_FRONT_CENTER:
 					out[3]  += *in;
@@ -294,13 +295,13 @@ static int M3F1R(float *in,float *out,uint32_t nbSample,uint32_t chan)
 	return nbSample * 4;
 }
 
-static int M2F2R(float *in,float *out,uint32_t nbSample,uint32_t chan)
+static int M2F2R(float *in,float *out,uint32_t nbSample,uint32_t chan,CHANNEL_TYPE *chanMap)
 {
 	memset(out, 0, sizeof(float) * nbSample * 4);
 
 	for (int i = 0; i < nbSample; i++) {
 		for (int c = 0; c < chan; c++) {
-			switch (ch_route.input_type[c]) {
+			switch (chanMap[c]) {
 				case CH_MONO:
 				case CH_FRONT_CENTER:
 					out[0]  += *in * 0.707;
@@ -345,13 +346,13 @@ static int M2F2R(float *in,float *out,uint32_t nbSample,uint32_t chan)
 	return nbSample * 4;
 }
 
-static int M3F2R(float *in,float *out,uint32_t nbSample,uint32_t chan)
+static int M3F2R(float *in,float *out,uint32_t nbSample,uint32_t chan,CHANNEL_TYPE *chanMap)
 {
 	memset(out, 0, sizeof(float) * nbSample * 5);
 
 	for (int i = 0; i < nbSample; i++) {
 		for (int c = 0; c < chan; c++) {
-			switch (ch_route.input_type[c]) {
+			switch (chanMap[c]) {
 				case CH_MONO:
 				case CH_FRONT_CENTER:
 					out[4]  += *in;
@@ -396,13 +397,13 @@ static int M3F2R(float *in,float *out,uint32_t nbSample,uint32_t chan)
 	return nbSample * 5;
 }
 
-static int M3F2RLFE(float *in,float *out,uint32_t nbSample,uint32_t chan)
+static int M3F2RLFE(float *in,float *out,uint32_t nbSample,uint32_t chan,CHANNEL_TYPE *chanMap)
 {
 	memset(out, 0, sizeof(float) * nbSample * 6);
 
 	for (int i = 0; i < nbSample; i++) {
 		for (int c = 0; c < chan; c++) {
-			switch (ch_route.input_type[c]) {
+			switch (chanMap[c]) {
 				case CH_MONO:
 				case CH_FRONT_CENTER:
 					out[4]  += *in;
@@ -443,13 +444,13 @@ static int M3F2RLFE(float *in,float *out,uint32_t nbSample,uint32_t chan)
 	return nbSample * 6;
 }
 
-static int MDolbyProLogic(float *in,float *out,uint32_t nbSample,uint32_t chan)
+static int MDolbyProLogic(float *in,float *out,uint32_t nbSample,uint32_t chan,CHANNEL_TYPE *chanMap)
 {
 	memset(out, 0, sizeof(float) * nbSample * 2);
 
 	for (int i = 0; i < nbSample; i++) {
 		for (int c = 0; c < chan; c++) {
-			switch (ch_route.input_type[c]) {
+			switch (chanMap[c]) {
 				case CH_MONO:
 				case CH_FRONT_CENTER:
 				case CH_LFE:
@@ -487,13 +488,13 @@ static int MDolbyProLogic(float *in,float *out,uint32_t nbSample,uint32_t chan)
 	return nbSample*2;
 }
 
-static int MDolbyProLogic2(float *in,float *out,uint32_t nbSample,uint32_t chan)
+static int MDolbyProLogic2(float *in,float *out,uint32_t nbSample,uint32_t chan,CHANNEL_TYPE *chanMap)
 {
 	memset(out, 0, sizeof(float) * nbSample * 2);
 
 	for (int i = 0; i < nbSample; i++) {
 		for (int c = 0; c < chan; c++) {
-			switch (ch_route.input_type[c]) {
+			switch (chanMap[c]) {
 				case CH_MONO:
 				case CH_FRONT_CENTER:
 				case CH_LFE:
@@ -538,7 +539,7 @@ static int MDolbyProLogic2(float *in,float *out,uint32_t nbSample,uint32_t chan)
 }
 
 
-typedef int MIXER(float *in,float *out,uint32_t nbSample,uint32_t chan)  ;
+typedef int MIXER(float *in,float *out,uint32_t nbSample,uint32_t chan,CHANNEL_TYPE *chanMap)  ;
 
 static MIXER *matrixCall[CHANNEL_LAST] = {
 NULL, MNto1, MStereo, M2F1R, M3F, M3F1R, M2F2R, M3F2R, M3F2RLFE, MDolbyProLogic, MDolbyProLogic2
@@ -586,13 +587,15 @@ uint32_t AUDMAudioFilterMixer::fill(uint32_t max,float *output,AUD_Status *statu
     
 
     // Now do the downsampling
-	if (_output == CHANNEL_INVALID || ch_route.compareChType(&_wavHeader, _previous->getInfo())) {
-		ch_route.copy = 1;
+	if (_output == CHANNEL_INVALID || true==ADM_audioCompareChannelMapping(&_wavHeader, _previous->getInfo(),
+			_previous->getChannelMapping(),outputChannelMapping))
+	{
+		
 		rd= (uint32_t)MCOPY(&_incomingBuffer[_head],output,available,input_channels);
-	} else {
-		ch_route.copy = 0;
+	} else 
+	{
 		MIXER *call=matrixCall[_output];
-		rd= (uint32_t)call(&_incomingBuffer[_head],output,available,input_channels);
+		rd= (uint32_t)call(&_incomingBuffer[_head],output,available,input_channels,_previous->getChannelMapping());
 	}
 
     _head+=available*input_channels;

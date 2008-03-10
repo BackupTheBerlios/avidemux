@@ -1,13 +1,11 @@
 /** *************************************************************************
              
-    \fn ADM_default.h
-    \brief include that file to get most of the basic types & functions
+    \fn ADM_filest.h
+    \brief Helpers function to access configuration files
                       
     copyright            : (C) 2008 by mean
     
  ***************************************************************************/
-
-
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -16,23 +14,20 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifndef ADM_DEFAULT_H
-#define ADM_DEFAULT_H
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "ADM_coreConfig.h"
-#include "ADM_inttype.h"
-#include "ADM_assert.h"
-
+#ifndef ADM_FILES_H
+#define ADM_FILES_H
+// Returns dir to ~/.avidemux, no need to free it
+char *ADM_getBaseDir(void);
+// Returns dir to ~/.avidemux/jobs, no need to free it
+char *ADM_getJobDir(void);
+// Returns dir to ~/.avidemux/custom, no need to free it
+char *ADM_getCustomDir(void);
 #ifdef __cplusplus
-#include "ADM_cpuCap.h"
-#include "ADM_clock.h"
-#include "ADM_misc.h"
+/* Returns the full path relative to install dir i.e. /usr +base1/base2, needs to be deleted [] by caller */
+char *ADM_getInstallRelativePath(const char *base1, const char *base2=NULL,const char *base3=NULL);
+/* Returns the full path relative to .avidemux dir i.e. /home/fx/... +base1/base2 needs to be deleted []*/
+char *ADM_getHomeRelativePath(const char *base1, const char *base2=NULL,const char *base3=NULL);
 #endif
+uint8_t buildDirectoryContent(uint32_t *outnb,const char *base, char *jobName[],int maxElems,const char *ext);
 
-#include "ADM_mangle.h"
-#include "ADM_files.h"
 #endif

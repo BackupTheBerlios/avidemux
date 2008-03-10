@@ -12,15 +12,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "ADM_default.h"
 #include <math.h>
-
-#include "ADM_assert.h"
-
 
 #include "avifmt.h"
 #include "avifmt2.h"
@@ -177,5 +171,15 @@ uint8_t AUDMAudioFilter_Bridge::fillIncomingBuffer(AUD_Status *status)
   }
   return 1;
 }
-
+/**
+ * 	\fn return _incoming->getChannelMapping();
+ * \brief since it is a bridge, we translate the filter channel mapping from the audiostream channel mapping
+ */
+CHANNEL_TYPE *AUDMAudioFilter_Bridge::getChannelMapping(void) 
+{
+	ADM_assert(_incoming);
+	CHANNEL_TYPE *chan=_incoming->getChannelMapping();
+	ADM_assert(chan);
+	return chan;
+}
 //EOF

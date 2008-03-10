@@ -38,8 +38,7 @@ AUDMEncoder::AUDMEncoder(AUDMAudioFilter *in)  :AVDMGenericAudioStream  ()
   tmpbuffer=new float[_wavheader->frequency*_wavheader->channels];
   tmphead=tmptail=0;
   eof_met=0;
-  ch_order[0] = CH_FRONT_LEFT;
-  ch_order[1] = CH_FRONT_RIGHT;
+  
 };
 /********************/
 AUDMEncoder::~AUDMEncoder()
@@ -134,27 +133,29 @@ void dither16(float *start, uint32_t len, uint8_t channels)
 			nr = 0;
 	}
 }
-
-void AUDMEncoder::reorderChannels(float *data, uint32_t nb)
+/**
+ * 	\fn reorderChannels
+ *  \brief Reorder the channels
+ */
+void AUDMEncoder::reorderChannels(float *data, uint32_t nb,CHANNEL_TYPE *input,CHANNEL_TYPE *output)
 {
 	float tmp [_wavheader->channels];
 	static uint8_t reorder[MAX_CHANNELS];
 	static bool reorder_on;
 	
-	if (ch_route.mode < 1) {
+	
 		reorder_on = 0;
 		int j = 0;
-
-		if (_wavheader->channels > 2) {
+		// Should we reorder the channels (might be needed for encoder ?
+		if (_wavheader->channels > 2) 
+		{
 			CHANNEL_TYPE *p_ch_type;
-			if (ch_route.copy)
- 				p_ch_type = ch_route.input_type;
-			else
- 				p_ch_type = ch_route.output_type;
-
-			for (int i = 0; i < MAX_CHANNELS; i++) {
-				for (int c = 0; c < _wavheader->channels; c++) {
-					if (p_ch_type[c] == ch_order[i]) {
+			for (int i = 0; i < _wavheader->channels; i++) 
+			{
+				for (int c = 0; c < _wavheader->channels; c++) 
+				{
+					if (input[c] == output[i]) 
+					{
 						if (j != c)
 							reorder_on = 1;
 						reorder[j++] = c;
@@ -162,9 +163,7 @@ void AUDMEncoder::reorderChannels(float *data, uint32_t nb)
 				}
 			}
 		}
-		if (ch_route.mode == 0)
-			ch_route.mode = 1;
-	}
+	
 
 	if (reorder_on)
 		for (int i = 0; i < nb; i++) {

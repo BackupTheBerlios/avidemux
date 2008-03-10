@@ -56,12 +56,12 @@ AUDMEncoder_Vorbis::AUDMEncoder_Vorbis(AUDMAudioFilter * instream)  :AUDMEncoder
   _wavheader->encoding=WAV_OGG;
   _oldpos=0;
   _handle=(void *)new  vorbisStruct; 
-  ch_order[0] = CH_FRONT_LEFT;
-  ch_order[1] = CH_FRONT_RIGHT;
-  ch_order[2] = CH_REAR_LEFT;
-  ch_order[3] = CH_REAR_RIGHT;
-  ch_order[4] = CH_FRONT_CENTER;
-  ch_order[5] = CH_LFE;
+  outputChannelMapping[0] = CH_FRONT_LEFT;
+  outputChannelMapping[1] = CH_FRONT_RIGHT;
+  outputChannelMapping[2] = CH_REAR_LEFT;
+  outputChannelMapping[3] = CH_REAR_RIGHT;
+  outputChannelMapping[4] = CH_FRONT_CENTER;
+  outputChannelMapping[5] = CH_LFE;
 };
 
 
@@ -228,7 +228,7 @@ uint8_t	AUDMEncoder_Vorbis::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sa
     float_samples=vorbis_analysis_buffer(&VD, nbSample) ;
     int index=tmphead;
     // Put our samples in incoming buffer
-    reorderChannels(&(tmpbuffer[tmphead]), nbSample);
+    reorderChannels(&(tmpbuffer[tmphead]), nbSample,_incoming->getChannelMapping(),outputChannelMapping);
     for (int i = 0; i < nbSample; i++)
       for (int j = 0; j < _wavheader->channels; j++) {
       float_samples[j][i] = tmpbuffer[index++];

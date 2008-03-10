@@ -31,6 +31,7 @@ class AUDMAudioFilter_Bridge : public AUDMAudioFilter
                                                                                            // Output MAXIMUM max float value
                                                                                            // Not sample! float!
     virtual    uint8_t    rewind(void)  ;                                              // go back to the beginning
+    virtual CHANNEL_TYPE *getChannelMapping(void);
 };
 
 

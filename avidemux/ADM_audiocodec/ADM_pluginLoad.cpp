@@ -44,7 +44,7 @@ std::vector<ADM_ad_plugin *> ADM_audioPlugins;
 static uint8_t tryLoadingAudioPlugin(const char *file)
 {
 	ADM_ad_plugin blank;
-	printf("[ADM_ad_plugin] Scanning %s\n",ADM_GetFileName(file));
+	//printf("[ADM_ad_plugin] Scanning %s\n",ADM_GetFileName(file));
 	ADM_LibWrapper *wrapper=new ADM_LibWrapper;
 	 if(true!=wrapper->loadLibrary(file))
 	 {
@@ -91,10 +91,9 @@ Err_ad:
  * 	\fn ADM_ad_loadPlugins
  *  \brief load all audio plugins
  */
-uint8_t ADM_ad_loadPlugins(void)
+uint8_t ADM_ad_loadPlugins(const char *path)
 {
 #define MAX_EXTERNAL_FILTER 50
-	  char *path="/home/fx/ADM_plugins";
 	  char *files[MAX_EXTERNAL_FILTER];
 	  uint32_t nbFile;
 	  

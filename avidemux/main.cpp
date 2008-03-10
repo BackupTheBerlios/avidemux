@@ -74,7 +74,7 @@ extern void ADM_memStat( void );
 extern void ADM_memStatInit( void );
 extern void ADM_memStatEnd( void );
 extern void getUIDescription(char*);
-extern uint8_t ADM_ad_loadPlugins(void);
+extern uint8_t ADM_ad_loadPlugins(const char *path);
 
 #ifdef __MINGW32__
 extern EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, void* pEstablisherFrame, struct _CONTEXT* pContextRecord, void* pDispatcherContext);
@@ -236,8 +236,19 @@ int main(int argc, char *argv[])
 	}
 	
 	ADM_dealloc(dynloadPath);
-	// Load audio codec plugin
-	ADM_ad_loadPlugins();
+	//***************Plugins *********************
+	// Load system wide audio decoder plugin
+	char *adPlugins=ADM_getInstallRelativePath("lib","ADM_plugins","audioDecoder");
+	ADM_ad_loadPlugins(adPlugins);
+	delete [] adPlugins;
+	// load local audio decoder plugins
+	adPlugins=ADM_getHomeRelativePath("plugins","audioDecoder");
+	ADM_ad_loadPlugins(adPlugins);
+	delete [] adPlugins;
+	//***************Plugins *********************
+	
+	
+	
     ADM_lavInit();
 #ifdef HAVE_AUDIO
     AVDM_audioInit();

@@ -1,6 +1,8 @@
 #ifndef ADM_CORE_H
 #define ADM_CORE_H
 
+#define ADM_INSTALL_DIR "${ADM_INSTALL_DIR}"
+
 // GCC - CPU
 #cmakedefine ADM_BIG_ENDIAN
 #cmakedefine ADM_CPU_64BIT

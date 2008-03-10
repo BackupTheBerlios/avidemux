@@ -21,19 +21,11 @@ to generic audio stream
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-//#include <stream.h>
-#include "ADM_assert.h"
+#include "ADM_default.h"
 #include <math.h>
-#include "config.h"
 #include "avifmt.h"
 #include "avifmt2.h"
 
-#include "fourcc.h"
-
-//#include "aviaudio.hxx"
 
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_editor/ADM_edAudio.hxx"
@@ -51,7 +43,15 @@ uint8_t		AVDMEditAudioStream::flushPacket(void)
 }
 // Build information
 //
-
+CHANNEL_TYPE *AVDMEditAudioStream::getChannelMapping(void)
+{
+#if 0
+	return _father->getChannelMapping();
+#else
+	return AVDMGenericAudioStream::getChannelMapping();
+#endif
+	
+}
 AVDMEditAudioStream::AVDMEditAudioStream (ADM_Composer * father)
 {
   uint32_t l = 0;

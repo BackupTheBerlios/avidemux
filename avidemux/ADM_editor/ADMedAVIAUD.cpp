@@ -47,6 +47,14 @@ uint8_t		 ADM_Composer::audioFlushPacket(void)
 	return 1;
 
 }
+#if 0
+CHANNEL_TYPE *ADM_Composer::getChannelMapping(void)
+{
+	_VIDEOS *currentVideo;
+		currentVideo=&_videos[AUDIOSEG];
+		return currentVideo->_audiostream->getChannelMapping();
+}
+#endif
 uint8_t ADM_Composer::getAudioPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
 uint8_t r;	

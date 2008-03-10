@@ -40,18 +40,18 @@ AUDMEncoder_Faac::AUDMEncoder_Faac(AUDMAudioFilter * instream)  :AUDMEncoder    
   channels=instream->getInfo()->channels;
   switch(channels)
   {
-    case 1:ch_order[1] = CH_FRONT_LEFT;break;
+    case 1:outputChannelMapping[1] = CH_FRONT_LEFT;break;
     case 2:
-      ch_order[0] = CH_FRONT_LEFT;
-      ch_order[1] = CH_FRONT_RIGHT;
+    	outputChannelMapping[0] = CH_FRONT_LEFT;
+    	outputChannelMapping[1] = CH_FRONT_RIGHT;
       break;
     default :
-      ch_order[0] = CH_FRONT_CENTER;
-      ch_order[1] = CH_FRONT_LEFT;
-      ch_order[2] = CH_FRONT_RIGHT;
-      ch_order[3] = CH_REAR_LEFT;
-      ch_order[4] = CH_REAR_RIGHT;
-      ch_order[5] = CH_LFE;
+    	outputChannelMapping[0] = CH_FRONT_CENTER;
+    	outputChannelMapping[1] = CH_FRONT_LEFT;
+    	outputChannelMapping[2] = CH_FRONT_RIGHT;
+    	outputChannelMapping[3] = CH_REAR_LEFT;
+    	outputChannelMapping[4] = CH_REAR_RIGHT;
+    	outputChannelMapping[5] = CH_LFE;
   }
 };
 
@@ -207,7 +207,7 @@ _again:
           return 0; 
         }
         ADM_assert(tmptail>=tmphead);
-        reorderChannels(&(tmpbuffer[tmphead]),*samples);
+        reorderChannels(&(tmpbuffer[tmphead]),*samples,_incoming->getChannelMapping(),outputChannelMapping);
         *len = faacEncEncode(_handle, (int32_t *)&(tmpbuffer[tmphead]), _chunk, dest, FA_BUFFER_SIZE);
         if(!*len) 
         {

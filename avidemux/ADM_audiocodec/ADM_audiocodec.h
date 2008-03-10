@@ -16,6 +16,7 @@
  ***************************************************************************/
 #ifndef ADMAUDIOCODEC
 #define ADMAUDIOCODEC
+
 #define SCRATCH_PAD_SIZE (100*1000*2)
 extern uint8_t scratchPad[];
 #define  ADMAC_BUFFER (48000*4)
@@ -33,6 +34,8 @@ class ADM_Audiocodec
 		virtual	uint8_t run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut)=0;
 		virtual	uint8_t isCompressed(void)=0;
 		virtual	uint8_t isDecompressable(void)=0;
+		// Channel mapping, only input is used by the decoders..
+		CHANNEL_TYPE channelMapping[MAX_CHANNELS];
  };
 
 ADM_Audiocodec	*getAudioCodec(uint32_t fourcc, WAVHeader *info, uint32_t extra=0, uint8_t *extraData=NULL);

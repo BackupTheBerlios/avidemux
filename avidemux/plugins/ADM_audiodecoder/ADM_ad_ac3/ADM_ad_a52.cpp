@@ -16,7 +16,7 @@
  ***************************************************************************/
 #include "ADM_default.h"
 #include "ADM_ad_plugin.h"
-#include "ADM_audiofilter/audiofilter_channel_route.h"
+
 #ifdef USE_AC3
 extern "C" {
 #include "ADM_liba52/a52.h"
@@ -131,8 +131,8 @@ uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   u
             break;
         }
 
-	if (ch_route.mode < 1) {
-		CHANNEL_TYPE *p_ch_type = ch_route.input_type;
+
+		CHANNEL_TYPE *p_ch_type = channelMapping;
 		if (flags & A52_LFE) {
 			*(p_ch_type++) = CH_LFE;
 		}
@@ -177,7 +177,7 @@ uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   u
 			default:
 				ADM_assert(0);
 		}
-	}
+	
 
         sample_t level = 1, bias = 0;
 

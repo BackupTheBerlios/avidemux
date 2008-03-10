@@ -29,6 +29,12 @@
 #include "ADM_toolkit/filesel.h"
 #include "ADM_toolkit/toolkit.hxx"
 
+#if defined(__WIN32)
+  static const char *separator="\\"; 
+#else
+  static const char *separator="/";
+#endif
+
 #undef fread
 #undef fwrite
 #undef fopen
@@ -62,12 +68,12 @@ int    ADM_fclose (FILE *file)
   return fclose(file); 
 }
 //*****************************
-static char basedir[1024]={0};
-static char jobdir[1024]={0};
-static char customdir[1024]={0};
-int baseDirDone=0;
-int jobDirDone=0;
-int customDirDone=0;
+static char ADM_basedir[1024]={0};
+static char *ADM_jobdir=NULL;
+static char *ADM_customdir=NULL;
+static int baseDirDone=0;
+
+
 #ifdef __WIN32
 const char *ADM_DIR_NAME="\\avidemux";
 #else
@@ -82,23 +88,15 @@ const char *ADM_DIR_NAME="/.avidemux";
 
 char *ADM_getCustomDir(void)
 {
-  if(customDirDone) return customdir;
-
-  char *rootDir;
-  rootDir=ADM_getBaseDir();
-  strncpy(customdir,rootDir,1023);
-#if defined(__WIN32)
-  strcat(customdir,"\\custom"); 
-#else
-  strcat(customdir,"/custom");
-#endif
-  if(!ADM_mkdir(customdir))
+  if(ADM_customdir) return ADM_customdir;
+  ADM_customdir=ADM_getHomeRelativePath("custom");
+  
+  if(!ADM_mkdir(ADM_customdir))
   {
-    GUI_Error_HIG("Oops","can't create custom directory (%s).",customdir);
-                return NULL;
+	  printf("can't create custom directory (%s).\n",ADM_customdir);
+      return NULL;
   }
-  customDirDone=1;
-  return customdir;
+  return ADM_customdir;
 }
 /*
       Get the  directory where jobs are stored
@@ -106,23 +104,59 @@ char *ADM_getCustomDir(void)
 
 char *ADM_getJobDir(void)
 {
-  if(jobDirDone) return jobdir;
+	  if(ADM_jobdir) return ADM_jobdir;
+	  ADM_jobdir=ADM_getHomeRelativePath("jobs");
+	  
+	  if(!ADM_mkdir(ADM_jobdir))
+	  {
+		  printf("can't create custom directory (%s).\n",ADM_jobdir);
+	      return NULL;
+	  }
+	  return ADM_jobdir;
+}
+/**
+ * 	\fn ADM_getRelativePath
+ */
+static char *ADM_getRelativePath(const char *base0,const char *base1, const char *base2,const char *base3)
+{
+	char *result;
+	int length=strlen(base1);
+	if(base2) length+=strlen(base2);
+	if(base3) length+=strlen(base3);
 
-  char *rootDir;
-  rootDir=ADM_getBaseDir();
-  strncpy(jobdir,rootDir,1023);
-#if defined(__WIN32)
-  strcat(jobdir,"\\jobs"); 
-#else
-  strcat(jobdir,"/jobs");
-#endif
-  if(!ADM_mkdir(jobdir))
-  {
-    GUI_Error_HIG("Oops","can't create job directory (%s).",jobdir);
-                return NULL;
-  }
-  jobDirDone=1;
-  return jobdir;
+	
+	
+	length+=strlen(base0);
+	length+=5; // Slashes + end 0
+	result=(char *)new char [length];
+	strcpy(result,base0);
+	strcat(result,separator);
+		
+	strcat(result,base1);
+	strcat(result,separator);
+	if(base2)
+	{
+		strcat(result,base2);
+		strcat(result,separator);
+		if(base3)
+		{
+			strcat(result,base3);
+			strcat(result,separator);
+		}
+	}
+	return result;
+}
+/**
+ * 	\fn char *ADM_getHomeRelativePath(const char *base1, const char *base2=NULL,const char *base3=NULL);
+ *  \brief Returns home directory +base 1 + base 2... The return value is a copy, and must be deleted []
+ */
+char *ADM_getHomeRelativePath(const char *base1, const char *base2,const char *base3)
+{
+	return ADM_getRelativePath(ADM_getBaseDir(),base1,base2,base3);
+}
+char *ADM_getInstallRelativePath(const char *base1, const char *base2,const char *base3)
+{
+	return ADM_getRelativePath(ADM_INSTALL_DIR,base1,base2,base3);
 }
 /*
       Get the root directory for .avidemux stuff
@@ -133,7 +167,7 @@ char *dirname=NULL;
 DIR *dir=NULL;
 char *home;
 //
-        if(baseDirDone) return basedir;
+        if(baseDirDone) return ADM_basedir;
 // Get the base directory
 #if defined(__WIN32)
         if( ! (home=getenv("USERPROFILE")) )
@@ -163,11 +197,11 @@ char *home;
         delete [] dirname;
 
         // Now built the filename
-        strncpy(basedir,home,1023);
-        strncat(basedir,ADM_DIR_NAME,1023-strlen(basedir));
+        strncpy(ADM_basedir,home,1023);
+        strncat(ADM_basedir,ADM_DIR_NAME,1023-strlen(ADM_basedir));
         baseDirDone=1;
-        printf("Using %s as base directory for prefs/jobs/...\n",basedir);
-        return basedir;
+        printf("Using %s as base directory for prefs/jobs/...\n",ADM_basedir);
+        return ADM_basedir;
 }
 /*----------------------------------------
       Create a directory
@@ -206,6 +240,11 @@ DIR *dir=NULL;
               closedir(dir); 
               return 1;
 }
+/**
+ *  \fn buildDirectoryContent
+ * 	\brief Returns the content of a dir with the extension ext. The receiving array must be allocated by caller
+ * (just the array, not the names themselves)
+ */
 uint8_t buildDirectoryContent(uint32_t *outnb,const char *base, char *jobName[],int maxElems,const char *ext)
 {
 

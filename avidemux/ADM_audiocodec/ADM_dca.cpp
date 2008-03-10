@@ -14,17 +14,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
 #include <math.h>
 
 #include "config.h"
-#include "fourcc.h"
+#include "ADM_default.h"
+
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiocodec/ADM_audiocodec.h"
-#include "ADM_audiofilter/audiofilter_channel_route.h"
 
 #include "prefs.h"
 

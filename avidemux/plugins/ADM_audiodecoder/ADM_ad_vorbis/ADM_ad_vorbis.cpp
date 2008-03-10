@@ -27,7 +27,7 @@
  ***************************************************************************/
 #include "ADM_default.h"
 #include "ADM_ad_plugin.h"
-#include "ADM_audiofilter/audiofilter_channel_route.h"
+
 
 #include <vorbis/codec.h>
 #include "ADM_ad_vorbis.h"
@@ -158,12 +158,12 @@ DECLARE_AUDIO_DECODER(ADM_vorbis,						// Class
 	STRUCT->ampscale=1;
 	_init=1;
 
-	ch_route.input_type[0] = CH_FRONT_LEFT;
-	ch_route.input_type[1] = CH_FRONT_RIGHT;
-	ch_route.input_type[2] = CH_REAR_LEFT;
-	ch_route.input_type[3] = CH_REAR_RIGHT;
-	ch_route.input_type[4] = CH_FRONT_CENTER;
-	ch_route.input_type[5] = CH_LFE;
+	channelMapping[0] = CH_FRONT_LEFT;
+	channelMapping[1] = CH_FRONT_RIGHT;
+	channelMapping[2] = CH_REAR_LEFT;
+	channelMapping[3] = CH_REAR_RIGHT;
+	channelMapping[4] = CH_FRONT_CENTER;
+	channelMapping[5] = CH_LFE;
  }
  // This codec expects more or less one packet at a time !
  

@@ -6,5 +6,5 @@ ADD_LIBRARY(ADM_ad_a52 SHARED ${ADM_ad_a52_SRCS})
 TARGET_LINK_LIBRARIES(ADM_ad_a52 ADM_liba52)
 
 # FIXME
-ADD_TARGET_CFLAGS(ADM_ad_a52 "-I${CMAKE_BINARY_DIR}/config/cli")
-ADD_TARGET_CFLAGS(ADM_ad_a52 "-I${CMAKE_SOURCE_DIR}/avidemux/ADM_audiocodec")
+INCLUDE(ad_plugin)
+ADM_audio_plugin(ADM_ad_a52)

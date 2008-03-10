@@ -77,6 +77,7 @@ typedef struct
 class AVDMGenericAudioStream
 {
    	protected:
+   				
     #define SIZE_INTERNAL 64*1024 
 					uint8_t 	internalBuffer[2 * SIZE_INTERNAL];
 					float 	internalBuffer_float[SIZE_INTERNAL];
@@ -163,10 +164,14 @@ class AVDMGenericAudioStream
 										uint32_t *samples);
 		// Return 1 if needs special muxing mode (AAC)			
 			virtual uint8_t packetPerFrame( void)	{return 0;} 
+				// The channel mapping for this stream
+				// Only used by decoder...
+			virtual CHANNEL_TYPE *getChannelMapping(void) {if(_codec) return _codec->channelMapping; else return NULL;}
 }
 ;
+/* Describe the channel mapping */
 
-
+//
 uint8_t mpegAudioIdentify(uint8_t *ptr, uint32_t maxLookUp, WAVHeader *header, uint8_t *tokens=NULL);
 
 #endif

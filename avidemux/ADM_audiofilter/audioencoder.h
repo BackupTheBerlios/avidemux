@@ -16,7 +16,6 @@
   \param param : An opaque structure that contains the codec specific configuration datas
 */
 #include "audioeng_buildfilters.h"
-#include "audiofilter_channel_route.h"
 
 typedef struct ADM_audioEncoderDescriptor
 {
@@ -56,10 +55,12 @@ class AUDMEncoder : public AVDMGenericAudioStream
     float          *tmpbuffer;
     uint8_t        refillBuffer(int minimum); // Mininum is in float
 
-    CHANNEL_TYPE ch_order[MAX_CHANNELS];
-    void reorderChannels(float *start, uint32_t nb);
+    
+    void reorderChannels(float *data, uint32_t nb,CHANNEL_TYPE *input,CHANNEL_TYPE *output);
 
     uint32_t       tmphead,tmptail;
+    // The encoder can remap the audio channel (or not). If so, let's store the the configuration here
+    CHANNEL_TYPE outputChannelMapping[MAX_CHANNELS];
   public:
     //
     uint32_t read(uint32_t len,uint8_t *buffer);
