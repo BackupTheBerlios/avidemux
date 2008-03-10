@@ -21,6 +21,7 @@
 
 #define ADM_LEGACY_PROGGY
 #include "ADM_default.h"
+
 #include <signal.h>
 #include <setjmp.h>
 #include <unistd.h>

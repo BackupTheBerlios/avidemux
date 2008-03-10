@@ -15,12 +15,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "ADM_default.h"
+#include "config.h"
 
+#ifdef USE_FREETYPE
 #include <iconv.h>
 
- #ifdef USE_FREETYPE
-
+#include "ADM_default.h"
 #include "ADM_vidFont.h"
 
 static    FT_Library   	library;   		/* handle to library     */

@@ -250,8 +250,6 @@ EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, 
 	if (myFatalFunction)
 		myFatalFunction("Crash", "Press OK to build crash info");
 
-	GUI_Error_HIG(QT_TR_NOOP("Fatal Error"),QT_TR_NOOP("A fatal error has occurred.\n\nClick OK to generate debug information. This may take a few minutes to complete."));
-
 	void* currentProcessId = GetCurrentProcess();
 
 	SymInitialize(currentProcessId, NULL, TRUE);

@@ -20,6 +20,7 @@
 #include "ui_srt.h"
 #undef Ui_Dialog
 
+#include "config.h"
 #include "ADM_default.h"
 
 #include "ADM_toolkit/toolkit.hxx"

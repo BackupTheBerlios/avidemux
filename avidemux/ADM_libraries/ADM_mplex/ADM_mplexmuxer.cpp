@@ -21,15 +21,10 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 
 #include "ADM_default.h"
 #include "ADM_threads.h"
-
 
 #include "interact.hpp"
 

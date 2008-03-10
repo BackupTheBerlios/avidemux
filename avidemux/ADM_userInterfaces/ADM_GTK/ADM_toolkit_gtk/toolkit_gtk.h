@@ -14,9 +14,8 @@
  ***************************************************************************/
 #ifndef ADM_TLK_GTK
 #define ADM_TLK_GTK
-#include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+
 #include <glib.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>

@@ -17,9 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "config.h"
 #include "ADM_default.h"
-
-#include "ADM_assert.h"
 
 #include "DIA_resizeWiz.h"
 #include "DIA_factory.h"

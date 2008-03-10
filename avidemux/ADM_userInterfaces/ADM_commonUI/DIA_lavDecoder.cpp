@@ -12,6 +12,7 @@
 //
 //
 
+#include "config.h"
 #include "ADM_default.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 

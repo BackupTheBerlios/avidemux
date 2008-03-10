@@ -14,8 +14,8 @@
  *   (at your option) any later version.                                   *
  ***************************************************************************/
 
-#ifndef __CLK__
-#define __CLK__
+#ifndef ADM_CLOCK_H
+#define ADM_CLOCK_H
 class Clock
 {
 	private: uint32_t _startTime;

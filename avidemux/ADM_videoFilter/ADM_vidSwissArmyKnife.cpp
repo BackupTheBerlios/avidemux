@@ -27,7 +27,6 @@
 #include <fstream>
 #include <iterator>
 
-#include "ADM_assert.h"
 #include "fourcc.h"
 #include "avi_vars.h"
 

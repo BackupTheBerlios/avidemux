@@ -15,6 +15,7 @@
  ***************************************************************************/
 #include "config.h"
 #include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "ADM_default.h"
 
 GtkWidget		*create_filterMain (void);
 GtkListStore 	*storeMainFilter;

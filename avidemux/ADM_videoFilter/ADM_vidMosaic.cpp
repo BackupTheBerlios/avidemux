@@ -14,6 +14,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 #include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
@@ -21,7 +22,6 @@
 #include "ADM_video/ADM_vidCommonFilter.h"
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
-
 
 #ifdef ADM_CPU_X86
 extern "C" {
@@ -33,11 +33,8 @@ extern "C" {
 #include "ADM_libraries/ADM_libswscale/swscale.h"
 
 #include "ADM_filter/video_filters.h"
-
 #include "ADM_video/ADM_cache.h"
-
 #include "ADM_vidMosaic_param.h"
-
 
 class  ADMVideoMosaic:public AVDMGenericVideoStream
  {

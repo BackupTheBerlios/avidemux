@@ -21,14 +21,14 @@
 #include <string.h>
 #include <math.h>
 
+#include "config.h"
 #include "ADM_default.h"
 #include "ADM_threads.h"
-
 
 extern "C" {
 #include "ADM_lavcodec.h"
 };
-#include "ADM_default.h"
+
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_toolkit/toolkit.hxx"

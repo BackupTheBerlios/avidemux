@@ -126,7 +126,6 @@ CHECK_FUNCTION_EXISTS(gettimeofday HAVE_GETTIMEOFDAY)
 CHECK_INCLUDE_FILES(inttypes.h   HAVE_INTTYPES_H)	# internal use, mpeg2enc, mplex
 CHECK_INCLUDE_FILES(stdint.h     HAVE_STDINT_H)		# internal use, mpeg2enc, mplex
 CHECK_INCLUDE_FILES(sys/types.h  HAVE_SYS_TYPES_H)	# mad, mpeg2enc
-CHECK_INCLUDE_FILES(unistd.h     HAVE_UNISTD_H)		# internal use, ass, mad
 CHECK_INCLUDE_FILES(malloc.h     HAVE_MALLOC_H)		# libavcodec, libavutil, libpostproc, libswscale, mplex
 
 MESSAGE("")
@@ -145,16 +144,19 @@ MESSAGE("")
 ########################################
 # Generate config.h
 ########################################
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/cmake/ADM_coreConfig.h.cmake" "${CMAKE_BINARY_DIR}/config/ADM_coreConfig.h")
+MESSAGE(STATUS "ADM_coreConfig.h generated")
+
 SET(CONFIG_HEADER_TYPE ADM_BUILD_CLI)
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/cmake/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config/cli/config.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/cmake/config.h.cmake" "${CMAKE_BINARY_DIR}/config/cli/config.h")
 MESSAGE(STATUS "CLI config.h generated")
 
 SET(CONFIG_HEADER_TYPE ADM_BUILD_GTK)
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/cmake/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config/gtk/config.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/cmake/config.h.cmake" "${CMAKE_BINARY_DIR}/config/gtk/config.h")
 MESSAGE(STATUS "GTK config.h generated")
 
 SET(CONFIG_HEADER_TYPE ADM_BUILD_QT4)
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/cmake/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config/qt4/config.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/cmake/config.h.cmake" "${CMAKE_BINARY_DIR}/config/qt4/config.h")
 MESSAGE(STATUS "Qt4 config.h generated")
 
 ########################################

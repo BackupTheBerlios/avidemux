@@ -5,14 +5,13 @@
 //
 //
 
-#include "ADM_default.h"
+#include "config.h"
 
-#include "ADM_toolkit/toolkit.hxx"
-
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 #ifdef USE_XVID_4
+#include "ADM_default.h"
+#include "ADM_toolkit/toolkit.hxx"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
-
 #include "ADM_codecs/ADM_xvid4param.h"
 /**
       \fn getFFCompressParams

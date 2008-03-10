@@ -6,6 +6,11 @@
     
  ***************************************************************************/
 
+#ifndef ADM_MANGLE_H
+#define ADM_MANGLE_H
+
+#include "ADM_coreConfig.h"
+
 #if ( defined(__PIC__) || defined(__pic__) ) && ! defined(PIC)
 #    define PIC
 #endif
@@ -80,3 +85,4 @@
 #endif
 
 #define ASM_CONST attribute_used __attribute__ ((aligned(8)))
+#endif

@@ -15,24 +15,22 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-#ifdef USE_ARTS
-#include <artsc.h>
-#endif
 
+#ifdef HAVE_AUDIO
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <errno.h>
 
 #include "avi_vars.h"
 #include "prefs.h"
-#ifdef HAVE_AUDIO
+
 #include "ADM_assert.h"
 #include "ADM_audiodevice.h"
 
 #include "ADM_audiodevice/ADM_deviceoss.h"
 
 #ifdef USE_ARTS
+#include <artsc.h>
 #include "ADM_audiodevice/ADM_deviceArts.h"
 #endif
 

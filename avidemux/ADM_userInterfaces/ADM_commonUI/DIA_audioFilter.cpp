@@ -12,11 +12,11 @@
 //
 //
 
+#include "config.h"
 #include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
-#include "ADM_assert.h" 
 #include "ADM_audiofilter/audiofilter_normalize_param.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 /**

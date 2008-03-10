@@ -19,16 +19,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "config.h"
+
+#ifdef USE_FFMPEG
 #include <math.h>
 
 #include "ADM_default.h"
 #include "ADM_threads.h"
 
-
-#ifdef USE_FFMPEG
 extern "C" {
 #include "ADM_lavcodec.h"
 }
@@ -57,7 +55,6 @@ extern "C" {
 
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
-
 
 #include "ADM_libraries/ADM_mplex/ADM_mthread.h"
 

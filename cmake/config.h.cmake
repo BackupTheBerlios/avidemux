@@ -1,22 +1,11 @@
-/* config.h.in.  Generated from configure.in by autoheader.  */
+#ifndef ADM_CONFIG_H
+#define ADM_CONFIG_H
+
+#include "../ADM_coreConfig.h"
 
 #define ADM_BUILD_CLI 1
 #define ADM_BUILD_GTK 2
 #define ADM_BUILD_QT4 3
-
-// GCC - CPU
-#cmakedefine ADM_BIG_ENDIAN
-#cmakedefine ADM_CPU_64BIT
-#cmakedefine ADM_CPU_ALTIVEC
-#cmakedefine ADM_CPU_DCBZL
-#cmakedefine ADM_CPU_PPC
-#cmakedefine ADM_CPU_SSSE3
-#cmakedefine ADM_CPU_X86
-#cmakedefine ADM_CPU_X86_32
-#cmakedefine ADM_CPU_X86_64
-
-// GCC - Operating System
-#cmakedefine ADM_BSD_FAMILY
 
 /* Jog Shuttle */
 #cmakedefine USE_JOG
@@ -42,29 +31,11 @@
 #cmakedefine HAVE_GETTEXT
 #endif
 
-/* Define to 1 if you have the `gettimeofday' function. */
-#cmakedefine HAVE_GETTIMEOFDAY
-
 // GTK+ uses X11 framework
 #cmakedefine HAVE_GTK_X11
 
-/* Define to 1 if you have the <inttypes.h> header file. */
-#cmakedefine HAVE_INTTYPES_H
-
 /* Define to 1 if you have the `mp3lame' library (-lmp3lame). */
 #cmakedefine HAVE_LIBMP3LAME
-
-/* Use malloc.h */
-#cmakedefine HAVE_MALLOC_H
-
-/* Define to 1 if you have the <stdint.h> header file. */
-#cmakedefine HAVE_STDINT_H
-
-/* Define to 1 if you have the <sys/types.h> header file. */
-#cmakedefine HAVE_SYS_TYPES_H
-
-/* Define to 1 if you have the <unistd.h> header file. */
-#cmakedefine HAVE_UNISTD_H
 
 /* stricter prototyping */
 #cmakedefine ICONV_NEED_CONST
@@ -165,9 +136,23 @@
 /* use Nvwa memory leak detector */
 #cmakedefine FIND_LEAKS
 
-#ifdef __MINGW32__
-#define rindex strrchr
-#define index strchr
-#define ftello ftello64
-#define fseeko fseeko64
+#if defined(OSS_SUPPORT) || defined (USE_ARTS) || defined(USE_SDL) || defined(__APPLE__) || defined(__WIN32) || defined(ALSA_SUPPORT)
+#define HAVE_AUDIO
+#endif
+
+// FIXME - start
+#ifdef HAVE_GETTEXT
+#  include <libintl.h>
+#  undef _
+#endif
+
+extern const char* translate(const char *__domainname, const char *__msgid);
+
+#ifdef QT_TR_NOOP
+#undef QT_TR_NOOP
+#endif
+
+#define QT_TR_NOOP(String) translate (PACKAGE, String)
+// FIXME - end
+
 #endif

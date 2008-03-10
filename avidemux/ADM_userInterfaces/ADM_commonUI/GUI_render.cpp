@@ -18,7 +18,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "ADM_default.h"
+#include "config.h"
 #include "ADM_assert.h"
 #include "GUI_render.h"
 #include "GUI_accelRender.h"

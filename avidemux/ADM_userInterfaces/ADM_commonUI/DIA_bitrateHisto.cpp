@@ -18,11 +18,14 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <math.h>
+
+#include "config.h"
 #include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "DIA_factory.h"
 #include "avi_vars.h"
-#include "math.h"
+
 /**
       \fn GUI_displayBitrate
       \brief display a bargraph with bitrates

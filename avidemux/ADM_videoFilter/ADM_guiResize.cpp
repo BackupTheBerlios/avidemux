@@ -17,6 +17,7 @@ GUI part of resize.
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 #include "ADM_default.h"
 
 #include "ADM_editor/ADM_edit.hxx"
@@ -24,8 +25,6 @@ GUI part of resize.
 #include "ADM_resizebis.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_assert.h"
-
 
 static int getResizeParams(uint32_t * w, uint32_t * h, uint32_t * algo,uint32_t ow,uint32_t oh,uint32_t fps);
 

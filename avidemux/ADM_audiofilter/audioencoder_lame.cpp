@@ -11,20 +11,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "ADM_default.h"
+#include "config.h"
 
 #ifdef HAVE_LIBMP3LAME
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+#include <lame/lame.h>
 
+#include "ADM_default.h"
 #include "audioprocess.hxx"
 #include "audioeng_process.h"
 #include "audioencoder.h"
-//
 
-#include "lame/lame.h"
 #include "ADM_audiofilter/audioencoder_lame_param.h"
 #include "ADM_audiofilter/audioencoder_lame.h"
 

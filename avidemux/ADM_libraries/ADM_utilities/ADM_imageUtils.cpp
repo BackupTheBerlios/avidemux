@@ -12,7 +12,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "ADM_default.h"
+#include "config.h"
 
 #include <stdlib.h>
 #include <stdio.h>

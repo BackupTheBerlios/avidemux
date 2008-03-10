@@ -18,13 +18,12 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 #include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-
-#include"ADM_vidField.h"
-
+#include "ADM_vidField.h"
 
 #ifdef ADM_CPU_X86_64
 static int64_t _l_w,_l_h;

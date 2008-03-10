@@ -18,14 +18,10 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "ADM_default.h"
 #include "ADM_threads.h"
+#include "ADM_transfert.h"
 
-#include"ADM_transfert.h"
 #define HIGH_LVL        ((TRANSFERT_BUFFER*2)/3)
 #define LOW_LVL         (TRANSFERT_BUFFER/3)
 // minimum amount of audio buffer we need

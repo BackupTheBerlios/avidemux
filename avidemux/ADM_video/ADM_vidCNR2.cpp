@@ -35,9 +35,10 @@
 //         31/07/2002 - ver 2.1  - Bug Fixes (thx to dividee ;)
 //         20/07/2002 - ver 2.0  - Avisynth filter coded (from scratch)
 
-
-#include "ADM_default.h"
 #include <math.h>
+
+#include "config.h"
+#include "ADM_default.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"

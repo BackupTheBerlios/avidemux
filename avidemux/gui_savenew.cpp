@@ -15,13 +15,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <unistd.h>
-#include <time.h>
-#include <sys/time.h>
-
 #include "ADM_default.h"
 #include "ADM_threads.h"
 

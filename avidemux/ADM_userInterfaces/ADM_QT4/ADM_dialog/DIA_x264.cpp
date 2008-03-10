@@ -5,20 +5,20 @@
 //
 //
 
+#include "config.h"
+
+#ifdef USE_X264
 #include "ADM_default.h"
-
-
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_codecs/ADM_x264param.h"
 
-#ifdef USE_X264
 extern "C"
 {
 #include "x264.h"
 }
-#endif
+
 /**
       \fn DIA_x264
       \brief Dialog for x264 codec settings
@@ -158,5 +158,5 @@ int code;
         }
          return 0;
 }
-
+#endif
 // EOF

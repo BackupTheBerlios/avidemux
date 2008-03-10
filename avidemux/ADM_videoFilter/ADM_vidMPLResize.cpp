@@ -19,6 +19,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 #include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
@@ -33,7 +34,6 @@ extern "C" {
 
 #include "ADM_libraries/ADM_lavutil/avutil.h"
 #include "ADM_libraries/ADM_libswscale/swscale.h"
-
 #include "ADM_filter/video_filters.h"
 
 typedef struct alg

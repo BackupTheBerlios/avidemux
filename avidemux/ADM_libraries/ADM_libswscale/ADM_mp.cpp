@@ -18,7 +18,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "ADM_default.h"
+#include "config.h"
 #include "fourcc.h"
 
 #ifdef ADM_CPU_X86

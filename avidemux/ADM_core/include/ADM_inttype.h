@@ -6,17 +6,15 @@
     
  ***************************************************************************/
 
-#ifndef __ZDEFAULT
-#define __ZDEFAULT
+#ifndef ADM_INTTYPE_H
+#define ADM_INTTYPE_H
 
-#include "config.h"
+#include "ADM_coreConfig.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 
 /*
    	The maximum width/height is MAXIMUM_SIZE 768*768 for now
@@ -48,16 +46,15 @@ typedef unsigned char ADM_filename;
 #define int32_t 	signed long  int
 #define int64_t 	signed long  long
 #define uint64_t 	unsigned long  long
+#endif	// ADM_CPU_64BIT
 
-#endif
 #define uint8_t  	unsigned char
 #define int8_t   	signed char
-
 #define int16_t 	signed short int
 #define uint16_t 	unsigned short int
 #define uint32_t 	unsigned long  int
+#endif	// GOT_TYPES
 
-#endif
 #define UNUSED_ARG(a) do {/* null */} while (&a == 0)
 
 #define MKFCC(a,b,c,d)   ((d<<24)+(c<<16)+(b<<8)+a)
@@ -70,28 +67,4 @@ typedef unsigned char ADM_filename;
 #define ADM_OK 	1
 #define ADM_IGN 2
 
-/*
- * Standard gettext macros.
- */
-#ifdef HAVE_GETTEXT
-#  include <libintl.h>
-#  undef _
-#endif
-
-extern const char* translate(const char *__domainname, const char *__msgid);
-
-#ifdef QT_TR_NOOP
-#undef QT_TR_NOOP
-#endif
-
-#define QT_TR_NOOP(String) translate (PACKAGE, String)
-
-#if (defined( HAVE_LIBESD) && defined(HAVE_ESD_H)) || \
- defined(OSS_SUPPORT) || defined (USE_ARTS) || \
-  defined(USE_SDL) || defined(__APPLE__) || \
-  defined(__WIN32) || defined(ALSA_SUPPORT)
-  
-#define HAVE_AUDIO
-#endif
-               
 #endif

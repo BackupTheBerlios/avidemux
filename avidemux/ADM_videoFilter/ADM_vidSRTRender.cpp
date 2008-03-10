@@ -15,14 +15,13 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "ADM_default.h"
+#include "config.h"
 
+#ifdef USE_FREETYPE
 #include <math.h>
 #include <iconv.h>
 
-
-#ifdef USE_FREETYPE
-
+#include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_editor/ADM_edit.hxx"
@@ -30,17 +29,13 @@
 
 #include "ADM_video/ADM_vidFont.h"
 #include "ADM_videoFilter/ADM_vidSRT.h"
-#include "ADM_assert.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
 
-
 #define SUB_OUT 0xf0000000
-
 #define ALPHA
-
 #define LUMA_LEVEL 10
 
 #define SAFE_STRCPY(dest,destLen,src,srcLen) \

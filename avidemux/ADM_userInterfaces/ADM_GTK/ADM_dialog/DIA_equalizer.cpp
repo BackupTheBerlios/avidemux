@@ -19,6 +19,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include <math.h>
+
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "avi_vars.h"
@@ -28,7 +30,6 @@
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidEqualizer.h"
-
 
 extern "C" {
 #include "ADM_libraries/ADM_lavcodec/avcodec.h"

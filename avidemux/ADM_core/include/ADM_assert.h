@@ -15,8 +15,8 @@
  ***************************************************************************/
 #ifndef ADM_ASSERT_H
 #define ADM_ASSERT_H
-#include "ADM_inttype.h"
 #include <assert.h>
+#include "ADM_inttype.h"
 
 #define ADM_assert(x) { if(!(x)) {ADM_backTrack("Assert failed :"#x,__LINE__,__FILE__);  }}
 

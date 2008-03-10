@@ -28,6 +28,7 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "config.h"
 #include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
@@ -38,9 +39,7 @@
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
 
-
 #include "ADM_filter/video_filters.h"
-
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 #if 0

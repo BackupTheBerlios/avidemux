@@ -14,6 +14,7 @@
  ***************************************************************************/
 #include "config.h"
 #include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "ADM_default.h"
 
 GtkListStore 	*storeFilterList;
 GtkWidget	*create_dialogList (void)

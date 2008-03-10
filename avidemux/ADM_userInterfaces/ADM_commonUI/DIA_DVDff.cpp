@@ -4,6 +4,7 @@
 
 */
 
+#include "config.h"
 #include "ADM_default.h"
 
 #include "ADM_lavcodec.h"
@@ -13,7 +14,6 @@
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_codecs/ADM_ffmpegConfig.h"
 #include "DIA_factory.h"
-#include "ADM_assert.h" 
 
 #warning FIXME Old : MaxBitrate in Byte/s, new entry in kb/s
 #warning FIXME Old : MaxBitrate in Byte/s, new entry in kb/s
@@ -22,12 +22,6 @@
 #warning FIXME Old : MaxBitrate in Byte/s new entry in kb/s
 #warning FIXME Old : MaxBitrate in Byte/s new entry in kb/s
 
-
-
-#include "ADM_codecs/ADM_codec.h"
-#include "ADM_encoder/ADM_vidEncode.hxx"
-#include "ADM_assert.h" 
-#include "DIA_factory.h"
 #include "../../ADM_libraries/ADM_libmpeg2enc/ADM_mpeg2enc.h"
 
 /**

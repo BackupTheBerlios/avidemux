@@ -18,6 +18,7 @@
 #include <sys/time.h>
 #include <errno.h>
 
+#include "config.h"
 #include "ADM_default.h"
 #include "ADM_threads.h"
 

@@ -38,7 +38,6 @@
 #include "ADM_filter/video_filters.h"
 
 #include "ADM_toolkit/filesel.h"
-
 #include "ADM_colorspace/colorspace.h"
 
 #include "ADM_videoFilter/ADM_vobsubinfo.h"

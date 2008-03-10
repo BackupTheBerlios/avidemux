@@ -15,20 +15,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <unistd.h>
-#include <time.h>
-#include <sys/time.h>
-
+#include "config.h"
 #include "ADM_default.h"
 #include "ADM_threads.h"
 
 #ifdef USE_FFMPEG
 extern "C" {
 	#include "ADM_lavcodec.h"
-	};
+};
 #endif
 
 #include "fourcc.h"
@@ -55,6 +49,7 @@ extern "C" {
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_SAVE_AVI
 #include "ADM_osSupport/ADM_debug.h"
+
 GenericAviSaveSmart::GenericAviSaveSmart(uint32_t qf) : GenericAviSave()
 {
 	_cqReenc=qf;

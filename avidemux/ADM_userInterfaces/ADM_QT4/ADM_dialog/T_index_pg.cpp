@@ -15,6 +15,8 @@ Indexer progress dialog
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include <math.h>
+
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -26,7 +28,6 @@ Indexer progress dialog
 #include <QtGui/QWidget>
 
 #include "ADM_default.h"
-#include "math.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_video/ADM_genvideo.hxx"

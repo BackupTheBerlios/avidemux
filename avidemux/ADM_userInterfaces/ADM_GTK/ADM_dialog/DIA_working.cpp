@@ -17,6 +17,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include <math.h>
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 
@@ -25,7 +26,6 @@
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_CLOCKnTIMELEFT
 #include "ADM_osSupport/ADM_debug.h"
-
 
 #include "DIA_working.h"
 #include "ADM_video/ADM_vidMisc.h"

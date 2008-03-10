@@ -16,14 +16,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "ADM_default.h"
 
 #ifdef __MINGW32__
 #include <windows.h>
 #include <excpt.h>
 #endif
 
+#include "config.h"
+#include "ADM_default.h"
 #include "ADM_threads.h"
+
 #define __DECLARE__
 #include "avi_vars.h"
 
@@ -105,7 +107,7 @@ extern int check_leaks();
 
 int main(int argc, char *argv[])
 {
-#ifdef __WIN32
+#if defined(__WIN32) && defined(USE_SDL)
 	redirectStdoutToFile();
 #endif
 

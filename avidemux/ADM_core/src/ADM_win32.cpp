@@ -402,7 +402,6 @@ void redirectStdoutToFile(void)
 	// This allows us to optionally compile all EXEs as console applications
 	// so the output can be printed to the terminal for debugging purposes.
 
-#ifdef USE_SDL
 	// Close SDL generated logs
 	fclose(stdout);
 	fclose(stderr);
@@ -448,6 +447,5 @@ void redirectStdoutToFile(void)
 	setvbuf(stderr, NULL, _IOLBF, BUFSIZ);
 
 	delete[] logPath;
-#endif	// USE_SDL
 }
 #endif	// __WIN32

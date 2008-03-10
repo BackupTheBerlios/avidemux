@@ -18,16 +18,14 @@
 #include <math.h>
 #include <algorithm>
 #include <string>
-//#include <vector>
+#include <ctype.h>
+
 using namespace std;
 
 #include "ADM_default.h"
-#include <ctype.h>
 
-#include "ADM_assert.h"
 #undef memcpy   // avoid compile errors due to macro
 #include "fourcc.h"
-//#include "avi_vars.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"

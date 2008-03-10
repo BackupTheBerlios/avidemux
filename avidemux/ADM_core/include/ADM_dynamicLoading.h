@@ -14,8 +14,8 @@
  *   (at your option) any later version.                                   *
  ***************************************************************************/
 
-#ifndef LIBWRAPPER
-#define LIBWRAPPER
+#ifndef ADM_DYNAMICLOADING_H
+#define ADM_DYNAMICLOADING_H
 
 class ADM_LibWrapper
 {

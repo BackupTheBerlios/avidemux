@@ -1,6 +1,8 @@
+#include <math.h>
 
+#include "config.h"
 #include "ADM_default.h"
-#include "math.h"
+
 char* ms2timedisplay(uint32_t ms)
 {
 	uint32_t mm, ss;

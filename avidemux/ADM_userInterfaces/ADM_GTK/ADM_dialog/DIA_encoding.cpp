@@ -7,13 +7,14 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <math.h>
+
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "prefs.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
-
 #include "DIA_encoding.h"
 #include "ADM_video/ADM_vidMisc.h"
 

@@ -17,13 +17,14 @@
  *                                                                         *
  ***************************************************************************/
 #define ADM_LEGACY_PROGGY
-#include "ADM_default.h"
-#include "fourcc.h"
+#include "config.h"
+
 #ifdef USE_LIBXML2
 	#include <libxml/tree.h>
 	#include <libxml/parser.h>
 #endif
 
+#include "fourcc.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_osSupport/ADM_quota.h"
 #include "ADM_assert.h"

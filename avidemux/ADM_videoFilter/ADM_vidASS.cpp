@@ -10,8 +10,8 @@
   Initial port from MPlayer by Moonz
 
 */
+#include "config.h"
 #include "ADM_default.h"
-
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
@@ -20,6 +20,7 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+
 #ifdef USE_FREETYPE
 
 #ifndef DIR_SEP

@@ -26,9 +26,9 @@
 #include <time.h>
 #include <sys/time.h>
 
+#include "config.h"
 #include "ADM_default.h"
 #include "ADM_threads.h"
-
 
 #include "fourcc.h"
 #include "avi_vars.h"

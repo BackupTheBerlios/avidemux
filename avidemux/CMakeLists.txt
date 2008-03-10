@@ -52,6 +52,7 @@ IF (ADM_DEBUG)
 ENDIF (ADM_DEBUG)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/config)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ADM_core/include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_utilities)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_lavutil)
@@ -489,13 +490,10 @@ IF (WIN32)
 	ADD_ADMLIB_ALL_TARGETS(ADM_osSupport)
 	
 	IF (MINGW)
-		ADD_LIB_ALL_TARGETS(imagehlp wsock32 pthreadGC2)
-	ELSEIF (CYGWIN)
-		ADD_LIB_ALL_TARGETS(pthread cygwin)
+		ADD_LIB_ALL_TARGETS(-mno-cygwin imagehlp wsock32 pthreadGC2)
 	ENDIF (MINGW)
 	
-	ADD_LIB_ALL_TARGETS(winmm)
-	ADD_LIB_ALL_TARGETS("-mno-cygwin -Wl,--export-all-symbols")
+	ADD_LIB_ALL_TARGETS(winmm -Wl,--export-all-symbols)
 
 	ADD_TARGET_LDFLAGS(avidemux2_cli "-Wl,-subsystem,console")
 	

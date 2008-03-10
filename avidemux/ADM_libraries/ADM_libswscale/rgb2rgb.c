@@ -26,7 +26,7 @@
  * under the LGPL license too
  */
 // MEANX
-#include "ADM_default.h"
+#include "config.h"
 #include "wrapper.h"
 // /MEANX
 

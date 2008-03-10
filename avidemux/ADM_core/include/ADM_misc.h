@@ -6,10 +6,10 @@
     
  ***************************************************************************/
 
+#ifndef ADM_MISC_H
+#define ADM_MISC_H
 
-#ifndef __ADM_MISC__
-#define __ADM_MISC__
-//#include "time.h"
+#include "ADM_coreConfig.h"
 
 typedef enum 
 {

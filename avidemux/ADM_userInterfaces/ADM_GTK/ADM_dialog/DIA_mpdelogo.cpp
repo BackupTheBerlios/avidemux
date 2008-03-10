@@ -20,13 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <math.h>
+
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_colorspace/ADM_rgb.h"
-
 #include "ADM_video/ADM_vidMPdelogo.h"
 
 extern "C" {

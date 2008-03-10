@@ -16,12 +16,9 @@
 #define HAVE_DETC
 #ifdef HAVE_DETC
 
-#include "ADM_default.h"
+#include "config.h"
 #include "ADM_lavcodec.h"
-#include "math.h"
 #include "fourcc.h"
-
-
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
@@ -31,7 +28,6 @@
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
-
 
 //static void decimate(uint8_t *src,uint8_t *target, uint32_t linessrc, uint32_t width);
 #include "ADM_filter/video_filters.h"

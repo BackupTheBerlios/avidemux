@@ -4,16 +4,12 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+#include "config.h"
 #include "ADM_default.h"
-#include <iconv.h>
-
-#include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
-
-
 
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
