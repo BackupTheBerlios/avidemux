@@ -30,6 +30,7 @@
 #ifdef USE_FREETYPE
 #include <math.h>
 #include <iconv.h>
+#include <errno.h>
 
 //#define __STDC_ISO_10646__
 

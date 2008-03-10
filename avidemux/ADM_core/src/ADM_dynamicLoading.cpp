@@ -14,24 +14,25 @@
  *   (at your option) any later version.                                   *
  ***************************************************************************/
 
-#include "config.h"
-
 #include <stdlib.h>
 #include <stdio.h>
-#include "ADM_default.h"
+
 #ifdef __WIN32
 #include <windows.h>
 #else
 #include <dlfcn.h>
 #endif
 
+#include "ADM_default.h"
 #include "ADM_dynamicLoading.h"
+
 // By default the library is silent, being part of ADM_core cannot use the debug_id funcs
 #if 1
 #define aprintf(...) {}
 #else
 #define aprintf printf
 #endif
+
 ADM_LibWrapper::ADM_LibWrapper()
 {
 	initialised = false;

@@ -216,7 +216,6 @@ ADD_ADMLIB_ALL_TARGETS(${ADM_INPUTS})
 # Tails
 #########################################
 SET(ADM_TAILS
-	ADM_core
 	ADM_osSupport
 	ADM_encoder
 	ADM_toolkit
@@ -307,7 +306,13 @@ IF (ADM_UI_QT4)
 		ADM_commonUI_qt4)
 ENDIF (ADM_UI_QT4)
 
-ADD_ADMLIB_ALL_TARGETS(ADM_utilities ADM_core)
+ADD_ADMLIB_ALL_TARGETS(ADM_utilities)
+
+###########################################
+# ADM_core
+###########################################
+ADD_SUBDIRECTORY(ADM_core)
+ADD_LIB_ALL_TARGETS(ADM_core)
 
 ###########################################
 # External libs
@@ -488,19 +493,19 @@ ENDIF (ADM_UI_QT4)
 ###########################################
 IF (WIN32)
 	ADD_ADMLIB_ALL_TARGETS(ADM_osSupport)
-	
+
 	IF (MINGW)
-		ADD_LIB_ALL_TARGETS(-mno-cygwin imagehlp wsock32 pthreadGC2)
+		ADD_LIB_ALL_TARGETS(-mno-cygwin)
 	ENDIF (MINGW)
-	
+
 	ADD_LIB_ALL_TARGETS(winmm -Wl,--export-all-symbols)
 
 	ADD_TARGET_LDFLAGS(avidemux2_cli "-Wl,-subsystem,console")
-	
+
 	IF (ADM_UI_GTK)
 		ADD_TARGET_LDFLAGS(avidemux2_gtk "-mwindows")
 	ENDIF (ADM_UI_GTK)
-	
+
 	IF (ADM_UI_QT4)
 		ADD_TARGET_LDFLAGS(avidemux2_qt4 "-mwindows")
 	ENDIF (ADM_UI_QT4)

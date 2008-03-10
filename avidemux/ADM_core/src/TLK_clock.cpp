@@ -33,13 +33,11 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-#include "config.h"
+#include "ADM_default.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_CLOCKnTIMELEFT
 #include "ADM_osSupport/ADM_debug.h"
-
-#include "avi_vars.h"
 
 static uint8_t inited=0;
 static struct timeval _itimev;

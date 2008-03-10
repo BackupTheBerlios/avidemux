@@ -163,45 +163,48 @@ char *ADM_getInstallRelativePath(const char *base1, const char *base2,const char
 ******************************************************/
 char *ADM_getBaseDir(void)
 {
-char *dirname=NULL;
-DIR *dir=NULL;
-char *home;
-//
-        if(baseDirDone) return ADM_basedir;
-// Get the base directory
-#if defined(__WIN32)
-        if( ! (home=getenv("USERPROFILE")) )
-        {
-          GUI_Error_HIG("Oops","can't determine $USERPROFILE.");
-                    home="c:\\";
-        }
+	char *dirname=NULL;
+	DIR *dir=NULL;
+	char *home;
 
+	if(baseDirDone) return ADM_basedir;
+
+	// Get the base directory
+#if defined(__WIN32)
+	if(!(home = getenv("USERPROFILE")))
+	{
+		printf("Oops: can't determine $USERPROFILE.");
+		home="c:\\";
+	}
 #else
-        if( ! (home=getenv("HOME")) )
-        {
-          GUI_Error_HIG("Oops","can't determine $HOME.");
-                return NULL;
-        }
+	if(!(home = getenv("HOME")))
+	{
+		printf("Oops: can't determine $HOME.");
+		return NULL;
+	}
 #endif
 
- // Try to open the .avidemux directory
-        dirname=new char[strlen(home)+strlen(ADM_DIR_NAME)+2];
-        strcpy(dirname,home);
-        strcat(dirname,ADM_DIR_NAME);
-        if(!ADM_mkdir(dirname))
-        {
-          GUI_Error_HIG("Oops","Cannot create the .avidemux directory", NULL);
-                        delete [] dirname;
-                        return NULL;
-        }
-        delete [] dirname;
+	// Try to open the .avidemux directory
+	dirname = new char[strlen(home) + strlen(ADM_DIR_NAME) + 2];
+	strcpy(dirname, home);
+	strcat(dirname, ADM_DIR_NAME);
 
-        // Now built the filename
-        strncpy(ADM_basedir,home,1023);
-        strncat(ADM_basedir,ADM_DIR_NAME,1023-strlen(ADM_basedir));
-        baseDirDone=1;
-        printf("Using %s as base directory for prefs/jobs/...\n",ADM_basedir);
-        return ADM_basedir;
+	if(!ADM_mkdir(dirname))
+	{
+		printf("Oops: cannot create the .avidemux directory", NULL);
+		delete [] dirname;
+		return NULL;
+	}
+
+	delete [] dirname;
+
+	// Now built the filename
+	strncpy(ADM_basedir,home,1023);
+	strncat(ADM_basedir,ADM_DIR_NAME,1023-strlen(ADM_basedir));
+	baseDirDone=1;
+	printf("Using %s as base directory for prefs/jobs/...\n", ADM_basedir);
+
+	return ADM_basedir;
 }
 /*----------------------------------------
       Create a directory

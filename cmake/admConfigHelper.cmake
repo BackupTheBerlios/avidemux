@@ -157,15 +157,19 @@ ENDMACRO (ADD_TARGET_CFLAGS)
 
 
 MACRO (ADD_TARGET_DEFINITIONS _target)
+	SET(newflag)
 	GET_TARGET_PROPERTY(_flags ${_target} COMPILE_FLAGS)
 
 	FOREACH (_def ${ARGN})
 		IF (${_def})
 			APPEND_FLAGS(_flags "-D${_def}")
+			SET(newflag 1)
 		ENDIF (${_def})
 	ENDFOREACH (_def ${ARGN})
 
-	SET_TARGET_PROPERTIES(${_target} PROPERTIES COMPILE_FLAGS "${_flags}")
+	IF (newflag)
+		SET_TARGET_PROPERTIES(${_target} PROPERTIES COMPILE_FLAGS "${_flags}")
+	ENDIF (newflag)
 ENDMACRO (ADD_TARGET_DEFINITIONS)
 
 

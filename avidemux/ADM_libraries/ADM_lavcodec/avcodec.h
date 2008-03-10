@@ -25,8 +25,6 @@
  * @file avcodec.h
  * external API header
  */
-
-#include "config.h" /* MEANX */
 #include "avutil.h"
 #include <sys/types.h> /* size_t */
 

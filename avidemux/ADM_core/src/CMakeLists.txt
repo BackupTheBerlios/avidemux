@@ -2,7 +2,14 @@ SET(ADM_core_SRCS
 	ADM_cpuCap.cpp  ADM_memcpy.cpp  ADM_memsupport.cpp  ADM_threads.cpp  ADM_win32.cpp
 	ADM_memory.cpp  ADM_misc.cpp  TLK_clock.cpp  ADM_crashdump.cpp  ADM_fileio.cpp ADM_dynamicLoading.cpp)
 
-ADD_ADM_LIB_ALL_TARGETS(ADM_core ${ADM_core_SRCS})
-ADD_SOURCE_CFLAGS(ADM_fileio.cpp ${GLIB_CFLAGS})
+ADD_LIBRARY(ADM_core SHARED ${ADM_core_SRCS})
 
-#ADD_TARGET_DEFINITIONS(ADM_core ADM_DEBUG FIND_LEAKS)
+REMOVE_DEFINITIONS(-DHAVE_CONFIG_H)
+ADD_TARGET_DEFINITIONS(ADM_core ADM_DEBUG FIND_LEAKS)
+
+IF (MINGW)
+	ADD_SOURCE_CFLAGS(ADM_fileio.cpp ${GLIB_CFLAGS})
+
+	ADD_TARGET_LDFLAGS(ADM_core ${GLIB_LDFLAGS})
+	TARGET_LINK_LIBRARIES(ADM_core pthreadGC2 imagehlp wsock32)
+ENDIF (MINGW)
