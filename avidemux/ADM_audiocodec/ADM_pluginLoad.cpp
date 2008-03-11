@@ -94,24 +94,33 @@ Err_ad:
 uint8_t ADM_ad_loadPlugins(const char *path)
 {
 #define MAX_EXTERNAL_FILTER 50
-	  char *files[MAX_EXTERNAL_FILTER];
-	  uint32_t nbFile;
-	  
-	  
-	  memset(files,0,sizeof(char *)*MAX_EXTERNAL_FILTER);
-	  printf("[ADM_ad_plugin] Scanning directory %s\n",path);
-	  if(!buildDirectoryContent(&nbFile,path,
-			  files,MAX_EXTERNAL_FILTER,"so"))
-	  {
-		  printf("[AudioPlugin] Cannot Parse plugin");
-		  return 0;
-	  }
-	  for(int i=0;i<nbFile;i++)
-	   {
-	     tryLoadingAudioPlugin(files[i]);
-	   }
-	   printf("[ADM_ad_plugin] Scanning done,found %d codec \n",ADM_audioPlugins.size());
-	   return 1;
+
+#ifdef __WIN32
+#define SHARED_LIB_EXT "dll"
+#elif defined(__APPLE__)
+#define SHARED_LIB_EXT "dylib"
+#else
+#define SHARED_LIB_EXT "so"
+#endif
+
+	char *files[MAX_EXTERNAL_FILTER];
+	uint32_t nbFile;
+
+	memset(files,0,sizeof(char *)*MAX_EXTERNAL_FILTER);
+	printf("[ADM_ad_plugin] Scanning directory %s\n",path);
+
+	if(!buildDirectoryContent(&nbFile, path, files, MAX_EXTERNAL_FILTER, SHARED_LIB_EXT))
+	{
+		printf("[ADM_ad_plugin] Cannot parse plugin");
+		return 0;
+	}
+
+	for(int i=0;i<nbFile;i++)
+		tryLoadingAudioPlugin(files[i]);
+
+	printf("[ADM_ad_plugin] Scanning done, found %d codec\n", ADM_audioPlugins.size());
+
+	return 1;
 }
 /**
  * 	\fn ADM_ad_searchCodec

@@ -21,6 +21,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#ifdef __WIN32
+#include <windows.h>
+#endif
+
 #ifdef __MINGW32__
 #include <glib.h>
 #endif
@@ -163,7 +167,20 @@ char *ADM_getHomeRelativePath(const char *base1, const char *base2,const char *b
 
 char *ADM_getInstallRelativePath(const char *base1, const char *base2,const char *base3)
 {
+#ifdef __WIN32
+	char moduleName[256];
+
+	GetModuleFileName(0, moduleName, sizeof(moduleName) / sizeof(char));
+
+	char *slash = strrchr(moduleName, '\\');
+		
+	if (slash)
+		*slash = '\0';
+
+	return ADM_getRelativePath(moduleName, base1, base2, base3);
+#else
 	return ADM_getRelativePath(ADM_INSTALL_DIR, base1, base2, base3);
+#endif
 }
 
 /*
@@ -287,7 +304,7 @@ uint8_t buildDirectoryContent(uint32_t *outnb, const char *base, char *jobName[]
 		if (memcmp(direntry->d_name + xbase, ext, extlen))
 			//if (direntry->d_name[len-1]!='s' || direntry->d_name[len-2]!='j' || direntry->d_name[len-3]!='.')
 		{
-			printf("ignored:%s\n", direntry->d_name);
+			printf("ignored: %s\n", direntry->d_name);
 			continue;
 		}
 
