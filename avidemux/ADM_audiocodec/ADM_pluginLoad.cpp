@@ -111,7 +111,7 @@ uint8_t ADM_ad_loadPlugins(const char *path)
 
 	if(!buildDirectoryContent(&nbFile, path, files, MAX_EXTERNAL_FILTER, SHARED_LIB_EXT))
 	{
-		printf("[ADM_ad_plugin] Cannot parse plugin");
+		printf("[ADM_ad_plugin] Cannot parse plugin\n");
 		return 0;
 	}
 

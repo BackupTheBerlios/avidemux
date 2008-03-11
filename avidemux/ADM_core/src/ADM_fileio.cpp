@@ -23,6 +23,8 @@
 
 #ifdef __WIN32
 #include <windows.h>
+#elif defined(__APPLE__)
+#include <Carbon/Carbon.h>
 #endif
 
 #ifdef __MINGW32__
@@ -168,7 +170,7 @@ char *ADM_getHomeRelativePath(const char *base1, const char *base2,const char *b
 char *ADM_getInstallRelativePath(const char *base1, const char *base2,const char *base3)
 {
 #ifdef __WIN32
-	char moduleName[256];
+	char moduleName[MAX_PATH];
 
 	GetModuleFileName(0, moduleName, sizeof(moduleName) / sizeof(char));
 
@@ -178,6 +180,26 @@ char *ADM_getInstallRelativePath(const char *base1, const char *base2,const char
 		*slash = '\0';
 
 	return ADM_getRelativePath(moduleName, base1, base2, base3);
+#elif defined(__APPLE__)
+#define MAX_PATH_SIZE 1024
+
+	char buffer[MAX_PATH_SIZE];
+
+	CFURLRef url(CFBundleCopyExecutableURL(CFBundleGetMainBundle()));
+	buffer[0] = '\0';
+
+	if (url)
+	{
+		CFURLGetFileSystemRepresentation(url, true, (UInt8*)buffer, MAX_PATH_SIZE);
+		CFRelease(url);
+
+		char *slash = strrchr(buffer, '/');
+		
+		if (slash)
+			*slash = '\0';
+	}
+
+	return ADM_getRelativePath(buffer, base1, base2, base3);
 #else
 	return ADM_getRelativePath(ADM_INSTALL_DIR, base1, base2, base3);
 #endif

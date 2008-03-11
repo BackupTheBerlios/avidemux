@@ -238,9 +238,15 @@ int main(int argc, char *argv[])
 	ADM_dealloc(dynloadPath);
 	//***************Plugins *********************
 	// Load system wide audio decoder plugin
-	char *adPlugins=ADM_getInstallRelativePath("lib","ADM_plugins","audioDecoder");
+#ifdef __APPLE__
+	char *adPlugins = ADM_getInstallRelativePath("lib","ADM_plugins","audioDecoder");
+#else
+	char *adPlugins = ADM_getInstallRelativePath("../Resources/lib","ADM_plugins","audioDecoder");
+#endif
+
 	ADM_ad_loadPlugins(adPlugins);
 	delete [] adPlugins;
+
 	// load local audio decoder plugins
 	adPlugins=ADM_getHomeRelativePath("plugins","audioDecoder");
 	ADM_ad_loadPlugins(adPlugins);
