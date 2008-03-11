@@ -40,14 +40,8 @@
 /* stricter prototyping */
 #cmakedefine ICONV_NEED_CONST
 
-/* use classing FAAD support */
-#cmakedefine OLD_FAAD_PROTO
-
 /* OSS detected */
 #cmakedefine OSS_SUPPORT
-
-/* use liba52 */
-#cmakedefine USE_AC3
 
 /* use Aften AC3 encoder */
 #cmakedefine USE_AFTEN
@@ -73,9 +67,6 @@
 /* Use faac audio enccoder */
 #cmakedefine USE_FAAC
 
-/* FAAD2 detected */
-#cmakedefine USE_FAAD
-
 /* FFmpeg */
 #cmakedefine USE_FFMPEG
 
@@ -98,9 +89,6 @@
 
 /* MJPEG */
 #cmakedefine USE_MJPEG
-
-/* use libmad */
-#cmakedefine USE_MP3
 
 /* libpng is available */
 #cmakedefine USE_PNG

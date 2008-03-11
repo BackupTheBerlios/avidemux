@@ -1,8 +1,15 @@
-SET(ADM_ad_faad_SRCS ADM_ad_faad.cpp )
+INCLUDE(admCheckFaad)
+checkFaad()
 
-ADD_LIBRARY(ADM_ad_faad SHARED ${ADM_ad_faad_SRCS})
+IF (HAVE_FAAD)
+	SET(ADM_ad_faad_SRCS ADM_ad_faad.cpp )
 
-# FIXME
-TARGET_LINK_LIBRARIES(ADM_ad_faad  ${FAAD_LIBRARY_DIR})
-INCLUDE(ad_plugin)
-ADM_audio_plugin(ADM_ad_faad)
+	ADD_LIBRARY(ADM_ad_faad SHARED ${ADM_ad_faad_SRCS})
+	TARGET_LINK_LIBRARIES(ADM_ad_faad ADM_core ${FAAD_LIBRARY_DIR})
+
+	INCLUDE(ad_plugin)
+	ADM_audio_plugin(ADM_ad_faad)
+
+	ADD_TARGET_CFLAGS(ADM_ad_faad "-I${FAAD_INCLUDE_DIR}")
+	ADD_TARGET_DEFINITIONS(ADM_ad_faad FAAD_OLD_PROTOTYPE)
+ENDIF (HAVE_FAAD)

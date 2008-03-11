@@ -15,12 +15,13 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+#include <faad.h>
+
 #include "ADM_default.h"
 #include "ADM_ad_plugin.h"
 
-#include "faad.h"
-
 #define FAAD_BUFFER 2048
+
 class ADM_faad : public     ADM_Audiocodec
 {
 	protected:
@@ -51,7 +52,7 @@ DECLARE_AUDIO_DECODER(ADM_faad,						// Class
 ADM_faad::ADM_faad( uint32_t fourcc ,WAVHeader *info,uint32_t l,uint8_t *d) :   ADM_Audiocodec(fourcc)
 {
 faacDecConfigurationPtr conf;
-#ifdef OLD_FAAD_PROTO
+#ifdef FAAD_OLD_PROTOTYPE
 unsigned long int srate;
 #else
 uint32_t srate;
@@ -131,7 +132,7 @@ long int res;
 void *outbuf;
 faacDecFrameInfo info;
 int max=0;
-#ifdef OLD_FAAD_PROTO
+#ifdef FAAD_OLD_PROTOTYPE
 unsigned long int srate;
 #else
 uint32_t srate;

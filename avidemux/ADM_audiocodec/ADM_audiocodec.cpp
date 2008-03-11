@@ -143,12 +143,3 @@ ADM_Audiocodec *out = NULL;
 	}
 	return out;
 }
-
-ADM_Audiocodec::ADM_Audiocodec( uint32_t fourcc ) {
-    UNUSED_ARG(fourcc);
-	_init=0;
-}
-
-ADM_Audiocodec::~ADM_Audiocodec()
-{}
-

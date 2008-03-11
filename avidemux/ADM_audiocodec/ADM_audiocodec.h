@@ -26,8 +26,13 @@ class ADM_Audiocodec
 		uint8_t	_init;
 		WAVHeader *_wavHeader;
 	public:
-		ADM_Audiocodec(uint32_t fourcc);
-		virtual	~ADM_Audiocodec();
+		ADM_Audiocodec(uint32_t fourcc)
+		{
+			UNUSED_ARG(fourcc);
+			_init=0;
+		};
+
+		virtual	~ADM_Audiocodec() {};
 		virtual	void purge(void) {}
 		virtual	uint8_t beginDecompress(void)=0;
 		virtual	uint8_t endDecompress(void)=0;
