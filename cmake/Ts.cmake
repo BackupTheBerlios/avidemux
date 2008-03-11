@@ -64,7 +64,7 @@ MACRO(COMPILE_AVIDEMUX_TS_FILES ts_subdir _sources)
                 
             SET(qm_files ${qm_files} ${_outXml} ${_out})
 
-			INSTALL(FILES ${_out} DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/i18n")
+			INSTALL(FILES ${_out} DESTINATION "${CMAKE_INSTALL_PREFIX}/${BIN_DIR}/i18n")
         ENDFOREACH(ts_input ${ts_files})
 
         SET(${_sources} ${${_sources}} ${qm_files})
@@ -95,7 +95,7 @@ MACRO(COMPILE_QT_TS_FILES ts_subdir _sources)
                 
             SET(qm_files ${qm_files} ${_out})
 
-			INSTALL(FILES ${_out} DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/i18n")
+			INSTALL(FILES ${_out} DESTINATION "${CMAKE_INSTALL_PREFIX}/${BIN_DIR}/i18n")
         ENDFOREACH(ts_input ${ts_files})
 
         SET(${_sources} ${${_sources}} ${qm_files})

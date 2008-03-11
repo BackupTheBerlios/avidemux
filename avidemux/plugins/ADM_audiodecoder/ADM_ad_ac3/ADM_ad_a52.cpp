@@ -17,7 +17,6 @@
 #include "ADM_default.h"
 #include "ADM_ad_plugin.h"
 
-#ifdef USE_AC3
 extern "C" {
 #include "ADM_liba52/a52.h"
 #include "ADM_liba52/mm_accel.h"
@@ -216,5 +215,3 @@ uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   u
     return 1; 
 
 }
-
-#endif

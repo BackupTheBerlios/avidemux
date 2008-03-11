@@ -49,6 +49,12 @@ IF (UNIX AND NOT APPLE)
 	SET(USE_JOG 1)
 ENDIF (UNIX AND NOT APPLE)
 
+IF (WIN32)
+	SET(BIN_DIR .)
+ELSE (WIN32)
+	SET(BIN_DIR bin)
+ENDIF (WIN32)
+
 ########################################
 # Standard Avidemux defines
 ########################################
@@ -61,11 +67,9 @@ SET(VERSION 2.5)
 SET(ADM_UI_GTK 1)
 SET(ADM_UI_QT4 1)
 
-SET(HAVE_AUDIO 1)
-SET(USE_MP3 1)
-SET(USE_AC3 1)
 SET(USE_FFMPEG 1)
 SET(USE_MJPEG 1)
+SET(ADM_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}")
 
 IF (NOT CMAKE_BUILD_TYPE)
 	SET(CMAKE_BUILD_TYPE "Release")
