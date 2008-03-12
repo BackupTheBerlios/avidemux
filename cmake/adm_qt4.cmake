@@ -1,16 +1,9 @@
-SET(VERBATIM "VERBATIM")
-
 # Cygwin and MSYS require escaping but standalone MinGW doesn't.
-# Since CMake doesn't provide a way of detecting MSYS, check for
-# sh.exe in the path.  MinGW makefiles can't be genereated if sh
-# is in the path.
-IF(MINGW)
-	FIND_PROGRAM(SH_EXECUTABLE NAMES sh)
-	
-	IF(NOT SH_EXECUTABLE)   # if not Cygwin or MSYS
-		SET(VERBATIM "")
-	ENDIF(NOT SH_EXECUTABLE)
-ENDIF(MINGW)
+IF (MINGW AND NOT MSYS)
+	SET(VERBATIM "")
+ELSE (MINGW AND NOT MSYS)
+	SET(VERBATIM "VERBATIM")
+ENDIF(MINGW AND NOT MSYS)
 
 ##############################################################"
 # FOR AQ

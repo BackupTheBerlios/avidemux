@@ -79,6 +79,9 @@ MESSAGE( STATUS "APPLE: " ${APPLE} )
 # is TRUE when using the MinGW compiler in Windows
 MESSAGE( STATUS "MINGW: " ${MINGW} )
 
+# is TRUE on Windows when using the MSYS
+MESSAGE( STATUS "MSYS: " ${MSYS} )
+
 # is TRUE on Windows when using the CygWin version of cmake
 MESSAGE( STATUS "CYGWIN: " ${CYGWIN} )
 
