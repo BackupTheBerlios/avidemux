@@ -494,7 +494,7 @@ IF (WIN32)
 		ADD_LIB_ALL_TARGETS(-mno-cygwin)
 	ENDIF (MINGW)
 
-	ADD_LIB_ALL_TARGETS(winmm -Wl,--export-all-symbols)
+	ADD_LIB_ALL_TARGETS(winmm)
 
 	ADD_TARGET_LDFLAGS(avidemux2_cli "-Wl,-subsystem,console")
 
@@ -505,10 +505,6 @@ IF (WIN32)
 	IF (ADM_UI_QT4)
 		ADD_TARGET_LDFLAGS(avidemux2_qt4 "-mwindows")
 	ENDIF (ADM_UI_QT4)
-
-	IF (CMAKE_BUILD_TYPE STREQUAL "Release")
-		ADD_LDFLAGS_ALL_TARGETS("-Wl,-s")
-	ENDIF (CMAKE_BUILD_TYPE STREQUAL "Release")
 ENDIF (WIN32)
 
 IF (APPLE)
