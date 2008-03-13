@@ -34,8 +34,6 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <iconv.h>
-
 #include "config.h"
 #include "ADM_default.h"
 

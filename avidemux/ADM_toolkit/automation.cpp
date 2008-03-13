@@ -20,7 +20,6 @@
 #include "config.h"
 
 #include <stdlib.h>
-//#include <glib.h>
 #include <signal.h>
 #ifndef __WIN32
 #include <unistd.h>

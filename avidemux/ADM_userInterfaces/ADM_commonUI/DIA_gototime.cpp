@@ -1,23 +1,6 @@
-//
-// C++ Implementation: ADM_vidForcedPP
-//
-//
-//
-//
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <math.h>
-#include <math.h>
-#include <iconv.h>
-
-
 #include "ADM_default.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
-#include "ADM_assert.h"
-
 
 uint8_t DIA_gotoTime(uint16_t *hh, uint16_t *mm, uint16_t *ss)
 {
@@ -35,4 +18,3 @@ diaElemUInteger   es(&s,QT_TR_NOOP("_Seconds:"),0,59);
     return 1;
 
 }
-//EOF 

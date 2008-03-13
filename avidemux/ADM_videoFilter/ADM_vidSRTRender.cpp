@@ -19,7 +19,6 @@
 
 #ifdef USE_FREETYPE
 #include <math.h>
-#include <iconv.h>
 
 #include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"

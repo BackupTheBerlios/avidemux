@@ -12,19 +12,12 @@
 //
 //
 #include "config.h"
-#ifdef USE_FREETYPE
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <iconv.h>
 
+#ifdef USE_FREETYPE
 #include "ADM_default.h"
 #include "GUI_render.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "DIA_flyDialog.h"
-
-#include "ADM_assert.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 

@@ -18,15 +18,12 @@
 #include "config.h"
 
 #ifdef USE_FREETYPE
-#include <iconv.h>
 
 #include "ADM_default.h"
 #include "ADM_vidFont.h"
 
 static    FT_Library   	library;   		/* handle to library     */
 static    int 			initialized=0; 	// 0 No init at all, 1 engine inited
-
-
 
 ADMfont::ADMfont ( void )
 {	

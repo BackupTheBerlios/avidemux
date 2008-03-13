@@ -317,9 +317,6 @@ ADD_LIB_ALL_TARGETS(ADM_core)
 ###########################################
 # External libs
 ###########################################
-# libiconv
-ADD_LIB_ALL_TARGETS("${LIBICONV_LIBRARY_DIR}")
-
 # gettext
 IF (GETTEXT_FOUND)
 	TARGET_LINK_LIBRARIES(avidemux2_cli ${GETTEXT_LIBRARY_DIR})
@@ -332,6 +329,9 @@ ENDIF (GETTEXT_FOUND)
 # Freetype2
 IF (USE_FREETYPE)
 	ADD_LDFLAGS_ALL_TARGETS(${FREETYPE2_LDFLAGS})
+
+	# libiconv
+	ADD_LIB_ALL_TARGETS("${LIBICONV_LIBRARY_DIR}")
 ENDIF (USE_FREETYPE)
 
 # FontConfig

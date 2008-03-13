@@ -19,38 +19,6 @@ ENDIF (VERBOSE)
 MESSAGE("")
 
 ########################################
-# libiconv
-########################################
-MESSAGE(STATUS "Checking for libiconv")
-MESSAGE(STATUS "*********************")
-
-FIND_HEADER_AND_LIB(LIBICONV iconv.h iconv)
-PRINT_LIBRARY_INFO("libiconv" LIBICONV_FOUND "${LIBICONV_INCLUDE_DIR}" "${LIBICONV_LIBRARY_DIR}")
-
-IF (NOT LIBICONV_INCLUDE_DIR)
-	MESSAGE(FATAL_ERROR "iconv.h not found")
-ENDIF (NOT LIBICONV_INCLUDE_DIR)
-
-IF (LIBICONV_LIBRARY_DIR)
-	MESSAGE(STATUS "libiconv is probably needed")
-
-	CHECK_CFLAGS_REQUIRED(iconv_check.cpp "-DICONV_NEED_CONST" "${LIBICONV_INCLUDE_DIR}" "${LIBICONV_LIBRARY_DIR}" LIBICONV_CFLAGS_REQUIRED)
-ELSE (LIBICONV_LIBRARY_DIR)
-	SET(LIBICONV_INCLUDE_DIR "")
-	SET(LIBICONV_LIBRARY_DIR "")
-	MESSAGE(STATUS "libiconv is probably not needed")
-
-	ADM_COMPILE(iconv_check.cpp "-DICONV_NEED_CONST" "" "" LIBICONV_CFLAGS_REQUIRED LIBICONV_COMPILE_OUTPUT)
-ENDIF (LIBICONV_LIBRARY_DIR)
-
-IF (LIBICONV_CFLAGS_REQUIRED)
-	SET(LIBICONV_DEFINITIONS "-DICONV_NEED_CONST")
-	SET(ICONV_NEED_CONST 1)
-ENDIF(LIBICONV_CFLAGS_REQUIRED)
-
-MESSAGE("")
-
-########################################
 # Libxml2
 ########################################
 MESSAGE(STATUS "Checking for Libxml2")

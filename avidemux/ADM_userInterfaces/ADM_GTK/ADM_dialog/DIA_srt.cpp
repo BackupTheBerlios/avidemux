@@ -14,11 +14,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include <iconv.h>
+#include "config.h"
 
 #ifdef USE_FREETYPE
-
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
