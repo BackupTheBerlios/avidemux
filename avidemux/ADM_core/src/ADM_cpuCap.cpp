@@ -142,55 +142,9 @@ int rval = 0;
 	return ;
 }
 
-/************************************************************************/
-#ifdef ADM_CPU_X86
-#include "ADM_libraries/ADM_libMpeg2Dec/mpeg2_cpu.h"
-#endif
 
-int ADM_mpeg2dec_mm_support(void)
-{
-int rval=0;
-
-#ifdef ADM_CPU_X86
-#undef MATCH
-#define MATCH(x,y) if(CpuCaps::myCpuCaps & CpuCaps::myCpuMask & ADM_CPUCAP_##x) rval|=MPEG2_ACCEL_X86_##x;
-	
-	MATCH(MMX,MMX);
-	MATCH(MMXEXT,MMXEXT);
-	MATCH(3DNOW,3DNOW);
-#endif
-
-	return rval;
-}
 //******************************************************
-#ifdef ADM_CPU_X86
-#include "ADM_lavcodec.h"
-#endif
-/**
- * 		\fn lavcodec_mm_support
- * 		\brief Give lavcodec CPU supported ( FF_MM_MMX)
- */
-int ADM_lavcodec_mm_support(void)
-{
-int rval=0;
 
-#ifdef ADM_CPU_X86
-#undef MATCH
-#define MATCH(x,y) if(CpuCaps::myCpuCaps &  CpuCaps::myCpuMask & ADM_CPUCAP_##x) rval|=MM_##x;
-
-	MATCH(MMX,MMX);
-	MATCH(MMXEXT,MMXEXT);
-	MATCH(SSE,SSE);
-	MATCH(SSE2,SSE2);
-	MATCH(SSE3,SSE3);
-	MATCH(SSSE3,SSSE3);
-	MATCH(3DNOW,3DNOW);
-	MATCH(3DNOWEXT,3DNOWEXT);
-#endif
-
-	return rval;
-}
-// EOF
 
 // Stolen from x264
 int ADM_cpu_num_processors(void)

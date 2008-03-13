@@ -5,7 +5,11 @@ IF (HAVE_FAAD)
 	SET(ADM_ad_faad_SRCS ADM_ad_faad.cpp)
 
 	ADD_LIBRARY(ADM_ad_faad SHARED ${ADM_ad_faad_SRCS})
-	TARGET_LINK_LIBRARIES(ADM_ad_faad ADM_core ${FAAD_LIBRARY_DIR})
+	TARGET_LINK_LIBRARIES(ADM_ad_faad ${FAAD_LIBRARY_DIR})
+
+	IF (WIN32)
+		TARGET_LINK_LIBRARIES(ADM_ad_faad ADM_core)
+	ENDIF (WIN32)
 
 	INCLUDE(ad_plugin)
 	ADM_audio_plugin(ADM_ad_faad)

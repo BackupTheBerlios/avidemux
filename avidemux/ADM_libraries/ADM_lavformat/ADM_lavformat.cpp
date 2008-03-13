@@ -1,4 +1,4 @@
-//
+
 // C++ Implementation: ADM_lavformat
 //
 // Description: 
@@ -52,7 +52,7 @@ extern "C"
 #define MODULE_NAME MODULE_LAVFORMAT
 #include "ADM_osSupport/ADM_debug.h"
 
-
+#include "ADM_cpuCap.h"
 static    AVOutputFormat *fmt;
 static    AVFormatContext *oc;
 static    AVStream *audio_st, *video_st;

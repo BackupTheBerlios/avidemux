@@ -27,7 +27,9 @@ SET(${ADM_LIB}_SRCS
 	dvbsub_parser.c
 	dvbsubdec.c
 	dvbsub.c xiph.c
-	sp5xdec.c nellymoserdec.c)
+	sp5xdec.c nellymoserdec.c
+	ADM_lavcodec.cpp
+)
 
 IF(ADM_CPU_X86)
 	SET(${ADM_LIB}_SRCS  ${${ADM_LIB}_SRCS}
