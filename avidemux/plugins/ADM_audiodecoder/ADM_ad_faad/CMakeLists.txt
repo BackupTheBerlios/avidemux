@@ -2,6 +2,9 @@ INCLUDE(admCheckFaad)
 checkFaad()
 
 IF (HAVE_FAAD)
+	INCLUDE(ad_plugin)
+	INIT_AUDIO_PLUGIN()
+	
 	SET(ADM_ad_faad_SRCS ADM_ad_faad.cpp)
 
 	ADD_LIBRARY(ADM_ad_faad SHARED ${ADM_ad_faad_SRCS})
@@ -11,9 +14,8 @@ IF (HAVE_FAAD)
 		TARGET_LINK_LIBRARIES(ADM_ad_faad ADM_core)
 	ENDIF (WIN32)
 
-	INCLUDE(ad_plugin)
-	ADM_audio_plugin(ADM_ad_faad)
-
 	ADD_TARGET_CFLAGS(ADM_ad_faad "-I${FAAD_INCLUDE_DIR}")
 	ADD_TARGET_DEFINITIONS(ADM_ad_faad FAAD_OLD_PROTOTYPE)
+	
+	INSTALL_AUDIODECODER(ADM_ad_faad)
 ENDIF (HAVE_FAAD)

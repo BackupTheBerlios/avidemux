@@ -25,20 +25,14 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include <vorbis/codec.h>
+
 #include "ADM_default.h"
 #include "ADM_ad_plugin.h"
-
-
-#include <vorbis/codec.h>
 #include "ADM_ad_vorbis.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_OGM_AUDIO
-#include "ADM_osSupport/ADM_debug.h"
+#define STRUCT ((oggVorbis *)_contextVoid)
 
-
- #define STRUCT ((oggVorbis *)_contextVoid)
- 
 class ADM_vorbis : public     ADM_Audiocodec
 {
 	protected:
@@ -199,7 +193,7 @@ int	nb_synth;
 
 	// Puge them
 	 vorbis_synthesis_read(&STRUCT->vdsp,nb_synth); 
-	 aprintf("This round : in %d bytes, out %d bytes synthetized:%d\n",nbIn,*nbOut,nb_synth);
+	 printf("This round : in %d bytes, out %d bytes synthetized:%d\n",nbIn,*nbOut,nb_synth);
 	return 1;
 	
 }	

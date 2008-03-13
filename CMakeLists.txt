@@ -173,6 +173,7 @@ MESSAGE("")
 # Directories to build
 ########################################
 ADD_SUBDIRECTORY(avidemux)
+ADD_SUBDIRECTORY(avidemux/plugins)
 ADD_SUBDIRECTORY(po)
 
 ########################################

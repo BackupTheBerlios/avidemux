@@ -7,8 +7,7 @@
 #include "ADM_default.h"
 #include "../ADM_audio/ADM_audiodef.h"
 #include "ADM_audiocodec.h"
-#include "ADM_audio/aviaudio.hxx"
-#include "ADM_audiocodec/ADM_audiocodec.h"
+#include "../ADM_audio/aviaudio.hxx"
 
 #define AD_API_VERSION 1
 /* These are the 6 functions exported by each plugin ...*/
