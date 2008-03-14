@@ -40,8 +40,6 @@ FILE            *ADM_fopen (const char *file, const char *mode);
 int             ADM_fclose (FILE *file);
 uint8_t         ADM_fileExist(char *name);
 uint8_t         ADM_mkdir(const char *name);
-//char            *ADM_rindex(const char *s, int c);
-//char            *ADM_index(const char *s, int c);
 
 /* Replacements for memory allocation functions */
 extern void     *ADM_alloc(size_t size);
