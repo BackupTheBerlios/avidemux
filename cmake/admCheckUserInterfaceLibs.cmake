@@ -1,15 +1,4 @@
 ########################################
-# GLib
-########################################
-MESSAGE(STATUS "Checking for GLib")
-MESSAGE(STATUS "*****************")
-
-PKG_CHECK_MODULES(GLIB glib-2.0)
-PRINT_LIBRARY_INFO("GLib" GLIB_FOUND "${GLIB_CFLAGS}" "${GLIB_LDFLAGS}" FATAL_ERROR)
-
-MESSAGE("")
-
-########################################
 # GTK+
 ########################################
 OPTION(GTK "" ON)

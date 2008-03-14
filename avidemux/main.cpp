@@ -239,9 +239,9 @@ int main(int argc, char *argv[])
 	//***************Plugins *********************
 	// Load system wide audio decoder plugin
 #ifdef __APPLE__
-	char *adPlugins = ADM_getInstallRelativePath("lib","ADM_plugins","audioDecoder");
-#else
 	char *adPlugins = ADM_getInstallRelativePath("../Resources/lib","ADM_plugins","audioDecoder");
+#else
+	char *adPlugins = ADM_getInstallRelativePath("lib","ADM_plugins","audioDecoder");
 #endif
 
 	ADM_ad_loadPlugins(adPlugins);

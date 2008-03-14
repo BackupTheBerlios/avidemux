@@ -24,7 +24,6 @@
 #include <sys/time.h>
 #include <fcntl.h>	/* O_RDONLY */
 #include <errno.h>
-#include <glib.h>
     
 #include "ADM_lavcodec.h"
 #include "fourcc.h"
@@ -40,7 +39,7 @@
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "gui_action.hxx"
 #include "gtkgui.h"
-//#include "ADM_gui/GUI_vars.h"
+
 #include "ADM_outputs/oplug_avi/GUI_mux.h"
 #include "ADM_outputs/oplug_mpegFF/oplug_vcdff.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
@@ -60,11 +59,9 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_codecs/ADM_ffmpeg.h"
-
 #include "ADM_libraries/ADM_libmpeg2enc/ADM_mpeg2enc.h"
-
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 #include "ADM_video/ADM_vidMisc.h"
+
 void A_handleSecondTrack (int tracktype);
 int A_delete(uint32_t start, uint32_t end);
 void A_saveImg (char *name);
@@ -155,7 +152,7 @@ uint8_t DIA_builtin(void);
 renderZoom currentZoom=ZOOM_1_1;
 uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name);
 extern const char * GUI_getCustomScript(uint32_t nb);
-extern gboolean SliderIsShifted;
+extern bool SliderIsShifted;
 
 void GUI_showCurrentFrameHex(void);
 void GUI_avsProxy(void);
@@ -172,7 +169,6 @@ extern void DIA_glyphEdit(void);
 
 void HandleAction (Action action)
 {
-  gchar *name_utf8;
   static int recursive = 0;
 
   uint32_t nf = 0;
@@ -210,13 +206,16 @@ int nw;
         case ACT_RECENT2:
         case ACT_RECENT3:
                         const char **name;
+						char* fileName;
                         int rank;
                                 name=prefs->get_lastfiles();
                                 rank=(int)action-ACT_RECENT0;
                                 ADM_assert(name[rank]);
-				name_utf8 = g_filename_from_utf8(name[rank], -1, NULL, NULL, NULL);
-                                A_openAvi2 (name_utf8, 0);
-				g_free(name_utf8);
+
+								fileName = ADM_strdup(name[rank]);
+                                A_openAvi2(fileName, 0);
+								ADM_dealloc(fileName);
+
                 return;
         case ACT_ViewMain: UI_toogleMain();return;
         case ACT_ViewSide: UI_toogleSide();return;
@@ -882,7 +881,6 @@ extern void GUI_PreviewEnd (void);
 int A_openAvi2 (char *name, uint8_t mode)
 {
   uint8_t res;
-  gchar *name_utf8;
   char *longname;
   uint32_t magic[4];
   uint32_t id = 0;
@@ -965,8 +963,7 @@ int A_openAvi2 (char *name, uint8_t mode)
 	}
 
 	/* remember any video or workbench file to "recent" */
-	name_utf8 = g_filename_to_utf8(longname, -1, NULL, NULL, NULL);
-	prefs->set_lastfile(name_utf8);
+	prefs->set_lastfile(longname);
         UI_updateRecentMenu();
 	updateLoaded ();
         if(currentaudiostream)
@@ -996,7 +993,7 @@ int A_openAvi2 (char *name, uint8_t mode)
 		}
 	UI_setTitle(longname+i);
     }
-	g_free(name_utf8);
+
 	delete[] longname;
 	return 1;
 }

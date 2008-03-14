@@ -140,7 +140,7 @@ static void GUI_initCursor( void );
  void UI_BusyCursor( void );
  void UI_NormalCursor( void );
 // For checking if Slider shift key is pressed
-gboolean SliderIsShifted = FALSE;
+bool SliderIsShifted = FALSE;
 gboolean UI_SliderPressed(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 gboolean UI_SliderReleased(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 gboolean UI_returnFocus(GtkWidget *widget, GdkEventButton *event, gpointer user_data);

@@ -143,7 +143,6 @@ ENDIF (ADM_UI_QT4)
 
 SDLify(main.cpp)
 ADD_SOURCE_CFLAGS(main.cpp "-DADM_SUBVERSION=${ADM_SUBVERSION}")
-ADD_SOURCE_CFLAGS(gtk_gui.cpp ${GLIB_CFLAGS})
 
 IF (USE_AMR_NB)
 	ADD_SOURCE_CFLAGS(main.cpp -I${AMRNB_INCLUDE_DIR})
@@ -468,14 +467,11 @@ ENDIF (USE_X264)
 ###########################################
 # UI Specific
 ###########################################
-ADD_TARGET_LDFLAGS(avidemux2_cli ${GLIB_LDFLAGS})
-
 IF (ADM_UI_GTK)
 	ADD_TARGET_LDFLAGS(avidemux2_gtk ${GTK_LDFLAGS} ${GTHREAD_LDFLAGS})
 ENDIF (ADM_UI_GTK)
 
 IF (ADM_UI_QT4)
-	ADD_TARGET_LDFLAGS(avidemux2_qt4 ${GLIB_LDFLAGS})
 	TARGET_LINK_LIBRARIES(avidemux2_qt4 ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY})
 ENDIF (ADM_UI_QT4)
 
