@@ -1,5 +1,0 @@
-*.o
-*.a
-.deps
-.libs
-config.cpu

@@ -1,1 +1,0 @@
-EXTRA_DIST = cputest.c dsputil_mmx.c dsputil_mmx_avg.h dsputil_mmx_rnd.h fdct_mmx.c fft_sse.c mmx.h motion_est_mmx.c mpegvideo_mmx.c mpegvideo_mmx_template.c simple_idct_mmx.c vp3dsp_mmx.c vp3dsp_sse2.c
