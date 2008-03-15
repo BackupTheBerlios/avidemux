@@ -2,7 +2,7 @@
 #define js_autocfg___
 
 /* AUTOMATICALLY GENERATED - DO NOT EDIT */
-#include "config.h"
+#include "ADM_coreConfig.h"
 
 
 #ifdef ADM_BIG_ENDIAN

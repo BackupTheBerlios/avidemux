@@ -240,12 +240,12 @@ ADD_ADMLIB_ALL_TARGETS(
 	ADM_libtwolame
 	ADM_libwrapper
 	ADM_lvemux
-	ADM_smjs
 	ADM_utilities
 	ADM_xvidratectl
 	ADM_colorspace)
 
 ADD_LIB_ALL_TARGETS(
+	ADM_smjs
 	ADM_libavutil
 	ADM_libpostproc
 	ADM_libswscale

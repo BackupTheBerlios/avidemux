@@ -5,16 +5,20 @@ SET(${ADM_LIB}_SRCS
 	jsarena.c  jsbool.c  jsdhash.c   jsexn.c   jsgc.c    jslock.c    jsmath.c  jsopcode.c  jsregexp.c  jsscript.c  jsxdrapi.c
 	jsarray.c  jsdate.c    jsdtoa.c    jsfile.c  jshash.c  jslog2.c    jsnum.c   jsparse.c   jsscan.c    jsstr.c     jsxml.c)
 	
-ADD_ADM_LIB_ALL_TARGETS(${ADM_LIB} ${${ADM_LIB}_SRCS})
+ADD_LIBRARY(${ADM_LIB} SHARED ${${ADM_LIB}_SRCS})
 
 IF (MINGW)
-	ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-DXP_WIN")
+	ADD_TARGET_CFLAGS(${ADM_LIB} "-DXP_WIN")
 ELSE (MINGW)
-	ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-DXP_UNIX -DSVR4 -DSYSV -D_BSD_SOURCE -DPOSIX_SOURCE -DHAVE_VA_COPY -DVA_COPY=va_copy")
+	ADD_TARGET_CFLAGS(${ADM_LIB} "-DXP_UNIX -DSVR4 -DSYSV -D_BSD_SOURCE -DPOSIX_SOURCE -DHAVE_VA_COPY -DVA_COPY=va_copy")
 ENDIF (MINGW)
 
-ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-DNDEBUG -DTRIMMED -DEXPORT_JS_API -DJS_USE_SAFE_ARENA -D_IEEE_LIBM")
-ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-Dmalloc=ADM_alloc")
-ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-Drealloc=ADM_realloc")
-ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-Dfree=ADM_dezalloc")
-ADD_CFLAGS_ALL_TARGETS(${ADM_LIB} "-Dcalloc=ADM_calloc -I/usr/include/nspr")
+ADD_TARGET_CFLAGS(${ADM_LIB} "-DNDEBUG -DTRIMMED -DEXPORT_JS_API -DJS_USE_SAFE_ARENA -D_IEEE_LIBM")
+ADD_TARGET_CFLAGS(${ADM_LIB} "-Dmalloc=ADM_alloc")
+ADD_TARGET_CFLAGS(${ADM_LIB} "-Drealloc=ADM_realloc")
+ADD_TARGET_CFLAGS(${ADM_LIB} "-Dfree=ADM_dezalloc")
+ADD_TARGET_CFLAGS(${ADM_LIB} "-Dcalloc=ADM_calloc -I/usr/include/nspr")
+
+TARGET_LINK_LIBRARIES(${ADM_LIB} ADM_core)
+
+INSTALL(TARGETS ${ADM_LIB} RUNTIME DESTINATION ${BIN_DIR} LIBRARY DESTINATION lib)
