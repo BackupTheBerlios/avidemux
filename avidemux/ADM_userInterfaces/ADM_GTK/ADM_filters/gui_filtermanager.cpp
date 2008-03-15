@@ -6,8 +6,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include <vector>
+
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
 #include "ADM_video/ADM_genvideo.hxx"
@@ -15,7 +17,7 @@
 #include "ADM_video/ADM_videoNull.h"
 #include "ADM_filter/video_filters.h"
 #include "ADM_video/ADM_vidPartial.h"
-
+#include "avi_vars.h"
 #include "ADM_filter/vidVCD.h"
 //___________________________________________
 typedef enum 

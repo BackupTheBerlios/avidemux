@@ -5,34 +5,14 @@
 #include "ADM_editor/ADM_edit.hxx"
 //----------------------
 
-
-#define HAVE_ENCODER
-
-
-//----------------------
-//----------------------
-//----------------------
-#if (defined( HAVE_LIBESD) && defined(HAVE_ESD_H)) || \
- defined(OSS_SUPPORT) || defined (USE_ARTS) || \
-  defined(USE_SDL) || defined(__APPLE__) || \
-  defined(__WIN32) || defined(ALSA_SUPPORT)
-  
-#define HAVE_AUDIO
-#endif
-//----------------------
-
-
-
 #ifdef __DECLARE__
 #define EXTERN 
 #else
 #define EXTERN extern
 #endif
 
-//
 #define DEBUG
 #define DEBUG_L2
-
 
 
 EXTERN ADM_Composer *video_body
@@ -40,6 +20,7 @@ EXTERN ADM_Composer *video_body
 =NULL
 #endif
 ;
+
 
 EXTERN uint32_t  curframe;
 EXTERN uint32_t verbose;

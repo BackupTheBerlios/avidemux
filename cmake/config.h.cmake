@@ -13,8 +13,6 @@
 #define PACKAGE   "avidemux"
 #define ADMLOCALE "${ADM_LOCALE}"
 
-#cmakedefine HAVE_AUDIO
-
 #if ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK || ${CONFIG_HEADER_TYPE} == ADM_BUILD_QT4
 /* use ALSA as possible audio device */
 #cmakedefine ALSA_SUPPORT
@@ -68,7 +66,7 @@
 #cmakedefine USE_FAAC
 
 /* FFmpeg */
-#cmakedefine USE_FFMPEG
+#define USE_FFMPEG
 
 /* FontConfig detected */
 #cmakedefine USE_FONTCONFIG
@@ -87,8 +85,7 @@
 /* Libxml2 is available */
 #cmakedefine USE_LIBXML2
 
-/* MJPEG */
-#cmakedefine USE_MJPEG
+#define USE_MJPEG
 
 /* libpng is available */
 #cmakedefine USE_PNG
@@ -127,6 +124,8 @@
 #if defined(OSS_SUPPORT) || defined (USE_ARTS) || defined(USE_SDL) || defined(__APPLE__) || defined(__WIN32) || defined(ALSA_SUPPORT)
 #define HAVE_AUDIO
 #endif
+
+#define HAVE_ENCODER
 
 // FIXME - start
 #ifdef HAVE_GETTEXT
