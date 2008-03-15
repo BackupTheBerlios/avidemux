@@ -12,7 +12,7 @@
 #include "ADM_default.h"
 #ifdef ADM_CPU_X86
 #include "ADM_libraries/ADM_libMpeg2Dec/mpeg2_cpu.h"
-#include "ADM_libraries/ADM_lavcodec/dsputil_cpu.h"
+#include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/dsputil_cpu.h"
 #include "ADM_cpuCap.h"
 #endif
 extern "C"

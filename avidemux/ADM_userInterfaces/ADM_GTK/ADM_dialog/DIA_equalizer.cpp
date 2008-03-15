@@ -32,7 +32,7 @@
 #include "ADM_video/ADM_vidEqualizer.h"
 
 extern "C" {
-#include "ADM_libraries/ADM_lavcodec/avcodec.h"
+#include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/avcodec.h"
 }
 
 static ColYuvRgb    *rgbConv=NULL;

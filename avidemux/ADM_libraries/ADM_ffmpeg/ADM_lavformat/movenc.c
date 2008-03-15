@@ -270,7 +270,8 @@ int codec_id; // MEANX
   //MEANX  put_byte(pb, codec_get_tag(ff_mp4_obj_type, track->enc->codec_id));
  // MEANX
     codec_id=track->enc->codec_id;
-    if(ADM_useAlternateTagging() && codec_id==CODEC_ID_MP3) codec_id=CODEC_ID_MP2;
+#warning useAlternateTagging disabled
+    //if(ADM_useAlternateTagging() && codec_id==CODEC_ID_MP3) codec_id=CODEC_ID_MP2;
     put_byte(pb, codec_get_tag(ff_mp4_obj_type, codec_id));
     // /MEANX
 

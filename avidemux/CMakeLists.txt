@@ -55,8 +55,8 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
 INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}/config")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_core/include")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_utilities")
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_lavutil")
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_lavcodec")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_ffmpeg/ADM_lavutil")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_ffmpeg/ADM_lavcodec")
 
 IF (GETTEXT_FOUND)
 	INCLUDE_DIRECTORIES(${GETTEXT_INCLUDE_DIR})
@@ -179,14 +179,15 @@ ENDFOREACH(_current ${ADM_SUBDIR})
 ###########################################
 ADD_SUBDIRECTORY(ADM_outputs)
 
-SET(ADM_OUTPUTS
+SET(ADM_OUTPUTS	
 	oplug_avi
 	oplug_mp4
 	oplug_mpeg
 	oplug_mpegFF
 	oplug_ogm
 	oplug_flv
-	oplug_dummy)
+	oplug_dummy
+	ADM_outputs)
 
 ADD_ADMLIB_ALL_TARGETS(${ADM_OUTPUTS})
 
@@ -232,24 +233,24 @@ ENDFOREACH(_current ${ADM_TAILS})
 ###########################################
 ADD_SUBDIRECTORY(ADM_libraries)
 
-SET(ADM_LIBRARIES
-	ADM_lavformat
-	ADM_lavcodec
-	ADM_lavutil
+ADD_ADMLIB_ALL_TARGETS(
 	ADM_mplex
 	ADM_libMpeg2Dec
 	ADM_libmpeg2enc
-	ADM_libswscale
 	ADM_libtwolame
 	ADM_libwrapper
 	ADM_lvemux
 	ADM_smjs
 	ADM_utilities
 	ADM_xvidratectl
-	ADM_libpostproc
 	ADM_colorspace)
 
-ADD_ADMLIB_ALL_TARGETS(${ADM_LIBRARIES})
+ADD_LIB_ALL_TARGETS(
+	ADM_libavutil
+	ADM_libpostproc
+	ADM_libswscale
+	ADM_libavcodec
+	ADM_libavformat)
 
 IF (USE_FREETYPE)
 	ADD_ADMLIB_ALL_TARGETS(ADM_libass)

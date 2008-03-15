@@ -1,7 +1,7 @@
 #include "ADM_default.h"
 #ifdef ADM_CPU_X86
 #include "ADM_lavcodec.h"
-#include "ADM_libraries/ADM_lavcodec/dsputil_cpu.h"
+#include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/dsputil_cpu.h"
 #endif
 /**
  * 		\fn lavcodec_mm_support

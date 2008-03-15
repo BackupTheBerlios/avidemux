@@ -208,20 +208,20 @@ extern "C"
 
 		return ptr;
 	}
-}
 
-char *av_strdup(const char *s)
-{
-    char *ptr;
-    int len;
+	char *av_strdup(const char *s)
+	{
+		char *ptr;
+		int len;
 
-    len = strlen(s) + 1;
-    ptr = (char *)av_malloc(len);
+		len = strlen(s) + 1;
+		ptr = (char *)av_malloc(len);
 
-    if (ptr)
-        memcpy(ptr, s, len);
+		if (ptr)
+			memcpy(ptr, s, len);
 
-    return ptr;
+		return ptr;
+	}
 }
 
 /**

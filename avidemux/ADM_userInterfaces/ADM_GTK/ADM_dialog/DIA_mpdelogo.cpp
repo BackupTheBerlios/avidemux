@@ -31,7 +31,7 @@
 #include "ADM_video/ADM_vidMPdelogo.h"
 
 extern "C" {
-#include "ADM_libraries/ADM_lavcodec/avcodec.h"
+#include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/avcodec.h"
 }
 
 static GtkWidget	*create_dialog1 (void);

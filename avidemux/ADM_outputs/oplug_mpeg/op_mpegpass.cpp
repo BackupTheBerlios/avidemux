@@ -31,7 +31,7 @@
 #include "prefs.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_outputfmt.h"
-#include "ADM_libraries/ADM_lavformat/ADM_lavformat.h"
+#include "../ADM_lavformat.h"
 
 #include "ADM_libraries/ADM_lvemux/ADM_muxer.h"
 

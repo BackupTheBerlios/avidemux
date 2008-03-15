@@ -27,14 +27,13 @@
 
 extern "C" 
 {
-	
-	#include "avformat.h"
+	#include "ADM_libraries/ADM_ffmpeg/ADM_lavformat/avformat.h"
 };
 
 #undef malloc
 #undef realloc
 #undef free
-#include "ADM_assert.h"
+
 #include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 

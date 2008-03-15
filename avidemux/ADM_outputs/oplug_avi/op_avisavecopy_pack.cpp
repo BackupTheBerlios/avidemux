@@ -335,8 +335,8 @@ void updateUserData(uint8_t *start, uint32_t len)
 extern "C"
 {
 #define av_always_inline inline
-#include "ADM_libraries/ADM_lavutil/bswap.h" 
-#include "ADM_libraries/ADM_lavcodec/bitstream.h" 
+#include "ADM_libraries/ADM_ffmpeg/ADM_lavutil/bswap.h" 
+#include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/bitstream.h" 
 }
 void putNvop(ADMBitstream *data,uint32_t timebits, uint32_t timeincval)
 {

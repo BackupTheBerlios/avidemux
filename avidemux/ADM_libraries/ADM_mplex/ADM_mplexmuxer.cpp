@@ -38,7 +38,7 @@
 #include "avifmt.h"
 #include "avifmt2.h"
 #include "ADM_editor/ADM_Video.h"
-#include "ADM_libraries/ADM_lavformat/ADM_lavformat.h"
+#include "ADM_outputs/ADM_lavformat.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_LAVFORMAT

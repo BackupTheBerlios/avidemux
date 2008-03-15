@@ -35,8 +35,8 @@ extern "C"
 #include "common.h"
 #include "bswap.h"
 #define INT_MAX (0x7FFFFFFF)
-#include "ADM_libraries/ADM_lavcodec/bitstream.h"
-#include "ADM_libraries/ADM_lavcodec/golomb.h"
+#include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/bitstream.h"
+#include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/golomb.h"
 }
 
 #include "ADM_infoExtractor/ADM_h264_tag.h"

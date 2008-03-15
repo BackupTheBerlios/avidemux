@@ -51,7 +51,7 @@ extern "C" {
 #include "ADM_userInterfaces/ADM_commonUI/DIA_encoding.h"
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-#include "ADM_libraries/ADM_lavformat/ADM_lavformat.h"
+#include "../ADM_lavformat.h"
 
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
