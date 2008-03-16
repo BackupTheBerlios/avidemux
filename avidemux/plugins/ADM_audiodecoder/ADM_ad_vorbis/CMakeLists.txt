@@ -1,6 +1,5 @@
 IF (USE_VORBIS)
 	INCLUDE(ad_plugin)
-	INIT_AUDIO_PLUGIN()
 
 	SET(ADM_ad_vorbis_SRCS ADM_ad_vorbis.cpp)
 
@@ -11,5 +10,6 @@ IF (USE_VORBIS)
 
 	ADD_TARGET_CFLAGS(ADM_ad_vorbis "-I${VORBIS_INCLUDE_DIR}")
 
+	INIT_AUDIO_PLUGIN(ADM_ad_vorbis)
 	INSTALL_AUDIODECODER(ADM_ad_vorbis)
 ENDIF (USE_VORBIS)

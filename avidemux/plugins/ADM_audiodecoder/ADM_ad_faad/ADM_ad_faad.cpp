@@ -42,7 +42,7 @@ class ADM_faad : public     ADM_Audiocodec
 };
 // Supported formats + declare our plugin
 //*******************************************************
-uint32_t Formats[]={WAV_AAC,WAV_MP4};
+static uint32_t Formats[]={WAV_AAC,WAV_MP4};
 DECLARE_AUDIO_DECODER(ADM_faad,						// Class
 			0,0,1, 												// Major, minor,patch 
 			Formats, 											// Supported formats

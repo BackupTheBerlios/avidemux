@@ -50,7 +50,7 @@ class ADM_vorbis : public     ADM_Audiocodec
 
 // Supported formats + declare our plugin
 //*******************************************************
-uint32_t Formats[]={WAV_OGG};
+static uint32_t Formats[]={WAV_OGG};
 DECLARE_AUDIO_DECODER(ADM_vorbis,						// Class
 			0,0,1, 												// Major, minor,patch 
 			Formats, 											// Supported formats

@@ -33,7 +33,6 @@
 #include "prefs.h"
 #include "ADM_audiodevice/audio_out.h"
 #include "ADM_toolkit/ADM_intfloat.h"
-#include "ADM_libraries/ADM_libwrapper/libwrapper_global.h"
 
 #ifdef USE_XVID_4
 extern void xvid4_init(void);
@@ -263,9 +262,7 @@ int main(int argc, char *argv[])
     buildDistMatrix();
     initScaleTab();
 
-    COL_init();
-	initLibWrappers();
-	
+    COL_init();	
     if(SpidermonkeyInit() == true)
         printf("Spidermonkey initialized.\n");
     else
@@ -293,7 +290,6 @@ void onexit( void )
     pthread_mutex_unlock(&g_pSpiderMonkeyMutex);
     destroyPrefs();
     filterCleanUp();
-	destroyLibWrappers();
 	ADM_lavDestroy();
 
 #ifdef USE_SDL

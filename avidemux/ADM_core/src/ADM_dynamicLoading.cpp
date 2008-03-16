@@ -90,11 +90,11 @@ bool ADM_LibWrapper::loadLibrary(const char* path)
 		return true;
 	}
 #else
-	hinstLib = dlopen(path, RTLD_NOW);
+	hinstLib = dlopen(path, RTLD_NOW | RTLD_GLOBAL);
 	
 	if (hinstLib == NULL)
 	{
-		aprintf("Unable to load [%s]: %s\n", path, dlerror());
+		printf("Unable to load [%s]: %s\n", path, dlerror());
 
 		return false;
 	}

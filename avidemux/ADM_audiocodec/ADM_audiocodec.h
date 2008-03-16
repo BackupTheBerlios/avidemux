@@ -83,23 +83,6 @@ class ADM_AudiocodecUnknown : public     ADM_Audiocodec
 };
 
 
-#ifdef USE_LIBDCA
-class ADM_AudiocodecDCA : public     ADM_Audiocodec
-{
-	protected:
-		void *dts_handle;
-
-	public:
-		ADM_AudiocodecDCA(uint32_t fourcc, WAVHeader *info);
-		virtual	~ADM_AudiocodecDCA();
-		virtual	uint8_t beginDecompress(void);
-		virtual	uint8_t endDecompress(void);
-		virtual	uint8_t run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut);
-		virtual	uint8_t isCompressed(void) {return 1;}
-		virtual	uint8_t isDecompressable(void) {return 1;}
-
-   };
-#endif
 
 class ADM_Audiocodec8Bits : public     ADM_Audiocodec
 {

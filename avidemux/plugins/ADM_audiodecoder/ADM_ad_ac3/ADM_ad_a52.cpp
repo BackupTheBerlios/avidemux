@@ -43,7 +43,7 @@ class ADM_AudiocodecAC3 : public     ADM_Audiocodec
    };
 // Supported formats + declare our plugin
 //*******************************************************
-   uint32_t Formats[]={WAV_AC3};
+   static  uint32_t Formats[]={WAV_AC3};
    DECLARE_AUDIO_DECODER(ADM_AudiocodecAC3,						// Class
 		   	0,0,1, 												// Major, minor,patch 
 		   	Formats, 											// Supported formats

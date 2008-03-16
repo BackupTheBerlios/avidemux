@@ -21,6 +21,12 @@
 #include "ADM_toolkit/filesel.h"
 #include "ADM_dynamicLoading.h"
 #include <vector>
+#if 1
+#define aprintf printf
+#else
+#define aprintf(...) {}
+#endif
+
 /**
  * 
  */
@@ -34,6 +40,7 @@ public:
 	ADM_ad_GetDecoderVersion	*getDecoderVersion;
 	ADM_ADM_ad_GetInfo			*getInfo;
 	ADM_LibWrapper				*wrapper;
+	const char 					*name;
 };
 
 std::vector<ADM_ad_plugin *> ADM_audioPlugins;
@@ -48,7 +55,7 @@ static uint8_t tryLoadingAudioPlugin(const char *file)
 	ADM_LibWrapper *wrapper=new ADM_LibWrapper;
 	 if(true!=wrapper->loadLibrary(file))
 	 {
-		 printf("Load failed\n");
+		 printf("[ADM_ad_plugin] LoadLibrary failed for %s\n",ADM_GetFileName(file));
 		 goto Err_ad;
 	 }
 #define FUNCKY(a,b,c)	 blank.a=(b *)wrapper->getSymbol(#c); if(!blank.a) { printf("[ADM_ad_plugin]"#c" failed\n"); goto Err_ad;;}
@@ -71,6 +78,7 @@ static uint8_t tryLoadingAudioPlugin(const char *file)
 	 const char *desc;
 	 blank.getDecoderVersion(&major,&minor,&patch);
 	 blank.wrapper=wrapper;
+	 blank.name=ADM_strdup(ADM_GetFileName(file));
 	 desc=blank.getInfo();
 	 // Print out stuff
 	 printf("[ADM_ad_plugin] Plugin loaded version %d.%d.%d, desc : %s\n",major,minor,patch,desc);
@@ -133,7 +141,7 @@ ADM_Audiocodec *ADM_ad_searchCodec(uint32_t fourcc,	WAVHeader *info,uint32_t ext
 		ADM_ad_plugin *a=ADM_audioPlugins[i];
 		ADM_assert(a);
 		ADM_assert(a->supportedFormat);
-		
+		aprintf("Format 0x%x : probing %s\n",fourcc,a->name);
 		if(a->supportedFormat(fourcc)==true)
 		{
 			ADM_assert(a->create);
