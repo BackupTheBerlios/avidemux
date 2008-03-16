@@ -65,16 +65,6 @@ ADM_Audiocodec *out = NULL;
 					out= (ADM_Audiocodec *)new ADM_AudiocodecWav(fourcc);
 #endif					
                   			break;
-#ifdef USE_AMR_NB
-				case WAV_AMRNB:
-					if (amrnb->isAvailable())
-					{
-						printf("\n AMR narrow band codec\n");
-						out=(ADM_Audiocodec *)new ADM_AudiocodecAMR(fourcc,info);
-					}
-
-					break;
-#endif
 				case WAV_8BITS:
 					printf("\n 8 BIts pseudo codec\n");
     					out= (ADM_Audiocodec *)new ADM_Audiocodec8Bits(fourcc);

@@ -56,10 +56,9 @@
  */
  /* MEANX */
 #include "config.h"
-#ifdef USE_AMR_NB
+#if 0 //def USE_AMR_NB
  /* MEANX */
 
-#include "ADM_libraries/ADM_libwrapper/libwrapper_global.h"
 #include "avcodec.h"
 
 #ifdef CONFIG_AMR_NB_FIXED

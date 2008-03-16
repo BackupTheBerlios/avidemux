@@ -90,7 +90,7 @@ uint8_t DIA_builtin(void)
 #ifdef USE_AFTEN
         aften=1;
 #endif
-#ifdef USE_AMR_NB
+#if 0 //def USE_AMR_NB
 	if (amrnb->isAvailable())
 		libamrnb=1;
 #endif

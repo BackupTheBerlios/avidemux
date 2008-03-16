@@ -1,0 +1,41 @@
+#
+MACRO(checkAMRNB)
+OPTION(AMRNB "" ON)
+
+MESSAGE(STATUS "Checking for amrnb")
+MESSAGE(STATUS "******************")
+
+IF (AMRNB)
+	
+	FIND_HEADER_AND_LIB(AMRNB amrnb/interf_dec.h amrnb GP3Decoder_Interface_Decode)
+	
+	PRINT_LIBRARY_INFO("amrnb" AMRNB_FOUND "${AMRNB_INCLUDE_DIR}" "${AMRNB_LIBRARY_DIR}")
+
+	IF (AMRNB_FOUND)
+		SET(USE_AMR_NB 1)
+		SET(CONFIG_AMR_NB 1)
+	ENDIF (AMRNB_FOUND)
+ELSE (AMRNB)
+	MESSAGE("${MSG_DISABLE_OPTION}")
+ENDIF (AMRNB)
+
+MESSAGE("")
+ENDMACRO(checkAMRNB)
+
+
+# AMRNB decoder
+checkAMRNB()
+
+IF (AMRNB_FOUND)
+	INCLUDE(ad_plugin)
+	
+	SET(ADM_ad_amrnb_SRCS ADM_ad_amrnb.cpp)
+
+	ADD_LIBRARY(ADM_ad_amrnb SHARED ${ADM_ad_amrnb_SRCS})
+	TARGET_LINK_LIBRARIES(ADM_ad_amrnb ${AMRNB_LIBRARY_DIR})
+
+	ADD_TARGET_CFLAGS(ADM_ad_amrnb "-I${AMRNB_INCLUDE_DIR}")
+
+	INIT_AUDIO_PLUGIN(ADM_ad_amrnb)
+	INSTALL_AUDIODECODER(ADM_ad_amrnb)
+ENDIF (AMRNB_FOUND)
