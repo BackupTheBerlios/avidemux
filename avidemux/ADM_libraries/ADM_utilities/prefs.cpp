@@ -115,7 +115,6 @@ static opt_def opt_defs [] = {
 	{"feature.svcdres.preferedsourceratio",		STRING,"1:1",	NULL, NULL, NULL },
 	{"feature.saveprefsonexit",		UINT,	"1",	NULL,	"0",	"1"	},
 	{"feature.ignoresavedmarkers",		UINT,	"0",	NULL,	"0",	"1"	},
-	{"feature.use_lavcodec_mpeg",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.disable_nuv_resync",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.tryautoidx",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.use_odml",		UINT,	"0",	NULL,	"0",	"1"	},
@@ -141,7 +140,7 @@ static opt_def opt_defs [] = {
 	{"priority.playback",		UINT,	"0",	NULL,	"0",	"4"	}
 };
 
-int num_opts = 81;
+int num_opts = 80;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2

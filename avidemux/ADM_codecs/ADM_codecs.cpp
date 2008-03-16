@@ -62,7 +62,6 @@ extern "C"
 #include "ADM_codecs/ADM_theora_dec.h"
 #endif
 
-#include "ADM_codecs/ADM_mpeg.h"
 #include "ADM_codecs/ADM_png.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_assert.h"
@@ -391,33 +390,13 @@ if (fourCC::check (fcc, (uint8_t *) "MJPG")
 
     }
   if (isMpeg12Compatible (fcc))
-    {
-      uint32_t lavcodec_mpeg = 0;
-      printf ("\n using Mpeg1/2 codec (libmpeg2)\n");
-      if (!prefs->get (FEATURE_USE_LAVCODEC_MPEG, &lavcodec_mpeg))
-	{
-	  lavcodec_mpeg = 0;
-	}
-      if (lavcodec_mpeg)
-	{
-	  return (decoders *) (new
-			       decoderFFMpeg12 (w, h, extraLen, extraData));
-	}
-      else
-	{
-	  return (decoders *) (new decoderMpeg (w, h, extraLen, extraData));
-	}
-      //  
-    }
+	  return (decoders *) (new decoderFFMpeg12 (w, h, extraLen, extraData));
 
   // default : null decoder
   printf ("\n using invalid codec for \n");
   fourCC::print (fcc);
 
   return (decoders *) (new decoderEmpty (w, h));
-
-
-
 }
 
 uint8_t coders::compress (ADMImage * in, ADMBitstream * out)

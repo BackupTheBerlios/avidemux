@@ -36,7 +36,6 @@
 #include "ADM_libraries/ADM_lvemux/ADM_muxer.h"
 
 // To have access to low level infos 
-#include "ADM_codecs/ADM_mpeg.h"
 #include "ADM_lavcodec.h"
 #include "ADM_codecs/ADM_ffmp43.h"
 #include "ADM_inputs/ADM_mpegdemuxer/dmx_mpegstartcode.h"
@@ -110,48 +109,11 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
 	}
 	// Check
 	WAVHeader *hdr=audio->getInfo();
-	uint32_t isMpeg1;
-	uint32_t isLav;
-	if(!prefs->get(FEATURE_USE_LAVCODEC_MPEG, &isLav))
-		{
-		 isLav=0;
-		}
 
-	if(!isLav)
-	{
-		decoderMpeg *mpeghdr;
-	
-		mpeghdr=(decoderMpeg *)video_body->rawGetDecoder(0);
-		isMpeg1=mpeghdr->isMpeg1();
-	}
-	else
-	{
-		// How to know if it is mpeg 1?
-		// Assume it is not
-		/*
-		decoderFFMpeg12 *mpeghdr;
-	
-		mpeghdr=(decoderFFMpeg12 *)video_body->rawGetDecoder(0);
-		isMpeg1=mpeghdr->isMpeg1();
-		*/
-		isMpeg1=0;
-	
-	}
-	
 	switch(format)
         {
         case ADM_PS:	
-                if(isMpeg1)
-                {
-                        if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
-                        {
-                          GUI_Error_HIG(QT_TR_NOOP("Incompatible audio"), QT_TR_NOOP("For VCD, audio must be 44.1 kHz MP2."));
-                                return 0 ;
-                        }
-                        mux=MUXER_VCD;
-                        printf("PassThrough: Using VCD PS\n");        
-                }else
-                {    // Mpeg2 
+                    // Mpeg2 
                         aviInfo info;
                         video_body->getVideoInfo(&info);
                         if(hdr->frequency==44100 && info.width==480&& hdr->encoding == WAV_MP2 ) // SVCD ?
@@ -181,7 +143,6 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                                mux=MUXER_DVD;
                                printf("PassThrough: Using DVD PS\n");
                         }
-                }
 
   	        muxer=new mplexMuxer();
                 break;

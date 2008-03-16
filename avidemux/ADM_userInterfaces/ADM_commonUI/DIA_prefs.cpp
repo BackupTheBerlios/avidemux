@@ -48,7 +48,6 @@ uint8_t DIA_Preferences(void)
 {
 uint32_t olddevice,newdevice;
 
-uint32_t	lavcodec_mpeg=0;
 uint32_t        use_odml=0;
 uint32_t	autosplit=0;
 uint32_t render;
@@ -151,8 +150,6 @@ char     *globalGlyphName=NULL;
         if(!prefs->get(SETTINGS_MPEGSPLIT, &autosplit))
                 autosplit=690;		
                         
-        if(!prefs->get(FEATURE_USE_LAVCODEC_MPEG, &lavcodec_mpeg))
-                lavcodec_mpeg=0;
         // Open DML (Gmv)
         if(!prefs->get(FEATURE_USE_ODML, &use_odml))
           use_odml=0;
@@ -185,7 +182,6 @@ char     *globalGlyphName=NULL;
         /************************ Build diaelems ****************************************/
         diaElemToggle useSysTray(&useTray,QT_TR_NOOP("_Use systray while encoding"));
         diaElemToggle allowAnyMpeg(&mpeg_no_limit,QT_TR_NOOP("_Accept non-standard audio frequency for DVD"));
-        diaElemToggle useLavcodec(&lavcodec_mpeg,QT_TR_NOOP("_Use libavcodec MPEG-2 decoder"));
         diaElemToggle openDml(&use_odml,QT_TR_NOOP("Create _OpenDML files"));
         diaElemToggle autoIndex(&useAutoIndex,QT_TR_NOOP("Automatically _index MPEG files"));
         diaElemToggle autoSwap(&useSwap,QT_TR_NOOP("Automatically _swap A and B if A>B"));
@@ -375,8 +371,8 @@ char     *globalGlyphName=NULL;
         diaElemTabs tabAuto(QT_TR_NOOP("Automation"),5,diaAuto);
         
         /* Input */
-        diaElem *diaInput[]={&nuvAudio,&useLavcodec};
-        diaElemTabs tabInput(QT_TR_NOOP("Input"),2,(diaElem **)diaInput);
+        diaElem *diaInput[]={&nuvAudio};
+        diaElemTabs tabInput(QT_TR_NOOP("Input"),1,(diaElem **)diaInput);
         
         /* Output */
         diaElem *diaOutput[]={&autoSplit,&openDml,&allowAnyMpeg,&togTagMp3};
@@ -482,8 +478,6 @@ char     *globalGlyphName=NULL;
                 prefs->set(FEATURE_MPEG_NO_LIMIT, mpeg_no_limit);
                 // Video render
                 prefs->set(DEVICE_VIDEODEVICE,render);
-                // Mpeg /lavcodec
-                prefs->set(FEATURE_USE_LAVCODEC_MPEG, lavcodec_mpeg);
                 // Odml
                 prefs->set(FEATURE_USE_ODML, use_odml);
 				// Split
