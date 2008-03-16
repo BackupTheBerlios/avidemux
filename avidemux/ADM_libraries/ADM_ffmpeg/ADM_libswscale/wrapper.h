@@ -3,7 +3,7 @@
 	Replacement for assert
 */
 #include "ADM_default.h"
-
+#undef memcpy
 //******************
 #undef malloc
 #undef realloc

@@ -84,6 +84,10 @@ untested special converters
 
 
 #include "../ADM_lavcodec/opt.h" //MEANX
+//**** Does not build as shared on amd64... MEANX
+#ifdef ARCH_X86_64
+#undef RUNTIME_CPUDETECT
+#endif
 
 #undef MOVNTQ
 #undef PAVGB
