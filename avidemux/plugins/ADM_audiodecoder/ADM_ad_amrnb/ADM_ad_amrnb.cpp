@@ -45,7 +45,7 @@ class ADM_AudiocodecAmrNb : public     ADM_Audiocodec
    DECLARE_AUDIO_DECODER(ADM_AudiocodecAmrNb,						// Class
 		   	0,0,1, 												// Major, minor,patch 
 		   	Formats, 											// Supported formats
-		   	"LibAC3 decoder plugin for avidemux (c) Mean/Gruntster\n"); 	// Desc
+		   	"LibAMR NB decoder plugin for avidemux (c) Mean/Gruntster\n"); 	// Desc
    //********************************************************
 
    ///************************************************

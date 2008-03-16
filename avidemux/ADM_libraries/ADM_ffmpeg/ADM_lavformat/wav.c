@@ -135,7 +135,7 @@ static int find_tag(ByteIOContext *pb, uint32_t tag1)
         size = 0x7fffffff;
     return size;
 }
-
+#ifdef CONFIG_WAV_DEMUXER //MEANX
 static int wav_probe(AVProbeData *p)
 {
     /* check file header */
@@ -254,7 +254,7 @@ static int wav_read_seek(AVFormatContext *s,
     return pcm_read_seek(s, stream_index, timestamp, flags);
 }
 
-#ifdef CONFIG_WAV_DEMUXER
+// MEANX #ifdef CONFIG_WAV_DEMUXER
 AVInputFormat wav_demuxer = {
     "wav",
     "wav format",

@@ -81,7 +81,8 @@ static uint8_t tryLoadingAudioPlugin(const char *file)
 	 blank.name=ADM_strdup(ADM_GetFileName(file));
 	 desc=blank.getInfo();
 	 // Print out stuff
-	 printf("[ADM_ad_plugin] Plugin loaded version %d.%d.%d, desc : %s\n",major,minor,patch,desc);
+	 printf("[ADM_ad_plugin] Plugin loaded version %d.%d.%d, name %s,desc : %s ",
+			 		major,minor,patch,blank.name,desc);
 	 
 	 //
 	 {
