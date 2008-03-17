@@ -48,3 +48,16 @@ ENDFOREACH(_flag)
 SET(PNG_CFLAGS ${PNG_CFLAGS} ${PNG_DEFINITIONS})
 SET(USE_PNG 1)
 MESSAGE("")
+
+########################################
+# pthreads
+########################################
+IF (WIN32)
+	MESSAGE(STATUS "Checking for pthreads")
+	MESSAGE(STATUS "*********************")
+
+	FIND_PACKAGE(Threads)
+	PRINT_LIBRARY_INFO("pthreads" PTHREAD_FOUND "${PTHREAD_INCLUDE_DIR}" "${PTHREAD_LIBRARIES}" FATAL_ERROR)
+
+	MESSAGE("")
+ENDIF (WIN32)
