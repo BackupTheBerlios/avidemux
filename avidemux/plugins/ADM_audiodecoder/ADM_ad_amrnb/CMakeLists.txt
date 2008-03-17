@@ -1,25 +1,17 @@
-#
 MACRO(checkAMRNB)
-OPTION(AMRNB "" ON)
+	OPTION(AMRNB "" ON)
 
-MESSAGE(STATUS "Checking for amrnb")
-MESSAGE(STATUS "******************")
+	MESSAGE(STATUS "Checking for amrnb")
+	MESSAGE(STATUS "******************")
 
-IF (AMRNB)
-	
-	FIND_HEADER_AND_LIB(AMRNB amrnb/interf_dec.h amrnb GP3Decoder_Interface_Decode)
-	
-	PRINT_LIBRARY_INFO("amrnb" AMRNB_FOUND "${AMRNB_INCLUDE_DIR}" "${AMRNB_LIBRARY_DIR}")
+	IF (AMRNB)
+		FIND_HEADER_AND_LIB(AMRNB amrnb/interf_dec.h amrnb GP3Decoder_Interface_Decode)
+		PRINT_LIBRARY_INFO("amrnb" AMRNB_FOUND "${AMRNB_INCLUDE_DIR}" "${AMRNB_LIBRARY_DIR}")
+	ELSE (AMRNB)
+		MESSAGE("${MSG_DISABLE_OPTION}")
+	ENDIF (AMRNB)
 
-	IF (AMRNB_FOUND)
-		SET(USE_AMR_NB 1)
-		SET(CONFIG_AMR_NB 1)
-	ENDIF (AMRNB_FOUND)
-ELSE (AMRNB)
-	MESSAGE("${MSG_DISABLE_OPTION}")
-ENDIF (AMRNB)
-
-MESSAGE("")
+	MESSAGE("")
 ENDMACRO(checkAMRNB)
 
 

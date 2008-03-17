@@ -3,8 +3,3 @@ SET(ADM_audiocodec_SRCS
 	ADM_audiocodec.cpp  ADM_codecwav.cpp  ADM_pluginLoad.cpp)
 
 ADD_ADM_LIB_ALL_TARGETS(ADM_audiocodec ${ADM_audiocodec_SRCS})
-
-IF (USE_AMR_NB)
-	ADD_SOURCE_CFLAGS(ADM_audiocodec.cpp -I${AMRNB_INCLUDE_DIR})
-ENDIF (USE_AMR_NB)
-

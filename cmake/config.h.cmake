@@ -18,9 +18,6 @@
 #cmakedefine ALSA_SUPPORT
 #endif
 
-/* AMR_NB */
-#cmakedefine AMR_NB
-
 /* FontConfig detected */
 #cmakedefine HAVE_FONTCONFIG
 
@@ -46,9 +43,6 @@
 #cmakedefine USE_AFTEN_07	// 0.07
 #cmakedefine USE_AFTEN_08	// 0.0.8
 
-/* Tell avidemux to use libamrnb */
-#cmakedefine USE_AMR_NB
-
 #if ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK || ${CONFIG_HEADER_TYPE} == ADM_BUILD_QT4
 /* aRts detected */
 #cmakedefine USE_ARTS
@@ -73,14 +67,6 @@
 
 /* FreeType2 detected */
 #cmakedefine USE_FREETYPE
-
-/* use late binding of selected libraries */
-#cmakedefine USE_LATE_BINDING
-
-/* libdca detected */
-#cmakedefine USE_LIBDCA
-#cmakedefine USE_LIBDCA_002
-#cmakedefine USE_LIBDCA_005
 
 /* Libxml2 is available */
 #cmakedefine USE_LIBXML2

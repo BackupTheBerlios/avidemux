@@ -23,11 +23,6 @@ MESSAGE("")
 # Global options
 ########################################
 OPTION(VERBOSE "" OFF)
-OPTION(LATE_BINDING "" OFF)
-
-IF (LATE_BINDING)
-	SET(USE_LATE_BINDING 1)
-ENDIF (LATE_BINDING)
 
 IF (NOT CMAKE_BUILD_TYPE)
 	SET(CMAKE_BUILD_TYPE "Release")
