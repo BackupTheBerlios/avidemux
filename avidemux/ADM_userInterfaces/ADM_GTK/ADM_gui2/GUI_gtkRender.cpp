@@ -40,6 +40,7 @@ extern "C"
 
 void GUI_gtk_grow_off(int onff);
 
+extern GtkWidget *guiRootWindow;
 extern GtkWidget *getDrawWidget(void);
 extern uint8_t UI_getPhysicalScreenSize(void* window, uint32_t *w, uint32_t *h);
 
@@ -107,22 +108,23 @@ void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo)
 #ifdef __WIN32
 		xinfo->display = (void*)GDK_WINDOW_HWND(widget->window);
 #elif defined(__APPLE__)
+		xinfo->display = 0;
+		xinfo->window = getMainNSWindow();
+#else
+		xinfo->window = GDK_WINDOW_XWINDOW(widget->window);
+		xinfo->display = GDK_WINDOW_XDISPLAY(win);
+#endif
+
 		int windowWidth, windowHeight;
 		int x, y;
 
 		gdk_drawable_get_size(win, &windowWidth, &windowHeight);
 		gdk_window_get_position(widget->window, &x, &y);
 
-		xinfo->display = 0;
-		xinfo->window = getMainNSWindow();
 		xinfo->x = x;
 		xinfo->y = windowHeight - (y + lastH);
 		xinfo->width = lastW;
 		xinfo->height = lastH;
-#else
-		xinfo->window = GDK_WINDOW_XWINDOW(widget->window);
-		xinfo->display = GDK_WINDOW_XDISPLAY(win);
-#endif
 }
 
 #ifdef ENABLE_WINDOW_SIZING_HACK
@@ -224,8 +226,15 @@ void UI_centreCanvasWindow(GtkWindow *window, GtkWidget *canvas, int newCanvasWi
 {
 	int winWidth, winHeight, widgetWidth, widgetHeight;
 	GdkScreen *screen = gdk_screen_get_default();
-	int monitorNo = gdk_screen_get_monitor_at_window(screen, GTK_WIDGET(window->transient_parent)->window);
 	GdkRectangle rect;
+	GtkWidget *referenceWidget;
+
+	if (window->transient_parent == NULL)
+		referenceWidget = guiRootWindow;
+	else
+		referenceWidget = GTK_WIDGET(window->transient_parent);
+
+	int monitorNo = gdk_screen_get_monitor_at_window(screen, referenceWidget->window);
 
 	gdk_screen_get_monitor_geometry(screen, monitorNo, &rect);
 	gtk_widget_get_size_request((GtkWidget*)canvas, &widgetWidth, &widgetHeight);

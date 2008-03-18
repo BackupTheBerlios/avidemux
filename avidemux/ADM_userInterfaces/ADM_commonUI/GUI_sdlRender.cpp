@@ -183,13 +183,11 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 		// Create Cocoa view and attach to Carbon window using custom Objective-C function.
 		// It's a retarded way of doing things but that's what Apple has imposed...
 		initSdlCocoaView(parent, window->x, window->y, window->width, window->height, (window->display != NULL));
+#endif
 
-	// SDL will resize our Cocoa window to width and height passed to SetVideoMode.
+	// SDL will resize our window to width and height passed to SetVideoMode.
 	// This is fine until we use zoomed views so pass window dimensions instead.
 	sdl_display= SDL_SetVideoMode(window->width, window->height, bpp, flags);
-#else
-	sdl_display= SDL_SetVideoMode( w, h,  bpp, flags );
-#endif
 
     if (!sdl_display)
     {

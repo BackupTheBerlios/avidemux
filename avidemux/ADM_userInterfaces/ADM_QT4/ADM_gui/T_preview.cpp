@@ -187,22 +187,23 @@ void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
 */
 void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo)
 {
+	QWidget* widget = videoWindow->parentWidget();
+
 #if defined(__WIN32)
 	xinfo->display=videoWindow->winId();
 #elif defined(__APPLE__)
-	QWidget* widget = videoWindow->parentWidget();
-
 	xinfo->display = HIViewGetWindow(HIViewRef(widget->winId()));
 	xinfo->window = 0;
-	xinfo->x = widget->x();
-	xinfo->y = widget->parentWidget()->height() - (widget->y() + displayH);
-	xinfo->width = displayW;
-	xinfo->height = displayH;
 #else
     const QX11Info &info=videoWindow->x11Info();
     xinfo->display=info.display();
     xinfo->window=videoWindow->winId();
-#endif 
+#endif
+
+	xinfo->x = widget->x();
+	xinfo->y = widget->parentWidget()->height() - (widget->y() + displayH);
+	xinfo->width = displayW;
+	xinfo->height = displayH;
 }
 
 

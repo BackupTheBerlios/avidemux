@@ -1,87 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="it">
-<defaultcodec></defaultcodec>
 <context>
     <name></name>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="58"/>
-        <source>1  - Extremely Low (Fastest)</source>
-        <translation>1  - Estremamente bassa (più veloce)</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="59"/>
-        <source>2  - Very Low</source>
-        <translation>2  - Molto bassa</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="60"/>
-        <source>3  - Low</source>
-        <translation>3  - Bassa</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="61"/>
-        <source>4  - Medium</source>
-        <translation>4  - Media</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="62"/>
-        <source>5  - High (Default)</source>
-        <translation>5  - Alta (predefinito)</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="63"/>
-        <source>6  - Very High</source>
-        <translation>6  - Molto alta</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="64"/>
-        <source>6B - Very High (RDO on Bframes)</source>
-        <translation>6B - Molto alta (RDO sui fotogrammi-B)</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="65"/>
-        <source>7 - Ultra High</source>
-        <translation>7  - Ultra</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="66"/>
-        <source>7B - Ultra High (RDO on Bframes)</source>
-        <translation>7B - Ultra (RDO sui fotogrammi-B)</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="69"/>
-        <source>Partition Decision</source>
-        <translation>Decisione partizione</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="72"/>
-        <source>Diamond search</source>
-        <translation>Ricerca romboidale</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="73"/>
-        <source>Hexagonal search</source>
-        <translation>Ricerca esagonale</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="74"/>
-        <source>Uneven multi hexagon</source>
-        <translation>Multi esagono irregolare</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="75"/>
-        <source>Exhaustive search</source>
-        <translation>Ricerca esaustiva</translation>
-    </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_xvid4.cpp" line="72"/>
         <source>VHQ Mode</source>
         <translation>Modalità VHQ</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="78"/>
-        <source>Max Ref Frames</source>
-        <translation>Numero massimo di fotogrammi di riferimento</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_xvid4.cpp" line="76"/>
@@ -94,34 +18,9 @@
         <translation>Croma ME</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="81"/>
-        <source>Mixed Refs</source>
-        <translation>Riferimenti misti</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="82"/>
-        <source>Fast P Skip</source>
-        <translation>P Skip veloce</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="83"/>
-        <source>DCT Decimate</source>
-        <translation>DCT Decimate</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="84"/>
-        <source>Interlaced</source>
-        <translation>Interlacciato</translation>
-    </message>
-    <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavcodec.cpp" line="108"/>
         <source>Motion Estimation</source>
         <translation>Stima movimento</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="103"/>
-        <source>Disabled</source>
-        <translation>Disattivo</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_xvid4.cpp" line="59"/>
@@ -132,86 +31,6 @@
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_xvid4.cpp" line="61"/>
         <source>High</source>
         <translation>Alta</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="107"/>
-        <source>Trellis</source>
-        <translation>Trellis</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="108"/>
-        <source>CABAC</source>
-        <translation>CABAC</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="109"/>
-        <source>Noise Reduction</source>
-        <translation>Riduzione interferenza</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="110"/>
-        <source>Deblocking Filter</source>
-        <translation>Filtro deblocking</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="111"/>
-        <source>Strength</source>
-        <translation>Intensità</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="112"/>
-        <source>Threshold</source>
-        <translation>Soglia</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="126"/>
-        <source>Misc</source>
-        <translation>Varie</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="129"/>
-        <source>8x8 Transform</source>
-        <translation>Trasforma 8x8</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="130"/>
-        <source>8x8P Transform</source>
-        <translation>Trasforma 8x8P</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="131"/>
-        <source>8x8B Transform</source>
-        <translation>Trasforma 8x8B</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="132"/>
-        <source>_4x4 Transform</source>
-        <translation>Trasforma _4x4</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="133"/>
-        <source>_8x8I Transform</source>
-        <translation>Trasforma _8x8I</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="134"/>
-        <source>_4x4I Transform</source>
-        <translation>Trasforma _4x4I</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="148"/>
-        <source>Transform</source>
-        <translation>Trasforma</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="144"/>
-        <source>B Frames</source>
-        <translation>Fotogrammi B</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="152"/>
-        <source>X264 Configuration</source>
-        <translation>Configurazione X264</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavcodec.cpp" line="51"/>
@@ -2061,37 +1880,37 @@ Spostare il segnalibro A.</translation>
         <translation>menu</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="61"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="58"/>
         <source>1  - Extremely Low (Fastest)</source>
         <translation>1  - Estremamente bassa (più veloce)</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="62"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="59"/>
         <source>2  - Very Low</source>
         <translation>2  - Molto bassa</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="63"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="60"/>
         <source>3  - Low</source>
         <translation>3  - Bassa</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="64"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="61"/>
         <source>4  - Medium</source>
         <translation>4  - Media</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="65"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="62"/>
         <source>5  - High (Default)</source>
         <translation>5  - Alta (predefinito)</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="66"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="63"/>
         <source>6  - Very High</source>
         <translation>6  - Molto alta</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="67"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="64"/>
         <source>6B - Very High (RDO on Bframes)</source>
         <translation>6B - Molto alta (RDO sui fotogrammi-B)</translation>
     </message>
@@ -2101,12 +1920,12 @@ Spostare il segnalibro A.</translation>
         <translation>7  - Ultra</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="69"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="66"/>
         <source>7B - Ultra High (RDO on Bframes)</source>
         <translation>7B - Ultra (RDO sui fotogrammi-B)</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="72"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="69"/>
         <source>Partition Decision</source>
         <translation>Decisione partizione</translation>
     </message>
@@ -2131,52 +1950,52 @@ Spostare il segnalibro A.</translation>
         <translation>Ricerca esaustiva</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="80"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="81"/>
         <source>VHQ Mode</source>
         <translation>Modalità VHQ</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="81"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="89"/>
         <source>Max Ref Frames</source>
         <translation>Numero massimo di fotogrammi di riferimento</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="146"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="154"/>
         <source>Max B Frames</source>
         <translation>Numero massimo di fotogrammi B</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="83"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="91"/>
         <source>Chroma ME</source>
         <translation>Croma ME</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="84"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="92"/>
         <source>Mixed Refs</source>
         <translation>Riferimenti misti</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="85"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="93"/>
         <source>Fast P Skip</source>
         <translation>P Skip veloce</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="86"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="94"/>
         <source>DCT Decimate</source>
         <translation>DCT Decimate</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="87"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="95"/>
         <source>Interlaced</source>
         <translation>Interlacciato</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="89"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="97"/>
         <source>Motion Estimation</source>
         <translation>Stima movimento</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="106"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="114"/>
         <source>Disabled</source>
         <translation>Disattivo</translation>
     </message>
@@ -2191,77 +2010,77 @@ Spostare il segnalibro A.</translation>
         <translation>Alta</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="110"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="118"/>
         <source>Trellis</source>
         <translation>Trellis</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="111"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="119"/>
         <source>CABAC</source>
         <translation>CABAC</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="112"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="120"/>
         <source>Noise Reduction</source>
         <translation>Riduzione interferenza</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="113"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="121"/>
         <source>Deblocking Filter</source>
         <translation>Filtro deblocking</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="114"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="122"/>
         <source>Strength</source>
         <translation>Intensità</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="115"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="123"/>
         <source>Threshold</source>
         <translation>Soglia</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="120"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="137"/>
         <source>Misc</source>
         <translation>Varie</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="132"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="140"/>
         <source>8x8 Transform</source>
         <translation>Trasforma 8x8</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="133"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="141"/>
         <source>8x8P Transform</source>
         <translation>Trasforma 8x8P</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="134"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="142"/>
         <source>8x8B Transform</source>
         <translation>Trasforma 8x8B</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="135"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="143"/>
         <source>_4x4 Transform</source>
         <translation>Trasforma _4x4</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="136"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="144"/>
         <source>_8x8I Transform</source>
         <translation>Trasforma _8x8I</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="137"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="145"/>
         <source>_4x4I Transform</source>
         <translation>Trasforma _4x4I</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="151"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="159"/>
         <source>Transform</source>
         <translation>Trasforma</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="147"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="155"/>
         <source>B Frames</source>
         <translation>Fotogrammi B</translation>
     </message>
@@ -3528,12 +3347,12 @@ It is needed to create PSP compatible video.</source>
         <translation>Seleziona un file</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="54"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="51"/>
         <source>Main</source>
         <translation>Generale</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_srt.cpp" line="101"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="109"/>
         <source>Motion</source>
         <translation>Movimento</translation>
     </message>
@@ -4362,6 +4181,41 @@ It is needed to create PSP compatible video.</source>
         <source>Put botj fields side by side.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="65"/>
+        <source>7  - Ultra High</source>
+        <translation>7  - Ultra</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="72"/>
+        <source>Diamond Search</source>
+        <translation>Ricerca romboidale</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="73"/>
+        <source>Hexagonal Search</source>
+        <translation>Ricerca esagonale</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="74"/>
+        <source>Uneven Multi-hexagon</source>
+        <translation>Multi-esagono irregolare</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="75"/>
+        <source>Exhaustive Search</source>
+        <translation>Ricerca esaustiva</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="77"/>
+        <source>Hadamard Exhaustive Search</source>
+        <translation>Ricerca esaustiva Hadamard</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="163"/>
+        <source>x264 Configuration</source>
+        <translation>Configurazione x264</translation>
+    </message>
 </context>
 <context>
     <name>ADMImage</name>
@@ -5047,174 +4901,179 @@ It is needed to create PSP compatible video.</source>
 <context>
     <name>ADMVideoSwissArmyKnife</name>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="258"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="261"/>
         <source>P&apos; = A</source>
         <translation>P&apos; = A</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="259"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="262"/>
         <source>P&apos; = P</source>
         <translation>P&apos; = P</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="260"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="263"/>
         <source>P&apos; = P - A</source>
         <translation>P&apos; = P - A</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="261"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="264"/>
         <source>P&apos; = A - P</source>
         <translation>P&apos; = A - P</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="262"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="265"/>
         <source>P&apos; = P + A</source>
         <translation>P&apos; = P + A</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="263"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="266"/>
         <source>P&apos; = P * A</source>
         <translation>P&apos; = P * A</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="264"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="267"/>
         <source>P&apos; = P / A</source>
         <translation>P&apos; = P / A</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="265"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="268"/>
         <source>P&apos; = A / P</source>
         <translation>P&apos; = A / P</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="266"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="269"/>
         <source>P&apos; = min (P, A)</source>
         <translation>P&apos; = min (P, A)</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="267"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="270"/>
         <source>P&apos; = max (P, A)</source>
         <translation>P&apos; = max (P, A)</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="272"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="275"/>
         <source>A = convolve(P); Load convolution kernel from file</source>
         <translation>A = avvolgi(P); carica nucleo di avvolgimento da file</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="274"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="277"/>
         <source>A = pixel from image file as float; Load image from file</source>
         <translation>A = pixel dal file immagine come float; carica immagine da file</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="276"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="279"/>
         <source>A = pixel from image file as integer; Load image from file</source>
         <translation>A = pixel dal file immagine come integer; carica immagine da file</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="278"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="281"/>
         <source>A = floating point constant value</source>
         <translation>A = valore costante virgola mobile</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="280"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="283"/>
         <source>A = rolling average of pixel: A = A*(1-alpha)+(P*alpha)</source>
         <translation>A = media mobile di pixel: A = A*(1-alpha)+(P*alpha)</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="285"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="288"/>
         <source>Select _Operation on each pixel P and input A:</source>
         <translation>_Seleziona opeazione per ogni pixel P e input A:</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="290"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="293"/>
         <source>Input _Type:</source>
         <translation>_Tipo in ingresso:</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="321"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="324"/>
         <source>Input _File (image or convolution kernel):</source>
         <translation>_File di ingresso (immagine o nucleo di avvolgimento):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="325"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="328"/>
         <source>_Load Bias (added to each pixel
 in file image when loaded):</source>
         <translation>_Carica Bias (aggiunto a ogni pixel
 nell&apos;immagine al caricamento):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="330"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="333"/>
         <source>Load _Multiplier (each pixel in
 file image mult. by this when loaded):</source>
         <translation>Carica _Moltiplicatore (ogni pixel nell&apos;immagine
 moltiplicato per questo valore al caricamento):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="335"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="338"/>
         <source>Input _Constant:</source>
         <translation>Costant_e in ingresso:</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="340"/>
-        <source>Memory constant _alpha
-(where A = (1-alpha)*A + alpha*curr_frame):</source>
-        <translation>Costante di memoria _alpha
-(dove A = (1-alpha)*A + alpha*fotogrammacorrente):</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="344"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="351"/>
         <source>Init _Start Frame (first frame # to use for head start):</source>
         <translation>Ini_zializza fotogramma iniziale (primo numero
 di fotogramma da usare per la partenza facilitata):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="348"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="355"/>
         <source>Init _End Frame (last frame # to use for head start):</source>
         <translation>Inizia_lizza fotogramma finale (ultimo numero
 di fotogramma da usare per la partenza facilitata):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="353"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="360"/>
         <source>Init By _Rolling (compute head start using a rolling average rather than a straight average)</source>
         <translation>Inizializza con media mobile (elabora partenza facilitata usando una media mobile invece di una media diretta)</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="357"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="364"/>
         <source>_Bias (will be added to result):</source>
         <translation>_Bias (sarà aggiunto al risultato):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="360"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="367"/>
         <source>_Result Bias (added to each result pixel):</source>
         <translation>Bias _risultato (aggiunto a ogni pixel risultato):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="365"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="372"/>
         <source>Result _Multiplier (each result pixel
 multiplied by this):</source>
         <translation>_Moltiplicatore risultato (ogni pixel risultato
 moltiplicato per questo valore):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="369"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="376"/>
         <source>_Histogram every N frames (0 to disable):</source>
         <translation>_Istogramma ogni N fotogrammi (0 per disattivare):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="371"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="378"/>
         <source>_Debugging settings (bits):</source>
         <translation>Impostazioni di _debug (bit):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="321"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="324"/>
         <source>Select file</source>
         <translation>Seleziona un file</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="380"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="388"/>
         <source>Swiss Army Knife Configuration</source>
         <translation>Configurazione Swiss Army Knife</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="343"/>
+        <source>Memory constant _alpha
+(where A = (1-alpha)*A + alpha*(curr_frame + lookahead)):</source>
+        <translation>Costante di memoria _alpha
+(dove A = (1-alpha)*A + alpha*(fotogrammacorrente + N fotogrammi)):</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="347"/>
+        <source>Look ahead _N frames:</source>
+        <translation>_N fotogrammi successivi:</translation>
     </message>
 </context>
 <context>
@@ -5475,14 +5334,14 @@ Vuoi usare quella modalità?</translation>
         <translation>Dovresti usare Strumenti -&gt; Ricostruisci fotogrammi. Vuoi farlo ora?</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="1510"/>
+        <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="1517"/>
         <source>This looks like mpeg
  Do you want to index it?</source>
         <translation>Questo sembra un file mpeg
  Vuoi indicizzarlo?</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="1562"/>
+        <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="1569"/>
         <source>Indexing failed</source>
         <translation>Indicizzazione fallita</translation>
     </message>

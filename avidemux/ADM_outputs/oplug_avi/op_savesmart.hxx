@@ -32,7 +32,7 @@
 	virtual 		uint8_t 	setupVideo( char *name  );
  	virtual 		uint8_t 	writeVideoChunk(uint32_t frame );
 				uint8_t		 writeVideoChunk_recode (uint32_t frame);
-				uint8_t		 writeVideoChunk_copy (uint32_t frame);
+				uint8_t		 writeVideoChunk_copy (uint32_t frame,uint32_t first=0);
               			encoder 	*_encoder;
               			uint8_t 	_cqReenc          ;
 				

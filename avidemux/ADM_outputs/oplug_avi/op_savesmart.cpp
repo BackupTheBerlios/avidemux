@@ -156,7 +156,7 @@ ADMBitstream bitstream(MAXIMUM_SIZE * MAXIMUM_SIZE * 3);
 	  stopEncoder ();	// Tobias F
 	  delete	    _encoder;
 	  _encoder = NULL;
-	  return writeVideoChunk_copy(frame);
+	  return writeVideoChunk_copy(frame,1);
 	}
 	// Else encode it ....
 	//1-Read it
@@ -173,7 +173,7 @@ ADMBitstream bitstream(MAXIMUM_SIZE * MAXIMUM_SIZE * 3);
 	return writter->saveVideoFrame (bitstream.len, _videoFlag, vbuffer);
 }
 //_________________________________________________________
-uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
+uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame,uint32_t first)
 {
   // Check flags and seq
   uint32_t myseq=0;
@@ -282,6 +282,30 @@ uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
         _videoFlag=img.flags;
 	
 	encoding_gui->setFrame(frame-frameStart,img.dataLength,0,frametogo);
+	if(first)
+	{
+		ADM_assert(_videoFlag == AVI_KEY_FRAME);
+		// Grab extra data ..
+			uint8_t *extraData;
+			uint32_t extraLen;
+			uint8_t r;
+   			video_body->getExtraHeaderData(&extraLen,&extraData);
+			if(extraLen)
+			{
+			//********************************************************************
+			// If we have global headers we have to duplicate the old headers as they were replaced
+			// by the new headers from the section we re-encoded
+			//********************************************************************
+				printf("[Smart] Duplicating vop header (%d bytes)\n",extraLen);
+				uint8_t *buffer=new uint8_t[extraLen+img.dataLength];
+				memcpy(buffer,extraData,extraLen);
+				memcpy(buffer+extraLen,img.data,img.dataLength);
+				r=writter->saveVideoFrame (img.dataLength+extraLen, img.flags, buffer);;
+				delete [] buffer;
+				return r;
+				
+			}
+	}
 	return writter->saveVideoFrame (img.dataLength, img.flags, img.data);;
 }
 //_________________________________________________________
