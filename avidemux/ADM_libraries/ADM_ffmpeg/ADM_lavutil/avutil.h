@@ -48,6 +48,13 @@
 
 #define LIBAVUTIL_IDENT         "Lavu" AV_STRINGIFY(LIBAVUTIL_VERSION)
 
+/* MEANX
+ * - */
+#define ASMALIGN(ZEROBITS) ".p2align " #ZEROBITS "\n\t"
+/* /MEANX
+ */
+
+
 
 #include "common.h"
 #include "mathematics.h"
