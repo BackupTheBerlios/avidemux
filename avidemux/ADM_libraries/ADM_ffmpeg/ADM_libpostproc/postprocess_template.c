@@ -50,8 +50,14 @@
 #undef PMAXUB
 
 #ifdef HAVE_MMX2
+// MEANX
+#undef REAL_PAVGB
+// /MEANX
 #define REAL_PAVGB(a,b) "pavgb " #a ", " #b " \n\t"
 #elif defined (HAVE_3DNOW)
+// MEANX
+#undef REAL_PAVGB
+// /MEANX
 #define REAL_PAVGB(a,b) "pavgusb " #a ", " #b " \n\t"
 #endif
 #define PAVGB(a,b)  REAL_PAVGB(a,b)
@@ -1204,11 +1210,18 @@ static inline void RENAME(dering)(uint8_t src[], int stride, PPContext *c)
 
 #undef FIND_MIN_MAX
 #ifdef HAVE_MMX2
+// MEANX
+#undef REAL_FIND_MIN_MAX
+// /MEANX
 #define REAL_FIND_MIN_MAX(addr)\
                 "movq " #addr ", %%mm0                  \n\t"\
                 "pminub %%mm0, %%mm7                    \n\t"\
                 "pmaxub %%mm0, %%mm6                    \n\t"
 #else
+// MEANX
+#undef REAL_FIND_MIN_MAX
+// /MEANX
+
 #define REAL_FIND_MIN_MAX(addr)\
                 "movq " #addr ", %%mm0                  \n\t"\
                 "movq %%mm7, %%mm1                      \n\t"\
@@ -3205,6 +3218,8 @@ static inline void RENAME(blockCopy)(uint8_t dst[], int dstStride, const uint8_t
                         "lea (%3,%5), %%"REG_d"         \n\t"
                         "pxor %%mm4, %%mm4              \n\t"
 #ifdef HAVE_MMX2
+// MEANX
+#undef REAL_SCALED_CPY
 #define REAL_SCALED_CPY(src1, src2, dst1, dst2)                                                \
                         "movq " #src1 ", %%mm0          \n\t"\
                         "movq " #src1 ", %%mm5          \n\t"\
@@ -3228,6 +3243,8 @@ static inline void RENAME(blockCopy)(uint8_t dst[], int dstStride, const uint8_t
                         "movq %%mm1, " #dst2 "          \n\t"\
 
 #else //HAVE_MMX2
+// MEANX
+#undef REAL_SCALED_CPY
 #define REAL_SCALED_CPY(src1, src2, dst1, dst2)                                        \
                         "movq " #src1 ", %%mm0          \n\t"\
                         "movq " #src1 ", %%mm5          \n\t"\

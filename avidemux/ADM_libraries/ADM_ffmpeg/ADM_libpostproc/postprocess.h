@@ -27,8 +27,9 @@
  *     external postprocessing API
  */
 
-#include "libavutil/avutil.h"
-
+// MEANX #include "libavutil/avutil.h"
+#include "../ADM_lavutil/avutil.h"
+// /MEANX
 #define LIBPOSTPROC_VERSION_MAJOR 51
 #define LIBPOSTPROC_VERSION_MINOR  1
 #define LIBPOSTPROC_VERSION_MICRO  0
