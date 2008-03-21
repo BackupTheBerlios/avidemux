@@ -340,3 +340,9 @@ AVOutputFormat flv_muxer = {
     flv_write_trailer,
     .codec_tag= (const AVCodecTag*[]){flv_video_codec_ids, flv_audio_codec_ids, 0},
 };
+// MEANX
+int flvenc_init(void)
+{
+    av_register_output_format(&flv_muxer);
+    return 0;
+}

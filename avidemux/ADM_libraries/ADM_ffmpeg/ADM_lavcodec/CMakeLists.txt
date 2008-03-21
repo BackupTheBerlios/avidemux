@@ -16,7 +16,10 @@ SET(${ADM_LIB}_SRCS
 	h263_parser.c  h264_parser.c  mpeg4video_parser.c  mpegvideo_enc.c  mpeg12enc.c
 	mpegaudioenc.c  ac3enc.c  ac3.c  ac3tab.c  mjpegenc.c  mjpegdec.c  wma.c  
 	dvbsub_parser.c  dvbsubdec.c  dvbsub.c  xiph.c  sp5xdec.c  nellymoserdec.c
-	ADM_lavcodec.cpp
+	ADM_lavcodec.cpp pthread.c
+	huffman.c wmv2dec.c wmv2.c h264pred.c
+	intrax8.c intrax8dsp.c dnxhddata.c faanidct.c ac3_parser.c
+	aac_ac3_parser.c aac_parser.c
 )
 
 IF(ADM_CPU_X86)
@@ -24,7 +27,10 @@ IF(ADM_CPU_X86)
 		i386/cputest.c  i386/mpegvideo_mmx.c  i386/vp3dsp_mmx.c  i386/dsputil_mmx.c
 		i386/fdct_mmx.c  i386/motion_est_mmx.c  i386/simple_idct_mmx.c  i386/fft_sse.c
 		i386/vp3dsp_sse2.c  i386/idct_mmx_xvid.c  i386/fft_3dn2.c  i386/snowdsp_mmx.c
-		i386/fft_3dn.c)
+		i386/fft_3dn.c
+		i386/dsputilenc_mmx.c
+		i386/vc1dsp_mmx.c
+		)
 ENDIF(ADM_CPU_X86)
 
 IF (ADM_CPU_ALTIVEC)

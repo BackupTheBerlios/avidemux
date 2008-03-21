@@ -25,7 +25,9 @@
 
 #include "ADM_assert.h"
 #include "prefs.h"
+extern "C" {
 #include "ADM_lavcodec.h"
+}
 #include "ADM_default.h"
 
 #include "ADM_codecs/ADM_codec.h"

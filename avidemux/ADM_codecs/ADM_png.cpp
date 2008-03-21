@@ -28,8 +28,10 @@
 
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_png.h"
-
+extern "C"
+{
 #include "png.h"
+}
 #include "ADM_assert.h"
 
 #define PNG_PTR ((png_structp)png_ptr)

@@ -680,7 +680,7 @@ uint8_t lavMuxer::close( void )
 		// Flush
 		// Cause deadlock :
 		av_write_trailer(oc);
-		url_fclose(&oc->pb);
+		url_fclose((oc->pb));
 
 	}
 	if(audio_st)

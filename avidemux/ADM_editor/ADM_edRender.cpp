@@ -519,7 +519,8 @@ ADMCompressedImage img;
 
 	// we do postproc !
 	// keep
-	uint8_t *oBuff[3],*iBuff[3];
+	uint8_t *oBuff[3];
+	const uint8_t *iBuff[3];
 	int	strideTab[3];
 	int	strideTab2[3];
 	aviInfo _info;

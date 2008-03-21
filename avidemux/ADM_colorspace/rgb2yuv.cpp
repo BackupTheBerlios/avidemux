@@ -24,13 +24,12 @@
 #include "config.h"
 #include "ADM_default.h"
 
-#ifdef ADM_CPU_X86
+
 extern "C" {
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/avcodec.h"
-}
-#endif
-
 #include "ADM_libraries/ADM_ffmpeg/ADM_libswscale/swscale.h"
+}
+
 #include "colorspace.h"
 
 /**

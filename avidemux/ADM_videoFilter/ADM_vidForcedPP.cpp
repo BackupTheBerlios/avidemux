@@ -166,7 +166,8 @@ uint8_t ADMVideoForcedPP::getFrameNumberNoAlloc(uint32_t frame,
 		}
 			// we do postproc !
 			// keep
-			uint8_t *iBuff[3],*oBuff[3];
+			const uint8_t *iBuff[3];
+			uint8_t *oBuff[3];
 			int strideTab[3],strideTab2[3];			
 				
 				

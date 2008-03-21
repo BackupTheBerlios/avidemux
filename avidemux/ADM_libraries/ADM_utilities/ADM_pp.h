@@ -11,7 +11,9 @@
 //
 #ifndef ADMPP
 #define ADMPP
+extern "C" {
 #include "../ADM_libpostproc/postprocess.h"
+}
 typedef struct ADM_PP
 {
 	pp_context_t			*ppContext;

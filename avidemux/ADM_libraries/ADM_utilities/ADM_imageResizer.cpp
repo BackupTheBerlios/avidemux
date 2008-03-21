@@ -11,22 +11,15 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include "ADM_assert.h"
 #include "ADM_default.h"
 
 #include "ADM_image.h"
 
-#ifdef ADM_CPU_X86
 extern "C" {
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/avcodec.h"
-}
-#endif
 #include "ADM_libraries/ADM_ffmpeg/ADM_libswscale/swscale.h"
+}
+
 
 ADMImageResizer::ADMImageResizer(uint32_t ow, uint32_t oh, uint32_t dw, uint32_t dh)
 {

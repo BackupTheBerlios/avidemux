@@ -18,14 +18,13 @@
 #include "ADM_default.h"
 #include "colorspace.h"
 
-#ifdef ADM_CPU_X86
+
 extern "C" {
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/avcodec.h"
-}
-#endif
-
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavutil/avutil.h"
 #include "ADM_libraries/ADM_ffmpeg/ADM_libswscale/swscale.h"
+}
+
 #include "ADM_rgb.h" 
 #include "ADM_colorspace.h"
 

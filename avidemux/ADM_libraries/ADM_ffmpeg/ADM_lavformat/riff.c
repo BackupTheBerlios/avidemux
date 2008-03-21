@@ -343,7 +343,7 @@ void put_bmp_header(ByteIOContext *pb, AVCodecContext *enc, const AVCodecTag *ta
 }
 #endif //CONFIG_MUXERS
 
-#ifdef CONFIG_DEMUXERS
+// MEANX #ifdef CONFIG_DEMUXERS
 /* We could be given one of the three possible structures here:
  * WAVEFORMAT, PCMWAVEFORMAT or WAVEFORMATEX. Each structure
  * is an expansion of the previous one with the fields added
@@ -410,8 +410,8 @@ int wav_codec_get_id(unsigned int tag, int bps)
         id = CODEC_ID_PCM_ZORK;
     return id;
 }
-#endif // CONFIG_DEMUXERS
-
+//#endif // CONFIG_DEMUXERS
+//#ifdef CONFIG_DEMUXERS //MEANX
 void ff_parse_specific_params(AVCodecContext *stream, int *au_rate, int *au_ssize, int *au_scale)
 {
     int gcd;

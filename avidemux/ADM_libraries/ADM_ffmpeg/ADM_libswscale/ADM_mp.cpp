@@ -21,14 +21,12 @@
 #include "config.h"
 #include "fourcc.h"
 
-#ifdef ADM_CPU_X86
+
 extern "C" {
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/avcodec.h"
-}
-#endif
-
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavutil/avutil.h"
 #include "ADM_libraries/ADM_ffmpeg/ADM_libswscale/swscale.h"
+}
 
 
 #include "ADM_mp.h"
