@@ -2,7 +2,6 @@
  * yuv2rgb.c, Software YUV to RGB converter
  *
  *  Copyright (C) 1999, Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
- *  All Rights Reserved.
  *
  *  Functions broken out from display_x11.c and several new modes
  *  added by Håkan Hjort <d95hjort@dtek.chalmers.se>
@@ -29,9 +28,6 @@
  *  along with mpeg2dec; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-// MEANX
-#include "config.h"
-// /MEANX
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,14 +39,13 @@
 #include "swscale.h"
 #include "swscale_internal.h"
 
+#ifdef HAVE_VIS
+#include "yuv2rgb_vis.c"
+#endif
+
 #ifdef HAVE_MLIB
 #include "yuv2rgb_mlib.c"
 #endif
-// MEANX
-#include "wrapper.h"
-
-// /MEANX
-
 
 #define DITHER1XBPP // only for mmx
 
@@ -164,13 +159,9 @@ const uint8_t  __attribute__((aligned(8))) dither_8x8_220[8][8]={
 #ifdef HAVE_MMX
 
 /* hope these constant values are cache line aligned */
-static uint64_t attribute_used __attribute__((aligned(8))) mmx_00ffw   = 0x00ff00ff00ff00ffULL;
-static uint64_t attribute_used __attribute__((aligned(8))) mmx_redmask = 0xf8f8f8f8f8f8f8f8ULL;
-static uint64_t attribute_used __attribute__((aligned(8))) mmx_grnmask = 0xfcfcfcfcfcfcfcfcULL;
-
-static uint64_t attribute_used __attribute__((aligned(8))) M24A=   0x00FF0000FF0000FFULL;
-static uint64_t attribute_used __attribute__((aligned(8))) M24B=   0xFF0000FF0000FF00ULL;
-static uint64_t attribute_used __attribute__((aligned(8))) M24C=   0x0000FF0000FF0000ULL;
+DECLARE_ASM_CONST(8, uint64_t, mmx_00ffw)   = 0x00ff00ff00ff00ffULL;
+DECLARE_ASM_CONST(8, uint64_t, mmx_redmask) = 0xf8f8f8f8f8f8f8f8ULL;
+DECLARE_ASM_CONST(8, uint64_t, mmx_grnmask) = 0xfcfcfcfcfcfcfcfcULL;
 
 // the volatile is required because gcc otherwise optimizes some writes away not knowing that these
 // are read in the asm block
@@ -178,14 +169,6 @@ static volatile uint64_t attribute_used __attribute__((aligned(8))) b5Dither;
 static volatile uint64_t attribute_used __attribute__((aligned(8))) g5Dither;
 static volatile uint64_t attribute_used __attribute__((aligned(8))) g6Dither;
 static volatile uint64_t attribute_used __attribute__((aligned(8))) r5Dither;
-
-static uint64_t __attribute__((aligned(8))) dither4[2]={
-    0x0103010301030103LL,
-    0x0200020002000200LL,};
-
-static uint64_t __attribute__((aligned(8))) dither8[2]={
-    0x0602060206020602LL,
-    0x0004000400040004LL,};
 
 #undef HAVE_MMX
 
@@ -293,8 +276,7 @@ static int func_name(SwsContext *c, uint8_t* src[], int srcStride[], int srcSlic
             dst_2 += dst_delta;\
         }\
         if (c->dstW & 4) {\
-            int av_unused U, V;\
-            int Y;\
+            int av_unused Y, U, V;\
 
 #define EPILOG2()\
         }\
@@ -637,6 +619,12 @@ SwsFunc yuv2rgb_get_func_ptr (SwsContext *c)
         case PIX_FMT_BGR565: return yuv420_rgb16_MMX;
         case PIX_FMT_BGR555: return yuv420_rgb15_MMX;
         }
+    }
+#endif
+#ifdef HAVE_VIS
+    {
+        SwsFunc t= yuv2rgb_init_vis(c);
+        if (t) return t;
     }
 #endif
 #ifdef HAVE_MLIB

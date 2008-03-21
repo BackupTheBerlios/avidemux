@@ -1,7 +1,7 @@
 /*
   marc.hoffman@analog.com    March 8, 2004
 
-  Altivec Acceleration for Color Space Conversion revision 0.2
+  AltiVec acceleration for colorspace conversion revision 0.2
 
   convert I420 YV12 to RGB in various formats,
     it rejects images that are not in 420 formats
@@ -52,7 +52,7 @@
 
   GL libraries seem to be very slow on this machine 1.33Ghz PB running
   Jaguar, this is not the case for my 1Ghz PB.  I thought it might be
-  a versioning issues, however i have libGL.1.2.dylib for both
+  a versioning issues, however I have libGL.1.2.dylib for both
   machines. ((We need to figure this out now))
 
   GL2 libraries work now with patch for RGB32
@@ -79,7 +79,6 @@
  * along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -696,7 +695,7 @@ SwsFunc yuv2rgb_init_altivec (SwsContext *c)
 
     /*
       and this seems not to matter too much I tried a bunch of
-      videos with abnormal widths and mplayer crashes else where.
+      videos with abnormal widths and MPlayer crashes elsewhere.
       mplayer -vo x11 -rawvideo on:w=350:h=240 raw-350x240.eyuv
       boom with X11 bad match.
 
@@ -749,13 +748,6 @@ SwsFunc yuv2rgb_init_altivec (SwsContext *c)
     return NULL;
 }
 
-static uint16_t roundToInt16(int64_t f){
-    int r= (f + (1<<15))>>16;
-         if (r<-0x7FFF) return 0x8000;
-    else if (r> 0x7FFF) return 0x7FFF;
-    else                return r;
-}
-
 void yuv2rgb_altivec_init_tables (SwsContext *c, const int inv_table[4],int brightness,int contrast, int saturation)
 {
     union {
@@ -763,7 +755,7 @@ void yuv2rgb_altivec_init_tables (SwsContext *c, const int inv_table[4],int brig
         vector signed short vec;
     } buf;
 
-    buf.tmp[0] =  ( (0xffffLL) * contrast>>8 )>>9;                      //cy
+    buf.tmp[0] =  ((0xffffLL) * contrast>>8)>>9;                        //cy
     buf.tmp[1] =  -256*brightness;                                      //oy
     buf.tmp[2] =  (inv_table[0]>>3) *(contrast>>16)*(saturation>>16);   //crv
     buf.tmp[3] =  (inv_table[1]>>3) *(contrast>>16)*(saturation>>16);   //cbu
