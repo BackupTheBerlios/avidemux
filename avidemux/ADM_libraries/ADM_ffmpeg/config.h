@@ -1,3 +1,4 @@
+#include "ADM_coreConfig.h"
 #define ENABLE_NELLYMOSER_DECODER 1
 #define ENABLE_ADPCM_IMA_AMV_DECODER 1
 #define ENABLE_CINEPAK_DECODER 1
@@ -338,6 +339,7 @@
 #define CONFIG_WMV3_DECODER 1
 #define CONFIG_MPEGAUDIO_HP 1
 #define CONFIG_ZLIB 1
+#define CONFIG_GPL 1
 #define ENABLE_ARMV4L 0
 #define ENABLE_MLIB 0
 #define ENABLE_SPARC 0
@@ -347,30 +349,50 @@
 #define ENABLE_BFIN 0
 #define ENABLE_SMALL 0
 #define ENABLE_MLP_PARSER 0
+#ifdef __APPLE__
+#	define CONFIG_DARWIN 1
+#endif
+#if defined(ADM_CPU_X86_32)
+#	define ARCH_X86 1
+#	define ARCH_X86_32 1
+#elif defined(ADM_CPU_X86_64)
+#	define ARCH_X86 1
+#	define ARCH_X86_64 1
+#elif defined(ADM_CPU_PPC)
+#	define ARCH_POWERPC 1
+#ifdef ADM_CPU_ALTIVEC
+#	define HAVE_ALTIVEC 1
+#ifndef __APPLE__
+#	define HAVE_ALTIVEC_H 1
+#endif	// __APPLE__
+#endif	// ADM_CPU_ALTIVEC
+#ifdef ADM_CPU_DCBZL
+#	define HAVE_DCBZL 1
+#endif	// ADM_CPU_DCBZL
+#endif	// ADM_CPU_X86_32
+#ifdef ADM_CPU_SSSE3
+#	define HAVE_SSSE3 1
+#endif
 #ifdef ARCH_POWERPC
-#define ENABLE_POWERPC 1
+#	define ENABLE_POWERPC 1
 #else
-#define ENABLE_POWERPC 0
+#	define ENABLE_POWERPC 0
 #endif
 #ifdef ARCH_X86
-#define ENABLE_MMX 1
-#define ENABLE_BSWAP 1
-#define HAVE_BYTESWAP_H 1
-#define HAVE_MMX 1
-#define HAVE_FAST_UNALIGNED 1
-#define ARCH_X86 1
+#	define ENABLE_MMX 1
+#	define ENABLE_BSWAP 1
+#	define HAVE_MMX 1
+#	define HAVE_FAST_UNALIGNED 1
+#	define HAVE_EBP_AVAILABLE 1
+#	define HAVE_EBX_AVAILABLE 1
 #else
-#define ENABLE_MMX 0
+#	define ENABLE_MMX 0
 #endif
 #ifdef ARCH_X86_64
-#define HAVE_FAST_64BIT 1
-#define HAVE_SSSE3 1
-#define HAVE_EBP_AVAILABLE 1
-#define HAVE_EBX_AVAILABLE 1
-#define ARCH_X86_64 1
+#	define HAVE_FAST_64BIT 1
 #endif
-#ifdef __APPLE__
-#define CONFIG_DARWIN 1
+#ifdef ADM_BIG_ENDIAN
+#	define WORDS_BIGENDIAN 1
 #endif
 #define ENABLE_THREADS 1
 #define ENABLE_ENCODERS 1
@@ -383,3 +405,4 @@
 #define HAVE_ROUNDF 1
 #define HAVE_THREADS 1
 #define RUNTIME_CPUDETECT 1
+#define restrict __restrict__

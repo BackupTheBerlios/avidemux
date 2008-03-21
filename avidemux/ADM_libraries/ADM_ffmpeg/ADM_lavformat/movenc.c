@@ -40,7 +40,7 @@
 #define MODE_IPOD 5
 
 // MEANX
-extern int ADM_useAlternateTagging(void);
+//extern int ADM_useAlternateTagging(void);
 // MEANX
 
 
@@ -271,7 +271,7 @@ int codec_id; // MEANX
     // Object type indication
    //MEANX  put_byte(pb, codec_get_tag(ff_mp4_obj_type, track->enc->codec_id));
    codec_id=track->enc->codec_id;
-    if(ADM_useAlternateTagging() && codec_id==CODEC_ID_MP3) codec_id=CODEC_ID_MP2;
+    //if(ADM_useAlternateTagging() && codec_id==CODEC_ID_MP3) codec_id=CODEC_ID_MP2;
     put_byte(pb, codec_get_tag(ff_mp4_obj_type, codec_id));
     // /MEANX
 

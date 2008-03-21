@@ -6,6 +6,8 @@
 #include <stdio.h>
 int main(void)
 {
+	printf("#include \"ADM_coreConfig.h\"\n");
+
 #define DECLARE_DECODER(a,b); printf("#define ENABLE_"#a"_DECODER 1\n"); 
   
     DECLARE_DECODER(NELLYMOSER,nellymoser);
@@ -375,6 +377,7 @@ int main(void)
 
 	printf("#define CONFIG_MPEGAUDIO_HP 1\n");
 	printf("#define CONFIG_ZLIB 1\n");
+	printf("#define CONFIG_GPL 1\n");
 
 #define ENABLE(a,b); printf("#define ENABLE_"#a" 0\n");
 
@@ -389,35 +392,56 @@ int main(void)
 #define DECLARE_ENABLE_PARSER(a,b); printf("#define ENABLE_"#a"_PARSER 0\n");
 	DECLARE_ENABLE_PARSER(MLP, wmv3);
 
-	// Hack so CMake and autoconf don't need to be changed
+	printf("#ifdef __APPLE__\n");
+	printf("#	define CONFIG_DARWIN 1\n");
+	printf("#endif\n");
+
+	printf("#if defined(ADM_CPU_X86_32)\n");
+	printf("#	define ARCH_X86 1\n");
+	printf("#	define ARCH_X86_32 1\n");
+	printf("#elif defined(ADM_CPU_X86_64)\n");
+	printf("#	define ARCH_X86 1\n");
+	printf("#	define ARCH_X86_64 1\n");
+	printf("#elif defined(ADM_CPU_PPC)\n");
+	printf("#	define ARCH_POWERPC 1\n");
+	printf("#ifdef ADM_CPU_ALTIVEC\n");
+	printf("#	define HAVE_ALTIVEC 1\n");
+	printf("#ifndef __APPLE__\n");
+	printf("#	define HAVE_ALTIVEC_H 1\n");
+	printf("#endif	// __APPLE__\n");
+	printf("#endif	// ADM_CPU_ALTIVEC\n");
+	printf("#ifdef ADM_CPU_DCBZL\n");
+	printf("#	define HAVE_DCBZL 1\n");
+	printf("#endif	// ADM_CPU_DCBZL\n");
+	printf("#endif	// ADM_CPU_X86_32\n");
+
+	printf("#ifdef ADM_CPU_SSSE3\n");
+	printf("#	define HAVE_SSSE3 1\n");
+	printf("#endif\n");
+
 	printf("#ifdef ARCH_POWERPC\n");
-	printf("#define ENABLE_POWERPC 1\n");
+	printf("#	define ENABLE_POWERPC 1\n");
 	printf("#else\n");
-	printf("#define ENABLE_POWERPC 0\n");
+	printf("#	define ENABLE_POWERPC 0\n");
 	printf("#endif\n");
 
 	printf("#ifdef ARCH_X86\n");
-	printf("#define ENABLE_MMX 1\n");
-	printf("#define ENABLE_BSWAP 1\n");
-	printf("#define HAVE_BYTESWAP_H 1\n");
-	printf("#define HAVE_MMX 1\n");
-	printf("#define HAVE_FAST_UNALIGNED 1\n");
-	printf("#define ARCH_X86 1\n");
+	printf("#	define ENABLE_MMX 1\n");
+	printf("#	define ENABLE_BSWAP 1\n");
+	printf("#	define HAVE_MMX 1\n");
+	printf("#	define HAVE_FAST_UNALIGNED 1\n");
+	printf("#	define HAVE_EBP_AVAILABLE 1\n");
+	printf("#	define HAVE_EBX_AVAILABLE 1\n");
 	printf("#else\n");
-	printf("#define ENABLE_MMX 0\n");
-
+	printf("#	define ENABLE_MMX 0\n");
 	printf("#endif\n");
 
 	printf("#ifdef ARCH_X86_64\n");
-	printf("#define HAVE_FAST_64BIT 1\n");
-	printf("#define HAVE_SSSE3 1\n");
-	printf("#define HAVE_EBP_AVAILABLE 1\n");
-	printf("#define HAVE_EBX_AVAILABLE 1\n");
-	printf("#define ARCH_X86_64 1\n");
+	printf("#	define HAVE_FAST_64BIT 1\n");
 	printf("#endif\n");
 
-	printf("#ifdef __APPLE__\n");
-	printf("#define CONFIG_DARWIN 1\n");
+	printf("#ifdef ADM_BIG_ENDIAN\n");
+	printf("#	define WORDS_BIGENDIAN 1\n");
 	printf("#endif\n");
 
 	printf("#define ENABLE_THREADS 1\n");
@@ -431,4 +455,5 @@ int main(void)
 	printf("#define HAVE_ROUNDF 1\n");
 	printf("#define HAVE_THREADS 1\n");
 	printf("#define RUNTIME_CPUDETECT 1\n");
+	printf("#define restrict __restrict__\n");
 }

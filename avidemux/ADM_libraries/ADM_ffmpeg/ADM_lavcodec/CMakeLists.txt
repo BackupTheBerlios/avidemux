@@ -16,21 +16,16 @@ SET(${ADM_LIB}_SRCS
 	h263_parser.c  h264_parser.c  mpeg4video_parser.c  mpegvideo_enc.c  mpeg12enc.c
 	mpegaudioenc.c  ac3enc.c  ac3.c  ac3tab.c  mjpegenc.c  mjpegdec.c  wma.c  
 	dvbsub_parser.c  dvbsubdec.c  dvbsub.c  xiph.c  sp5xdec.c  nellymoserdec.c
-	ADM_lavcodec.cpp pthread.c
-	huffman.c wmv2dec.c wmv2.c h264pred.c
-	intrax8.c intrax8dsp.c dnxhddata.c faanidct.c ac3_parser.c
-	aac_ac3_parser.c aac_parser.c
-)
+	ADM_lavcodec.cpp  pthread.c  huffman.c  wmv2dec.c  wmv2.c  h264pred.c  intrax8.c
+	intrax8dsp.c  dnxhddata.c  faanidct.c  ac3_parser.c  aac_ac3_parser.c
+	aac_parser.c  mpegaudiodecheader.c)
 
 IF(ADM_CPU_X86)
 	SET(${ADM_LIB}_SRCS  ${${ADM_LIB}_SRCS}
 		i386/cputest.c  i386/mpegvideo_mmx.c  i386/vp3dsp_mmx.c  i386/dsputil_mmx.c
 		i386/fdct_mmx.c  i386/motion_est_mmx.c  i386/simple_idct_mmx.c  i386/fft_sse.c
 		i386/vp3dsp_sse2.c  i386/idct_mmx_xvid.c  i386/fft_3dn2.c  i386/snowdsp_mmx.c
-		i386/fft_3dn.c
-		i386/dsputilenc_mmx.c
-		i386/vc1dsp_mmx.c
-		)
+		i386/fft_3dn.c  i386/dsputilenc_mmx.c  i386/vc1dsp_mmx.c  i386/idct_mmx.c)
 ENDIF(ADM_CPU_X86)
 
 IF (ADM_CPU_ALTIVEC)
@@ -42,15 +37,14 @@ IF (ADM_CPU_ALTIVEC)
 ENDIF (ADM_CPU_ALTIVEC)
 
 ADD_LIBRARY(${ADM_LIB} SHARED ${${ADM_LIB}_SRCS})
-ADD_TARGET_CFLAGS(${ADM_LIB} "-I../ADM_lavutil -DHAVE_AV_CONFIG_H -Drestrict=__restrict__ -fomit-frame-pointer")
 
-IF (ADM_DEBUG)
-	ADD_TARGET_CFLAGS(${ADM_LIB} "-O2")
-ENDIF (ADM_DEBUG)
-IF (UNIX)
-	ADD_TARGET_CFLAGS(${ADM_LIB} -fPIC -DPIC)
-        ADD_TARGET_LDFLAGS(${ADM_LIB} "-rdynamic -export-dynamic -Wl,-Bsymbolic")
-ENDIF (UNIX)
+IF (WIN32 AND ADM_DEBUG)
+	ADD_SOURCE_CFLAGS(cabac.c -O2)
+	ADD_SOURCE_CFLAGS(h264.c -O2)
+	ADD_SOURCE_CFLAGS(h264_parser.c -O2)
+	ADD_SOURCE_CFLAGS(i386/dsputil_mmx.c -O2)
+	ADD_SOURCE_CFLAGS(i386/snowdsp_mmx.c -O2)
+ENDIF (WIN32 AND ADM_DEBUG)
 
 TARGET_LINK_LIBRARIES(${ADM_LIB} ADM_core ADM_libavutil ${ZLIB_LIBRARY})
 

@@ -21,6 +21,7 @@
 #cmakedefine HAVE_GETTIMEOFDAY
 
 // Presence of header files
+#cmakedefine HAVE_BYTESWAP_H
 #cmakedefine HAVE_INTTYPES_H
 #cmakedefine HAVE_MALLOC_H
 #cmakedefine HAVE_STDINT_H
