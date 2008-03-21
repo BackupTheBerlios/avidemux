@@ -14,7 +14,6 @@ log.c
 lzo.c
 mathematics.c
 md5.c
-mem.c
 random.c
 rational.c
 rc4.c
