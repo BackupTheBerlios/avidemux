@@ -2,7 +2,7 @@ SET(ADM_LIB ADM_libavformat)
 
 SET(${ADM_LIB}_SRCS 
 	mpeg.c  utils.c  avio.c  aviobuf.c  cutils.c  img2.c  file.c  mpegtsenc.c
-	movenc.c  avienc.c  wav.c  mov.c  matroska.c  isom.c  isom.h  riff.c
+	movenc.c  avienc.c  wav.c  mov.c  matroska.c  isom.c  isom.h  
 	flvenc.c  matroskaenc.c
 	avc.c raw.c  riff.c)
 
