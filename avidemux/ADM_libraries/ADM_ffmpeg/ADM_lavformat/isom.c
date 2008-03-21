@@ -40,7 +40,7 @@ const AVCodecTag ff_mp4_obj_type[] = {
     { CODEC_ID_AAC       , 102 }, /* MPEG2 AAC Main */
     { CODEC_ID_AAC       , 103 }, /* MPEG2 AAC Low */
     { CODEC_ID_AAC       , 104 }, /* MPEG2 AAC SSR */
-    { CODEC_ID_MP3       , 107 }, /* 11172-3 */
+    { CODEC_ID_MP2       , 107 }, /* 11172-3 */ /* MEANX WAS MP3 */
     { CODEC_ID_MP3       , 105 }, /* 13818-3 */
     { CODEC_ID_MPEG1VIDEO, 106 }, /* 11172-2 */
     { CODEC_ID_MJPEG     , 108 }, /* 10918-1 */
@@ -149,7 +149,9 @@ const AVCodecTag codec_movaudio_tags[] = {
     { CODEC_ID_MACE3, MKTAG('M', 'A', 'C', '3') }, /* Macintosh Audio Compression and Expansion 3:1 */
     { CODEC_ID_MACE6, MKTAG('M', 'A', 'C', '6') }, /* Macintosh Audio Compression and Expansion 6:1 */
 
-    { CODEC_ID_MP3, MKTAG('.', 'm', 'p', '3') }, /* MPEG layer 3 */ /* sample files at http://www.3ivx.com/showcase.html use this tag */
+    //MEANX { CODEC_ID_MP3, MKTAG('.', 'm', 'p', '3') }, /* MPEG layer 3 */ /* sample files at http://www.3ivx.com/showcase.html use this tag */
+     { CODEC_ID_MP3, MKTAG( 'm', 'p', '4','a') },
+    // /MEANX
     { CODEC_ID_MP3, 0x6D730055 }, /* MPEG layer 3 */
     { CODEC_ID_MP3, MKTAG('m', 's', 0x00, 0x55) }, /* MPEG layer 3 *//* XXX: check endianness */
 

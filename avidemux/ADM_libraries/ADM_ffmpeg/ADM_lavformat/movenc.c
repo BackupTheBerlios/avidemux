@@ -39,6 +39,11 @@
 #define MODE_3G2 4
 #define MODE_IPOD 5
 
+// MEANX
+extern int ADM_useAlternateTagging(void);
+// MEANX
+
+
 typedef struct MOVIentry {
     unsigned int flags, size;
     uint64_t     pos;
@@ -245,6 +250,8 @@ static void putDescr(ByteIOContext *pb, int tag, unsigned int size)
 
 static int mov_write_esds_tag(ByteIOContext *pb, MOVTrack* track) // Basic
 {
+int codec_id; // MEANX
+
     offset_t pos = url_ftell(pb);
     int decoderSpecificInfoLen = track->vosLen ? descrLength(track->vosLen):0;
 
@@ -262,7 +269,11 @@ static int mov_write_esds_tag(ByteIOContext *pb, MOVTrack* track) // Basic
     putDescr(pb, 0x04, 13 + decoderSpecificInfoLen);
 
     // Object type indication
-    put_byte(pb, codec_get_tag(ff_mp4_obj_type, track->enc->codec_id));
+   //MEANX  put_byte(pb, codec_get_tag(ff_mp4_obj_type, track->enc->codec_id));
+   codec_id=track->enc->codec_id;
+    if(ADM_useAlternateTagging() && codec_id==CODEC_ID_MP3) codec_id=CODEC_ID_MP2;
+    put_byte(pb, codec_get_tag(ff_mp4_obj_type, codec_id));
+    // /MEANX
 
     // the following fields is made of 6 bits to identify the streamtype (4 for video, 5 for audio)
     // plus 1 bit to indicate upstream and 1 bit set to 1 (reserved)
@@ -382,7 +393,7 @@ static int mov_write_audio_tag(ByteIOContext *pb, MOVTrack* track)
         track->enc->codec_id == CODEC_ID_PCM_S24LE ||
         track->enc->codec_id == CODEC_ID_PCM_S32LE))
         mov_write_wave_tag(pb, track);
-    else if(track->tag == MKTAG('m','p','4','a'))
+    else if(track->tag == MKTAG('m','p','4','a')) // MEANX : Not changed, AAC OR MP3 NOT SURE...
         mov_write_esds_tag(pb, track);
     else if(track->enc->codec_id == CODEC_ID_AMR_NB)
         mov_write_amr_tag(pb, track);
@@ -930,8 +941,11 @@ static int mov_write_edts_tag(ByteIOContext *pb, MOVTrack *track)
 
     put_be32(pb, av_rescale_rnd(track->trackDuration, globalTimescale, track->timescale, AV_ROUND_UP)); /* duration   ... doesn't seem to effect psp */
 
-    put_be32(pb, track->cluster[0].cts); /* first pts is cts since dts is 0 */
-    put_be32(pb, 0x00010000);
+    // MEANX NO put_be32(pb, track->cluster[0].cts); /* first pts is cts since dts is 0 */
+    // MEANX NO put_be32(pb, 0x00010000);
+ put_be32(pb, 0x00000000);
+ put_be32(pb, 0x00000001);
+
     return 0x24;
 }
 
@@ -1747,3 +1761,15 @@ AVOutputFormat ipod_muxer = {
     .codec_tag = (const AVCodecTag*[]){ff_mp4_obj_type, 0},
 };
 #endif
+/* MEANX */
+int movenc_init(void)
+{
+    av_register_output_format(&mov_muxer);
+    av_register_output_format(&tgp_muxer);
+    av_register_output_format(&mp4_muxer);
+    av_register_output_format(&psp_muxer);
+    av_register_output_format(&tg2_muxer);
+    // FIXME av_register_output_format(&ipod_muxer);
+    return 0;
+}
+/* MEANX */
