@@ -537,6 +537,7 @@ decoderFFH264::decoderFFH264 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d, u
   _refCopy = 1;			// YUV420 only
   _context->extradata = (uint8_t *) d;
   _context->extradata_size = (int) l;
+  decoderMultiThread ();
   if(lowdelay)
     LOWDELAY();
   printf ("[lavc] Initializing H264 decoder with %d extradata\n", l);
