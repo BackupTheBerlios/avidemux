@@ -33,18 +33,18 @@ IF (ADM_CPU_ALTIVEC)
 		ppc/dsputil_altivec.c  ppc/dsputil_ppc.c  ppc/fdct_altivec.c  ppc/fft_altivec.c
 		ppc/float_altivec.c  ppc/gmc_altivec.c  ppc/h264_altivec.c  ppc/idct_altivec.c
 		ppc/int_altivec.c  ppc/mpegvideo_altivec.c  ppc/mpegvideo_ppc.c
-		ppc/snow_altivec.c  ppc/vc1dsp_altivec.c)
+		ppc/snow_altivec.c  ppc/vc1dsp_altivec.c  ppc/check_altivec.c)
 ENDIF (ADM_CPU_ALTIVEC)
 
 ADD_LIBRARY(${ADM_LIB} SHARED ${${ADM_LIB}_SRCS})
 
-IF (WIN32 AND ADM_DEBUG)
+IF (ADM_DEBUG AND ADM_CPU_X86_32)
 	ADD_SOURCE_CFLAGS(cabac.c -O2)
 	ADD_SOURCE_CFLAGS(h264.c -O2)
 	ADD_SOURCE_CFLAGS(h264_parser.c -O2)
 	ADD_SOURCE_CFLAGS(i386/dsputil_mmx.c -O2)
 	ADD_SOURCE_CFLAGS(i386/snowdsp_mmx.c -O2)
-ENDIF (WIN32 AND ADM_DEBUG)
+ENDIF (ADM_DEBUG AND ADM_CPU_X86_32)
 
 TARGET_LINK_LIBRARIES(${ADM_LIB} ADM_core ADM_libavutil ${ZLIB_LIBRARY})
 
