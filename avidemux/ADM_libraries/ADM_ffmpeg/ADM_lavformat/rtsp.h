@@ -18,8 +18,8 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#ifndef RTSP_H
-#define RTSP_H
+#ifndef FFMPEG_RTSP_H
+#define FFMPEG_RTSP_H
 
 #include <stdint.h>
 #include "avformat.h"
@@ -81,12 +81,13 @@ typedef int FFRTSPCallback(enum RTSPCallbackAction action,
 int rtsp_init(void);
 void rtsp_parse_line(RTSPHeader *reply, const char *buf);
 
+#if LIBAVFORMAT_VERSION_INT < (53 << 16)
 extern int rtsp_default_protocols;
+#endif
 extern int rtsp_rtp_port_min;
 extern int rtsp_rtp_port_max;
-extern AVInputFormat rtsp_demuxer;
 
 int rtsp_pause(AVFormatContext *s);
 int rtsp_resume(AVFormatContext *s);
 
-#endif /* RTSP_H */
+#endif /* FFMPEG_RTSP_H */

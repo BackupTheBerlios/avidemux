@@ -85,18 +85,21 @@ static int flic_decode_init(AVCodecContext *avctx)
     s->avctx = avctx;
 
     s->fli_type = AV_RL16(&fli_header[4]); /* Might be overridden if a Magic Carpet FLC */
-    depth       = AV_RL16(&fli_header[12]);
 
-    if (depth == 0) {
-      depth = 8; /* Some FLC generators set depth to zero, when they mean 8Bpp. Fix up here */
-    }
-
+    depth = 0;
     if (s->avctx->extradata_size == 12) {
         /* special case for magic carpet FLIs */
         s->fli_type = FLC_MAGIC_CARPET_SYNTHETIC_TYPE_CODE;
+        depth = 8;
     } else if (s->avctx->extradata_size != 128) {
         av_log(avctx, AV_LOG_ERROR, "Expected extradata of 12 or 128 bytes\n");
         return -1;
+    } else {
+        depth = AV_RL16(&fli_header[12]);
+    }
+
+    if (depth == 0) {
+        depth = 8; /* Some FLC generators set depth to zero, when they mean 8Bpp. Fix up here */
     }
 
     if ((s->fli_type == FLC_FLX_TYPE_CODE) && (depth == 16)) {
@@ -124,7 +127,7 @@ static int flic_decode_init(AVCodecContext *avctx)
 
 static int flic_decode_frame_8BPP(AVCodecContext *avctx,
                                   void *data, int *data_size,
-                                  uint8_t *buf, int buf_size)
+                                  const uint8_t *buf, int buf_size)
 {
     FlicDecodeContext *s = avctx->priv_data;
 
@@ -424,7 +427,7 @@ static int flic_decode_frame_8BPP(AVCodecContext *avctx,
 
 static int flic_decode_frame_15_16BPP(AVCodecContext *avctx,
                                       void *data, int *data_size,
-                                      uint8_t *buf, int buf_size)
+                                      const uint8_t *buf, int buf_size)
 {
     /* Note, the only difference between the 15Bpp and 16Bpp */
     /* Format is the pixel format, the packets are processed the same. */
@@ -480,8 +483,9 @@ static int flic_decode_frame_15_16BPP(AVCodecContext *avctx,
         switch (chunk_type) {
         case FLI_256_COLOR:
         case FLI_COLOR:
-            /* For some reason, it seems that non-paletised flics do include one of these */
-            /* chunks in their first frame.  Why i do not know, it seems rather extraneous */
+            /* For some reason, it seems that non-palettized flics do
+             * include one of these chunks in their first frame.
+             * Why I do not know, it seems rather extraneous. */
 /*            av_log(avctx, AV_LOG_ERROR, "Unexpected Palette chunk %d in non-paletised FLC\n",chunk_type);*/
             stream_ptr = stream_ptr + chunk_size - 6;
             break;
@@ -689,7 +693,7 @@ static int flic_decode_frame_15_16BPP(AVCodecContext *avctx,
 
 static int flic_decode_frame_24BPP(AVCodecContext *avctx,
                                    void *data, int *data_size,
-                                   uint8_t *buf, int buf_size)
+                                   const uint8_t *buf, int buf_size)
 {
   av_log(avctx, AV_LOG_ERROR, "24Bpp FLC Unsupported due to lack of test files.\n");
   return -1;
@@ -697,7 +701,7 @@ static int flic_decode_frame_24BPP(AVCodecContext *avctx,
 
 static int flic_decode_frame(AVCodecContext *avctx,
                              void *data, int *data_size,
-                             uint8_t *buf, int buf_size)
+                             const uint8_t *buf, int buf_size)
 {
     if (avctx->pix_fmt == PIX_FMT_PAL8) {
       return flic_decode_frame_8BPP(avctx, data, data_size,

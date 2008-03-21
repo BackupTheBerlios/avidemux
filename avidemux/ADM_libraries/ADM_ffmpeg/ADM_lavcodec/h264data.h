@@ -26,36 +26,13 @@
  * @author Michael Niedermayer <michaelni@gmx.at>
  */
 
-#ifndef AVCODEC_H264DATA_H
-#define AVCODEC_H264DATA_H
+#ifndef FFMPEG_H264DATA_H
+#define FFMPEG_H264DATA_H
 
 #include <stdint.h>
 #include "mpegvideo.h"
 #include "rational.h"
 
-#define VERT_PRED             0
-#define HOR_PRED              1
-#define DC_PRED               2
-#define DIAG_DOWN_LEFT_PRED   3
-#define DIAG_DOWN_RIGHT_PRED  4
-#define VERT_RIGHT_PRED       5
-#define HOR_DOWN_PRED         6
-#define VERT_LEFT_PRED        7
-#define HOR_UP_PRED           8
-
-#define LEFT_DC_PRED          9
-#define TOP_DC_PRED           10
-#define DC_128_PRED           11
-
-
-#define DC_PRED8x8            0
-#define HOR_PRED8x8           1
-#define VERT_PRED8x8          2
-#define PLANE_PRED8x8         3
-
-#define LEFT_DC_PRED8x8       4
-#define TOP_DC_PRED8x8        5
-#define DC_128_PRED8x8        6
 
 #define EXTENDED_SAR          255
 
@@ -77,7 +54,7 @@ NAL_SPS_EXT,
 NAL_AUXILIARY_SLICE=19
 };
 
-static const AVRational pixel_aspect[14]={
+static const AVRational pixel_aspect[17]={
  {0, 1},
  {1, 1},
  {12, 11},
@@ -92,10 +69,13 @@ static const AVRational pixel_aspect[14]={
  {15, 11},
  {64, 33},
  {160,99},
+ {4, 3},
+ {3, 2},
+ {2, 1},
 };
 
 static const uint8_t golomb_to_pict_type[5]=
-{P_TYPE, B_TYPE, I_TYPE, SP_TYPE, SI_TYPE};
+{FF_P_TYPE, FF_B_TYPE, FF_I_TYPE, FF_SP_TYPE, FF_SI_TYPE};
 
 static const uint8_t pict_type_to_golomb[7]=
 {-1, 2, 0, 1, -1, 4, 3};
@@ -544,7 +524,7 @@ static const uint8_t default_scaling8[2][64]={
    24,25,27,28,30,32,33,35
 }};
 
-static const int dequant4_coeff_init[6][3]={
+static const uint8_t dequant4_coeff_init[6][3]={
   {10,13,16},
   {11,14,18},
   {13,16,20},
@@ -553,10 +533,10 @@ static const int dequant4_coeff_init[6][3]={
   {18,23,29},
 };
 
-static const int dequant8_coeff_init_scan[16] = {
+static const uint8_t dequant8_coeff_init_scan[16] = {
   0,3,4,3, 3,1,5,1, 4,5,2,5, 3,1,5,1
 };
-static const int dequant8_coeff_init[6][6]={
+static const uint8_t dequant8_coeff_init[6][6]={
   {20,18,32,19,25,24},
   {22,19,35,21,28,26},
   {26,23,42,24,33,31},
@@ -624,7 +604,7 @@ static const int quant_coeff[52][16]={
 
 
 /* Deblocking filter (p153) */
-static const int alpha_table[52*3] = {
+static const uint8_t alpha_table[52*3] = {
      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -640,7 +620,7 @@ static const int alpha_table[52*3] = {
    255,255,255,255,255,255,255,255,255,255,255,255,255,
    255,255,255,255,255,255,255,255,255,255,255,255,255,
 };
-static const int beta_table[52*3] = {
+static const uint8_t beta_table[52*3] = {
      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -656,7 +636,7 @@ static const int beta_table[52*3] = {
     18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
     18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
 };
-static const int tc0_table[52*3][3] = {
+static const uint8_t tc0_table[52*3][3] = {
     { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 },
     { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 },
     { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 },
@@ -688,7 +668,7 @@ static const int tc0_table[52*3][3] = {
 
 /* Cabac pre state table */
 
-static const int cabac_context_init_I[460][2] =
+static const int8_t cabac_context_init_I[460][2] =
 {
     /* 0 - 10 */
     { 20, -15 }, {  2, 54 },  {  3,  74 }, { 20, -15 },
@@ -857,7 +837,7 @@ static const int cabac_context_init_I[460][2] =
     {  29,   9 }, {  35,  20 }, {  29,  36 }, {  14,  67 }
 };
 
-static const int cabac_context_init_PB[3][460][2] =
+static const int8_t cabac_context_init_PB[3][460][2] =
 {
     /* i_cabac_init_idc == 0 */
     {
@@ -1328,4 +1308,4 @@ static const int cabac_context_init_PB[3][460][2] =
     }
 };
 
-#endif // AVCODEC_H264DATA_H
+#endif /* FFMPEG_H264DATA_H */

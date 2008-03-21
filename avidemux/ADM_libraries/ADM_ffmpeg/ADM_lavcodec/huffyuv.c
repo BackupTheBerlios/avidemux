@@ -639,12 +639,10 @@ static int encode_init(AVCodecContext *avctx)
     }else s->context= 0;
 
     if(avctx->codec->id==CODEC_ID_HUFFYUV){
-#if 0 // MEANX     
         if(avctx->pix_fmt==PIX_FMT_YUV420P){
             av_log(avctx, AV_LOG_ERROR, "Error: YV12 is not supported by huffyuv; use vcodec=ffvhuff or format=422p\n");
             return -1;
         }
-#endif
         if(avctx->context_model){
             av_log(avctx, AV_LOG_ERROR, "Error: per-frame huffman tables are not supported by huffyuv; use vcodec=ffvhuff\n");
             return -1;
@@ -961,7 +959,7 @@ static void draw_slice(HYuvContext *s, int y){
     s->last_slice_end= y + h;
 }
 
-static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8_t *buf, int buf_size){
+static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, const uint8_t *buf, int buf_size){
     HYuvContext *s = avctx->priv_data;
     const int width= s->width;
     const int width2= s->width>>1;
@@ -974,7 +972,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
 
     s->bitstream_buffer= av_fast_realloc(s->bitstream_buffer, &s->bitstream_buffer_size, buf_size + FF_INPUT_BUFFER_PADDING_SIZE);
 
-    s->dsp.bswap_buf((uint32_t*)s->bitstream_buffer, (uint32_t*)buf, buf_size/4);
+    s->dsp.bswap_buf((uint32_t*)s->bitstream_buffer, (const uint32_t*)buf, buf_size/4);
 
     if(p->data[0])
         avctx->release_buffer(avctx, p);

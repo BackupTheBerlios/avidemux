@@ -40,7 +40,7 @@
 //#include "xvmc_debug.h"
 
 //set s->block
-inline void XVMC_init_block(MpegEncContext *s){
+void XVMC_init_block(MpegEncContext *s){
 xvmc_render_state_t * render;
     render = (xvmc_render_state_t*)s->current_picture.data[2];
     assert(render != NULL);
@@ -90,9 +90,9 @@ xvmc_render_state_t * render,* last, * next;
     render->p_past_surface = NULL;
 
     switch(s->pict_type){
-        case  I_TYPE:
+        case  FF_I_TYPE:
             return 0;// no prediction from other frames
-        case  B_TYPE:
+        case  FF_B_TYPE:
             next = (xvmc_render_state_t*)s->next_picture.data[2];
             assert(next!=NULL);
             assert(next->state & MP_XVMC_STATE_PREDICTION);
@@ -100,7 +100,7 @@ xvmc_render_state_t * render,* last, * next;
             if(next->magic != MP_XVMC_RENDER_MAGIC) return -1;
             render->p_future_surface = next->p_surface;
             //no return here, going to set forward prediction
-        case  P_TYPE:
+        case  FF_P_TYPE:
             last = (xvmc_render_state_t*)s->last_picture.data[2];
             if(last == NULL)// && !s->first_field)
                 last = render;//predict second field from the first
@@ -275,7 +275,7 @@ const int mb_xy = s->mb_y * s->mb_stride + s->mb_x;
 
     for(i=0; i<blocks_per_mb; i++){
         if(s->block_last_index[i] >= 0){
-            // i do not have unsigned_intra MOCO to test, hope it is OK
+            // I do not have unsigned_intra MOCO to test, hope it is OK
             if( (s->mb_intra) && ( render->idct || (!render->idct && !render->unsigned_intra)) )
                 s->pblocks[i][0]-=1<<10;
             if(!render->idct){

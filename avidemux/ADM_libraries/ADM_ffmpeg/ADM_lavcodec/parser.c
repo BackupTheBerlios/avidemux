@@ -24,6 +24,11 @@
 
 AVCodecParser *av_first_parser = NULL;
 
+AVCodecParser* av_parser_next(AVCodecParser *p){
+    if(p) return p->next;
+    else  return av_first_parser;
+}
+
 void av_register_codec_parser(AVCodecParser *parser)
 {
     parser->next = av_first_parser;
@@ -192,7 +197,7 @@ int av_parser_change(AVCodecParserContext *s,
     *poutbuf_size= buf_size;
     if(avctx->extradata){
         if(  (keyframe && (avctx->flags2 & CODEC_FLAG2_LOCAL_HEADER))
-            /*||(s->pict_type != I_TYPE && (s->flags & PARSER_FLAG_DUMP_EXTRADATA_AT_NOKEY))*/
+            /*||(s->pict_type != FF_I_TYPE && (s->flags & PARSER_FLAG_DUMP_EXTRADATA_AT_NOKEY))*/
             /*||(? && (s->flags & PARSER_FLAG_DUMP_EXTRADATA_AT_BEGIN)*/){
             int size= buf_size + avctx->extradata_size;
             *poutbuf_size= size;

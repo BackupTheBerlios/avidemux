@@ -25,12 +25,13 @@
  * @author Michael Niedermayer <michaelni@gmx.at>
  */
 
-#ifndef H264_H
-#define H264_H
+#ifndef FFMPEG_H264_H
+#define FFMPEG_H264_H
 
 #include "dsputil.h"
 #include "cabac.h"
 #include "mpegvideo.h"
+#include "h264pred.h"
 
 #define interlaced_dct interlaced_dct_is_a_bad_name
 #define mb_intra mb_intra_is_not_initialized_see_mb_type
@@ -58,13 +59,16 @@
 #define MB_MBAFF h->mb_mbaff
 #define MB_FIELD h->mb_field_decoding_flag
 #define FRAME_MBAFF h->mb_aff_frame
+#define FIELD_PICTURE (s->picture_structure != PICT_FRAME)
 #else
 #define MB_MBAFF 0
 #define MB_FIELD 0
 #define FRAME_MBAFF 0
+#define FIELD_PICTURE 0
 #undef  IS_INTERLACED
 #define IS_INTERLACED(mb_type) 0
 #endif
+#define FIELD_OR_MBAFF_PICTURE (FRAME_MBAFF || FIELD_PICTURE)
 
 /**
  * Sequence parameter set
@@ -83,8 +87,8 @@ typedef struct SPS{
     int poc_cycle_length;              ///< num_ref_frames_in_pic_order_cnt_cycle
     int ref_frame_count;               ///< num_ref_frames
     int gaps_in_frame_num_allowed_flag;
-    int mb_width;                      ///< frame_width_in_mbs_minus1 + 1
-    int mb_height;                     ///< frame_height_in_mbs_minus1 + 1
+    int mb_width;                      ///< pic_width_in_mbs_minus1 + 1
+    int mb_height;                     ///< pic_height_in_map_units_minus1 + 1
     int frame_mbs_only_flag;
     int mb_aff;                        ///<mb_adaptive_frame_field_flag
     int direct_8x8_inference_flag;
@@ -150,8 +154,8 @@ typedef enum MMCOOpcode{
  */
 typedef struct MMCO{
     MMCOOpcode opcode;
-    int short_frame_num;
-    int long_index;
+    int short_pic_num;  ///< pic_num without wrapping (pic_num & max_pic_num)
+    int long_arg;       ///< index, pic_num, or num long refs depending on opcode
 } MMCO;
 
 /**
@@ -185,10 +189,7 @@ typedef struct H264Context{
 
     int8_t intra4x4_pred_mode_cache[5*8];
     int8_t (*intra4x4_pred_mode)[8];
-    void (*pred4x4  [9+3])(uint8_t *src, uint8_t *topright, int stride);//FIXME move to dsp?
-    void (*pred8x8l [9+3])(uint8_t *src, int topleft, int topright, int stride);
-    void (*pred8x8  [4+3])(uint8_t *src, int stride);
-    void (*pred16x16[4+3])(uint8_t *src, int stride);
+    H264PredContext hpc;
     unsigned int topleft_samples_available;
     unsigned int top_samples_available;
     unsigned int topright_samples_available;
@@ -285,7 +286,7 @@ typedef struct H264Context{
     int prev_frame_num;           ///< frame_num of the last pic for POC type 1/2
 
     /**
-     * frame_num for frames or 2*frame_num for field pics.
+     * frame_num for frames or 2*frame_num+1 for field pics.
      */
     int curr_pic_num;
 
@@ -325,8 +326,10 @@ typedef struct H264Context{
     unsigned int list_count;
     Picture *short_ref[32];
     Picture *long_ref[32];
-    Picture default_ref_list[2][32];
-    Picture ref_list[2][48];     ///< 0..15: frame refs, 16..47: mbaff field refs
+    Picture default_ref_list[2][32]; ///< base reference list for all slices of a coded picture
+    Picture ref_list[2][48];         /**< 0..15: frame refs, 16..47: mbaff field refs.
+                                          Reordered version of default_ref_list
+                                          according to picture reordering in slice header */
     Picture *delayed_pic[18]; //FIXME size?
     Picture *delayed_output_pic;
 
@@ -345,8 +348,8 @@ typedef struct H264Context{
     GetBitContext *intra_gb_ptr;
     GetBitContext *inter_gb_ptr;
 
-    DECLARE_ALIGNED_8(DCTELEM, mb[16*24]);
-    DCTELEM mb_padding[256];        ///< as mb is addressed by scantable[i] and scantable is uint8_t we can either check that i is not to large or ensure that there is some unused stuff after mb
+    DECLARE_ALIGNED_16(DCTELEM, mb[16*24]);
+    DCTELEM mb_padding[256];        ///< as mb is addressed by scantable[i] and scantable is uint8_t we can either check that i is not too large or ensure that there is some unused stuff after mb
 
     /**
      * Cabac
@@ -382,6 +385,35 @@ typedef struct H264Context{
     const uint8_t *field_scan8x8_cavlc_q0;
 
     int x264_build;
+
+    /**
+     * @defgroup multithreading Members for slice based multithreading
+     * @{
+     */
+    struct H264Context *thread_context[MAX_THREADS];
+
+    /**
+     * current slice number, used to initalize slice_num of each thread/context
+     */
+    int current_slice;
+
+    /**
+     * Max number of threads / contexts.
+     * This is equal to AVCodecContext.thread_count unless
+     * multithreaded decoding is impossible, in which case it is
+     * reduced to 1.
+     */
+    int max_contexts;
+
+    /**
+     *  1 if the single thread fallback warning has already been
+     *  displayed, 0 otherwise.
+     */
+    int single_decode_warning;
+
+    int last_slice_type;
+    /** @} */
+
 }H264Context;
 
-#endif /* H264_H */
+#endif /* FFMPEG_H264_H */

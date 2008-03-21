@@ -32,6 +32,8 @@
 #include "vc1data.h"
 #include "vc1acdata.h"
 #include "msmpeg4data.h"
+#include "unary.h"
+#include "simple_idct.h"
 
 #undef NDEBUG
 #include <assert.h>
@@ -41,59 +43,6 @@
 #define AC_VLC_BITS 9
 static const uint16_t table_mb_intra[64][2];
 
-
-/**
- * Get unary code of limited length
- * @todo FIXME Slow and ugly
- * @param gb GetBitContext
- * @param[in] stop The bitstop value (unary code of 1's or 0's)
- * @param[in] len Maximum length
- * @return Unary length/index
- */
-static int get_prefix(GetBitContext *gb, int stop, int len)
-{
-#if 1
-    int i;
-
-    for(i = 0; i < len && get_bits1(gb) != stop; i++);
-    return i;
-/*  int i = 0, tmp = !stop;
-
-  while (i != len && tmp != stop)
-  {
-    tmp = get_bits(gb, 1);
-    i++;
-  }
-  if (i == len && tmp != stop) return len+1;
-  return i;*/
-#else
-  unsigned int buf;
-  int log;
-
-  OPEN_READER(re, gb);
-  UPDATE_CACHE(re, gb);
-  buf=GET_CACHE(re, gb); //Still not sure
-  if (stop) buf = ~buf;
-
-  log= av_log2(-buf); //FIXME: -?
-  if (log < limit){
-    LAST_SKIP_BITS(re, gb, log+1);
-    CLOSE_READER(re, gb);
-    return log;
-  }
-
-  LAST_SKIP_BITS(re, gb, limit);
-  CLOSE_READER(re, gb);
-  return limit;
-#endif
-}
-
-static inline int decode210(GetBitContext *gb){
-    if (get_bits1(gb))
-        return 0;
-    else
-        return 2 - get_bits1(gb);
-}
 
 /**
  * Init VC-1 specific tables and VC1Context members
@@ -195,11 +144,11 @@ static void decode_rowskip(uint8_t* plane, int width, int height, int stride, Ge
     int x, y;
 
     for (y=0; y<height; y++){
-        if (!get_bits(gb, 1)) //rowskip
+        if (!get_bits1(gb)) //rowskip
             memset(plane, 0, width);
         else
             for (x=0; x<width; x++)
-                plane[x] = get_bits(gb, 1);
+                plane[x] = get_bits1(gb);
         plane += stride;
     }
 }
@@ -215,12 +164,12 @@ static void decode_colskip(uint8_t* plane, int width, int height, int stride, Ge
     int x, y;
 
     for (x=0; x<width; x++){
-        if (!get_bits(gb, 1)) //colskip
+        if (!get_bits1(gb)) //colskip
             for (y=0; y<height; y++)
                 plane[y*stride] = 0;
         else
             for (y=0; y<height; y++)
-                plane[y*stride] = get_bits(gb, 1);
+                plane[y*stride] = get_bits1(gb);
         plane ++;
     }
 }
@@ -242,7 +191,7 @@ static int bitplane_decoding(uint8_t* data, int *raw_flag, VC1Context *v)
     width = v->s.mb_width;
     height = v->s.mb_height;
     stride = v->s.mb_stride;
-    invert = get_bits(gb, 1);
+    invert = get_bits1(gb);
     imode = get_vlc2(gb, ff_vc1_imode_vlc.table, VC1_IMODE_VLC_BITS, 1);
 
     *raw_flag = 0;
@@ -256,7 +205,7 @@ static int bitplane_decoding(uint8_t* data, int *raw_flag, VC1Context *v)
     case IMODE_NORM2:
         if ((height * width) & 1)
         {
-            *planep++ = get_bits(gb, 1);
+            *planep++ = get_bits1(gb);
             offset = 1;
         }
         else offset = 0;
@@ -375,7 +324,7 @@ static int vop_dquant_decoding(VC1Context *v)
     }
     else
     {
-        v->dquantfrm = get_bits(gb, 1);
+        v->dquantfrm = get_bits1(gb);
         if ( v->dquantfrm )
         {
             v->dqprofile = get_bits(gb, 2);
@@ -386,7 +335,9 @@ static int vop_dquant_decoding(VC1Context *v)
                 v->dqsbedge = get_bits(gb, 2);
                 break;
             case DQPROFILE_ALL_MBS:
-                v->dqbilevel = get_bits(gb, 1);
+                v->dqbilevel = get_bits1(gb);
+                if(!v->dqbilevel)
+                    v->halfpq = 0;
             default: break; //Forbidden ?
             }
             if (v->dqbilevel || v->dqprofile != DQPROFILE_ALL_MBS)
@@ -449,7 +400,7 @@ static void vc1_mc_1mv(VC1Context *v, int dir)
     my = s->mv[dir][0][1];
 
     // store motion vectors for further use in B frames
-    if(s->pict_type == P_TYPE) {
+    if(s->pict_type == FF_P_TYPE) {
         s->current_picture.motion_val[1][s->block_index[0]][0] = mx;
         s->current_picture.motion_val[1][s->block_index[0]][1] = my;
     }
@@ -826,10 +777,14 @@ static int decode_sequence_header(AVCodecContext *avctx, GetBitContext *gb)
 
     if (v->profile == PROFILE_ADVANCED)
     {
+        v->zz_8x4 = ff_vc1_adv_progressive_8x4_zz;
+        v->zz_4x8 = ff_vc1_adv_progressive_4x8_zz;
         return decode_sequence_header_adv(v, gb);
     }
     else
     {
+        v->zz_8x4 = ff_vc1_simple_progressive_8x4_zz;
+        v->zz_4x8 = ff_vc1_simple_progressive_4x8_zz;
         v->res_sm = get_bits(gb, 2); //reserved
         if (v->res_sm)
         {
@@ -843,37 +798,32 @@ static int decode_sequence_header(AVCodecContext *avctx, GetBitContext *gb)
     v->frmrtq_postproc = get_bits(gb, 3); //common
     // (bitrate-32kbps)/64kbps
     v->bitrtq_postproc = get_bits(gb, 5); //common
-    v->s.loop_filter = get_bits(gb, 1); //common
+    v->s.loop_filter = get_bits1(gb); //common
     if(v->s.loop_filter == 1 && v->profile == PROFILE_SIMPLE)
     {
         av_log(avctx, AV_LOG_ERROR,
                "LOOPFILTER shell not be enabled in simple profile\n");
     }
 
-    v->res_x8 = get_bits(gb, 1); //reserved
-    if (v->res_x8)
-    {
-        av_log(avctx, AV_LOG_ERROR,
-               "1 for reserved RES_X8 is forbidden\n");
-        //return -1;
-    }
-    v->multires = get_bits(gb, 1);
-    v->res_fasttx = get_bits(gb, 1);
+    v->res_x8 = get_bits1(gb); //reserved
+    v->multires = get_bits1(gb);
+    v->res_fasttx = get_bits1(gb);
     if (!v->res_fasttx)
     {
-        av_log(avctx, AV_LOG_ERROR,
-               "0 for reserved RES_FASTTX is forbidden\n");
-        //return -1;
+        v->s.dsp.vc1_inv_trans_8x8 = ff_simple_idct;
+        v->s.dsp.vc1_inv_trans_8x4 = ff_simple_idct84_add;
+        v->s.dsp.vc1_inv_trans_4x8 = ff_simple_idct48_add;
+        v->s.dsp.vc1_inv_trans_4x4 = ff_simple_idct44_add;
     }
 
-    v->fastuvmc =  get_bits(gb, 1); //common
+    v->fastuvmc =  get_bits1(gb); //common
     if (!v->profile && !v->fastuvmc)
     {
         av_log(avctx, AV_LOG_ERROR,
                "FASTUVMC unavailable in Simple Profile\n");
         return -1;
     }
-    v->extended_mv =  get_bits(gb, 1); //common
+    v->extended_mv =  get_bits1(gb); //common
     if (!v->profile && v->extended_mv)
     {
         av_log(avctx, AV_LOG_ERROR,
@@ -881,9 +831,9 @@ static int decode_sequence_header(AVCodecContext *avctx, GetBitContext *gb)
         return -1;
     }
     v->dquant =  get_bits(gb, 2); //common
-    v->vstransform =  get_bits(gb, 1); //common
+    v->vstransform =  get_bits1(gb); //common
 
-    v->res_transtab = get_bits(gb, 1);
+    v->res_transtab = get_bits1(gb);
     if (v->res_transtab)
     {
         av_log(avctx, AV_LOG_ERROR,
@@ -891,10 +841,10 @@ static int decode_sequence_header(AVCodecContext *avctx, GetBitContext *gb)
         return -1;
     }
 
-    v->overlap = get_bits(gb, 1); //common
+    v->overlap = get_bits1(gb); //common
 
-    v->s.resync_marker = get_bits(gb, 1);
-    v->rangered = get_bits(gb, 1);
+    v->s.resync_marker = get_bits1(gb);
+    v->rangered = get_bits1(gb);
     if (v->rangered && v->profile == PROFILE_SIMPLE)
     {
         av_log(avctx, AV_LOG_INFO,
@@ -904,8 +854,8 @@ static int decode_sequence_header(AVCodecContext *avctx, GetBitContext *gb)
     v->s.max_b_frames = avctx->max_b_frames = get_bits(gb, 3); //common
     v->quantizer_mode = get_bits(gb, 2); //common
 
-    v->finterpflag = get_bits(gb, 1); //common
-    v->res_rtm_flag = get_bits(gb, 1); //reserved
+    v->finterpflag = get_bits1(gb); //common
+    v->res_rtm_flag = get_bits1(gb); //reserved
     if (!v->res_rtm_flag)
     {
 //            av_log(avctx, AV_LOG_ERROR,
@@ -949,7 +899,7 @@ static int decode_sequence_header_adv(VC1Context *v, GetBitContext *gb)
     v->frmrtq_postproc = get_bits(gb, 3); //common
     // (bitrate-32kbps)/64kbps
     v->bitrtq_postproc = get_bits(gb, 5); //common
-    v->postprocflag = get_bits(gb, 1); //common
+    v->postprocflag = get_bits1(gb); //common
 
     v->s.avctx->coded_width = (get_bits(gb, 12) + 1) << 1;
     v->s.avctx->coded_height = (get_bits(gb, 12) + 1) << 1;
@@ -959,7 +909,7 @@ static int decode_sequence_header_adv(VC1Context *v, GetBitContext *gb)
     v->interlace = get_bits1(gb);
     v->tfcntrflag = get_bits1(gb);
     v->finterpflag = get_bits1(gb);
-    get_bits1(gb); // reserved
+    skip_bits1(gb); // reserved
 
     v->s.h_edge_pos = v->s.avctx->coded_width;
     v->s.v_edge_pos = v->s.avctx->coded_height;
@@ -1021,11 +971,11 @@ static int decode_sequence_header_adv(VC1Context *v, GetBitContext *gb)
     if(v->hrd_param_flag) {
         int i;
         v->hrd_num_leaky_buckets = get_bits(gb, 5);
-        get_bits(gb, 4); //bitrate exponent
-        get_bits(gb, 4); //buffer size exponent
+        skip_bits(gb, 4); //bitrate exponent
+        skip_bits(gb, 4); //buffer size exponent
         for(i = 0; i < v->hrd_num_leaky_buckets; i++) {
-            get_bits(gb, 16); //hrd_rate[n]
-            get_bits(gb, 16); //hrd_buffer[n]
+            skip_bits(gb, 16); //hrd_rate[n]
+            skip_bits(gb, 16); //hrd_buffer[n]
         }
     }
     return 0;
@@ -1051,7 +1001,7 @@ static int decode_entry_point(AVCodecContext *avctx, GetBitContext *gb)
 
     if(v->hrd_param_flag){
         for(i = 0; i < v->hrd_num_leaky_buckets; i++) {
-            get_bits(gb, 8); //hrd_full[n]
+            skip_bits(gb, 8); //hrd_full[n]
         }
     }
 
@@ -1084,37 +1034,38 @@ static int vc1_parse_frame_header(VC1Context *v, GetBitContext* gb)
 {
     int pqindex, lowquant, status;
 
-    if(v->finterpflag) v->interpfrm = get_bits(gb, 1);
+    if(v->finterpflag) v->interpfrm = get_bits1(gb);
     skip_bits(gb, 2); //framecnt unused
     v->rangeredfrm = 0;
-    if (v->rangered) v->rangeredfrm = get_bits(gb, 1);
-    v->s.pict_type = get_bits(gb, 1);
+    if (v->rangered) v->rangeredfrm = get_bits1(gb);
+    v->s.pict_type = get_bits1(gb);
     if (v->s.avctx->max_b_frames) {
         if (!v->s.pict_type) {
-            if (get_bits(gb, 1)) v->s.pict_type = I_TYPE;
-            else v->s.pict_type = B_TYPE;
-        } else v->s.pict_type = P_TYPE;
-    } else v->s.pict_type = v->s.pict_type ? P_TYPE : I_TYPE;
+            if (get_bits1(gb)) v->s.pict_type = FF_I_TYPE;
+            else v->s.pict_type = FF_B_TYPE;
+        } else v->s.pict_type = FF_P_TYPE;
+    } else v->s.pict_type = v->s.pict_type ? FF_P_TYPE : FF_I_TYPE;
 
     v->bi_type = 0;
-    if(v->s.pict_type == B_TYPE) {
+    if(v->s.pict_type == FF_B_TYPE) {
         v->bfraction = get_vlc2(gb, ff_vc1_bfraction_vlc.table, VC1_BFRACTION_VLC_BITS, 1);
         v->bfraction = ff_vc1_bfraction_lut[v->bfraction];
         if(v->bfraction == 0) {
-            v->s.pict_type = BI_TYPE;
+            v->s.pict_type = FF_BI_TYPE;
         }
     }
-    if(v->s.pict_type == I_TYPE || v->s.pict_type == BI_TYPE)
-        get_bits(gb, 7); // skip buffer fullness
+    if(v->s.pict_type == FF_I_TYPE || v->s.pict_type == FF_BI_TYPE)
+        skip_bits(gb, 7); // skip buffer fullness
 
     /* calculate RND */
-    if(v->s.pict_type == I_TYPE || v->s.pict_type == BI_TYPE)
+    if(v->s.pict_type == FF_I_TYPE || v->s.pict_type == FF_BI_TYPE)
         v->rnd = 1;
-    if(v->s.pict_type == P_TYPE)
+    if(v->s.pict_type == FF_P_TYPE)
         v->rnd ^= 1;
 
     /* Quantizer stuff */
     pqindex = get_bits(gb, 5);
+    if(!pqindex) return -1;
     if (v->quantizer_mode == QUANT_FRAME_IMPLICIT)
         v->pq = ff_vc1_pquant_table[0][pqindex];
     else
@@ -1126,43 +1077,43 @@ static int vc1_parse_frame_header(VC1Context *v, GetBitContext* gb)
     if (v->quantizer_mode == QUANT_NON_UNIFORM)
         v->pquantizer = 0;
     v->pqindex = pqindex;
-    if (pqindex < 9) v->halfpq = get_bits(gb, 1);
+    if (pqindex < 9) v->halfpq = get_bits1(gb);
     else v->halfpq = 0;
     if (v->quantizer_mode == QUANT_FRAME_EXPLICIT)
-        v->pquantizer = get_bits(gb, 1);
+        v->pquantizer = get_bits1(gb);
     v->dquantfrm = 0;
-    if (v->extended_mv == 1) v->mvrange = get_prefix(gb, 0, 3);
+    if (v->extended_mv == 1) v->mvrange = get_unary(gb, 0, 3);
     v->k_x = v->mvrange + 9 + (v->mvrange >> 1); //k_x can be 9 10 12 13
     v->k_y = v->mvrange + 8; //k_y can be 8 9 10 11
     v->range_x = 1 << (v->k_x - 1);
     v->range_y = 1 << (v->k_y - 1);
     if (v->profile == PROFILE_ADVANCED)
     {
-        if (v->postprocflag) v->postproc = get_bits(gb, 1);
+        if (v->postprocflag) v->postproc = get_bits1(gb);
     }
     else
-        if (v->multires && v->s.pict_type != B_TYPE) v->respic = get_bits(gb, 2);
+        if (v->multires && v->s.pict_type != FF_B_TYPE) v->respic = get_bits(gb, 2);
 
-    if(v->res_x8 && (v->s.pict_type == I_TYPE || v->s.pict_type == BI_TYPE)){
-        if(get_bits1(gb))return -1;
-    }
+    if(v->res_x8 && (v->s.pict_type == FF_I_TYPE || v->s.pict_type == FF_BI_TYPE)){
+        v->x8_type = get_bits1(gb);
+    }else v->x8_type = 0;
 //av_log(v->s.avctx, AV_LOG_INFO, "%c Frame: QP=[%i]%i (+%i/2) %i\n",
-//        (v->s.pict_type == P_TYPE) ? 'P' : ((v->s.pict_type == I_TYPE) ? 'I' : 'B'), pqindex, v->pq, v->halfpq, v->rangeredfrm);
+//        (v->s.pict_type == FF_P_TYPE) ? 'P' : ((v->s.pict_type == FF_I_TYPE) ? 'I' : 'B'), pqindex, v->pq, v->halfpq, v->rangeredfrm);
 
-    if(v->s.pict_type == I_TYPE || v->s.pict_type == P_TYPE) v->use_ic = 0;
+    if(v->s.pict_type == FF_I_TYPE || v->s.pict_type == FF_P_TYPE) v->use_ic = 0;
 
     switch(v->s.pict_type) {
-    case P_TYPE:
+    case FF_P_TYPE:
         if (v->pq < 5) v->tt_index = 0;
         else if(v->pq < 13) v->tt_index = 1;
         else v->tt_index = 2;
 
         lowquant = (v->pq > 12) ? 0 : 1;
-        v->mv_mode = ff_vc1_mv_pmode_table[lowquant][get_prefix(gb, 1, 4)];
+        v->mv_mode = ff_vc1_mv_pmode_table[lowquant][get_unary(gb, 1, 4)];
         if (v->mv_mode == MV_PMODE_INTENSITY_COMP)
         {
             int scale, shift, i;
-            v->mv_mode2 = ff_vc1_mv_pmode_table2[lowquant][get_prefix(gb, 1, 3)];
+            v->mv_mode2 = ff_vc1_mv_pmode_table2[lowquant][get_unary(gb, 1, 3)];
             v->lumscale = get_bits(gb, 6);
             v->lumshift = get_bits(gb, 6);
             v->use_ic = 1;
@@ -1225,7 +1176,7 @@ static int vc1_parse_frame_header(VC1Context *v, GetBitContext* gb)
         v->ttfrm = 0; //FIXME Is that so ?
         if (v->vstransform)
         {
-            v->ttmbf = get_bits(gb, 1);
+            v->ttmbf = get_bits1(gb);
             if (v->ttmbf)
             {
                 v->ttfrm = ff_vc1_ttfrm_to_tt[get_bits(gb, 2)];
@@ -1235,7 +1186,7 @@ static int vc1_parse_frame_header(VC1Context *v, GetBitContext* gb)
             v->ttfrm = TT_8X8;
         }
         break;
-    case B_TYPE:
+    case FF_B_TYPE:
         if (v->pq < 5) v->tt_index = 0;
         else if(v->pq < 13) v->tt_index = 1;
         else v->tt_index = 2;
@@ -1266,7 +1217,7 @@ static int vc1_parse_frame_header(VC1Context *v, GetBitContext* gb)
         v->ttfrm = 0;
         if (v->vstransform)
         {
-            v->ttmbf = get_bits(gb, 1);
+            v->ttmbf = get_bits1(gb);
             if (v->ttmbf)
             {
                 v->ttfrm = ff_vc1_ttfrm_to_tt[get_bits(gb, 2)];
@@ -1278,17 +1229,20 @@ static int vc1_parse_frame_header(VC1Context *v, GetBitContext* gb)
         break;
     }
 
-    /* AC Syntax */
-    v->c_ac_table_index = decode012(gb);
-    if (v->s.pict_type == I_TYPE || v->s.pict_type == BI_TYPE)
+    if(!v->x8_type)
     {
-        v->y_ac_table_index = decode012(gb);
+        /* AC Syntax */
+        v->c_ac_table_index = decode012(gb);
+        if (v->s.pict_type == FF_I_TYPE || v->s.pict_type == FF_BI_TYPE)
+        {
+            v->y_ac_table_index = decode012(gb);
+        }
+        /* DC Syntax */
+        v->s.dc_table_index = get_bits1(gb);
     }
-    /* DC Syntax */
-    v->s.dc_table_index = get_bits(gb, 1);
 
-    if(v->s.pict_type == BI_TYPE) {
-        v->s.pict_type = B_TYPE;
+    if(v->s.pict_type == FF_BI_TYPE) {
+        v->s.pict_type = FF_B_TYPE;
         v->bi_type = 1;
     }
     return 0;
@@ -1305,26 +1259,26 @@ static int vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
         v->fcm = decode012(gb);
         if(v->fcm) return -1; // interlaced frames/fields are not implemented
     }
-    switch(get_prefix(gb, 0, 4)) {
+    switch(get_unary(gb, 0, 4)) {
     case 0:
-        v->s.pict_type = P_TYPE;
+        v->s.pict_type = FF_P_TYPE;
         break;
     case 1:
-        v->s.pict_type = B_TYPE;
+        v->s.pict_type = FF_B_TYPE;
         break;
     case 2:
-        v->s.pict_type = I_TYPE;
+        v->s.pict_type = FF_I_TYPE;
         break;
     case 3:
-        v->s.pict_type = BI_TYPE;
+        v->s.pict_type = FF_BI_TYPE;
         break;
     case 4:
-        v->s.pict_type = P_TYPE; // skipped pic
+        v->s.pict_type = FF_P_TYPE; // skipped pic
         v->p_frame_skipped = 1;
         return 0;
     }
     if(v->tfcntrflag)
-        get_bits(gb, 8);
+        skip_bits(gb, 8);
     if(v->broadcast) {
         if(!v->interlace || v->psf) {
             v->rptfrm = get_bits(gb, 2);
@@ -1339,15 +1293,16 @@ static int vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
     v->rnd = get_bits1(gb);
     if(v->interlace)
         v->uvsamp = get_bits1(gb);
-    if(v->finterpflag) v->interpfrm = get_bits(gb, 1);
-    if(v->s.pict_type == B_TYPE) {
+    if(v->finterpflag) v->interpfrm = get_bits1(gb);
+    if(v->s.pict_type == FF_B_TYPE) {
         v->bfraction = get_vlc2(gb, ff_vc1_bfraction_vlc.table, VC1_BFRACTION_VLC_BITS, 1);
         v->bfraction = ff_vc1_bfraction_lut[v->bfraction];
         if(v->bfraction == 0) {
-            v->s.pict_type = BI_TYPE; /* XXX: should not happen here */
+            v->s.pict_type = FF_BI_TYPE; /* XXX: should not happen here */
         }
     }
     pqindex = get_bits(gb, 5);
+    if(!pqindex) return -1;
     v->pqindex = pqindex;
     if (v->quantizer_mode == QUANT_FRAME_IMPLICIT)
         v->pq = ff_vc1_pquant_table[0][pqindex];
@@ -1360,16 +1315,16 @@ static int vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
     if (v->quantizer_mode == QUANT_NON_UNIFORM)
         v->pquantizer = 0;
     v->pqindex = pqindex;
-    if (pqindex < 9) v->halfpq = get_bits(gb, 1);
+    if (pqindex < 9) v->halfpq = get_bits1(gb);
     else v->halfpq = 0;
     if (v->quantizer_mode == QUANT_FRAME_EXPLICIT)
-        v->pquantizer = get_bits(gb, 1);
+        v->pquantizer = get_bits1(gb);
 
-    if(v->s.pict_type == I_TYPE || v->s.pict_type == P_TYPE) v->use_ic = 0;
+    if(v->s.pict_type == FF_I_TYPE || v->s.pict_type == FF_P_TYPE) v->use_ic = 0;
 
     switch(v->s.pict_type) {
-    case I_TYPE:
-    case BI_TYPE:
+    case FF_I_TYPE:
+    case FF_BI_TYPE:
         status = bitplane_decoding(v->acpred_plane, &v->acpred_is_raw, v);
         if (status < 0) return -1;
         av_log(v->s.avctx, AV_LOG_DEBUG, "ACPRED plane encoding: "
@@ -1385,10 +1340,10 @@ static int vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
             }
         }
         break;
-    case P_TYPE:
+    case FF_P_TYPE:
         if(v->postprocflag)
             v->postproc = get_bits1(gb);
-        if (v->extended_mv) v->mvrange = get_prefix(gb, 0, 3);
+        if (v->extended_mv) v->mvrange = get_unary(gb, 0, 3);
         else v->mvrange = 0;
         v->k_x = v->mvrange + 9 + (v->mvrange >> 1); //k_x can be 9 10 12 13
         v->k_y = v->mvrange + 8; //k_y can be 8 9 10 11
@@ -1400,11 +1355,11 @@ static int vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
         else v->tt_index = 2;
 
         lowquant = (v->pq > 12) ? 0 : 1;
-        v->mv_mode = ff_vc1_mv_pmode_table[lowquant][get_prefix(gb, 1, 4)];
+        v->mv_mode = ff_vc1_mv_pmode_table[lowquant][get_unary(gb, 1, 4)];
         if (v->mv_mode == MV_PMODE_INTENSITY_COMP)
         {
             int scale, shift, i;
-            v->mv_mode2 = ff_vc1_mv_pmode_table2[lowquant][get_prefix(gb, 1, 3)];
+            v->mv_mode2 = ff_vc1_mv_pmode_table2[lowquant][get_unary(gb, 1, 3)];
             v->lumscale = get_bits(gb, 6);
             v->lumshift = get_bits(gb, 6);
             /* fill lookup tables for intensity compensation */
@@ -1466,7 +1421,7 @@ static int vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
         v->ttfrm = 0; //FIXME Is that so ?
         if (v->vstransform)
         {
-            v->ttmbf = get_bits(gb, 1);
+            v->ttmbf = get_bits1(gb);
             if (v->ttmbf)
             {
                 v->ttfrm = ff_vc1_ttfrm_to_tt[get_bits(gb, 2)];
@@ -1476,10 +1431,10 @@ static int vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
             v->ttfrm = TT_8X8;
         }
         break;
-    case B_TYPE:
+    case FF_B_TYPE:
         if(v->postprocflag)
             v->postproc = get_bits1(gb);
-        if (v->extended_mv) v->mvrange = get_prefix(gb, 0, 3);
+        if (v->extended_mv) v->mvrange = get_unary(gb, 0, 3);
         else v->mvrange = 0;
         v->k_x = v->mvrange + 9 + (v->mvrange >> 1); //k_x can be 9 10 12 13
         v->k_y = v->mvrange + 8; //k_y can be 8 9 10 11
@@ -1516,7 +1471,7 @@ static int vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
         v->ttfrm = 0;
         if (v->vstransform)
         {
-            v->ttmbf = get_bits(gb, 1);
+            v->ttmbf = get_bits1(gb);
             if (v->ttmbf)
             {
                 v->ttfrm = ff_vc1_ttfrm_to_tt[get_bits(gb, 2)];
@@ -1530,20 +1485,20 @@ static int vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
 
     /* AC Syntax */
     v->c_ac_table_index = decode012(gb);
-    if (v->s.pict_type == I_TYPE || v->s.pict_type == BI_TYPE)
+    if (v->s.pict_type == FF_I_TYPE || v->s.pict_type == FF_BI_TYPE)
     {
         v->y_ac_table_index = decode012(gb);
     }
     /* DC Syntax */
-    v->s.dc_table_index = get_bits(gb, 1);
-    if ((v->s.pict_type == I_TYPE || v->s.pict_type == BI_TYPE) && v->dquant) {
+    v->s.dc_table_index = get_bits1(gb);
+    if ((v->s.pict_type == FF_I_TYPE || v->s.pict_type == FF_BI_TYPE) && v->dquant) {
         av_log(v->s.avctx, AV_LOG_DEBUG, "VOP DQuant info\n");
         vop_dquant_decoding(v);
     }
 
     v->bi_type = 0;
-    if(v->s.pict_type == BI_TYPE) {
-        v->s.pict_type = B_TYPE;
+    if(v->s.pict_type == FF_BI_TYPE) {
+        v->s.pict_type = FF_B_TYPE;
         v->bi_type = 1;
     }
     return 0;
@@ -1568,7 +1523,7 @@ static int vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
     {                                                          \
       if (v->dqbilevel)                                        \
       {                                                        \
-        mquant = (get_bits(gb, 1)) ? v->altpq : v->pq;         \
+        mquant = (get_bits1(gb)) ? v->altpq : v->pq;           \
       }                                                        \
       else                                                     \
       {                                                        \
@@ -2319,7 +2274,7 @@ static void vc1_decode_ac_coeff(VC1Context *v, int *last, int *skip, int *value,
         run = vc1_index_decode_table[codingset][index][0];
         level = vc1_index_decode_table[codingset][index][1];
         lst = index >= vc1_last_decode_table[codingset];
-        if(get_bits(gb, 1))
+        if(get_bits1(gb))
             level = -level;
     } else {
         escape = decode210(gb);
@@ -2339,23 +2294,23 @@ static void vc1_decode_ac_coeff(VC1Context *v, int *last, int *skip, int *value,
                 else
                     run += vc1_delta_run_table[codingset][level] + 1;
             }
-            if(get_bits(gb, 1))
+            if(get_bits1(gb))
                 level = -level;
         } else {
             int sign;
-            lst = get_bits(gb, 1);
+            lst = get_bits1(gb);
             if(v->s.esc3_level_length == 0) {
                 if(v->pq < 8 || v->dquantfrm) { // table 59
                     v->s.esc3_level_length = get_bits(gb, 3);
                     if(!v->s.esc3_level_length)
                         v->s.esc3_level_length = get_bits(gb, 2) + 8;
                 } else { //table 60
-                    v->s.esc3_level_length = get_prefix(gb, 1, 6) + 2;
+                    v->s.esc3_level_length = get_unary(gb, 1, 6) + 2;
                 }
                 v->s.esc3_run_length = 3 + get_bits(gb, 2);
             }
             run = get_bits(gb, v->s.esc3_run_length);
-            sign = get_bits(gb, 1);
+            sign = get_bits1(gb);
             level = get_bits(gb, v->s.esc3_level_length);
             if(sign)
                 level = -level;
@@ -2407,9 +2362,9 @@ static int vc1_decode_i_block(VC1Context *v, DCTELEM block[64], int n, int coded
             if (v->pq == 1)
                 dcdiff = (dcdiff<<2) + get_bits(gb, 2) - 3;
             else if (v->pq == 2)
-                dcdiff = (dcdiff<<1) + get_bits(gb, 1) - 1;
+                dcdiff = (dcdiff<<1) + get_bits1(gb)   - 1;
         }
-        if (get_bits(gb, 1))
+        if (get_bits1(gb))
             dcdiff = -dcdiff;
     }
 
@@ -2577,9 +2532,9 @@ static int vc1_decode_i_block_adv(VC1Context *v, DCTELEM block[64], int n, int c
             if (mquant == 1)
                 dcdiff = (dcdiff<<2) + get_bits(gb, 2) - 3;
             else if (mquant == 2)
-                dcdiff = (dcdiff<<1) + get_bits(gb, 1) - 1;
+                dcdiff = (dcdiff<<1) + get_bits1(gb)   - 1;
         }
-        if (get_bits(gb, 1))
+        if (get_bits1(gb))
             dcdiff = -dcdiff;
     }
 
@@ -2605,7 +2560,7 @@ static int vc1_decode_i_block_adv(VC1Context *v, DCTELEM block[64], int n, int c
     ac_val = s->ac_val[0][0] + s->block_index[n] * 16;
     ac_val2 = ac_val;
 
-    scale = mquant * 2 + v->halfpq;
+    scale = mquant * 2 + ((mquant == v->pq) ? v->halfpq : 0);
 
     if(dc_pred_dir) //left
         ac_val -= 16;
@@ -2781,9 +2736,9 @@ static int vc1_decode_intra_block(VC1Context *v, DCTELEM block[64], int n, int c
             if (mquant == 1)
                 dcdiff = (dcdiff<<2) + get_bits(gb, 2) - 3;
             else if (mquant == 2)
-                dcdiff = (dcdiff<<1) + get_bits(gb, 1) - 1;
+                dcdiff = (dcdiff<<1) + get_bits1(gb)   - 1;
         }
-        if (get_bits(gb, 1))
+        if (get_bits1(gb))
             dcdiff = -dcdiff;
     }
 
@@ -2931,7 +2886,8 @@ static int vc1_decode_intra_block(VC1Context *v, DCTELEM block[64], int n, int c
 
 /** Decode P block
  */
-static int vc1_decode_p_block(VC1Context *v, DCTELEM block[64], int n, int mquant, int ttmb, int first_block)
+static int vc1_decode_p_block(VC1Context *v, DCTELEM block[64], int n, int mquant, int ttmb, int first_block,
+                              uint8_t *dst, int linesize, int skip_block)
 {
     MpegEncContext *s = &v->s;
     GetBitContext *gb = &s->gb;
@@ -2977,7 +2933,10 @@ static int vc1_decode_p_block(VC1Context *v, DCTELEM block[64], int n, int mquan
             if(!v->pquantizer)
                 block[idx] += (block[idx] < 0) ? -mquant : mquant;
         }
-        s->dsp.vc1_inv_trans_8x8(block);
+        if(!skip_block){
+            s->dsp.vc1_inv_trans_8x8(block);
+            s->dsp.add_pixels_clamped(block, dst, linesize);
+        }
         break;
     case TT_4X4:
         for(j = 0; j < 4; j++) {
@@ -2994,8 +2953,8 @@ static int vc1_decode_p_block(VC1Context *v, DCTELEM block[64], int n, int mquan
                 if(!v->pquantizer)
                     block[idx + off] += (block[idx + off] < 0) ? -mquant : mquant;
             }
-            if(!(subblkpat & (1 << (3 - j))))
-                s->dsp.vc1_inv_trans_4x4(block, j);
+            if(!(subblkpat & (1 << (3 - j))) && !skip_block)
+                s->dsp.vc1_inv_trans_4x4(dst + (j&1)*4 + (j&2)*2*linesize, linesize, block + off);
         }
         break;
     case TT_8X4:
@@ -3008,16 +2967,13 @@ static int vc1_decode_p_block(VC1Context *v, DCTELEM block[64], int n, int mquan
                 i += skip;
                 if(i > 31)
                     break;
-                if(v->profile < PROFILE_ADVANCED)
-                    idx = ff_vc1_simple_progressive_8x4_zz[i++];
-                else
-                    idx = ff_vc1_adv_progressive_8x4_zz[i++];
-                block[idx + off] = value * scale;
+                idx = v->zz_8x4[i++]+off;
+                block[idx] = value * scale;
                 if(!v->pquantizer)
-                    block[idx + off] += (block[idx + off] < 0) ? -mquant : mquant;
+                    block[idx] += (block[idx] < 0) ? -mquant : mquant;
             }
-            if(!(subblkpat & (1 << (1 - j))))
-                s->dsp.vc1_inv_trans_8x4(block, j);
+            if(!(subblkpat & (1 << (1 - j))) && !skip_block)
+                s->dsp.vc1_inv_trans_8x4(dst + j*4*linesize, linesize, block + off);
         }
         break;
     case TT_4X8:
@@ -3030,16 +2986,13 @@ static int vc1_decode_p_block(VC1Context *v, DCTELEM block[64], int n, int mquan
                 i += skip;
                 if(i > 31)
                     break;
-                if(v->profile < PROFILE_ADVANCED)
-                    idx = ff_vc1_simple_progressive_4x8_zz[i++];
-                else
-                    idx = ff_vc1_adv_progressive_4x8_zz[i++];
-                block[idx + off] = value * scale;
+                idx = v->zz_4x8[i++]+off;
+                block[idx] = value * scale;
                 if(!v->pquantizer)
-                    block[idx + off] += (block[idx + off] < 0) ? -mquant : mquant;
+                    block[idx] += (block[idx] < 0) ? -mquant : mquant;
             }
-            if(!(subblkpat & (1 << (1 - j))))
-                s->dsp.vc1_inv_trans_4x8(block, j);
+            if(!(subblkpat & (1 << (1 - j))) && !skip_block)
+                s->dsp.vc1_inv_trans_4x8(dst + j*4, linesize, block + off);
         }
         break;
     }
@@ -3100,12 +3053,12 @@ static int vc1_decode_p_mb(VC1Context *v)
             if (s->mb_intra && !mb_has_coeffs)
             {
                 GET_MQUANT();
-                s->ac_pred = get_bits(gb, 1);
+                s->ac_pred = get_bits1(gb);
                 cbp = 0;
             }
             else if (mb_has_coeffs)
             {
-                if (s->mb_intra) s->ac_pred = get_bits(gb, 1);
+                if (s->mb_intra) s->ac_pred = get_bits1(gb);
                 cbp = get_vlc2(&v->s.gb, v->cbpcy_vlc->table, VC1_CBPCY_P_VLC_BITS, 2);
                 GET_MQUANT();
             }
@@ -3140,9 +3093,7 @@ static int vc1_decode_p_mb(VC1Context *v)
                     if((i>3) && (s->flags & CODEC_FLAG_GRAY)) continue;
                     s->dsp.vc1_inv_trans_8x8(s->block[i]);
                     if(v->rangeredfrm) for(j = 0; j < 64; j++) s->block[i][j] <<= 1;
-                    for(j = 0; j < 64; j++) s->block[i][j] += 128;
-                    if(!v->res_fasttx && v->res_x8) for(j = 0; j < 64; j++) s->block[i][j] += 16;
-                    s->dsp.put_pixels_clamped(s->block[i], s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
+                    s->dsp.put_signed_pixels_clamped(s->block[i], s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
                     if(v->pq >= 9 && v->overlap) {
                         if(v->c_avail)
                             s->dsp.vc1_h_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
@@ -3150,11 +3101,9 @@ static int vc1_decode_p_mb(VC1Context *v)
                             s->dsp.vc1_v_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
                     }
                 } else if(val) {
-                    vc1_decode_p_block(v, s->block[i], i, mquant, ttmb, first_block);
+                    vc1_decode_p_block(v, s->block[i], i, mquant, ttmb, first_block, s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize, (i&4) && (s->flags & CODEC_FLAG_GRAY));
                     if(!v->ttmbf && ttmb < 8) ttmb = -1;
                     first_block = 0;
-                    if((i<4) || !(s->flags & CODEC_FLAG_GRAY))
-                        s->dsp.add_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize);
                 }
             }
         }
@@ -3222,7 +3171,7 @@ static int vc1_decode_p_mb(VC1Context *v)
                             break;
                         }
                     }
-                if(intrapred)s->ac_pred = get_bits(gb, 1);
+                if(intrapred)s->ac_pred = get_bits1(gb);
                 else s->ac_pred = 0;
             }
             if (!v->ttmbf && coded_inter)
@@ -3244,9 +3193,7 @@ static int vc1_decode_p_mb(VC1Context *v)
                     if((i>3) && (s->flags & CODEC_FLAG_GRAY)) continue;
                     s->dsp.vc1_inv_trans_8x8(s->block[i]);
                     if(v->rangeredfrm) for(j = 0; j < 64; j++) s->block[i][j] <<= 1;
-                    for(j = 0; j < 64; j++) s->block[i][j] += 128;
-                    if(!v->res_fasttx && v->res_x8) for(j = 0; j < 64; j++) s->block[i][j] += 16;
-                    s->dsp.put_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize);
+                    s->dsp.put_signed_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize);
                     if(v->pq >= 9 && v->overlap) {
                         if(v->c_avail)
                             s->dsp.vc1_h_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
@@ -3254,11 +3201,9 @@ static int vc1_decode_p_mb(VC1Context *v)
                             s->dsp.vc1_v_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
                     }
                 } else if(is_coded[i]) {
-                    status = vc1_decode_p_block(v, s->block[i], i, mquant, ttmb, first_block);
+                    status = vc1_decode_p_block(v, s->block[i], i, mquant, ttmb, first_block, s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize, (i&4) && (s->flags & CODEC_FLAG_GRAY));
                     if(!v->ttmbf && ttmb < 8) ttmb = -1;
                     first_block = 0;
-                    if((i<4) || !(s->flags & CODEC_FLAG_GRAY))
-                        s->dsp.add_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize);
                 }
             }
             return status;
@@ -3426,14 +3371,11 @@ static void vc1_decode_b_mb(VC1Context *v)
             if((i>3) && (s->flags & CODEC_FLAG_GRAY)) continue;
             s->dsp.vc1_inv_trans_8x8(s->block[i]);
             if(v->rangeredfrm) for(j = 0; j < 64; j++) s->block[i][j] <<= 1;
-            for(j = 0; j < 64; j++) s->block[i][j] += 128;
-            s->dsp.put_pixels_clamped(s->block[i], s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
+            s->dsp.put_signed_pixels_clamped(s->block[i], s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
         } else if(val) {
-            vc1_decode_p_block(v, s->block[i], i, mquant, ttmb, first_block);
+            vc1_decode_p_block(v, s->block[i], i, mquant, ttmb, first_block, s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize, (i&4) && (s->flags & CODEC_FLAG_GRAY));
             if(!v->ttmbf && ttmb < 8) ttmb = -1;
             first_block = 0;
-            if((i<4) || !(s->flags & CODEC_FLAG_GRAY))
-                s->dsp.add_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize);
         }
     }
 }
@@ -3481,7 +3423,6 @@ static void vc1_decode_i_blocks(VC1Context *v)
     s->mb_x = s->mb_y = 0;
     s->mb_intra = 1;
     s->first_slice_line = 1;
-    ff_er_add_slice(s, 0, 0, s->mb_width - 1, s->mb_height - 1, (AC_END|DC_END|MV_END));
     for(s->mb_y = 0; s->mb_y < s->mb_height; s->mb_y++) {
         for(s->mb_x = 0; s->mb_x < s->mb_width; s->mb_x++) {
             ff_init_block_index(s);
@@ -3495,7 +3436,7 @@ static void vc1_decode_i_blocks(VC1Context *v)
 
             // do actual MB decoding and displaying
             cbp = get_vlc2(&v->s.gb, ff_msmp4_mb_i_vlc.table, MB_INTRA_VLC_BITS, 2);
-            v->s.ac_pred = get_bits(&v->s.gb, 1);
+            v->s.ac_pred = get_bits1(&v->s.gb);
 
             for(k = 0; k < 6; k++) {
                 val = ((cbp >> (5 - k)) & 1);
@@ -3510,7 +3451,6 @@ static void vc1_decode_i_blocks(VC1Context *v)
                 vc1_decode_i_block(v, s->block[k], k, val, (k<4)? v->codingset : v->codingset2);
 
                 s->dsp.vc1_inv_trans_8x8(s->block[k]);
-                if(!v->res_fasttx && !v->res_x8) for(j = 0; j < 64; j++) s->block[k][j] -= 16;
                 if(v->pq >= 9 && v->overlap) {
                     for(j = 0; j < 64; j++) s->block[k][j] += 128;
                 }
@@ -3541,6 +3481,7 @@ static void vc1_decode_i_blocks(VC1Context *v)
             }
 
             if(get_bits_count(&s->gb) > v->bits) {
+                ff_er_add_slice(s, 0, 0, s->mb_x, s->mb_y, (AC_END|DC_END|MV_END));
                 av_log(s->avctx, AV_LOG_ERROR, "Bits overconsumption: %i > %i\n", get_bits_count(&s->gb), v->bits);
                 return;
             }
@@ -3548,6 +3489,7 @@ static void vc1_decode_i_blocks(VC1Context *v)
         ff_draw_horiz_band(s, s->mb_y * 16, 16);
         s->first_slice_line = 0;
     }
+    ff_er_add_slice(s, 0, 0, s->mb_width - 1, s->mb_height - 1, (AC_END|DC_END|MV_END));
 }
 
 /** Decode blocks of I-frame for advanced profile
@@ -3593,7 +3535,6 @@ static void vc1_decode_i_blocks_adv(VC1Context *v)
     s->mb_x = s->mb_y = 0;
     s->mb_intra = 1;
     s->first_slice_line = 1;
-    ff_er_add_slice(s, 0, 0, s->mb_width - 1, s->mb_height - 1, (AC_END|DC_END|MV_END));
     for(s->mb_y = 0; s->mb_y < s->mb_height; s->mb_y++) {
         for(s->mb_x = 0; s->mb_x < s->mb_width; s->mb_x++) {
             ff_init_block_index(s);
@@ -3607,13 +3548,13 @@ static void vc1_decode_i_blocks_adv(VC1Context *v)
             // do actual MB decoding and displaying
             cbp = get_vlc2(&v->s.gb, ff_msmp4_mb_i_vlc.table, MB_INTRA_VLC_BITS, 2);
             if(v->acpred_is_raw)
-                v->s.ac_pred = get_bits(&v->s.gb, 1);
+                v->s.ac_pred = get_bits1(&v->s.gb);
             else
                 v->s.ac_pred = v->acpred_plane[mb_pos];
 
             if(v->condover == CONDOVER_SELECT) {
                 if(v->overflg_is_raw)
-                    overlap = get_bits(&v->s.gb, 1);
+                    overlap = get_bits1(&v->s.gb);
                 else
                     overlap = v->over_flags_plane[mb_pos];
             } else
@@ -3670,6 +3611,7 @@ static void vc1_decode_i_blocks_adv(VC1Context *v)
             }
 
             if(get_bits_count(&s->gb) > v->bits) {
+                ff_er_add_slice(s, 0, 0, s->mb_x, s->mb_y, (AC_END|DC_END|MV_END));
                 av_log(s->avctx, AV_LOG_ERROR, "Bits overconsumption: %i > %i\n", get_bits_count(&s->gb), v->bits);
                 return;
             }
@@ -3677,6 +3619,7 @@ static void vc1_decode_i_blocks_adv(VC1Context *v)
         ff_draw_horiz_band(s, s->mb_y * 16, 16);
         s->first_slice_line = 0;
     }
+    ff_er_add_slice(s, 0, 0, s->mb_width - 1, s->mb_height - 1, (AC_END|DC_END|MV_END));
 }
 
 static void vc1_decode_p_blocks(VC1Context *v)
@@ -3708,7 +3651,6 @@ static void vc1_decode_p_blocks(VC1Context *v)
         break;
     }
 
-    ff_er_add_slice(s, 0, 0, s->mb_width - 1, s->mb_height - 1, (AC_END|DC_END|MV_END));
     s->first_slice_line = 1;
     for(s->mb_y = 0; s->mb_y < s->mb_height; s->mb_y++) {
         for(s->mb_x = 0; s->mb_x < s->mb_width; s->mb_x++) {
@@ -3718,6 +3660,7 @@ static void vc1_decode_p_blocks(VC1Context *v)
 
             vc1_decode_p_mb(v);
             if(get_bits_count(&s->gb) > v->bits || get_bits_count(&s->gb) < 0) {
+                ff_er_add_slice(s, 0, 0, s->mb_x, s->mb_y, (AC_END|DC_END|MV_END));
                 av_log(s->avctx, AV_LOG_ERROR, "Bits overconsumption: %i > %i at %ix%i\n", get_bits_count(&s->gb), v->bits,s->mb_x,s->mb_y);
                 return;
             }
@@ -3725,6 +3668,7 @@ static void vc1_decode_p_blocks(VC1Context *v)
         ff_draw_horiz_band(s, s->mb_y * 16, 16);
         s->first_slice_line = 0;
     }
+    ff_er_add_slice(s, 0, 0, s->mb_width - 1, s->mb_height - 1, (AC_END|DC_END|MV_END));
 }
 
 static void vc1_decode_b_blocks(VC1Context *v)
@@ -3756,7 +3700,6 @@ static void vc1_decode_b_blocks(VC1Context *v)
         break;
     }
 
-    ff_er_add_slice(s, 0, 0, s->mb_width - 1, s->mb_height - 1, (AC_END|DC_END|MV_END));
     s->first_slice_line = 1;
     for(s->mb_y = 0; s->mb_y < s->mb_height; s->mb_y++) {
         for(s->mb_x = 0; s->mb_x < s->mb_width; s->mb_x++) {
@@ -3766,6 +3709,7 @@ static void vc1_decode_b_blocks(VC1Context *v)
 
             vc1_decode_b_mb(v);
             if(get_bits_count(&s->gb) > v->bits || get_bits_count(&s->gb) < 0) {
+                ff_er_add_slice(s, 0, 0, s->mb_x, s->mb_y, (AC_END|DC_END|MV_END));
                 av_log(s->avctx, AV_LOG_ERROR, "Bits overconsumption: %i > %i at %ix%i\n", get_bits_count(&s->gb), v->bits,s->mb_x,s->mb_y);
                 return;
             }
@@ -3773,6 +3717,7 @@ static void vc1_decode_b_blocks(VC1Context *v)
         ff_draw_horiz_band(s, s->mb_y * 16, 16);
         s->first_slice_line = 0;
     }
+    ff_er_add_slice(s, 0, 0, s->mb_width - 1, s->mb_height - 1, (AC_END|DC_END|MV_END));
 }
 
 static void vc1_decode_skip_blocks(VC1Context *v)
@@ -3791,43 +3736,47 @@ static void vc1_decode_skip_blocks(VC1Context *v)
         ff_draw_horiz_band(s, s->mb_y * 16, 16);
         s->first_slice_line = 0;
     }
-    s->pict_type = P_TYPE;
+    s->pict_type = FF_P_TYPE;
 }
 
 static void vc1_decode_blocks(VC1Context *v)
 {
 
     v->s.esc3_level_length = 0;
+    if(v->x8_type){
+        ff_intrax8_decode_picture(&v->x8, 2*v->pq+v->halfpq, v->pq*(!v->pquantizer) );
+    }else{
 
-    switch(v->s.pict_type) {
-    case I_TYPE:
-        if(v->profile == PROFILE_ADVANCED)
-            vc1_decode_i_blocks_adv(v);
-        else
-            vc1_decode_i_blocks(v);
-        break;
-    case P_TYPE:
-        if(v->p_frame_skipped)
-            vc1_decode_skip_blocks(v);
-        else
-            vc1_decode_p_blocks(v);
-        break;
-    case B_TYPE:
-        if(v->bi_type){
+        switch(v->s.pict_type) {
+        case FF_I_TYPE:
             if(v->profile == PROFILE_ADVANCED)
                 vc1_decode_i_blocks_adv(v);
             else
                 vc1_decode_i_blocks(v);
-        }else
-            vc1_decode_b_blocks(v);
-        break;
+            break;
+        case FF_P_TYPE:
+            if(v->p_frame_skipped)
+                vc1_decode_skip_blocks(v);
+            else
+                vc1_decode_p_blocks(v);
+            break;
+        case FF_B_TYPE:
+            if(v->bi_type){
+                if(v->profile == PROFILE_ADVANCED)
+                    vc1_decode_i_blocks_adv(v);
+                else
+                    vc1_decode_i_blocks(v);
+            }else
+                vc1_decode_b_blocks(v);
+            break;
+        }
     }
 }
 
 /** Find VC-1 marker in buffer
  * @return position where next marker starts or end of buffer if no marker found
  */
-static av_always_inline uint8_t* find_next_marker(uint8_t *src, uint8_t *end)
+static av_always_inline const uint8_t* find_next_marker(const uint8_t *src, const uint8_t *end)
 {
     uint32_t mrk = 0xFFFFFFFF;
 
@@ -3840,7 +3789,7 @@ static av_always_inline uint8_t* find_next_marker(uint8_t *src, uint8_t *end)
     return end;
 }
 
-static av_always_inline int vc1_unescape_buffer(uint8_t *src, int size, uint8_t *dst)
+static av_always_inline int vc1_unescape_buffer(const uint8_t *src, int size, uint8_t *dst)
 {
     int dsize = 0, i;
 
@@ -3878,6 +3827,10 @@ static int vc1_decode_init(AVCodecContext *avctx)
     avctx->flags |= CODEC_FLAG_EMU_EDGE;
     v->s.flags |= CODEC_FLAG_EMU_EDGE;
 
+    if(avctx->idct_algo==FF_IDCT_AUTO){
+        avctx->idct_algo=FF_IDCT_WMV2;
+    }
+
     if(ff_h263_decode_init(avctx) < 0)
         return -1;
     if (vc1_init_common(v) < 0) return -1;
@@ -3909,10 +3862,12 @@ static int vc1_decode_init(AVCodecContext *avctx)
             av_log(avctx, AV_LOG_INFO, "Read %i bits in overflow\n", -count);
         }
     } else { // VC1/WVC1
-        uint8_t *start = avctx->extradata, *end = avctx->extradata + avctx->extradata_size;
-        uint8_t *next; int size, buf2_size;
+        const uint8_t *start = avctx->extradata;
+        uint8_t *end = avctx->extradata + avctx->extradata_size;
+        const uint8_t *next;
+        int size, buf2_size;
         uint8_t *buf2 = NULL;
-        int seq_inited = 0, ep_inited = 0;
+        int seq_initialized = 0, ep_initialized = 0;
 
         if(avctx->extradata_size < 16) {
             av_log(avctx, AV_LOG_ERROR, "Extradata size too small: %i\n", avctx->extradata_size);
@@ -3934,19 +3889,19 @@ static int vc1_decode_init(AVCodecContext *avctx)
                     av_free(buf2);
                     return -1;
                 }
-                seq_inited = 1;
+                seq_initialized = 1;
                 break;
             case VC1_CODE_ENTRYPOINT:
                 if(decode_entry_point(avctx, &gb) < 0){
                     av_free(buf2);
                     return -1;
                 }
-                ep_inited = 1;
+                ep_initialized = 1;
                 break;
             }
         }
         av_free(buf2);
-        if(!seq_inited || !ep_inited){
+        if(!seq_initialized || !ep_initialized){
             av_log(avctx, AV_LOG_ERROR, "Incomplete extradata\n");
             return -1;
         }
@@ -3978,6 +3933,7 @@ static int vc1_decode_init(AVCodecContext *avctx)
 //            return -1;
     }
 
+    ff_intrax8_common_init(&v->x8,s);
     return 0;
 }
 
@@ -3987,7 +3943,7 @@ static int vc1_decode_init(AVCodecContext *avctx)
  */
 static int vc1_decode_frame(AVCodecContext *avctx,
                             void *data, int *data_size,
-                            uint8_t *buf, int buf_size)
+                            const uint8_t *buf, int buf_size)
 {
     VC1Context *v = avctx->priv_data;
     MpegEncContext *s = &v->s;
@@ -4020,7 +3976,7 @@ static int vc1_decode_frame(AVCodecContext *avctx,
         buf2 = av_mallocz(buf_size + FF_INPUT_BUFFER_PADDING_SIZE);
 
         if(IS_MARKER(AV_RB32(buf))){ /* frame starts with marker and needs to be parsed */
-            uint8_t *start, *end, *next;
+            const uint8_t *start, *end, *next;
             int size;
 
             next = buf;
@@ -4044,7 +4000,7 @@ static int vc1_decode_frame(AVCodecContext *avctx,
                 }
             }
         }else if(v->interlace && ((buf[0] & 0xC0) == 0xC0)){ /* WVC1 interlaced stores both fields divided by marker */
-            uint8_t *divider;
+            const uint8_t *divider;
 
             divider = find_next_marker(buf, buf + buf_size);
             if((divider == (buf + buf_size)) || AV_RB32(divider) != VC1_CODE_FIELD){
@@ -4074,24 +4030,24 @@ static int vc1_decode_frame(AVCodecContext *avctx,
         }
     }
 
-    if(s->pict_type != I_TYPE && !v->res_rtm_flag){
+    if(s->pict_type != FF_I_TYPE && !v->res_rtm_flag){
         av_free(buf2);
         return -1;
     }
 
     // for hurry_up==5
     s->current_picture.pict_type= s->pict_type;
-    s->current_picture.key_frame= s->pict_type == I_TYPE;
+    s->current_picture.key_frame= s->pict_type == FF_I_TYPE;
 
     /* skip B-frames if we don't have reference frames */
-    if(s->last_picture_ptr==NULL && (s->pict_type==B_TYPE || s->dropable)){
+    if(s->last_picture_ptr==NULL && (s->pict_type==FF_B_TYPE || s->dropable)){
         av_free(buf2);
         return -1;//buf_size;
     }
     /* skip b frames if we are in a hurry */
-    if(avctx->hurry_up && s->pict_type==B_TYPE) return -1;//buf_size;
-    if(   (avctx->skip_frame >= AVDISCARD_NONREF && s->pict_type==B_TYPE)
-       || (avctx->skip_frame >= AVDISCARD_NONKEY && s->pict_type!=I_TYPE)
+    if(avctx->hurry_up && s->pict_type==FF_B_TYPE) return -1;//buf_size;
+    if(   (avctx->skip_frame >= AVDISCARD_NONREF && s->pict_type==FF_B_TYPE)
+       || (avctx->skip_frame >= AVDISCARD_NONKEY && s->pict_type!=FF_I_TYPE)
        ||  avctx->skip_frame >= AVDISCARD_ALL) {
         av_free(buf2);
         return buf_size;
@@ -4103,7 +4059,7 @@ static int vc1_decode_frame(AVCodecContext *avctx,
     }
 
     if(s->next_p_frame_damaged){
-        if(s->pict_type==B_TYPE)
+        if(s->pict_type==FF_B_TYPE)
             return buf_size;
         else
             s->next_p_frame_damaged=0;
@@ -4113,6 +4069,9 @@ static int vc1_decode_frame(AVCodecContext *avctx,
         av_free(buf2);
         return -1;
     }
+
+    s->me.qpel_put= s->dsp.put_qpel_pixels_tab;
+    s->me.qpel_avg= s->dsp.avg_qpel_pixels_tab;
 
     ff_er_frame_start(s);
 
@@ -4127,7 +4086,7 @@ static int vc1_decode_frame(AVCodecContext *avctx,
 
 assert(s->current_picture.pict_type == s->current_picture_ptr->pict_type);
 assert(s->current_picture.pict_type == s->pict_type);
-    if (s->pict_type == B_TYPE || s->low_delay) {
+    if (s->pict_type == FF_B_TYPE || s->low_delay) {
         *pict= *(AVFrame*)s->current_picture_ptr;
     } else if (s->last_picture_ptr != NULL) {
         *pict= *(AVFrame*)s->last_picture_ptr;
@@ -4139,7 +4098,7 @@ assert(s->current_picture.pict_type == s->pict_type);
     }
 
     /* Return the Picture timestamp as the frame number */
-    /* we substract 1 because it is added on utils.c    */
+    /* we subtract 1 because it is added on utils.c     */
     avctx->frame_number = s->picture_number - 1;
 
     av_free(buf2);
@@ -4162,6 +4121,7 @@ static int vc1_decode_end(AVCodecContext *avctx)
     av_freep(&v->acpred_plane);
     av_freep(&v->over_flags_plane);
     av_freep(&v->mb_type_base);
+    ff_intrax8_common_end(&v->x8);
     return 0;
 }
 

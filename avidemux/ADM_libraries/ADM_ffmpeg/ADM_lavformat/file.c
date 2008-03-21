@@ -23,6 +23,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <stdlib.h>
+#include "os_support.h"
 
 
 /* standard file protocol */
@@ -90,11 +92,16 @@ URLProtocol file_protocol = {
 static int pipe_open(URLContext *h, const char *filename, int flags)
 {
     int fd;
+    const char * final;
+    av_strstart(filename, "pipe:", &filename);
 
-    if (flags & URL_WRONLY) {
-        fd = 1;
-    } else {
-        fd = 0;
+    fd = strtol(filename, &final, 10);
+    if((filename == final) || *final ) {/* No digits found, or something like 10ab */
+        if (flags & URL_WRONLY) {
+            fd = 1;
+        } else {
+            fd = 0;
+        }
     }
 #ifdef O_BINARY
     setmode(fd, O_BINARY);
@@ -104,28 +111,9 @@ static int pipe_open(URLContext *h, const char *filename, int flags)
     return 0;
 }
 
-static int pipe_read(URLContext *h, unsigned char *buf, int size)
-{
-    int fd = (size_t)h->priv_data;
-    return read(fd, buf, size);
-}
-
-static int pipe_write(URLContext *h, unsigned char *buf, int size)
-{
-    int fd = (size_t)h->priv_data;
-    return write(fd, buf, size);
-}
-
-static int pipe_close(URLContext *h)
-{
-    return 0;
-}
-
 URLProtocol pipe_protocol = {
     "pipe",
     pipe_open,
-    pipe_read,
-    pipe_write,
-    NULL,
-    pipe_close,
+    file_read,
+    file_write,
 };

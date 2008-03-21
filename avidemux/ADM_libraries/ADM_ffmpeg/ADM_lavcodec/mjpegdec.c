@@ -332,7 +332,7 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
         av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return -1;
     }
-    s->picture.pict_type= I_TYPE;
+    s->picture.pict_type= FF_I_TYPE;
     s->picture.key_frame= 1;
 
     for(i=0; i<3; i++){
@@ -671,7 +671,8 @@ static int mjpeg_decode_scan(MJpegDecodeContext *s, int nb_components, int ss, i
         linesize[c]=s->linesize[c];
         if(s->avctx->codec->id==CODEC_ID_AMV) {
             //picture should be flipped upside-down for this codec
-            data[c] += (linesize[c] * (s->v_scount[i] * 8 * s->mb_height - 1));
+            assert(!(s->avctx->flags & CODEC_FLAG_EMU_EDGE));
+            data[c] += (linesize[c] * (s->v_scount[i] * (8 * s->mb_height -((s->height/s->v_max)&7)) - 1 ));
             linesize[c] *= -1;
         }
     }
@@ -1072,9 +1073,9 @@ static int valid_marker_list[] =
 
 /* return the 8 bit start code value and update the search
    state. Return -1 if no start code found */
-static int find_marker(uint8_t **pbuf_ptr, uint8_t *buf_end)
+static int find_marker(const uint8_t **pbuf_ptr, const uint8_t *buf_end)
 {
-    uint8_t *buf_ptr;
+    const uint8_t *buf_ptr;
     unsigned int v, v2;
     int val;
 #ifdef DEBUG
@@ -1104,10 +1105,10 @@ found:
 
 int ff_mjpeg_decode_frame(AVCodecContext *avctx,
                               void *data, int *data_size,
-                              uint8_t *buf, int buf_size)
+                              const uint8_t *buf, int buf_size)
 {
     MJpegDecodeContext *s = avctx->priv_data;
-    uint8_t *buf_end, *buf_ptr;
+    const uint8_t *buf_end, *buf_ptr;
     int start_code;
     AVFrame *picture = data;
 
@@ -1135,7 +1136,7 @@ int ff_mjpeg_decode_frame(AVCodecContext *avctx,
                 /* unescape buffer of SOS, use special treatment for JPEG-LS */
                 if (start_code == SOS && !s->ls)
                 {
-                    uint8_t *src = buf_ptr;
+                    const uint8_t *src = buf_ptr;
                     uint8_t *dst = s->buffer;
 
                     while (src<buf_end)
@@ -1162,7 +1163,7 @@ int ff_mjpeg_decode_frame(AVCodecContext *avctx,
                            (buf_end - buf_ptr) - (dst - s->buffer));
                 }
                 else if(start_code == SOS && s->ls){
-                    uint8_t *src = buf_ptr;
+                    const uint8_t *src = buf_ptr;
                     uint8_t *dst = s->buffer;
                     int bit_count = 0;
                     int t = 0, b = 0;

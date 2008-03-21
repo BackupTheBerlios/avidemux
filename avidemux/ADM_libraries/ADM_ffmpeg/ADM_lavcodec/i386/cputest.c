@@ -35,21 +35,17 @@
 
 /* ebx saving is necessary for PIC. gcc seems unable to see it alone */
 #define cpuid(index,eax,ebx,ecx,edx)\
-    __asm __volatile\
+    asm volatile\
         ("mov %%"REG_b", %%"REG_S"\n\t"\
          "cpuid\n\t"\
          "xchg %%"REG_b", %%"REG_S\
          : "=a" (eax), "=S" (ebx),\
            "=c" (ecx), "=d" (edx)\
          : "0" (index));
-/* MEANX */
-extern int ADM_lavcodec_mm_support(void);
-/*/MEANX */
+
 /* Function to test if multimedia instructions are supported...  */
 int mm_support(void)
 {
-		return ADM_lavcodec_mm_support();
-#if 0 // MEANX : We use the function in ADM_cpuCaps which is about the same
     int rval = 0;
     int eax, ebx, ecx, edx;
     int max_std_level, max_ext_level, std_caps=0, ext_caps=0;
@@ -86,13 +82,17 @@ int mm_support(void)
         if (std_caps & (1<<23))
             rval |= FF_MM_MMX;
         if (std_caps & (1<<25))
-            rval |= FF_MM_MMXEXT | FF_MM_SSE;
+            rval |= FF_MM_MMXEXT
+#if !defined(__GNUC__) || __GNUC__ > 2
+                  | FF_MM_SSE;
         if (std_caps & (1<<26))
             rval |= FF_MM_SSE2;
         if (ecx & 1)
             rval |= FF_MM_SSE3;
         if (ecx & 0x00000200 )
-            rval |= FF_MM_SSSE3;
+            rval |= FF_MM_SSSE3
+#endif
+                  ;
     }
 
     cpuid(0x80000000, max_ext_level, ebx, ecx, edx);
@@ -121,7 +121,6 @@ int mm_support(void)
         (rval&FF_MM_3DNOWEXT) ? "3DNowExt ":"");
 #endif
     return rval;
-#endif // #if 0
 }
 
 #ifdef TEST

@@ -156,7 +156,7 @@ int64_t av_i2int(AVInteger a){
     return out;
 }
 
-#if 0
+#ifdef TEST
 #undef NDEBUG
 #include <assert.h>
 
@@ -171,7 +171,7 @@ const uint8_t ff_log2_tab[256]={
         7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
 };
 
-main(){
+int main(void){
     int64_t a,b;
 
     for(a=7; a<256*256*256; a+=13215){
@@ -192,5 +192,6 @@ main(){
             assert(av_i2int(av_div_i(ai,bi)) == a/b);
         }
     }
+    return 0;
 }
 #endif

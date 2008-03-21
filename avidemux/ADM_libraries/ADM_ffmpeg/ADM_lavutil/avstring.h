@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVUTIL_STRING_H
-#define AVUTIL_STRING_H
+#ifndef FFMPEG_AVSTRING_H
+#define FFMPEG_AVSTRING_H
 
 #include <stddef.h>
 
@@ -73,4 +73,18 @@ size_t av_strlcpy(char *dst, const char *src, size_t size);
  */
 size_t av_strlcat(char *dst, const char *src, size_t size);
 
-#endif /* AVUTIL_STRING_H */
+/**
+ * Append output to a string, according to a format. Never write out of
+ * the destination buffer, and and always put a terminating 0 within
+ * the buffer.
+ * @param dst destination buffer (string to which the output is
+ *  appended)
+ * @param size total size of the destination buffer
+ * @param fmt printf-compatible format string, specifying how the
+ *  following parameters are used
+ * @return the length of the string that would have been generated
+ *  if enough space had been available
+ */
+size_t av_strlcatf(char *dst, size_t size, const char *fmt, ...);
+
+#endif /* FFMPEG_AVSTRING_H */

@@ -22,6 +22,11 @@
 
 AVBitStreamFilter *first_bitstream_filter= NULL;
 
+AVBitStreamFilter *av_bitstream_filter_next(AVBitStreamFilter *f){
+    if(f) return f->next;
+    else  return first_bitstream_filter;
+}
+
 void av_register_bitstream_filter(AVBitStreamFilter *bsf){
     bsf->next = first_bitstream_filter;
     first_bitstream_filter= bsf;
@@ -43,6 +48,8 @@ AVBitStreamFilterContext *av_bitstream_filter_init(const char *name){
 }
 
 void av_bitstream_filter_close(AVBitStreamFilterContext *bsfc){
+    if(bsfc->filter->close)
+        bsfc->filter->close(bsfc);
     av_freep(&bsfc->priv_data);
     av_parser_close(bsfc->parser);
     av_free(bsfc);

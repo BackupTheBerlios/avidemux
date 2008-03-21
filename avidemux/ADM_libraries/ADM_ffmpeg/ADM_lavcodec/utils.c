@@ -27,10 +27,10 @@
 
 #include "avcodec.h"
 #include "dsputil.h"
-#include "mpegvideo.h"
 #include "integer.h"
 #include "opt.h"
 #include "crc.h"
+#include "imgconvert.h"
 #include <stdarg.h>
 #include <limits.h>
 #include <float.h>
@@ -126,6 +126,11 @@ static void do_free(void)
 /* encoder management */
 AVCodec *first_avcodec = NULL;
 
+AVCodec *av_codec_next(AVCodec *c){
+    if(c) return c->next;
+    else  return first_avcodec;
+}
+
 void register_avcodec(AVCodec *format)
 {
     AVCodec **p;
@@ -171,6 +176,7 @@ void avcodec_align_dimensions(AVCodecContext *s, int *width, int *height){
     case PIX_FMT_YUVJ420P:
     case PIX_FMT_YUVJ422P:
     case PIX_FMT_YUVJ444P:
+    case PIX_FMT_YUVA420P:
         w_align= 16; //FIXME check for non mpeg style codecs and use less alignment
         h_align= 16;
         break;
@@ -265,7 +271,8 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
         buf->last_pic_num= *picture_number;
     }else{
         int h_chroma_shift, v_chroma_shift;
-        int pixel_size, size[3];
+        int size[4] = {0};
+        int tmpsize;
         AVPicture picture;
 
         avcodec_get_chroma_sub_sample(s->pix_fmt, &h_chroma_shift, &v_chroma_shift);
@@ -278,28 +285,22 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
         }
         avcodec_align_dimensions(s, &w, &h);
 
-        avpicture_fill(&picture, NULL, s->pix_fmt, w, h);
-        pixel_size= picture.linesize[0]*8 / w;
-//av_log(NULL, AV_LOG_ERROR, "%d %d %d %d\n", (int)picture.data[1], w, h, s->pix_fmt);
-        assert(pixel_size>=1);
-            //FIXME next ensures that linesize= 2^x uvlinesize, that is needed because some MC code assumes it
-        if(pixel_size == 3*8)
-            w= ALIGN(w, STRIDE_ALIGN<<h_chroma_shift);
-        else
-            w= ALIGN(pixel_size*w, STRIDE_ALIGN<<(h_chroma_shift+3)) / pixel_size;
-        size[1] = avpicture_fill(&picture, NULL, s->pix_fmt, w, h);
-        size[0] = picture.linesize[0] * h;
-        size[1] -= size[0];
-        if(picture.data[2])
-            size[1]= size[2]= size[1]/2;
-        else
-            size[2]= 0;
+        ff_fill_linesize(&picture, s->pix_fmt, w);
+
+        for (i=0; i<4; i++)
+            picture.linesize[i] = ALIGN(picture.linesize[i], STRIDE_ALIGN);
+
+        tmpsize = ff_fill_pointer(&picture, NULL, s->pix_fmt, h);
+
+        for (i=0; i<3 && picture.data[i+1]; i++)
+            size[i] = picture.data[i+1] - picture.data[i];
+        size[i] = tmpsize - (picture.data[i] - picture.data[0]);
 
         buf->last_pic_num= -256*256*256*64;
         memset(buf->base, 0, sizeof(buf->base));
         memset(buf->data, 0, sizeof(buf->data));
 
-        for(i=0; i<3 && size[i]; i++){
+        for(i=0; i<4 && size[i]; i++){
             const int h_shift= i==0 ? 0 : h_chroma_shift;
             const int v_shift= i==0 ? 0 : v_chroma_shift;
 
@@ -351,7 +352,7 @@ void avcodec_default_release_buffer(AVCodecContext *s, AVFrame *pic){
 
     FFSWAP(InternalBuffer, *buf, *last);
 
-    for(i=0; i<3; i++){
+    for(i=0; i<4; i++){
         pic->data[i]=NULL;
 //        pic->base[i]=NULL;
     }
@@ -538,7 +539,7 @@ static const AVOption options[]={
 {"normal", NULL, 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_NORMAL, INT_MIN, INT_MAX, V|E, "strict"},
 {"inofficial", "allow inofficial extensions", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_INOFFICIAL, INT_MIN, INT_MAX, V|E, "strict"},
 {"experimental", "allow non standardized experimental things", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_EXPERIMENTAL, INT_MIN, INT_MAX, V|E, "strict"},
-{"b_qoffset", "qp offset between p and b frames", OFFSET(b_quant_offset), FF_OPT_TYPE_FLOAT, 1.25, FLT_MIN, FLT_MAX, V|E},
+{"b_qoffset", "qp offset between P and B frames", OFFSET(b_quant_offset), FF_OPT_TYPE_FLOAT, 1.25, FLT_MIN, FLT_MAX, V|E},
 {"er", "set error resilience strategy", OFFSET(error_resilience), FF_OPT_TYPE_INT, FF_ER_CAREFUL, INT_MIN, INT_MAX, A|V|D, "er"},
 {"careful", NULL, 0, FF_OPT_TYPE_CONST, FF_ER_CAREFUL, INT_MIN, INT_MAX, V|D, "er"},
 {"compliant", NULL, 0, FF_OPT_TYPE_CONST, FF_ER_COMPLIANT, INT_MIN, INT_MAX, V|D, "er"},
@@ -557,10 +558,10 @@ static const AVOption options[]={
 {"rc_eq", "set rate control equation", OFFSET(rc_eq), FF_OPT_TYPE_STRING, DEFAULT, CHAR_MIN, CHAR_MAX, V|E},
 {"maxrate", "set max video bitrate tolerance (in bits/s)", OFFSET(rc_max_rate), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"minrate", "set min video bitrate tolerance (in bits/s)", OFFSET(rc_min_rate), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
-{"bufsize", "set ratecontrol buffer size (in bits)", OFFSET(rc_buffer_size), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
+{"bufsize", "set ratecontrol buffer size (in bits)", OFFSET(rc_buffer_size), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, A|V|E},
 {"rc_buf_aggressivity", "currently useless", OFFSET(rc_buffer_aggressivity), FF_OPT_TYPE_FLOAT, 1.0, FLT_MIN, FLT_MAX, V|E},
-{"i_qfactor", "qp factor between p and i frames", OFFSET(i_quant_factor), FF_OPT_TYPE_FLOAT, -0.8, -FLT_MAX, FLT_MAX, V|E},
-{"i_qoffset", "qp offset between p and i frames", OFFSET(i_quant_offset), FF_OPT_TYPE_FLOAT, 0.0, -FLT_MAX, FLT_MAX, V|E},
+{"i_qfactor", "qp factor between P and I frames", OFFSET(i_quant_factor), FF_OPT_TYPE_FLOAT, -0.8, -FLT_MAX, FLT_MAX, V|E},
+{"i_qoffset", "qp offset between P and I frames", OFFSET(i_quant_offset), FF_OPT_TYPE_FLOAT, 0.0, -FLT_MAX, FLT_MAX, V|E},
 {"rc_init_cplx", "initial complexity for 1-pass encoding", OFFSET(rc_initial_cplx), FF_OPT_TYPE_FLOAT, DEFAULT, -FLT_MAX, FLT_MAX, V|E},
 {"dct", "DCT algorithm", OFFSET(dct_algo), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, V|E, "dct"},
 {"auto", "autoselect a good one (default)", 0, FF_OPT_TYPE_CONST, FF_DCT_AUTO, INT_MIN, INT_MAX, V|E, "dct"},
@@ -593,6 +594,7 @@ static const AVOption options[]={
 {"vp3", NULL, 0, FF_OPT_TYPE_CONST, FF_IDCT_VP3, INT_MIN, INT_MAX, V|E|D, "idct"},
 {"ipp", NULL, 0, FF_OPT_TYPE_CONST, FF_IDCT_IPP, INT_MIN, INT_MAX, V|E|D, "idct"},
 {"xvidmmx", NULL, 0, FF_OPT_TYPE_CONST, FF_IDCT_XVIDMMX, INT_MIN, INT_MAX, V|E|D, "idct"},
+{"faani", "floating point AAN IDCT", 0, FF_OPT_TYPE_CONST, FF_IDCT_FAAN, INT_MIN, INT_MAX, V|D|E, "idct"},
 {"slice_count", NULL, OFFSET(slice_count), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"ec", "set error concealment strategy", OFFSET(error_concealment), FF_OPT_TYPE_FLAGS, 3, INT_MIN, INT_MAX, V|D, "ec"},
 {"guess_mvs", "iterative motion vector (MV) search (slow)", 0, FF_OPT_TYPE_CONST, FF_EC_GUESS_MVS, INT_MIN, INT_MAX, V|D, "ec"},
@@ -679,7 +681,7 @@ static const AVOption options[]={
 {"nr", "noise reduction", OFFSET(noise_reduction), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"rc_init_occupancy", "number of bits which should be loaded into the rc buffer before decoding starts", OFFSET(rc_initial_buffer_occupancy), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"inter_threshold", NULL, OFFSET(inter_threshold), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
-{"flags2", NULL, OFFSET(flags2), FF_OPT_TYPE_FLAGS, CODEC_FLAG2_FASTPSKIP, INT_MIN, INT_MAX, V|A|E|D, "flags2"},
+{"flags2", NULL, OFFSET(flags2), FF_OPT_TYPE_FLAGS, CODEC_FLAG2_FASTPSKIP|CODEC_FLAG2_BIT_RESERVOIR, INT_MIN, INT_MAX, V|A|E|D, "flags2"},
 {"error", NULL, OFFSET(error_rate), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"antialias", "MP3 antialias algorithm", OFFSET(antialias_algo), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|D, "aa"},
 {"auto", NULL, 0, FF_OPT_TYPE_CONST, FF_AA_AUTO, INT_MIN, INT_MAX, V|D, "aa"},
@@ -753,7 +755,9 @@ static const AVOption options[]={
 {"timecode_frame_start", "GOP timecode frame start number, in non drop frame format", OFFSET(timecode_frame_start), FF_OPT_TYPE_INT, 0, 0, INT_MAX, V|E},
 {"drop_frame_timecode", NULL, 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_DROP_FRAME_TIMECODE, INT_MIN, INT_MAX, V|E, "flags2"},
 {"non_linear_q", "use non linear quantizer", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_NON_LINEAR_QUANT, INT_MIN, INT_MAX, V|E, "flags2"},
-// MEANX {"request_channels", "set desired number of audio channels", OFFSET(request_channels), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, A|D},
+{"request_channels", "set desired number of audio channels", OFFSET(request_channels), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, A|D},
+{"drc_scale", "percentage of dynamic range compression to apply", OFFSET(drc_scale), FF_OPT_TYPE_FLOAT, 1.0, 0.0, 1.0, A|D},
+{"reservoir", "use bit reservoir", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_BIT_RESERVOIR, INT_MIN, INT_MAX, A|E, "flags2"},
 {NULL},
 };
 
@@ -764,7 +768,7 @@ static const AVOption options[]={
 #undef D
 #undef DEFAULT
 
-static AVClass av_codec_context_class = { "AVCodecContext", context_to_name, options };
+static const AVClass av_codec_context_class = { "AVCodecContext", context_to_name, options };
 
 void avcodec_get_context_defaults2(AVCodecContext *s, enum CodecType codec_type){
     int flags=0;
@@ -840,7 +844,7 @@ int attribute_align_arg avcodec_open(AVCodecContext *avctx, AVCodec *codec)
         goto end;
     }
 
-    if(avctx->codec)
+    if(avctx->codec || !codec)
         goto end;
 
     if (codec->priv_data_size > 0) {
@@ -926,7 +930,7 @@ int avcodec_encode_subtitle(AVCodecContext *avctx, uint8_t *buf, int buf_size,
 
 int attribute_align_arg avcodec_decode_video(AVCodecContext *avctx, AVFrame *picture,
                          int *got_picture_ptr,
-                         uint8_t *buf, int buf_size)
+                         const uint8_t *buf, int buf_size)
 {
     int ret;
 
@@ -949,21 +953,18 @@ int attribute_align_arg avcodec_decode_video(AVCodecContext *avctx, AVFrame *pic
 
 int attribute_align_arg avcodec_decode_audio2(AVCodecContext *avctx, int16_t *samples,
                          int *frame_size_ptr,
-                         uint8_t *buf, int buf_size)
+                         const uint8_t *buf, int buf_size)
 {
     int ret;
 
     if((avctx->codec->capabilities & CODEC_CAP_DELAY) || buf_size){
         //FIXME remove the check below _after_ ensuring that all audio check that the available space is enough
-#if 0 // MEANX : Silence
         if(*frame_size_ptr < AVCODEC_MAX_AUDIO_FRAME_SIZE){
             av_log(avctx, AV_LOG_ERROR, "buffer smaller than AVCODEC_MAX_AUDIO_FRAME_SIZE\n");
             return -1;
         }
-#endif
         if(*frame_size_ptr < FF_MIN_BUFFER_SIZE ||
-        *frame_size_ptr < avctx->channels * avctx->frame_size * sizeof(int16_t) ||
-        *frame_size_ptr < buf_size){
+        *frame_size_ptr < avctx->channels * avctx->frame_size * sizeof(int16_t)){
             av_log(avctx, AV_LOG_ERROR, "buffer %d too small\n", *frame_size_ptr);
             return -1;
         }
@@ -981,7 +982,7 @@ int attribute_align_arg avcodec_decode_audio2(AVCodecContext *avctx, int16_t *sa
 #if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
 int avcodec_decode_audio(AVCodecContext *avctx, int16_t *samples,
                          int *frame_size_ptr,
-                         uint8_t *buf, int buf_size){
+                         const uint8_t *buf, int buf_size){
     *frame_size_ptr= AVCODEC_MAX_AUDIO_FRAME_SIZE;
     return avcodec_decode_audio2(avctx, samples, frame_size_ptr, buf, buf_size);
 }
@@ -995,7 +996,7 @@ int avcodec_decode_subtitle(AVCodecContext *avctx, AVSubtitle *sub,
 
     *got_sub_ptr = 0;
     ret = avctx->codec->decode(avctx, sub, got_sub_ptr,
-                               (uint8_t *)buf, buf_size);
+                               buf, buf_size);
     if (*got_sub_ptr)
         avctx->frame_number++;
     return ret;
@@ -1076,6 +1077,7 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
     char buf1[32];
     char channels_str[100];
     int bitrate;
+    AVRational display_aspect_ratio;
 
     if (encode)
         p = avcodec_find_encoder(enc->codec_id);
@@ -1126,7 +1128,17 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
             snprintf(buf + strlen(buf), buf_size - strlen(buf),
                      ", %dx%d",
                      enc->width, enc->height);
-            if(av_log_level >= AV_LOG_DEBUG){
+            if (enc->sample_aspect_ratio.num) {
+                av_reduce(&display_aspect_ratio.num, &display_aspect_ratio.den,
+                          enc->width*enc->sample_aspect_ratio.num,
+                          enc->height*enc->sample_aspect_ratio.den,
+                          1024*1024);
+                snprintf(buf + strlen(buf), buf_size - strlen(buf),
+                         " [PAR %d:%d DAR %d:%d]",
+                         enc->sample_aspect_ratio.num, enc->sample_aspect_ratio.den,
+                         display_aspect_ratio.num, display_aspect_ratio.den);
+            }
+            if(av_log_get_level() >= AV_LOG_DEBUG){
                 int g= ff_gcd(enc->time_base.num, enc->time_base.den);
                 snprintf(buf + strlen(buf), buf_size - strlen(buf),
                      ", %d/%d",
@@ -1181,6 +1193,7 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
             break;
         case CODEC_ID_PCM_S16LE:
         case CODEC_ID_PCM_S16BE:
+        case CODEC_ID_PCM_S16LE_PLANAR:
         case CODEC_ID_PCM_U16LE:
         case CODEC_ID_PCM_U16BE:
             bitrate = enc->sample_rate * enc->channels * 16;
@@ -1202,6 +1215,10 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
         break;
     case CODEC_TYPE_SUBTITLE:
         snprintf(buf, buf_size, "Subtitle: %s", codec_name);
+        bitrate = enc->bit_rate;
+        break;
+    case CODEC_TYPE_ATTACHMENT:
+        snprintf(buf, buf_size, "Attachment: %s", codec_name);
         bitrate = enc->bit_rate;
         break;
     default:
@@ -1232,27 +1249,15 @@ unsigned avcodec_build( void )
   return LIBAVCODEC_BUILD;
 }
 
-static void init_crcs(void){
-#if LIBAVUTIL_VERSION_INT  < (50<<16)
-    av_crc04C11DB7= av_mallocz_static(sizeof(AVCRC) * 257);
-    av_crc8005    = av_mallocz_static(sizeof(AVCRC) * 257);
-    av_crc07      = av_mallocz_static(sizeof(AVCRC) * 257);
-#endif
-    av_crc_init(av_crc04C11DB7, 0, 32, AV_CRC_32_IEEE, sizeof(AVCRC)*257);
-    av_crc_init(av_crc8005    , 0, 16, AV_CRC_16     , sizeof(AVCRC)*257);
-    av_crc_init(av_crc07      , 0,  8, AV_CRC_8_ATM  , sizeof(AVCRC)*257);
-}
-
 void avcodec_init(void)
 {
-    static int inited = 0;
+    static int initialized = 0;
 
-    if (inited != 0)
+    if (initialized != 0)
         return;
-    inited = 1;
+    initialized = 1;
 
     dsputil_static_init();
-    init_crcs();
 }
 
 void avcodec_flush_buffers(AVCodecContext *avctx)
@@ -1280,13 +1285,14 @@ void avcodec_default_free_buffers(AVCodecContext *s){
 
 char av_get_pict_type_char(int pict_type){
     switch(pict_type){
-    case I_TYPE: return 'I';
-    case P_TYPE: return 'P';
-    case B_TYPE: return 'B';
-    case S_TYPE: return 'S';
-    case SI_TYPE:return 'i';
-    case SP_TYPE:return 'p';
-    default:     return '?';
+    case FF_I_TYPE: return 'I';
+    case FF_P_TYPE: return 'P';
+    case FF_B_TYPE: return 'B';
+    case FF_S_TYPE: return 'S';
+    case FF_SI_TYPE:return 'i';
+    case FF_SP_TYPE:return 'p';
+    case FF_BI_TYPE:return 'b';
+    default:        return '?';
     }
 }
 
@@ -1306,6 +1312,7 @@ int av_get_bits_per_sample(enum CodecID codec_id){
         return 8;
     case CODEC_ID_PCM_S16BE:
     case CODEC_ID_PCM_S16LE:
+    case CODEC_ID_PCM_S16LE_PLANAR:
     case CODEC_ID_PCM_U16BE:
     case CODEC_ID_PCM_U16LE:
         return 16;
@@ -1380,7 +1387,7 @@ int av_tempfile(char *prefix, char **filename) {
         return -1;
     }
 #if !defined(HAVE_MKSTEMP)
-    fd = open(*filename, O_RDWR /* MEANX | O_BINARY*/ | O_CREAT, 0444);
+    fd = open(*filename, O_RDWR | O_BINARY | O_CREAT, 0444);
 #else
     snprintf(*filename, len, "/tmp/%sXXXXXX", prefix);
     fd = mkstemp(*filename);

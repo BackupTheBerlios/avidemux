@@ -37,15 +37,13 @@
 #include <unistd.h>
 
 #include "avcodec.h"
-#include "dsputil.h"
 
 typedef struct QtrleContext {
 
     AVCodecContext *avctx;
-    DSPContext dsp;
     AVFrame frame;
 
-    unsigned char *buf;
+    const unsigned char *buf;
     int size;
 
 } QtrleContext;
@@ -521,7 +519,6 @@ static int qtrle_decode_init(AVCodecContext *avctx)
             avctx->bits_per_sample);
         break;
     }
-    dsputil_init(&s->dsp, avctx);
 
     s->frame.data[0] = NULL;
 
@@ -530,7 +527,7 @@ static int qtrle_decode_init(AVCodecContext *avctx)
 
 static int qtrle_decode_frame(AVCodecContext *avctx,
                               void *data, int *data_size,
-                              uint8_t *buf, int buf_size)
+                              const uint8_t *buf, int buf_size)
 {
     QtrleContext *s = avctx->priv_data;
 

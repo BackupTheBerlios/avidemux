@@ -34,7 +34,6 @@
 #include <unistd.h>
 
 #include "avcodec.h"
-#include "dsputil.h"
 
 #define CPAIR 2
 #define CQUAD 4
@@ -45,10 +44,9 @@
 typedef struct SmcContext {
 
     AVCodecContext *avctx;
-    DSPContext dsp;
     AVFrame frame;
 
-    unsigned char *buf;
+    const unsigned char *buf;
     int size;
 
     /* SMC color tables */
@@ -434,7 +432,6 @@ static int smc_decode_init(AVCodecContext *avctx)
 
     s->avctx = avctx;
     avctx->pix_fmt = PIX_FMT_PAL8;
-    dsputil_init(&s->dsp, avctx);
 
     s->frame.data[0] = NULL;
 
@@ -443,7 +440,7 @@ static int smc_decode_init(AVCodecContext *avctx)
 
 static int smc_decode_frame(AVCodecContext *avctx,
                              void *data, int *data_size,
-                             uint8_t *buf, int buf_size)
+                             const uint8_t *buf, int buf_size)
 {
     SmcContext *s = avctx->priv_data;
 

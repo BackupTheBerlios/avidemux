@@ -20,11 +20,11 @@
 
 /**
  * @file common.h
- * common internal and external api header.
+ * common internal and external API header
  */
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef FFMPEG_COMMON_H
+#define FFMPEG_COMMON_H
 
 #include <inttypes.h>
 
@@ -44,9 +44,15 @@
 #ifndef av_always_inline
 #if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
 #    define av_always_inline __attribute__((always_inline)) inline
-#    define av_noinline __attribute__((noinline))
 #else
 #    define av_always_inline inline
+#endif
+#endif
+
+#ifndef av_noinline
+#if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
+#    define av_noinline __attribute__((noinline))
+#else
 #    define av_noinline
 #endif
 #endif
@@ -90,9 +96,7 @@ extern const uint8_t ff_log2_tab[256];
 
 static inline int av_log2(unsigned int v)
 {
-    int n;
-
-    n = 0;
+    int n = 0;
     if (v & 0xffff0000) {
         v >>= 16;
         n += 16;
@@ -108,9 +112,7 @@ static inline int av_log2(unsigned int v)
 
 static inline int av_log2_16bit(unsigned int v)
 {
-    int n;
-
-    n = 0;
+    int n = 0;
     if (v & 0xff00) {
         v >>= 8;
         n += 8;
@@ -170,7 +172,7 @@ static inline int mid_pred(int a, int b, int c)
  */
 static inline int av_clip(int a, int amin, int amax)
 {
-    if (a < amin)      return amin;
+    if      (a < amin) return amin;
     else if (a > amax) return amax;
     else               return a;
 }
@@ -184,6 +186,17 @@ static inline uint8_t av_clip_uint8(int a)
 {
     if (a&(~255)) return (-a)>>31;
     else          return a;
+}
+
+/**
+ * clip a signed integer value into the -32768,32767 range
+ * @param a value to clip
+ * @return clipped value
+ */
+static inline int16_t av_clip_int16(int a)
+{
+    if ((a+32768) & ~65535) return (a>>31) ^ 32767;
+    else                    return a;
 }
 
 /* math */
@@ -268,23 +281,22 @@ static inline int ff_get_fourcc(const char *s){
     }
 
 #if defined(ARCH_X86) || defined(ARCH_POWERPC) || defined(ARCH_BFIN)
+#define AV_READ_TIME read_time
 #if defined(ARCH_X86_64)
 static inline uint64_t read_time(void)
 {
-        uint64_t a, d;
-        asm volatile(   "rdtsc\n\t"
-                : "=a" (a), "=d" (d)
-        );
-        return (d << 32) | (a & 0xffffffff);
+    uint64_t a, d;
+    asm volatile("rdtsc\n\t"
+                 : "=a" (a), "=d" (d));
+    return (d << 32) | (a & 0xffffffff);
 }
 #elif defined(ARCH_X86_32)
 static inline long long read_time(void)
 {
-        long long l;
-        asm volatile(   "rdtsc\n\t"
-                : "=A" (l)
-        );
-        return l;
+    long long l;
+    asm volatile("rdtsc\n\t"
+                 : "=A" (l));
+    return l;
 }
 #elif ARCH_BFIN
 static inline uint64_t read_time(void)
@@ -319,29 +331,34 @@ static inline uint64_t read_time(void)
      return (((uint64_t)tbu)<<32) | (uint64_t)tbl;
 }
 #endif
+#elif defined(HAVE_GETHRTIME)
+#define AV_READ_TIME gethrtime
+#endif
 
+#ifdef AV_READ_TIME
 #define START_TIMER \
 uint64_t tend;\
-uint64_t tstart= read_time();\
+uint64_t tstart= AV_READ_TIME();\
 
 #define STOP_TIMER(id) \
-tend= read_time();\
+tend= AV_READ_TIME();\
 {\
-  static uint64_t tsum=0;\
-  static int tcount=0;\
-  static int tskip_count=0;\
-  if(tcount<2 || tend - tstart < FFMAX(8*tsum/tcount, 2000)){\
-      tsum+= tend - tstart;\
-      tcount++;\
-  }else\
-      tskip_count++;\
-  if(((tcount+tskip_count)&(tcount+tskip_count-1))==0){\
-      av_log(NULL, AV_LOG_DEBUG, "%"PRIu64" dezicycles in %s, %d runs, %d skips\n", tsum*10/tcount, id, tcount, tskip_count);\
-  }\
+    static uint64_t tsum=0;\
+    static int tcount=0;\
+    static int tskip_count=0;\
+    if(tcount<2 || tend - tstart < FFMAX(8*tsum/tcount, 2000)){\
+        tsum+= tend - tstart;\
+        tcount++;\
+    }else\
+        tskip_count++;\
+    if(((tcount+tskip_count)&(tcount+tskip_count-1))==0){\
+        av_log(NULL, AV_LOG_DEBUG, "%"PRIu64" dezicycles in %s, %d runs, %d skips\n",\
+               tsum*10/tcount, id, tcount, tskip_count);\
+    }\
 }
 #else
 #define START_TIMER
 #define STOP_TIMER(id) {}
 #endif
 
-#endif /* COMMON_H */
+#endif /* FFMPEG_COMMON_H */
