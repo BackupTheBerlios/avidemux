@@ -46,6 +46,11 @@
 #ifdef HAVE_MLIB
 #include "yuv2rgb_mlib.c"
 #endif
+// MEANX
+#include "wrapper.h"
+#include "ADM_mangle.h"
+// /MEANX
+
 
 #define DITHER1XBPP // only for mmx
 

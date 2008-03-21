@@ -27,7 +27,8 @@
  * AVOptions
  */
 
-#include "libavutil/rational.h"
+// MEANX #include "libavutil/rational.h"
+#include "../ADM_lavutil/rational.h"
 
 enum AVOptionType{
     FF_OPT_TYPE_FLAGS,

@@ -1,2 +1,2 @@
-gcc ffconf.c -o ffconf
-./ffconf > ffconf.h
+gcc ../ffconf.c -o ffconf
+./ffconf > ../config.h

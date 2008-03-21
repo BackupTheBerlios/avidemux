@@ -59,7 +59,9 @@ untested special converters
 #include <math.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <stddef.h> // MEANX
 #include "config.h"
+#include <limits.h> // MEANX
 #include <assert.h>
 #ifdef HAVE_SYS_MMAN_H
 #include <sys/mman.h>
@@ -72,7 +74,12 @@ untested special converters
 #include "x86_cpu.h"
 #include "bswap.h"
 #include "rgb2rgb.h"
-#include "libavcodec/opt.h"
+// MEANX #include "libavcodec/opt.h"
+#include "../ADM_lavcodec/opt.h"
+// MEANX
+#include "wrapper.h"
+#include "ADM_mangle.h"
+// /MEANX
 
 #undef MOVNTQ
 #undef PAVGB
@@ -83,7 +90,11 @@ untested special converters
 //#undef ARCH_X86
 //#define WORDS_BIGENDIAN
 #define DITHER1XBPP
-
+// MEANX
+#ifdef ARCH_X86_64
+#undef RUNTIME_CPUDETECT
+#endif 
+// /MEANX
 #define FAST_BGR2YV12 // use 7 bit coeffs instead of 15bit
 
 #define RET 0xC3 //near return opcode for X86
@@ -242,7 +253,7 @@ static const char * sws_context_to_name(void * ptr) {
     return "swscaler";
 }
 
-#define OFFSET(x) offsetof(SwsContext, x)
+#define OFFSET(x)  offsetof(SwsContext, x)
 #define DEFAULT 0
 #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 

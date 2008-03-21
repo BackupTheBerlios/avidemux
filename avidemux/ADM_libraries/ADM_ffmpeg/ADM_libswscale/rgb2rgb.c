@@ -32,6 +32,11 @@
 #include "swscale_internal.h"
 #include "x86_cpu.h"
 #include "bswap.h"
+// MEANX
+#include "wrapper.h"
+#include "ADM_mangle.h"
+// /MEANX
+
 
 #define FAST_BGR2YV12 // use 7 bit coeffs instead of 15bit
 

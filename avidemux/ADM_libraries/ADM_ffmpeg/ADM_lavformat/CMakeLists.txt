@@ -9,7 +9,8 @@ ADD_LIBRARY(${ADM_LIB} SHARED ${${ADM_LIB}_SRCS})
 ADD_TARGET_CFLAGS(${ADM_LIB} "-I../ADM_lavcodec -I../ADM_lavutil -DHAVE_AV_CONFIG_H")
 
 IF (UNIX)
-	ADD_TARGET_CFLAGS(${ADM_LIB} -fPIC)
+	ADD_TARGET_CFLAGS(${ADM_LIB} -fPIC -DPIC)
+        ADD_TARGET_LDFLAGS(${ADM_LIB} "-rdynamic -export-dynamic -Wl,-Bsymbolic")
 ENDIF (UNIX)
 
 TARGET_LINK_LIBRARIES(${ADM_LIB} ADM_core ADM_libavutil ADM_libavcodec)

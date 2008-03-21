@@ -29,8 +29,9 @@
 
 #ifndef FFMPEG_DSPUTIL_H
 #define FFMPEG_DSPUTIL_H
-
+#include "math.h" //MEANX
 #include "avcodec.h"
+#include "intreadwrite.h" //MEANX
 
 
 //#define DEBUG
@@ -510,7 +511,9 @@ static inline int get_penalty_factor(int lambda, int lambda2, int type){
 
 /* should be defined by architectures supporting
    one or more MultiMedia extension */
+#if 0 //MEANX
 int mm_support(void);
+#endif
 
 void dsputil_init_alpha(DSPContext* c, AVCodecContext *avctx);
 void dsputil_init_armv4l(DSPContext* c, AVCodecContext *avctx);
@@ -527,7 +530,8 @@ void dsputil_init_vis(DSPContext* c, AVCodecContext *avctx);
 #if defined(HAVE_MMX)
 
 #undef emms_c
-
+#include "dsputil_cpu.h" /* MEANX */
+#if 0
 #define MM_MMX    0x0001 /* standard MMX */
 #define MM_3DNOW  0x0004 /* AMD 3DNOW */
 #define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
@@ -538,14 +542,15 @@ void dsputil_init_vis(DSPContext* c, AVCodecContext *avctx);
 #define MM_SSSE3  0x0080 /* Conroe SSSE3 functions */
 
 extern int mm_flags;
-
+#endif // /MEANX
 void add_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int line_size);
 void put_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int line_size);
 void put_signed_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int line_size);
 
 static inline void emms(void)
 {
-    asm volatile ("emms;":::"memory");
+    //asm volatile ("emms;":::"memory");
+    asm volatile ("emms;"); //  MEANX
 }
 
 

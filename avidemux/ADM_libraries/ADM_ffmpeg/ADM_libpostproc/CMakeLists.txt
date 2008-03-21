@@ -10,6 +10,7 @@ IF(ADM_CPU_X86_64)
 ENDIF(ADM_CPU_X86_64)
 IF (UNIX)
 	ADD_TARGET_CFLAGS(${ADM_LIB} -fPIC -DPIC)
+        ADD_TARGET_LDFLAGS(${ADM_LIB} "-rdynamic -export-dynamic -Wl,-Bsymbolic")
 ENDIF (UNIX)
 
 

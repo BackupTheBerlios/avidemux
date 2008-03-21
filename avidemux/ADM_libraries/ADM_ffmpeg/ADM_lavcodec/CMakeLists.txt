@@ -10,7 +10,7 @@ SET(${ADM_LIB}_SRCS
 	xan.c  rpza.c  msrle.c  msvideo1.c  cinepak.c  vqavideo.c  idcinvideo.c  smc.c
 	flicvideo.c  interplayvideo.c  dpcm.c  8bps.c  vmdav.c  truemotion1.c  flac.c
 	g726.c  qtrle.c  lcl.c  snow.c  rangecoder.c  bitstream.c  h264idct.c  h261.c
-	amr.c  tscc.c  resample2.c  pthread.c  qdm2.c  bitstream_filter.c  eval.c  vc1.c
+	amr.c  tscc.c  resample2.c    qdm2.c  bitstream_filter.c  eval.c  vc1.c
 	vc1dsp.c  vp56.c  vp6.c  vp5.c  indeo2.c  smacker.c  opt.c  fraps.c  dnxhddec.c
 	mpeg12data.c  mpegaudiodata.c  msmpeg4data.c  vc1data.c  vp56data.c  mjpegbdec.c
 	h263_parser.c  h264_parser.c  mpeg4video_parser.c  mpegvideo_enc.c  mpeg12enc.c
@@ -43,6 +43,7 @@ IF (ADM_DEBUG)
 ENDIF (ADM_DEBUG)
 IF (UNIX)
 	ADD_TARGET_CFLAGS(${ADM_LIB} -fPIC -DPIC)
+        ADD_TARGET_LDFLAGS(${ADM_LIB} "-rdynamic -export-dynamic -Wl,-Bsymbolic")
 ENDIF (UNIX)
 
 TARGET_LINK_LIBRARIES(${ADM_LIB} ADM_core ADM_libavutil ${ZLIB_LIBRARY})

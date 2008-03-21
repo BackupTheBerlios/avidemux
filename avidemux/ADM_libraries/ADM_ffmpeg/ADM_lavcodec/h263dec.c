@@ -118,6 +118,24 @@ int ff_h263_decode_init(AVCodecContext *avctx)
 
     return 0;
 }
+/* MeanX : Ugly patch to detect vo ppacked stuff ... */
+int av_is_voppacked(AVCodecContext *avctx, int *vop_packed, int *gmc, int *qpel)
+{
+    MpegEncContext *s = avctx->priv_data;
+    // set sane default
+    *vop_packed=0;
+    *gmc=0;
+    *qpel=0;
+    if(avctx->codec->id!=CODEC_ID_MPEG4) return 0;
+    	
+  	*vop_packed=(s->divx_packed);
+	*qpel=s->quarter_sample;
+	*gmc=0;	// FIXME
+	return 1;
+
+  }
+  /* MeanX */
+
 
 int ff_h263_decode_end(AVCodecContext *avctx)
 {
@@ -255,6 +273,7 @@ static int decode_slice(MpegEncContext *s){
     /* try to detect the padding bug */
     if(      s->codec_id==CODEC_ID_MPEG4
        &&   (s->workaround_bugs&FF_BUG_AUTODETECT)
+        &&  !(s->workaround_bugs&FF_BUG_NO_PADDING) // MEANX
        &&    s->gb.size_in_bits - get_bits_count(&s->gb) >=0
        &&    s->gb.size_in_bits - get_bits_count(&s->gb) < 48
 //       &&   !s->resync_marker
@@ -277,8 +296,10 @@ static int decode_slice(MpegEncContext *s){
                 s->padding_bug_score++;
         }
     }
-
-    if(s->workaround_bugs&FF_BUG_AUTODETECT){
+// MEANX   slice end not reached when autodetect is set
+   if( !(s->workaround_bugs&FF_BUG_NO_PADDING) &&
+            s->workaround_bugs&FF_BUG_AUTODETECT ){
+    // MEANX if(s->workaround_bugs&FF_BUG_AUTODETECT){
         if(s->padding_bug_score > -2 && !s->data_partitioning /*&& (s->divx_version || !s->resync_marker)*/)
             s->workaround_bugs |=  FF_BUG_NO_PADDING;
         else
@@ -412,6 +433,13 @@ retry:
     } else {
         ret = h263_decode_picture_header(s);
     }
+	//MEANX we need to do it here also for quicktime file / ctts atom 
+        // we need the correct frame type, and qt file may contain 
+        // vop not coded frame.
+        pict->pict_type=s->current_picture.pict_type= s->pict_type;
+        pict->key_frame=s->current_picture.key_frame= s->pict_type == FF_I_TYPE;
+        //MEANX
+
 
     if(ret==FRAME_SKIPPED) return get_consumed_bytes(s, buf_size);
 
@@ -690,6 +718,12 @@ intrax8_decoded:
 
 assert(s->current_picture.pict_type == s->current_picture_ptr->pict_type);
 assert(s->current_picture.pict_type == s->pict_type);
+/* MEANX */
+  if(s->current_picture_ptr)
+      s->current_picture_ptr->opaque=pict->opaque;
+/* MEANX */
+
+
     if (s->pict_type == FF_B_TYPE || s->low_delay) {
         *pict= *(AVFrame*)s->current_picture_ptr;
     } else if (s->last_picture_ptr != NULL) {

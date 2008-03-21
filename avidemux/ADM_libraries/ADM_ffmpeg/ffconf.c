@@ -25,6 +25,7 @@ int main(void)
     DECLARE_DECODER(VCR1, vcr1);
     DECLARE_DECODER(VP5, vp5);
     DECLARE_DECODER(VP6, vp6);
+    DECLARE_DECODER(VP6A, vp6);
     DECLARE_DECODER(VP6F, vp6f);
     DECLARE_DECODER(WMV3, wmv3);
     DECLARE_DECODER (WMV1, wmv1);
@@ -54,7 +55,23 @@ int main(void)
     DECLARE_DECODER (AMV, amv);
 #undef DECLARE_DECODER
 #define DECLARE_DECODER(a,b); printf("#define ENABLE_"#a"_DECODER 0\n"); 
+    DECLARE_DECODER(PCX, aasc);
+    DECLARE_DECODER(SUNRAST, aasc);
+    DECLARE_DECODER(VB, aasc);
+    DECLARE_DECODER(XSUB, aasc);
+    DECLARE_DECODER(AC3, aasc);
+    DECLARE_DECODER(APE, aasc);
+    DECLARE_DECODER(MPC8, aasc);
+    DECLARE_DECODER(PCM_S16LE_PLANAR, aasc);
+    DECLARE_DECODER(PCM_ZORK, aasc);
+    DECLARE_DECODER(ADPCM_EA_R1, aasc);
+    DECLARE_DECODER(ADPCM_EA_R2, aasc);
+    DECLARE_DECODER(ADPCM_EA_R3, aasc);
+    DECLARE_DECODER(ADPCM_EA_XAS, aasc);
+    DECLARE_DECODER(ADPCM_IMA_EA_EACS, aasc);
+    DECLARE_DECODER(ADPCM_IMA_EA_SEAD, aasc);
 
+//
     DECLARE_DECODER(AASC, aasc);
     DECLARE_DECODER(AVS, avs);
     DECLARE_DECODER(BETHSOFTVID, bethsoftvid);
@@ -232,6 +249,8 @@ int main(void)
 
 #undef DECLARE_ENCODER
 #define DECLARE_ENCODER(a,b); printf("#define ENABLE_"#a"_ENCODER 0\n"); 
+    DECLARE_ENCODER(DNXHD, amv);
+    DECLARE_ENCODER(PCM_ZORK, amv);
     DECLARE_ENCODER(ADPCM_IMA_AMV, amv);
     DECLARE_ENCODER(LIBX264, libx264);
     DECLARE_ENCODER(LIBXVID, libxvid);
@@ -326,7 +345,9 @@ int main(void)
 	DECLARE_BSF(NOISE, noise);
 	DECLARE_BSF(MP3_HEADER_DECOMPRESS, mp3_header_decompress);
 	DECLARE_BSF(MJPEGA_DUMP_HEADER, mjpega_dump_header);
-	DECLARE_BSF(IMX_DUMP_HEADER, imx_dump_header);
+	DECLARE_BSF(H264_MP4TOANNEXB, imx_dump_header);
+	DECLARE_BSF(MOV2TEXTSUB, imx_dump_header);
+	DECLARE_BSF(TEXT2MOVSUB, imx_dump_header);
 
 #define DECLARE_MUXER(a,b); printf("#define CONFIG_"#a"_MUXER 1\n");
 
@@ -365,6 +386,8 @@ int main(void)
 	ENABLE(SH4, sh4);
 	ENABLE(BFIN, bfin);
 	ENABLE(SMALL, small);
+#define DECLARE_ENABLE_PARSER(a,b); printf("#define ENABLE_"#a"_PARSER 0\n");
+	DECLARE_ENABLE_PARSER(MLP, wmv3);
 
 	// Hack so CMake and autoconf don't need to be changed
 	printf("#ifdef ARCH_POWERPC\n");
@@ -375,14 +398,22 @@ int main(void)
 
 	printf("#ifdef ARCH_X86\n");
 	printf("#define ENABLE_MMX 1\n");
+	printf("#define ENABLE_BSWAP 1\n");
+	printf("#define HAVE_BYTESWAP_H 1\n");
 	printf("#define HAVE_MMX 1\n");
 	printf("#define HAVE_FAST_UNALIGNED 1\n");
+	printf("#define ARCH_X86 1\n");
 	printf("#else\n");
 	printf("#define ENABLE_MMX 0\n");
+
 	printf("#endif\n");
 
 	printf("#ifdef ARCH_X86_64\n");
 	printf("#define HAVE_FAST_64BIT 1\n");
+	printf("#define HAVE_SSSE3 1\n");
+	printf("#define HAVE_EBP_AVAILABLE 1\n");
+	printf("#define HAVE_EBX_AVAILABLE 1\n");
+	printf("#define ARCH_X86_64 1\n");
 	printf("#endif\n");
 
 	printf("#ifdef __APPLE__\n");
@@ -390,7 +421,14 @@ int main(void)
 	printf("#endif\n");
 
 	printf("#define ENABLE_THREADS 1\n");
+	printf("#define ENABLE_ENCODERS 1\n");
+	printf("#define ENABLE_VIS 0\n");
+	printf("#define ENABLE_GRAY 0\n");
 	printf("#define HAVE_LRINTF 1\n");
+	printf("#define HAVE_LLRINT 1\n");
+	printf("#define HAVE_LRINT 1\n");
+	printf("#define HAVE_ROUND 1\n");
+	printf("#define HAVE_ROUNDF 1\n");
 	printf("#define HAVE_THREADS 1\n");
 	printf("#define RUNTIME_CPUDETECT 1\n");
 }

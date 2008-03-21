@@ -27,7 +27,8 @@
 #include <altivec.h>
 #endif
 
-#include "avutil.h"
+// MEANX #include "avutil.h"
+#include "../ADM_lavutil/avutil.h"
 
 #define MAX_FILTER_SIZE 256
 
