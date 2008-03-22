@@ -370,6 +370,9 @@
 #	define HAVE_DCBZL 1
 #endif	// ADM_CPU_DCBZL
 #endif	// ADM_CPU_X86_32
+#ifdef ADM_CPU_MMX2
+#	define HAVE_MMX2 1
+#endif
 #ifdef ADM_CPU_SSSE3
 #	define HAVE_SSSE3 1
 #endif

@@ -9,6 +9,7 @@
 #cmakedefine ADM_CPU_ALTIVEC
 #cmakedefine ADM_CPU_DCBZL
 #cmakedefine ADM_CPU_PPC
+#cmakedefine ADM_CPU_MMX2
 #cmakedefine ADM_CPU_SSSE3
 #cmakedefine ADM_CPU_X86
 #cmakedefine ADM_CPU_X86_32

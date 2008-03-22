@@ -2,13 +2,14 @@
 #  ADM_BIG_ENDIAN  - big endian CPU detected
 #  ADM_BSD_FAMILY  - BSD family operating system was detected
 #  ADM_CPU_64BIT   - 64-bit CPU was detected
-#  ADM_CPU_ALTIVEC - PowerPC CPU with AltiVec architecture was detected
-#  ADM_CPU_DCBZL   - PowerPC CPU with dcbzl instruction was detected
 #  ADM_CPU_PPC     - PowerPC CPU architecture was detected
-#  ADM_CPU_SSSE3   - x86 CPU with SSSE3 instructions was detected
+#  ADM_CPU_ALTIVEC - PowerPC CPU with AltiVec instructions is supported
+#  ADM_CPU_DCBZL   - PowerPC CPU with dcbzl instruction is supported
 #  ADM_CPU_X86     - x86 CPU architecture was detected
 #  ADM_CPU_X86_32  - x86 32-bit CPU architecture was detected
 #  ADM_CPU_X86_64  - x86 64-bit CPU architecture was detected
+#  ADM_CPU_MMX2    - x86 CPU with MMX2 instructions is supported
+#  ADM_CPU_SSSE3   - x86 CPU with SSSE3 instructions is supported
 
 MACRO (PERFORM_SYSTEM_TEST testFile testName testSupportedVarName)
 	IF (${ARGC} EQUAL 4)
@@ -132,6 +133,12 @@ ELSE (X86_64_SUPPORTED)
 ENDIF (X86_64_SUPPORTED)
 
 IF (ADM_CPU_X86)
+	PERFORM_SYSTEM_TEST(cpu_mmx2_check.cpp "MMX2 capable" MMX2_SUPPORTED)
+
+	IF (MMX2_SUPPORTED)
+		SET(ADM_CPU_MMX2 1)
+	ENDIF (MMX2_SUPPORTED)
+
 	PERFORM_SYSTEM_TEST(cpu_ssse3_check.cpp "SSSE3 capable" SSSE3_SUPPORTED)
 
 	IF (SSSE3_SUPPORTED)

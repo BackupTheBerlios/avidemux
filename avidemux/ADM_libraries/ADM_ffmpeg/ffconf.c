@@ -415,6 +415,10 @@ int main(void)
 	printf("#endif	// ADM_CPU_DCBZL\n");
 	printf("#endif	// ADM_CPU_X86_32\n");
 
+	printf("#ifdef ADM_CPU_MMX2\n");
+	printf("#	define HAVE_MMX2 1\n");
+	printf("#endif\n");
+
 	printf("#ifdef ADM_CPU_SSSE3\n");
 	printf("#	define HAVE_SSSE3 1\n");
 	printf("#endif\n");
