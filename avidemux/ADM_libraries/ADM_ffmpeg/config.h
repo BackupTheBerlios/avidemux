@@ -371,7 +371,7 @@
 #	define HAVE_DCBZL 1
 #endif	// ADM_CPU_DCBZL
 #endif	// ADM_CPU_X86_32
-#ifdef ADM_CPU_MMX2
+#if defined(ADM_CPU_X86_32) && defined(ADM_CPU_MMX2)
 #	define HAVE_MMX2 1
 #endif
 #ifdef ADM_CPU_SSSE3
@@ -383,13 +383,10 @@
 #	define ENABLE_POWERPC 0
 #endif
 #ifdef ARCH_X86
-#	define ENABLE_MMX 1
-#	define ENABLE_X86 1
 #	define ENABLE_BSWAP 1
 #	define HAVE_MMX 1
 #	define ENABLE_MMX 1
 #	define HAVE_FAST_UNALIGNED 1
-#	define ENABLE_FAST_UNALIGNED 1
 #	define HAVE_EBP_AVAILABLE 1
 #	define HAVE_EBX_AVAILABLE 1
 #else
@@ -397,19 +394,9 @@
 #endif
 #ifdef ARCH_X86_64
 #	define HAVE_FAST_64BIT 1
-#	define HAVE_EBP_AVAILABLE 1
-#	define ENABLE_EBP_AVAILABLE 1
-#	define HAVE_EBX_AVAILABLE 1
-#	define ENABLE_EBX_AVAILABLE 1
-#	define ENABLE_EBX_AVAILABLE 1
-#	define ENABLE_EBX_AVAILABLE 1
-#	undef HAVE_MMX2
-#	define HAVE_SSE2 1
-#	define HAVE_SSE 1
 #endif
 #ifdef ADM_BIG_ENDIAN
 #	define WORDS_BIGENDIAN 1
-#	define ENABLE_X86_64 1
 #endif
 #define ENABLE_THREADS 1
 #define ENABLE_ENCODERS 1
