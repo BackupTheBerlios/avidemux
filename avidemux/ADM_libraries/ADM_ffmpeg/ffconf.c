@@ -391,7 +391,7 @@ int main(void)
 	ENABLE(SMALL, small);
 #define DECLARE_ENABLE_PARSER(a,b); printf("#define ENABLE_"#a"_PARSER 0\n");
 	DECLARE_ENABLE_PARSER(MLP, wmv3);
-
+        printf("//****************** SYSTEM *******************\n");
 	printf("#ifdef __APPLE__\n");
 	printf("#	define CONFIG_DARWIN 1\n");
 	printf("#endif\n");
@@ -431,9 +431,12 @@ int main(void)
 
 	printf("#ifdef ARCH_X86\n");
 	printf("#	define ENABLE_MMX 1\n");
+	printf("#	define ENABLE_X86 1\n");
 	printf("#	define ENABLE_BSWAP 1\n");
 	printf("#	define HAVE_MMX 1\n");
+	printf("#	define ENABLE_MMX 1\n");
 	printf("#	define HAVE_FAST_UNALIGNED 1\n");
+	printf("#	define ENABLE_FAST_UNALIGNED 1\n");
 	printf("#	define HAVE_EBP_AVAILABLE 1\n");
 	printf("#	define HAVE_EBX_AVAILABLE 1\n");
 	printf("#else\n");
@@ -442,10 +445,23 @@ int main(void)
 
 	printf("#ifdef ARCH_X86_64\n");
 	printf("#	define HAVE_FAST_64BIT 1\n");
+
+	printf("#	define HAVE_EBP_AVAILABLE 1\n");
+	printf("#	define ENABLE_EBP_AVAILABLE 1\n");
+	printf("#	define HAVE_EBX_AVAILABLE 1\n");
+	printf("#	define ENABLE_EBX_AVAILABLE 1\n");
+
+	printf("#	define ENABLE_EBX_AVAILABLE 1\n");
+	printf("#	define ENABLE_EBX_AVAILABLE 1\n");
+	printf("#	undef HAVE_MMX2\n");
+	printf("#	define HAVE_SSE2 1\n");
+	printf("#	define HAVE_SSE 1\n");
+
 	printf("#endif\n");
 
 	printf("#ifdef ADM_BIG_ENDIAN\n");
 	printf("#	define WORDS_BIGENDIAN 1\n");
+	printf("#	define ENABLE_X86_64 1\n");
 	printf("#endif\n");
 
 	printf("#define ENABLE_THREADS 1\n");
