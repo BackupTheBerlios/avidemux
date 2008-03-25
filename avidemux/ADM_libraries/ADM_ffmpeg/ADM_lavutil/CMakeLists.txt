@@ -18,7 +18,6 @@ random.c
 rational.c
 rc4.c
 sha1.c
-softfloat.c
 string.c
 tree.c
 )
