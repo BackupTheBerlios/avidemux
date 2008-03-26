@@ -14,10 +14,25 @@
  ***************************************************************************/
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
+namespace ADM_GtkFactory
+{
 
 static void cb_button (GtkWidget *widget,gpointer callback_data);
+class diaElemButton : public diaElem
+{
+  protected:
+  public:
+    void            *_cookie;
+    ADM_FAC_CALLBACK *_callBack;
+            diaElemButton(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void *cookie,const char *tip=NULL);
+  virtual   ~diaElemButton() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      enable(uint32_t onoff) ;
+};
+
 
 diaElemButton:: diaElemButton(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void *cookie,const char *tip)
   : diaElem(ELEM_BUTTON)
@@ -64,5 +79,19 @@ void cb_button (GtkWidget *widget,gpointer callback_data)
   diaElemButton *button=(diaElemButton *)callback_data;
   button->_callBack(button->_cookie);
 }
+
+} // End of namespace
+//****************************Hoook*****************
+
+diaElem  *gtkCreateButton(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void *cookie,const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemButton(toggleTitle,cb,cookie,tip);
+}
+void gtkDeleteButton(diaElem *e)
+{
+	ADM_GtkFactory::diaElemButton *a=(ADM_GtkFactory::diaElemButton *)e;
+	delete a;
+}
+//
 
 //EOF

@@ -14,7 +14,7 @@
  ***************************************************************************/
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 diaElemMatrix::diaElemMatrix(uint8_t *trix,const char *toggleTitle, uint32_t trixSize,const char *tip)
   : diaElem(ELEM_MATRIX)

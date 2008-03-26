@@ -40,7 +40,7 @@
 #include "ADM_filter/video_filters.h"
 
 
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 
 #include "ADM_colorspace/colorspace.h"
 

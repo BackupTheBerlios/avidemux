@@ -25,7 +25,7 @@
 #include "ADM_vidStabilize.h"
 #include "ADM_filter/video_filters.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 static FILTER_PARAM stabParam={1,{"param"}};
 

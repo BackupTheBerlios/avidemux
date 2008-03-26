@@ -27,7 +27,7 @@
 #include "ADM_codecs/ADM_codec.h"
 #include "../ADM_commonUI/GUI_ui.h"
 
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "ADM_editor/ADM_Video.h"
 
 #include "prefs.h"
@@ -120,7 +120,10 @@ extern GtkWidget	*create_mainWindow (void);
 extern void guiCallback(GtkMenuItem * menuitem, gpointer user_data);
 extern void HandleAction(Action act);
 extern gboolean UI_on_key_press(GtkWidget *widget, GdkEventKey* event, gpointer user_data);
+namespace ADM_GTK_fileSel
+{
 extern void fileReadWrite(SELFILE_CB cb, int rw, char *name);
+};
 
 // To build vcodec
 extern uint32_t encoderGetNbEncoder(void);
@@ -1178,11 +1181,11 @@ void DNDDataReceived( GtkWidget *widget, GdkDragContext *dc,
       char *filename=names[i];
       if (avifileinfo) 
               {
-                    fileReadWrite(A_appendAvi, 0, (char*)filename);
+    	  		   ADM_GTK_fileSel::fileReadWrite(A_appendAvi, 0, (char*)filename);
                }
                else
                {
-                    fileReadWrite(reinterpret_cast <void (*)(char *)> (A_openAvi), 0, (char*)filename);
+            	   ADM_GTK_fileSel::fileReadWrite(reinterpret_cast <void (*)(char *)> (A_openAvi), 0, (char*)filename);
                }
       ADM_dealloc(names[i]); 
     }

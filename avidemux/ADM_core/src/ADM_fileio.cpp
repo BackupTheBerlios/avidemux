@@ -28,7 +28,7 @@
 #endif
 
 #include "ADM_default.h"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #ifdef __WIN32

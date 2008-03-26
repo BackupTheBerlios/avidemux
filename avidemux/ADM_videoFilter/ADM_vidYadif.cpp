@@ -33,7 +33,7 @@
 #include "ADM_video/ADM_cache.h"
 #include "ADM_filter/video_filters.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 //************************************************
 #define MIN(a,b) ((a) > (b) ? (b) : (a))
 #define MAX(a,b) ((a) < (b) ? (b) : (a))

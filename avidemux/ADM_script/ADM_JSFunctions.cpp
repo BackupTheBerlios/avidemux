@@ -42,9 +42,9 @@
 #include "ADM_script/ADM_container.h"
 
 #include "ADM_JSGlobal.h"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 std::vector <std::string> g_vIncludes;
 extern char **environ;

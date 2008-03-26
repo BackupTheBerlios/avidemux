@@ -40,7 +40,7 @@
 
 #include "ADM_filter/video_filters.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 #include "ADM_vidEraser.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_flyDialog.h" // for MenuMapping

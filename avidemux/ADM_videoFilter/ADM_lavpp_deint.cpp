@@ -34,7 +34,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 
 #include "ADM_colorspace/colorspace.h"
 
@@ -46,7 +46,7 @@
 
 #include "ADM_lavpp_deintparam.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 /*
 {"al", "autolevels",            0, 1, 2, LEVEL_FIX},
 {"lb", "linblenddeint",         1, 1, 4, LINEAR_BLEND_DEINT_FILTER},

@@ -13,11 +13,11 @@
  ***************************************************************************/
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 
 
 #include "ADM_ocr/adm_glyph.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 static GtkWidget *create_dialog1 (void);
 static admGlyph *currentGlyph=NULL;
 static GtkWidget *dialog;

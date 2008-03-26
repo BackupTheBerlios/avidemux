@@ -36,9 +36,9 @@
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_video/ADM_cache.h"
 #include "ADM_filter/video_filters.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_enter.h"
+#include "DIA_enter.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 #include "ADM_vidBlendRemoval_param.h"
 #define MUL 1
 // Set it to 2 for post separate field

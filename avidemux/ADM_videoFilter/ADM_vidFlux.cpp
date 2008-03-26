@@ -36,7 +36,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 #include "ADM_vidFlux.h"
 #include "ADM_filter/video_filters.h"
 

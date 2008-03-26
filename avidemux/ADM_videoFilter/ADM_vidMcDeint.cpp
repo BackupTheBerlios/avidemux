@@ -35,7 +35,7 @@
 
 #include "ADM_vidMcDeint_param.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 static FILTER_PARAM mcDeintParam={3,{"mode","qp","initial_parity"}};
 

@@ -51,7 +51,7 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_video/ADM_vidPartial.h"
 #include "ADM_filter/vidVCD.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 /*******************************************************/
 #define NB_TREE 8
 #define myFg 0xFF

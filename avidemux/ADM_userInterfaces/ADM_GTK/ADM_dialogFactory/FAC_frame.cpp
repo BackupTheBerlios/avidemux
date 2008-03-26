@@ -14,7 +14,7 @@
  ***************************************************************************/
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 
 diaElemFrame::diaElemFrame(const char *toggleTitle, const char *tip)

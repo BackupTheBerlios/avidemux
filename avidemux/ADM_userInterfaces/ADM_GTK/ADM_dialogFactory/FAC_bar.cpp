@@ -14,8 +14,20 @@
  ***************************************************************************/
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_commonUI/DIA_factory.h"
-
+#include "DIA_factory.h"
+namespace ADM_GtkFactory
+{
+class diaElemBar : public diaElem
+{
+  protected :
+        uint32_t per;
+public:
+  
+  diaElemBar(uint32_t percent,const char *toggleTitle);
+  virtual ~diaElemBar() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+};
 
 diaElemBar::diaElemBar(uint32_t percent,const char *toggleTitle)
   : diaElem(ELEM_BAR)
@@ -61,5 +73,17 @@ void diaElemBar::getMe(void)
 {
   
 }
+} // End of namespace
+//****************************Hoook*****************
 
+diaElem  *gtkCreateBar(uint32_t percent,const char *toggleTitle)
+{
+	return new  ADM_GtkFactory::diaElemBar(percent,toggleTitle);
+}
+void gtkDeleteBar(diaElem *e)
+{
+	ADM_GtkFactory::diaElemBar *a=(ADM_GtkFactory::diaElemBar *)e;
+	delete a;
+}
+//
 //EOF

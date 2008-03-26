@@ -17,12 +17,18 @@
 #include "ADM_default.h"
 
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
+#include "DIA_coreUI_internal.h"
+
 #include "prefs.h"
 
-    
+namespace ADM_QT4_fileSel
+{
 static void GUI_FileSelSelect(const char *label, char **name, uint32_t access) ;
-
+static void GUI_FileSelRead(const char *label,SELFILE_CB cb) ;
+static void GUI_FileSelWrite(const char *label,SELFILE_CB cb);
+static void GUI_FileSelRead(const char *label, char * * name);
+static void GUI_FileSelWrite(const char *label, char * * name);
 //****************************************************************************************************
 void GUI_FileSelRead(const char *label,SELFILE_CB cb) 
 {
@@ -198,6 +204,33 @@ uint8_t FileSel_SelectDir(const char *title,char *target,uint32_t max, const cha
   }
 
   return 0;
+}
+/**
+ * 
+ */
+void init(void)
+{
+	// Nothing special to do for QT4 fileselector
+}
+} // End of nameSpace
+static DIA_FILESEL_DESC_T Qt4FileSelDesc=
+{
+	ADM_QT4_fileSel::init,	
+	ADM_QT4_fileSel::GUI_FileSelRead,
+	ADM_QT4_fileSel::GUI_FileSelWrite,
+	ADM_QT4_fileSel::GUI_FileSelRead,
+	ADM_QT4_fileSel::GUI_FileSelWrite,
+	ADM_QT4_fileSel::FileSel_SelectWrite,
+	ADM_QT4_fileSel::FileSel_SelectRead,
+	ADM_QT4_fileSel::FileSel_SelectDir
+};
+
+
+
+// Hook our functions
+void initFileSelector(void)
+{
+	DIA_fileSelInit(&Qt4FileSelDesc);
 }
 
 

@@ -16,7 +16,7 @@
 #include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 #include "ADM_lavcodec.h"
 #include "ADM_codecs/ADM_ffmpegConfig.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"

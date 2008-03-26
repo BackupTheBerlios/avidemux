@@ -52,7 +52,7 @@
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 
 #define PROGRESSIVE  0x00000001

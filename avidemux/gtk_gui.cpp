@@ -29,7 +29,7 @@
 #include "fourcc.h"
 #include "avi_vars.h"
 #include "ADM_assert.h"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "prototype.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/bitmap.h"
@@ -52,8 +52,8 @@
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_busy.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_enter.h"
+#include "DIA_factory.h"
+#include "DIA_enter.h"
 
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"

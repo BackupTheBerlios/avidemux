@@ -28,7 +28,7 @@
 
 #include"ADM_vidLargeMedian.h"
 #include "ADM_filter/video_filters.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 static FILTER_PARAM nullParam={2,{"chroma","luma"}};
 

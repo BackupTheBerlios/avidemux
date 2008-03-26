@@ -21,7 +21,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 
 extern "C" {

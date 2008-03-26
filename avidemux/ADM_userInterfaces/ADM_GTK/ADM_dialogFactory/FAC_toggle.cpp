@@ -14,7 +14,7 @@
  ***************************************************************************/
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 static void cb_menu(void *w,void *p);
 static void cb_menu2(void *w,void *p);

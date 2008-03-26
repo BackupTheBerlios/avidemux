@@ -14,7 +14,7 @@
 
 #include "config.h"
 #include "ADM_default.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 /**
       \fn DIA_lavDecoder

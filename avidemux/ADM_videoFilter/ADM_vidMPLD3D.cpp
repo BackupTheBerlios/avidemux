@@ -31,7 +31,7 @@ Daniel Moreno <comac@comac.darktech.org>
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_filter/video_filters.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 static FILTER_PARAM mp3Param={3,{"param1","param2","param3"}};
 
 

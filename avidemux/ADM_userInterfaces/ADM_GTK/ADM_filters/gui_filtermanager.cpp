@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_videoNull.h"

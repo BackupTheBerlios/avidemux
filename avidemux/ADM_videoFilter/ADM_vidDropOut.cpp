@@ -21,7 +21,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_vidDropOut.h"
 #include "ADM_filter/video_filters.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 static FILTER_PARAM dropParam={1,{"threshold"}};
 

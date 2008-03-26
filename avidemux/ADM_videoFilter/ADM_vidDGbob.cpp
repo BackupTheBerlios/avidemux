@@ -35,7 +35,7 @@
 
 #include "ADM_vidDGbob_param.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 class DGbob : public AVDMGenericVideoStream
 {

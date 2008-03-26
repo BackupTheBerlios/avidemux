@@ -33,7 +33,7 @@
 #include "fourcc.h"
 
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 

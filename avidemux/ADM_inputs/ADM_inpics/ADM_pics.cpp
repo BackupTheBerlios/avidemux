@@ -34,7 +34,7 @@
 #include "ADM_toolkit/bitmap.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_assert.h"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_INPIC
 #include "ADM_osSupport/ADM_debug.h"

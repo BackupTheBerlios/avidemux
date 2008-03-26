@@ -1,6 +1,6 @@
 #include "config.h"
 #include "ADM_default.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 uint8_t DIA_gotoTime(uint16_t *hh, uint16_t *mm, uint16_t *ss)
 {

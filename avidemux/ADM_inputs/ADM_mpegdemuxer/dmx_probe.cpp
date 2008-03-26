@@ -25,7 +25,7 @@
 #include "ADM_assert.h"
 
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "fourcc.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 

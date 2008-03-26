@@ -29,7 +29,7 @@
 #include <QTabWidget>
 
 #include "ADM_default.h"
-#include "../ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 #include "ADM_assert.h"
 
 class factoryWindow : public QDialog
@@ -205,4 +205,12 @@ void insertTab(uint32_t index, diaElemTabs *tab, QTabWidget *wtab)
     tab->dias[i]->finalize(); 
   }
 }
+/**
+ * 
+ */
+void InitFactory(void)
+{
+	
+}
+
 //EOF

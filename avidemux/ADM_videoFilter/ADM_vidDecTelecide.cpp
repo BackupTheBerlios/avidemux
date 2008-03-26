@@ -42,7 +42,7 @@
 
 #include "ADM_vidDecTelecide.h"
 #include "ADM_filter/video_filters.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 static FILTER_PARAM decomb_template={16,{"order","back","guide",
 	 	 	"gthresh","post","chroma","vthresh",

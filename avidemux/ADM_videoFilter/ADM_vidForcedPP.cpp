@@ -23,10 +23,10 @@
 #include "ADM_osSupport/ADM_debug.h"
 
 #include "ADM_vidForcedPP.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_enter.h"
+#include "DIA_enter.h"
 #include "ADM_filter/video_filters.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 static FILTER_PARAM ppParam={3,{"postProcType","postProcStrength","forcedQuant"}};
 

@@ -16,7 +16,7 @@
 #include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 int DIA_getMPParams( uint32_t *pplevel, uint32_t *ppstrength,uint32_t *swap)
 {

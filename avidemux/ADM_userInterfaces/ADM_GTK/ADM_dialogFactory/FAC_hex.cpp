@@ -14,7 +14,7 @@
  ***************************************************************************/
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 
 #define HEX_NB_LINE   8

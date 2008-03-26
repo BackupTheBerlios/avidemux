@@ -54,7 +54,7 @@ extern int muxParam;
 
 
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "ADM_coreUI/include/DIA_factory.h"
 const char *getStrFromAudioCodec( uint32_t codec);
 //_________________________
 uint8_t ADM_aviUISetMuxer(  void )
@@ -374,7 +374,7 @@ GenericAviSave::guiStop (void)
       encoding_gui=NULL;
 
 }
-void GenericAviSave::guiSetPhasis(char *str)
+void GenericAviSave::guiSetPhasis(const char *str)
 {
       ADM_assert(encoding_gui);
       encoding_gui->setPhasis(str);

@@ -43,7 +43,7 @@
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "ADM_inputs/ADM_mpegdemuxer/dmx_demuxer.h"
 #include "ADM_inputs/ADM_mpegdemuxer/dmx_demuxerPS.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"

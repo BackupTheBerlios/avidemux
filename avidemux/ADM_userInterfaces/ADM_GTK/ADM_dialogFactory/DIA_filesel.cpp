@@ -13,8 +13,8 @@
  *                                                                         *
  ***************************************************************************/
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_commonUI/DIA_factory.h"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_factory.h"
+#include "DIA_fileSel.h"
 
 static void fileRead(void *w,void *p);
 static void dirSel(void *w,void *p);

@@ -34,7 +34,7 @@
 #include "ADM_video/ADM_vidCommonFilter.h"
 #include "ADM_filter/video_filters.h"
 #include "ADM_colorspace/ADM_rgb.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 static FILTER_PARAM logoParam={4,
         { /* float */ "image",

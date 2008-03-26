@@ -40,7 +40,7 @@
 #include "ADM_outputs/oplug_avi/op_savesmart.hxx"
 #include "ADM_filter/video_filters.h"
 
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
 #include "ADM_outputs/oplug_mpegFF/oplug_vcdff.h"
 

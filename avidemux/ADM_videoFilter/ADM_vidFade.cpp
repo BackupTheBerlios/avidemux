@@ -23,7 +23,7 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_vidFade_param.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 class AVDM_Fade : public AVDMGenericVideoStream
 {

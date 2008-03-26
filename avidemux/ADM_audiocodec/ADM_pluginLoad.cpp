@@ -18,7 +18,7 @@
  ***************************************************************************/
 #include "ADM_default.h"
 #include "ADM_ad_plugin.h"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "ADM_dynamicLoading.h"
 #include <vector>
 #if 1

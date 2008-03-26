@@ -2298,7 +2298,7 @@ void av_resample_close(struct AVResampleContext *c);
 
 #if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
 /* YUV420 format is assumed ! */
-
+#if 0 // MEANX
 /**
  * @deprecated Use the software scaler (swscale) instead.
  */
@@ -2330,7 +2330,7 @@ attribute_deprecated void img_resample(struct ImgReSampleContext *s,
  * @deprecated Use the software scaler (swscale) instead.
  */
 attribute_deprecated void img_resample_close(struct ImgReSampleContext *s);
-
+#endif //MEANX
 #endif
 
 /**

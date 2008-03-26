@@ -23,7 +23,7 @@
 
 #include <math.h>
 
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "ADM_assert.h"
 #include "prototype.h"
 #include "ADM_audiodevice/audio_out.h"

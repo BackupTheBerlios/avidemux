@@ -23,9 +23,9 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_enter.h"
+#include "DIA_enter.h"
 #include "ADM_video/ADM_cache.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 static FILTER_PARAM ResampParam={2,{"newfps","use_linear"}};
 typedef struct FPS_Param

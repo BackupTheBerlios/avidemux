@@ -26,7 +26,7 @@
 #include "ADM_lavcodec.h"
 #include "ADM_default.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "DIA_factory.h"
 #include "ADM_inputs/ADM_mpegdemuxer/dmx_mpegstartcode.h"
 #include "ADM_inputs/ADM_mpegdemuxer/dmx_demuxerTS.h"

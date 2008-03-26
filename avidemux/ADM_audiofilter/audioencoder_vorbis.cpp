@@ -248,7 +248,7 @@ uint8_t	AUDMEncoder_Vorbis::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sa
       @return 1 on success, 0 on failure
 
 */
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 int DIA_getVorbisSettings(ADM_audioEncoderDescriptor *descriptor)
   {
     int ret=0;

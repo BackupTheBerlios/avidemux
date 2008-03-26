@@ -27,14 +27,17 @@ email                : fixounet@free.fr
 #include "ADM_default.h"
 #include "avi_vars.h"
 
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
+#include "DIA_coreUI_internal.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "prefs.h"
 
 #define TH_READ 1
 #define TH_WRITE 2
-
 extern char *actual_workbench_file;
+
+namespace ADM_GTK_fileSel 
+{
 
 static void GUI_FileSel(const char *label, SELFILE_CB *cb, int rw, char **name = NULL);
 uint8_t initFileSelector(void);
@@ -544,4 +547,30 @@ uint8_t setFilter(GtkWidget *dialog)
 
 	return 1;
 }
+/*************/
+void init(void)
+{
+	initFileSelector();
+}
+} // End of nameSpace
+static DIA_FILESEL_DESC_T GtkFileSelDesc=
+{
+	ADM_GTK_fileSel::init,	
+	ADM_GTK_fileSel::GUI_FileSelRead,
+	ADM_GTK_fileSel::GUI_FileSelWrite,
+	ADM_GTK_fileSel::GUI_FileSelRead,
+	ADM_GTK_fileSel::GUI_FileSelWrite,
+	ADM_GTK_fileSel::FileSel_SelectWrite,
+	ADM_GTK_fileSel::FileSel_SelectRead,
+	ADM_GTK_fileSel::FileSel_SelectDir
+};
+
+
+
+// Hook our functions
+void initFileSelector(void)
+{
+	DIA_fileSelInit(&GtkFileSelDesc);
+}
+
 //EOF

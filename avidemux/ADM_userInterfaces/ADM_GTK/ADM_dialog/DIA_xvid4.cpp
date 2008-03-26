@@ -1,5 +1,5 @@
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #ifdef USE_XVID_4

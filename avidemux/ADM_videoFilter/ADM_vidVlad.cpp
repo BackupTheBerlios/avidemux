@@ -28,7 +28,7 @@
 #include "ADM_vidVlad.h"
 #include "ADM_filter/video_filters.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 
 #ifdef ADM_CPU_X86_64
 #define COUNTER long int

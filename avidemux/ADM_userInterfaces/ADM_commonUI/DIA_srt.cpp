@@ -21,7 +21,7 @@
 
 #include "ADM_toolkit/toolkit.hxx"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 //#include "ADM_video/ADM_vidFont.h"
 class ADMfont;

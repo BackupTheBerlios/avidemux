@@ -37,7 +37,10 @@ uint8_t diaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs)
 {
   return 0; 
 }
-
+void InitFactory(void)
+{
+	
+}
 
 
 //EOF

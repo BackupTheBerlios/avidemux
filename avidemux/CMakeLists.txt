@@ -54,6 +54,7 @@ ENDIF (ADM_DEBUG)
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
 INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}/config")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_core/include")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_coreUI/include")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_utilities")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_ffmpeg/ADM_lavutil")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_ffmpeg/ADM_lavcodec")
@@ -299,10 +300,12 @@ ENDIF (ADM_UI_QT4)
 ADD_ADMLIB_ALL_TARGETS(ADM_utilities)
 
 ###########################################
-# ADM_core
+# ADM_core/ADM_coreUI
 ###########################################
 ADD_SUBDIRECTORY(ADM_core)
 ADD_LIB_ALL_TARGETS(ADM_core)
+ADD_SUBDIRECTORY(ADM_coreUI)
+ADD_LIB_ALL_TARGETS(ADM_coreUI)
 
 ###########################################
 # External libs

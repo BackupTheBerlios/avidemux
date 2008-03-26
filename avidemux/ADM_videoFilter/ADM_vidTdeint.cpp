@@ -51,7 +51,7 @@
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_video/ADM_cache.h"
 #include "ADM_filter/video_filters.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_enter.h"
+#include "DIA_factory.h"
 
 
 #define min MIN

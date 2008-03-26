@@ -23,8 +23,8 @@
  #include "ADM_ocr.h"
  #include "ADM_ocrInternal.h"
  #include "ADM_toolkit/toolkit.hxx"
- #include "ADM_userInterfaces/ADM_commonUI/DIA_enter.h"
- #include "ADM_videoFilter/ADM_vidDvbSub.h"
+ #include "DIA_enter.h"
+#include "ADM_videoFilter/ADM_vidDvbSub.h"
 
 /*  *****************************
  * 	**** Case 1 : Vobsub ********

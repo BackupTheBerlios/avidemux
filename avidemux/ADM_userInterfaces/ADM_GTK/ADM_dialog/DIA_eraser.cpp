@@ -28,11 +28,11 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_videoFilter/ADM_vidEraser.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 
 #include "DIA_flyDialog.h"
 #include "DIA_flyEraser.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h" // for diaElemMenu etc.
+#include "DIA_factory.h"
 #include "ADM_filter/video_filters.h"
 
 using namespace std;

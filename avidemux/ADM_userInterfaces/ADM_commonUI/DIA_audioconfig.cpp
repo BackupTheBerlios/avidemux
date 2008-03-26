@@ -28,7 +28,6 @@
       @return 1 on success, 0 on failure
 
 */
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 int DIA_defaultSettings(ADM_audioEncoderDescriptor *descriptor)
   {
     int ret=0;

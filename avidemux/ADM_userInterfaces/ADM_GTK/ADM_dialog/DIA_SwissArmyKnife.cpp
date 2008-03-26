@@ -31,7 +31,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "DIA_flyDialog.h"
 #include "DIA_flySwissArmyKnife.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h" // for diaElemMenu etc.
+#include "DIA_factory.h"
 #include "ADM_filter/video_filters.h"
 
 #undef _

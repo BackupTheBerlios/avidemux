@@ -13,11 +13,15 @@
  ***************************************************************************/
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
+#include "DIA_coreUI_internal.h"
 
 static uint8_t  buildOneTab(GtkWidget *nb,int index, diaElemTabs *tab);
 static uint8_t  readOneTab(int index, diaElemTabs *tab);
-
+//
+static uint8_t gtkDiaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs);
+static uint8_t gtkDiaFactoryRun(const char *title,uint32_t nb,diaElem **elems);
+//
 
 /**
     \fn addLine(diaElem *elem, GtkDialog *dialog, GtkWidget *vbox)
@@ -48,7 +52,7 @@ void getLine(diaElem *elem, GtkWidget *dialog, GtkWidget *vbox,uint32_t line)
     @return 0 on failure, 1 on success
 */
 
-uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
+uint8_t gtkDiaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
 {
   uint8_t ret=0;
   ADM_assert(elems);
@@ -146,7 +150,7 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
     \fn   diaFactoryRun
     \brief   Same as above but for tabbed dialog
 */
-uint8_t diaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs)
+uint8_t gtkDiaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs)
 {
   uint8_t ret=0;
   ADM_assert(tabs);
@@ -281,6 +285,40 @@ uint8_t  readOneTab(int index, diaElemTabs *tab)
     tab->dias[i]->getMe();
   }
   return 1; 
+}
+
+
+//*****************HOOK************
+/**
+ * 	\fn InitFactory
+ *  \brief Install hoook for dialogFactory
+ * */
+extern diaElem  *gtkCreateButton(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void *cookie,const char *tip);
+extern void 	gtkDeleteButton(diaElem *e);
+extern diaElem  *gtkCreateBar(uint32_t percent,const char *toggleTitle);
+extern void     gtkDeleteBar(diaElem *e);
+//************
+static FactoryDescriptor GtkFactoryDescriptor=
+{
+	&gtkDiaFactoryRun,
+	&gtkDiaFactoryRunTabs,
+	// Buttons
+	&gtkCreateButton,
+	&gtkDeleteButton,
+	// Bar
+	&gtkCreateBar,
+	&gtkDeleteBar
+};
+
+/**
+ * 	\fn InitFactory
+ *  \brief Install our factory hooks
+ */
+void InitFactory(void)
+{
+	DIA_factoryInit(&GtkFactoryDescriptor);
+	
+	
 }
 
 //EOF

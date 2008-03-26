@@ -74,7 +74,7 @@ extern void ADM_memStatInit( void );
 extern void ADM_memStatEnd( void );
 extern void getUIDescription(char*);
 extern uint8_t ADM_ad_loadPlugins(const char *path);
-
+extern void InitFactory(void);
 #ifdef __MINGW32__
 extern EXCEPTION_DISPOSITION exceptionHandler(struct _EXCEPTION_RECORD* pExceptionRec, void* pEstablisherFrame, struct _CONTEXT* pContextRecord, void* pDispatcherContext);
 #else
@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 #ifdef USE_XVID_4
     xvid4_init();
 #endif
-
+    InitFactory();
     initFileSelector();
     ADM_InitMemcpy();
 

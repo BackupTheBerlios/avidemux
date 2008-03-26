@@ -28,7 +28,7 @@
 #include <QLineEdit>
 
 #include "ADM_default.h"
-#include "../ADM_commonUI/DIA_factory.h"
+#include "DIA_factory.h"
 #include "ADM_assert.h"
 
 

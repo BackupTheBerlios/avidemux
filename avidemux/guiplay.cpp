@@ -31,7 +31,7 @@
 #include "avi_vars.h"
 #include "ADM_assert.h" 
 
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "prototype.h"
 #include "ADM_audiodevice/audio_out.h"
 
