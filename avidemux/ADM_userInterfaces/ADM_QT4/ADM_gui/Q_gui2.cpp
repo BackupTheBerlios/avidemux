@@ -35,7 +35,7 @@
 #include "ADM_codecs/ADM_codec.h"
 #include "gui_action.hxx"
 #include "ADM_editor/ADM_outputfmt.h"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 #include "ADM_video/ADM_vidMisc.h"
 #include "prefs.h"
 #include "ADM_video/ADM_vidMisc.h"

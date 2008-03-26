@@ -32,7 +32,7 @@
 #include "prefs.h"
 #include "DIA_factory.h"
 #include "ADM_assert.h"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 extern const char *shortkey(const char *);
 void GUI_FileSelRead(const char *label, char * * name);
 #define MAX_SEL 2040

@@ -36,7 +36,7 @@
 #include "QStringListModel" 
 #include "QColor" 
 #include "ADM_default.h"
-#include "ADM_toolkit/filesel.h"
+#include "DIA_fileSel.h"
 
 # include "prefs.h"
 #include "ADM_audiodevice/audio_out.h"
