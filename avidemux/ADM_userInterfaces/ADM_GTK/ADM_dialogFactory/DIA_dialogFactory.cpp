@@ -297,6 +297,12 @@ extern diaElem  *gtkCreateButton(const char *toggleTitle, ADM_FAC_CALLBACK *cb,v
 extern void 	gtkDeleteButton(diaElem *e);
 extern diaElem  *gtkCreateBar(uint32_t percent,const char *toggleTitle);
 extern void     gtkDeleteBar(diaElem *e);
+extern diaElem  *gtkCreateFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, ELEM_TYPE_FLOAT min, ELEM_TYPE_FLOAT max,const char *tip);
+extern void     gtkDeleteFloat(diaElem *e);
+extern CREATE_INTEGER_T gtkCreateInteger;
+extern CREATE_UINTEGER_T gtkCreateUInteger;
+extern DELETE_DIA_ELEM_T gtkDestroyInteger;
+extern DELETE_DIA_ELEM_T gtkDestroyUInteger;
 //************
 static FactoryDescriptor GtkFactoryDescriptor=
 {
@@ -307,7 +313,16 @@ static FactoryDescriptor GtkFactoryDescriptor=
 	&gtkDeleteButton,
 	// Bar
 	&gtkCreateBar,
-	&gtkDeleteBar
+	&gtkDeleteBar,
+	// Float
+	&gtkCreateFloat,
+	&gtkDeleteFloat,
+	// Integer
+	&gtkCreateInteger,
+	&gtkDestroyInteger,
+	// UInteger
+	&gtkCreateUInteger,
+	&gtkDestroyUInteger
 };
 
 /**

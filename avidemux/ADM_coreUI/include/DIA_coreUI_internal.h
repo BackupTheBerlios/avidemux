@@ -49,6 +49,15 @@ typedef struct
 //
 	CREATE_BAR_T		 *CreateBar;
 	DELETE_DIA_ELEM_T    *DestroyBar;
+// Float
+	CREATE_FLOAT_T       *CreateFloat;
+	DELETE_DIA_ELEM_T    *DestroyFloat;
+// Integer	
+	CREATE_INTEGER_T     *CreateInteger;
+	DELETE_DIA_ELEM_T    *DestroyInteger;
+// UInteger	
+	CREATE_UINTEGER_T    *CreateUInteger;
+	DELETE_DIA_ELEM_T    *DestroyUInteger;
 	
 }FactoryDescriptor;
 //

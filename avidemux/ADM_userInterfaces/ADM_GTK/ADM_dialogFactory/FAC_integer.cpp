@@ -16,6 +16,35 @@
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_factory.h"
 
+
+
+namespace ADM_GtkFactory
+{
+class diaElemInteger : public diaElem
+{
+
+public:
+  int32_t min,max;
+  diaElemInteger(int32_t *intValue,const char *toggleTitle, int32_t min, int32_t max,const char *tip=NULL);
+  virtual ~diaElemInteger() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  void      enable(uint32_t onoff) ;
+};
+/* Same but unsigned */
+class diaElemUInteger : public diaElem
+{
+
+public:
+  uint32_t min,max;
+  diaElemUInteger(uint32_t *intValue,const char *toggleTitle, uint32_t min, uint32_t max,const char *tip=NULL);
+  virtual ~diaElemUInteger() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  void      enable(uint32_t onoff) ;
+  
+};
+
 diaElemInteger::diaElemInteger(int32_t *intValue,const char *toggleTitle, int32_t min, int32_t max,const char *tip)
   : diaElem(ELEM_INTEGER)
 {
@@ -156,7 +185,28 @@ void diaElemUInteger::enable(uint32_t onoff)
 }
 
 //****************************************************
+} // End of namespace
+//****************************Hoook*****************
 
+diaElem  *gtkCreateInteger(int32_t *intValue,const char *toggleTitle,int32_t min, int32_t max,const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemInteger(intValue,toggleTitle,min,max,tip);
+}
+void gtkDestroyInteger(diaElem *e)
+{
+	ADM_GtkFactory::diaElemInteger *a=(ADM_GtkFactory::diaElemInteger *)e;
+	delete a;
+}
+diaElem  *gtkCreateUInteger(uint32_t *intValue,const char *toggleTitle,uint32_t min, uint32_t max,const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemUInteger(intValue,toggleTitle,min,max,tip);
+}
+void gtkDestroyUInteger(diaElem *e)
+{
+	ADM_GtkFactory::diaElemUInteger *a=(ADM_GtkFactory::diaElemUInteger *)e;
+	delete a;
+}
+//****************************************************
 template <typename T>
 static
 uint32_t diaElemSliderDigitsDefault (T incr)

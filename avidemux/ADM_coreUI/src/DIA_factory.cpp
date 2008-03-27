@@ -71,5 +71,63 @@ diaElemBar ::~diaElemBar()
 	internalPointer=NULL;
 }
 DIA_MKSTUBS(diaElemBar)
+
+// ****************** Buttons ********************
+diaElemFloat ::diaElemFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, ELEM_TYPE_FLOAT min,
+        ELEM_TYPE_FLOAT max,const char *tip) :diaElem(ELEM_FLOAT)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateFloat(intValue,toggleTitle, min,max,tip);
+}
+diaElemFloat ::~diaElemFloat()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyFloat(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemFloat::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+DIA_MKSTUBS(diaElemFloat)
+// ****************** Integer ********************
+diaElemInteger ::diaElemInteger(int32_t *intValue,const char *toggleTitle, int32_t min, int32_t max,const char *tip) :
+	diaElem(ELEM_INTEGER)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateInteger(intValue,toggleTitle, min,max,tip);
+}
+diaElemInteger ::~diaElemInteger()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyInteger(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemInteger::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+DIA_MKSTUBS(diaElemInteger)
+// ****************** UInteger ********************
+diaElemUInteger ::diaElemUInteger(uint32_t *intValue,const char *toggleTitle, uint32_t min, uint32_t max,const char *tip) :
+	diaElem(ELEM_INTEGER)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateUInteger(intValue,toggleTitle, min,max,tip);
+}
+diaElemUInteger ::~diaElemUInteger()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyUInteger(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemUInteger::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+DIA_MKSTUBS(diaElemUInteger)
 // ******************************************	
 // EOF

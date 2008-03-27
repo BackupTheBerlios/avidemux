@@ -16,6 +16,23 @@
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_factory.h"
 
+namespace ADM_GtkFactory
+{
+
+
+class diaElemFloat : public diaElem
+{
+
+public:
+  ELEM_TYPE_FLOAT min,max;
+  diaElemFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, ELEM_TYPE_FLOAT min, 
+               ELEM_TYPE_FLOAT max,const char *tip=NULL);
+  virtual ~diaElemFloat() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  void      enable(uint32_t onoff) ;
+};
+
 diaElemFloat::diaElemFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, 
                             ELEM_TYPE_FLOAT min, ELEM_TYPE_FLOAT max,const char *tip)
   : diaElem(ELEM_FLOAT)
@@ -81,5 +98,17 @@ void diaElemFloat::enable(uint32_t onoff)
   GtkWidget *widget=(GtkWidget *)myWidget;
   gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);
 }
+} // End of namespace
+//****************************Hoook*****************
 
+diaElem  *gtkCreateFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, ELEM_TYPE_FLOAT min,
+        ELEM_TYPE_FLOAT max,const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemFloat(intValue,toggleTitle,min,max,tip);
+}
+void gtkDeleteFloat(diaElem *e)
+{
+	ADM_GtkFactory::diaElemFloat *a=(ADM_GtkFactory::diaElemFloat *)e;
+	delete a;
+}
 //EOF

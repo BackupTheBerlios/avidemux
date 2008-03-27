@@ -84,6 +84,7 @@ typedef struct dialElemLink
 /*********************************************/
 
 typedef void      DELETE_DIA_ELEM_T(diaElem *widget);
+typedef void      FINALIZE_DIA_ELEM_T(void);
 /*********************************************/
 typedef diaElem  *(CREATE_BUTTON_T)(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void *cookie,const char *tip);
 
@@ -183,6 +184,8 @@ public:
   void      getMe(void);
 };
 /*********************************************/
+typedef diaElem  *(CREATE_INTEGER_T)(int32_t *intValue,const char *toggleTitle,int32_t min, int32_t max,const char *tip);
+typedef diaElem  *(CREATE_UINTEGER_T)(uint32_t *intValue,const char *toggleTitle,uint32_t min, uint32_t max,const char *tip);
 class diaElemInteger : public diaElem
 {
 
@@ -223,6 +226,8 @@ public:
 };
 
 /*********************************************/
+typedef diaElem  *(CREATE_FLOAT_T)(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, ELEM_TYPE_FLOAT min,
+        ELEM_TYPE_FLOAT max,const char *tip);
 class diaElemFloat : public diaElem
 {
 
