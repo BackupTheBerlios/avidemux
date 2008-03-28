@@ -129,5 +129,93 @@ void      diaElemUInteger::enable(uint32_t onoff)
 		internalPointer->enable(onoff); 
 	}
 DIA_MKSTUBS(diaElemUInteger)
+// ****************** diaElemNotch ********************
+diaElemNotch ::diaElemNotch(uint32_t yes,const char *toggleTitle, const char *tip):
+	diaElem(ELEM_NOTCH)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateNotch(yes,toggleTitle,tip);
+}
+diaElemNotch ::~diaElemNotch()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyNotch(internalPointer);
+	internalPointer=NULL;
+}
+
+DIA_MKSTUBS(diaElemNotch)
+// ****************** diaReadonlyText ********************
+diaElemReadOnlyText ::diaElemReadOnlyText(char *readyOnly,const char *toggleTitle,const char *tip):
+	diaElem(ELEM_ROTEXT)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateReadonlyText(readyOnly,toggleTitle,tip);
+}
+diaElemReadOnlyText ::~diaElemReadOnlyText()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyReadonlyText(internalPointer);
+	internalPointer=NULL;
+}
+
+DIA_MKSTUBS(diaElemReadOnlyText)
+// ****************** diaText ********************
+diaElemText ::diaElemText(char **readyOnly,const char *toggleTitle,const char *tip):
+	diaElem(ELEM_TEXT)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateText(readyOnly,toggleTitle,tip);
+}
+diaElemText ::~diaElemText()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyText(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemText::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+DIA_MKSTUBS(diaElemText)
 // ******************************************	
+
+diaElemHex ::diaElemHex(const char *toggleTitle, uint32_t dataSize,uint8_t *data):
+	diaElem(ELEM_HEXDUMP)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateHex(toggleTitle,dataSize,data);
+}
+diaElemHex ::~diaElemHex()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyHex(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemHex::finalize(void)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->finalize(); 
+	}
+DIA_MKSTUBS(diaElemHex)
+// ****************** diaElemMatrix ********************
+diaElemMatrix ::diaElemMatrix(uint8_t *trix,const char *toggleTitle, uint32_t trixSize,const char *tip):
+	diaElem(ELEM_MATRIX)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateMatrix(trix,toggleTitle,trixSize,tip);
+}
+diaElemMatrix ::~diaElemMatrix()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyMatrix(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemMatrix::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+DIA_MKSTUBS(diaElemMatrix)
+
 // EOF

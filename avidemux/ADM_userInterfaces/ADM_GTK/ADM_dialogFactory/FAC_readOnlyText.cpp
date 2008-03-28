@@ -15,6 +15,32 @@
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_factory.h"
+namespace ADM_GtkFactory
+{
+
+class diaElemReadOnlyText : public diaElem
+{
+
+public:
+  
+  diaElemReadOnlyText(char *readyOnly,const char *toggleTitle,const char *tip=NULL);
+  virtual ~diaElemReadOnlyText() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  
+};
+
+class diaElemText : public diaElem
+{
+
+public:
+  
+  diaElemText(char **text,const char *toggleTitle,const char *tip=NULL);
+  virtual ~diaElemText() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  void enable(uint32_t onoff);
+};
 
 
 diaElemReadOnlyText::diaElemReadOnlyText(char *readyOnly,const char *toggleTitle,const char *tip)
@@ -120,5 +146,26 @@ void diaElemText::enable(uint32_t onoff)
   GtkWidget *widget=(GtkWidget *)myWidget;
   gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);
 }
+} // End of namespace
+//****************************Hoook*****************
 
+diaElem  *gtkCreateRoText(char *text,const char *toggleTitle, const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemReadOnlyText(text,toggleTitle,tip);
+}
+void gtkDestroyRoText(diaElem *e)
+{
+	ADM_GtkFactory::diaElemReadOnlyText *a=(ADM_GtkFactory::diaElemReadOnlyText *)e;
+	delete a;
+}
+
+diaElem  *gtkCreateText(char **text,const char *toggleTitle, const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemText(text,toggleTitle,tip);
+}
+void gtkDestroyText(diaElem *e)
+{
+	ADM_GtkFactory::diaElemText *a=(ADM_GtkFactory::diaElemText *)e;
+	delete a;
+}
 //EOF

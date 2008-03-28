@@ -103,6 +103,7 @@ class diaElemButton : public diaElem
 };
 
 /*********************************************/
+typedef diaElem  *(CREATE_MATRIX_T)(uint8_t *trix,const char *toggleTitle, uint32_t trixSize,const char *tip);
 
 class diaElemMatrix : public diaElem
 {
@@ -370,6 +371,7 @@ public:
 };
 /*************************************************/
 /* The text MUST be copied internally ! */
+typedef diaElem *(DIA_CREATE_READONLYTEXT_T )(char *readOnly,const char *toggleTitle, const char *tip);
 class diaElemReadOnlyText : public diaElem
 {
 
@@ -382,6 +384,7 @@ public:
   
 };
 /*************************************************/
+typedef diaElem *(DIA_CREATE_TEXT_T )(char **readOnly,const char *toggleTitle, const char *tip);
 /* The text MUST be copied internally ! */
 class diaElemText : public diaElem
 {
@@ -396,6 +399,7 @@ public:
 };
 
 /*********************************************/
+typedef diaElem *(DIA_CREATE_NOTCH_T )(uint32_t yes,const char *toggleTitle, const char *tip);
 class diaElemNotch : public diaElem
 {
   uint32_t yesno;
@@ -404,7 +408,7 @@ public:
   diaElemNotch(uint32_t yes,const char *toggleTitle, const char *tip=NULL);
   virtual ~diaElemNotch() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
-  void getMe(void) {};
+  void getMe(void) ;
 };
 /*********************************************/
 class diaElemTabs 
@@ -443,6 +447,7 @@ public:
   void finalize(void);
 };
 /**********************************************/
+typedef diaElem *(DIA_CREATE_HEX_T )(const char *toggleTitle, uint32_t dataSize,uint8_t *data);
 class diaElemHex : public diaElem
 {
   uint32_t dataSize;

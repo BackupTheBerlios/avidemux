@@ -303,6 +303,16 @@ extern CREATE_INTEGER_T gtkCreateInteger;
 extern CREATE_UINTEGER_T gtkCreateUInteger;
 extern DELETE_DIA_ELEM_T gtkDestroyInteger;
 extern DELETE_DIA_ELEM_T gtkDestroyUInteger;
+extern DIA_CREATE_NOTCH_T  gtkCreateNotch;
+extern DELETE_DIA_ELEM_T   gtkDestroyNotch;
+extern DIA_CREATE_READONLYTEXT_T gtkCreateRoText;
+extern DIA_CREATE_TEXT_T gtkCreateText;
+extern DELETE_DIA_ELEM_T   gtkDestroyRoText;
+extern DELETE_DIA_ELEM_T   gtkDestroyText;
+extern DIA_CREATE_HEX_T    gtkCreateHex;
+extern DELETE_DIA_ELEM_T   gtkDestroyHex;
+extern CREATE_MATRIX_T     gtkCreateMatrix;
+extern DELETE_DIA_ELEM_T   gtkDestroyMatrix;
 //************
 static FactoryDescriptor GtkFactoryDescriptor=
 {
@@ -322,7 +332,23 @@ static FactoryDescriptor GtkFactoryDescriptor=
 	&gtkDestroyInteger,
 	// UInteger
 	&gtkCreateUInteger,
-	&gtkDestroyUInteger
+	&gtkDestroyUInteger,
+	// Notch
+	&gtkCreateNotch,
+	&gtkDestroyNotch,
+	// RoText
+	&gtkCreateRoText,
+	&gtkDestroyRoText,
+	// Text
+	&gtkCreateText,
+	&gtkDestroyText,
+	// Hex
+	&gtkCreateHex,
+	&gtkDestroyHex,
+	// Matrix
+	&gtkCreateMatrix,
+	&gtkDestroyMatrix
+	
 };
 
 /**

@@ -15,6 +15,20 @@
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_factory.h"
+namespace ADM_GtkFactory
+{
+class diaElemMatrix : public diaElem
+{
+  protected:
+  public:
+    uint8_t *_matrix;
+    uint32_t _matrixSize;
+    		diaElemMatrix(uint8_t *trix,const char *toggleTitle, uint32_t trixSize,const char *tip=NULL);
+  virtual   ~diaElemMatrix() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      enable(uint32_t onoff) ;
+};
 
 diaElemMatrix::diaElemMatrix(uint8_t *trix,const char *toggleTitle, uint32_t trixSize,const char *tip)
   : diaElem(ELEM_MATRIX)
@@ -114,5 +128,16 @@ void diaElemMatrix::enable(uint32_t onoff)
 			  gtk_widget_set_sensitive( GTK_WIDGET(arrayWidget[index++]),onoff);
 		  }
 }
+} // End of namespace
+//****************************Hoook*****************
 
+diaElem  *gtkCreateMatrix(uint8_t *trix,const char *toggleTitle, uint32_t trixSize,const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemMatrix(trix,toggleTitle,trixSize,tip);
+}
+void gtkDestroyMatrix(diaElem *e)
+{
+	ADM_GtkFactory::diaElemMatrix *a=(ADM_GtkFactory::diaElemMatrix *)e;
+	delete a;
+}
 //EOF

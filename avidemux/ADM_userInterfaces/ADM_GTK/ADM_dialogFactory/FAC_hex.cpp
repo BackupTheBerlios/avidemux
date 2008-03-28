@@ -15,7 +15,21 @@
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_factory.h"
-
+namespace ADM_GtkFactory
+{
+class diaElemHex : public diaElem
+{
+  uint32_t dataSize;
+  uint8_t  *data;
+  
+public:
+  
+  diaElemHex(const char *toggleTitle, uint32_t dataSize,uint8_t *data);
+  virtual ~diaElemHex() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void) ;
+  void finalize(void);
+};
 
 #define HEX_NB_LINE   8
 #define HEX_NB_COLUMN 16
@@ -211,5 +225,20 @@ void diaElemHex::finalize(void)
 {
 
 };
+
+} // End of namespace
+//****************************Hoook*****************
+
+diaElem  *gtkCreateHex(const char *toggleTitle, uint32_t dataSize,uint8_t *data)
+{
+	return new  ADM_GtkFactory::diaElemHex(toggleTitle,dataSize,data);
+}
+void gtkDestroyHex(diaElem *e)
+{
+	ADM_GtkFactory::diaElemHex *a=(ADM_GtkFactory::diaElemHex *)e;
+	delete a;
+}
+//EOF
+
 
 //EOF

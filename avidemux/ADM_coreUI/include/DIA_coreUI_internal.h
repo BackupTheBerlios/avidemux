@@ -58,7 +58,21 @@ typedef struct
 // UInteger	
 	CREATE_UINTEGER_T    *CreateUInteger;
 	DELETE_DIA_ELEM_T    *DestroyUInteger;
-	
+// Notch	
+	DIA_CREATE_NOTCH_T   *CreateNotch;
+	DELETE_DIA_ELEM_T    *DestroyNotch;
+// ReadonlyText
+	DIA_CREATE_READONLYTEXT_T *CreateReadonlyText;
+	DELETE_DIA_ELEM_T    *DestroyReadonlyText;
+// Text
+	DIA_CREATE_TEXT_T    *CreateText;
+	DELETE_DIA_ELEM_T    *DestroyText;
+// Hex
+	DIA_CREATE_HEX_T     *CreateHex;
+	DELETE_DIA_ELEM_T    *DestroyHex;
+// Matrix
+	CREATE_MATRIX_T      *CreateMatrix;
+	DELETE_DIA_ELEM_T    *DestroyMatrix;
 }FactoryDescriptor;
 //
 uint8_t DIA_factoryInit(FactoryDescriptor *d);

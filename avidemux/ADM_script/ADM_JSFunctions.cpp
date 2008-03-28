@@ -82,6 +82,7 @@ JSBool facHex(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 JSBool facDirSel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facButton(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facNotch(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facSlider(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool crashTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool assertTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
@@ -102,23 +103,24 @@ static JSFunctionSpec adm_functions[] = {
   {"exec",          systemExecute,        3},
   {"include",          systemInclude,        1},
   {"pathOnly",          pathOnly,        1},
-  {"dialogFactoryInt",          facInt,        0},
-  {"dialogFactoryFloat",        facFloat,        0},
+  {"dialogFactoryInt",          facInt,           0},
+  {"dialogFactoryFloat",        facFloat,         0},
   {"dialogFactoryToggle",       facToggle,        0},
-  {"dialogFactoryMenu",         facMenu,        0},
-  {"dialogFactoryFileSel",      facFile,        0},
-  {"dialogFactoryBitrate",      facBitrate,        0},
-  {"dialogFactoryBar",        facBar,        0},
-  {"dialogFactoryRoText",     facRoText,        0},
-  {"dialogFactoryText",       facText,        0},
-  {"dialogFactoryTabs",       facTab,        0},
+  {"dialogFactoryMenu",         facMenu,          0},
+  {"dialogFactoryFileSel",      facFile,          0},
+  {"dialogFactoryBitrate",      facBitrate,       0},
+  {"dialogFactoryBar",        facBar,             0},
+  {"dialogFactoryRoText",     facRoText,          0},
+  {"dialogFactoryText",       facText,            0},
+  {"dialogFactoryTabs",       facTab,             0},
   {"dialogFactoryDirSel",       facDirSel,        0},
-  {"dialogFactoryFrame",       facFrame,        0},
-  {"dialogFactoryHex",       facHex,        0},
+  {"dialogFactoryFrame",       facFrame,          0},
+  {"dialogFactoryHex",       facHex,              0},
   {"dialogFactoryButton",       facButton,        0},
   {"dialogFactorySlider",       facSlider,        0},
   {"dialogFactoryMatrix",       facMatrix,        0},
-  {"crashTest",               crashTest,        0},
+  {"dialogFactoryNotch",       facNotch,		  0},
+  {"crashTest",               crashTest,          0},
   {"assertTest",               assertTest,        0},
   {0}
 };
@@ -816,6 +818,22 @@ JSBool facMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 	  
   }
   
+  return JS_TRUE;
+      
+      
+}
+JSBool facNotch(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+    
+	diaElemNotch notch(1,"Notch");
+      
+         diaElem *elems[]={&notch   };
+  if(diaFactoryRun("Test Notch",1,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
   return JS_TRUE;
       
       

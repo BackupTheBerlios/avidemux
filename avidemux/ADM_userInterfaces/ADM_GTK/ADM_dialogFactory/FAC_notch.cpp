@@ -16,6 +16,21 @@
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_factory.h"
 
+namespace ADM_GtkFactory
+{
+
+
+class diaElemNotch : public diaElem
+{
+  uint32_t yesno;
+public:
+  
+  diaElemNotch(uint32_t yes,const char *toggleTitle, const char *tip=NULL);
+  virtual ~diaElemNotch() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void) {};
+};
+
 
 diaElemNotch::diaElemNotch(uint32_t yes,const char *toggleTitle, const char *tip)
   : diaElem(ELEM_NOTCH)
@@ -56,5 +71,17 @@ void diaElemNotch::setMe(void *dialog, void *opaque,uint32_t line)
                     (GtkAttachOptions) (0), 0, 0);
   
 }
+//****************************************************
+} // End of namespace
+//****************************Hoook*****************
 
+diaElem  *gtkCreateNotch(uint32_t yes,const char *toggleTitle, const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemNotch(yes,toggleTitle, tip);
+}
+void gtkDestroyNotch(diaElem *e)
+{
+	ADM_GtkFactory::diaElemNotch *a=(ADM_GtkFactory::diaElemNotch *)e;
+	delete a;
+}
 //EOF
