@@ -1,12 +1,8 @@
 #include <stdio.h>
-#include <string.h>
 
 #include <QApplication>
-#include <QLocale>
-#include <QTranslator>
+#include <QtCore>
 
-static const int MAX_MESSAGE_COUNT = 300;
-static char* translatedMessage[MAX_MESSAGE_COUNT];
 static QTranslator qtTranslator;
 static QTranslator avidemuxTranslator;
 
@@ -23,28 +19,17 @@ static void loadTranslation(QTranslator *qTranslator, QString translation)
 		printf("FAILED\n");		
 }
 
-void initTranslator(void)
-{
-	memset(translatedMessage, 0, MAX_MESSAGE_COUNT * sizeof(char*));
-}
+void initTranslator(void) {}
 
 const char* translate(const char *__domainname, const char *__msgid)
 {
-	static int counter = 0;
-	QString messageString = QApplication::translate("",  __msgid);
+	static QMap<QString, QByteArray> map;
+	QString msgid = QString(__msgid);
 
-	counter++;
+	if (!map.contains(msgid))
+		map[msgid] = QApplication::translate("", __msgid).toUtf8();
 
-	if (counter >= MAX_MESSAGE_COUNT)
-		counter = 0;
-
-	if (translatedMessage[counter])
-		delete[] translatedMessage[counter];
-
-	translatedMessage[counter] = new char[messageString.toUtf8().length() + 1];
-	strcpy(translatedMessage[counter], messageString.toUtf8().constData());
-
-	return translatedMessage[counter];
+	return map.value(msgid).constData();
 }
 
 #define HIDE_STRING_FROM_QT(domainname, msgid)  QApplication::translate(domainname, msgid) // to hide string from lupdate so a true test can be conducted
@@ -65,16 +50,7 @@ void loadTranslator(void)
 	printf("[Locale] Test: &Edit -> %s\n\n", HIDE_STRING_FROM_QT("MainWindow", "&Edit").toUtf8().data());
 }
 
-void destroyTranslator(void)
-{
-	for (int counter = 0; counter < MAX_MESSAGE_COUNT; counter++)
-	{
-		if (translatedMessage[counter])
-			delete[] translatedMessage[counter];
-	}
-
-	memset(translatedMessage, 0, MAX_MESSAGE_COUNT * sizeof(char*));
-}
+void destroyTranslator(void) {}
 
 void getUIDescription(char* desc)
 {

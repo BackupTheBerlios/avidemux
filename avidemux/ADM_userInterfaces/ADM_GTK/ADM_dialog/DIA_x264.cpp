@@ -1166,10 +1166,10 @@ create_dialog1 (void)
   comboboxDirectMode = gtk_combo_box_new_text ();
   gtk_widget_show (comboboxDirectMode);
   gtk_box_pack_start (GTK_BOX (hbox1), comboboxDirectMode, FALSE, TRUE, 0);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDirectMode), QT_TR_NOOP("Auto"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDirectMode), QT_TR_NOOP("Temporal"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDirectMode), QT_TR_NOOP("Spatial"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDirectMode), QT_TR_NOOP("None"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDirectMode), QT_TR_NOOP("Spatial"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDirectMode), QT_TR_NOOP("Temporal"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDirectMode), QT_TR_NOOP("Auto"));
 
   label20 = gtk_label_new (QT_TR_NOOP("<b>B-Frames</b>"));
   gtk_widget_show (label20);

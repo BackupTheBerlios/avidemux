@@ -722,7 +722,7 @@ NULL,//     char      *logfile;
 0,//     uint32_t BidirME;
 1,//     uint32_t Adaptative;
 1,//     uint32_t Weighted;
-0,//     uint32_t DirectMode;
+1,//     uint32_t DirectMode;
 //     //
 4,//     uint32_t PartitionDecision;
 16, //Range
@@ -780,7 +780,7 @@ NULL,//     char      *logfile;
 0,//     uint32_t BidirME;
 1,//     uint32_t Adaptative;
 1,//     uint32_t Weighted;
-0,//     uint32_t DirectMode;
+1,//     uint32_t DirectMode;
 //     //
 4,//     uint32_t PartitionDecision;
 4,//              Range

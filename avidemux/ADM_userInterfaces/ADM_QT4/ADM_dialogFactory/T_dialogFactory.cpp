@@ -181,6 +181,7 @@ void insertTab(uint32_t index, diaElemTabs *tab, QTabWidget *wtab)
 
   QWidget *wid=new QWidget;
   QGridLayout *layout=new QGridLayout(wid);
+  QSpacerItem *spacerItem = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
   
   /* First compute the size of our window */
   int vsize=0;
@@ -204,6 +205,8 @@ void insertTab(uint32_t index, diaElemTabs *tab, QTabWidget *wtab)
   {
     tab->dias[i]->finalize(); 
   }
+
+  layout->addItem(spacerItem, v, 0);
 }
 /**
  * 

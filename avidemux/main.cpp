@@ -274,6 +274,10 @@ int main(int argc, char *argv[])
 
     UI_RunApp();
 
+#ifdef ADM_WIN32
+	__except1(exceptionHandler);
+#endif
+
     printf("Normal exit\n");
     return 0;
 }

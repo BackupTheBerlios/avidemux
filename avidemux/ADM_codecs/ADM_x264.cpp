@@ -98,7 +98,7 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   MKPARAM (b_interlaced,interlaced);
       
   //
-  MKPARAM(analyse.i_direct_mv_pred,DirectMode+1);
+  MKPARAM(analyse.i_direct_mv_pred,DirectMode);
   MKPARAM(rc.i_qp_min,MinQp);
   MKPARAM(rc.i_qp_max,MaxQp);
   MKPARAM(rc.i_qp_step,QpStep);
