@@ -15,7 +15,23 @@
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_factory.h"
-
+namespace ADM_GtkFactory
+{
+class diaElemBitrate : public diaElem
+{
+  protected:
+    COMPRES_PARAMS    copy;
+    uint32_t maxQ;
+public:
+  
+  diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip=NULL);
+  virtual ~diaElemBitrate() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  void setMaxQz(uint32_t qz);
+  
+  void updateMe(void);
+};
 
 static void cb_mod(void *w,void *p);
 /**
@@ -293,5 +309,16 @@ void cb_mod(void *w,void *p)
   me->updateMe();
 }
 
+} // End of namespace
+//****************************Hoook*****************
 
+diaElem  *gtkCreateBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemBitrate(p,toggleTitle,tip);
+}
+void gtkDestroyBitrate(diaElem *e)
+{
+	ADM_GtkFactory::diaElemBitrate *a=(ADM_GtkFactory::diaElemBitrate *)e;
+	delete a;
+}
 //EOF

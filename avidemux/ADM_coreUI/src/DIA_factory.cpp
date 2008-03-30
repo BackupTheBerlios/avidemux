@@ -301,5 +301,31 @@ diaElemThreadCount ::~diaElemThreadCount()
 }
 DIA_MKSTUBS(diaElemThreadCount)
 
+// ****************** diaElemBitrate ********************
+diaElemBitrate ::diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip):
+	diaElem(ELEM_BITRATE)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateBitrate(p,toggleTitle,tip);
+}
+diaElemBitrate ::~diaElemBitrate()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyBitrate(internalPointer);
+	internalPointer=NULL;
+}
+void diaElemBitrate::updateMe()
+{
+	
+}
+void diaElemBitrate::setMaxQz(uint32_t qz)
+{
+	diaElemBitrate *cast=(diaElemBitrate *)internalPointer;
+		cast->setMaxQz(qz);
+	
+}
+DIA_MKSTUBS(diaElemBitrate)
+
+//
 
 // EOF

@@ -82,6 +82,9 @@ typedef struct
 // ThreadCount
 	CREATE_THREADCOUNT_T *CreateThreadCount;
 	DELETE_DIA_ELEM_T    *DestroyThreadCount;
+// Bitrate
+	CREATE_BITRATE_T     *CreateBitrate;
+	DELETE_DIA_ELEM_T    *DestroyBitrate;
 }FactoryDescriptor;
 //
 uint8_t DIA_factoryInit(FactoryDescriptor *d);

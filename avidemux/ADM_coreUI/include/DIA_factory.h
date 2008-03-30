@@ -326,7 +326,7 @@ public:
 
 /*************************************************/
 #include "ADM_encoder/ADM_vidEncode.hxx"
-
+typedef diaElem  *(CREATE_BITRATE_T)(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip);
 class diaElemBitrate : public diaElem
 {
   protected:
