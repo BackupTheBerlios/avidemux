@@ -83,6 +83,7 @@ JSBool facDirSel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 JSBool facButton(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facNotch(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facThreadCount(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facSlider(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool crashTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool assertTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
@@ -120,6 +121,7 @@ static JSFunctionSpec adm_functions[] = {
   {"dialogFactorySlider",       facSlider,        0},
   {"dialogFactoryMatrix",       facMatrix,        0},
   {"dialogFactoryNotch",       facNotch,		  0},
+  {"dialogFactoryThreadCount", facThreadCount,		  0},
   {"crashTest",               crashTest,          0},
   {"assertTest",               assertTest,        0},
   {0}
@@ -825,6 +827,22 @@ JSBool facMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
   
   return JS_TRUE;
       
+      
+}
+JSBool facThreadCount(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+	uint32_t val=1;
+	diaElemThreadCount threadcount(&val,"ThreadCount");
+      
+    diaElem *elems[]={&threadcount   };
+    
+  if(diaFactoryRun("Test ThreadCount",1,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  return JS_TRUE;
       
 }
 JSBool facNotch(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)

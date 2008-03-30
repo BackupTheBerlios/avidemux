@@ -376,7 +376,7 @@ public:
 };
 /*************************************************/
 /* The text MUST be copied internally ! */
-typedef diaElem *(DIA_CREATE_READONLYTEXT_T )(const char *readOnly,const char *toggleTitle, const char *tip);
+typedef diaElem *(CREATE_READONLYTEXT_T )(const char *readOnly,const char *toggleTitle, const char *tip);
 class diaElemReadOnlyText : public diaElem
 {
 
@@ -389,7 +389,7 @@ public:
   
 };
 /*************************************************/
-typedef diaElem *(DIA_CREATE_TEXT_T )(char **readOnly,const char *toggleTitle, const char *tip);
+typedef diaElem *(CREATE_TEXT_T )(char **readOnly,const char *toggleTitle, const char *tip);
 /* The text MUST be copied internally ! */
 class diaElemText : public diaElem
 {
@@ -404,7 +404,7 @@ public:
 };
 
 /*********************************************/
-typedef diaElem *(DIA_CREATE_NOTCH_T )(uint32_t yes,const char *toggleTitle, const char *tip);
+typedef diaElem *(CREATE_NOTCH_T )(uint32_t yes,const char *toggleTitle, const char *tip);
 class diaElemNotch : public diaElem
 {
   uint32_t yesno;
@@ -452,7 +452,7 @@ public:
   void finalize(void);
 };
 /**********************************************/
-typedef diaElem *(DIA_CREATE_HEX_T )(const char *toggleTitle, uint32_t dataSize,uint8_t *data);
+typedef diaElem *(CREATE_HEX_T )(const char *toggleTitle, uint32_t dataSize,uint8_t *data);
 class diaElemHex : public diaElem
 {
   uint32_t dataSize;
@@ -467,6 +467,7 @@ public:
   void finalize(void);
 };
 /**********************************************/
+typedef diaElem *(CREATE_THREADCOUNT_T)(uint32_t *value, const char *title, const char *tip = NULL);
 class diaElemThreadCount : public diaElem
 {
 

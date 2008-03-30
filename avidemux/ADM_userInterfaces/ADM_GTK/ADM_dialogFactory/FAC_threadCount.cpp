@@ -16,6 +16,21 @@
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_factory.h"
 
+
+namespace ADM_GtkFactory
+{
+
+class diaElemThreadCount : public diaElem
+{
+
+public:
+  
+  diaElemThreadCount(uint32_t *value, const char *title, const char *tip = NULL);
+  virtual ~diaElemThreadCount() ;
+  void setMe(void *dialog, void *opaque, uint32_t line);
+  void getMe(void);
+};
+
 static void customToggled(void *widget, void *userData);
 
 diaElemThreadCount::diaElemThreadCount(uint32_t *value, const char *title, const char *tip) : diaElem(ELEM_THREAD_COUNT)
@@ -129,5 +144,14 @@ void customToggled(void *widget, void *userData)
 
 	gtk_widget_set_sensitive(GTK_WIDGET(widgets[3]), gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widgets[2])));
 }
-
+} // End of namesapce
+diaElem  *gtkCreateThreadCount(uint32_t *value, const char *title, const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemThreadCount(value,title,tip);
+}
+void gtkDestroyThreadCount(diaElem *e)
+{
+	ADM_GtkFactory::diaElemThreadCount *a=(ADM_GtkFactory::diaElemThreadCount *)e;
+	delete a;
+}
 //EOF

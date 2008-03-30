@@ -299,24 +299,26 @@ extern diaElem  *gtkCreateBar(uint32_t percent,const char *toggleTitle);
 extern void     gtkDeleteBar(diaElem *e);
 extern diaElem  *gtkCreateFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, ELEM_TYPE_FLOAT min, ELEM_TYPE_FLOAT max,const char *tip);
 extern void     gtkDeleteFloat(diaElem *e);
-extern CREATE_INTEGER_T gtkCreateInteger;
+extern CREATE_INTEGER_T  gtkCreateInteger;
 extern CREATE_UINTEGER_T gtkCreateUInteger;
 extern DELETE_DIA_ELEM_T gtkDestroyInteger;
 extern DELETE_DIA_ELEM_T gtkDestroyUInteger;
-extern DIA_CREATE_NOTCH_T  gtkCreateNotch;
+extern CREATE_NOTCH_T    gtkCreateNotch;
 extern DELETE_DIA_ELEM_T   gtkDestroyNotch;
-extern DIA_CREATE_READONLYTEXT_T gtkCreateRoText;
-extern DIA_CREATE_TEXT_T gtkCreateText;
+extern CREATE_READONLYTEXT_T gtkCreateRoText;
+extern CREATE_TEXT_T gtkCreateText;
 extern DELETE_DIA_ELEM_T   gtkDestroyRoText;
 extern DELETE_DIA_ELEM_T   gtkDestroyText;
-extern DIA_CREATE_HEX_T    gtkCreateHex;
+extern CREATE_HEX_T        gtkCreateHex;
 extern DELETE_DIA_ELEM_T   gtkDestroyHex;
 extern CREATE_MATRIX_T     gtkCreateMatrix;
 extern DELETE_DIA_ELEM_T   gtkDestroyMatrix;
 extern CREATE_MENUDYNAMIC_T     gtkCreateMenuDynamic;
-extern CREATE_MENU_T     gtkCreateMenu;
+extern CREATE_MENU_T       gtkCreateMenu;
 extern DELETE_DIA_ELEM_T   gtkDestroyMenu;
 extern DELETE_DIA_ELEM_T   gtkDestroyMenuDynamic;
+extern CREATE_THREADCOUNT_T gtkCreateThreadCount;
+extern DELETE_DIA_ELEM_T    gtkDestroyThreadCount;
 //************
 static FactoryDescriptor GtkFactoryDescriptor=
 {
@@ -357,6 +359,9 @@ static FactoryDescriptor GtkFactoryDescriptor=
 	&gtkDestroyMenu,
 	&gtkCreateMenuDynamic,
 	&gtkDestroyMenuDynamic,
+	// ThreadCount
+	&gtkCreateThreadCount,
+	&gtkDestroyThreadCount
 		
 };
 

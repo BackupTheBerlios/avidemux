@@ -286,4 +286,20 @@ void      diaElemMenuDynamic::updateMe(void)
 }
 
 DIA_MKSTUBS(diaElemMenuDynamic)
+// ****************** diaElemMatrix ********************
+diaElemThreadCount ::diaElemThreadCount(uint32_t *value, const char *title, const char *tip):
+	diaElem(ELEM_THREAD_COUNT)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateThreadCount(value,title,tip);
+}
+diaElemThreadCount ::~diaElemThreadCount()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyThreadCount(internalPointer);
+	internalPointer=NULL;
+}
+DIA_MKSTUBS(diaElemThreadCount)
+
+
 // EOF
