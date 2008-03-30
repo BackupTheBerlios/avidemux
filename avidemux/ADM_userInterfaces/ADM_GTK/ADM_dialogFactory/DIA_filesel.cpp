@@ -18,11 +18,11 @@
 #include "prefs.h"
 namespace ADM_GtkFactory
 {
-class diaElemFile : public diaElem
+class diaElemFile : public diaElemFileBase
 {
 
 protected:
-    const char * defaultSuffix;
+    
 public:
   
   diaElemFile(uint32_t writeMode,char **filename,const char *toggleTitle,
@@ -30,11 +30,11 @@ public:
   virtual ~diaElemFile() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
-  uint32_t _write;
+  
   void   changeFile(void);
   void   enable(uint32_t onoff);
 };
-class diaElemDirSelect : public diaElem
+class diaElemDirSelect : public diaElemDirSelectBase
 {
 
 public:
@@ -54,9 +54,10 @@ static void dirSel(void *w,void *p);
 
 diaElemFile::diaElemFile(uint32_t writemode,char **filename,const char *toggleTitle,
                          const char * defaultSuffix,const char *selectFileDesc)
-  : diaElem(ELEM_FILE_READ),
-    defaultSuffix (defaultSuffix)
+  : diaElemFileBase()
+    
 {
+  this->defaultSuffix=defaultSuffix;
   param=(void *)filename;
   paramTitle=toggleTitle;
 
@@ -213,7 +214,7 @@ void fileRead(void *w,void *p)
 
 /*********************************************************************/
 diaElemDirSelect::diaElemDirSelect(char **filename,const char *toggleTitle,const char *selectDirDesc)
-  : diaElem(ELEM_DIR_SELECT)
+  : diaElemDirSelectBase()
 {
   param=(void *)filename;
   paramTitle=toggleTitle;

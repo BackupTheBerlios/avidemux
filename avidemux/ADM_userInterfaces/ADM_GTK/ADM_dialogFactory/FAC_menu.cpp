@@ -21,13 +21,10 @@ static void cb_menu(void *w,void *p);
 static void cb_menus(void *w,void *p);
 
 
-class diaElemMenuDynamic : public diaElem
+class diaElemMenuDynamic : public diaElemMenuDynamicBase
 {
 protected:
-	diaMenuEntryDynamic **menu;
-	uint32_t            nbMenu;
-	dialElemLink        links[MENU_MAX_lINK];
-	uint32_t            nbLink;
+	
 
 public:
   diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
@@ -42,13 +39,10 @@ public:
   virtual void      finalize(void);
 };
 //**********************
-class diaElemMenu : public diaElem
+class diaElemMenu : public diaElemMenuBase
 {
 protected:
-	const diaMenuEntry  *menu;
-	uint32_t            nbMenu;
-	dialElemLink        links[MENU_MAX_lINK];
-	uint32_t            nbLink;
+	
 
 	diaElemMenuDynamic  *dyna;
 	diaMenuEntryDynamic  **menus;	
@@ -67,7 +61,7 @@ public:
 //**********************
 diaElemMenu::diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
                const diaMenuEntry *menu,const char *tip)
-  : diaElem(ELEM_MENU)
+  : diaElemMenuBase()
 {
   param=(void *)intValue;
   paramTitle=itle;
@@ -125,7 +119,7 @@ void   diaElemMenu::finalize(void)
 //*******************************
 diaElemMenuDynamic::diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
                 diaMenuEntryDynamic **menu,const char *tip)
-  : diaElem(ELEM_MENU)
+  : diaElemMenuDynamicBase()
 {
   param=(void *)intValue;
   paramTitle=itle;

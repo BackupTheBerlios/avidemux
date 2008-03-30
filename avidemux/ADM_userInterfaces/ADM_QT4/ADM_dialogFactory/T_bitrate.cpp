@@ -201,7 +201,7 @@ ADM_Qbitrate::~ADM_Qbitrate()
 
 //**********************************
 diaElemBitrate::diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip)
-  : diaElem(ELEM_BITRATE)
+  : diaElemBitrateBase()
 {
  
   param=(void *)p;

@@ -66,7 +66,7 @@ extern const char *shortkey(const char *);
 
 diaElemMenu::diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
                const diaMenuEntry *menu,const char *tip)
-  : diaElem(ELEM_MENU)
+  : diaElemMenuBase()
 {
   param=(void *)intValue;
   paramTitle=itle;
@@ -128,7 +128,7 @@ void   diaElemMenu::finalize(void)
 
 diaElemMenuDynamic::diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
                 diaMenuEntryDynamic **menu,const char *tip)
-  : diaElem(ELEM_MENU)
+  : diaElemMenuDynamicBase()
 {
   param=(void *)intValue;
   paramTitle=shortkey(itle);

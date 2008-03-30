@@ -91,6 +91,9 @@ typedef struct
 // Dir
 	CREATE_DIR_T         *CreateDir;
 	DELETE_DIA_ELEM_T    *DestroyDir;
+// Frame
+	CREATE_FRAME_T       *CreateFrame;
+	DELETE_DIA_ELEM_T    *DestroyFrame;
 }FactoryDescriptor;
 //
 uint8_t DIA_factoryInit(FactoryDescriptor *d);

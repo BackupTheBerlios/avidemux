@@ -224,7 +224,7 @@ DIA_MKSTUBS(diaElemMatrix)
 // ****************** diaElemMenu ********************
 diaElemMenu ::diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
         const diaMenuEntry *menu,const char *tip):
-	diaElem(ELEM_MENU)
+	diaElemMenuBase()
 {
 	ADM_assert(Factory); 
 	internalPointer=Factory->CreateMenu(intValue, itle,  nb,  menu,tip);
@@ -242,7 +242,7 @@ void      diaElemMenu::enable(uint32_t onoff)
 	}
 uint8_t   diaElemMenu::link(diaMenuEntry *entry,uint32_t onoff,diaElem *w)
 {
-	diaElemMenu *cast=(diaElemMenu *)internalPointer;
+	diaElemMenuBase *cast=(diaElemMenuBase *)internalPointer;
 	cast->link(entry,onoff,w);
 }
 void      diaElemMenu::updateMe(void)
@@ -258,7 +258,7 @@ DIA_MKSTUBS(diaElemMenu)
 // ****************** diaElemMenuDynamic ********************
 diaElemMenuDynamic ::diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
          diaMenuEntryDynamic **menu,const char *tip):
-	diaElem(ELEM_MENU)
+        	 diaElemMenuDynamicBase()
 {
 	ADM_assert(Factory); 
 	internalPointer=Factory->CreateMenuDynamic(intValue, itle,  nb,  menu,tip);
@@ -276,7 +276,7 @@ void      diaElemMenuDynamic::enable(uint32_t onoff)
 	}
 uint8_t   diaElemMenuDynamic::link(diaMenuEntryDynamic *entry,uint32_t onoff,diaElem *w)
 {
-	diaElemMenuDynamic *cast=(diaElemMenuDynamic *)internalPointer;
+	diaElemMenuDynamicBase *cast=(diaElemMenuDynamicBase *)internalPointer;
 	cast->link(entry,onoff,w);
 }
 void   diaElemMenuDynamic::finalize(void)
@@ -307,7 +307,7 @@ DIA_MKSTUBS(diaElemThreadCount)
 
 // ****************** diaElemBitrate ********************
 diaElemBitrate ::diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip):
-	diaElem(ELEM_BITRATE)
+	diaElemBitrateBase()
 {
 	ADM_assert(Factory); 
 	internalPointer=Factory->CreateBitrate(p,toggleTitle,tip);
@@ -324,15 +324,14 @@ void diaElemBitrate::updateMe()
 }
 void diaElemBitrate::setMaxQz(uint32_t qz)
 {
-	diaElemBitrate *cast=(diaElemBitrate *)internalPointer;
+	diaElemBitrateBase *cast=(diaElemBitrateBase *)internalPointer;
 		cast->setMaxQz(qz);
 	
 }
 DIA_MKSTUBS(diaElemBitrate)
 // ****************** diaElemFile ********************
 diaElemFile ::diaElemFile(uint32_t writeMode,char **filename,const char *toggleTitle,
-        const char *defaultSuffix ,const char *tip):
-	diaElem(ELEM_FILE_READ)
+        const char *defaultSuffix ,const char *tip)
 {
 	ADM_assert(Factory); 
 	internalPointer=Factory->CreateFile(writeMode,filename,toggleTitle,defaultSuffix,tip);
@@ -350,14 +349,14 @@ void      diaElemFile::enable(uint32_t onoff)
 	}
 void      diaElemFile::changeFile(void)
 	{ 
-	diaElemFile *cast=(diaElemFile *)internalPointer;
+	diaElemFileBase *cast=(diaElemFileBase *)internalPointer;
 	cast->changeFile();
 	}
 DIA_MKSTUBS(diaElemFile)
 
 // ****************** diaElemDirSelect ********************
 diaElemDirSelect ::diaElemDirSelect(char **filename,const char *toggleTitle,const char *tip):
-	diaElem(ELEM_DIR_SELECT)
+	diaElemDirSelectBase()
 {
 	ADM_assert(Factory); 
 	internalPointer=Factory->CreateDir( filename, toggleTitle, tip);
@@ -375,9 +374,40 @@ void      diaElemDirSelect::enable(uint32_t onoff)
 	}
 void      diaElemDirSelect::changeFile(void)
 	{ 
-	diaElemDirSelect *cast=(diaElemDirSelect *)internalPointer;
+	diaElemDirSelectBase *cast=(diaElemDirSelectBase *)internalPointer;
 	cast->changeFile();
 	}
 DIA_MKSTUBS(diaElemDirSelect)
-
+// ****************** diaElemFrame ********************
+diaElemFrame ::diaElemFrame(const char *toggleTitle, const char *tip):
+	diaElemFrameBase()
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateFrame( toggleTitle, tip);
+}
+diaElemFrame ::~diaElemFrame()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyFrame(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemFrame::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+void diaElemFrame::swallow(diaElem *widget)
+{
+	diaElemFrameBase *cast=(diaElemFrameBase *)internalPointer;
+		cast->swallow(widget);	
+}
+ 
+void diaElemFrame::finalize(void)
+{
+	internalPointer->finalize();
+		
+}
+ 
+DIA_MKSTUBS(diaElemFrame)
+//
 // EOF

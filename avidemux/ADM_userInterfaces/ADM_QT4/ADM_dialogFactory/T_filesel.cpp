@@ -140,9 +140,10 @@ class  ADM_Qfilesel : public QWidget
 
 diaElemFile::diaElemFile(uint32_t writemode,char **filename,const char *toggleTitle,
                          const char *defaultSuffix,const char *selectFileDesc)
-  : diaElem(ELEM_FILE_READ),
-    defaultSuffix (defaultSuffix)
+  : diaElemFileBase()
+    
 {
+  this->defaultSuffix=defaultSuffix;
   param=(void *)filename;
   paramTitle=shortkey(toggleTitle);
 
@@ -188,7 +189,8 @@ void diaElemFile::enable(uint32_t onoff)
 }
 
 //****************************
-diaElemDirSelect::diaElemDirSelect(char **filename,const char *toggleTitle,const char *selectDirDesc) : diaElem(ELEM_DIR_SELECT)
+diaElemDirSelect::diaElemDirSelect(char **filename,const char *toggleTitle,const char *selectDirDesc) :
+	diaElemDirSelectBase()
 {
   param=(void *)filename;
   paramTitle=shortkey(toggleTitle);

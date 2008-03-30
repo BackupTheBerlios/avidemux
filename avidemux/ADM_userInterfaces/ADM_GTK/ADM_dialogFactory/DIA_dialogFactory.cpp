@@ -325,7 +325,8 @@ extern CREATE_FILE_T        gtkCreateFile;
 extern DELETE_DIA_ELEM_T    gtkDestroyFile;
 extern CREATE_DIR_T         gtkCreateDir;
 extern DELETE_DIA_ELEM_T    gtkDestroyDir;
-
+CREATE_FRAME_T				gtkCreateFrame;
+extern DELETE_DIA_ELEM_T    gtkDestroyFrame;
 
 //************
 static FactoryDescriptor GtkFactoryDescriptor=
@@ -378,7 +379,10 @@ static FactoryDescriptor GtkFactoryDescriptor=
 	&gtkDestroyFile,
 	// Dir
 	&gtkCreateDir,
-	&gtkDestroyDir
+	&gtkDestroyDir,
+	// Frame
+	&gtkCreateFrame,
+	&gtkDestroyFrame
 		
 };
 

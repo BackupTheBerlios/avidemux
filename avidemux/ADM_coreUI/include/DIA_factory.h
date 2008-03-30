@@ -281,13 +281,24 @@ typedef diaElem  *(CREATE_MENU_T)(uint32_t *intValue,const char *itle, uint32_t 
         const diaMenuEntry *menu,const char *tip);
 typedef diaElem  *(CREATE_MENUDYNAMIC_T)(uint32_t *intValue,const char *itle, uint32_t nb, 
          diaMenuEntryDynamic **menu,const char *tip);
-class diaElemMenuDynamic : public diaElem
+
+class diaElemMenuDynamicBase : public diaElem
 {
+protected:	
 diaMenuEntryDynamic **menu;
 uint32_t            nbMenu;
 dialElemLink        links[MENU_MAX_lINK];
 uint32_t            nbLink;
 
+public:
+	diaElemMenuDynamicBase() : diaElem(ELEM_MENU) {};
+  
+  virtual   ~diaElemMenuDynamicBase() {};
+  virtual uint8_t   link(diaMenuEntryDynamic *entry,uint32_t onoff,diaElem *w)=0;
+};
+
+class diaElemMenuDynamic : public diaElemMenuDynamicBase
+{
 public:
   diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
                diaMenuEntryDynamic **menu,const char *tip=NULL);
@@ -301,13 +312,20 @@ public:
   virtual void      finalize(void);
 };
 
- 
-class diaElemMenu : public diaElem
+class diaElemMenuBase : public diaElem
 {
-const diaMenuEntry  *menu;
-uint32_t            nbMenu;
-dialElemLink        links[MENU_MAX_lINK];
-uint32_t            nbLink;
+protected:
+	const diaMenuEntry  *menu;
+	uint32_t            nbMenu;
+	dialElemLink        links[MENU_MAX_lINK];
+	uint32_t            nbLink;
+public:	
+	diaElemMenuBase(void) : diaElem(ELEM_MENU) {};
+	virtual ~diaElemMenuBase(void) {};
+	virtual uint8_t   link(diaMenuEntry *entry,uint32_t onoff,diaElem *w)=0;
+};
+class diaElemMenu : public diaElemMenuBase
+{
 
 diaElemMenuDynamic  *dyna;
 diaMenuEntryDynamic  **menus;
@@ -327,11 +345,20 @@ public:
 /*************************************************/
 #include "ADM_encoder/ADM_vidEncode.hxx"
 typedef diaElem  *(CREATE_BITRATE_T)(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip);
-class diaElemBitrate : public diaElem
+class diaElemBitrateBase : public diaElem
 {
   protected:
     COMPRES_PARAMS    copy;
     uint32_t maxQ;
+public:
+  
+	diaElemBitrateBase(void) : diaElem(ELEM_BITRATE) {};
+  virtual ~diaElemBitrateBase() {} ;
+  virtual void setMaxQz(uint32_t qz)=0;
+};
+class diaElemBitrate : public diaElemBitrateBase
+{
+  protected:
 public:
   
   diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip=NULL);
@@ -345,11 +372,24 @@ public:
 
 /*************************************************/
 typedef diaElem *CREATE_FILE_T(uint32_t writeMode,char **filename,const char *toggleTitle,  const char *defaultSuffix ,const char *tip);
-class diaElemFile : public diaElem
+class diaElemFileBase : public diaElem
 {
 
 protected:
     const char * defaultSuffix;
+public:
+  
+	diaElemFileBase(void) : diaElem(ELEM_FILE_READ){};
+  virtual ~diaElemFileBase() {};
+  virtual void   changeFile(void)=0;
+  uint32_t _write;
+
+};
+class diaElemFile : public diaElemFileBase
+{
+
+protected:
+    
 public:
   
   diaElemFile(uint32_t writeMode,char **filename,const char *toggleTitle,
@@ -357,13 +397,22 @@ public:
   virtual ~diaElemFile() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
-  uint32_t _write;
+  
   void   changeFile(void);
   void   enable(uint32_t onoff);
 };
 /*************************************************/
 typedef diaElem *CREATE_DIR_T(char **filename,const char *toggleTitle,const char *tip);
-class diaElemDirSelect : public diaElem
+class diaElemDirSelectBase : public diaElem
+{
+
+public:
+  
+	diaElemDirSelectBase(void) :diaElem(ELEM_DIR_SELECT) {};
+  virtual ~diaElemDirSelectBase() {} ;
+  virtual void changeFile(void)=0;
+};
+class diaElemDirSelect : public diaElemDirSelectBase
 {
 
 public:
@@ -438,11 +487,22 @@ class diaElemTabs
 };
 /**********************************************/
 #define DIA_MAX_FRAME 10
-class diaElemFrame : public diaElem
+class diaElemFrameBase :public diaElem
 {
+protected:
   uint32_t frameSize;
   uint32_t nbElems;
   diaElem  *elems[DIA_MAX_FRAME];
+public:
+  
+	diaElemFrameBase(void) : diaElem(ELEM_FRAME) {};
+  virtual ~diaElemFrameBase() {};
+  virtual void swallow(diaElem *widget)=0;
+};
+typedef diaElem *(CREATE_FRAME_T )(const char *toggleTitle, const char *tip);
+class diaElemFrame : public diaElemFrameBase
+{
+  
 public:
   
   diaElemFrame(const char *toggleTitle, const char *tip=NULL);

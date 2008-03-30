@@ -15,10 +15,23 @@
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_factory.h"
-
-
+namespace ADM_GtkFactory
+{
+class diaElemFrame : public diaElemFrameBase
+{
+  
+public:
+  
+  diaElemFrame(const char *toggleTitle, const char *tip=NULL);
+  virtual ~diaElemFrame() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void) ;
+  void swallow(diaElem *widget);
+  void enable(uint32_t onoff);
+  void finalize(void);
+};
 diaElemFrame::diaElemFrame(const char *toggleTitle, const char *tip)
-  : diaElem(ELEM_FRAME)
+  : diaElemFrameBase()
 {
   param=NULL;
   paramTitle=toggleTitle;
@@ -102,4 +115,17 @@ void diaElemFrame::enable(uint32_t onoff)
    GtkWidget *widget=(GtkWidget *)myWidget;
    gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);
 }
+} // End of namespace
+//****************************Hoook*****************
+
+diaElem  *gtkCreateFrame(const char *toggleTitle, const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemFrame(toggleTitle,tip);
+}
+void gtkDestroyFrame(diaElem *e)
+{
+	ADM_GtkFactory::diaElemFrame *a=(ADM_GtkFactory::diaElemFrame *)e;
+	delete a;
+}
+//EOF
 //EOF

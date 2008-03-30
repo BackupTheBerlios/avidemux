@@ -34,7 +34,7 @@
 extern const char *shortkey(const char *);
 
 diaElemFrame::diaElemFrame(const char *toggleTitle, const char *tip)
-  : diaElem(ELEM_FRAME)
+  : diaElemFrameBase()
 {
   param=NULL;
   paramTitle=shortkey(toggleTitle);
