@@ -59,16 +59,16 @@ typedef struct
 	CREATE_UINTEGER_T    *CreateUInteger;
 	DELETE_DIA_ELEM_T    *DestroyUInteger;
 // Notch	
-	CREATE_NOTCH_T   *CreateNotch;
+	CREATE_NOTCH_T       *CreateNotch;
 	DELETE_DIA_ELEM_T    *DestroyNotch;
 // ReadonlyText
 	CREATE_READONLYTEXT_T *CreateReadonlyText;
-	DELETE_DIA_ELEM_T    *DestroyReadonlyText;
+	DELETE_DIA_ELEM_T     *DestroyReadonlyText;
 // Text
-	CREATE_TEXT_T    *CreateText;
+	CREATE_TEXT_T        *CreateText;
 	DELETE_DIA_ELEM_T    *DestroyText;
 // Hex
-	CREATE_HEX_T     *CreateHex;
+	CREATE_HEX_T         *CreateHex;
 	DELETE_DIA_ELEM_T    *DestroyHex;
 // Matrix
 	CREATE_MATRIX_T      *CreateMatrix;
@@ -85,6 +85,12 @@ typedef struct
 // Bitrate
 	CREATE_BITRATE_T     *CreateBitrate;
 	DELETE_DIA_ELEM_T    *DestroyBitrate;
+// File
+	CREATE_FILE_T        *CreateFile;
+	DELETE_DIA_ELEM_T    *DestroyFile;
+// Dir
+	CREATE_DIR_T         *CreateDir;
+	DELETE_DIA_ELEM_T    *DestroyDir;
 }FactoryDescriptor;
 //
 uint8_t DIA_factoryInit(FactoryDescriptor *d);

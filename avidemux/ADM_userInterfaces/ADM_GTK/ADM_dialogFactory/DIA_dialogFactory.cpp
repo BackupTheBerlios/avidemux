@@ -321,6 +321,12 @@ extern CREATE_THREADCOUNT_T gtkCreateThreadCount;
 extern DELETE_DIA_ELEM_T    gtkDestroyThreadCount;
 extern CREATE_BITRATE_T     gtkCreateBitrate;
 extern DELETE_DIA_ELEM_T    gtkDestroyBitrate;
+extern CREATE_FILE_T        gtkCreateFile;
+extern DELETE_DIA_ELEM_T    gtkDestroyFile;
+extern CREATE_DIR_T         gtkCreateDir;
+extern DELETE_DIA_ELEM_T    gtkDestroyDir;
+
+
 //************
 static FactoryDescriptor GtkFactoryDescriptor=
 {
@@ -366,7 +372,13 @@ static FactoryDescriptor GtkFactoryDescriptor=
 	&gtkDestroyThreadCount,
 	// Bitrate
 	&gtkCreateBitrate,
-	&gtkDestroyBitrate
+	&gtkDestroyBitrate,
+	// File
+	&gtkCreateFile,
+	&gtkDestroyFile,
+	// Dir
+	&gtkCreateDir,
+	&gtkDestroyDir
 		
 };
 

@@ -15,7 +15,38 @@
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_factory.h"
 #include "DIA_fileSel.h"
+#include "prefs.h"
+namespace ADM_GtkFactory
+{
+class diaElemFile : public diaElem
+{
 
+protected:
+    const char * defaultSuffix;
+public:
+  
+  diaElemFile(uint32_t writeMode,char **filename,const char *toggleTitle,
+              const char *defaultSuffix = 0,const char *tip=NULL);
+  virtual ~diaElemFile() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  uint32_t _write;
+  void   changeFile(void);
+  void   enable(uint32_t onoff);
+};
+class diaElemDirSelect : public diaElem
+{
+
+public:
+  
+  diaElemDirSelect(char **filename,const char *toggleTitle,const char *tip=NULL);
+  virtual ~diaElemDirSelect() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  
+  void changeFile(void);
+  void   enable(uint32_t onoff);
+};
 static void fileRead(void *w,void *p);
 static void dirSel(void *w,void *p);
 
@@ -305,5 +336,27 @@ void dirSel(void *w,void *p)
   diaElemDirSelect *me=(diaElemDirSelect *)p;
   me->changeFile();
 }
+} // End of namespace
+//****************************Hoook*****************
 
+diaElem  *gtkCreateFile(uint32_t writeMode,char **filename,const char *toggleTitle,
+        const char *defaultSuffix ,const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemFile(writeMode,filename,toggleTitle,defaultSuffix ,tip);
+}
+void gtkDestroyFile(diaElem *e)
+{
+	ADM_GtkFactory::diaElemFile *a=(ADM_GtkFactory::diaElemFile *)e;
+	delete a;
+}
+
+diaElem  *gtkCreateDir(char **filename,const char *toggleTitle,const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemDirSelect(filename,toggleTitle,tip);
+}
+void gtkDestroyDir(diaElem *e)
+{
+	ADM_GtkFactory::diaElemDirSelect *a=(ADM_GtkFactory::diaElemDirSelect *)e;
+	delete a;
+}
 //EOF

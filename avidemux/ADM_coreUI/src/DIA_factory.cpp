@@ -4,6 +4,10 @@
   Check the GTK/QT/.. functions to see the intersting parts
   (C) Mean 2008 fixounet@free.fr
 
+/!\ Big Warning, each time there is a cast, it is a gross hack and needs to be fixed
+ later by using proper inheritance. It is very dangerous as it is.
+
+
  ***************************************************************************/
 
 /***************************************************************************
@@ -325,7 +329,55 @@ void diaElemBitrate::setMaxQz(uint32_t qz)
 	
 }
 DIA_MKSTUBS(diaElemBitrate)
+// ****************** diaElemFile ********************
+diaElemFile ::diaElemFile(uint32_t writeMode,char **filename,const char *toggleTitle,
+        const char *defaultSuffix ,const char *tip):
+	diaElem(ELEM_FILE_READ)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateFile(writeMode,filename,toggleTitle,defaultSuffix,tip);
+}
+diaElemFile ::~diaElemFile()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyBitrate(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemFile::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+void      diaElemFile::changeFile(void)
+	{ 
+	diaElemFile *cast=(diaElemFile *)internalPointer;
+	cast->changeFile();
+	}
+DIA_MKSTUBS(diaElemFile)
 
-//
+// ****************** diaElemDirSelect ********************
+diaElemDirSelect ::diaElemDirSelect(char **filename,const char *toggleTitle,const char *tip):
+	diaElem(ELEM_DIR_SELECT)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateDir( filename, toggleTitle, tip);
+}
+diaElemDirSelect ::~diaElemDirSelect()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyBitrate(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemDirSelect::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+void      diaElemDirSelect::changeFile(void)
+	{ 
+	diaElemDirSelect *cast=(diaElemDirSelect *)internalPointer;
+	cast->changeFile();
+	}
+DIA_MKSTUBS(diaElemDirSelect)
 
 // EOF

@@ -344,6 +344,7 @@ public:
 };
 
 /*************************************************/
+typedef diaElem *CREATE_FILE_T(uint32_t writeMode,char **filename,const char *toggleTitle,  const char *defaultSuffix ,const char *tip);
 class diaElemFile : public diaElem
 {
 
@@ -361,6 +362,7 @@ public:
   void   enable(uint32_t onoff);
 };
 /*************************************************/
+typedef diaElem *CREATE_DIR_T(char **filename,const char *toggleTitle,const char *tip);
 class diaElemDirSelect : public diaElem
 {
 
