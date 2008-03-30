@@ -555,6 +555,7 @@ JSBool facToggle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 JSBool facMenu(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
    uint32_t tog=4;
+   ELEM_TYPE_FLOAT f=1;
    
     diaMenuEntry menu[]={
                              {2,   QT_TR_NOOP("No Strategy"),NULL},
@@ -563,9 +564,13 @@ JSBool facMenu(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
                              {7,  QT_TR_NOOP("NTSC converted from PAL"),NULL}
                           };
    diaElemMenu blend(&tog,QT_TR_NOOP("menu"),4,menu);
-    diaElem *elems[]={&blend   };
     
-  if(diaFactoryRun("Test Menu",1,elems))
+    // Link it to another
+    diaElemFloat toggle(&f,"Linked float",1,2);
+    blend.link(&(menu[1]),1,&toggle);
+    //
+diaElem *elems[]={&blend,&toggle   };
+  if(diaFactoryRun("Test Menu",2,elems))
   {
     *rval = BOOLEAN_TO_JSVAL(1);
     printf("Value : %u\n",tog);

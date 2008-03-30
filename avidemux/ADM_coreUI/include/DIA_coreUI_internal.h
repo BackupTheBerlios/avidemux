@@ -73,6 +73,13 @@ typedef struct
 // Matrix
 	CREATE_MATRIX_T      *CreateMatrix;
 	DELETE_DIA_ELEM_T    *DestroyMatrix;
+// Menu
+	CREATE_MENU_T        *CreateMenu;
+	DELETE_DIA_ELEM_T    *DestroyMenu;
+// MenuDynamic
+	CREATE_MENUDYNAMIC_T *CreateMenuDynamic;
+	DELETE_DIA_ELEM_T    *DestroyMenuDynamic;
+	
 }FactoryDescriptor;
 //
 uint8_t DIA_factoryInit(FactoryDescriptor *d);

@@ -145,7 +145,7 @@ diaElemNotch ::~diaElemNotch()
 
 DIA_MKSTUBS(diaElemNotch)
 // ****************** diaReadonlyText ********************
-diaElemReadOnlyText ::diaElemReadOnlyText(char *readyOnly,const char *toggleTitle,const char *tip):
+diaElemReadOnlyText ::diaElemReadOnlyText(const char *readyOnly,const char *toggleTitle,const char *tip):
 	diaElem(ELEM_ROTEXT)
 {
 	ADM_assert(Factory); 
@@ -217,5 +217,73 @@ void      diaElemMatrix::enable(uint32_t onoff)
 		internalPointer->enable(onoff); 
 	}
 DIA_MKSTUBS(diaElemMatrix)
+// ****************** diaElemMenu ********************
+diaElemMenu ::diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
+        const diaMenuEntry *menu,const char *tip):
+	diaElem(ELEM_MENU)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateMenu(intValue, itle,  nb,  menu,tip);
+}
+diaElemMenu ::~diaElemMenu()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyMenu(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemMenu::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+uint8_t   diaElemMenu::link(diaMenuEntry *entry,uint32_t onoff,diaElem *w)
+{
+	diaElemMenu *cast=(diaElemMenu *)internalPointer;
+	cast->link(entry,onoff,w);
+}
+void      diaElemMenu::updateMe(void)
+{
+	
 
+}
+void   diaElemMenu::finalize(void)
+{
+	internalPointer->finalize();
+}
+DIA_MKSTUBS(diaElemMenu)
+// ****************** diaElemMenuDynamic ********************
+diaElemMenuDynamic ::diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
+         diaMenuEntryDynamic **menu,const char *tip):
+	diaElem(ELEM_MENU)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateMenuDynamic(intValue, itle,  nb,  menu,tip);
+}
+diaElemMenuDynamic ::~diaElemMenuDynamic()
+{
+	ADM_assert(Factory); 
+	Factory->DestroyMenuDynamic(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemMenuDynamic::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+uint8_t   diaElemMenuDynamic::link(diaMenuEntryDynamic *entry,uint32_t onoff,diaElem *w)
+{
+	diaElemMenuDynamic *cast=(diaElemMenuDynamic *)internalPointer;
+	cast->link(entry,onoff,w);
+}
+void   diaElemMenuDynamic::finalize(void)
+{
+	internalPointer->finalize();
+}
+void      diaElemMenuDynamic::updateMe(void)
+{
+	
+
+}
+
+DIA_MKSTUBS(diaElemMenuDynamic)
 // EOF

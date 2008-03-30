@@ -37,7 +37,7 @@ extern const char *shortkey(const char *);
 
 
 //********************************************************************
-diaElemReadOnlyText::diaElemReadOnlyText(char *readyOnly,const char *toggleTitle,const char *tip)
+diaElemReadOnlyText::diaElemReadOnlyText(const char *readyOnly,const char *toggleTitle,const char *tip)
   : diaElem(ELEM_TOGGLE)
 {
   param=(void *)ADM_strdup(readyOnly);

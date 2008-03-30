@@ -313,6 +313,10 @@ extern DIA_CREATE_HEX_T    gtkCreateHex;
 extern DELETE_DIA_ELEM_T   gtkDestroyHex;
 extern CREATE_MATRIX_T     gtkCreateMatrix;
 extern DELETE_DIA_ELEM_T   gtkDestroyMatrix;
+extern CREATE_MENUDYNAMIC_T     gtkCreateMenuDynamic;
+extern CREATE_MENU_T     gtkCreateMenu;
+extern DELETE_DIA_ELEM_T   gtkDestroyMenu;
+extern DELETE_DIA_ELEM_T   gtkDestroyMenuDynamic;
 //************
 static FactoryDescriptor GtkFactoryDescriptor=
 {
@@ -347,8 +351,13 @@ static FactoryDescriptor GtkFactoryDescriptor=
 	&gtkDestroyHex,
 	// Matrix
 	&gtkCreateMatrix,
-	&gtkDestroyMatrix
-	
+	&gtkDestroyMatrix,
+	// Menu
+	&gtkCreateMenu,
+	&gtkDestroyMenu,
+	&gtkCreateMenuDynamic,
+	&gtkDestroyMenuDynamic,
+		
 };
 
 /**

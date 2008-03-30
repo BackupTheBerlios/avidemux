@@ -23,7 +23,7 @@ class diaElemReadOnlyText : public diaElem
 
 public:
   
-  diaElemReadOnlyText(char *readyOnly,const char *toggleTitle,const char *tip=NULL);
+  diaElemReadOnlyText(const char *readyOnly,const char *toggleTitle,const char *tip=NULL);
   virtual ~diaElemReadOnlyText() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
@@ -43,7 +43,7 @@ public:
 };
 
 
-diaElemReadOnlyText::diaElemReadOnlyText(char *readyOnly,const char *toggleTitle,const char *tip)
+diaElemReadOnlyText::diaElemReadOnlyText(const char *readyOnly,const char *toggleTitle,const char *tip)
   : diaElem(ELEM_ROTEXT)
 {
   param=(void *)ADM_strdup(readyOnly);
@@ -149,7 +149,7 @@ void diaElemText::enable(uint32_t onoff)
 } // End of namespace
 //****************************Hoook*****************
 
-diaElem  *gtkCreateRoText(char *text,const char *toggleTitle, const char *tip)
+diaElem  *gtkCreateRoText(const char *text,const char *toggleTitle, const char *tip)
 {
 	return new  ADM_GtkFactory::diaElemReadOnlyText(text,toggleTitle,tip);
 }

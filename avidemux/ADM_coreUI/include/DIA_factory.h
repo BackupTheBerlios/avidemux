@@ -277,6 +277,10 @@ class diaMenuEntryDynamic : public diaMenuEntry
 //*******************************
 // Same but for dynamic menus
 //*******************************
+typedef diaElem  *(CREATE_MENU_T)(uint32_t *intValue,const char *itle, uint32_t nb, 
+        const diaMenuEntry *menu,const char *tip);
+typedef diaElem  *(CREATE_MENUDYNAMIC_T)(uint32_t *intValue,const char *itle, uint32_t nb, 
+         diaMenuEntryDynamic **menu,const char *tip);
 class diaElemMenuDynamic : public diaElem
 {
 diaMenuEntryDynamic **menu;
@@ -291,12 +295,13 @@ public:
   virtual   ~diaElemMenuDynamic() ;
   void      setMe(void *dialog, void *opaque,uint32_t line);
   void      getMe(void);
-  uint8_t   link(diaMenuEntryDynamic *entry,uint32_t onoff,diaElem *w);
-  void      updateMe(void);
-  void      enable(uint32_t onoff) ;
-  void      finalize(void);
+  virtual uint8_t   link(diaMenuEntryDynamic *entry,uint32_t onoff,diaElem *w);
+  virtual void      updateMe(void);
+  virtual void      enable(uint32_t onoff) ;
+  virtual void      finalize(void);
 };
 
+ 
 class diaElemMenu : public diaElem
 {
 const diaMenuEntry  *menu;
@@ -313,8 +318,8 @@ public:
   virtual ~diaElemMenu() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
-  uint8_t   link(diaMenuEntry *entry,uint32_t onoff,diaElem *w);
-  void      updateMe(void);
+  virtual uint8_t   link(diaMenuEntry *entry,uint32_t onoff,diaElem *w);
+  virtual void      updateMe(void);
   void      enable(uint32_t onoff) ;
   void      finalize(void);;
 };
@@ -371,13 +376,13 @@ public:
 };
 /*************************************************/
 /* The text MUST be copied internally ! */
-typedef diaElem *(DIA_CREATE_READONLYTEXT_T )(char *readOnly,const char *toggleTitle, const char *tip);
+typedef diaElem *(DIA_CREATE_READONLYTEXT_T )(const char *readOnly,const char *toggleTitle, const char *tip);
 class diaElemReadOnlyText : public diaElem
 {
 
 public:
   
-  diaElemReadOnlyText(char *readyOnly,const char *toggleTitle,const char *tip=NULL);
+  diaElemReadOnlyText(const char *readyOnly,const char *toggleTitle,const char *tip=NULL);
   virtual ~diaElemReadOnlyText() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);

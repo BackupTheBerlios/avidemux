@@ -207,7 +207,7 @@ void diaElemBitrate::getMe(void)
  
 }
 //******************************************************
-diaElemReadOnlyText::diaElemReadOnlyText(char *readyOnly,const char *toggleTitle,const char *tip)
+diaElemReadOnlyText::diaElemReadOnlyText(const char *readyOnly,const char *toggleTitle,const char *tip)
   : diaElem(ELEM_ROTEXT)
 {
  
@@ -266,6 +266,10 @@ diaElemMenuDynamic::diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint
 
 diaElemMenuDynamic::~diaElemMenuDynamic()
 { 
+}
+void      diaElemMenuDynamic::updateMe(void)
+{
+
 }
 void diaElemMenuDynamic::setMe(void *dialog, void *opaque,uint32_t line)
 {

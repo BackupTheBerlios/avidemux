@@ -15,10 +15,56 @@
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_factory.h"
-
+namespace ADM_GtkFactory
+{
 static void cb_menu(void *w,void *p);
 static void cb_menus(void *w,void *p);
 
+
+class diaElemMenuDynamic : public diaElem
+{
+protected:
+	diaMenuEntryDynamic **menu;
+	uint32_t            nbMenu;
+	dialElemLink        links[MENU_MAX_lINK];
+	uint32_t            nbLink;
+
+public:
+  diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
+               diaMenuEntryDynamic **menu,const char *tip=NULL);
+  
+  virtual   ~diaElemMenuDynamic() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  virtual uint8_t   link(diaMenuEntryDynamic *entry,uint32_t onoff,diaElem *w);
+  virtual void      updateMe(void);
+  virtual void      enable(uint32_t onoff) ;
+  virtual void      finalize(void);
+};
+//**********************
+class diaElemMenu : public diaElem
+{
+protected:
+	const diaMenuEntry  *menu;
+	uint32_t            nbMenu;
+	dialElemLink        links[MENU_MAX_lINK];
+	uint32_t            nbLink;
+
+	diaElemMenuDynamic  *dyna;
+	diaMenuEntryDynamic  **menus;	
+public:
+  diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
+               const diaMenuEntry *menu,const char *tip=NULL);
+  
+  virtual ~diaElemMenu() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  virtual uint8_t   link(diaMenuEntry *entry,uint32_t onoff,diaElem *w);
+  virtual void      updateMe(void);
+  void      enable(uint32_t onoff) ;
+  void      finalize(void);;
+};
+//**********************
 diaElemMenu::diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
                const diaMenuEntry *menu,const char *tip)
   : diaElem(ELEM_MENU)
@@ -219,6 +265,28 @@ void cb_menus(void *w,void *p)
 {
   diaElemMenu *me=(diaElemMenu *)p;
   me->updateMe();
+}
+//********************
+}; // End of namespace
+
+diaElem  *gtkCreateMenu(uint32_t *intValue,const char *itle, uint32_t nb,         const diaMenuEntry *menu,const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemMenu(intValue,itle,nb,menu,tip);
+}
+void gtkDestroyMenu(diaElem *e)
+{
+	ADM_GtkFactory::diaElemMenu *a=(ADM_GtkFactory::diaElemMenu *)e;
+	delete a;
+}
+diaElem  *gtkCreateMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
+        diaMenuEntryDynamic **menu,const char *tipp)
+{
+	return new  ADM_GtkFactory::diaElemMenuDynamic(intValue,itle,nb,menu,tipp);
+}
+void gtkDestroyMenuDynamic(diaElem *e)
+{
+	ADM_GtkFactory::diaElemMenuDynamic *a=(ADM_GtkFactory::diaElemMenuDynamic *)e;
+	delete a;
 }
 
 //EOF
