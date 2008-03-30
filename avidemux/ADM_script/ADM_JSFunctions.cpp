@@ -557,7 +557,6 @@ JSBool facToggle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 JSBool facMenu(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
    uint32_t tog=4;
-   ELEM_TYPE_FLOAT f=1;
    
     diaMenuEntry menu[]={
                              {2,   QT_TR_NOOP("No Strategy"),NULL},
