@@ -274,7 +274,7 @@ int main(int argc, char *argv[])
 
     UI_RunApp();
 
-#ifdef ADM_WIN32
+#ifdef __MINGW32__
 	__except1(exceptionHandler);
 #endif
 
