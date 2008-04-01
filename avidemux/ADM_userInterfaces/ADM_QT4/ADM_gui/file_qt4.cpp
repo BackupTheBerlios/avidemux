@@ -219,8 +219,8 @@ static DIA_FILESEL_DESC_T Qt4FileSelDesc =
 	ADM_QT4_fileSel::GUI_FileSelWrite,
 	ADM_QT4_fileSel::GUI_FileSelRead,
 	ADM_QT4_fileSel::GUI_FileSelWrite,
-	ADM_QT4_fileSel::FileSel_SelectWrite,
 	ADM_QT4_fileSel::FileSel_SelectRead,
+	ADM_QT4_fileSel::FileSel_SelectWrite,
 	ADM_QT4_fileSel::FileSel_SelectDir
 };
 
