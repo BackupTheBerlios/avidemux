@@ -39,7 +39,7 @@ extern char *actual_workbench_file;
 namespace ADM_GTK_fileSel 
 {
 
-static void GUI_FileSel(const char *label, SELFILE_CB *cb, int rw, char **name = NULL);
+static void GUI_FileSel(const char *label, SELFILE_CB cb, int rw, char **name = NULL);
 uint8_t initFileSelector(void);
 
 static GtkFileFilter *filter_avi = NULL, *filter_mpeg = NULL, *filter_image = NULL, *filter_all = NULL;
@@ -278,13 +278,13 @@ uint8_t FileSel_SelectDir(const char *title, char *target, uint32_t max, const c
 	return ret;
 }
 
-void GUI_FileSelWrite(const char *label, SELFILE_CB * cb)
+void GUI_FileSelWrite(const char *label, SELFILE_CB cb)
 {
 	/* Create the selector */
 	GUI_FileSel(label, cb, 1);
 }
 
-void GUI_FileSelRead(const char *label, SELFILE_CB * cb)
+void GUI_FileSelRead(const char *label, SELFILE_CB cb)
 {
 	/* Create the selector */
 	GUI_FileSel(label, cb, 0);
@@ -301,7 +301,7 @@ void GUI_FileSelWrite(const char *label, char * * name)
 }
 
 // CYB 2005.02.23: DND
-void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
+void fileReadWrite(SELFILE_CB cb, int rw, char *name)
 {
 	if (name)
 	{
@@ -407,7 +407,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 // CYB 2005.02.23: DND
 
 
-void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
+void GUI_FileSel(const char *label, SELFILE_CB cb, int rw,char **rname)
 {
 	/* Create the selector */
 	GtkWidget *dialog;
@@ -555,7 +555,7 @@ void init(void)
 } // End of nameSpace
 static DIA_FILESEL_DESC_T GtkFileSelDesc=
 {
-	ADM_GTK_fileSel::init,	
+	ADM_GTK_fileSel::init,
 	ADM_GTK_fileSel::GUI_FileSelRead,
 	ADM_GTK_fileSel::GUI_FileSelWrite,
 	ADM_GTK_fileSel::GUI_FileSelRead,
@@ -564,8 +564,6 @@ static DIA_FILESEL_DESC_T GtkFileSelDesc=
 	ADM_GTK_fileSel::FileSel_SelectRead,
 	ADM_GTK_fileSel::FileSel_SelectDir
 };
-
-
 
 // Hook our functions
 void initFileSelector(void)
