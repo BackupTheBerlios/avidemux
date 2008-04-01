@@ -16,13 +16,64 @@
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_factory.h"
 
+namespace ADM_GtkFactory
+{
+class diaElemToggle : public diaElemToggleBase
+{
+  protected:
+public:
+            diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip=NULL);
+  virtual   ~diaElemToggle() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      enable(uint32_t onoff) ;
+  void      finalize(void);
+  void      updateMe();
+  uint8_t   link(uint32_t onoff,diaElem *w);
+};
+
+class diaElemToggleUint : public diaElem
+{
+  protected:
+        uint32_t *emb;
+        const char *embName;
+        void *widgetUint;
+        uint32_t _min,_max;
+public:
+            diaElemToggleUint(uint32_t *toggleValue,const char *toggleTitle, uint32_t *uintval,
+            					const char *name,uint32_t min,uint32_t max,const char *tip=NULL);
+  virtual   ~diaElemToggleUint() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      enable(uint32_t onoff) ;
+  void      finalize(void);
+  void      updateMe();
+};
+class diaElemToggleInt : public diaElem
+{
+  protected:
+	  		 int32_t *emb;
+	         const char *embName;
+	         void *widgetUint;
+	         int32_t _min,_max;
+public:
+            diaElemToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval,
+            				const char *name,int32_t min,int32_t max,const char *tip=NULL);
+  virtual   ~diaElemToggleInt() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      finalize(void);
+  void      updateMe();
+  void      enable(uint32_t onoff) ;
+};
+
 static void cb_menu(void *w,void *p);
 static void cb_menu2(void *w,void *p);
 
 
 
 diaElemToggle::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip)
-  : diaElem(ELEM_TOGGLE)
+  : diaElemToggleBase()
 {
   param=(void *)toggleValue;
   paramTitle=toggleTitle;
@@ -208,7 +259,7 @@ void cb_menu2(void *w,void *p)
 }
 //*************************************************************************
 diaElemToggleInt::diaElemToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval, const char *name,int32_t min,int32_t max,const char *tip)
-  : diaElemToggleUint(toggleValue,toggleTitle, NULL, name,0,0,tip)
+  : diaElem(ELEM_TOGGLE_INT)
 {
   param=(void *)toggleValue;
   paramTitle=toggleTitle;
@@ -276,5 +327,67 @@ void cb_menu3(void *w,void *p)
   diaElemToggleInt *me=(diaElemToggleInt *)p;
   me->updateMe();
 }
+void   diaElemToggleInt::updateMe(void)
+{
+  GtkWidget *widget=(GtkWidget *)myWidget;
+  GtkWidget *wuint=(GtkWidget *)widgetUint;
+  uint32_t val;
+  uint32_t rank;
+  ADM_assert(widget);
+  
+  
+  rank=gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget));
+  gtk_widget_set_sensitive(GTK_WIDGET(wuint),rank);
+    
+}
+void   diaElemToggleInt::finalize(void)
+{
+  updateMe();
+}
+void   diaElemToggleInt::enable(uint32_t onoff)
+{
+   GtkWidget *widget=(GtkWidget *)myWidget;
+  GtkWidget *wuint=(GtkWidget *)widgetUint;
+  
+  gtk_widget_set_sensitive(GTK_WIDGET(widget),onoff);
+  gtk_widget_set_sensitive(GTK_WIDGET(wuint),onoff);
+}
+
+} // End of namespace
+//****************************Hoook*****************
+
+diaElem  *gtkCreateToggleUint(uint32_t *toggleValue,const char *toggleTitle, uint32_t *uintval,
+		const char *name,uint32_t min,uint32_t max,const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemToggleUint(toggleValue,toggleTitle, uintval,
+			name,min,max,tip);
+}
+void gtkDestroyToggleUint(diaElem *e)
+{
+	ADM_GtkFactory::diaElemToggleUint *a=(ADM_GtkFactory::diaElemToggleUint *)e;
+	delete a;
+}
+
+diaElem  *gtkCreateToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval,
+		const char *name,int32_t min,int32_t max,const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemToggleInt(toggleValue,toggleTitle, uintval,
+			name,min,max,tip);
+}
+void gtkDestroyToggleInt(diaElem *e)
+{
+	ADM_GtkFactory::diaElemToggleInt *a=(ADM_GtkFactory::diaElemToggleInt *)e;
+	delete a;
+}
+diaElem  *gtkCreateToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip)
+{
+	return new  ADM_GtkFactory::diaElemToggle(toggleValue,toggleTitle, tip);
+}
+void gtkDestroyToggle(diaElem *e)
+{
+	ADM_GtkFactory::diaElemToggle *a=(ADM_GtkFactory::diaElemToggle *)e;
+	delete a;
+}
+
 
 //EOF

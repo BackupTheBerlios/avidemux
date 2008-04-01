@@ -1,6 +1,9 @@
 /***************************************************************************
                           DIA_factory.h
   Handles univeral dialog
+  
+  DO NOT USE TEMPLATE HERE!
+  
   (C) Mean 2006 fixounet@free.fr
 
  ***************************************************************************/
@@ -17,6 +20,10 @@
 #define DIA_FACTORY_H
 
 #include "ADM_assert.h"
+
+#define ADM_COREUI_MAJOR 1
+#define ADM_COREUI_MINOR 0
+#define ADM_COREUI_PATCH 0
 
 typedef enum 
 {
@@ -85,10 +92,9 @@ typedef struct dialElemLink
 
 typedef void      DELETE_DIA_ELEM_T(diaElem *widget);
 typedef void      FINALIZE_DIA_ELEM_T(void);
+typedef void      COREUI_GET_VERSION(uint32_t *maj,uint32_t *min,uint32_t *patch);
 /*********************************************/
 typedef diaElem  *(CREATE_BUTTON_T)(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void *cookie,const char *tip);
-
-
 class diaElemButton : public diaElem
 {
   protected:
@@ -118,34 +124,64 @@ class diaElemMatrix : public diaElem
   void      enable(uint32_t onoff) ;
 };
 /************************************/
-template <typename T>
-class diaElemGenericSlider : public diaElem
+class diaElemSliderBase : public diaElem
 {
   protected:
     
-    T min,max,incr;
-    uint32_t digits;
+      uint32_t digits;
 public:
-    diaElemGenericSlider(T *value,const char *toggleTitle, T min,T max,T incr = 1, const char *tip=NULL);
-  virtual   ~diaElemGenericSlider() ;
+	                diaElemSliderBase() : diaElem(ELEM_SLIDER) {}
+  virtual           ~diaElemSliderBase() {};
+  virtual uint8_t   setDigits(uint32_t digits) { this->digits = digits; }
+};
+
+typedef diaElem *CREATE_USLIDER_T(uint32_t *value,const char *toggleTitle, uint32_t min,uint32_t max,uint32_t incr , const char *tip);
+typedef diaElem *CREATE_SLIDER_T(int32_t *value,const char *toggleTitle, int32_t min,int32_t max,int32_t incr , const char *tip);
+class diaElemUSlider : public diaElemSliderBase
+{
+  protected:
+	  uint32_t min,max,incr;
+public:
+	diaElemUSlider(uint32_t *value,const char *toggleTitle, uint32_t min,uint32_t max,uint32_t incr = 1, const char *tip=NULL);
+  virtual   ~diaElemUSlider() ;
   void      setMe(void *dialog, void *opaque,uint32_t line);
   void      getMe(void);
   void      enable(uint32_t onoff) ;
-  void      setDigits(uint32_t digits) { this->digits = digits; }
+  uint8_t   setDigits(uint32_t digits) ;
 };
-typedef diaElemGenericSlider <int32_t> diaElemSlider;
-/* Same but unsigned */
-typedef diaElemGenericSlider <uint32_t> diaElemUSlider;
-/* Same but float */
-typedef diaElemGenericSlider <ELEM_TYPE_FLOAT> diaElemFSlider;
-
+class diaElemSlider : public diaElemSliderBase
+{
+  protected:
+    
+	  int32_t min,max,incr;
+    
+public:
+	diaElemSlider(int32_t *value,const char *toggleTitle, int32_t min,int32_t max,int32_t incr = 1, const char *tip=NULL);
+  virtual   ~diaElemSlider() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      enable(uint32_t onoff) ;
+  uint8_t   setDigits(uint32_t digits) ;
+  
+};
 /*********************************************/
-class diaElemToggle : public diaElem
+typedef diaElem *CREATE_TOGGLE(uint32_t *toggleValue,const char *toggleTitle, const char *tip);
+class diaElemToggleBase : public diaElem
 {
   protected:
     dialElemLink        links[MENU_MAX_lINK];
     uint32_t            nbLink;
     
+public:
+			diaElemToggleBase() :diaElem(ELEM_TOGGLE)
+						{};
+  virtual   ~diaElemToggleBase() {};
+  virtual uint8_t   link(uint32_t onoff,diaElem *w)=0;
+};
+typedef diaElem *CREATE_TOGGLE_T(uint32_t *toggleValue,const char *toggleTitle, const char *tip);
+class diaElemToggle : public diaElemToggleBase
+{
+  protected:
 public:
             diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip=NULL);
   virtual   ~diaElemToggle() ;
@@ -157,6 +193,8 @@ public:
   uint8_t   link(uint32_t onoff,diaElem *w);
 };
 /*********************************************/
+typedef diaElem *CREATE_TOGGLE_UINT(uint32_t *toggleValue,const char *toggleTitle, uint32_t *uintval, 
+								const char *name,uint32_t min,uint32_t max,const char *tip=NULL);
 class diaElemToggleUint : public diaElem
 {
   protected:
@@ -165,7 +203,8 @@ class diaElemToggleUint : public diaElem
         void *widgetUint;
         uint32_t _min,_max;
 public:
-            diaElemToggleUint(uint32_t *toggleValue,const char *toggleTitle, uint32_t *uintval, const char *name,uint32_t min,uint32_t max,const char *tip=NULL);
+            diaElemToggleUint(uint32_t *toggleValue,const char *toggleTitle, uint32_t *uintval,
+            					const char *name,uint32_t min,uint32_t max,const char *tip=NULL);
   virtual   ~diaElemToggleUint() ;
   void      setMe(void *dialog, void *opaque,uint32_t line);
   void      getMe(void);
@@ -173,16 +212,24 @@ public:
   void      finalize(void);
   void      updateMe();
 };
-class diaElemToggleInt : public diaElemToggleUint
+typedef diaElem *CREATE_TOGGLE_INT(uint32_t *toggleValue,const char *toggleTitle, int32_t *intval, 
+									const char *name,int32_t min,int32_t max,const char *tip=NULL);
+class diaElemToggleInt : public diaElem
 {
   protected:
-        int32_t *emb;
-        int32_t _min,_max;
+	  		 int32_t *emb;
+	         const char *embName;
+	         void *widgetUint;
+	         int32_t _min,_max;
 public:
-            diaElemToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval, const char *name,int32_t min,int32_t max,const char *tip=NULL);
+            diaElemToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval,
+            				const char *name,int32_t min,int32_t max,const char *tip=NULL);
   virtual   ~diaElemToggleInt() ;
   void      setMe(void *dialog, void *opaque,uint32_t line);
   void      getMe(void);
+  void      finalize(void);
+  void      updateMe();
+  void      enable(uint32_t onoff) ;
 };
 /*********************************************/
 typedef diaElem  *(CREATE_INTEGER_T)(int32_t *intValue,const char *toggleTitle,int32_t min, int32_t max,const char *tip);
@@ -467,6 +514,7 @@ public:
   void getMe(void) ;
 };
 /*********************************************/
+typedef diaElem *(CREATE_TAB_T )(const char *toggleTitle, uint32_t nb, diaElem **content);
 class diaElemTabs 
 {
   public:

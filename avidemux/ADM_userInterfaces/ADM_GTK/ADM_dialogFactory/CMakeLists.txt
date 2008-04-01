@@ -16,6 +16,7 @@ SET(${ADM_LIB}_SRCS
 	FAC_notch.cpp
 	FAC_toggle.cpp
 	FAC_threadCount.cpp
+	FAC_slider.cpp
 	FAC_matrix.cpp)
 
 ADD_ADM_LIB_GTK_TARGET(${ADM_LIB} ${${ADM_LIB}_SRCS})

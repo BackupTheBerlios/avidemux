@@ -29,8 +29,21 @@ static FactoryDescriptor *Factory=NULL;
  */
 uint8_t  DIA_factoryInit(FactoryDescriptor *d)
 {
+	uint32_t major,minor,patch;
 	Factory=d;
-	return 1;
+	d->FactoryGetVersion(&major,&minor,&patch);
+	printf("[COREUI] Compiled with %02d.%02d.%02d\n",ADM_COREUI_MAJOR,ADM_COREUI_MINOR,ADM_COREUI_PATCH);
+	printf("[COREUI] Linked with   %02d.%02d.%02d\n",major,minor,patch);
+	if(major!=ADM_COREUI_MAJOR)
+	{
+			printf("[CoreUI]Incompatible COREUI Major version, compiled with %d, using %d\n",ADM_COREUI_MAJOR,major);
+			ADM_assert(0);
+	}
+	if(minor!=ADM_COREUI_MINOR)
+	{
+		printf("[CoreUI] Maybe Incompatible COREUI Minor version, compiled with %d, using %d\n",ADM_COREUI_MINOR,minor);
+	}
+	printf("[CoreUI] Compiled with patch version %d, using %d\n",ADM_COREUI_PATCH,patch);
 }
 // ****************** All ************************
 uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
@@ -409,5 +422,137 @@ void diaElemFrame::finalize(void)
 }
  
 DIA_MKSTUBS(diaElemFrame)
+// ****************** diaElemToggleUint ********************
+diaElemToggleUint ::diaElemToggleUint(uint32_t *toggleValue,const char *toggleTitle, uint32_t *uintval, const char *name,uint32_t min,uint32_t max,const char *tip):
+	diaElem(ELEM_TOGGLE_UINT)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateToggleUint(toggleValue,toggleTitle,uintval,name,min,max,tip);
+}
+diaElemToggleUint ::~diaElemToggleUint()
+	{
+	
+	ADM_assert(Factory); 
+	Factory->DestroyToggleUint(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemToggleUint::finalize(void)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->finalize(); 
+	}
+void      diaElemToggleUint::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+DIA_MKSTUBS(diaElemToggleUint)
+// ****************** diaElemToggleInt ********************
+diaElemToggleInt ::diaElemToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval, 
+									const char *name,int32_t min,int32_t max,const char *tip):
+	diaElem(ELEM_TOGGLE_INT)
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateToggleInt(toggleValue,toggleTitle,uintval,name,min,max,tip);
+}
+diaElemToggleInt ::~diaElemToggleInt()
+	{
+	
+	ADM_assert(Factory); 
+	Factory->DestroyToggleInt(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemToggleInt::finalize(void)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->finalize(); 
+	}
+void      diaElemToggleInt::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+DIA_MKSTUBS(diaElemToggleInt)
+// ****************** diaElemToggle ********************
+diaElemToggle ::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip):
+	diaElemToggleBase()
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateToggle(toggleValue,toggleTitle,tip);
+}
+diaElemToggle ::~diaElemToggle()
+	{
+	
+	ADM_assert(Factory); 
+	Factory->DestroyToggle(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemToggle::finalize(void)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->finalize(); 
+	}
+void      diaElemToggle::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+uint8_t   diaElemToggle::link(uint32_t onoff,diaElem *w)
+{
+	diaElemToggleBase *cast=(diaElemToggleBase *)internalPointer;
+			cast->link(onoff,w);	
+}
+DIA_MKSTUBS(diaElemToggle)
+//
+// ****************** diaElemUSlider ********************
+diaElemUSlider ::diaElemUSlider(uint32_t *value,const char *toggleTitle, uint32_t min,uint32_t max,uint32_t incr , const char *tip):
+	diaElemSliderBase()
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateUSlider(value,toggleTitle,min,max,incr,tip);
+}
+diaElemUSlider ::~diaElemUSlider()
+	{
+	
+	ADM_assert(Factory); 
+	Factory->DestroyUSlider(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemUSlider::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+uint8_t   diaElemUSlider::setDigits(uint32_t digits)
+{
+	diaElemSliderBase *cast=(diaElemSliderBase *)internalPointer;
+			cast->setDigits(digits);	
+}
+DIA_MKSTUBS(diaElemUSlider)
+// ****************** diaElemSlider ********************
+diaElemSlider ::diaElemSlider(int32_t *value,const char *toggleTitle, int32_t min,int32_t max,int32_t incr , const char *tip):
+	diaElemSliderBase()
+{
+	ADM_assert(Factory); 
+	internalPointer=Factory->CreateSlider(value,toggleTitle,min,max,incr,tip);
+}
+diaElemSlider ::~diaElemSlider()
+	{
+	
+	ADM_assert(Factory); 
+	Factory->DestroySlider(internalPointer);
+	internalPointer=NULL;
+}
+void      diaElemSlider::enable(uint32_t onoff)
+	{ 
+		ADM_assert(internalPointer); 
+		internalPointer->enable(onoff); 
+	}
+uint8_t   diaElemSlider::setDigits(uint32_t digits)
+{
+	diaElemSliderBase *cast=(diaElemSliderBase *)internalPointer;
+			cast->setDigits(digits);	
+}
+DIA_MKSTUBS(diaElemSlider)
 //
 // EOF

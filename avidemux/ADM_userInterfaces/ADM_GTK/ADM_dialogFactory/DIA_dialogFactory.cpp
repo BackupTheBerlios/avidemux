@@ -325,12 +325,33 @@ extern CREATE_FILE_T        gtkCreateFile;
 extern DELETE_DIA_ELEM_T    gtkDestroyFile;
 extern CREATE_DIR_T         gtkCreateDir;
 extern DELETE_DIA_ELEM_T    gtkDestroyDir;
-CREATE_FRAME_T				gtkCreateFrame;
+extern CREATE_FRAME_T		gtkCreateFrame;
 extern DELETE_DIA_ELEM_T    gtkDestroyFrame;
-
+extern CREATE_TOGGLE_UINT   gtkCreateToggleUint;
+extern DELETE_DIA_ELEM_T    gtkDestroyToggleUint;
+extern CREATE_TOGGLE_INT    gtkCreateToggleInt;
+extern DELETE_DIA_ELEM_T    gtkDestroyToggleInt;
+extern CREATE_TOGGLE_T      gtkCreateToggle;
+extern DELETE_DIA_ELEM_T    gtkDestroyToggle;
+extern CREATE_USLIDER_T     gtkCreateUSlider;
+extern DELETE_DIA_ELEM_T    gtkDestroyUSlider;
+extern 	CREATE_SLIDER_T     gtkCreateSlider;
+extern 	DELETE_DIA_ELEM_T   gtkDestroySlider;
+/**
+ *  \fn gtkFactoryGetVersion
+ * 	\brief returns the version this has been compiled with
+ */
+void      gtkFactoryGetVersion(uint32_t *maj,uint32_t *minor,uint32_t *patch)
+{
+	*maj=ADM_COREUI_MAJOR;
+	*minor=ADM_COREUI_MINOR;
+	*patch=ADM_COREUI_PATCH;
+	
+}
 //************
 static FactoryDescriptor GtkFactoryDescriptor=
 {
+	&gtkFactoryGetVersion,
 	&gtkDiaFactoryRun,
 	&gtkDiaFactoryRunTabs,
 	// Buttons
@@ -382,8 +403,20 @@ static FactoryDescriptor GtkFactoryDescriptor=
 	&gtkDestroyDir,
 	// Frame
 	&gtkCreateFrame,
-	&gtkDestroyFrame
-		
+	&gtkDestroyFrame,
+    // Toggle uint/int
+	&gtkCreateToggleUint,
+	&gtkDestroyToggleUint,
+	&gtkCreateToggleInt,
+	&gtkDestroyToggleInt,
+	// Regular toggle
+	&gtkCreateToggle,
+	&gtkDestroyToggle,
+	// Slider
+	&gtkCreateUSlider,
+	&gtkDestroyUSlider,
+	&gtkCreateSlider,
+	&gtkDestroySlider
 };
 
 /**

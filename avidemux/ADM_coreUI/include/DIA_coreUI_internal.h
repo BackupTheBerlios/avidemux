@@ -41,6 +41,7 @@ typedef uint8_t DIA_FACTORY_RUN_TABS(const char *title,uint32_t nb,diaElemTabs *
 typedef uint8_t DIA_FACTORY_RUN(const char *title,uint32_t nb,diaElem **elems);
 typedef struct
 {
+	COREUI_GET_VERSION   *FactoryGetVersion;
 	DIA_FACTORY_RUN      *FactoryRun;
 	DIA_FACTORY_RUN_TABS *FactoryRunTab;
 //	
@@ -94,6 +95,21 @@ typedef struct
 // Frame
 	CREATE_FRAME_T       *CreateFrame;
 	DELETE_DIA_ELEM_T    *DestroyFrame;
+// Toggle uint
+	CREATE_TOGGLE_UINT   *CreateToggleUint;
+	DELETE_DIA_ELEM_T    *DestroyToggleUint;
+// Toggle int
+	CREATE_TOGGLE_INT    *CreateToggleInt;
+	DELETE_DIA_ELEM_T    *DestroyToggleInt;
+// Regular Toggle	
+	CREATE_TOGGLE_T      *CreateToggle;
+	DELETE_DIA_ELEM_T    *DestroyToggle;
+// Uslider
+	CREATE_USLIDER_T     *CreateUSlider;
+	DELETE_DIA_ELEM_T    *DestroyUSlider;
+// Slider
+	CREATE_SLIDER_T      *CreateSlider;
+	DELETE_DIA_ELEM_T    *DestroySlider;
 }FactoryDescriptor;
 //
 uint8_t DIA_factoryInit(FactoryDescriptor *d);

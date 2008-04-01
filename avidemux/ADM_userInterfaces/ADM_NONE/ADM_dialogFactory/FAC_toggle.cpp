@@ -29,7 +29,7 @@
 
 
 diaElemToggle::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip)
-  : diaElem(ELEM_TOGGLE)
+  : diaElemToggleBase()
 {
 }
 
@@ -357,7 +357,7 @@ void   diaElemToggleUint::enable(uint32_t onoff)
 }
 //**************************
 diaElemToggleInt::diaElemToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval, const char *name,int32_t min,int32_t max,const char *tip)
-  :diaElemToggleUint(toggleValue,toggleTitle, NULL, name,0,0,tip)
+  :diaElem(ELEM_TOGGLE_INT)
 {
  
 }
@@ -398,7 +398,7 @@ void   diaElemButton::enable(uint32_t onoff)
 
 }
 //***
- 
+#if 0
  template <typename T>
  diaElemGenericSlider<T>::diaElemGenericSlider(T *value,const char *toggleTitle, T min,T max,T incr,const char *tip)
      : diaElem(ELEM_SLIDER)
@@ -429,7 +429,7 @@ void   diaElemButton::enable(uint32_t onoff)
  template class diaElemGenericSlider <uint32_t>;
  template class diaElemGenericSlider <ELEM_TYPE_FLOAT>;
 //****
-
+#endif
 
 
  diaElemMatrix::diaElemMatrix(uint8_t *trix,const char *toggleTitle, uint32_t trixSize,const char *tip)
