@@ -79,7 +79,7 @@ class ADM_QCheckBox : public QCheckBox
 
 
 diaElemToggle::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip)
-  : diaElem(ELEM_TOGGLE)
+  : diaElemToggleBase()
 {
   param=(void *)toggleValue;
   paramTitle=shortkey(toggleTitle);
@@ -274,7 +274,7 @@ void   diaElemToggleUint::enable(uint32_t onoff)
 //******************************************************
 
 diaElemToggleInt::diaElemToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval, const char *name,int32_t min,int32_t max,const char *tip)
-  : diaElemToggleUint(toggleValue,toggleTitle, NULL, name,0,0,tip)
+  : diaElem(ELEM_TOGGLE_INT)
 {
    param=(void *)toggleValue;
   paramTitle=shortkey(toggleTitle);
@@ -330,6 +330,43 @@ void diaElemToggleInt::getMe(void)
  if(u>_max) u=_max;
  *emb=u;
 }
+
+void   diaElemToggleInt::finalize(void)
+{
+  updateMe();
+}
+void   diaElemToggleInt::updateMe(void)
+{
+  uint32_t val;
+  uint32_t rank=FALSE;
+  ADM_assert(myWidget);
+  
+  ADM_QCheckBox *box=(ADM_QCheckBox *)myWidget;
+  QSpinBox *spin=(QSpinBox *)widgetUint;
+  
+  if(Qt::Checked==box->checkState())
+  {
+    rank=TRUE;
+  }
+  spin->setEnabled(rank);
+}
+void   diaElemToggleInt::enable(uint32_t onoff)
+{
+    ADM_QCheckBox *box=(ADM_QCheckBox *)myWidget;
+      QSpinBox *spin=(QSpinBox *)widgetUint;
+  ADM_assert(box);
+  if(onoff)
+  {
+    box->setEnabled(TRUE);
+    spin->setEnabled(TRUE);
+  }
+  else
+  {
+    box->setEnabled(FALSE);
+    spin->setEnabled(FALSE);
+  }
+}
+
 //******************************************************
 
 
