@@ -10,10 +10,8 @@
 //
 
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "DIA_fileSel.h"
 #include "DIA_coreUI_internal.h"
 

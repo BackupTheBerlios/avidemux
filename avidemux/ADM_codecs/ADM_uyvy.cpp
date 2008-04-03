@@ -18,14 +18,12 @@
 #if  defined( __FreeBSD__ ) || defined(__APPLE__)
 #include <sys/types.h>
 #endif
-#include <stdlib.h>
-#include <string.h>
 
 #include "ADM_default.h"
 #include "avifmt.h"
 #include "avifmt2.h"
 #include "fourcc.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_uyvy.h"
 

@@ -17,7 +17,7 @@
 
 #include "config.h"
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 #include "ADM_audio/audiomode.hxx"
 #include "ADM_audiofilter/audiofilter_limiter_param.h"

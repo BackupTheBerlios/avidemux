@@ -1,6 +1,6 @@
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_fileSel.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 #ifdef USE_XVID_4
 #include "ADM_encoder/ADM_vidEncode.hxx"

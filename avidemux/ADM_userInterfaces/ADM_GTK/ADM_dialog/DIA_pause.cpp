@@ -10,7 +10,7 @@
 //
 //
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 static GtkWidget	*create_dialog1 (void);
 //	Return 1 if resume, 0 if abort

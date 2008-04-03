@@ -24,7 +24,7 @@ GUI part of resize.
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_resizebis.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 static int getResizeParams(uint32_t * w, uint32_t * h, uint32_t * algo,uint32_t ow,uint32_t oh,uint32_t fps);
 

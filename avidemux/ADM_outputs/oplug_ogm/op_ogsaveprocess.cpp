@@ -30,7 +30,7 @@
 #include "config.h"
 #include "fourcc.h"
 #include "avi_vars.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 //#include "avilist.h"
 

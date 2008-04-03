@@ -14,13 +14,6 @@
 //
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
-#include "ADM_assert.h"
-
 #ifdef ADM_DEBUG
 //	#define ODML_INDEX_VERBOSE
 #endif
@@ -30,7 +23,7 @@
 
 #include "fourcc.h"
 #include "ADM_openDML.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 
 #include "ADM_osSupport/ADM_debugID.h"

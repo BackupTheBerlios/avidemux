@@ -32,7 +32,7 @@
 #include "ADM_inputs/ADM_nuv/ADM_nuv.h"
 #include "ADM_inputs/ADM_h263/ADM_h263.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"

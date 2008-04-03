@@ -1,14 +1,23 @@
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
+/**
+ * 
+ * 
+ */
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+#include "ADM_default.h"
 #include <string.h>
 #include <pthread.h>
-#include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_JSGlobal.h"
 #include "ADM_JSAvidemux.h"
 #include "ADM_JSDirectorySearch.h"
-#include "ADM_assert.h"
 
 extern uint8_t JS_AvidemuxFunction(JSContext *cx,JSObject *global);
 extern void A_Resync(void);
@@ -17,7 +26,7 @@ extern char * actual_workbench_file;
 void
 printJSError(JSContext *cx, const char *message, JSErrorReport *report)
 {// begin printJSError
-int quiet=isQuiet();
+int quiet=GUI_isQuiet();
 char buf[4];
 FILE *fd = fopen(report->filename,"rb");
         if(quiet)

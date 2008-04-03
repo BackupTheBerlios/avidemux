@@ -19,17 +19,10 @@
  ***************************************************************************/
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <time.h>
-#include <sys/time.h>
-
-#include "ADM_assert.h"
+#include "ADM_default.h"
 #include "fourcc.h"
 #include "avi_vars.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 //#include "avilist.h"
 

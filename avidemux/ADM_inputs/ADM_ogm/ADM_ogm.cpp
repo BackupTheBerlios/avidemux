@@ -33,19 +33,13 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <math.h>
-#include "ADM_assert.h"
-
 #include "ADM_default.h"
 #include "fourcc.h"
 #include "ADM_ogm.h"
 #include "ADM_ogmpages.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_OGM

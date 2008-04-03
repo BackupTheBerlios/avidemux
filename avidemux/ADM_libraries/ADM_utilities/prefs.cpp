@@ -22,10 +22,8 @@
 #include <libxml/parser.h>
 #endif
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_osSupport/ADM_quota.h"
-#include <string.h>
-#include <strings.h>
 #include <unistd.h>	/* access(), R_OK */
 #include <errno.h>	/* errno, ENOENT */
 #include <dirent.h>

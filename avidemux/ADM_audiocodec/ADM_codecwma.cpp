@@ -26,7 +26,7 @@
 #include "ADM_lavcodec.h"
 
 #include "fourcc.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiocodec/ADM_audiocodec.h"

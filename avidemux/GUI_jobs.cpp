@@ -21,7 +21,7 @@
 #include "ADM_default.h"
 #include "ADM_assert.h"
 #include "DIA_fileSel.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 #define MAX_JOBS 120
 static char *jobName[MAX_JOBS];

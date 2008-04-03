@@ -1,7 +1,8 @@
-/***************************************************************************
-                          toolkit.hxx  -  description
-                             -------------------
-    begin                : Fri Dec 14 2001
+/** *************************************************************************
+    \file                      DIA_toolkit.h
+    \brief Handle basic popup window
+                             
+    begin                : Fri Dec 14 2001--8
     copyright            : (C) 2001 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
@@ -15,25 +16,31 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef __TOOLKIT__
-#define __TOOLKIT__
-
+#ifndef ADM_COREUI_TOOLKIT__
+#define ADM_COREUI_TOOLKIT__
+// These two are obsoletes...
 void            GUI_Alert(const char *alertstring);
 void            GUI_Info(const char *alertstring);
+// Display a warning/info/debug message. The primary field is the "title" of the window, secondary format is printf like
 void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format, ...);
+// Display an error message. The primary field is the "title" of the window, secondary format is printf like
 void            GUI_Error_HIG(const char *primary, const char *secondary_format, ...);
+// ask for confirmation. The button_confirm will be the title of the button (accept, do it,...) 
 int             GUI_Confirmation_HIG(const char *button_confirm, const char *primary, const char *secondary_format, ...);
+// Ask for yes/no. Yes will return 1, No will return 0
 int             GUI_YesNo(const char *primary, const char *secondary_format, ...);
+// About the same as GUI_YesNo, the button will be ok/cancel
 int             GUI_Question(const char *alertstring);
+// Give some time to the UI to handle its events
 void            GUI_Sleep(uint32_t ms);
+// Ask to choose between choice1 and choice2
 int             GUI_Alternate(char *title,char *choice1,char *choice2);
-uint32_t        getTime( int called );;
-void            runDialog(volatile int *lock);
-// warning : they are in GUI_enter
-uint8_t  		GUI_getDoubleValue(double *valye, float min, float max, const char *title);
-uint8_t  		GUI_getIntegerValue(int *valye, int min, int max, const char *title);
 
-uint8_t		isQuiet(void);
+
+// Set ui in verbose mode (default). Show all popup & questions
 void            GUI_Verbose(void);
+// Set the ui in silent mode. All popups & questions will be answered with their default value
 void            GUI_Quiet(void);
+// Is the UI in quiet mode ?
+uint8_t			GUI_isQuiet(void);
 #endif

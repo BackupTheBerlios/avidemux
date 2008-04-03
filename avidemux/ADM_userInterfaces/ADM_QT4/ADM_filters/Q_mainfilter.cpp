@@ -22,12 +22,6 @@
  ***************************************************************************/
 
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #include <vector>
 
 #define Ui_Dialog Ui_mainFilterDialog
@@ -42,10 +36,9 @@
 #include "ADM_audiodevice/audio_out.h"
 #include "ADM_audio/ADM_audiodef.h"
 
-#include "ADM_assert.h"
 #include "GUI_render.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"

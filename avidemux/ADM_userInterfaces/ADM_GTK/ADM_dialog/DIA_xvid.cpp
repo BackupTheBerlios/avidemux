@@ -1,7 +1,7 @@
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_lavcodec.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
 //#include "ADM_gui/GUI_xvidparam.h"

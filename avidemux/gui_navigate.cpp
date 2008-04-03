@@ -31,7 +31,7 @@
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "gui_action.hxx"
 #include "gtkgui.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_render.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 #include "ADM_video/ADM_genvideo.hxx"

@@ -29,7 +29,7 @@
 
 #include "ADM_default.h"
 #include "DIA_fileSel.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #ifdef __WIN32
 static const char *separator="\\";

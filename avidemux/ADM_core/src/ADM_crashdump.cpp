@@ -28,7 +28,7 @@
 #endif
 
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #define CRASH_FILE "crash.js"
 

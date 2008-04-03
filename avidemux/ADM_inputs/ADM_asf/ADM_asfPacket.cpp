@@ -25,7 +25,7 @@
 #include "ADM_assert.h"
 
 #include "fourcc.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #include "ADM_asfPacket.h"
 

@@ -20,12 +20,7 @@
  ***************************************************************************/
 #include "config.h"
  
-#include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
-#include <unistd.h>
-#include <errno.h>
-
 #include "prefs.h"
 #include "fourcc.h"
 #include "avi_vars.h"
@@ -35,7 +30,7 @@
 #include "prototype.h"
 #include "ADM_audiodevice/audio_out.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 

@@ -35,7 +35,7 @@
 #include "../ADM_toolkit_gtk/jogshuttle.h"
 #include "../ADM_toolkit_gtk/ADM_jogshuttle.h"
 #include "gtkgui.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 extern uint8_t UI_getPhysicalScreenSize(void* window, uint32_t *w,uint32_t *h);
 

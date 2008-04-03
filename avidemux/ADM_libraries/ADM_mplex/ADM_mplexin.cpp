@@ -21,7 +21,7 @@
 #undef realloc
 #undef free
 
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_LAVFORMAT

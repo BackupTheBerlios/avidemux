@@ -31,7 +31,7 @@
 //#include "ADM_3gp/ADM_3gp.h"
 #include "ADM_inputs/ADM_mp4/ADM_mp4.h"
 #include "ADM_inputs/ADM_avsproxy/ADM_avsproxy.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"

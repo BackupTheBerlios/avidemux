@@ -26,7 +26,7 @@
 
 #include "fourcc.h"
 #include "ADM_mp4.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_3GP

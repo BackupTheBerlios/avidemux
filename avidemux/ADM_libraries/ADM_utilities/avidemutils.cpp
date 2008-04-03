@@ -14,19 +14,15 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <string.h>
-//#include <sstream>
-#include "ADM_assert.h"
+#include "ADM_default.h"
+#include "config.h"
 #include <math.h>
 
-#include "config.h"
+
 #include "avifmt.h"
 #include "avifmt2.h"
 #include "fourcc.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_toolkit/bitmap.h"
 #include "avidemutils.h"
 char *ADM_escape(const ADM_filename *incoming);

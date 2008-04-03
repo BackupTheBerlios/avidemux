@@ -10,12 +10,12 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#include "config.h"
-#include <stdlib.h>
+#include "ADM_default.h"
+
 #include "ADM_JSAvidemuxVideo.h"
 #include "ADM_JSGlobal.h"
-#include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+
+
 #include "../ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "avi_vars.h"

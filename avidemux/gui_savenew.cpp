@@ -20,8 +20,8 @@
 
 #include "avi_vars.h"
 #include "prototype.h"
-#include "ADM_toolkit/toolkit.hxx"
-
+#include "DIA_coreToolkit.h"
+#include "DIA_enter.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 
@@ -332,7 +332,7 @@ uint8_t  A_SaveAudioNVideo(const char *name)
                     if(GUI_Question(QT_TR_NOOP("You may need smart copy.\n Enable it ?")))
                     {
                         value=4;
-                        if( ! GUI_getIntegerValue(&value, 2, 31, "_Q factor (set 4):"))
+                        if( ! DIA_GetIntegerValue(&value, 2, 31, "_Q factor (set 4):",""))
                                       return 0;
                         nw=new   GenericAviSaveSmart(value);
                     }

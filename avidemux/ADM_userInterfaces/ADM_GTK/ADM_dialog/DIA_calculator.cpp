@@ -18,7 +18,7 @@
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "DIA_fileSel.h"
 
 #include "ADM_editor/ADM_edit.hxx"

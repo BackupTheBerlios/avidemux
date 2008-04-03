@@ -5,25 +5,16 @@
 */
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
 
 #include "ADM_lavcodec.h"
 
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_codecs/ADM_ffmpegConfig.h"
-#include "DIA_factory.h"
-#include "ADM_assert.h" 
 
-
-
-#include "ADM_codecs/ADM_codec.h"
-#include "ADM_encoder/ADM_vidEncode.hxx"
-#include "ADM_assert.h" 
+  
 #include "DIA_factory.h"
 #include "../../ADM_encoder/adm_encmjpeg_param.h"
 

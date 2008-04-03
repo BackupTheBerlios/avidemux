@@ -15,19 +15,13 @@
  ***************************************************************************/
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <string.h>
-
-#include <math.h>
 
 #include "ADM_default.h"
 #include "ADM_editor/ADM_Video.h"
-#include "ADM_assert.h"
+
 
 #include "fourcc.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #include "ADM_flv.h"
 

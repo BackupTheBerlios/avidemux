@@ -29,7 +29,7 @@ email                : fixounet@free.fr
 
 #include "DIA_fileSel.h"
 #include "DIA_coreUI_internal.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "prefs.h"
 
 #define TH_READ 1

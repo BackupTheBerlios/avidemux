@@ -32,7 +32,7 @@
 #undef realloc
 #undef free
 
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audio/ADM_a52info.h"
 #include "avifmt.h"

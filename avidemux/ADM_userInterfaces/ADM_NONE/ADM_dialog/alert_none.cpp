@@ -12,7 +12,7 @@
 
 #include "prefs.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #include "ADM_assert.h" 
 
@@ -244,7 +244,7 @@ uint8_t  GUI_getDoubleValue(double *valye, float min, float max, const char *tit
   return 0; 
 }
 
-uint8_t		isQuiet(void)
+uint8_t		GUI_isQuiet(void)
 {
     return beQuiet;
 }

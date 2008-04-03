@@ -35,7 +35,7 @@ extern "C"
 #undef free
 
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audio/ADM_a52info.h"

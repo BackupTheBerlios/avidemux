@@ -24,7 +24,7 @@
 #include "ui_ocr.h"
 
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "DIA_fileSel.h"
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"

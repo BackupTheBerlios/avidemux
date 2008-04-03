@@ -28,7 +28,7 @@ Indexer progress dialog
 #include <QtGui/QWidget>
 
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_encoder/ADM_vidEncode.hxx"

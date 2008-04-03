@@ -26,7 +26,7 @@
 
 #include "fourcc.h"
 #include "ADM_mp4.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_codecs/ADM_codec.h"
 
 #include "ADM_mp4Tree.h"

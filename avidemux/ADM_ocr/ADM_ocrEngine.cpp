@@ -22,7 +22,7 @@
 
  #include "ADM_ocr.h"
  #include "ADM_ocrInternal.h"
- #include "ADM_toolkit/toolkit.hxx"
+ #include "DIA_coreToolkit.h"
 
 #include "ADM_video/ADM_vidMisc.h"
 

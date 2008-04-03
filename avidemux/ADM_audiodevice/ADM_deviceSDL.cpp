@@ -11,22 +11,17 @@
 //
 
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <errno.h>
 
 
-#include "ADM_assert.h"
+#include "ADM_default.h"
   
-#include "fourcc.h" 
  
 #ifdef USE_SDL
 #include "SDL.h"
 
 
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_audiodevice.h"
 #include "ADM_audiodevice/ADM_deviceoss.h"
 #include "ADM_audiodevice/ADM_deviceALSA.h"

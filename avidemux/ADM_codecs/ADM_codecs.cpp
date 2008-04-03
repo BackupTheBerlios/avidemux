@@ -19,10 +19,6 @@
  ***************************************************************************/
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
 
 #ifdef USE_FFMPEG
 extern "C"
@@ -63,7 +59,7 @@ extern "C"
 #endif
 
 #include "ADM_codecs/ADM_png.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_assert.h"
 #include "prefs.h"
 

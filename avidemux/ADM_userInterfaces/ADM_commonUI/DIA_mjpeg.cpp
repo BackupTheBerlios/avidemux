@@ -9,7 +9,7 @@
 
 #include "ADM_lavcodec.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_codecs/ADM_ffmpegConfig.h"

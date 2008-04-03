@@ -24,7 +24,7 @@
 #include "avifmt2.h"
 #include "ADM_bitstream.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 

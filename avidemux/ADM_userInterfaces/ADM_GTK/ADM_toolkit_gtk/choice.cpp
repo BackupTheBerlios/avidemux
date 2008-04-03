@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 #include "toolkit_gtk.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 static void alert_cb_ok(void);
 static void alert_cb_destroyed(void);

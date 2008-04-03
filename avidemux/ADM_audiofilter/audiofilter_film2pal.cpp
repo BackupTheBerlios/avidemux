@@ -25,7 +25,7 @@
 #include "avifmt.h"
 #include "avifmt2.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+
 //#include "ADM_dialog/DIA_working.h"
 #include "audioeng_process.h"
 #include "audiofilter_film2pal.h"

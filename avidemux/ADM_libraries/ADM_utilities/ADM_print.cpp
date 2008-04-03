@@ -1,15 +1,24 @@
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
+/***************************************************************************
+                    
+    copyright            : (C) 2006 by mean
+    email                : fixounet@free.fr
+ ***************************************************************************/
 
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 #include "config.h"
+
 #include "fourcc.h"
 #include "ADM_default.h"
 #include <math.h>
 
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_image.h"
 
 #include "ADM_print_priv.h"

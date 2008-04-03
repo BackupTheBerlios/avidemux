@@ -42,7 +42,7 @@
 
 #include "avilist.h"
 #include "op_aviwrite.hxx"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_osSupport/ADM_quota.h"
 #include "ADM_osSupport/ADM_fileio.h"
 

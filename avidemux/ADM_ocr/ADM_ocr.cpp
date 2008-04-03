@@ -11,10 +11,6 @@
  *                                                                         *
  ***************************************************************************/
  #include "config.h"
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
- #include "ADM_assert.h"
 #include "ADM_default.h"
 
  #include "ADM_editor/ADM_edit.hxx"
@@ -22,8 +18,7 @@
 
  #include "ADM_ocr.h"
 #include "ADM_ocrInternal.h"
- #include "ADM_toolkit/toolkit.hxx"
- #include "DIA_enter.h"
+  #include "DIA_enter.h"
 static uint32_t minThreshold=0x80;
 
 /* In the UI related code */

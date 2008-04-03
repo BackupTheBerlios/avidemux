@@ -18,13 +18,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-//#include <stream.h>
-#include "ADM_assert.h"
+#include "ADM_default.h"
 #include <math.h>
-
 #include "config.h"
 #include "avifmt.h"
 #include "avifmt2.h"
@@ -32,7 +27,6 @@
 #include "aviaudio.hxx"
 #include "prefs.h"
 
-#include "ADM_toolkit/toolkit.hxx"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
 

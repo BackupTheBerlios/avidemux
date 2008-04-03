@@ -9,7 +9,7 @@
 
 #ifdef USE_X264
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "DIA_factory.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_codecs/ADM_x264param.h"

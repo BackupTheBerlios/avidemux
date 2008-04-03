@@ -16,16 +16,9 @@
  ***************************************************************************/
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
 #include "ADM_default.h"
 #include "ADM_assert.h"
 
-
-#include "ADM_toolkit/toolkit.hxx"
 #include "DIA_fileSel.h"
 #include "ADM_osSupport/ADM_quota.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_idx_pg.h"

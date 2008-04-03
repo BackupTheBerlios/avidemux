@@ -18,13 +18,6 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <unistd.h>
-#include <time.h>
-#include <sys/time.h>
-
 #include "config.h"
 #include "ADM_default.h"
 #include "ADM_threads.h"
@@ -32,7 +25,7 @@
 
 #include "fourcc.h"
 #include "avi_vars.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 //#include "avilist.h"
 

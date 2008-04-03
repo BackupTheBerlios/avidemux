@@ -16,7 +16,7 @@
 #include "ADM_default.h"
 #include "ADM_JSAvidemux.h"
 #include "avi_vars.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "../ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
 #include "ADM_script/ADM_container.h"
 

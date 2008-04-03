@@ -19,12 +19,6 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <string.h>
-#include <math.h>
-
 #include "ADM_default.h"
 #include "ADM_threads.h"
 
@@ -36,7 +30,7 @@ extern "C" {
 #include "prototype.h"
 
 #include "ADM_colorspace/colorspace.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 

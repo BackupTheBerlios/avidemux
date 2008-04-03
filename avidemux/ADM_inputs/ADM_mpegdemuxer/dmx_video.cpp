@@ -16,12 +16,8 @@
  ***************************************************************************/
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "config.h"
 #include <math.h>
-
 #include "ADM_default.h"
 #include "avifmt.h"
 #include "avifmt2.h"
@@ -30,10 +26,7 @@
 #include "ADM_audio/aviaudio.hxx"
 
 #include "fourcc.h"
-#include "ADM_assert.h"
-
-
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 
 

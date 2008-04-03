@@ -27,7 +27,7 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_videoFilter/ADM_vidEraser.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "DIA_fileSel.h"
 
 #include "DIA_flyDialog.h"

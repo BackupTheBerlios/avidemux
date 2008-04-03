@@ -14,15 +14,10 @@
  ***************************************************************************/
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
 #include "ADM_default.h"
 #include "ADM_threads.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_encoder/ADM_vidEncode.hxx"

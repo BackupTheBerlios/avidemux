@@ -23,10 +23,6 @@
 
 #include "config.h"
 
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
 
 #include "ADM_default.h"
@@ -40,9 +36,9 @@
 #include "ADM_videoFilter/ADM_vobsubinfo.h"
 #include "ADM_videoFilter/ADM_vidVobSub.h"
 #include "ADM_ocr/ADM_ocr.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "prefs.h"
-#include "ADM_assert.h"
+
 
 #include "ADM_ocr/ADM_ocr.h"
 

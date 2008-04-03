@@ -7,13 +7,9 @@
  *                                                                         *
  ***************************************************************************/
  #include "config.h"
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
- #include "ADM_assert.h"
 #include "ADM_default.h"
  #include "adm_glyph.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
  //*************************************************
 admGlyph::admGlyph(uint32_t w,uint32_t h)
 {

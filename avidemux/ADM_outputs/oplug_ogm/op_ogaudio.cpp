@@ -29,7 +29,7 @@
 #include "fourcc.h"
 #include "avi_vars.h"
 #include "ADM_assert.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 //#include "avilist.h"
 

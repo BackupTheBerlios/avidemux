@@ -19,7 +19,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "DIA_flyDialog.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #include "DIA_factory.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"

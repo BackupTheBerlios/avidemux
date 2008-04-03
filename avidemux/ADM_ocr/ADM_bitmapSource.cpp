@@ -22,8 +22,7 @@
 
  #include "ADM_ocr.h"
  #include "ADM_ocrInternal.h"
- #include "ADM_toolkit/toolkit.hxx"
- #include "DIA_enter.h"
+  #include "DIA_enter.h"
 #include "ADM_videoFilter/ADM_vidDvbSub.h"
 
 /*  *****************************

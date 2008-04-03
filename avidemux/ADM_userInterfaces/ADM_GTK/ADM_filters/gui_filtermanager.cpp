@@ -10,7 +10,7 @@
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include <vector>
 
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "DIA_fileSel.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_editor/ADM_edit.hxx"

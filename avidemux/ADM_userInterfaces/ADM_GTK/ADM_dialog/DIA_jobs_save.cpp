@@ -1,5 +1,5 @@
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "DIA_fileSel.h"
 #include "avidemutils.h"
 

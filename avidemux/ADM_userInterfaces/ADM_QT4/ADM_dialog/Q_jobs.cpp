@@ -7,7 +7,7 @@
 #include "ADM_default.h"
 
 
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 static void             updateStatus(void);
 extern bool parseECMAScript(const char *name);

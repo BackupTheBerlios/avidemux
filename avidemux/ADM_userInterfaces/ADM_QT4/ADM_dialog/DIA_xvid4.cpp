@@ -9,7 +9,7 @@
 
 #ifdef USE_XVID_4
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "DIA_factory.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_codecs/ADM_xvid4param.h"

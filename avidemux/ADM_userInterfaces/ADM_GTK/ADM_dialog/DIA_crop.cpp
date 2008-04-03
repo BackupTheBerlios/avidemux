@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"

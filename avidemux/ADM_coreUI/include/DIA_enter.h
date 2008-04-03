@@ -20,5 +20,7 @@
 uint8_t  DIA_GetFloatValue(float *value, float min, float max, const char *title, const char *legend);
 //  Get an integer value
 uint8_t  DIA_GetIntegerValue(int *value, int min, int max, const char *title, const char *legend);
+//uint8_t  		GUI_getDoubleValue(double *valye, float min, float max, const char *title);
+
 
 #endif

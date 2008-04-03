@@ -26,7 +26,7 @@
 
 #include "fourcc.h"
 #include "ADM_h263.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "bitsRead.h"
 
 

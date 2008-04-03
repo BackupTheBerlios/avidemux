@@ -65,7 +65,7 @@ version 2 media descriptor :
 
 #include "fourcc.h"
 #include "ADM_mp4.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_codecs/ADM_codec.h"
 
 #include "ADM_video/ADM_videoInfoExtractor.h"

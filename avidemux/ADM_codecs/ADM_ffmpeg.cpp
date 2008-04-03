@@ -32,7 +32,7 @@
 
 #include "ADM_lavcodec.h"
 #include "avi_vars.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_assert.h"
 #include "ADM_codecs/ADM_ffmpeg.h"
 

@@ -19,9 +19,6 @@
  ***************************************************************************/
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "ADM_assert.h"
 #include "prefs.h"
@@ -32,7 +29,7 @@ extern "C" {
 
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_ffmp43.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME  MODULE_CODEC

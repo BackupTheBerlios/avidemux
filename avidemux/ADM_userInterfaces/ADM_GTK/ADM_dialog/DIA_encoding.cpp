@@ -12,7 +12,7 @@
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "prefs.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 #include "DIA_encoding.h"
@@ -365,7 +365,7 @@ uint32_t tim;
 
           sprintf(string,QT_TR_NOOP("%d%%"),(int)(100*f));
           
-          if(isQuiet()) printf("[Encoding]%s\n",string);
+          if(GUI_isQuiet()) printf("[Encoding]%s\n",string);
               gtk_progress_bar_set_text       (GTK_PROGRESS_BAR(WID(progressbar1)), string);
           
         _totalSize=_audioSize+_videoSize;

@@ -20,7 +20,7 @@
 #include "prefs.h"
 #include "DIA_working.h"
 #include "DIA_encoding.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
 #include "ADM_video/ADM_vidMisc.h"
 

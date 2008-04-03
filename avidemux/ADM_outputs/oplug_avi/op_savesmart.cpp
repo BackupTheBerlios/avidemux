@@ -29,7 +29,6 @@ extern "C" {
 #include "avi_vars.h"
 #ifdef HAVE_ENCODER
 
-#include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"

@@ -53,9 +53,6 @@
 #ifdef __FreeBSD__
 	#include <sys/types.h>
 #endif
-#include <stdlib.h>
-#include <string.h>
-
 #include <math.h>
 
 #include "ADM_default.h"
@@ -76,7 +73,7 @@ extern "C"
 
 #include "RTjpegN.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "DIA_fileSel.h"
 
 #include "ADM_osSupport/ADM_debugID.h"

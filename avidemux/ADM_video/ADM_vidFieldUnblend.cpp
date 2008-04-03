@@ -17,17 +17,11 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include "ADM_assert.h"
-
-#include "config.h"
-#include "fourcc.h"
 #include "ADM_default.h"
 #include <math.h>
 
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 

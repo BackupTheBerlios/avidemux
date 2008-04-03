@@ -19,15 +19,9 @@
  ***************************************************************************/
 
 #include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
-#include <time.h>
-#include <sys/time.h>
-
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_muxer.h"

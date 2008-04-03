@@ -17,7 +17,7 @@
 #include "fourcc.h"
 #include "ADM_avsproxy.h"
 #include "ADM_avsproxy_internal.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_3GP

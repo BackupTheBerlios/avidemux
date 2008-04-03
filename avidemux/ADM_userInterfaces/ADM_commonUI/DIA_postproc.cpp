@@ -14,7 +14,7 @@
 
 #include "config.h"
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #include "DIA_factory.h"
 

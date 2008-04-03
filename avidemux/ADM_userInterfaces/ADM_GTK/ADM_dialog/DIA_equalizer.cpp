@@ -22,7 +22,7 @@
 #include <math.h>
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "avi_vars.h"
 
 #include "ADM_colorspace/ADM_rgb.h"

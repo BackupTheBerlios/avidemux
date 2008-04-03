@@ -8,7 +8,7 @@
 #include "ADM_default.h"
 
 #include "DIA_factory.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "DIA_fileSel.h"
 
 #include "ADM_editor/ADM_edit.hxx"

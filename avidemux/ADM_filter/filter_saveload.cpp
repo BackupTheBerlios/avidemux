@@ -25,7 +25,7 @@
 #endif
 
 #include "fourcc.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_osSupport/ADM_quota.h"
 #include "ADM_assert.h"
 

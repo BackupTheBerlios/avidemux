@@ -12,7 +12,7 @@
 //
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 
 #include "ADM_video/ADM_vidCNR2_param.h"

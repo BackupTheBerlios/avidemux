@@ -22,20 +22,11 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <unistd.h>
-
-#include <time.h>
-#include <sys/time.h>
-
+#include "ADM_default.h"
 
 #include "fourcc.h"
 #include "avi_vars.h"
-#include "ADM_toolkit/toolkit.hxx"
-#include "ADM_assert.h"
+
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
 

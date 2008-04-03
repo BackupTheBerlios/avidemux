@@ -22,7 +22,7 @@
 
 #include "config.h"
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "DIA_factory.h"
 #include "avi_vars.h"
 

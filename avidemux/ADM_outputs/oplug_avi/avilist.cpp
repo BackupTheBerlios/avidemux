@@ -21,26 +21,13 @@
  /*
 * MODIFIED BY GMV 30.1.05: prepared for ODML
 */
- 
-#include <stdio.h>
-#include <stdlib.h>
-
-
-
-#include <string.h>
-//#include <stream.h>
-#include <math.h>
-
 #include "config.h"
+#include "ADM_default.h"
 #include "avifmt.h"
 #include "avifmt2.h"
-
-#include "ADM_assert.h"
-
 #include "fourcc.h"
-
 #include "avilist.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 // initialize List
 

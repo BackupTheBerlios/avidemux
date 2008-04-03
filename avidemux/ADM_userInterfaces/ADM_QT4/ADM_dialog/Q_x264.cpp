@@ -25,7 +25,7 @@
 #include "ADM_default.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_codecs/ADM_x264param.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "avidemutils.h"
 #include "avi_vars.h"
 #include "DIA_fileSel.h"

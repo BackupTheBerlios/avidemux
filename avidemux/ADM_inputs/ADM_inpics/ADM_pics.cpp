@@ -32,7 +32,7 @@
 #include "fourcc.h"
 #include "ADM_pics.h"
 #include "ADM_toolkit/bitmap.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_assert.h"
 #include "DIA_fileSel.h"
 #include "ADM_osSupport/ADM_debugID.h"

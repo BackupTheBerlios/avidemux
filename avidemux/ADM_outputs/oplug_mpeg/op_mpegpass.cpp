@@ -11,14 +11,9 @@
 //
 //
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <time.h>
-#include <sys/time.h>
-#include <errno.h>
 
 #include "config.h"
+#include <math.h>
 #include "ADM_default.h"
 #include "ADM_threads.h"
 
@@ -29,7 +24,7 @@
 
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_editor/ADM_outputfmt.h"
 #include "../ADM_lavformat.h"
 

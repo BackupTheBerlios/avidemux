@@ -30,7 +30,7 @@
 #include "ADM_filter/video_filters.h"
 #include "avi_vars.h"
 #include "../ADM_userInterfaces/ADM_commonUI/DIA_working.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
 
 

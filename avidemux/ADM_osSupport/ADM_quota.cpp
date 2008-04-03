@@ -21,7 +21,7 @@ struct qfile_t {
 #define msg_len 512
 static qfile_t qfile[qfile_len];
 
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
          
 #ifdef USE_LIBXML2

@@ -32,7 +32,7 @@
 #include "ADM_assert.h"
 #include "fourcc.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "DIA_fileSel.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"

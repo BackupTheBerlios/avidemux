@@ -27,7 +27,7 @@
 #include "ADM_JSAvidemux.h"
 #include "ADM_JSGlobal.h"
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_editor/ADM_outputfmt.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "adm_scanner.h" 

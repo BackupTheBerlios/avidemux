@@ -30,7 +30,7 @@
 
 #include "fourcc.h"
 #include "ADM_openDML.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_ODML

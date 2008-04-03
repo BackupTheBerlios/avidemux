@@ -13,9 +13,6 @@
  ***************************************************************************/
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <math.h>
 
 #include "ADM_default.h"
@@ -23,7 +20,7 @@
 #include "ADM_assert.h"
 
 #include "fourcc.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 //#include "DIA_working.h"
 #include "ADM_asf.h"
 #include "ADM_asfPacket.h"

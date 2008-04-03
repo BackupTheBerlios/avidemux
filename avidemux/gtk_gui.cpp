@@ -31,7 +31,7 @@
 #include "ADM_assert.h"
 #include "DIA_fileSel.h"
 #include "prototype.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_toolkit/bitmap.h"
 
 #include "ADM_audio/aviaudio.hxx"

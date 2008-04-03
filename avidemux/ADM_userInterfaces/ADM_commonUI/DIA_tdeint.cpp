@@ -17,7 +17,7 @@
 #include "config.h"
 #include "ADM_default.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #include "DIA_factory.h"
 #include "ADM_videoFilter/ADM_vidTDeint_param.h"

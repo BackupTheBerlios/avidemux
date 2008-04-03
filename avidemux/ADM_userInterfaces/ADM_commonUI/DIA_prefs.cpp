@@ -12,13 +12,6 @@
  *                                                                         *
  ***************************************************************************/
 
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-
 #include "config.h"
 #include "ADM_default.h"
 # include "prefs.h"
@@ -27,7 +20,7 @@
 #include "ADM_assert.h"
 #include "GUI_render.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "DIA_factory.h"
 
 #ifdef __WIN32

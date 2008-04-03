@@ -16,11 +16,10 @@
  ***************************************************************************/
 #include "config.h"
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_vidField.h"
-
+#include "DIA_enter.h"
 //_______________________________________________________________
 
 ADMVideoFields::ADMVideoFields(
@@ -213,9 +212,9 @@ int i,j;
 	_in=instream;
 	i=(int)_param->motion_trigger;
 	j=(int)_param->blend_trigger;
-	if(GUI_getIntegerValue(&i,0,255,QT_TR_NOOP("Motion Threshold")))
+	if(DIA_GetIntegerValue(&i,0,255,QT_TR_NOOP("Motion Threshold"),""))
 	{
-		if(GUI_getIntegerValue(&j,0,255,QT_TR_NOOP("Blend Threshold")))
+		if(DIA_GetIntegerValue(&j,0,255,QT_TR_NOOP("Blend Threshold"),""))
 		{
 			_param->motion_trigger=(uint8_t)i;
 			_param->blend_trigger=(uint8_t)j;

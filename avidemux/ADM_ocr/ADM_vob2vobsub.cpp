@@ -24,21 +24,14 @@
  ***************************************************************************/
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "ADM_default.h"
 #include <math.h>
-#include <unistd.h>
-#include <string.h>
-
 
 #include <time.h>
 #include <sys/time.h>
 
-//#define TEST_V2V
+#include "DIA_coreToolkit.h"
 
-#include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
-#include "ADM_assert.h"
 
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"

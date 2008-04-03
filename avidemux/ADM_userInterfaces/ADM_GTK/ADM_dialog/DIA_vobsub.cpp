@@ -14,7 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "DIA_fileSel.h"
 
 #define CHECK_GET(x,y) {*y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}

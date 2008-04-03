@@ -36,7 +36,7 @@
 #include "fourcc.h"
 #include "avi_vars.h"
 
-#include "ADM_toolkit/toolkit.hxx"
+
 #include "prototype.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"

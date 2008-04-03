@@ -20,13 +20,11 @@
 
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
 
 #include "avi_vars.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 #include "ADM_assert.h"
 
 #include "ADM_audiodevice/audio_out.h"

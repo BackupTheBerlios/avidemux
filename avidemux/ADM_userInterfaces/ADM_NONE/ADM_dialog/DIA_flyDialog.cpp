@@ -14,15 +14,12 @@
 
 #include "config.h"
 
-#include <string.h>
-#include <stdio.h>
-
 #include <math.h>
 
 #include "ADM_default.h"
 
 
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #include "ADM_colorspace/ADM_rgb.h"
 

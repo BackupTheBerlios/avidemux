@@ -18,7 +18,7 @@ Indexer progress dialog
 #include <math.h>
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_encoder/ADM_vidEncode.hxx"

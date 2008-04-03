@@ -32,7 +32,7 @@
 #include "fourcc.h"
 #include "ADM_h263.h"
 #include "bitsRead.h"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 #ifdef H263_VERBOSE
 #define ONEOPT(x) {if(parser->read1bit()) printf(x);			}

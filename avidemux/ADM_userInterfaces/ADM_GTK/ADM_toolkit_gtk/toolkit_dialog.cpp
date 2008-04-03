@@ -102,7 +102,7 @@ GtkWidget *top;
 	Answers always no to question
 
 */
-uint8_t isQuiet(void )
+uint8_t GUI_isQuiet(void )
 {
 	return beQuiet;
 }

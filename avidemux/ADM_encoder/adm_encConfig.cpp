@@ -16,17 +16,13 @@
  ***************************************************************************/
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
 #include "ADM_lavcodec.h"
 
 #include "ADM_assert.h"
 #include "fourcc.h"
 #include "ADM_osSupport/ADM_quota.h"
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_toolkit/toolkit.hxx"
+#include "DIA_coreToolkit.h"
 
 #include "prefs.h"
 #include "ADM_vidEncode.hxx"

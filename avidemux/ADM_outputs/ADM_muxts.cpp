@@ -29,7 +29,7 @@
 #include "ADM_assert.h"
 
 #include "ADM_default.h"
-#include "ADM_toolkit/toolkit.hxx"
+
 
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audio/ADM_a52info.h"
