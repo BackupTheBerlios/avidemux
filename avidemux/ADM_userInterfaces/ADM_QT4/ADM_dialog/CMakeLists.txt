@@ -12,6 +12,9 @@ SET(${ADM_LIB}_Q
 	resizing
 	jobs
 	working
+	x264_matrix
+	x264_zones
+	x264
 	vobsub)
 
 SET(${ADM_LIB}_T
@@ -23,7 +26,6 @@ SET(${ADM_LIB}_SRCS
 	alert_qt4.cpp
 	DIA_busy.cpp
 	DIA_none.cpp
-	DIA_x264.cpp
 	DIA_xvid4.cpp
 	OCR_none.cpp)
 

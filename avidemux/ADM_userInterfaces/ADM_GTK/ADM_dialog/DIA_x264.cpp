@@ -309,7 +309,6 @@ int signalReceiver(GtkObject * object, gpointer user_data)
     ENTRY(AR_Num);\
     ENTRY(AR_Den);\
     \
-    COMBO(PartitionDecision); \
     SPIN(Range);\
     COMBO(Method); \
     COMBO(DirectMode); \
@@ -333,6 +332,24 @@ void upload(GtkWidget *dialog,ADM_x264Param *param)
 #undef ENTRY
 #undef PSEUDO
 	RADIO_SET(radiobuttonAsInputAR, param->AR_AsInput);
+
+	uint32_t decisionItem;
+
+	if (param->PartitionDecision < 6)
+		decisionItem = param->PartitionDecision - 1;
+	else
+		if (param->PartitionDecision == 6)
+			if (param->RDO)
+				decisionItem = 6;
+			else
+				decisionItem = 5;
+		else
+			if (param->RDO)
+				decisionItem = 8;
+			else
+				decisionItem = 7;
+
+	gtk_combo_box_set_active(GTK_COMBO_BOX(WID(comboboxPartitionDecision)), decisionItem);
 }
 void download(GtkWidget *dialog,ADM_x264Param *param)
 {
@@ -354,6 +371,24 @@ void download(GtkWidget *dialog,ADM_x264Param *param)
               param-> AR_Den=x264_ar[rank].den;
         }
         param->AR_AsInput = RADIO_GET(radiobuttonAsInputAR);
+
+	uint32_t decisionItem = gtk_combo_box_get_active(GTK_COMBO_BOX(WID(comboboxPartitionDecision)));
+
+	if (decisionItem < 6)
+	{
+		param->PartitionDecision = decisionItem + 1;
+		param->RDO = false;
+	}
+	else if (decisionItem == 6)
+	{
+		param->PartitionDecision = 6;
+		param->RDO = true;
+	}
+	else
+	{
+		param->PartitionDecision = 7;
+		param->RDO = (decisionItem == 8);
+	}
 }
 
 GtkWidget*

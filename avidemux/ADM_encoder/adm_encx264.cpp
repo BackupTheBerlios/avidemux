@@ -96,7 +96,7 @@ EncoderX264::configure (AVDMGenericVideoStream * instream)
     {
 
     case COMPRESS_CQ:
-      printf ("\n[x264] cq mode: %ld", _param.qz);
+      printf ("\n[x264] CQ mode: %ld\n", _param.qz);
       _state = enc_CQ;
       _codec = new X264EncoderCQ (_w, _h);
 
@@ -107,7 +107,7 @@ EncoderX264::configure (AVDMGenericVideoStream * instream)
 	}
       break;
     case COMPRESS_AQ:
-      printf ("\n[x264] AQ mode: %ld", _param.qz);
+      printf ("\n[x264] AQ mode: %ld\n", _param.qz);
       _state = enc_CQ;
       _codec = new X264EncoderAQ (_w, _h);
 
@@ -118,7 +118,7 @@ EncoderX264::configure (AVDMGenericVideoStream * instream)
 	}
       break;
     case COMPRESS_CBR:
-      printf ("\n[x264] CBR mode: %lu", _param.bitrate);
+      printf ("\n[x264] CBR mode: %lu\n", _param.bitrate);
       _state = enc_CBR;
 
       _codec = new X264EncoderCBR (_w, _h);
@@ -142,12 +142,9 @@ EncoderX264::configure (AVDMGenericVideoStream * instream)
       ADM_assert (0);
     }
 
-
-  printf ("\n[x264] Encoder ready, w: %lu h: %lu mode: %d", _w, _h, _state);
+  printf ("[x264] Encoder ready, w: %lu, h: %lu, mode: %d\n", _w, _h, _state);
   return 1;
-
 }
-
 
 
 uint8_t

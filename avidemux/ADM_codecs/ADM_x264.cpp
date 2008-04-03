@@ -15,6 +15,8 @@
 //
 #include "config.h"
 
+#ifdef USE_X264
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,165 +24,266 @@
 
 #include "ADM_default.h"
 #include "ADM_codecs/ADM_codec.h"
-#ifdef USE_X264
-
 #include "ADM_codecs/ADM_x264.h"
-extern "C"
-{
-#include "x264.h"
-};
-
 #include "ADM_assert.h"
 #include "avi_vars.h"
 
-#define HANDLE ((x264_t *)_handle)
-#define PICS ((x264_picture_t *)_pic)
-
+#define HANDLE ((x264_t *) _handle)
+#define PICS ((x264_picture_t *) _pic)
 
 typedef struct avcc		// for avcc atom
 {
-  uint8_t *sps;
-  int sps_length;
-  uint8_t *pps;
-  int pps_length;
+	uint8_t *sps;
+	int sps_length;
+	uint8_t *pps;
+	int pps_length;
 } avcc;
 
-
 // Yes, ugly FIXME
-static x264_param_t     param;
-static ADM_x264Param    admParam;
+static x264_param_t param;
+static ADM_x264Param admParam;
+
+void X264Encoder::printParam(x264_param_t *x264Param)
+{
+	printf("[x264] b_repeat_headers = %d\n", x264Param->b_repeat_headers);
+	printf("[x264] i_log_level = %d\n", x264Param->i_log_level);
+	printf("[x264] i_threads = %d", x264Param->i_threads);
+
+	if (x264Param->i_threads == 0)
+		printf (" (auto)");
+	if (x264Param->i_threads == 1)
+		printf (" (disabled)");
+
+	printf("\n[x264] i_width = %d, i_height = %d\n", x264Param->i_width, x264Param->i_height);
+	printf("[x264] i_csp = %d\n", x264Param->i_csp);	
+	printf("[x264] i_fps_num = %d, i_fps_den = %d\n", x264Param->i_fps_num, x264Param->i_fps_den);
+	printf("[x264] rc.i_rc_method = %d\n", x264Param->rc.i_rc_method);
+	printf("[x264] rc.i_bitrate = %d\n", x264Param->rc.i_bitrate);
+	printf("[x264] rc.f_rf_constant = %f\n", x264Param->rc.f_rf_constant);
+	printf("[x264] rc.i_qp_constant = %d\n", x264Param->rc.i_qp_constant);	
+	printf("[x264] analyse.i_subpel_refine = %d\n", x264Param->analyse.i_subpel_refine);
+	printf("[x264] analyse.b_bframe_rdo = %d\n", x264Param->analyse.b_bframe_rdo);
+	printf("[x264] analyse.i_me_method = %d\n", x264Param->analyse.i_me_method);
+	printf("[x264] analyse.i_me_range = %d\n", x264Param->analyse.i_me_range);
+	printf("[x264] analyse.i_mv_range = %d\n", x264Param->analyse.i_mv_range);
+	printf("[x264] analyse.i_mv_range_thread = %d\n", x264Param->analyse.i_mv_range_thread);
+	printf("[x264] analyse.i_direct_mv_pred = %d\n", x264Param->analyse.i_direct_mv_pred);
+	printf("[x264] analyse.i_direct_8x8_inference = %d\n", x264Param->analyse.i_direct_8x8_inference);
+	printf("[x264] analyse.b_weighted_bipred = %d\n", x264Param->analyse.b_weighted_bipred);
+	printf("[x264] analyse.b_transform_8x8 = %d\n", x264Param->analyse.b_transform_8x8);
+	printf("[x264] analyse.inter = %d\n", x264Param->analyse.inter);
+	printf("[x264] b_cabac = %d\n", x264Param->b_cabac);
+	printf("[x264] b_interlaced = %d\n", x264Param->b_interlaced);
+	printf("[x264] b_deblocking_filter = %d\n", x264Param->b_deblocking_filter);
+	printf("[x264] i_deblocking_filter_alphac0 = %d\n", x264Param->i_deblocking_filter_alphac0);
+	printf("[x264] i_deblocking_filter_beta = %d\n", x264Param->i_deblocking_filter_beta);
+	printf("[x264] i_bframe = %d\n", x264Param->i_bframe);
+	printf("[x264] i_bframe_bias = %d\n", x264Param->i_bframe_bias);
+	printf("[x264] i_frame_reference = %d\n", x264Param->i_frame_reference);
+	printf("[x264] b_bframe_pyramid = %d\n", x264Param->b_bframe_pyramid);
+	printf("[x264] b_bframe_adaptive = %d\n", x264Param->b_bframe_adaptive);
+	printf("[x264] i_keyint_max = %d\n", x264Param->i_keyint_max);
+	printf("[x264] i_keyint_min = %d\n", x264Param->i_keyint_min);
+	printf("[x264] i_scenecut_threshold = %d\n", x264Param->i_scenecut_threshold);
+	printf("[x264] b_pre_scenecut = %d\n", x264Param->b_pre_scenecut);
+	printf("[x264] analyse.b_mixed_references = %d\n", x264Param->analyse.b_mixed_references);
+	printf("[x264] analyse.b_chroma_me = %d\n", x264Param->analyse.b_chroma_me);
+	printf("[x264] analyse.b_bidir_me = %d\n", x264Param->analyse.b_bidir_me);
+	printf("[x264] analyse.i_trellis = %d\n", x264Param->analyse.i_trellis);
+	printf("[x264] analyse.b_fast_pskip = %d\n", x264Param->analyse.b_fast_pskip);
+	printf("[x264] analyse.b_dct_decimate = %d\n", x264Param->analyse.b_dct_decimate);
+	printf("[x264] analyse.i_noise_reduction = %d\n", x264Param->analyse.i_noise_reduction);
+	printf("[x264] analyse.i_luma_deadzone[0] = %d\n", x264Param->analyse.i_luma_deadzone[0]);
+	printf("[x264] analyse.i_luma_deadzone[1] = %d\n", x264Param->analyse.i_luma_deadzone[1]);
+	printf("[x264] i_cqm_preset = %d\n", x264Param->i_cqm_preset);
+
+	printf("[x264] cqm_4iy = ");
+	printCqm(x264Param->cqm_4iy, sizeof(x264Param->cqm_4iy));
+	printf("\n[x264] cqm_4ic = ");
+	printCqm(x264Param->cqm_4ic, sizeof(x264Param->cqm_4ic));
+	printf("\n[x264] cqm_4py = ");
+	printCqm(x264Param->cqm_4py, sizeof(x264Param->cqm_4py));
+	printf("\n[x264] cqm_4pc = ");
+	printCqm(x264Param->cqm_4pc, sizeof(x264Param->cqm_4pc));
+	printf("\n[x264] cqm_8iy = ");
+	printCqm(x264Param->cqm_8iy, sizeof(x264Param->cqm_8iy));
+	printf("\n[x264] cqm_8py = ");
+	printCqm(x264Param->cqm_8py, sizeof(x264Param->cqm_8py));
+
+	printf("\n[x264] rc.i_qp_min = %d\n", x264Param->rc.i_qp_min);
+	printf("[x264] rc.i_qp_max = %d\n", x264Param->rc.i_qp_max);
+	printf("[x264] rc.i_qp_step = %d\n", x264Param->rc.i_qp_step);
+	printf("[x264] rc.f_rate_tolerance = %f\n", x264Param->rc.f_rate_tolerance);
+	printf("[x264] rc.f_ip_factor = %f\n", x264Param->rc.f_ip_factor);
+	printf("[x264] rc.f_pb_factor = %f\n", x264Param->rc.f_pb_factor);
+	printf("[x264] analyse.i_chroma_qp_offset = %d\n", x264Param->analyse.i_chroma_qp_offset);
+	printf("[x264] rc.f_qcompress = %f\n", x264Param->rc.f_qcompress);
+	printf("[x264] rc.f_complexity_blur = %f\n", x264Param->rc.f_complexity_blur);
+	printf("[x264] rc.f_qblur = %f\n", x264Param->rc.f_qblur);
+	printf("[x264] rc.i_vbv_max_bitrate = %d\n", x264Param->rc.i_vbv_max_bitrate);
+	printf("[x264] rc.i_vbv_buffer_size = %d\n", x264Param->rc.i_vbv_buffer_size);
+	printf("[x264] rc.f_vbv_buffer_init = %f\n", x264Param->rc.f_vbv_buffer_init);
+
+	printf("[x264] i_level_idc = %d\n", x264Param->i_level_idc);
+	printf("[x264] i_sps_id = %d\n", x264Param->i_sps_id);
+	printf("[x264] b_deterministic = %d\n", x264Param->b_deterministic);
+	printf("[x264] b_aud = %d\n", x264Param->b_aud);
+	printf("[x264] analyse.b_psnr = %d\n", x264Param->analyse.b_psnr);
+	printf("[x264] analyse.b_ssim = %d\n", x264Param->analyse.b_ssim);
+	printf("[x264] vui.i_overscan = %d\n", x264Param->vui.i_overscan);
+	printf("[x264] vui.i_vidformat = %d\n", x264Param->vui.i_vidformat);
+	printf("[x264] vui.i_colorprim = %d\n", x264Param->vui.i_colorprim);
+	printf("[x264] vui.i_transfer = %d\n", x264Param->vui.i_transfer);
+	printf("[x264] vui.i_colmatrix = %d\n", x264Param->vui.i_colmatrix);
+	printf("[x264] vui.i_chroma_loc = %d\n", x264Param->vui.i_chroma_loc);
+	printf("[x264] vui.b_fullrange = %d\n", x264Param->vui.b_fullrange);
+}
+
+void X264Encoder::printCqm(const uint8_t cqm[], uint8_t size)
+{
+	for (int index = 0; index < size; index++)
+		printf("%d ", cqm[index]);
+}
 
 //**********************************************************
 // Do the translation avidemux parameters->x264 parameters
 //**********************************************************
-uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
+uint8_t X264Encoder::preamble(uint32_t fps1000, ADM_x264Param *zparam)
 {
-  x264_t *xhandle = NULL;
+	x264_t *xhandle = NULL;
 
-  printf ("[x264] Opening x264 for %lu x %lu\n", _w, _h);
+	if (zparam->globalHeader)
+		param.b_repeat_headers = 0;
+	else
+		param.b_repeat_headers = 1;
 
-  param.i_threads = zparam->nbThreads;
-  param.i_width = _w;
-  param.i_height = _h;
-  param.i_csp = X264_CSP_I420;
+	param.i_log_level = X264_LOG_INFO;
+	param.i_threads = zparam->nbThreads;
+	param.i_width = _w;
+	param.i_height = _h;
+	param.i_csp = X264_CSP_I420;
+	param.i_fps_num = fps1000;
+	param.i_fps_den = 1000;
 
-#define MKPARAM(x,y) {param.x = zparam->y;printf("[x264] "#x" = %d\n",param.x);}
-#define MKPARAMF(x,y) {param.x = (float)zparam->y / 100; printf("[x264] "#x" = %.2f\n",param.x);}
+	if (zparam->AR_AsInput)
+	{
+		param.vui.i_sar_width = video_body->getPARWidth();
+		param.vui.i_sar_height = video_body->getPARHeight();
+	}
+	else
+	{
+		param.vui.i_sar_width = zparam->AR_Num;
+		param.vui.i_sar_height = zparam->AR_Den;
+	}
 
-  if (zparam->AR_AsInput) {
-    param.vui.i_sar_width = video_body->getPARWidth();
-    param.vui.i_sar_height = video_body->getPARHeight();
-  } else {
-    MKPARAM(vui.i_sar_width , AR_Num);	// FIXME
-    MKPARAM(vui.i_sar_height, AR_Den);
-  }
+	param.analyse.i_subpel_refine = zparam->PartitionDecision;
+	param.analyse.b_bframe_rdo = zparam->RDO;
+	param.analyse.i_me_method = zparam->Method;
+	param.analyse.i_me_range = zparam->Range;
+	param.analyse.i_mv_range = zparam->mv_range_thread;
+	param.analyse.i_mv_range_thread = zparam->mv_range_thread;
+	param.analyse.i_direct_mv_pred = zparam->DirectMode;
+	param.analyse.i_direct_8x8_inference = zparam->direct_8x8_inference;
+	param.analyse.b_weighted_bipred = zparam->Weighted;
+	param.analyse.b_transform_8x8 = zparam->_8x8;
+	param.analyse.inter = 0;
 
-  param.i_fps_num = fps1000;
-  param.i_fps_den = 1000;
-  if(zparam->idc)
-  {
-    MKPARAM(i_level_idc,idc);
-    printf("[x264] *** Forcing level = %d\n",param.i_level_idc);
-  }
-  // KeyframeBoost ?
-  // BframeReduction ?
-  // PartitionDecision ?
-  MKPARAMF(rc.f_qcompress,BitrateVariability);
-  
-  param.i_frame_reference = 1;
-  // update for Sadarax dialog
-  MKPARAM(rc.i_vbv_max_bitrate,vbv_max_bitrate);
-  MKPARAM(rc.i_vbv_buffer_size,vbv_buffer_size);
-  MKPARAMF(rc.f_vbv_buffer_init,vbv_buffer_init);
-  
-  MKPARAM (analyse.b_fast_pskip,fastPSkip);
-  MKPARAM (analyse.b_dct_decimate,DCTDecimate);
-  MKPARAM (b_interlaced,interlaced);
-      
-  //
-  MKPARAM(analyse.i_direct_mv_pred,DirectMode);
-  MKPARAM(rc.i_qp_min,MinQp);
-  MKPARAM(rc.i_qp_max,MaxQp);
-  MKPARAM(rc.i_qp_step,QpStep);
-  MKPARAM(i_frame_reference,MaxRefFrames);
-  MKPARAM(i_scenecut_threshold,SceneCut);
-  MKPARAM(i_keyint_min,MinIdr);
-  MKPARAM(i_keyint_max,MaxIdr);
-  MKPARAM(i_bframe,MaxBFrame);
-  MKPARAM(i_bframe_bias,Bias);
-  MKPARAM( b_bframe_pyramid,BasReference );
-  MKPARAM(analyse. b_bidir_me,BidirME );
-  MKPARAM( b_bframe_adaptive, Adaptative);
-  MKPARAM( analyse.b_weighted_bipred, Weighted);
-  MKPARAM( b_cabac , CABAC);
-  MKPARAM( analyse.i_trellis, Trellis);
-  MKPARAM(analyse.i_subpel_refine,PartitionDecision+1);
-#define MIN_RDO 6
-  if(zparam->PartitionDecision+1>=MIN_RDO)
-  {
-      int rank,parity;
-      rank=((zparam->PartitionDecision+1-MIN_RDO)>>1)+MIN_RDO;
-      parity=(zparam->PartitionDecision+1-MIN_RDO)&1;
-      
-      param.analyse.i_subpel_refine=rank;
-      param.analyse.b_bframe_rdo=parity;
-  }
-  MKPARAM(analyse.b_chroma_me,ChromaME);
-  MKPARAM(b_deblocking_filter,DeblockingFilter);
-  MKPARAM(i_deblocking_filter_alphac0,Strength );
-  MKPARAM(i_deblocking_filter_beta, Threshold);
-  
-  MKPARAM(analyse.i_me_method,Method);
-  MKPARAM(analyse.i_me_range,Range);
-//  MKPARAM(PartitionDecision,Method);
-  MKPARAM(analyse.b_transform_8x8,_8x8);
-  MKPARAM(analyse.b_mixed_references,MixedRefs);
-  MKPARAM(analyse.i_noise_reduction,NoiseReduction);
-  
-#define MES(x,y) if(zparam->x) {param.analyse.inter |=X264_ANALYSE_##y;printf("[x264] "#x" is on\n");}
-  param.analyse.inter=0;
-  MES(  _8x8P,  PSUB16x16);
-  MES(  _8x8B,  BSUB16x16);
-  MES(  _4x4,   PSUB8x8);
-  MES(  _8x8I,  I8x8);
-  MES(  _4x4I,  I4x4);
-  param.i_log_level=X264_LOG_INFO;
-  
-  /*
-     int         i_vbv_max_bitrate;
-        int         i_vbv_buffer_size;
-        float       f_vbv_buffer_init;
+	if (zparam->_8x8P)
+		param.analyse.inter |= X264_ANALYSE_PSUB16x16;
 
-  */
-  printf("[x264] VBV_max_br = %d\n", param.rc.i_vbv_max_bitrate);
-  printf("[x264] vbv_buffer_size = %d\n", param.rc.i_vbv_buffer_size);
-  printf("[x264] f_vbv_buffer_init = %f\n", param.rc.f_vbv_buffer_init);
-  
-  if(zparam->globalHeader)
-      param.b_repeat_headers=0;
-  else
-      param.b_repeat_headers=1;
+	if (zparam->_8x8B)
+		param.analyse.inter |= X264_ANALYSE_BSUB16x16;
 
-  xhandle = x264_encoder_open (&param);
-  if (!xhandle)
-    return 0;
+	if (zparam->_4x4)
+		param.analyse.inter |= X264_ANALYSE_PSUB8x8;
 
-  _handle = (void *) xhandle;
-  _pic = (void *) new    x264_picture_t;
-  printf ("[x264] init ok (atom mode: %d)\n", zparam->globalHeader);
+	if (zparam->_8x8I)
+		param.analyse.inter |= X264_ANALYSE_I8x8;
 
-  if (param.i_threads > 1)
-    printf ("[x264] using %d threads\n", param.i_threads);
-  else if (param.i_threads == 0)
-    printf ("[x264] using threads\n");
+	if (zparam->_4x4I)
+		param.analyse.inter |= X264_ANALYSE_I4x4;
 
-  if (zparam->globalHeader)
-    return createHeader ();
-  else
-    return 1;
+	param.b_cabac = zparam->CABAC;
+	param.b_interlaced = zparam->interlaced;
+	param.b_deblocking_filter = zparam->DeblockingFilter;
+	param.i_deblocking_filter_alphac0 = zparam->Strength;
+	param.i_deblocking_filter_beta = zparam->Threshold;
+	param.i_bframe = zparam->MaxBFrame;
+	param.i_bframe_bias = zparam->Bias;
+	param.i_frame_reference = zparam->MaxRefFrames;
+	param.b_bframe_pyramid = zparam->BasReference;
+	param.b_bframe_adaptive = zparam->Adaptative;
+	param.i_keyint_max = zparam->MaxIdr;
+	param.i_keyint_min = zparam->MinIdr;
+	param.i_scenecut_threshold = zparam->SceneCut;
+	param.b_pre_scenecut = zparam->pre_scenecut;
+	param.analyse.b_mixed_references = zparam->MixedRefs;
+	param.analyse.b_chroma_me = zparam->ChromaME;
+	param.analyse.b_bidir_me = zparam->BidirME;
+	param.analyse.i_trellis = zparam->Trellis;
+	param.analyse.b_fast_pskip = zparam->fastPSkip;
+	param.analyse.b_dct_decimate = zparam->DCTDecimate;
+	param.analyse.i_noise_reduction = zparam->NoiseReduction;
+	param.analyse.i_luma_deadzone[0] = zparam->interLumaDeadzone;
+	param.analyse.i_luma_deadzone[1] = zparam->intraLumaDeadzone;
+	param.i_cqm_preset = zparam->cqmPreset;
 
+	memcpy(param.cqm_4iy, zparam->intra4x4Luma, sizeof(param.cqm_4iy));
+	memcpy(param.cqm_4ic, zparam->intraChroma, sizeof(param.cqm_4ic));
+	memcpy(param.cqm_4py, zparam->inter4x4Luma, sizeof(param.cqm_4py));
+	memcpy(param.cqm_4pc, zparam->interChroma, sizeof(param.cqm_4pc));
+	memcpy(param.cqm_8iy, zparam->intra8x8Luma, sizeof(param.cqm_8iy));
+	memcpy(param.cqm_8py, zparam->inter8x8Luma, sizeof(param.cqm_8py));
 
+	param.rc.i_qp_min = zparam->MinQp;
+	param.rc.i_qp_max = zparam->MaxQp;
+	param.rc.i_qp_step = zparam->QpStep;
+	param.rc.f_rate_tolerance = (float)zparam->rateTolerance / 100;
+	param.rc.f_ip_factor = zparam->quantiserIpRatio;
+	param.rc.f_pb_factor = zparam->quantiserPbRatio;
+	param.analyse.i_chroma_qp_offset = zparam->chromaQuantiserOffset;
+	param.rc.f_qcompress = (float)zparam->BitrateVariability / 100;
+	param.rc.f_complexity_blur = zparam->quantiserComplexityBlur;
+	param.rc.f_qblur = zparam->quantiserBlur;
+	param.rc.i_vbv_max_bitrate = zparam->vbv_max_bitrate;
+	param.rc.i_vbv_buffer_size = zparam->vbv_buffer_size;
+	param.rc.f_vbv_buffer_init = (float)zparam->vbv_buffer_init / 100;
+
+	if (zparam->idc)	// Used to default to zero so still need to cater for it
+		param.i_level_idc = zparam->idc;
+
+	param.i_sps_id = zparam->spsId;
+	param.b_deterministic = zparam->deterministic;
+	param.b_aud = zparam->accessUnitDelimiters;
+	param.analyse.b_psnr = zparam->psnrComputation;
+	param.analyse.b_ssim = zparam->ssimComputation;
+
+	param.vui.i_overscan = zparam->overscan;
+	param.vui.i_vidformat = zparam->videoFormat;
+	param.vui.i_colorprim = zparam->colourPrimaries;
+	param.vui.i_transfer = zparam->transferCharacteristics;
+	param.vui.i_colmatrix = zparam->colourMatrix;
+	param.vui.i_chroma_loc = zparam->chromaSampleLocation;
+	param.vui.b_fullrange = zparam->fullRangeSamples;
+
+	printParam(&param);
+
+	xhandle = x264_encoder_open(&param);
+
+	if (!xhandle)
+		return 0;
+
+	_handle = (void*)xhandle;
+	_pic = (void*)new x264_picture_t;
+
+	printf("[x264] init ok (atom mode: %d)\n", zparam->globalHeader);
+
+	if (zparam->globalHeader)
+		return createHeader();
+	else
+		return 1;
 }
+
 uint8_t X264Encoder::getExtraData (uint32_t * l, uint8_t ** d)
 {
   *l = extraSize;

@@ -715,16 +715,17 @@ NULL,//     char      *logfile;
 1,//     uint32_t   _8X8I;
 1,//     uint32_t   _4x4I;
 //     //
-2,//     uint32_t  MaxBFrame;
+0,//     uint32_t  MaxBFrame;
 0,//     int32_t   Bias;
 //     //
 0,//     uint32_t BasReference;
 0,//     uint32_t BidirME;
 1,//     uint32_t Adaptative;
-1,//     uint32_t Weighted;
+0,//     uint32_t Weighted;
 1,//     uint32_t DirectMode;
 //     //
-4,//     uint32_t PartitionDecision;
+5,//     uint32_t PartitionDecision;
+0,//	 bool RDO
 16, //Range
 1,//     uint32_t Method;
 1,//     uint32_t AR_Num;
@@ -738,14 +739,42 @@ NULL,//     char      *logfile;
 1, //        ChromaME
 0, // Mixed Ref
 0, //NoiseReduction
-0, // level IDC for psp  
+51, // level IDC
 0, // fastPSkip;
 1,  //DCTDecimate;
 0,   //interlaced;
 0,    // vbv_max_bitrate;
 0,  // vbv_buffer_size;
-90  // vbv_buffer_init;
-
+90, // vbv_buffer_init;
+-1,	// mv_range
+-1,	// mv_range_thread
+-1,	// direct_8x8_inference
+0,	// pre_scenecut
+21,	// interLumaDeadzone
+11,	// intraLumaDeadzone
+0,	// cqmPreset
+{6,13,20,28,13,20,28,32,20,28,32,37,28,32,37,42},	// intra4x4Luma
+{6,13,20,28,13,20,28,32,20,28,32,37,28,32,37,42},	// intra4x4Chroma
+{10,14,20,24,14,20,24,27,20,24,27,30,24,27,30,34},	// inter4x4Luma
+{10,14,20,24,14,20,24,27,20,24,27,30,24,27,30,34},	// inter4x4Chroma
+{6,10,13,16,18,23,25,27,10,11,16,18,23,25,27,29,13,16,18,23,25,27,29,31,16,18,23,25,27,29,31,33,18,23,25,27,29,31,33,36,23,25,27,29,31,33,36,38,25,27,29,31,33,36,38,40,27,29,31,33,36,38,40,42},	// intra8x8Luma
+{9,13,15,17,19,21,22,24,13,13,17,19,21,22,24,25,15,17,19,21,22,24,25,27,17,19,21,22,24,25,27,28,19,21,22,24,25,27,28,30,21,22,24,25,27,28,30,32,22,24,25,27,28,30,32,33,24,25,27,28,30,32,33,35},	// inter8x8Luma
+100,	// rateTolerance
+1.4,	// quantiserIpRatio
+1.3,	// quantiserPbRatio
+0,		// chromaQuantiserOffset
+20.0,	// quantiserComplexityBlur
+0.5,	// quantiserBlur
+0,		// spsId
+1,		// deterministic
+0,		// accessUnitDelimiters
+1,		// psnrComputation
+1,		// ssimComputation
+0,		// overscan
+5,		// videoFormat
+2,		// colourPrimaries
+2,		// transferCharacteristics
+2		// colourMatrix
 };
 /**************************************/
 ADM_x264Param x264ExtraPSP = {
@@ -779,10 +808,11 @@ NULL,//     char      *logfile;
 0,//     uint32_t BasReference;
 0,//     uint32_t BidirME;
 1,//     uint32_t Adaptative;
-1,//     uint32_t Weighted;
+0,//     uint32_t Weighted;
 1,//     uint32_t DirectMode;
 //     //
-4,//     uint32_t PartitionDecision;
+5,//     uint32_t PartitionDecision;
+0,//	 bool RDO
 4,//              Range
 1,//     uint32_t Method;
 1,//     uint32_t AR_Num;
@@ -796,13 +826,42 @@ NULL,//     char      *logfile;
 0, //        ChromaME
 0, // Mixed Ref
 0, //NoiseReduction
-30, // level IDC for psp  
+30, // level IDC
 0, // fastPSkip;
 1,  //DCTDecimate;
 0,   //interlaced;
 0,    // vbv_max_bitrate;
 0,  // vbv_buffer_size;
-90  // vbv_buffer_init;
+90, // vbv_buffer_init;
+-1,	// mv_range
+-1,	// mv_range_thread
+-1,	// direct_8x8_inference
+0,	// pre_scenecut
+21,	// interLumaDeadzone
+11,	// intraLumaDeadzone
+0,	// cqmPreset
+{6,13,20,28,13,20,28,32,20,28,32,37,28,32,37,42},	// intra4x4Luma
+{6,13,20,28,13,20,28,32,20,28,32,37,28,32,37,42},	// intra4x4Chroma
+{10,14,20,24,14,20,24,27,20,24,27,30,24,27,30,34},	// inter4x4Luma
+{10,14,20,24,14,20,24,27,20,24,27,30,24,27,30,34},	// inter4x4Chroma
+{6,10,13,16,18,23,25,27,10,11,16,18,23,25,27,29,13,16,18,23,25,27,29,31,16,18,23,25,27,29,31,33,18,23,25,27,29,31,33,36,23,25,27,29,31,33,36,38,25,27,29,31,33,36,38,40,27,29,31,33,36,38,40,42},	// intra8x8Luma
+{9,13,15,17,19,21,22,24,13,13,17,19,21,22,24,25,15,17,19,21,22,24,25,27,17,19,21,22,24,25,27,28,19,21,22,24,25,27,28,30,21,22,24,25,27,28,30,32,22,24,25,27,28,30,32,33,24,25,27,28,30,32,33,35},	// inter8x8Luma
+100,	// rateTolerance
+1.4,	// quantiserIpRatio
+1.3,	// quantiserPbRatio
+0,		// chromaQuantiserOffset
+20.0,	// quantiserComplexityBlur
+0.5,	// quantiserBlur
+0,		// spsId
+1,		// deterministic
+0,		// accessUnitDelimiters
+1,		// psnrComputation
+1,		// ssimComputation
+0,		// overscan
+5,		// videoFormat
+2,		// colourPrimaries
+2,		// transferCharacteristics
+2		// colourMatrix
 };
 /**************************************/
 ADM_x264Param x264ExtraDefault=x264Extra;
