@@ -21,7 +21,7 @@
 #include "ui_x264_matrix.h"
 #include "ADM_default.h"
 #include "DIA_fileSel.h"
-#include "ADM_toolkit\toolkit.hxx"
+#include "ADM_toolkit/toolkit.hxx"
 
 extern int x264_cqm_parse_file(const char *filename, uint8_t* cqm_4iy, uint8_t* cqm_4ic, uint8_t* cqm_4py, uint8_t* cqm_4pc, uint8_t* cqm_8iy, uint8_t* cqm_8py);
 
