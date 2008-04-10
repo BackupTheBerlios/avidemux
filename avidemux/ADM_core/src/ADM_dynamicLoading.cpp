@@ -16,6 +16,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 #ifdef __WIN32
 #include <windows.h>
@@ -135,7 +136,6 @@ void* ADM_LibWrapper::getSymbol(const char* name)
 
 bool ADM_LibWrapper::getSymbols(int symCount, ...)
 {
-#ifdef __WIN32
     va_list va;
     va_start(va, symCount);
 
@@ -159,5 +159,4 @@ bool ADM_LibWrapper::getSymbols(int symCount, ...)
 
     va_end(va);
     return true;
-#endif
 }

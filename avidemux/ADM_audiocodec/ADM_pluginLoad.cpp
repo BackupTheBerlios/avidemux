@@ -21,6 +21,7 @@
 #include "DIA_fileSel.h"
 #include "ADM_dynamicLoading.h"
 #include <vector>
+
 #if 1
 #define aprintf printf
 #else
@@ -30,17 +31,27 @@
 /**
  * 
  */
-class ADM_ad_plugin
+class ADM_ad_plugin : public ADM_LibWrapper
 {
-public:
-	ADM_ad_CreateFunction		*create;
-	ADM_ad_DeleteFunction		*destroy;
-	ADM_ad_SupportedFormat		*supportedFormat;
-	ADM_ad_GetApiVersion		*getApiVersion;
-	ADM_ad_GetDecoderVersion	*getDecoderVersion;
-	ADM_ADM_ad_GetInfo			*getInfo;
-	ADM_LibWrapper				*wrapper;
-	const char 					*name;
+	public:
+		ADM_ad_CreateFunction		*create;
+		ADM_ad_DeleteFunction		*destroy;
+		ADM_ad_SupportedFormat		*supportedFormat;
+		ADM_ad_GetApiVersion		*getApiVersion;
+		ADM_ad_GetDecoderVersion	*getDecoderVersion;
+		ADM_ADM_ad_GetInfo			*getInfo;
+		const char 					*name;
+
+		ADM_ad_plugin(const char *file) : ADM_LibWrapper()
+		{
+			initialised = (loadLibrary(file) && getSymbols(6,
+				&create, "create",
+				&destroy, "destroy",
+				&supportedFormat, "supportedFormat",
+				&getApiVersion, "getApiVersion",
+				&getDecoderVersion, "getDecoderVersion",
+				&getInfo, "getInfo"));
+		};
 };
 
 std::vector<ADM_ad_plugin *> ADM_audioPlugins;
@@ -50,51 +61,38 @@ std::vector<ADM_ad_plugin *> ADM_audioPlugins;
  */
 static uint8_t tryLoadingAudioPlugin(const char *file)
 {
-	ADM_ad_plugin blank;
-	//printf("[ADM_ad_plugin] Scanning %s\n",ADM_GetFileName(file));
-	ADM_LibWrapper *wrapper=new ADM_LibWrapper;
-	 if(true!=wrapper->loadLibrary(file))
-	 {
-		 printf("[ADM_ad_plugin] LoadLibrary failed for %s\n",ADM_GetFileName(file));
-		 goto Err_ad;
-	 }
-#define FUNCKY(a,b,c)	 blank.a=(b *)wrapper->getSymbol(#c); if(!blank.a) { printf("[ADM_ad_plugin]"#c" failed\n"); goto Err_ad;;}
-	 FUNCKY(create,ADM_ad_CreateFunction,create);
-	 FUNCKY(destroy,ADM_ad_DeleteFunction,destroy);
-	 FUNCKY(supportedFormat,ADM_ad_SupportedFormat,supportedFormat);
-	 FUNCKY(getApiVersion,ADM_ad_GetApiVersion,getApiVersion);
-	 FUNCKY(getDecoderVersion,ADM_ad_GetDecoderVersion,getDecoderVersion);
-	 FUNCKY(getInfo,ADM_ADM_ad_GetInfo,getInfo);
-	 
-	 // Check API version
-	 if(blank.getApiVersion()!=AD_API_VERSION)
-	 {
-		 	printf("[ADM_ad_plugin] File %s has API version too old (%d vs %d)\n",
-		 			ADM_GetFileName(file),ADM_GetFileName(file),AD_API_VERSION);
-		 	 goto Err_ad;
-	 }
-	 // Get infos
-	 uint32_t major,minor,patch;
-	 const char *desc;
-	 blank.getDecoderVersion(&major,&minor,&patch);
-	 blank.wrapper=wrapper;
-	 blank.name=ADM_strdup(ADM_GetFileName(file));
-	 desc=blank.getInfo();
-	 // Print out stuff
-	 printf("[ADM_ad_plugin] Plugin loaded version %d.%d.%d, name %s,desc : %s ",
-			 		major,minor,patch,blank.name,desc);
-	 
-	 //
-	 {
-		 ADM_ad_plugin *p=new ADM_ad_plugin;
-		 *p=blank;
-		 ADM_audioPlugins.push_back(p);
-	 }
-	 return 1;
+	ADM_ad_plugin *plugin = new ADM_ad_plugin(file);
+
+	if (!plugin->isAvailable())
+	{
+		printf("[ADM_ad_plugin] Unable to load %s\n", ADM_GetFileName(file));
+		goto Err_ad;
+	}
+
+	// Check API version
+	if (plugin->getApiVersion() != AD_API_VERSION)
+	{
+		printf("[ADM_ad_plugin] File %s has API version too old (%d vs %d)\n",
+			ADM_GetFileName(file), ADM_GetFileName(file), AD_API_VERSION);
+		goto Err_ad;
+	}
+
+	// Get infos
+	uint32_t major, minor, patch;
+
+	plugin->getDecoderVersion(&major, &minor, &patch);
+	plugin->name = ADM_strdup(ADM_GetFileName(file));
+
+	printf("[ADM_ad_plugin] Plugin loaded version %d.%d.%d, name %s, desc: %s\n",
+		major, minor, patch, plugin->name, plugin->getInfo());
+
+	ADM_audioPlugins.push_back(plugin);
+
+	return 1;
+
 Err_ad:
-	delete wrapper;
+	delete plugin;
 	return 0;
-	
 }
 /**
  * 	\fn ADM_ad_loadPlugins
