@@ -41,14 +41,14 @@ extern int ADM_cpu_num_processors(void);
 #define WRAP_Open(x) \
 {\
 AVCodec *codec=avcodec_find_decoder(x);\
-if(!codec) {GUI_Alert(QT_TR_NOOP("Internal error finding codec"#x));ADM_assert(0);} \
+if(!codec) {GUI_Error_HIG("Codec",QT_TR_NOOP("Internal error finding codec"#x));ADM_assert(0);} \
   codecId=x; \
   _context->workaround_bugs=1*FF_BUG_AUTODETECT +1*FF_BUG_NO_PADDING;/**/ \
   _context->error_concealment=3; \
   if (avcodec_open(_context, codec) < 0)  \
                       { \
                                         printf("[lavc] Decoder init: "#x" video decoder failed!\n"); \
-                                        GUI_Alert("Internal error opening "#x); \
+                                        GUI_Error_HIG("Codec","Internal error opening "#x); \
                                         ADM_assert(0); \
                                 } \
                                 else \

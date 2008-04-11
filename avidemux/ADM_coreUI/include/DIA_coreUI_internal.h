@@ -113,4 +113,29 @@ typedef struct
 }FactoryDescriptor;
 //
 uint8_t DIA_factoryInit(FactoryDescriptor *d);
+
+// This is for coreToolkit UI elements
+typedef void            CREATE_GUI_INFO_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format);
+typedef void            CREATE_GUI_ERROR_HIG(const char *primary, const char *secondary_format);
+typedef int             CREATE_GUI_CONFIRMATION_HIG(const char *button_confirm, const char *primary, const char *secondary_format);
+typedef int             CREATE_GUI_YESNO(const char *primary, const char *secondary_format);
+typedef int             CREATE_GUI_QUESTION(const char *alertstring);
+typedef int             CREATE_GUI_ALTERNATE(char *title,char *choice1,char *choice2);
+typedef void            CREATE_GUI_VERBOSE(void);
+typedef void            CREATE_GUI_QUIET(void);
+typedef uint8_t			CREATE_GUI_IS_GUIET(void);
+// GUI_Sleep is internal
+typedef struct
+{
+	CREATE_GUI_INFO_HIG 		*infoHig;
+	CREATE_GUI_ERROR_HIG		*errorHig;
+	CREATE_GUI_CONFIRMATION_HIG *confirmationHig;
+	CREATE_GUI_YESNO 			*yesno;
+	CREATE_GUI_QUESTION 		*question;
+	CREATE_GUI_ALTERNATE        *alternate;
+	CREATE_GUI_VERBOSE 			*verbose;
+	CREATE_GUI_QUIET 			*quiet;
+	CREATE_GUI_IS_GUIET 		*isQuiet;
+}CoreToolkitDescriptor;
+uint8_t  DIA_toolkitInit(CoreToolkitDescriptor *d);
 #endif

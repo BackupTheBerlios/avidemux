@@ -18,6 +18,7 @@
 
 
 #include "DIA_fileSel.h"
+#include "DIA_coreToolkit.h"
 #include "DIA_coreUI_internal.h"
 
 #include "prefs.h"

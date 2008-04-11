@@ -11,14 +11,6 @@
 
 #include "ADM_coreConfig.h"
 
-typedef enum 
-{
-        ADM_LOG_NONE=0,
-        ADM_LOG_IMPORTANT=1,
-        ADM_LOG_INFO=2,
-        ADM_LOG_DEBUG=3
-  
-} ADM_LOG_LEVEL;
 
 typedef struct 
 {

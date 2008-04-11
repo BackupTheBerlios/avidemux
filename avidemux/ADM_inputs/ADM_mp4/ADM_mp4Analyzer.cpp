@@ -619,8 +619,14 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                           commonPart(H264);
                                           // There is a avcC atom just after
                                           // configuration data for h264
+nextAtom:                                          
                                           adm_atom avcc(&son);
                                           printf("Reading avcC, got %s\n",fourCC::tostringBE(avcc.getFCC()));
+                                          if(avcc.getFCC()==MKFCCR('c','o','l','r')) // Color atom
+                                          {
+                                        	  avcc.skipAtom();
+                                        	  goto nextAtom;
+                                          }
                                           int len,offset;
                                           VDEO.extraDataSize=avcc.getRemainingSize();
                                           VDEO.extraData=new uint8_t [VDEO.extraDataSize];

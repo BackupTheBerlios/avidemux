@@ -33,6 +33,21 @@
 #include "ADM_assert.h"
 
 extern const char *shortkey(const char *);
+namespace ADM_Qt4Factory
+{
+class diaElemButton : public diaElem
+{
+  protected:
+  public:
+    void            *_cookie;
+    ADM_FAC_CALLBACK *_callBack;
+            diaElemButton(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void *cookie,const char *tip=NULL);
+  virtual   ~diaElemButton() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      enable(uint32_t onoff) ;
+};
+
 
 class  ADM_Qbutton : public QWidget
 {
@@ -69,7 +84,7 @@ void ADM_Qbutton::clicked(bool i)
 ADM_Qbutton::~ADM_Qbutton()
 {
 }
-
+//*****************************
 diaElemButton:: diaElemButton(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void *cookie,const char *tip)
   : diaElem(ELEM_BUTTON)
 {
@@ -105,5 +120,19 @@ void   diaElemButton::enable(uint32_t onoff)
 {
 
 }
+
+}; // End of namespace
+//****************************Hoook*****************
+
+diaElem  *qt4CreateButton(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void *cookie,const char *tip)
+{
+	return new  ADM_Qt4Factory::diaElemButton(toggleTitle,cb,cookie,tip);
+}
+void qt4DestroyButton(diaElem *e)
+{
+	ADM_Qt4Factory::diaElemButton *a=(ADM_Qt4Factory::diaElemButton *)e;
+	delete a;
+}
+//
 //EOF
 

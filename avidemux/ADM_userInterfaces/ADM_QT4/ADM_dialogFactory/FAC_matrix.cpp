@@ -32,7 +32,20 @@
 
 extern const char *shortkey(const char *);
 
-
+namespace ADM_qt4Factory
+{
+class diaElemMatrix : public diaElem
+{
+  protected:
+  public:
+    uint8_t *_matrix;
+    uint32_t _matrixSize;
+    		diaElemMatrix(uint8_t *trix,const char *toggleTitle, uint32_t trixSize,const char *tip=NULL);
+  virtual   ~diaElemMatrix() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      enable(uint32_t onoff) ;
+};
 
 
 diaElemMatrix::diaElemMatrix(uint8_t *trix,const char *toggleTitle, uint32_t trixSize,const char *tip)
@@ -114,4 +127,15 @@ void diaElemMatrix::enable(uint32_t onoff)
 				  
 			  }
 }
+}
+//****************************Hoook*****************
 
+diaElem  *qt4CreateMatrix(uint8_t *trix,const char *toggleTitle, uint32_t trixSize,const char *tip)
+{
+	return new  ADM_qt4Factory::diaElemMatrix(trix,toggleTitle,trixSize,tip);
+}
+void qt4DestroyMatrix(diaElem *e)
+{
+	ADM_qt4Factory::diaElemMatrix *a=(ADM_qt4Factory::diaElemMatrix *)e;
+	delete a;
+}

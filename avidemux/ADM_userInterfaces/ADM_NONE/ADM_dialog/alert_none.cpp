@@ -12,7 +12,7 @@
 
 #include "prefs.h"
 
-
+#include "DIA_coreToolkit.h"
 
 #include "ADM_assert.h" 
 
@@ -41,20 +41,6 @@ static void boxAdd(const char *str)
 }
 
 
-void            GUI_Alert(const char *alertstring)
-{
-  boxStart();
-  boxAdd("Alert");
-  boxAdd(alertstring);
-  boxEnd();
-}
-void            GUI_Info(const char *alertstring)
-{
-  boxStart();
-  boxAdd("Alert");
-  boxAdd(alertstring);
-  boxEnd();
-}
 
 void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format, ...)
 {
@@ -260,3 +246,8 @@ int32_t UI_readJog(void)
 {
  return 0; 
 }
+void InitCoreToolkit(void)
+{
+	
+}
+//EOF

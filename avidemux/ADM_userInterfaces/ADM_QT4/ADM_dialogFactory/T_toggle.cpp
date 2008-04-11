@@ -32,6 +32,61 @@
 #include "ADM_assert.h"
 
 extern const char *shortkey(const char *);
+
+
+namespace ADM_qt4Factory
+{
+class diaElemToggle : public diaElemToggleBase
+{
+  protected:
+public:
+            diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip=NULL);
+  virtual   ~diaElemToggle() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      enable(uint32_t onoff) ;
+  void      finalize(void);
+  void      updateMe();
+  uint8_t   link(uint32_t onoff,diaElem *w);
+};
+
+class diaElemToggleUint : public diaElem
+{
+  protected:
+        uint32_t *emb;
+        const char *embName;
+        void *widgetUint;
+        uint32_t _min,_max;
+public:
+            diaElemToggleUint(uint32_t *toggleValue,const char *toggleTitle, uint32_t *uintval,
+            					const char *name,uint32_t min,uint32_t max,const char *tip=NULL);
+  virtual   ~diaElemToggleUint() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      enable(uint32_t onoff) ;
+  void      finalize(void);
+  void      updateMe();
+};
+class diaElemToggleInt : public diaElem
+{
+  protected:
+	  		 int32_t *emb;
+	         const char *embName;
+	         void *widgetUint;
+	         int32_t _min,_max;
+public:
+            diaElemToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval,
+            				const char *name,int32_t min,int32_t max,const char *tip=NULL);
+  virtual   ~diaElemToggleInt() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      finalize(void);
+  void      updateMe();
+  void      enable(uint32_t onoff) ;
+};
+
+
+
 typedef enum
 {
     TT_TOGGLE,TT_TOGGLE_UINT,TT_TOGGLE_INT
@@ -367,8 +422,41 @@ void   diaElemToggleInt::enable(uint32_t onoff)
   }
 }
 
-//******************************************************
+} // End of namespace
+//****************************Hoook*****************
 
+diaElem  *qt4CreateToggleUint(uint32_t *toggleValue,const char *toggleTitle, uint32_t *uintval,
+		const char *name,uint32_t min,uint32_t max,const char *tip)
+{
+	return new  ADM_qt4Factory::diaElemToggleUint(toggleValue,toggleTitle, uintval,
+			name,min,max,tip);
+}
+void qt4DestroyToggleUint(diaElem *e)
+{
+	ADM_qt4Factory::diaElemToggleUint *a=(ADM_qt4Factory::diaElemToggleUint *)e;
+	delete a;
+}
+
+diaElem  *qt4CreateToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval,
+		const char *name,int32_t min,int32_t max,const char *tip)
+{
+	return new  ADM_qt4Factory::diaElemToggleInt(toggleValue,toggleTitle, uintval,
+			name,min,max,tip);
+}
+void qt4DestroyToggleInt(diaElem *e)
+{
+	ADM_qt4Factory::diaElemToggleInt *a=(ADM_qt4Factory::diaElemToggleInt *)e;
+	delete a;
+}
+diaElem  *qt4CreateToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip)
+{
+	return new  ADM_qt4Factory::diaElemToggle(toggleValue,toggleTitle, tip);
+}
+void qt4DestroyToggle(diaElem *e)
+{
+	ADM_qt4Factory::diaElemToggle *a=(ADM_qt4Factory::diaElemToggle *)e;
+	delete a;
+}
 
 
 

@@ -34,7 +34,32 @@
 
 extern const char *shortkey(const char *);
 
+namespace ADM_qt4Factory
+{
 
+class diaElemReadOnlyText : public diaElem
+{
+
+public:
+  
+  diaElemReadOnlyText(const char *readyOnly,const char *toggleTitle,const char *tip=NULL);
+  virtual ~diaElemReadOnlyText() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  
+};
+
+class diaElemText : public diaElem
+{
+
+public:
+  
+  diaElemText(char **text,const char *toggleTitle,const char *tip=NULL);
+  virtual ~diaElemText() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  void enable(uint32_t onoff);
+};
 
 //********************************************************************
 diaElemReadOnlyText::diaElemReadOnlyText(const char *readyOnly,const char *toggleTitle,const char *tip)
@@ -119,5 +144,28 @@ void diaElemText::enable(uint32_t onoff)
   else
     lineEdit->setDisabled(TRUE);
 }
+} // End of namespace
+//****************************Hoook*****************
+
+diaElem  *qt4CreateRoText(const char *text,const char *toggleTitle, const char *tip)
+{
+	return new  ADM_qt4Factory::diaElemReadOnlyText(text,toggleTitle,tip);
+}
+void qt4DestroyRoText(diaElem *e)
+{
+	ADM_qt4Factory::diaElemReadOnlyText *a=(ADM_qt4Factory::diaElemReadOnlyText *)e;
+	delete a;
+}
+
+diaElem  *qt4CreateText(char **text,const char *toggleTitle, const char *tip)
+{
+	return new  ADM_qt4Factory::diaElemText(text,toggleTitle,tip);
+}
+void qt4DestroyText(diaElem *e)
+{
+	ADM_qt4Factory::diaElemText *a=(ADM_qt4Factory::diaElemText *)e;
+	delete a;
+}
+//EOF
 
 //EOF

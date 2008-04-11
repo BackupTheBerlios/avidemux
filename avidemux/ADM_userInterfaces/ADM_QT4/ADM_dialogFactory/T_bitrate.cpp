@@ -34,6 +34,22 @@
 
 extern const char *shortkey(const char *);
 
+namespace ADM_Qt4Factory
+{
+class diaElemBitrate : public diaElemBitrateBase
+{
+protected:
+public:
+  
+  diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip=NULL);
+  virtual ~diaElemBitrate() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  void setMaxQz(uint32_t qz);
+  
+  void updateMe(void);
+};
+
 class  ADM_Qbitrate : public QWidget
 {
      Q_OBJECT
@@ -241,5 +257,17 @@ void diaElemBitrate::getMe(void)
   memcpy(param,&copy,sizeof(copy));
 }
 
+} // End of namespace
+//****************************Hoook*****************
+
+diaElem  *qt4CreateBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip)
+{
+	return new  ADM_Qt4Factory::diaElemBitrate(p,toggleTitle,tip);
+}
+void qt4DestroyBitrate(diaElem *e)
+{
+	ADM_Qt4Factory::diaElemBitrate *a=(ADM_Qt4Factory::diaElemBitrate *)e;
+	delete a;
+}
 //EOF
 

@@ -13,6 +13,7 @@
 #include "ADM_default.h"
 
 #include "DIA_fileSel.h"
+#include "DIA_coreToolkit.h"
 #include "DIA_coreUI_internal.h"
 
 namespace  ADM_CLI_fileSel

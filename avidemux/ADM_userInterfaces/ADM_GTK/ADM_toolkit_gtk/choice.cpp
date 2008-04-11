@@ -63,6 +63,8 @@ void alert_cb_ko(void)
 
 //
 //_______________________________
+namespace ADM_GtkCoreUIToolkit
+{
 int GUI_Alternate(char *title,char *choice1,char *choice2)
 {
     GtkWidget *window1;
@@ -132,5 +134,5 @@ int GUI_Alternate(char *title,char *choice1,char *choice2)
     return ret;
 }
 
-
+} // End of namespace
 //EOF

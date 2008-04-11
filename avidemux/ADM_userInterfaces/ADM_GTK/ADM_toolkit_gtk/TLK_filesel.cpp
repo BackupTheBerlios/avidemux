@@ -18,7 +18,7 @@ email                : fixounet@free.fr
 ***************************************************************************/
 
 #include "toolkit_gtk.h"
-
+#include "DIA_coreToolkit.h"
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>

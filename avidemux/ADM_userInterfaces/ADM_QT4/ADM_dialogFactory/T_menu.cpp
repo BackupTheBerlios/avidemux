@@ -34,6 +34,47 @@
 
 
 extern const char *shortkey(const char *);
+
+namespace ADM_qt4Factory
+{
+class diaElemMenuDynamic : public diaElemMenuDynamicBase
+{
+protected:
+	
+
+public:
+  diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
+               diaMenuEntryDynamic **menu,const char *tip=NULL);
+  
+  virtual   ~diaElemMenuDynamic() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  virtual uint8_t   link(diaMenuEntryDynamic *entry,uint32_t onoff,diaElem *w);
+  virtual void      updateMe(void);
+  virtual void      enable(uint32_t onoff) ;
+  virtual void      finalize(void);
+};
+//**********************
+class diaElemMenu : public diaElemMenuBase
+{
+protected:
+	
+
+	diaElemMenuDynamic  *dyna;
+	diaMenuEntryDynamic  **menus;	
+public:
+  diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
+               const diaMenuEntry *menu,const char *tip=NULL);
+  
+  virtual ~diaElemMenu() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  virtual uint8_t   link(diaMenuEntry *entry,uint32_t onoff,diaElem *w);
+  virtual void      updateMe(void);
+  void      enable(uint32_t onoff) ;
+  void      finalize(void);;
+};
+
 /**/
 
   class ADM_QComboBox : public QComboBox
@@ -241,4 +282,29 @@ void   diaElemMenuDynamic::updateMe(void)
 {
   finalize();
 }
+//********************
+}; // End of namespace
+
+diaElem  *qt4CreateMenu(uint32_t *intValue,const char *itle, uint32_t nb,         const diaMenuEntry *menu,const char *tip)
+{
+	return new  ADM_qt4Factory::diaElemMenu(intValue,itle,nb,menu,tip);
+}
+void qt4DestroyMenu(diaElem *e)
+{
+	ADM_qt4Factory::diaElemMenu *a=(ADM_qt4Factory::diaElemMenu *)e;
+	delete a;
+}
+diaElem  *qt4CreateMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
+        diaMenuEntryDynamic **menu,const char *tipp)
+{
+	return new  ADM_qt4Factory::diaElemMenuDynamic(intValue,itle,nb,menu,tipp);
+}
+void qt4DestroyMenuDynamic(diaElem *e)
+{
+	ADM_qt4Factory::diaElemMenuDynamic *a=(ADM_qt4Factory::diaElemMenuDynamic *)e;
+	delete a;
+}
+
+//EOF
+
 //EOF

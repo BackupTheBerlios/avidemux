@@ -33,6 +33,23 @@
 
 extern const char *shortkey(const char *);
 
+
+namespace ADM_qt4Factory
+{
+class diaElemFrame : public diaElemFrameBase
+{
+  
+public:
+  
+  diaElemFrame(const char *toggleTitle, const char *tip=NULL);
+  virtual ~diaElemFrame() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void) ;
+  void swallow(diaElem *widget);
+  void enable(uint32_t onoff);
+  void finalize(void);
+};
+
 diaElemFrame::diaElemFrame(const char *toggleTitle, const char *tip)
   : diaElemFrameBase()
 {
@@ -99,7 +116,16 @@ void diaElemFrame::enable(uint32_t onoff)
 {
   
 }
+} // End of namespace
+//****************************Hoook*****************
 
-//******************************************************
-
+diaElem  *qt4CreateFrame(const char *toggleTitle, const char *tip)
+{
+	return new  ADM_qt4Factory::diaElemFrame(toggleTitle,tip);
+}
+void qt4DestroyFrame(diaElem *e)
+{
+	ADM_qt4Factory::diaElemFrame *a=(ADM_qt4Factory::diaElemFrame *)e;
+	delete a;
+}
 //EOF

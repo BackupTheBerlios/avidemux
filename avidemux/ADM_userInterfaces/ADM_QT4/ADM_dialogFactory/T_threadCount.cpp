@@ -26,6 +26,21 @@ Handle dialog factory element : Thread Count
 
 extern const char* shortkey(const char*);
 
+
+namespace ADM_qt4Factory
+{
+
+class diaElemThreadCount : public diaElem
+{
+
+public:
+  
+  diaElemThreadCount(uint32_t *value, const char *title, const char *tip = NULL);
+  virtual ~diaElemThreadCount() ;
+  void setMe(void *dialog, void *opaque, uint32_t line);
+  void getMe(void);
+};
+
 class ADM_QthreadCount : public QWidget
 {
 	Q_OBJECT
@@ -141,3 +156,16 @@ void diaElemThreadCount::getMe(void)
 	else
 		*val = (threadCount->spinBox)->value();
 }
+//**********************
+} // End of namesapce
+//**********************
+diaElem  *qt4CreateThreadCount(uint32_t *value, const char *title, const char *tip)
+{
+	return new  ADM_qt4Factory::diaElemThreadCount(value,title,tip);
+}
+void qt4DestroyThreadCount(diaElem *e)
+{
+	ADM_qt4Factory::diaElemThreadCount *a=(ADM_qt4Factory::diaElemThreadCount *)e;
+	delete a;
+}
+//EOF

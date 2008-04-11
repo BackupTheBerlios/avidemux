@@ -161,7 +161,7 @@ GtkCellRenderer *renderer;
                         
                         default:
                                 printf("Event:%d\n",event); 
-                                GUI_Alert(QT_TR_NOOP("Unknown event"));break;
+                                GUI_Error_HIG("Jobs",QT_TR_NOOP("Unknown event"));break;
                 }
                 
         }

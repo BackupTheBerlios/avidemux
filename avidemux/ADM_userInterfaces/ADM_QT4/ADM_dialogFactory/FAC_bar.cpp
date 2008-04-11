@@ -34,7 +34,19 @@
 
 extern const char *shortkey(const char *);
 
-
+namespace ADM_Qt4Factory
+{
+class diaElemBar : public diaElem
+{
+  protected :
+        uint32_t per;
+public:
+  
+  diaElemBar(uint32_t percent,const char *toggleTitle);
+  virtual ~diaElemBar() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+};
 
 //********************************************************************
 diaElemBar::diaElemBar(uint32_t percent,const char *toggleTitle)
@@ -68,5 +80,16 @@ void diaElemBar::setMe(void *dialog, void *opaque,uint32_t line)
 void diaElemBar::getMe(void)
 {
 }
+} // nameapsce
 
+diaElem  *qt4CreateBar(uint32_t percent,const char *toggleTitle)
+{
+	return new  ADM_Qt4Factory::diaElemBar(percent,toggleTitle);
+}
+void qt4DestroyBar(diaElem *e)
+{
+	ADM_Qt4Factory::diaElemBar *a=(ADM_Qt4Factory::diaElemBar *)e;
+	delete a;
+}
+//
 //EOF

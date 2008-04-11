@@ -35,6 +35,32 @@
 extern const char *shortkey(const char *);
 
 
+namespace ADM_qt4Factory
+{
+class diaElemInteger : public diaElem
+{
+
+public:
+  int32_t min,max;
+  diaElemInteger(int32_t *intValue,const char *toggleTitle, int32_t min, int32_t max,const char *tip=NULL);
+  virtual ~diaElemInteger() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  void      enable(uint32_t onoff) ;
+};
+/* Same but unsigned */
+class diaElemUInteger : public diaElem
+{
+
+public:
+  uint32_t min,max;
+  diaElemUInteger(uint32_t *intValue,const char *toggleTitle, uint32_t min, uint32_t max,const char *tip=NULL);
+  virtual ~diaElemUInteger() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  void      enable(uint32_t onoff) ;
+  
+};
 
 //********************************************************************
 diaElemInteger::diaElemInteger(int32_t *intValue,const char *toggleTitle, int32_t min, int32_t max,const char *tip)
@@ -144,6 +170,27 @@ void diaElemUInteger::enable(uint32_t onoff)
     box->setDisabled(1);
 }
 //********************************************
+//****************************************************
+} // End of namespace
+//****************************Hoook*****************
 
+diaElem  *qt4CreateInteger(int32_t *intValue,const char *toggleTitle,int32_t min, int32_t max,const char *tip)
+{
+	return new  ADM_qt4Factory::diaElemInteger(intValue,toggleTitle,min,max,tip);
+}
+void qt4DestroyInteger(diaElem *e)
+{
+	ADM_qt4Factory::diaElemInteger *a=(ADM_qt4Factory::diaElemInteger *)e;
+	delete a;
+}
+diaElem  *qt4CreateUInteger(uint32_t *intValue,const char *toggleTitle,uint32_t min, uint32_t max,const char *tip)
+{
+	return new  ADM_qt4Factory::diaElemUInteger(intValue,toggleTitle,min,max,tip);
+}
+void qt4DestroyUInteger(diaElem *e)
+{
+	ADM_qt4Factory::diaElemUInteger *a=(ADM_qt4Factory::diaElemUInteger *)e;
+	delete a;
+}
 //EOF
 

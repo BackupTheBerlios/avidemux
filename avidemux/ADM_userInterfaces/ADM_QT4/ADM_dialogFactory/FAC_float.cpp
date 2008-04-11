@@ -32,6 +32,23 @@
 
 extern const char *shortkey(const char *);
 
+namespace ADM_qt4Factory
+{
+
+
+class diaElemFloat : public diaElem
+{
+
+public:
+  ELEM_TYPE_FLOAT min,max;
+  diaElemFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, ELEM_TYPE_FLOAT min, 
+               ELEM_TYPE_FLOAT max,const char *tip=NULL);
+  virtual ~diaElemFloat() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  void      enable(uint32_t onoff) ;
+};
+
 
 //********************************************************************
 diaElemFloat::diaElemFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, ELEM_TYPE_FLOAT min, ELEM_TYPE_FLOAT max,const char *tip)
@@ -85,4 +102,17 @@ void diaElemFloat::enable(uint32_t onoff)
     box->setEnabled(1);
   else
     box->setDisabled(1);
+}
+} // End of namespace
+//****************************Hoook*****************
+
+diaElem  *qt4CreateFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, ELEM_TYPE_FLOAT min,
+        ELEM_TYPE_FLOAT max,const char *tip)
+{
+	return new  ADM_qt4Factory::diaElemFloat(intValue,toggleTitle,min,max,tip);
+}
+void qt4DestroyFloat(diaElem *e)
+{
+	ADM_qt4Factory::diaElemFloat *a=(ADM_qt4Factory::diaElemFloat *)e;
+	delete a;
 }

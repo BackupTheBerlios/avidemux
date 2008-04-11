@@ -185,7 +185,7 @@ JSBool displayError(JSContext *cx, JSObject *obj, uintN argc,
 		return JS_FALSE;
 	char  *stringa = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
 	GUI_Verbose();
-	GUI_Alert(stringa);
+	GUI_Error_HIG("Error",stringa);
 	GUI_Quiet();
 
 	return JS_TRUE;
@@ -200,7 +200,7 @@ JSBool displayInfo(JSContext *cx, JSObject *obj, uintN argc,
 		return JS_FALSE;
 	char  *stringa = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
 	GUI_Verbose();
-	GUI_Info(stringa);
+	GUI_Info_HIG(ADM_LOG_IMPORTANT,"Info",stringa);
 	GUI_Quiet();
 	return JS_TRUE;
 }// end displayInfo

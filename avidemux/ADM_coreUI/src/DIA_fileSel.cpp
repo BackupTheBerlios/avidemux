@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include "ADM_default.h"
+#include "DIA_coreToolkit.h"
 #include "DIA_coreUI_internal.h"
 
 static DIA_FILESEL_DESC_T *fileSelDescriptor=NULL;

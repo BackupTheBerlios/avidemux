@@ -18,9 +18,23 @@
 
 #ifndef ADM_COREUI_TOOLKIT__
 #define ADM_COREUI_TOOLKIT__
+<<<<<<< HEAD:avidemux/ADM_coreUI/include/DIA_coreToolkit.h
+
+
+typedef enum 
+{
+        ADM_LOG_NONE=0,
+        ADM_LOG_IMPORTANT=1,
+        ADM_LOG_INFO=2,
+        ADM_LOG_DEBUG=3
+  
+} ADM_LOG_LEVEL;
+
+=======
 // These two are obsoletes...
 void            GUI_Alert(const char *alertstring);
 void            GUI_Info(const char *alertstring);
+>>>>>>> master:avidemux/ADM_coreUI/include/DIA_coreToolkit.h
 // Display a warning/info/debug message. The primary field is the "title" of the window, secondary format is printf like
 void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format, ...);
 // Display an error message. The primary field is the "title" of the window, secondary format is printf like

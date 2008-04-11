@@ -14,6 +14,7 @@
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_factory.h"
+#include "DIA_coreToolkit.h"
 #include "DIA_coreUI_internal.h"
 
 static uint8_t  buildOneTab(GtkWidget *nb,int index, diaElemTabs *tab);

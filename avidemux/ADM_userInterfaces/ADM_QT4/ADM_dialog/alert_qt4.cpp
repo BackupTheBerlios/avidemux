@@ -1,13 +1,5 @@
-
-
-
-
-
-
-
-
 /**
-    \fn alert_qt4
+    \file alert_qt4
    copyright            : (C) 2007 by mean
     email                : Mean/fixounet@free.fr
  ***************************************************************************/
@@ -23,16 +15,15 @@
 
 #include <QDialog>
 #include <QMessageBox>
-
+#include "DIA_coreToolkit.h"
+#include "DIA_coreUI_internal.h"
 #include "ADM_default.h"
 #include "prefs.h"
 
-
-
-
 static int beQuiet=0;
 extern QWidget *QuiMainWindows;
-
+namespace ADM_Qt4CoreUIToolkit
+{
 //****************************************************************************************************
 void            GUI_Alert(const char *alertstring)
 {
@@ -51,12 +42,11 @@ void            GUI_Info(const char *alertstring)
 }
 
 //****************************************************************************************************
-void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format, ...)
+void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format)
 {
   uint32_t msglvl=2;
   char *string;
   char alertstring[1024];
-  char alertstring2[1024];
 
         prefs->get(MESSAGE_LEVEL,&msglvl);
 
@@ -71,11 +61,7 @@ void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, cons
             snprintf(alertstring,1024,"<big><b>%s</b></big>",primary);
          }else
          {
-            va_list ap;
-            va_start(ap, secondary_format);
-            vsnprintf(alertstring2,1023,secondary_format, ap);
-            snprintf(alertstring,1024,"<big><b>%s</b></big><br><br>%s",primary,alertstring2);
-            va_end(ap);
+        	 snprintf(alertstring,1024,"<big><b>%s</b></big><br><br>%s",primary,secondary_format);
          }
         QMessageBox::StandardButton reply;
           reply = QMessageBox::information(QuiMainWindows, QString::fromUtf8(QT_TR_NOOP("Info")),
@@ -84,12 +70,12 @@ void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, cons
 
 }
 //****************************************************************************************************
-void            GUI_Error_HIG(const char *primary, const char *secondary_format, ...)
+void            GUI_Error_HIG(const char *primary, const char *secondary_format)
 {
   uint32_t msglvl=2;
   char *string;
   char alertstring[1024];
-  char alertstring2[1024];
+  
   
         prefs->get(MESSAGE_LEVEL,&msglvl);
 
@@ -104,11 +90,7 @@ void            GUI_Error_HIG(const char *primary, const char *secondary_format,
             snprintf(alertstring,1024,"<big><b>%s</b></big>",primary);
          }else
          {
-            va_list ap;
-            va_start(ap, secondary_format);
-            vsnprintf(alertstring2,1023,secondary_format, ap);
-            snprintf(alertstring,1024,"<big><b>%s</b></big><br><br>%s",primary,alertstring2);
-            va_end(ap);
+        	 snprintf(alertstring,1024,"<big><b>%s</b></big><br><br>%s",primary,secondary_format);
          }
           QMessageBox::StandardButton reply;
           reply = QMessageBox::critical(QuiMainWindows, QString::fromUtf8(QT_TR_NOOP("Info")),
@@ -116,11 +98,11 @@ void            GUI_Error_HIG(const char *primary, const char *secondary_format,
                                     QMessageBox::Ok );
 }
 //****************************************************************************************************
-int             GUI_Confirmation_HIG(const char *button_confirm, const char *primary, const char *secondary_format, ...)
+int             GUI_Confirmation_HIG(const char *button_confirm, const char *primary, const char *secondary_format)
 {
 uint32_t msglvl=2;
 char alertstring[1024];
-char alertstring2[1024];
+
         if (beQuiet)
               {
                       printf("Info: %s\n", primary);
@@ -133,11 +115,7 @@ char alertstring2[1024];
         }
         else
         {	
-              va_list ap;
-              va_start(ap, secondary_format);
-              vsnprintf(alertstring2,1023,secondary_format, ap);
-              snprintf(alertstring,1024,"<big><b>%s</b></big><br><br>%s",primary,alertstring2);
-              va_end(ap);
+        	snprintf(alertstring,1024,"<big><b>%s</b></big><br><br>%s",primary,secondary_format);
         }
           QMessageBox::StandardButton reply;
           reply = QMessageBox::question(QuiMainWindows, QString::fromUtf8(QT_TR_NOOP("Confirmation")),
@@ -147,7 +125,7 @@ char alertstring2[1024];
         return 0; 
 }
 //****************************************************************************************************
-int             GUI_YesNo(const char *primary, const char *secondary_format, ...)
+int             GUI_YesNo(const char *primary, const char *secondary_format)
 {
 uint32_t msglvl=2;
 char alertstring[1024];
@@ -164,11 +142,7 @@ char alertstring2[1024];
         }
         else
         {	
-              va_list ap;
-              va_start(ap, secondary_format);
-              vsnprintf(alertstring2,1023,secondary_format, ap);
-              snprintf(alertstring,1024,"<big><b>%s</b></big><br><br>%s",primary,alertstring2);
-              va_end(ap);
+        	snprintf(alertstring,1024,"<big><b>%s</b></big><br><br>%s",primary,secondary_format);
         }
           QMessageBox::StandardButton reply;
           reply = QMessageBox::question(QuiMainWindows, QString::fromUtf8(QT_TR_NOOP("Confirmation")),
@@ -252,4 +226,24 @@ void            GUI_Quiet(void)
   beQuiet=1;
 }
 //****************************************************************************************************
+}
+
+static CoreToolkitDescriptor Qt4CoreToolkitDescriptor=
+{
+		&ADM_Qt4CoreUIToolkit::GUI_Info_HIG,
+		&ADM_Qt4CoreUIToolkit::GUI_Error_HIG,
+		&ADM_Qt4CoreUIToolkit::GUI_Confirmation_HIG,
+		&ADM_Qt4CoreUIToolkit::GUI_YesNo,
+		&ADM_Qt4CoreUIToolkit::GUI_Question,
+		&ADM_Qt4CoreUIToolkit::GUI_Alternate,
+		&ADM_Qt4CoreUIToolkit::GUI_Verbose,
+		&ADM_Qt4CoreUIToolkit::GUI_Quiet,
+		&ADM_Qt4CoreUIToolkit::GUI_isQuiet
+};
+
+void InitCoreToolkit(void )
+{
+	DIA_toolkitInit(&Qt4CoreToolkitDescriptor);
+	
+}
 //EOF

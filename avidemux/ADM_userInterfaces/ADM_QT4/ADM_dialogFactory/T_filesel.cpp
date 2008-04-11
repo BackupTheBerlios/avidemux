@@ -44,6 +44,39 @@ typedef enum
     ADM_FILEMODE_WRITE
 }ADM_fileMode;
 
+namespace ADM_Qt4Factory
+{
+class diaElemFile : public diaElemFileBase
+{
+
+protected:
+    
+public:
+  
+  diaElemFile(uint32_t writeMode,char **filename,const char *toggleTitle,
+              const char *defaultSuffix = 0,const char *tip=NULL);
+  virtual ~diaElemFile() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  
+  void   changeFile(void);
+  void   enable(uint32_t onoff);
+};
+class diaElemDirSelect : public diaElemDirSelectBase
+{
+
+public:
+  
+  diaElemDirSelect(char **filename,const char *toggleTitle,const char *tip=NULL);
+  virtual ~diaElemDirSelect() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  
+  void changeFile(void);
+  void   enable(uint32_t onoff);
+};
+
+
 class  ADM_Qfilesel : public QWidget
 {
      Q_OBJECT
@@ -187,7 +220,7 @@ void diaElemFile::enable(uint32_t onoff)
   ADM_Qfilesel *fs=(ADM_Qfilesel *)myWidget;
   fs->setEnabled(onoff);
 }
-
+void diaElemFile::changeFile(void) {}
 //****************************
 diaElemDirSelect::diaElemDirSelect(char **filename,const char *toggleTitle,const char *selectDirDesc) :
 	diaElemDirSelectBase()
@@ -228,5 +261,29 @@ void diaElemDirSelect::getMe(void)
 void diaElemDirSelect::enable(uint32_t onoff) {}
   
 void diaElemDirSelect::changeFile(void) {}
+} // End of namespace
+//****************************Hoook*****************
+
+diaElem  *qt4CreateFile(uint32_t writeMode,char **filename,const char *toggleTitle,
+        const char *defaultSuffix ,const char *tip)
+{
+	return new  ADM_Qt4Factory::diaElemFile(writeMode,filename,toggleTitle,defaultSuffix ,tip);
+}
+void qt4DestroyFile(diaElem *e)
+{
+	ADM_Qt4Factory::diaElemFile *a=(ADM_Qt4Factory::diaElemFile *)e;
+	delete a;
+}
+
+diaElem  *qt4CreateDir(char **filename,const char *toggleTitle,const char *tip)
+{
+	return new  ADM_Qt4Factory::diaElemDirSelect(filename,toggleTitle,tip);
+}
+void qt4DestroyDir(diaElem *e)
+{
+	ADM_Qt4Factory::diaElemDirSelect *a=(ADM_Qt4Factory::diaElemDirSelect *)e;
+	delete a;
+}
+//EOF
 
 //EOF

@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include "ADM_default.h"
+#include "DIA_coreToolkit.h"
 #include "DIA_coreUI_internal.h"
 #include "DIA_factoryStubs.h"
 
@@ -44,6 +45,7 @@ uint8_t  DIA_factoryInit(FactoryDescriptor *d)
 		printf("[CoreUI] Maybe Incompatible COREUI Minor version, compiled with %d, using %d\n",ADM_COREUI_MINOR,minor);
 	}
 	printf("[CoreUI] Compiled with patch version %d, using %d\n",ADM_COREUI_PATCH,patch);
+	return 1;
 }
 // ****************** All ************************
 uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)

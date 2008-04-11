@@ -17,11 +17,9 @@
 #include "DIA_factory.h"
 namespace ADM_GtkFactory
 {
-class diaElemBitrate : public diaElem
+class diaElemBitrate : public diaElemBitrateBase
 {
-  protected:
-    COMPRES_PARAMS    copy;
-    uint32_t maxQ;
+protected:
 public:
   
   diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip=NULL);
@@ -63,7 +61,7 @@ static COMPRESSION_MODE readPulldown(COMPRES_PARAMS *copy,int rank)
 }
 
  diaElemBitrate::diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip)
-  : diaElem(ELEM_BITRATE)
+  : diaElemBitrateBase()
 {
   param=(void *)p;
   memcpy(&copy,p,sizeof(copy));

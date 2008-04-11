@@ -20,7 +20,8 @@
  ***************************************************************************/
 #include "toolkit_gtk.h"
 #include "prefs.h"
-
+#include "DIA_coreToolkit.h"
+#include "DIA_coreUI_internal.h"
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \
     gtk_widget_ref (widget), (GDestroyNotify) gtk_widget_unref)
@@ -102,6 +103,8 @@ GtkWidget *top;
 	Answers always no to question
 
 */
+namespace ADM_GtkCoreUIToolkit
+{
 uint8_t GUI_isQuiet(void )
 {
 	return beQuiet;
@@ -192,7 +195,7 @@ Takes primary and optional secondary string, as described in GNOME HIG 2.0.
 @secondary_format: printf()-style format string for secondary text, or NULL for no secondary text
 @...: arguments for secondary_format
 */
-void GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format, ...)
+void GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format)
 {
 	GtkWidget *dialog;
 	uint32_t msglvl=2;
@@ -205,22 +208,18 @@ void GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *sec
                 return;
         }
 
-	va_list ap;
-	va_start(ap, secondary_format);
 
 	char *alertstring;
 	
 	if (secondary_format)
 	{
-		char *secondary = g_strdup_vprintf(secondary_format, ap);
+
 		if (beQuiet)
 		{
-			printf("Info: %s\n%s\n", primary, secondary);
-			g_free(secondary);
+			printf("Info: %s\n%s\n", primary, secondary_format);
 			return;
 		}
-		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>\n\n", secondary, NULL);
-		g_free(secondary);
+		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>\n\n", secondary_format, NULL);
 	}
 	else
 	{	
@@ -232,7 +231,6 @@ void GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *sec
 		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>", NULL);
 	}
 	
-	va_end(ap);
 	
 	dialog=create_dialogInfo();
 	gtk_label_set_text(GTK_LABEL(WID(label1)), alertstring);
@@ -245,31 +243,6 @@ void GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *sec
 	UI_purge();
 }
 
-/**
-	GUI_Alert : Just display an alert string in a dialog box
-	The string can contain \n for multi lines display
-	
-	Deprecated - for error alerts, use GUI_Error_HIG.
-*/
-void 		GUI_Alert(const char *alertstring)
-{
-	   GtkWidget *dialog;
-
-        if(beQuiet) 
-        {
-                printf("Info: %s\n",alertstring);
-                return  ;
-        }
-        dialog=create_dialogWarning();
-        gtk_label_set_text(GTK_LABEL(WID(label1)),alertstring);
-        gtk_label_set_use_markup(GTK_LABEL(WID(label1)), TRUE);
-        gtk_register_dialog(dialog);
-        gtk_dialog_run(GTK_DIALOG(dialog));
-        gtk_unregister_dialog(dialog);
-        gtk_widget_destroy(dialog);
-	UI_purge();
-
-}
 
 /**
 GUI_Error_HIG: display an error dialog.
@@ -279,7 +252,7 @@ Takes primary and optional secondary string, as described in GNOME HIG 2.0.
 @secondary_format: printf()-style format string for secondary text, or NULL for no secondary text
 @...: arguments for secondary_format
 */
-void GUI_Error_HIG(const char *primary, const char *secondary_format, ...)
+void GUI_Error_HIG(const char *primary, const char *secondary_format)
 {
 	GtkWidget *dialog;
 	uint32_t msglvl=2;
@@ -291,22 +264,18 @@ void GUI_Error_HIG(const char *primary, const char *secondary_format, ...)
                 return;
         }
 
-	va_list ap;
-	va_start(ap, secondary_format);
 
 	char *alertstring;
 	
 	if (secondary_format)
 	{
-		char *secondary = g_strdup_vprintf(secondary_format, ap);
+		
 		if (beQuiet)
 		{
-			printf("Info: %s\n%s\n", primary, secondary);
-			g_free(secondary);
+			printf("Info: %s\n%s\n", primary, secondary_format);
 			return;
 		}
-		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>\n\n", secondary, NULL);
-		g_free(secondary);
+		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>\n\n", secondary_format, NULL);
 	}
 	else
 	{	
@@ -318,7 +287,6 @@ void GUI_Error_HIG(const char *primary, const char *secondary_format, ...)
 		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>", NULL);
 	}
 	
-	va_end(ap);
 	
 	dialog=create_dialogWarning();
 	gtk_label_set_text(GTK_LABEL(WID(label1)), alertstring);
@@ -345,27 +313,22 @@ Takes primary and optional secondary string.
 @secondary_format: printf()-style format string for secondary text, or NULL for no secondary text
 @...: arguments for secondary_format
 */
-int GUI_Confirmation_HIG(const char *button_confirm, const char *primary, const char *secondary_format, ...)
+int GUI_Confirmation_HIG(const char *button_confirm, const char *primary, const char *secondary_format)
 {
 	int ret=0;
 	GtkWidget *dialog;
 	
-	va_list ap;
-	va_start(ap, secondary_format);
-
 	char *alertstring;
 	
 	if (secondary_format)
 	{
-		char *secondary = g_strdup_vprintf(secondary_format, ap);
+		
 		if (beQuiet)
 		{
-			printf("Info: %s\n%s\n", primary, secondary);
-			g_free(secondary);
+			printf("Info: %s\n%s\n", primary, secondary_format);
 			return 0;
 		}
-		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>\n\n", secondary, NULL);
-		g_free(secondary);
+		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>\n\n", secondary_format, NULL);
 	}
 	else
 	{	
@@ -377,7 +340,6 @@ int GUI_Confirmation_HIG(const char *button_confirm, const char *primary, const 
 		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>", NULL);
 	}
 	
-	va_end(ap);
 
 	dialog=create_dialogConfirmation(button_confirm);
 	gtk_label_set_text(GTK_LABEL(WID(label1)), alertstring);
@@ -408,27 +370,22 @@ See GNOME HIG 2.0, chapter 3, section "Alerts" for more details.
 @secondary_format: printf()-style format string for secondary text, or NULL for no secondary text
 @...: arguments for secondary_format
 */
-int GUI_YesNo(const char *primary, const char *secondary_format, ...)
+int GUI_YesNo(const char *primary, const char *secondary_format)
 {
 	int ret=0;
 	GtkWidget *dialog;
 	
-	va_list ap;
-	va_start(ap, secondary_format);
-
 	char *alertstring;
 	
 	if (secondary_format)
 	{
-		char *secondary = g_strdup_vprintf(secondary_format, ap);
+		
 		if (beQuiet)
 		{
-			printf("Info: %s\n%s\n", primary, secondary);
-			g_free(secondary);
+			printf("Info: %s\n%s\n", primary, secondary_format);
 			return 0;
 		}
-		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>\n\n", secondary, NULL);
-		g_free(secondary);
+		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>\n\n", secondary_format, NULL);
 	}
 	else
 	{	
@@ -440,7 +397,6 @@ int GUI_YesNo(const char *primary, const char *secondary_format, ...)
 		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>", NULL);
 	}
 	
-	va_end(ap);
 
 	dialog=create_dialogYN();
 	gtk_label_set_text(GTK_LABEL(WID(label1)), alertstring);
@@ -456,7 +412,27 @@ int GUI_YesNo(const char *primary, const char *secondary_format, ...)
 	UI_purge();
 	return ret;
 }
+extern int GUI_Alternate(char *title,char *choice1,char *choice2);
+} // End of namespace
 
+static CoreToolkitDescriptor GtkCoreToolkitDescriptor=
+{
+		&ADM_GtkCoreUIToolkit::GUI_Info_HIG,
+		&ADM_GtkCoreUIToolkit::GUI_Error_HIG,
+		&ADM_GtkCoreUIToolkit::GUI_Confirmation_HIG,
+		&ADM_GtkCoreUIToolkit::GUI_YesNo,
+		&ADM_GtkCoreUIToolkit::GUI_Question,
+		&ADM_GtkCoreUIToolkit::GUI_Alternate,
+		&ADM_GtkCoreUIToolkit::GUI_Verbose,
+		&ADM_GtkCoreUIToolkit::GUI_Quiet,
+		&ADM_GtkCoreUIToolkit::GUI_isQuiet
+};
+
+void InitCoreToolkit(void )
+{
+	DIA_toolkitInit(&GtkCoreToolkitDescriptor);
+	
+}
 /**
 	Return the line number of a selection
 	0 if no selection of fails

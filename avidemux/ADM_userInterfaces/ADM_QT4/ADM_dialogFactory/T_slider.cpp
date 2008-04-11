@@ -36,6 +36,39 @@ extern const char *shortkey(const char *);
 
 
 
+namespace ADM_qt4Factory
+{
+
+
+class diaElemUSlider : public diaElemSliderBase
+{
+  protected:
+	  uint32_t min,max,incr;
+public:
+	diaElemUSlider(uint32_t *value,const char *toggleTitle, uint32_t min,uint32_t max,uint32_t incr = 1, const char *tip=NULL);
+  virtual   ~diaElemUSlider() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      enable(uint32_t onoff) ;
+  
+};
+class diaElemSlider : public diaElemSliderBase
+{
+  protected:
+    
+	  int32_t min,max,incr;
+    
+public:
+	diaElemSlider(int32_t *value,const char *toggleTitle, int32_t min,int32_t max,int32_t incr = 1, const char *tip=NULL);
+  virtual   ~diaElemSlider() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      enable(uint32_t onoff) ;
+  
+  
+};
+
+
 //********************************************************************
 
 class SpinSlider : public QWidget
@@ -204,3 +237,30 @@ void diaElemSlider::enable(uint32_t onoff)
   else
     box->setDisabled(1);
 }
+
+//****************************************************
+} // End of namespace
+//****************************Hoook*****************
+
+diaElem  *qt4CreateSlider(int32_t *value,const char *toggleTitle, int32_t min,int32_t max,int32_t incr , const char *tip)
+{
+	return new  ADM_qt4Factory::diaElemSlider(value,toggleTitle,min,max,incr,tip);
+}
+void qt4DestroySlider(diaElem *e)
+{
+	ADM_qt4Factory::diaElemSlider *a=(ADM_qt4Factory::diaElemSlider *)e;
+	delete a;
+}
+diaElem  *qt4CreateUSlider(uint32_t *value,const char *toggleTitle, uint32_t min,uint32_t max,uint32_t incr , const char *tip)
+{
+	return new  ADM_qt4Factory::diaElemUSlider(value,toggleTitle,min,max,incr,tip);
+}
+void qt4DestroyUSlider(diaElem *e)
+{
+	ADM_qt4Factory::diaElemUSlider *a=(ADM_qt4Factory::diaElemUSlider *)e;
+	delete a;
+}
+//****************************************************
+//EOF
+
+
