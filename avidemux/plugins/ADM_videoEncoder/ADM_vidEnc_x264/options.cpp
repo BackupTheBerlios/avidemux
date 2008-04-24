@@ -748,7 +748,7 @@ void x264Options::setQuantiser(unsigned int quantiser)
 
 unsigned int x264Options::getVbrQuantiser(void)
 {
-	return _param.rc.f_rf_constant;
+	return (unsigned int)_param.rc.f_rf_constant;
 }
 
 void x264Options::setVbrQuantiser(unsigned vbrQuantiser)

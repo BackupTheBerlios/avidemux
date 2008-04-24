@@ -1,7 +1,7 @@
 #ifndef configGuiLoader_h
 #define configGuiLoader_h
 
-#include "ADM_dynamicloading.h"
+#include "ADM_dynamicLoading.h"
 #include "options.h"
 
 extern "C"
