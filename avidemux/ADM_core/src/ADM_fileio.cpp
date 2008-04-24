@@ -204,6 +204,10 @@ char *ADM_getInstallRelativePath(const char *base1, const char *base2,const char
 #endif
 }
 
+char *ADM_getPluginPath(void)
+{
+	return ADM_getInstallRelativePath("lib", "ADM_plugins", "videoEncoder");
+}
 /*
       Get the root directory for .avidemux stuff
 ******************************************************/

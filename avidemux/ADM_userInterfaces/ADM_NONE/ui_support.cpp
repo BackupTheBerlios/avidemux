@@ -1,5 +1,9 @@
 #include <stdio.h>
+
 #include "config.h"
+#include "ADM_inttype.h"
+#include "ADM_files.h"
+#include "ADM_encoder/ADM_pluginLoad.h"
 
 #ifdef HAVE_GETTEXT
 #include <libintl.h>
@@ -27,4 +31,12 @@ const char* translate(const char *__domainname, const char *__msgid)
 void getUIDescription(char* desc)
 {
 	sprintf(desc, "CLI");
+}
+
+void loadPlugins(void)
+{
+	char *pluginDir = ADM_getPluginPath();
+
+	ADM_vidEnc_loadPlugins(ADM_VIDENC_UI_CLI, pluginDir);
+	delete [] pluginDir;
 }

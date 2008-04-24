@@ -58,9 +58,9 @@ extern "C" {
 
 #include "ADM_libraries/ADM_mplex/ADM_mthread.h"
 
-static uint8_t *_buffer=NULL,*_outbuffer=NULL;
-static void  end (void);
-extern const char *getStrFromAudioCodec( uint32_t codec);
+static uint8_t *_buffer = NULL, *_outbuffer = NULL;
+static void end(void);
+extern const char *getStrFromAudioCodec(uint32_t codec);
 
 extern COMPRES_PARAMS ffmpeg1Codec,ffmpeg2DVDCodec,ffmpeg2SVCDCodec,RequantCodec;	
 extern FFcodecSetting ffmpeg1Extra,ffmpeg2DVDExtra,ffmpeg2SVCDExtra;
@@ -68,15 +68,10 @@ extern COMPRES_PARAMS SVCDCodec, DVDCodec,VCDCodec;
 
 extern uint8_t    isMpeg12Compatible (uint32_t fourcc);
 
+extern SelectCodecType videoCodecGetType(void);
 
-extern SelectCodecType  current_codec;
-
-static char *twoPass=NULL;
-static char *twoFake=NULL;
-
-
-
-
+static char *twoPass = NULL;
+static char *twoFake = NULL;
 
 uint8_t oplug_mpegff(const char *name, ADM_OUT_FORMAT type)
 {
@@ -156,7 +151,7 @@ DIA_encoding  *encoding;
                 // Check
                 WAVHeader *hdr=audio->getInfo();	
                 audio_encoding=hdr->encoding;
-                if(current_codec==CodecXVCD ||current_codec==CodecVCD)
+                if (videoCodecGetType() == CodecXVCD || videoCodecGetType() == CodecVCD)
                 {
                         if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
                         {
@@ -192,7 +187,7 @@ DIA_encoding  *encoding;
         // Create muxer
        
        
-        switch(current_codec)
+        switch (videoCodecGetType())
         {
                 
                 case CodecXVCD:
@@ -244,7 +239,7 @@ DIA_encoding  *encoding;
       ADM_assert(  _outbuffer);
 
       encoding =new DIA_encoding(_fps1000);
-      switch(current_codec)
+      switch (videoCodecGetType())
       {
           case CodecVCD:
             encoding->setCodec("libmpeg2enc VCD");

@@ -64,9 +64,6 @@ extern uint32_t					videoProcessMode (void);
 extern uint32_t 				frameStart,frameEnd;
 extern uint32_t 				audioProcessMode(void);
 extern AVDMGenericAudioStream 	*currentaudiostream;;
-extern SelectCodecType  		current_codec;
-
-
 
 static 				uint8_t *_buffer=NULL,*_outbuffer=NULL;
 

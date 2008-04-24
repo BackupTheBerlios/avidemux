@@ -126,7 +126,7 @@ extern void fileReadWrite(SELFILE_CB cb, int rw, char *name);
 };
 
 // To build vcodec
-extern uint32_t encoderGetNbEncoder(void);
+extern int encoderGetEncoderCount(void);
 extern const char* encoderGetIndexedName(uint32_t i);
 // To build a codec
 uint32_t audioFilterGetNbEncoder(void);
@@ -492,7 +492,7 @@ uint8_t  bindGUI( void )
 	const char *name;
         GtkComboBox     *combo_box;
 
-                nbVid=encoderGetNbEncoder();
+                nbVid=encoderGetEncoderCount();
                 combo_box=GTK_COMBO_BOX(lookup_widget(guiRootWindow,VIDEO_WIDGET));
                 gtk_combo_box_remove_text(combo_box,0);
                 printf("Found %d video encoder\n",nbVid);

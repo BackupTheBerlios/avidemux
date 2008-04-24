@@ -54,15 +54,6 @@ extern "C" {
 #define TARGET_COLORSPACE       PIX_FMT_RGB32 
 #define ALTERNATE_COLORSPACE    PIX_FMT_BGR32
 
-void COL_init(void);
-
-void COL_init(void)
-{
-// int flags;
-//         FLAGS();
-//         sws_rgb2rgb_init(flags);
-
-}
  //***********************************************
  ColBase::ColBase(uint32_t ww, uint32_t hh)
  {

@@ -139,7 +139,7 @@ void X264Encoder::printParam(x264_param_t *x264Param)
 	printf("[x264] vui.b_fullrange = %d\n", x264Param->vui.b_fullrange);
 }
 
-void X264Encoder::printCqm(const uint8_t cqm[], uint8_t size)
+void X264Encoder::printCqm(const uint8_t cqm[], int size)
 {
 	for (int index = 0; index < size; index++)
 		printf("%d ", cqm[index]);

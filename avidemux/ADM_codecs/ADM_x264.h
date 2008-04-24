@@ -32,7 +32,7 @@ protected:
 	uint32_t curFrame;
 
 	void printParam(x264_param_t* x264Param);
-	void printCqm(const uint8_t cqm[], uint8_t size);
+	void printCqm(const uint8_t cqm[], int size);
 	uint8_t preamble(uint32_t fps1000, ADM_x264Param * param);
 	uint8_t createHeader(void);
 

@@ -45,7 +45,7 @@ extern char **global_argv;
 extern uint8_t UI_getPhysicalScreenSize(void* window, uint32_t *w,uint32_t *h);
 extern int automation(void );
 extern void HandleAction(Action a);
-extern uint32_t encoderGetNbEncoder (void);
+extern int encoderGetEncoderCount (void);
 extern const char *encoderGetIndexedName (uint32_t i);
 extern uint32_t audioFilterGetNbEncoder(void);
 extern const char* audioFilterGetIndexedName(uint32_t i);
@@ -701,7 +701,7 @@ void setupMenus(void)
 	uint32_t nbVid;
 	const char *name;
 
-	nbVid=encoderGetNbEncoder();
+	nbVid=encoderGetEncoderCount();
 	printf("Found %d video encoder(s)\n",nbVid);
 	for(uint32_t i=1;i<nbVid;i++)
 	{

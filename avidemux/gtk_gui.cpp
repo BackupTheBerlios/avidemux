@@ -130,7 +130,7 @@ extern uint8_t DIA_gotoTime(uint16_t *hh, uint16_t *mm, uint16_t *ss);
 extern uint8_t GUI_getFrame(uint32_t frameno,  uint32_t *flags);
 extern int A_SaveUnpackedVop(const char *name);
 extern int A_SavePackedVop(const char *name);
-extern void      videoCodecConfigureUI(void);
+extern void videoCodecConfigureUI(int codecIndex = -1);
 extern void audioCodecChanged(int newcodec);
 extern void videoCodecChanged(int newcodec);
 extern void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );

@@ -13,68 +13,54 @@
 
 //___________________________________
  
-extern uint32_t encoderGetNbEncoder(void);
+extern int encoderGetEncoderCount(void);
 extern const char* encoderGetIndexedName(uint32_t i);
-COMPRES_PARAMS *videoCodecGetDescriptor (SelectCodecType codec);
-COMPRES_PARAMS *videoCodecGetDescriptorByIndex (int index);
+extern int videoCodecGetIndex(void);
+
 static GtkWidget *create_dialog1 (void);
 
 //___________________________________________________________
-uint8_t DIA_videoCodec( SelectCodecType *codec )
+uint8_t DIA_videoCodec(int *codecIndex)
 {
 #define CONFIGURE 99
-        uint8_t ret=0;
-        SelectCodecType old=*codec;
-        uint32_t nb;
-        GtkWidget *widget[30];
-        const char *name[30];
-        GtkWidget *dialog;
-        
-        nb=encoderGetNbEncoder();
-        
-        dialog=create_dialog1();
-        	
-        gtk_register_dialog(dialog);
-        COMPRES_PARAMS *desc=videoCodecGetDescriptor (*codec);
-        if(!desc) return 0;
-        
-        // now set the input one
-        int memo=0;
-        for(uint32_t i=0;i<nb;i++)
-        {
-                name[i]=encoderGetIndexedName(i);
-                gtk_combo_box_append_text      (GTK_COMBO_BOX (WID(combobox1)),name[i]);
-                if(videoCodecGetDescriptorByIndex (i)==desc) memo=i;
-        }
-        gtk_combo_box_set_active(GTK_COMBO_BOX (WID(combobox1)),memo);
-        gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonConf),CONFIGURE);
-        int running=1;
-        while(running)
-          switch(gtk_dialog_run(GTK_DIALOG(dialog)))
-        {
-          case GTK_RESPONSE_OK:
-          	{
-                  ret=1;
-                    int s=gtk_combo_box_get_active(GTK_COMBO_BOX (WID(combobox1)));
-                    COMPRES_PARAMS *nw=videoCodecGetDescriptorByIndex (s);
-                    *codec=nw->codec;
-                    running=0;
-                  break;
-                }
-          case CONFIGURE:
-          {
-            int s=gtk_combo_box_get_active(GTK_COMBO_BOX (WID(combobox1)));
-            COMPRES_PARAMS *nw=videoCodecGetDescriptorByIndex (s);
-            if(nw->configure) nw->configure(nw);
-            break;
-          }
-          default:
-                running=0;
-                break;
-        }
-        gtk_widget_destroy(dialog);
-        gtk_unregister_dialog(dialog);
-        return ret;
+	uint8_t ret = 0;
+	uint32_t nb = encoderGetEncoderCount();
+	GtkWidget *dialog = create_dialog1();
+
+	gtk_register_dialog(dialog);
+
+	for (int i = 0; i < nb; i++)
+		gtk_combo_box_append_text(GTK_COMBO_BOX(WID(combobox1)), encoderGetIndexedName(i));
+
+	gtk_combo_box_set_active(GTK_COMBO_BOX (WID(combobox1)), videoCodecGetIndex());
+	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), WID(buttonConf), CONFIGURE);
+
+	int running = 1;
+
+	while (running)
+	{
+		switch (gtk_dialog_run(GTK_DIALOG(dialog)))
+		{
+		case GTK_RESPONSE_OK:
+			*codecIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(WID(combobox1)));
+
+			ret = 1;
+			running = 0;
+			break;
+		case CONFIGURE:
+			videoCodecConfigureUI(gtk_combo_box_get_active(GTK_COMBO_BOX(WID(combobox1))));
+
+			break;
+		default:
+			running = 0;
+			break;
+		}
+	}
+
+	gtk_widget_destroy(dialog);
+	gtk_unregister_dialog(dialog);
+
+	return ret;
 } 
 
 GtkWidget *create_dialog1 (void)

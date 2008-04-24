@@ -37,7 +37,7 @@
 #define __ADM_VIDEO__
 
 #define INT int32_t
-#include "ADM_video/ADM_confCouple.h"
+#include "ADM_confCouple.h"
 #include "ADM_image.h"
 
 #define Pixel uint8_t

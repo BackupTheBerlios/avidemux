@@ -63,7 +63,7 @@ char *x264_slurp_file(const char *filename)
 	return buf;
 }
 
-int x264_cqm_parse_jmlist(const char *buf, const char *name, uint8_t *cqm, const uint8_t *jvt, int length)
+int x264_cqm_parse_jmlist(const char *buf, const char *name, uint8_t *cqm, uint8_t *defaultMatrix, int length)
 {
 	char *p;
 	char *nextvar;
@@ -92,7 +92,7 @@ int x264_cqm_parse_jmlist(const char *buf, const char *name, uint8_t *cqm, const
 
 		if (i == 0 && coef == 0)
 		{
-			memcpy(cqm, jvt, length);
+			memcpy(cqm, defaultMatrix, length);
 			return 0;
 		}
 
@@ -119,6 +119,7 @@ int x264_cqm_parse_file(const char *filename, uint8_t* intra4x4Luma, uint8_t* in
 {
 	char *buf, *p;
 	int b_error = 0;
+	uint8_t* dummyMatrix = new uint8_t[64];
 
 	buf = x264_slurp_file(filename);
 
@@ -131,14 +132,17 @@ int x264_cqm_parse_file(const char *filename, uint8_t* intra4x4Luma, uint8_t* in
 	while ((p = strchr(buf, '#')) != NULL)
 		memset(p, ' ', strcspn(p, "\n"));
 
-	b_error |= x264_cqm_parse_jmlist(buf, "INTRA4X4_LUMA",   intra4x4Luma, x264_cqm_jvt4i, 16);
-	b_error |= x264_cqm_parse_jmlist(buf, "INTRA4X4_CHROMA", intra4x4Chroma, x264_cqm_jvt4i, 16);
-	b_error |= x264_cqm_parse_jmlist(buf, "INTER4X4_LUMA",   inter4x4Luma, x264_cqm_jvt4p, 16);
-	b_error |= x264_cqm_parse_jmlist(buf, "INTER4X4_CHROMA", inter4x4Chroma, x264_cqm_jvt4p, 16);
-	b_error |= x264_cqm_parse_jmlist(buf, "INTRA8X8_LUMA",   intra8x8Luma, x264_cqm_jvt8i, 64);
-	b_error |= x264_cqm_parse_jmlist(buf, "INTER8X8_LUMA",   inter8x8Luma, x264_cqm_jvt8p, 64);
+	memset(dummyMatrix, 16, 64);
+
+	b_error |= x264_cqm_parse_jmlist(buf, "INTRA4X4_LUMA",   intra4x4Luma, dummyMatrix, 16);
+	b_error |= x264_cqm_parse_jmlist(buf, "INTRA4X4_CHROMA", intra4x4Chroma, dummyMatrix, 16);
+	b_error |= x264_cqm_parse_jmlist(buf, "INTER4X4_LUMA",   inter4x4Luma, dummyMatrix, 16);
+	b_error |= x264_cqm_parse_jmlist(buf, "INTER4X4_CHROMA", inter4x4Chroma, dummyMatrix, 16);
+	b_error |= x264_cqm_parse_jmlist(buf, "INTRA8X8_LUMA",   intra8x8Luma, dummyMatrix, 64);
+	b_error |= x264_cqm_parse_jmlist(buf, "INTER8X8_LUMA",   inter8x8Luma, dummyMatrix, 64);
 
 	delete [] buf;
+	delete dummyMatrix;
 
 	return b_error;
 }

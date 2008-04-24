@@ -7,6 +7,7 @@ uint8_t DIA_flv1Param(COMPRES_PARAMS *incoming);
 #include "ADM_vidEncode.hxx"
 // Yv12
 extern uint8_t DIA_requant(COMPRES_PARAMS *incoming);
+#define FF_TRELLIS 0		// use treillis for mpeg1 encoding
 
 COMPRES_PARAMS yv12codec = {
   CodecYV12,
@@ -708,7 +709,7 @@ NULL,//     char      *logfile;
 25,//     uint32_t  MinIdr;
 250,//     uint32_t  MaxIdr;
 //     //
-1,//     uint32_t  _8x8;
+0,//     uint32_t  _8x8;
 1,//     uint32_t   _8x8P;
 1,//     uint32_t   _8x8B;
 0,//     uint32_t   _4x4;
@@ -740,7 +741,7 @@ NULL,//     char      *logfile;
 0, // Mixed Ref
 0, //NoiseReduction
 51, // level IDC
-0, // fastPSkip;
+1, // fastPSkip;
 1,  //DCTDecimate;
 0,   //interlaced;
 0,    // vbv_max_bitrate;
@@ -753,12 +754,12 @@ NULL,//     char      *logfile;
 21,	// interLumaDeadzone
 11,	// intraLumaDeadzone
 0,	// cqmPreset
-{6,13,20,28,13,20,28,32,20,28,32,37,28,32,37,42},	// intra4x4Luma
-{6,13,20,28,13,20,28,32,20,28,32,37,28,32,37,42},	// intra4x4Chroma
-{10,14,20,24,14,20,24,27,20,24,27,30,24,27,30,34},	// inter4x4Luma
-{10,14,20,24,14,20,24,27,20,24,27,30,24,27,30,34},	// inter4x4Chroma
-{6,10,13,16,18,23,25,27,10,11,16,18,23,25,27,29,13,16,18,23,25,27,29,31,16,18,23,25,27,29,31,33,18,23,25,27,29,31,33,36,23,25,27,29,31,33,36,38,25,27,29,31,33,36,38,40,27,29,31,33,36,38,40,42},	// intra8x8Luma
-{9,13,15,17,19,21,22,24,13,13,17,19,21,22,24,25,15,17,19,21,22,24,25,27,17,19,21,22,24,25,27,28,19,21,22,24,25,27,28,30,21,22,24,25,27,28,30,32,22,24,25,27,28,30,32,33,24,25,27,28,30,32,33,35},	// inter8x8Luma
+{16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16}, // intra4x4Luma
+{16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16}, // intra4x4Chroma
+{16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16}, // inter4x4Luma
+{16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16}, // inter4x4Chroma
+{16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16}, // intra8x8Luma
+{16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16}, // inter8x8Luma
 100,	// rateTolerance
 1.4,	// quantiserIpRatio
 1.3,	// quantiserPbRatio
@@ -827,7 +828,7 @@ NULL,//     char      *logfile;
 0, // Mixed Ref
 0, //NoiseReduction
 30, // level IDC
-0, // fastPSkip;
+1, // fastPSkip;
 1,  //DCTDecimate;
 0,   //interlaced;
 0,    // vbv_max_bitrate;
@@ -891,7 +892,7 @@ COMPRES_PARAMS CopyCodec =
   { CodecCopy, "Copy", "Copy", "Copy", COMPRESS_CQ, 4, 1500, 700,1000, 0, 0, NULL,
 0 };
 
-COMPRES_PARAMS *AllVideoCodec[] = {
+COMPRES_PARAMS *internalVideoCodec[] = {
   &CopyCodec,
 #ifdef USE_XVID_4
   &Xvid4Codec,
@@ -917,4 +918,9 @@ COMPRES_PARAMS *AllVideoCodec[] = {
   &ffmpegFLV1,
   &DUMMYONE
 };
+
+int getInternalVideoCodecCount()
+{
+	return (sizeof(internalVideoCodec) / sizeof(COMPRES_PARAMS*)) - 1;	// There is a dummy extra one at the end
+}
 #endif

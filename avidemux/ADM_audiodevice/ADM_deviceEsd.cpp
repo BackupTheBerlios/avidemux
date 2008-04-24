@@ -33,11 +33,6 @@
 #include "ADM_audiodevice/ADM_deviceoss.h"
 #include "ADM_audiodevice/ADM_deviceALSA.h"
 #include  "ADM_audiodevice/ADM_deviceEsd.h"
-#include "ADM_toolkit/toolkit.hxx"
-
-
-
-
 
 
 //_______________________________________________

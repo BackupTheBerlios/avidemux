@@ -27,6 +27,7 @@ char *ADM_getCustomDir(void);
 char *ADM_getInstallRelativePath(const char *base1, const char *base2=NULL,const char *base3=NULL);
 /* Returns the full path relative to .avidemux dir i.e. /home/fx/... +base1/base2 needs to be deleted []*/
 char *ADM_getHomeRelativePath(const char *base1, const char *base2=NULL,const char *base3=NULL);
+char *ADM_getPluginPath(void);
 #endif
 uint8_t buildDirectoryContent(uint32_t *outnb,const char *base, char *jobName[],int maxElems,const char *ext);
 

@@ -3,6 +3,10 @@
 #include <QApplication>
 #include <QtCore>
 
+#include "ADM_inttype.h"
+#include "ADM_files.h"
+#include "ADM_encoder/ADM_pluginLoad.h"
+
 static QTranslator qtTranslator;
 static QTranslator avidemuxTranslator;
 
@@ -55,4 +59,12 @@ void destroyTranslator(void) {}
 void getUIDescription(char* desc)
 {
 	sprintf(desc, "Qt4 (%s)", qVersion());
+}
+
+void loadPlugins(void)
+{
+	char *pluginDir = ADM_getPluginPath();
+
+	ADM_vidEnc_loadPlugins(ADM_VIDENC_UI_QT, pluginDir);
+	delete [] pluginDir;
 }

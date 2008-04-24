@@ -1,23 +1,13 @@
 ########################################
 # x264
 ########################################
-OPTION(X264 "" ON)
+INCLUDE(admCheckX264)
 
-MESSAGE(STATUS "Checking for x264")
-MESSAGE(STATUS "*****************")
+checkX264()
 
-IF (X264)
-	FIND_HEADER_AND_LIB(X264 x264.h x264 x264_encoder_open)
-	PRINT_LIBRARY_INFO("x264" X264_FOUND "${X264_INCLUDE_DIR}" "${X264_LIBRARY_DIR}")
-
-	IF (X264_FOUND)
-		SET(USE_X264 1)
-	ENDIF (X264_FOUND)
-ELSE (X264)
-	MESSAGE("${MSG_DISABLE_OPTION}")
-ENDIF (X264)
-
-MESSAGE("")
+IF (X264_FOUND)
+	SET(USE_X264 1)
+ENDIF (X264_FOUND)
 
 ########################################
 # Xvid

@@ -32,7 +32,6 @@
 #include "ADM_encoder/adm_encConfig.h"
 #include "prefs.h"
 #include "ADM_audiodevice/audio_out.h"
-#include "ADM_toolkit/ADM_intfloat.h"
 
 #ifdef USE_XVID_4
 extern void xvid4_init(void);
@@ -66,7 +65,6 @@ extern void  buildDistMatrix( void );
 extern void initScaleTab( void );
 extern uint8_t initGUI( void );
 extern void destroyGUI(void);
-extern void COL_init(void);
 extern uint8_t initFileSelector(void);
 extern void AUDMEncoder_initDither(void);
 extern void ADM_memStat( void );
@@ -74,6 +72,7 @@ extern void ADM_memStatInit( void );
 extern void ADM_memStatEnd( void );
 extern void getUIDescription(char*);
 extern uint8_t ADM_ad_loadPlugins(const char *path);
+extern void loadPlugins(void);
 extern void InitFactory(void);
 extern void InitCoreToolkit(void);
 #ifdef __MINGW32__
@@ -177,15 +176,14 @@ int main(int argc, char *argv[])
 	printf("\nLarge file available: %d offset\n", __USE_FILE_OFFSET64);
 #endif
 
-   // Start counting memory
+	// Start counting memory
 	ADM_memStatInit();
-	ADM_intFloatInit();
 
 	printf("\nInitialising prefs\n");
 	initPrefs();
 	prefs->load();
     CpuCaps::init();
-    
+
 	register_Encoders();
 
 #ifdef USE_SDL
@@ -204,23 +202,17 @@ int main(int argc, char *argv[])
 #ifdef USE_XVID_4
     xvid4_init();
 #endif
+
     // Hook our UI...
     InitFactory();
     InitCoreToolkit();
     initFileSelector();
     //****************
-    
-    
+
     ADM_InitMemcpy();
 
 	// Load .avidemuxrc
     quotaInit();
-
-	if(!initGUI())
-	{
-		printf("\n Fatal : could not init GUI\n");
-		exit(-1);
-	}
 
     video_body = new ADM_Composer;
 
@@ -239,8 +231,9 @@ int main(int argc, char *argv[])
 	{
 		filterDynLoad(dynloadPath);
 	}
-	
+
 	ADM_dealloc(dynloadPath);
+
 	//***************Plugins *********************
 	// Load system wide audio decoder plugin
 #ifdef __APPLE__
@@ -256,10 +249,16 @@ int main(int argc, char *argv[])
 	adPlugins=ADM_getHomeRelativePath("plugins","audioDecoder");
 	ADM_ad_loadPlugins(adPlugins);
 	delete [] adPlugins;
+
+	loadPlugins();
 	//***************Plugins *********************
-	
-	
-	
+
+	if(!initGUI())
+	{
+		printf("\n Fatal : could not init GUI\n");
+		exit(-1);
+	}
+
     ADM_lavInit();
 #ifdef HAVE_AUDIO
     AVDM_audioInit();
@@ -268,7 +267,6 @@ int main(int argc, char *argv[])
     buildDistMatrix();
     initScaleTab();
 
-    COL_init();	
     if(SpidermonkeyInit() == true)
         printf("Spidermonkey initialized.\n");
     else

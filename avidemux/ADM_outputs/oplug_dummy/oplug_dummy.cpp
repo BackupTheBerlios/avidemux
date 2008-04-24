@@ -60,7 +60,6 @@ extern void   	 				UI_purge(void );
 
 extern uint32_t					videoProcessMode (void);
 extern uint32_t 				frameStart,frameEnd;
-extern SelectCodecType  		current_codec;
 
 
 

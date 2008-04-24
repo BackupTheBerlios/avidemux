@@ -1,1 +1,2 @@
 ADD_SUBDIRECTORY(ADM_audiodecoder)
+ADD_SUBDIRECTORY(ADM_videoEncoder)

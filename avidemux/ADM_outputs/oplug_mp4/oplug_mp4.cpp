@@ -61,9 +61,6 @@ static uint8_t *_buffer=NULL,*_outbuffer=NULL;
 static void  end (void);
 extern const char *getStrFromAudioCodec( uint32_t codec);
 
-
-extern SelectCodecType  current_codec;
-
 static char *twoPass=NULL;
 static char *twoFake=NULL;
 

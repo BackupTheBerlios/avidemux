@@ -21,16 +21,15 @@ MESSAGE("")
 ########################################
 # Libxml2
 ########################################
-MESSAGE(STATUS "Checking for Libxml2")
-MESSAGE(STATUS "********************")
+INCLUDE(admCheckLibxml2)
 
-SET(LibXml2_FIND_QUIETLY TRUE)
+checkLibxml2()
 
-FIND_PACKAGE(LibXml2)
-PRINT_LIBRARY_INFO("Libxml2" LIBXML2_FOUND "${LIBXML2_INCLUDE_DIR} ${LIBXML2_DEFINITIONS}" "${LIBXML2_LIBRARIES}" FATAL_ERROR)
-
-SET(USE_LIBXML2 1)
-MESSAGE("")
+IF (LIBXML2_FOUND)
+	SET(USE_LIBXML2 1)
+ELSEIF (LIBXML2_FOUND)
+	MESSAGE(${ARGV4} "Could not find Libxml2")
+ENDIF (LIBXML2_FOUND)
 
 ########################################
 # libpng

@@ -38,7 +38,7 @@ uint8_t  DIA_toolkitInit(CoreToolkitDescriptor *d)
 
 void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format, ...)
 {
-	char text[MAX_ALERT_SIZE+1];
+	char text[MAX_ALERT_SIZE+1] = {0};
 	ADM_assert(Toolkit);
 	va_list ap;
 	
@@ -62,7 +62,7 @@ void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, cons
 
 void            GUI_Error_HIG(const char *primary, const char *secondary_format, ...)
 {
-	char text[MAX_ALERT_SIZE+1];
+	char text[MAX_ALERT_SIZE+1] = {0};
 		ADM_assert(Toolkit);
 		va_list ap;
 		
@@ -84,7 +84,7 @@ void            GUI_Error_HIG(const char *primary, const char *secondary_format,
 
 int             GUI_Confirmation_HIG(const char *button_confirm, const char *primary, const char *secondary_format, ...)
 {
-	char text[MAX_ALERT_SIZE+1];
+	char text[MAX_ALERT_SIZE+1] = {0};
 			ADM_assert(Toolkit);
 			va_list ap;
 			
@@ -106,7 +106,7 @@ int             GUI_Confirmation_HIG(const char *button_confirm, const char *pri
 
 int             GUI_YesNo(const char *primary, const char *secondary_format, ...)
 {
-	char text[MAX_ALERT_SIZE+1];
+	char text[MAX_ALERT_SIZE+1] = {0};
 			ADM_assert(Toolkit);
 			va_list ap;
 			

@@ -45,6 +45,7 @@ typedef enum
   CodecRequant,
   CodecDV,
   CodecFLV1,
+  CodecExternal,
   CodecDummy
 }SelectCodecType;
 
@@ -72,17 +73,17 @@ typedef enum
 
 struct COMPRES_PARAMS
 {
-  const SelectCodecType codec;
+  SelectCodecType codec;
   const char *menuName;
   const char *tagName;
   const char *descriptor;
   COMPRESSION_MODE mode;
   uint32_t qz, bitrate, finalsize,avg_bitrate;  // avg_bitrate is in kb/s!!
-  const uint32_t capabilities;
-  const uint32_t extra_param;
+  uint32_t capabilities;
+  uint32_t extra_param;
   void *extraSettings;
-  const uint32_t extraSettingsLen;
-    uint8_t (*configure) (struct COMPRES_PARAMS * par);
+  uint32_t extraSettingsLen;
+  uint8_t (*configure) (struct COMPRES_PARAMS * par);
 };
 
 //typedef struct COMPRES_PARAMS;
