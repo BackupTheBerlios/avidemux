@@ -25,6 +25,7 @@
 x264Options::x264Options(void)
 {
 	x264_param_default(&_param);
+	_param.rc.psz_rc_eq = strdup(_param.rc.psz_rc_eq);
 
 	_sarAsInput = false;
 	_param.rc.i_rc_method = X264_RC_CQP;
@@ -1348,7 +1349,6 @@ char* x264Options::toXml(void)
 		memcpy(xml, tempBuffer, tempBufferSize);
 		xml[tempBufferSize] = 0;
 
-		xmlFree(xmlBuffer);
 		xmlFreeDoc(xmlDoc);
 
 		break;
