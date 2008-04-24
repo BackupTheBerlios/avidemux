@@ -21,24 +21,17 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-
 #include "config.h"
-#include "fourcc.h"
-
-#include "config.h"
+#include "ADM_default.h"
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_video/ADM_videoNull.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
 
-#include "ADM_filter/video_filters.h"
+
 
 
 //_______________________________________________________________

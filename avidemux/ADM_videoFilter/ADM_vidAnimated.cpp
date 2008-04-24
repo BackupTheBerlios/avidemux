@@ -13,17 +13,16 @@
  ***************************************************************************/
 #include "ADM_default.h"
 
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
 
-#include "ADM_filter/video_filters.h"
+
 #include "ADM_vidAnimated.h"
 #include "ADM_inputs/ADM_inpics/ADM_pics.h"
-
+#include "ADM_codecs/ADM_codec.h" //For decoders
 static FILTER_PARAM animated_template={10,
     {"tc0","tc1","tc2",
     "tc3","tc4","tc5",

@@ -15,19 +15,13 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "config.h"
 
 #include "ADM_default.h"
-#include "fourcc.h"
-#include "avi_vars.h"
 
-
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_videoFilter/ADM_vidFlipV.h"
-#include "ADM_filter/video_filters.h"
+
 
 //#define REDUCED
 //adm_fast_memcpy myAdmMemcpy=memcpy;

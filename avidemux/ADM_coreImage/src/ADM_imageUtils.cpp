@@ -12,12 +12,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
+#include "ADM_default.h"
 #include "ADM_image.h"
 #include "ADM_toolkit/bitmap.h"
 #include "avifmt.h"
@@ -31,7 +28,7 @@
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_lavcodec.h"
 #include "ADM_codecs/ADM_ffmpeg.h"
-
+#define QT_TR_NOOP(x) x // No translation in core*
 static uint8_t tinyAverage(uint8_t *dst, uint8_t *src1, uint8_t *src2,uint32_t l)
 {
 

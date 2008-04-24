@@ -20,7 +20,7 @@ Daniel Moreno <comac@comac.darktech.org>
  
 #ifndef _D3D__
 #define _D3D__   
-#include "ADM_video/ADM_vidCached.h"
+
 typedef struct MPD3D_PARAM
 {
 	double  param1;  // Luma 

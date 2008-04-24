@@ -14,7 +14,6 @@
 #ifndef ADM_VID_COLOR_YUV_H
 #define ADM_VID_COLOR_YUV_H
 #include "ADM_vidColorYuv_param.h"
-#include "ADM_video/ADM_cache.h"
 class  ADMVideoColorYuv:public AVDMGenericVideoStream
 {
 

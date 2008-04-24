@@ -28,8 +28,7 @@ using namespace std;
 #include "fourcc.h"
 
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_encoder/adm_encoder.h"

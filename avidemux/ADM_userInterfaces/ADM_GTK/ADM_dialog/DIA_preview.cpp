@@ -20,7 +20,7 @@
  ***************************************************************************/
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 
 
 #include "DIA_flyDialog.h"

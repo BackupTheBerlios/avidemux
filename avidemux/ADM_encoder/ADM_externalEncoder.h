@@ -18,7 +18,7 @@
 #define ADM_externalEncoder_H
 
 #include "ADM_codecs/ADM_codec.h"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_vidEncode.hxx"
 #include "adm_encoder.h"
 #include "ADM_pluginLoad.h"

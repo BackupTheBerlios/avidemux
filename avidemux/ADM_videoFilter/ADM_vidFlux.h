@@ -17,7 +17,6 @@
  
 #ifndef __FLUX__
 #define __FLUX__   
-#include "ADM_video/ADM_cache.h"
 typedef struct FLUX_PARAM
 {
 	uint32_t temporal_threshold;

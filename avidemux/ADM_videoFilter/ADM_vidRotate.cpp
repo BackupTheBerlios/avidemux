@@ -15,18 +15,8 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "ADM_default.h"
-
-
-
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-//#include "ADM_video/ADM_vidRotate.h"
-#include "ADM_filter/video_filters.h"
+#include "ADM_videoFilter.h"
 #include "ADM_assert.h"
         
 #include "DIA_factory.h"

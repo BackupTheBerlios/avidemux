@@ -32,10 +32,8 @@
 #include "fourcc.h"
 
 
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_video/ADM_vidCommonFilter.h"
-#include "ADM_filter/video_filters.h"
 #include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_codecs/ADM_codec.h"

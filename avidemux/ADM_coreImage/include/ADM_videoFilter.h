@@ -170,6 +170,24 @@ AVDMGenericVideoStream *filter; 			\
 #define GET2(x,t) (assert(couples->getCouple((char *)#x,&(t))),(_param->x)=(t))
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
 
+typedef struct
+ {
+          uint32_t    nb;
+          const char  *param[25];
+ }FILTER_PARAM;
+ 
+#include "ADM_videoFilter_iface.h"
+ CONFcouple *filterBuildCouple(FILTER_PARAM *param,uint32_t n,Arg *args); 
+ 
 #define MPLAYER_RESIZE_PREFFERED
+ // You should not use this functions.
+ // Needed for some legacy filters...
+ AVDMGenericVideoStream *getLastVideoFilter( uint32_t frameStart, uint32_t nbFrame);
+ AVDMGenericVideoStream *getLastVideoFilter( void );
+ AVDMGenericVideoStream *getFirstVideoFilter( uint32_t frameStart, uint32_t nbFrame);
+ AVDMGenericVideoStream *getFirstVideoFilter( void);
+ AVDMGenericVideoStream *getFirstCurrentVideoFilter( void);
+// 
+#include "ADM_videoFilterCache.h"
 #endif
 

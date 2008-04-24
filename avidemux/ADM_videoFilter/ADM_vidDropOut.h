@@ -16,7 +16,6 @@
  ***************************************************************************/
 #ifndef __DROPOUT__
 #define __DROPOUT__   
-#include "ADM_video/ADM_cache.h"
  
 class  ADMVideoDropOut:public AVDMGenericVideoStream
  {

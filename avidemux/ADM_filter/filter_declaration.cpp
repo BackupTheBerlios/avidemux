@@ -18,23 +18,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "ADM_assert.h"
-
 #include "config.h"
-#include "fourcc.h"
+#include "ADM_default.h"
 
-#include "avi_vars.h"
 #ifdef HAVE_ENCODER
 
 
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_filter/video_filters.h"
-
+#include "ADM_videoFilter.h"
+#include "ADM_videoFilter_internal.h"
 #define FILTERDEC(x) extern   AVDMGenericVideoStream *x(AVDMGenericVideoStream *in, CONFcouple *param)
 #define FILTERDECX(x) extern   AVDMGenericVideoStream *x(AVDMGenericVideoStream *in, int n,Arg *args)
 #define REGISTER(e,a,g,b,c,d) {FILTERDEC(d);registerFilterEx(a,b,c,d,e,NULL,NULL);}

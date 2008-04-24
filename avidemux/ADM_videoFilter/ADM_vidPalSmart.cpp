@@ -16,12 +16,9 @@
 
 #include "ADM_default.h"
 
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-
+#include "ADM_videoFilter.h"
 #include"ADM_vidDeinterlace.h"
 #include"ADM_vidPalSmart.h"
-#include "ADM_filter/video_filters.h"
 
 #define MATCH_THRESH 100
 #define ASM_DEINT

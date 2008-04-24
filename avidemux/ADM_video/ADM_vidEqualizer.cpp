@@ -12,16 +12,14 @@
 
 
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
 
-
-
 #include "ADM_vidEqualizer.h"
-#include "ADM_filter/video_filters.h"
+
 
 static FILTER_PARAM equalizer_template={8,{"0","1","2","3"
 					,"4","5","6","7"}};

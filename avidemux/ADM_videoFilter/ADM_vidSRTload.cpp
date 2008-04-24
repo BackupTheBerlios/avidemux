@@ -36,8 +36,7 @@
 
 #include "ADM_default.h"
 
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 
 #include "ADM_video/ADM_vidFont.h"
 #include "ADM_videoFilter/ADM_vidSRT.h"

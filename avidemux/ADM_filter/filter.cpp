@@ -26,9 +26,9 @@
 
 
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_video/ADM_videoNull.h"
-#include "ADM_filter/video_filters.h"
+#include "ADM_videoFilter_internal.h"
 #include "ADM_video/ADM_vidPartial.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_render.h"
 
@@ -131,7 +131,7 @@ void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
 {
 //    printf ("nb_video_filter = %d, max %d, name = %s\n", nb_video_filter, (MAX_FILTER-1), name);
         allfilters.push_back (FILTER_ENTRY (name, create, tag, viewable,
-                                            filtername, desc, create_from_script));
+                                            filtername, VF_MISC,desc, create_from_script));
 
         if(viewable==1)
 	{

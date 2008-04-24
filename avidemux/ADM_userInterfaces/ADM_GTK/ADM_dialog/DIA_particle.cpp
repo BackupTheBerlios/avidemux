@@ -25,7 +25,8 @@
 #ifdef HAVE_ENCODER
 
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
+#include "ADM_videoFilter_internal.h"
 #include "ADM_videoFilter/ADM_vidParticle.h"
 
 #include "DIA_fileSel.h"
@@ -33,7 +34,7 @@
 #include "DIA_flyDialog.h"
 #include "DIA_flyParticle.h"
 #include "DIA_factory.h"
-#include "ADM_filter/video_filters.h"
+
 
 #undef _
 #define _(_s) QT_TR_NOOP(_s)

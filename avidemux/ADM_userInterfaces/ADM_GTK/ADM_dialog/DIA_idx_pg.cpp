@@ -20,7 +20,7 @@ Indexer progress dialog
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "DIA_coreToolkit.h"
 
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_encoder/adm_encoder.h"
 #include "DIA_idx_pg.h"

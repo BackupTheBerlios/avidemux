@@ -21,8 +21,7 @@
 #include "fourcc.h"
 
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_video/ADM_mpdetc.h"
 
 #include "ADM_osSupport/ADM_debugID.h"

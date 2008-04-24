@@ -23,7 +23,7 @@
 
 #include "DIA_fileSel.h"
 #include "ADM_image.h"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_colorspace/ADM_rgb.h"
 
 #include "ADM_videoFilter/ADM_vobsubinfo.h"

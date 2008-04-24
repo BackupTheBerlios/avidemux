@@ -21,7 +21,6 @@
 #include <algorithm>
 #include <math.h>
 
-#include "ADM_video/ADM_cache.h"
 
 struct PARTICLE_PARAM
 {

@@ -20,32 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include "ADM_assert.h"
-
 #include "config.h"
-#include "fourcc.h"
-
-#include "config.h"
-#include "avi_vars.h"
-
-
-
-
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_filter/video_filters.h"
-
-
+#include "ADM_default.h"
+#include "ADM_videoFilter.h"
 #include "DIA_fileSel.h"
-
 #include "ADM_colorspace/colorspace.h"
-
 #include "ADM_vobsubinfo.h"
-
 #define VOBSUB "/capture/sub/phone.sub"
 
 #include "ADM_vidVobSub.h"
@@ -53,7 +33,7 @@
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
-
+#include <math.h>
 
 extern uint8_t DIA_vobsub(vobSubParam *param);
 

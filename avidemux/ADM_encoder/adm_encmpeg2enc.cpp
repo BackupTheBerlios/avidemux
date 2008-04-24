@@ -32,12 +32,12 @@
 
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encConfig.h"
 
 #include "ADM_audiofilter/audioprocess.hxx"
-#include "ADM_filter/video_filters.h"
+
 #include "ADM_libraries/ADM_libmpeg2enc/ADM_mpeg2enc.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"

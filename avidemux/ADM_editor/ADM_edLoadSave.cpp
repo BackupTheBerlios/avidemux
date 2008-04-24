@@ -34,8 +34,9 @@
 
 #include "DIA_coreToolkit.h"
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_filter/video_filters.h"
+#include "ADM_videoFilter.h"
+#include "ADM_videoFilter_internal.h"
+
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_encoder/adm_encConfig.h"
 #include "prefs.h"

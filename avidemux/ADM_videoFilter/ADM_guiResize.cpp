@@ -20,8 +20,7 @@ GUI part of resize.
 #include "config.h"
 #include "ADM_default.h"
 
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_resizebis.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
 #include "DIA_coreToolkit.h"

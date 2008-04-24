@@ -18,7 +18,7 @@
 
 #include "ADM_default.h"
 
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flyDialogQt4.h"
 

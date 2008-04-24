@@ -34,8 +34,8 @@
 #include "DIA_coreToolkit.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_render.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_filter/video_filters.h"
+#include "ADM_videoFilter.h"
+#include "ADM_videoFilter_internal.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_busy.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
 

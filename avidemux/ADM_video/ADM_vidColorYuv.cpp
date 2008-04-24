@@ -49,14 +49,14 @@
 #include "ADM_default.h"
 
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
 
 #include "ADM_vidColorYuv.h"
-#include "ADM_filter/video_filters.h"
+
 
 extern int DIA_coloryuv(COLOR_YUV_PARAM *param);
 

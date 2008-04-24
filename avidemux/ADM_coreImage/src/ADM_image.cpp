@@ -11,14 +11,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include "ADM_assert.h"
+
 #include "ADM_default.h"
-
 #include "ADM_image.h"
 
 //#include "ADM_assert.h"

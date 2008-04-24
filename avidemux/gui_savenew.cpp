@@ -25,7 +25,8 @@
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
+#include "ADM_videoFilter_internal.h"
 //#include "ADM_codecs/ADM_divxEncode.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
@@ -38,7 +39,7 @@
 
 #include "ADM_outputs/oplug_avi/op_saveprocess.h"
 #include "ADM_outputs/oplug_avi/op_savesmart.hxx"
-#include "ADM_filter/video_filters.h"
+
 
 #include "DIA_fileSel.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"

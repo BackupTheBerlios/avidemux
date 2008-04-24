@@ -10,7 +10,7 @@
 #include "ADM_default.h"
 
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_video/ADM_vidCommonFilter.h"
 
 
@@ -20,9 +20,8 @@ extern "C" {
 #include "ADM_libraries/ADM_ffmpeg/ADM_libswscale/swscale.h"
 }
 
-#include "ADM_filter/video_filters.h"
 
-#include "ADM_video/ADM_cache.h"
+
 #include "ADM_vidMPdelogo.h"
 
 class  ADMVideoMPdelogo:public AVDMGenericVideoStream

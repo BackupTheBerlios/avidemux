@@ -17,7 +17,6 @@
 #ifndef __THRESHOLD__
 #define __THRESHOLD__   
 
-#include "ADM_video/ADM_cache.h"
 
 typedef struct THRESHOLD_PARAM
 {

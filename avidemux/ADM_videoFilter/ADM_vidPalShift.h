@@ -16,7 +16,6 @@
  ***************************************************************************/
 #ifndef PALSHIFT__
 #define PALSHIFT__
-#include "ADM_video/ADM_cache.h" 
  class  ADMVideoPalShift:public AVDMGenericVideoStream
  {
 

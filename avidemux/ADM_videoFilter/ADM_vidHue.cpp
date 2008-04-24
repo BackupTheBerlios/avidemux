@@ -15,11 +15,10 @@
 #include <math.h>
 
 
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_filter/video_filters.h"
+#include "ADM_videoFilter.h"
+
+
 #include "DIA_enter.h"
-#include "ADM_video/ADM_cache.h"
 
 
 #include "ADM_vidHue.h"

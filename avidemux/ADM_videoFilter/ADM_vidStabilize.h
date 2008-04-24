@@ -16,7 +16,6 @@
  ***************************************************************************/
 #ifndef __STABL__
 #define __STABL__   
-#include "ADM_video/ADM_cache.h" 
  class  ADMVideoStabilize:public AVDMGenericVideoStream
  {
 

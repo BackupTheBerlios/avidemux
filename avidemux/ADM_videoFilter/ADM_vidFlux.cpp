@@ -18,30 +18,12 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h" 
- 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
 #include <math.h>
-
 #include "ADM_default.h"
 #include "fourcc.h"
-#include "config.h"
-
-
-
-//#include "ADM_toolkit/toolkit.hxx"
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-
-
+#include "ADM_videoFilter.h"
 #include "DIA_factory.h"
 #include "ADM_vidFlux.h"
-#include "ADM_filter/video_filters.h"
-
-
-#include "ADM_assert.h"
 
 static int16_t scaletab[16];
 static uint64_t scaletab_MMX[65536];

@@ -34,8 +34,9 @@
 
 #include "DIA_coreToolkit.h"
 #include "DIA_fileSel.h"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_filter/video_filters.h"
+#include "ADM_videoFilter.h"
+
+#include "ADM_videoFilter_internal.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_PREVIEW

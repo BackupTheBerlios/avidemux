@@ -25,7 +25,8 @@
 #include <algorithm>
 
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
+#include "ADM_videoFilter_internal.h"
 #include "ADM_videoFilter/ADM_vidEraser.h"
 
 #include "DIA_fileSel.h"
@@ -33,7 +34,7 @@
 #include "DIA_flyDialog.h"
 #include "DIA_flyEraser.h"
 #include "DIA_factory.h"
-#include "ADM_filter/video_filters.h"
+
 
 using namespace std;
 

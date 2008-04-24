@@ -23,8 +23,8 @@
 #include "ADM_default.h"
 
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_filter/video_filters.h"
+#include "ADM_videoFilter.h"
+#include "ADM_videoFilter_internal.h"
 #include "ADM_video/ADM_vidPartial.h"
 
 extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, AVDMGenericVideoStream *in);

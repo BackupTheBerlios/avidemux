@@ -26,6 +26,7 @@
 #define __ADM_encoder__
 #include "ADM_image.h"
 #include "ADM_bitstream.h"
+#include "ADM_videoFilter.h"
 typedef enum
 {
 

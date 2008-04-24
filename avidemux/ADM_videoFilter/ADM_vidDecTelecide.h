@@ -18,7 +18,6 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#include "ADM_video/ADM_cache.h"
 #undef DEBUG_PATTERN_GUIDANCE
 
 #undef WINDOWED_MATCH

@@ -20,14 +20,12 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 #include "ADM_default.h"
 #include <math.h>
 //#define LOOP
 
-
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_filter/video_filters.h"
+#include "ADM_videoFilter.h"
 
 static void Process(uint8_t *src,uint8_t *data, uint32_t width, uint32_t height,double frac);
 

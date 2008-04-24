@@ -12,10 +12,11 @@
 
 #include "DIA_coreToolkit.h"
 #include "DIA_fileSel.h"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
+#include "ADM_videoFilter_internal.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_videoNull.h"
-#include "ADM_filter/video_filters.h"
+
 #include "ADM_video/ADM_vidPartial.h"
 #include "avi_vars.h"
 #include "ADM_filter/vidVCD.h"

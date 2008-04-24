@@ -23,7 +23,7 @@
 #include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_image.h"
 
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 class ADMfont;
 //#include "ADM_video/ADM_vidFont.h"
 #include "ADM_videoFilter/ADM_vidSRT.h"

@@ -20,7 +20,6 @@
 #define TOP_MARGIN 50
 
 #include "ADM_vidAnimated_param.h"
-#include "ADM_video/ADM_cache.h"
 
 class  ADMVideoAnimated:public AVDMGenericVideoStream
 {

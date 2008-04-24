@@ -19,11 +19,9 @@
 #include "ADM_default.h"
 
 
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_vidChromaShift.h"
 
-#include "ADM_filter/video_filters.h"
 
 
 static FILTER_PARAM cshiftParam={2,{"u","v"}};

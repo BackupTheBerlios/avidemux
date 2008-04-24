@@ -14,7 +14,6 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "ADM_video/ADM_cache.h"
 class  ADMVideoTelecide:public ADMVideoFields
  {
 

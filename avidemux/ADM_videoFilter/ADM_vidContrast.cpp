@@ -14,14 +14,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 #include "ADM_default.h"
 #include <math.h>
 
 
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_videoFilter/ADM_vidContrast.h"
-#include "ADM_filter/video_filters.h"
 
 static FILTER_PARAM contrastParam =
   { 5, {"offset", "coef", "doLuma", "doChromaU", "doChromaV"} };

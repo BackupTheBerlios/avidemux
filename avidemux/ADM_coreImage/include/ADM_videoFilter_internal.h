@@ -18,6 +18,18 @@
  #define  __VIDEO_FILTERS__
 
 #include "ADM_script/adm_scanner.h"
+
+typedef enum
+{
+	VF_TRANSFORM,
+	VF_INTERLACING,
+	VF_COLORS,
+	VF_NOISE,
+	VF_SHARPNESS,
+	VF_SUBTITLE,
+	VF_MISC
+}VF_CATEGORY;
+
 typedef enum
 {
                 VF_INVALID=0,
@@ -125,9 +137,10 @@ typedef AVDMGenericVideoStream *(ADM_create_from_scriptT) (AVDMGenericVideoStrea
         const char        *filtername;
         const char        *description;
         ADM_create_from_scriptT *create_from_script;
-
+        VF_CATEGORY		  category;
        FILTER_ENTRY (const char * name, ADM_createT * create, VF_FILTERS tag,
                      uint8_t viewable, const char * filtername,
+                     VF_CATEGORY category=VF_MISC,
                      const char * description = 0,
                      ADM_create_from_scriptT * create_from_script = 0)
            : name (name),
@@ -137,6 +150,7 @@ typedef AVDMGenericVideoStream *(ADM_create_from_scriptT) (AVDMGenericVideoStrea
              viewable (viewable),
              filtername (filtername),
              description (description),
+             category(category),
              create_from_script (create_from_script)
        {
        }
@@ -149,6 +163,7 @@ typedef AVDMGenericVideoStream *(ADM_create_from_scriptT) (AVDMGenericVideoStrea
              viewable (0),
              filtername (0),
              description (0),
+             category(VF_MISC),
              create_from_script (0)
        {
        }
@@ -161,17 +176,9 @@ typedef AVDMGenericVideoStream *(ADM_create_from_scriptT) (AVDMGenericVideoStrea
           CONFcouple             *conf;
    }FILTER;
 
-   typedef struct
-   {
-            uint32_t    nb;
-            const char  *param[25];
-   }FILTER_PARAM;
+ 
    
-AVDMGenericVideoStream *getLastVideoFilter( uint32_t frameStart, uint32_t nbFrame);
-AVDMGenericVideoStream *getLastVideoFilter( void );
-AVDMGenericVideoStream *getFirstVideoFilter( uint32_t frameStart, uint32_t nbFrame);
-AVDMGenericVideoStream *getFirstVideoFilter( void);
-AVDMGenericVideoStream *getFirstCurrentVideoFilter( void);
+
 FILTER * getCurrentVideoFilterList (uint32_t * count);
 const FILTER_ENTRY * filterGetEntryFromTag (VF_FILTERS tag);
 const char * filterGetNameFromTag(VF_FILTERS tag);
@@ -188,7 +195,7 @@ int  filterLoadXml(char *name,uint8_t silent);
  void filterLoad(char *name);
  int filterLoad(char *name,uint8_t silent);
  void filterSave(char *name,uint8_t silent);
-CONFcouple *filterBuildCouple(FILTER_PARAM *param,uint32_t n,Arg *args);
+
 void filterSaveScriptJS(FILE *f);
 
 void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable,

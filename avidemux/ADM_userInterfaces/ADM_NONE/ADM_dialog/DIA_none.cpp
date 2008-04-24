@@ -24,7 +24,7 @@
 
 #include "ADM_assert.h"
 
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_video/ADM_vidCNR2_param.h"
 #include "ADM_video/ADM_vidColorYuv_param.h"
 #include "ADM_video/ADM_vidPartial_param.h"

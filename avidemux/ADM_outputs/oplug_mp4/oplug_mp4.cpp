@@ -31,8 +31,9 @@ extern "C" {
 
 #include "ADM_colorspace/colorspace.h"
 #include "DIA_coreToolkit.h"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_filter/video_filters.h"
+#include "ADM_videoFilter.h"
+#include "ADM_videoFilter_internal.h"
+
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_encoder/adm_encoder.h"

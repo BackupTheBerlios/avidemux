@@ -15,8 +15,7 @@
 #include "config.h"
 #include "ADM_default.h"
 
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
@@ -24,9 +23,13 @@
 
 #include "ADM_vidForcedPP.h"
 #include "DIA_enter.h"
-#include "ADM_filter/video_filters.h"
 
 #include "DIA_factory.h"
+
+// FIXME
+#define AVI_KEY_FRAME   0x10
+#define AVI_B_FRAME	0x4000	 // hopefully it is not used..
+
 
 static FILTER_PARAM ppParam={3,{"postProcType","postProcStrength","forcedQuant"}};
 

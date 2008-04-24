@@ -32,9 +32,9 @@
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 //#include "ADM_gui/GUI_encoder.h"
-#include "ADM_filter/video_filters.h"
+#include "ADM_videoFilter_internal.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
 #include "op_aviwrite.hxx"

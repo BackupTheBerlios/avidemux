@@ -22,9 +22,7 @@
 #include "ADM_default.h"
 #include <math.h>
 #include "config.h"
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_filter/video_filters.h"
+#include "ADM_videoFilter.h"
 
 #include "DIA_fileSel.h"
 
@@ -37,7 +35,10 @@
 #include "ADM_osSupport/ADM_debug.h"
 
 #include "ADM_lavpp_deintparam.h"
-
+extern "C"
+{
+#include "ADM_libraries/ADM_ffmpeg/ADM_libpostproc/postprocess.h"
+};
 #include "DIA_factory.h"
 /*
 {"al", "autolevels",            0, 1, 2, LEVEL_FIX},
@@ -52,6 +53,8 @@
 {"l5", "lowpass5",              1, 1, 4, LOWPASS5_DEINT_FILTER}, *********
 */
 
+#define AVI_KEY_FRAME 0x10  // FIXME
+#define AVI_B_FRAME 0x4000
 
 
 class  ADMVideoLavPPDeint:public AVDMGenericVideoStream

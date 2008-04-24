@@ -20,13 +20,9 @@
  
 #include "config.h"
 #include "ADM_default.h"
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-
-#include "ADM_filter/video_filters.h"
+#include "ADM_videoFilter.h"
 
 #include "DIA_factory.h"
-
 #include "ADM_vidComputeAverage.h"
 
 static FILTER_PARAM computeAverageParam={5,{"start_frame",

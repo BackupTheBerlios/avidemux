@@ -22,8 +22,7 @@
 #include "config.h"
 #include "ADM_default.h"
 #include "DIA_coreToolkit.h"
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_video/ADM_vidCommonFilter.h"
 
 
@@ -32,7 +31,6 @@ extern "C" {
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavutil/avutil.h"
 #include "ADM_libraries/ADM_ffmpeg/ADM_libswscale/swscale.h"
 }
-#include "ADM_filter/video_filters.h"
 
 typedef struct alg
 {

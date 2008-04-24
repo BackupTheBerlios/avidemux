@@ -21,24 +21,15 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-
 #include "config.h"
-#include "fourcc.h"
-#include "config.h"
-#include "avi_vars.h"
+#include "ADM_default.h"
 #ifdef HAVE_ENCODER
 
 
 
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_resizebis.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
-#include "ADM_filter/video_filters.h"
 
 
 static FILTER_PARAM mpresizeParam={3,{"w","h","algo"}};

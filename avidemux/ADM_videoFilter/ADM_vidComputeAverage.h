@@ -23,7 +23,6 @@
 
 #include <map>
 
-#include "ADM_video/ADM_cache.h"
 
 typedef struct COMPUTEAVERAGE_PARAM
 {

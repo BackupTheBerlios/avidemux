@@ -20,7 +20,7 @@
 #include "fourcc.h"
 #include "ADM_assert.h"
 
-#include "ADM_video/ADM_confCouple.h"
+#include "ADM_videoFilter.h"
 static char tmpstring[1024]; // should be enougth
 CONFcouple::CONFcouple(uint32_t nub)
 {

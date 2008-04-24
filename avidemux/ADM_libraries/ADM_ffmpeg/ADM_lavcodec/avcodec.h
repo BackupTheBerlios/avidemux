@@ -26,7 +26,7 @@
  * external API header
  */
 
-#include "config.h" // MEANX
+#include "ADM_coreConfig.h" // MEANX
 #include "../ADM_lavutil/avutil.h" // MEANX
 
 #define LIBAVCODEC_VERSION_MAJOR 51

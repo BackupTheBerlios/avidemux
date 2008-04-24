@@ -17,8 +17,7 @@
 #include "config.h"
 #include "ADM_default.h"
 
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_video/ADM_vidCommonFilter.h"
 
 #include "DIA_factory.h"
@@ -32,9 +31,6 @@ extern "C" {
 }
 
 
-
-#include "ADM_filter/video_filters.h"
-#include "ADM_video/ADM_cache.h"
 #include "ADM_vidMosaic_param.h"
 
 class  ADMVideoMosaic:public AVDMGenericVideoStream

@@ -33,8 +33,8 @@
 #include "ADM_inputs/ADM_avsproxy/ADM_avsproxy.h"
 
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_filter/video_filters.h"
+#include "ADM_videoFilter.h"
+
 #include "ADM_inputs/ADM_mpegdemuxer/dmx_identify.h"
 #include "ADM_assert.h"
 

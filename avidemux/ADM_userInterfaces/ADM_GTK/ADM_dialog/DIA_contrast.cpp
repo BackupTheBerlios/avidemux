@@ -19,8 +19,7 @@
 
 
 
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
 #include "ADM_videoFilter/ADM_vidContrast.h"
 
 #include "ADM_colorspace/ADM_rgb.h"

@@ -28,8 +28,7 @@
 #include "fourcc.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_codecs/ADM_codec.h"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_filter/video_filters.h"
+#include "ADM_videoFilter.h"
 #include "avi_vars.h"
 
 #include "ADM_osSupport/ADM_debugID.h"

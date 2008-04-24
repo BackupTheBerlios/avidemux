@@ -16,7 +16,6 @@
  ***************************************************************************/
 #ifndef __VLAD__
 #define __VLAD__   
-#include "ADM_video/ADM_cache.h" 
 typedef struct VLAD_PARAM
 {
 	uint32_t ythresholdMask;

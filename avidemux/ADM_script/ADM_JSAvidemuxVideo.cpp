@@ -21,12 +21,13 @@
 #include "avi_vars.h"
 #include "gui_action.hxx"
 #include "ADM_encoder/ADM_vidEncode.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_videoFilter.h"
+#include "ADM_videoFilter_internal.h"
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_editor/ADM_outputfmt.h"
 #include "../ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
-#include "ADM_filter/video_filters.h"
+
 
 #include "ADM_script/ADM_container.h"
 

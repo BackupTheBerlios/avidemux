@@ -37,7 +37,7 @@
 #include "ADM_codecs/ADM_ffmpeg.h"
 
 #include "prefs.h"
-#include "ADM_video/ADM_cache.h"
+
 #include "ADM_video/ADM_vidMisc.h"
 //#define TEST_NOB 1
 

@@ -2,7 +2,6 @@
 #ifndef ADM_KERNELDEINT
 #define ADM_KERNELDEINT
 
-#include "ADM_video/ADM_cache.h"
 typedef struct  KERNEL_CONF
 {
 	uint32_t		order, threshold;

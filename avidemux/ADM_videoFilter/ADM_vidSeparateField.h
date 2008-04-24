@@ -1,7 +1,6 @@
 /*
 
 */
-#include "ADM_video/ADM_cache.h"
   class  AVDMVideoSeparateField:public AVDMGenericVideoStream
  {
 

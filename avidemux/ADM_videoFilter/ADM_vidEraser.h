@@ -20,7 +20,6 @@
 
 #include <map>
 
-#include "ADM_video/ADM_cache.h"
 
 #include <vector>
 #include <string>
