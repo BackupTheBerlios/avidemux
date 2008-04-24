@@ -147,20 +147,3 @@ uint8_t *src,*dst,*srcu,*srcv; //,*dstu,*dstv;
           return 1;
 }
 
-BUILD_CREATE(res_create,AVDMVideoStreamResize);
-BUILD_CREATE(crop_create,AVDMVideoStreamCrop);
-BUILD_CREATE(bsmear_create,AVDMVideoStreamBSMear);
-/*AVDMGenericVideoStream *res_create(AVDMGenericVideoStream *in, CONFcouple *param)
-{
- 	return new   AVDMVideoStreamResize(in,param);
-}
-
-AVDMGenericVideoStream *crop_create(AVDMGenericVideoStream *in, CONFcouple *param)
-{
- 	return new   AVDMVideoStreamCrop(in,param);
-}; ;
-AVDMGenericVideoStream *bsmear_create(AVDMGenericVideoStream *in, CONFcouple *param)
-{
- 	return new   AVDMVideoStreamBSMear(in,param);
-}; ;
-*/

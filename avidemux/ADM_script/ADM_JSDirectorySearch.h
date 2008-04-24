@@ -7,6 +7,7 @@
 
 // Spidermonkey
 #include "ADM_libraries/ADM_smjs/jsapi.h"
+#include <string.h>
 #include "DirectorySearch.h"
 
 class ADM_JSDirectorySearch
