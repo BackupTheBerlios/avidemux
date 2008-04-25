@@ -301,14 +301,14 @@ const char *encoderGetIndexedName(uint32_t i)
 {
 	int nb = encoderGetEncoderCount();
 
-	ADM_assert(i <= nb);
+	ADM_assert(i < nb);
 
 	return AllVideoCodec[i].menuName;
 }
 
 void videoCodecChanged(int newCodecIndex)
 {
-	ADM_assert(newCodecIndex <= encoderGetEncoderCount());
+	ADM_assert(newCodecIndex < encoderGetEncoderCount());
 
 	currentCodecType = AllVideoCodec[newCodecIndex].codec;
 	currentCodecIndex = newCodecIndex;

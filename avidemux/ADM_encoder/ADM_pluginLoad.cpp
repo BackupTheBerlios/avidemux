@@ -126,10 +126,7 @@ int ADM_vidEnc_loadPlugins(int uiType, const char *path)
 	fflush(stdout);
 
 	if (!buildDirectoryContent(&nbFile, path, files, MAX_EXTERNAL_FILTER, SHARED_LIB_EXT))
-	{
 		printf("[ADM_vidEnc_plugin] Cannot parse plugin\n");
-		return 0;
-	}
 
 	for (int i = 0; i < nbFile; i++)
 		loadVideoPlugin(uiType, files[i]);

@@ -392,16 +392,16 @@ void x264ConfigDialog::loadSettings(vidEncProperties *properties, x264Options *o
 	ui.quantiserMinSpinBox->setValue(options->getQuantiserMinimum());
 	ui.quantiserMaxSpinBox->setValue(options->getQuantiserMaximum());
 	ui.quantiserMaxStepSpinBox->setValue(options->getQuantiserStep());
-	ui.avgBitrateToleranceSpinBox->setValue(options->getAverageBitrateTolerance());
+	ui.avgBitrateToleranceSpinBox->setValue((int)(options->getAverageBitrateTolerance() * 100));
 	ui.quantiserIpRatioSpinBox->setValue(options->getIpFrameQuantiser());
 	ui.quantiserPbRatioSpinBox->setValue(options->getPbFrameQuantiser());
 	ui.chromaLumaOffsetSpinBox->setValue(options->getChromaLumaQuantiserDifference());
-	ui.quantiserCurveCompressSpinBox->setValue(options->getQuantiserCurveCompression());
+	ui.quantiserCurveCompressSpinBox->setValue((int)(options->getQuantiserCurveCompression() * 100));
 	ui.quantiserBeforeCompressSpinBox->setValue(options->getReduceFluxBeforeCurveCompression());
 	ui.quantiserAfterCompressSpinBox->setValue(options->getReduceFluxAfterCurveCompression());
 	ui.vbvMaxBitrateSpinBox->setValue(options->getVbvMaximumBitrate());
 	ui.vbvBufferSizeSpinBox->setValue(options->getVbvBufferSize());
-	ui.vbvBufferOccupancySpinBox->setValue(options->getVbvInitialOccupancy());
+	ui.vbvBufferOccupancySpinBox->setValue((int)(options->getVbvInitialOccupancy() * 100));
 
 	// Output tab
 	if (!options->getIdcLevel())
