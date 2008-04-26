@@ -74,19 +74,19 @@ int vidEncIsConfigurable(int encoderId)
 	return x264Encoder_isConfigurable();
 }
 
-int vidEncConfigure(int encoderId)
+int vidEncConfigure(int encoderId, vidEncVideoProperties *properties)
 {
-	return x264Encoder_configure();
+	return x264Encoder_configure(properties);
 }
 
-int vidEncGetOptions(int encoderId, char *options, int bufferSize)
+int vidEncGetOptions(int encoderId, vidEncOptions *encodeOptions, char *pluginOptions, int bufferSize)
 {
-	return x264Encoder_getOptions(options, bufferSize);
+	return x264Encoder_getOptions(encodeOptions, pluginOptions, bufferSize);
 }
 
-int vidEncSetOptions(int encoderId, char *options)
+int vidEncSetOptions(int encoderId, vidEncOptions *encodeOptions, char *pluginOptions)
 {
-	return x264Encoder_setOptions(options);
+	return x264Encoder_setOptions(encodeOptions, pluginOptions);
 }
 
 int vidEncGetPassCount(int encoderId)
@@ -99,7 +99,7 @@ int vidEncGetCurrentPass(int encoderId)
 	return x264Encoder_getCurrentPass();
 }
 
-int vidEncOpen(int encoderId, vidEncProperties *properties)
+int vidEncOpen(int encoderId, vidEncVideoProperties *properties)
 {
 	return x264Encoder_open(properties);
 }

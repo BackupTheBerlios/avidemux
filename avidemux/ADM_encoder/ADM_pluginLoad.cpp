@@ -61,7 +61,7 @@ ADM_vidEnc_plugin::ADM_vidEnc_plugin(const char *file) : ADM_LibWrapper()
 
 std::vector<ADM_vidEnc_plugin *> ADM_videoEncoderPlugins;
 
-static int loadVideoPlugin(int uiType, const char *file)
+static int loadVideoEncoderPlugin(int uiType, const char *file)
 {
 	ADM_vidEnc_plugin *plugin = new ADM_vidEnc_plugin(file);
 	int* encoderIds;
@@ -106,7 +106,7 @@ static int loadVideoPlugin(int uiType, const char *file)
  * 	\fn ADM_vidEnc_loadPlugins
  *  \brief load all audio plugins
  */
-int ADM_vidEnc_loadPlugins(int uiType, const char *path)
+int loadVideoEncoderPlugins(int uiType, const char *path)
 {
 #define MAX_EXTERNAL_FILTER 50
 
@@ -119,7 +119,7 @@ int ADM_vidEnc_loadPlugins(int uiType, const char *path)
 #endif
 
 	char *files[MAX_EXTERNAL_FILTER];
-	uint32_t nbFile;
+	uint32_t nbFile = 0;
 
 	memset(files, 0, sizeof(char *)*MAX_EXTERNAL_FILTER);
 	printf("[ADM_vidEnc_plugin] Scanning directory %s\n", path);
@@ -129,7 +129,7 @@ int ADM_vidEnc_loadPlugins(int uiType, const char *path)
 		printf("[ADM_vidEnc_plugin] Cannot parse plugin\n");
 
 	for (int i = 0; i < nbFile; i++)
-		loadVideoPlugin(uiType, files[i]);
+		loadVideoEncoderPlugin(uiType, files[i]);
 
 	printf("[ADM_vidEnc_plugin] Scanning done, found %d codec\n", ADM_videoEncoderPlugins.size());
 
@@ -154,27 +154,115 @@ int ADM_vidEnc_loadPlugins(int uiType, const char *path)
 
 		sprintf(displayName, "%s (%s)", codecType, codecName);
 
-		COMPRES_PARAMS *params = &AllVideoCodec[internalCodecCount + i];
+		COMPRES_PARAMS *param = &AllVideoCodec[internalCodecCount + i];
 
-		params->codec = CodecExternal;
-		params->menuName = displayName;
-		params->tagName = displayName;
-		params->extra_param = i;
+		param->codec = CodecExternal;
+		param->menuName = displayName;
+		param->tagName = displayName;
+		param->extra_param = i;
 
-		int length = plugin->getOptions(plugin->encoderId, NULL, 0);
-		char *options = new char[length + 1];
+		int length = plugin->getOptions(plugin->encoderId, NULL, NULL, 0);
+		char *pluginOptions = new char[length + 1];
+		vidEncOptions encodeOptions;
 
-		plugin->getOptions(plugin->encoderId, options, length);
-		options[length] = 0;
+		plugin->getOptions(plugin->encoderId, &encodeOptions, pluginOptions, length);
+		pluginOptions[length] = 0;
 
-		params->extraSettings = options;
-		params->extraSettingsLen = length;
+		updateCompressionParameters(param, encodeOptions.encodeMode, encodeOptions.encodeModeParameter, pluginOptions, length);
 	}
 
 	return 1;
 }
 
-ADM_vidEnc_plugin* ADM_vidEnc_getPlugin(int index)
+void updateCompressionParameters(COMPRES_PARAMS *params, int encodeMode, int encodeModeParameter, char* extraSettings, int extraSettingsLength)
+{
+	COMPRESSION_MODE compressMode = getCompressionMode(encodeMode);
+
+	switch (compressMode)
+	{
+		case COMPRESS_CBR:
+			params->bitrate = encodeModeParameter;
+			break;
+		case COMPRESS_AQ:
+			params->qz = encodeModeParameter;
+			break;
+		case COMPRESS_CQ:
+			params->qz = encodeModeParameter;
+			break;
+		case COMPRESS_2PASS:
+			params->finalsize = encodeModeParameter;
+			break;
+		case COMPRESS_2PASS_BITRATE:
+			params->avg_bitrate = encodeModeParameter;
+			break;
+		default:
+			ADM_assert(0);
+	}
+
+	if (params->extraSettings)
+		delete [] (char*)params->extraSettings;
+
+	params->extraSettings = extraSettings;
+	params->extraSettingsLen = extraSettingsLength;
+}
+
+COMPRESSION_MODE getCompressionMode(int encodeMode)
+{
+	COMPRESSION_MODE mode;
+
+	switch (encodeMode)
+	{
+		case ADM_VIDENC_MODE_AQP:
+			mode = COMPRESS_AQ;
+			break;
+		case ADM_VIDENC_MODE_CQP:
+			mode = COMPRESS_CQ;
+			break;
+		case ADM_VIDENC_MODE_CBR:
+			mode = COMPRESS_CBR;
+			break;
+		case ADM_VIDENC_MODE_2PASS_SIZE:
+			mode = COMPRESS_2PASS;
+			break;
+		case ADM_VIDENC_MODE_2PASS_ABR:
+			mode = COMPRESS_2PASS_BITRATE;
+			break;
+		default:
+			ADM_assert(0);
+	}
+
+	return mode;
+}
+
+int getVideoEncodePluginMode(COMPRESSION_MODE mode)
+{
+	int encodeMode;
+
+	switch (mode)
+	{
+		case COMPRESS_AQ:
+			encodeMode = ADM_VIDENC_MODE_AQP;
+			break;
+		case COMPRESS_CQ:
+			encodeMode = ADM_VIDENC_MODE_CQP;
+			break;
+		case COMPRESS_CBR:
+			encodeMode = ADM_VIDENC_MODE_CBR;
+			break;
+		case COMPRESS_2PASS:
+			encodeMode = ADM_VIDENC_MODE_2PASS_SIZE;
+			break;
+		case COMPRESS_2PASS_BITRATE:
+			encodeMode = ADM_VIDENC_MODE_2PASS_ABR;
+			break;
+		default:
+			ADM_assert(0);
+	}
+
+	return encodeMode;
+}
+
+ADM_vidEnc_plugin* getVideoEncoderPlugin(int index)
 {
 	ADM_assert(index < ADM_videoEncoderPlugins.size());
 

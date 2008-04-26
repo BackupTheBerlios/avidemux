@@ -56,13 +56,19 @@ typedef struct
 
 typedef struct
 {
+	int structSize;
 	unsigned int width;
 	unsigned int height;
 	unsigned int parWidth;
 	unsigned int parHeight;
+} vidEncVideoProperties;
+
+typedef struct
+{
+	int structSize;
 	unsigned int encodeMode;
 	int encodeModeParameter;
-} vidEncProperties;
+} vidEncOptions;
 
 int vidEncGetEncoders(int uiType, int **encoderIds);
 const char* vidEncGetEncoderName(int encoderId);
@@ -74,14 +80,14 @@ void vidEncGetEncoderVersion(int encoderId, int *major, int *minor, int *patch);
 const char* vidEncGetEncoderGuid(int encoderId);
 
 int vidEncIsConfigurable(int encoderId);
-int vidEncConfigure(int encoderId);
-int vidEncGetOptions(int encoderId, char *options, int bufferSize);
-int vidEncSetOptions(int encoderId, char *options);
+int vidEncConfigure(int encoderId, vidEncVideoProperties *properties);
+int vidEncGetOptions(int encoderId, vidEncOptions *encodeOptions, char *pluginOptions, int bufferSize);
+int vidEncSetOptions(int encoderId, vidEncOptions *encodeOptions, char *pluginOptions);
 
 int vidEncGetPassCount(int encoderId);
 int vidEncGetLastPass(int encoderId);
 
-int vidEncOpen(int encoderId, vidEncProperties *properties);
+int vidEncOpen(int encoderId, vidEncVideoProperties *properties);
 int vidEncBeginPass(int encoderId);
 int vidEncEncodeFrame(int encoderId, vidEncEncodeParams *encodeParams);
 int vidEndFinishPass(int encoderId);

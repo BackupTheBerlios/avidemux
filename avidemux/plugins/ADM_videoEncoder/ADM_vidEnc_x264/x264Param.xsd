@@ -348,15 +348,6 @@
 				<xs:element name="rateControl">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="method">
-								<xs:complexType>
-									<xs:choice>
-										<xs:element name="bitrate" type="uint"/>
-										<xs:element name="quantiser" type="quantiser"/>
-										<xs:element name="vbrQuantiser" type="quantiser"/>
-									</xs:choice>
-								</xs:complexType>
-							</xs:element>
 							<xs:element name="quantiserMinimum">
 								<xs:simpleType>
 									<xs:restriction base="xs:integer">

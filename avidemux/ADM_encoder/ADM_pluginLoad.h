@@ -19,6 +19,7 @@
 
 #include "ADM_dynamicLoading.h"
 #include "ADM_plugin/ADM_vidEnc_plugin.h"
+#include "ADM_vidEncode.hxx"
 
 typedef int _vidEncGetEncoders(int uiType, int **encoderIds);
 typedef const char* _vidEncGetEncoderName(int encoderId);
@@ -30,14 +31,14 @@ typedef void _vidEncGetEncoderVersion(int encoderId, int *major, int *minor, int
 typedef const char* _vidEncGetEncoderGuid(int encoderId);
 
 typedef int _vidEncIsConfigurable(int encoderId);
-typedef int _vidEncConfigure(int encoderId);
-typedef int _vidEncGetOptions(int encoderId, char *options, int bufferSize);
-typedef int _vidEncSetOptions(int encoderId, char *options);
+typedef int _vidEncConfigure(int encoderId, vidEncVideoProperties *properties);
+typedef int _vidEncGetOptions(int encoderId, vidEncOptions *encodeOptions, char *pluginOptions, int bufferSize);
+typedef int _vidEncSetOptions(int encoderId, vidEncOptions *encodeOptions, char *pluginOptions);
 
 typedef int _vidEncGetPassCount(int encoderId);
 typedef int _vidEncGetCurrentPass(int encoderId);
 
-typedef int _vidEncOpen(int encoderId, vidEncProperties *properties);
+typedef int _vidEncOpen(int encoderId, vidEncVideoProperties *properties);
 typedef int _vidEncBeginPass(int encoderId);
 typedef int _vidEncEncodeFrame(int encoderId, vidEncEncodeParams *encodeParams);
 typedef int _vidFinishPass(int encoderId);
@@ -75,7 +76,10 @@ class ADM_vidEnc_plugin : public ADM_LibWrapper
 		ADM_vidEnc_plugin(const char *file);
 };
 
-ADM_vidEnc_plugin* ADM_vidEnc_getPlugin(int index);
-int ADM_vidEnc_loadPlugins(int uiType, const char *path);
+ADM_vidEnc_plugin* getVideoEncoderPlugin(int index);
+int loadVideoEncoderPlugins(int uiType, const char *path);
+void updateCompressionParameters(COMPRES_PARAMS *params, int encodeMode, int encodeModeParameter, char* extraSettings, int extraSettingsLength);
+COMPRESSION_MODE getCompressionMode(int encodeMode);
+int getVideoEncodePluginMode(COMPRESSION_MODE mode);
 
 #endif // ADM_pluginLoad_h

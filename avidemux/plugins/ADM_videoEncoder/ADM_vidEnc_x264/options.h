@@ -229,17 +229,6 @@ public:
 	bool getComputeSsim(void);
 	void setComputeSsim(bool computeSsim);
 
-	unsigned int getRateControlMethod(void);
-
-	unsigned int getBitrate(void);
-	void setBitrate(unsigned int bitrate);
-
-	unsigned int getQuantiser(void);
-	void setQuantiser(unsigned int quantiser);
-
-	unsigned int getVbrQuantiser(void);
-	void setVbrQuantiser(unsigned int vbrQuantiser);
-
 	unsigned int getQuantiserMinimum(void);
 	void setQuantiserMinimum(unsigned int quantiserMinimum);
 

@@ -28,7 +28,6 @@ x264Options::x264Options(void)
 	_param.rc.psz_rc_eq = strdup(_param.rc.psz_rc_eq);
 
 	_sarAsInput = false;
-	_param.rc.i_rc_method = X264_RC_CQP;
 }
 
 x264Options::~x264Options(void)
@@ -717,50 +716,6 @@ void x264Options::setComputeSsim(bool computeSsim)
 	_param.analyse.b_ssim = computeSsim;
 }
 
-unsigned int x264Options::getRateControlMethod(void)
-{
-	return _param.rc.i_rc_method;
-}
-
-unsigned int x264Options::getBitrate(void)
-{
-	return _param.rc.i_bitrate;
-}
-
-void x264Options::setBitrate(unsigned int bitrate)
-{
-	_param.rc.i_rc_method = X264_RC_ABR;
-	_param.rc.i_bitrate = bitrate;
-}
-
-unsigned int x264Options::getQuantiser(void)
-{
-	return _param.rc.i_qp_constant;
-}
-
-void x264Options::setQuantiser(unsigned int quantiser)
-{
-	if (quantiser <= 51)
-	{
-		_param.rc.i_rc_method = X264_RC_CQP;
-		_param.rc.i_qp_constant = quantiser;
-	}
-}
-
-unsigned int x264Options::getVbrQuantiser(void)
-{
-	return (unsigned int)_param.rc.f_rf_constant;
-}
-
-void x264Options::setVbrQuantiser(unsigned vbrQuantiser)
-{
-	if (vbrQuantiser <= 51)
-	{
-		_param.rc.i_rc_method = X264_RC_CRF;
-		_param.rc.f_rf_constant = vbrQuantiser;
-	}
-}
-
 unsigned int x264Options::getQuantiserMinimum(void)
 {
 	return _param.rc.i_qp_min;
@@ -1283,21 +1238,6 @@ char* x264Options::toXml(void)
 		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"computeSsim", boolean2String(xmlBuffer, bufferSize, getComputeSsim()));
 
 		xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"rateControl", NULL);
-		xmlNodeChild2 = xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"method", NULL);
-
-		switch (getRateControlMethod())
-		{
-			case X264_RC_CQP:
-				xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"quantiser", number2String(xmlBuffer, bufferSize, getQuantiser()));
-				break;
-			case X264_RC_CRF:
-				xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"vbrQuantiser", number2String(xmlBuffer, bufferSize, getVbrQuantiser()));
-				break;
-			case X264_RC_ABR:
-				xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"bitrate", number2String(xmlBuffer, bufferSize, getBitrate()));
-				break;
-		}
-
 		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"quantiserMinimum", number2String(xmlBuffer, bufferSize, getQuantiserMinimum()));
 		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"quantiserMaximum", number2String(xmlBuffer, bufferSize, getQuantiserMaximum()));
 		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"quantiserStep", number2String(xmlBuffer, bufferSize, getQuantiserStep()));
@@ -1778,21 +1718,7 @@ void x264Options::parseRateControlOptions(xmlNode* node)
 		{
 			char *content = (char*)xmlNodeGetContent(xmlChild);
 
-			if (strcmp((char*)xmlChild->name, "method") == 0)
-			{
-				xmlNode *xmlMethod = node->children;
-				char *methodContent = (char*)xmlNodeGetContent(xmlChild);
-
-				if (strcmp((char*)xmlMethod->name, "quantiser") == 0)
-					setQuantiser(atoi(methodContent));
-				else if (strcmp((char*)xmlMethod->name, "vbrQuantiser") == 0)
-					setVbrQuantiser(atoi(methodContent));
-				else if (strcmp((char*)xmlMethod->name, "bitrate") == 0)
-					setBitrate(atoi(methodContent));
-
-				xmlFree(methodContent);
-			}
-			else if (strcmp((char*)xmlChild->name, "quantiserMinimum") == 0)
+			if (strcmp((char*)xmlChild->name, "quantiserMinimum") == 0)
 				setQuantiserMinimum(atoi(content));
 			else if (strcmp((char*)xmlChild->name, "quantiserMaximum") == 0)
 				setQuantiserMaximum(atoi(content));

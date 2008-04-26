@@ -39,12 +39,12 @@ private:
 	uint8_t inter4x4Luma[16], interChroma[16];
 	uint8_t intra8x8Luma[64], inter8x8Luma[64];
 
-	void loadSettings(vidEncProperties *properties, x264Options *options);
+	void loadSettings(vidEncOptions *encodeOptions, x264Options *options);
 	int getValueIndexInArray(uint8_t value, const uint8_t valueArray[], int elementCount);
 
 public:
-	x264ConfigDialog(vidEncProperties *properties, x264Options *options);
-	void saveSettings(vidEncProperties *properties, x264Options *options);
+	x264ConfigDialog(vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options);
+	void saveSettings(vidEncOptions *encodeOptions, x264Options *options);
 
 private slots:
 	// General tab

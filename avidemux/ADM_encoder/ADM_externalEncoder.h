@@ -26,7 +26,6 @@
 class externalEncoder : public Encoder
 {
 private:
-	COMPRES_PARAMS _compressParams;
 	ADM_vidEnc_plugin *_plugin;
 	bool _openPass;
 

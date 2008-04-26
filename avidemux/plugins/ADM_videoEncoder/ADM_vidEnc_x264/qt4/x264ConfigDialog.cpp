@@ -25,7 +25,7 @@
 #include "DIA_coreToolkit.h"
 #include "DIA_fileSel.h"
 
-x264ConfigDialog::x264ConfigDialog(vidEncProperties *properties, x264Options *options)
+x264ConfigDialog::x264ConfigDialog(vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options)
 {
 	static const int _predefinedARs[aspectRatioCount][2] = {{16, 15}, {64, 45}, {8, 9}, {32, 27}};
 
@@ -75,7 +75,7 @@ x264ConfigDialog::x264ConfigDialog(vidEncProperties *properties, x264Options *op
 	connect(ui.zoneEditButton, SIGNAL(pressed()), this, SLOT(zoneEditButton_pressed()));
 	connect(ui.frameTypeFileButton, SIGNAL(pressed()), this, SLOT(frameTypeFileButton_pressed()));	
 
-	loadSettings(properties, options);
+	loadSettings(encodeOptions, options);
 }
 
 // General tab
@@ -245,30 +245,30 @@ int x264ConfigDialog::getValueIndexInArray(uint8_t value, const uint8_t valueArr
 	return valueIndex;
 }
 
-void x264ConfigDialog::loadSettings(vidEncProperties *properties, x264Options *options)
+void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *options)
 {
 	// General tab
-	switch (properties->encodeMode)
+	switch (encodeOptions->encodeMode)
 	{
 		case ADM_VIDENC_MODE_CBR:	// Constant Bitrate (Single Pass)
 			ui.encodingModeComboBox->setCurrentIndex(0);
-			ui.targetRateControlSpinBox->setValue(properties->encodeModeParameter);
+			ui.targetRateControlSpinBox->setValue(encodeOptions->encodeModeParameter);
 			break;
 		case ADM_VIDENC_MODE_CQP:	// Constant Quality (Single Pass)
 			ui.encodingModeComboBox->setCurrentIndex(1);
-			ui.targetRateControlSpinBox->setValue(properties->encodeModeParameter);
+			ui.quantiserSpinBox->setValue(encodeOptions->encodeModeParameter);
 			break;
 		case ADM_VIDENC_MODE_AQP:	// Average Quantizer (Single Pass)
 			ui.encodingModeComboBox->setCurrentIndex(2);
-			ui.targetRateControlSpinBox->setValue(properties->encodeModeParameter);
+			ui.quantiserSpinBox->setValue(encodeOptions->encodeModeParameter);
 			break;
 		case ADM_VIDENC_MODE_2PASS_SIZE:	// Video Size (Two Pass)
 			ui.encodingModeComboBox->setCurrentIndex(3);
-			ui.targetRateControlSpinBox->setValue(properties->encodeModeParameter);
+			ui.targetRateControlSpinBox->setValue(encodeOptions->encodeModeParameter);
 			break;
 		case ADM_VIDENC_MODE_2PASS_ABR:	// Average Bitrate (Two Pass)
 			ui.encodingModeComboBox->setCurrentIndex(4);
-			ui.targetRateControlSpinBox->setValue(properties->encodeModeParameter);
+			ui.targetRateControlSpinBox->setValue(encodeOptions->encodeModeParameter);
 			break;
 	}
 
@@ -426,30 +426,30 @@ void x264ConfigDialog::loadSettings(vidEncProperties *properties, x264Options *o
 	ui.fullRangeSamplesCheckBox->setChecked(options->getFullRangeSamples());
 }
 
-void x264ConfigDialog::saveSettings(vidEncProperties *properties, x264Options *options)
+void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *options)
 {
 	// General tab
 	switch (ui.encodingModeComboBox->currentIndex())
 	{
 		case 0:	// Constant Bitrate (Single Pass)
-			properties->encodeMode = ADM_VIDENC_MODE_CBR;
-			properties->encodeModeParameter = ui.targetRateControlSpinBox->value();
+			encodeOptions->encodeMode = ADM_VIDENC_MODE_CBR;
+			encodeOptions->encodeModeParameter = ui.targetRateControlSpinBox->value();
 			break;
 		case 1: // Constant Quality (Single Pass)
-			properties->encodeMode = ADM_VIDENC_MODE_CQP;
-			properties->encodeModeParameter = ui.quantiserSpinBox->value();
+			encodeOptions->encodeMode = ADM_VIDENC_MODE_CQP;
+			encodeOptions->encodeModeParameter = ui.quantiserSpinBox->value();
 			break;
 		case 2: // Average Quantizer (Single Pass)
-			properties->encodeMode = ADM_VIDENC_MODE_AQP;
-			properties->encodeModeParameter = ui.quantiserSpinBox->value();
+			encodeOptions->encodeMode = ADM_VIDENC_MODE_AQP;
+			encodeOptions->encodeModeParameter = ui.quantiserSpinBox->value();
 			break;
 		case 3: // Video Size (Two Pass)
-			properties->encodeMode = ADM_VIDENC_MODE_2PASS_SIZE;
-			properties->encodeModeParameter = ui.targetRateControlSpinBox->value();
+			encodeOptions->encodeMode = ADM_VIDENC_MODE_2PASS_SIZE;
+			encodeOptions->encodeModeParameter = ui.targetRateControlSpinBox->value();
 			break;
 		case 4: // Average Bitrate (Two Pass)
-			properties->encodeMode = ADM_VIDENC_MODE_2PASS_ABR;
-			properties->encodeModeParameter = ui.targetRateControlSpinBox->value();
+			encodeOptions->encodeMode = ADM_VIDENC_MODE_2PASS_ABR;
+			encodeOptions->encodeModeParameter = ui.targetRateControlSpinBox->value();
 			break;
 	}
 
@@ -588,13 +588,13 @@ void x264ConfigDialog::saveSettings(vidEncProperties *properties, x264Options *o
 
 extern "C"
 {
-	int showX264ConfigDialog(vidEncProperties *properties, x264Options *options)
+	int showX264ConfigDialog(vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options)
 	{
-		x264ConfigDialog dialog(properties, options);
+		x264ConfigDialog dialog(properties, encodeOptions, options);
 
 		if (dialog.exec() == QDialog::Accepted)
 		{
-			dialog.saveSettings(properties, options);
+			dialog.saveSettings(encodeOptions, options);
 
 			return 1;
 		}

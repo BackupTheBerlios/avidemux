@@ -18,13 +18,9 @@
 #include "ADM_externalEncoder.h"
 #include "ADM_plugin/ADM_vidEnc_plugin.h"
 
-#include "avi_vars.h"
-
 externalEncoder::externalEncoder(COMPRES_PARAMS *params)
 {
-	memcpy(&_compressParams, params, sizeof(COMPRES_PARAMS));
-
-	_plugin = ADM_vidEnc_getPlugin(params->extra_param);
+	_plugin = getVideoEncoderPlugin(params->extra_param);
 	_openPass = false;
 }
 
@@ -47,36 +43,13 @@ uint8_t externalEncoder::configure(AVDMGenericVideoStream *instream)
 
 	_in = instream;
 
-	vidEncProperties properties;
+	vidEncVideoProperties properties;
 
+	properties.structSize = sizeof(vidEncVideoProperties);
 	properties.width = _w;
 	properties.height = _h;
-	properties.parWidth = video_body->getPARWidth();
-	properties.parHeight = video_body->getPARHeight();
-
-	switch (_compressParams.mode)
-	{
-		case COMPRESS_AQ:
-			properties.encodeMode = ADM_VIDENC_MODE_AQP;
-			properties.encodeModeParameter = _compressParams.qz;
-			break;
-		case COMPRESS_CQ:
-			properties.encodeMode = ADM_VIDENC_MODE_CQP;
-			properties.encodeModeParameter = _compressParams.qz;
-			break;
-		case COMPRESS_CBR:
-			properties.encodeMode = ADM_VIDENC_MODE_CBR;
-			properties.encodeModeParameter = _compressParams.bitrate;
-			break;
-		case COMPRESS_2PASS:
-			properties.encodeMode = ADM_VIDENC_MODE_2PASS_SIZE;
-			properties.encodeModeParameter = _compressParams.finalsize;
-			break;
-		case COMPRESS_2PASS_BITRATE:
-			properties.encodeMode = ADM_VIDENC_MODE_2PASS_ABR;
-			properties.encodeModeParameter = _compressParams.avg_bitrate;
-			break;
-	}
+	properties.parWidth = instream->getPARWidth();
+	properties.parHeight = instream->getPARHeight();
 
 	if (_plugin->open(_plugin->encoderId, &properties))
 		return 1;

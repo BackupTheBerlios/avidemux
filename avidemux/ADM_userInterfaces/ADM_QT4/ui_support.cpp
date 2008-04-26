@@ -65,6 +65,6 @@ void loadPlugins(void)
 {
 	char *pluginDir = ADM_getPluginPath();
 
-	ADM_vidEnc_loadPlugins(ADM_VIDENC_UI_QT, pluginDir);
+	loadVideoEncoderPlugins(ADM_VIDENC_UI_QT, pluginDir);
 	delete [] pluginDir;
 }

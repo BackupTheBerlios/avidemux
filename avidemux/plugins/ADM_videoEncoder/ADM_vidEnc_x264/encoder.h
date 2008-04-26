@@ -39,7 +39,7 @@
 
 		configGuiLoader *_loader;
 		x264Options _options;
-		vidEncProperties _properties;
+		vidEncOptions _encodeOptions;
 
 		x264_t *_handler;
 		x264_param_t _param;
@@ -58,18 +58,19 @@
 
 		void printParam(x264_param_t* x264Param);
 		void printCqm(const uint8_t cqm[], int size);
+		void updateParameters(void);
 
 	public:
 		x264Encoder(void);
 		~x264Encoder(void);
 		void setUiType(int uiType);
 		int isConfigurable(void);
-		int configure(void);
-		int getOptions(char *options, int bufferSize);
-		int setOptions(char *options);
+		int configure(vidEncVideoProperties *properties);
+		int getOptions(vidEncOptions *encodeOptions, char *pluginOptions, int bufferSize);
+		int setOptions(vidEncOptions *encodeOptions, char *pluginOptions);
 		int getCurrentPass(void);
 		int getPassCount(void);
-		int open(vidEncProperties *properties);
+		int open(vidEncVideoProperties *properties);
 		int beginPass(void);
 		int getExtraHeaderData(uint8_t **data);
 		int encodeFrame(vidEncEncodeParams *encodeParams);
@@ -79,12 +80,12 @@
 #else
 	void *encoders_getPointer(int uiType);
 	int x264Encoder_isConfigurable(void);
-	int x264Encoder_configure(void);
-	int x264Encoder_getOptions(char *options, int bufferSize);
-	int x264Encoder_setOptions(char *options);
+	int x264Encoder_configure(vidEncVideoProperties *properties);
+	int x264Encoder_getOptions(vidEncOptions *encodeOptions, char *pluginOptions, int bufferSize);
+	int x264Encoder_setOptions(vidEncOptions *encodeOptions, char *pluginOptions);
 	int x264Encoder_getPassCount(void);
 	int x264Encoder_getCurrentPass(void);
-	int x264Encoder_open(vidEncProperties *properties);
+	int x264Encoder_open(vidEncVideoProperties *properties);
 	void x264Encoder_close(void);
 	int x264Encoder_encodeFrame(vidEncEncodeParams *encodeParams);
 #endif	// __cplusplus

@@ -28,7 +28,7 @@
 #include "ADM_vidEncode.hxx"
 #include "ADM_videoFilter.h"
 
-
+#include "avi_vars.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_ENCODER
@@ -440,23 +440,40 @@ void videoCodecConfigureUI(int codecIndex)
 
 	if (currentCodecType == CodecExternal)
 	{
-		ADM_vidEnc_plugin *plugin = ADM_vidEnc_getPlugin(param->extra_param);
+		ADM_vidEnc_plugin *plugin = getVideoEncoderPlugin(param->extra_param);
+		vidEncOptions encodeOptions;
+		vidEncVideoProperties properties;
 
-		plugin->setOptions(plugin->encoderId, (char*)param->extraSettings);
+		if (avifileinfo)
+		{
+			aviInfo info;
+			video_body->getVideoInfo(&info);
+
+			properties.width = info.width;
+			properties.height = info.height;
+			properties.parWidth = video_body->getPARWidth();
+			properties.parHeight = video_body->getPARHeight();
+		}
+		else
+		{
+			properties.width = 0;
+			properties.height = 0;
+			properties.parWidth = 0;
+			properties.parHeight = 0;
+		}
+
+		properties.structSize = sizeof(vidEncVideoProperties);
 
 		if (plugin->isConfigurable(plugin->encoderId))
-			if (plugin->configure(plugin->encoderId))
+			if (plugin->configure(plugin->encoderId, &properties))
 			{
-				delete [] (char*)param->extraSettings;
+				int length = plugin->getOptions(plugin->encoderId, NULL, NULL, 0);
+				char *pluginOptions = new char[length + 1];
 
-				int length = plugin->getOptions(plugin->encoderId, NULL, 0);
-				char *options = new char[length + 1];
+				plugin->getOptions(plugin->encoderId, &encodeOptions, pluginOptions, length);
+				pluginOptions[length] = 0;
 
-				plugin->getOptions(plugin->encoderId, options, length);
-				options[length] = 0;
-
-				param->extraSettings = options;
-				param->extraSettingsLen = length;
+				updateCompressionParameters(param, encodeOptions.encodeMode, encodeOptions.encodeModeParameter, pluginOptions, length);
 			}
 	}
 	else
@@ -470,58 +487,72 @@ void videoCodecConfigureUI(int codecIndex)
 	Set mode param and extra data for the currently selected codec
 	The extradata is a free binary chunk (->memcpy of codec.specific part)
 ___________________________________________________________*/
-
-void
-setVideoEncoderSettings (COMPRESSION_MODE mode, uint32_t param,
-			 uint32_t extraConf, uint8_t * extraData)
+void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t param, uint32_t extraConf, uint8_t* extraData)
 {
-  COMPRES_PARAMS *generic = NULL;
-  void *specific = NULL;
-  uint32_t specSize = 0;
-  COMPRES_PARAMS *zparam = &AllVideoCodec[currentCodecIndex];
+	COMPRES_PARAMS *zparam = &AllVideoCodec[currentCodecIndex];
 
-  zparam->mode = mode;
+	zparam->mode = mode;
 
-  switch (mode)
-    {
-    case COMPRESS_SAME:
-      aprintf ("Same as input\n");
-      break;
-    case COMPRESS_CBR:
-      aprintf ("CBR : %lu kbps\n", param);
-      zparam->bitrate = param;
-      break;
-    case COMPRESS_AQ:
-      aprintf ("AQ : %lu q\n", param);
-      zparam->qz = param;
-      break;
-    case COMPRESS_CQ:
-      aprintf ("CQ : %lu q\n", param);
-      zparam->qz = param;
-      break;
-    case COMPRESS_2PASS:
-      aprintf ("2pass : %lu q\n", param);
-      zparam->finalsize = param;
-      break;
-    case COMPRESS_2PASS_BITRATE:
-      aprintf ("2passbitrate : %lu q\n", param);
-      zparam->avg_bitrate = param;
-      break;
-    default:
-      ADM_assert (0);
-
-    }
-
-  if (extraConf && extraData && zparam->extraSettingsLen)
-    {
-      if (zparam->extraSettingsLen != extraConf)
-		printf("\n*** ERROR : Extra data for codec config has a different size!!! *****\n");
-      else
+	switch (mode)
 	{
-	  printf ("\n using %u bytes of codec specific data...\n", extraConf);
-	  memcpy (zparam->extraSettings, extraData, extraConf);
+		case COMPRESS_SAME:
+			aprintf ("Same as input\n");
+			break;
+		case COMPRESS_CBR:
+			aprintf ("CBR : %lu kbps\n", param);
+			zparam->bitrate = param;
+			break;
+		case COMPRESS_AQ:
+			aprintf ("AQ : %lu q\n", param);
+			zparam->qz = param;
+			break;
+		case COMPRESS_CQ:
+			aprintf ("CQ : %lu q\n", param);
+			zparam->qz = param;
+			break;
+		case COMPRESS_2PASS:
+			aprintf ("2pass : %lu q\n", param);
+			zparam->finalsize = param;
+			break;
+		case COMPRESS_2PASS_BITRATE:
+			aprintf ("2passbitrate : %lu q\n", param);
+			zparam->avg_bitrate = param;
+			break;
+		default:
+			ADM_assert(0);
 	}
-    }
+
+	if (zparam->extra_param)
+	{
+		ADM_vidEnc_plugin *plugin = getVideoEncoderPlugin(zparam->extra_param);
+		vidEncOptions options;
+
+		options.structSize = sizeof(vidEncOptions);
+		options.encodeMode = getVideoEncodePluginMode(mode);
+		options.encodeModeParameter = param;
+
+		if (zparam->extraSettings)
+			delete [] (char*)zparam->extraSettings;
+
+		zparam->extraSettings = extraData;
+
+		if (extraData)
+			zparam->extraSettingsLen = strlen((char*)extraData);
+		else
+			zparam->extraSettingsLen = 0;
+
+		plugin->setOptions(plugin->encoderId, &options, (char*)zparam->extraSettings);
+	}
+	else if (extraConf && extraData && zparam->extraSettingsLen)
+	{
+		if (zparam->extraSettingsLen != extraConf)
+			printf("\n*** ERROR : Extra data for codec config has a different size!!! *****\n");
+		else
+		{
+			printf ("\n using %u bytes of codec specific data...\n", extraConf);
+			memcpy (zparam->extraSettings, extraData, extraConf);
+		}
+	}
 }
 
 Encoder *getVideoEncoder(uint32_t w, uint32_t h, uint32_t globalHeaderFlag)

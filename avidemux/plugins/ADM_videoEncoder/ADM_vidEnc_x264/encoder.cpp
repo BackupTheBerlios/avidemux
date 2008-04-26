@@ -27,12 +27,12 @@ extern "C"
 {
 	void *encoders_getPointer(int uiType) { encoder.setUiType(uiType); return &encoders; } 
 	int x264Encoder_isConfigurable(void) { return encoder.isConfigurable(); }
-	int x264Encoder_configure(void) { return encoder.configure(); }
-	int x264Encoder_getOptions(char* options, int bufferSize) { return encoder.getOptions(options, bufferSize); };
-	int x264Encoder_setOptions(char* options) { return encoder.setOptions(options); };
+	int x264Encoder_configure(vidEncVideoProperties *properties) { return encoder.configure(properties); }
+	int x264Encoder_getOptions(vidEncOptions *encodeOptions, char *pluginOptions, int bufferSize) { return encoder.getOptions(encodeOptions, pluginOptions, bufferSize); };
+	int x264Encoder_setOptions(vidEncOptions *encodeOptions, char *pluginOptions) { return encoder.setOptions(encodeOptions, pluginOptions); };
 	int x264Encoder_getPassCount(void) { return encoder.getPassCount(); }
 	int x264Encoder_getCurrentPass(void) { return encoder.getCurrentPass(); }
-	int x264Encoder_open(vidEncProperties *properties) { return encoder.open(properties); }
+	int x264Encoder_open(vidEncVideoProperties *properties) { return encoder.open(properties); }
 	int x264Encoder_beginPass(void) { return encoder.beginPass(); }
 	int x264Encoder_encodeFrame(vidEncEncodeParams *encodeParams) { return encoder.encodeFrame(encodeParams); }
 	int x264Encoder_finishPass(void) { return encoder.finishPass(); }
@@ -43,14 +43,15 @@ x264Encoder::x264Encoder(void)
 {
 	_loader = NULL;
 	_handler = NULL;
-	_passCount = 2;
+	_passCount = 1;
 	_currentPass = 0;
 	_openPass = false;
 
-	x264_param_t *param = _options.getParameters();
+	_encodeOptions.structSize = sizeof(vidEncOptions);
+	_encodeOptions.encodeMode = ADM_VIDENC_MODE_AQP;
+	_encodeOptions.encodeModeParameter = 26;
 
-	memcpy(&_param, param, sizeof(x264_param_t));
-	delete param;
+	updateParameters();
 }
 
 x264Encoder::~x264Encoder(void)
@@ -71,7 +72,7 @@ int x264Encoder::isConfigurable(void)
 	return (_uiType == ADM_VIDENC_UI_GTK || _uiType == ADM_VIDENC_UI_QT);
 }
 
-int x264Encoder::configure(void)
+int x264Encoder::configure(vidEncVideoProperties *properties)
 {
 	if (_loader == NULL)
 	{
@@ -99,18 +100,21 @@ int x264Encoder::configure(void)
 	}
 
 	if (_loader->isAvailable())
-		return _loader->showX264ConfigDialog(&_properties, &_options);
+		return _loader->showX264ConfigDialog(properties, &_encodeOptions, &_options);
 	else
 		return 0;
 }
 
-int x264Encoder::getOptions(char *options, int bufferSize)
+int x264Encoder::getOptions(vidEncOptions *encodeOptions, char *pluginOptions, int bufferSize)
 {
 	char* xml = _options.toXml();
 	int xmlLength = strlen(xml);
-	
+
 	if (bufferSize >= xmlLength)
-		memcpy(options, xml, xmlLength);
+	{
+		memcpy(pluginOptions, xml, xmlLength);
+		memcpy(encodeOptions, &_encodeOptions, sizeof(vidEncOptions));
+	}
 	else if (bufferSize != 0)
 		xmlLength = 0;
 
@@ -119,9 +123,49 @@ int x264Encoder::getOptions(char *options, int bufferSize)
 	return xmlLength;
 }
 
-int x264Encoder::setOptions(char *options)
+int x264Encoder::setOptions(vidEncOptions *encodeOptions, char *pluginOptions)
 {
-	return _options.fromXml(options);
+	if (_options.fromXml(pluginOptions))
+	{
+		memcpy(&_encodeOptions, encodeOptions, sizeof(vidEncOptions));
+		updateParameters();
+
+		return 1;
+	}
+	else
+		return 0;
+}
+
+void x264Encoder::updateParameters(void)
+{
+	x264_param_t *param = _options.getParameters();
+
+	memcpy(&_param, param, sizeof(x264_param_t));
+	delete param;
+
+	switch (_encodeOptions.encodeMode)
+	{
+		case ADM_VIDENC_MODE_CBR:
+			_param.rc.i_rc_method = X264_RC_ABR;
+			_param.rc.i_bitrate = _encodeOptions.encodeModeParameter;
+			break;
+		case ADM_VIDENC_MODE_CQP:
+			_param.rc.i_rc_method = X264_RC_CQP;
+			_param.rc.i_qp_constant = _encodeOptions.encodeModeParameter;
+			break;
+		case ADM_VIDENC_MODE_AQP:
+			_param.rc.i_rc_method = X264_RC_CRF;
+			_param.rc.f_rf_constant = _encodeOptions.encodeModeParameter;
+			break;
+		case ADM_VIDENC_MODE_2PASS_SIZE:
+			_param.rc.i_rc_method = X264_RC_ABR;
+			_param.rc.i_bitrate = _encodeOptions.encodeModeParameter;
+			break;
+		case ADM_VIDENC_MODE_2PASS_ABR:
+			_param.rc.i_rc_method = X264_RC_ABR;
+			_param.rc.i_bitrate = _encodeOptions.encodeModeParameter;
+			break;
+	}
 }
 
 int x264Encoder::getCurrentPass(void)
@@ -134,12 +178,10 @@ int x264Encoder::getPassCount(void)
 	return _passCount;
 }
 
-int x264Encoder::open(vidEncProperties *properties)
+int x264Encoder::open(vidEncVideoProperties *properties)
 {
 	if (_handler)
 		return ADM_VIDENC_ERR_ALREADY_OPEN;
-
-	memcpy(&_properties, properties, sizeof(vidEncProperties));
 
 	_param.i_width = _width = properties->width;
 	_param.i_height = _height = properties->height;
