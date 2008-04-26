@@ -55,7 +55,7 @@ uint8_t ret=0;
 
         dialog=create_ChromaShift();
         gtk_register_dialog(dialog);
-        gtk_window_set_title (GTK_WINDOW (dialog), QT_TR_NOOP("ASHARP"));
+        gtk_window_set_title (GTK_WINDOW (dialog), QT_TR_NOOP("Chroma Shift"));
         gtk_widget_show(dialog);
 	
         myCrop=new flyChromaShift( width, height,in,WID(drawingarea1),WID(hscale));

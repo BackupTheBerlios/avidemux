@@ -102,7 +102,7 @@ uint8_t GenericAviSaveCopyUnpack::setupVideo (char *name)
 	}
  _incoming = getFirstVideoFilter (frameStart,frameEnd-frameStart);
  encoding_gui->setFps(_incoming->getInfo()->fps1000);
- encoding_gui->setPhasis("Saving");
+ encoding_gui->setPhasis(QT_TR_NOOP("Saving"));
  
  // Set up our copy codec ...
   copy=new EncoderCopy(NULL);

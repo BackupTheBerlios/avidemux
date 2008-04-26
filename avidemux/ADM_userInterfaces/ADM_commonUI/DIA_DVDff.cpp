@@ -54,9 +54,9 @@ diaMenuEntry interM[]={
 };
 diaMenuEntry vbvM[3]=
 {
-	{40,"VCD 40 kB"},
-	{112,"SVCD 112 kB"},
-	{224,"DVD 224 kB"}
+	{40,QT_TR_NOOP("VCD 40 kB")},
+	{112,QT_TR_NOOP("SVCD 112 kB")},
+	{224,QT_TR_NOOP("DVD 224 kB")}
 };
 
                       

@@ -57,7 +57,7 @@ public:
   }
   virtual const char *getDisplayName (void)
   {
-    return "Mjpeg";
+    return QT_TR_NOOP("MJPEG");
   }
 };
 

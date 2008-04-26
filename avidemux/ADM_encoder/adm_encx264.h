@@ -62,7 +62,7 @@ public:
   }
   virtual const char *getDisplayName (void)
   {
-    return "X264";
+    return QT_TR_NOOP("x264");
   }
   virtual uint8_t hasExtraHeaderData (uint32_t * l, uint8_t ** data);
 

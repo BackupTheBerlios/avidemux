@@ -242,25 +242,25 @@ DIA_encoding  *encoding;
       switch (videoCodecGetType())
       {
           case CodecVCD:
-            encoding->setCodec("libmpeg2enc VCD");
+            encoding->setCodec(QT_TR_NOOP("libmpeg2enc VCD"));
             break;
           case CodecSVCD:
-            encoding->setCodec("libmpeg2enc SVCD");
+            encoding->setCodec(QT_TR_NOOP("libmpeg2enc SVCD"));
             break;
           case CodecDVD:
-            encoding->setCodec("libmpeg2enc DVD");
+            encoding->setCodec(QT_TR_NOOP("libmpeg2enc DVD"));
             break;
           case CodecXVCD:
-            encoding->setCodec("FFmpeg Mpeg1 VBR");
+            encoding->setCodec(QT_TR_NOOP("FFmpeg MPEG-1 VBR"));
             break;
           case CodecXSVCD:
-            encoding->setCodec("FFmpeg Mpeg2 SVCD VBR");
+            encoding->setCodec(QT_TR_NOOP("FFmpeg MPEG-2 SVCD VBR"));
             break;
           case CodecXDVD:
-            encoding->setCodec("FFmpeg Mpeg2 DVD VBR");
+            encoding->setCodec(QT_TR_NOOP("FFmpeg MPEG-2 DVD VBR"));
             break;
           case CodecRequant:
-            encoding->setCodec("Mpeg Requantizer");
+            encoding->setCodec(QT_TR_NOOP("MPEG Requantizer"));
             break;
           
           default:
@@ -268,11 +268,11 @@ DIA_encoding  *encoding;
 	}
         switch(mux)
           {
-            case MUXER_NONE:encoding->setContainer("Mpeg ES");break;
-            case MUXER_TS:  encoding->setContainer("Mpeg TS");break;
-            case MUXER_VCD: encoding->setContainer("Mpeg VCD");break;
-            case MUXER_SVCD:encoding->setContainer("Mpeg SVCD");break;
-            case MUXER_DVD: encoding->setContainer("Mpeg DVD");break;
+            case MUXER_NONE:encoding->setContainer(QT_TR_NOOP("MPEG ES"));break;
+            case MUXER_TS:  encoding->setContainer(QT_TR_NOOP("MPEG TS"));break;
+            case MUXER_VCD: encoding->setContainer(QT_TR_NOOP("MPEG VCD"));break;
+            case MUXER_SVCD:encoding->setContainer(QT_TR_NOOP("MPEG SVCD"));break;
+            case MUXER_DVD: encoding->setContainer(QT_TR_NOOP("MPEG DVD"));break;
             default:
                 ADM_assert(0);
           }
@@ -293,7 +293,7 @@ DIA_encoding  *encoding;
                                 }
                         if(!reuse)
                         {
-                                encoding->setPhasis ("Pass 1/2");
+                                encoding->setPhasis (QT_TR_NOOP("Pass 1/2"));
                                 encoder->startPass1();
                                 bitstream.data=_buffer;
                                 bitstream.bufferSize=_page;
@@ -353,15 +353,15 @@ DIA_encoding  *encoding;
                 }
               }
           if(encoder->isDualPass())
-                  encoding->setPhasis ("Pass 2/2");
+                  encoding->setPhasis (QT_TR_NOOP("Pass 2/2"));
           else
-                  encoding->setPhasis ("Encoding");
+                  encoding->setPhasis (QT_TR_NOOP("Encoding"));
 
          // Set info for audio if any
          if(muxer)
          {
             if(!audioProcessMode())
-                  encoding->setAudioCodec("Copy");
+                  encoding->setAudioCodec(QT_TR_NOOP("Copy"));
             else
                   encoding->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));
          }

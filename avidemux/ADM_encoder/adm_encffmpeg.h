@@ -44,7 +44,7 @@ public:
   virtual uint8_t startPass1 (void);
   virtual const char *getDisplayName (void)
   {
-    return "LavCodec";
+    return QT_TR_NOOP("LavCodec");
   }
   virtual const char *getCodecName (void);	//{return "DX50";}
   virtual const char *getFCCHandler (void)

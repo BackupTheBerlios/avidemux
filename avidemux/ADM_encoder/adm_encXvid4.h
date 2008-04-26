@@ -59,7 +59,7 @@ public:
   }
   virtual const char *getDisplayName (void)
   {
-    return "Xvid4";
+    return QT_TR_NOOP("Xvid4");
   }
 
 };

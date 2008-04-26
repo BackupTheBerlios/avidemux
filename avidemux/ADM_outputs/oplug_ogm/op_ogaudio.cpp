@@ -63,7 +63,7 @@ WAVHeader	*info=NULL;
 		{
 			audioFilter=NULL;	
 			_audioBuffer=NULL;
-			encoding_gui->setAudioCodec("None");
+			encoding_gui->setAudioCodec(QT_TR_NOOP("None"));
 			return 1;
 		}
 		if(audioProcessMode() && currentaudiostream->isCompressed() 
@@ -83,7 +83,7 @@ WAVHeader	*info=NULL;
 		}
 		else	// Copymode
 		{
-			encoding_gui->setAudioCodec("Copy");
+			encoding_gui->setAudioCodec(QT_TR_NOOP("Copy"));
 			
 		}
 		//______________ Write headers/ Audio..._____________________

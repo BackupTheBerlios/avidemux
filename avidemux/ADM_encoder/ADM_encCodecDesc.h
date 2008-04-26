@@ -11,7 +11,7 @@ extern uint8_t DIA_requant(COMPRES_PARAMS *incoming);
 
 COMPRES_PARAMS yv12codec = {
   CodecYV12,
-  "YV12 (raw)",
+  QT_TR_NOOP("YV12 (raw)"),
   "YV12",
   "YV12",
   COMPRESS_CQ,
@@ -109,7 +109,7 @@ FFcodecSetting ffmpeg4Extra_FLV1 = {
 
 COMPRES_PARAMS ffmpegH263Codec = {
   CodecH263,
-  "H.263 (lavc)",
+  QT_TR_NOOP("H.263 (lavc)"),
   "H263",
   "Lavcodec H263",
   COMPRESS_CQ,
@@ -125,7 +125,7 @@ COMPRES_PARAMS ffmpegH263Codec = {
 };
 COMPRES_PARAMS ffmpegH263PCodec = {
   CodecH263P,
-  "H.263+ (lavc)",
+  QT_TR_NOOP("H.263+ (lavc)"),
   "H263P",
   "Lavcodec H263+",
   COMPRESS_CQ,
@@ -141,7 +141,7 @@ COMPRES_PARAMS ffmpegH263PCodec = {
 };
 COMPRES_PARAMS ffmpegMpeg4 = {
   CodecFF,
-  "MPEG-4 ASP (lavc)",
+  QT_TR_NOOP("MPEG-4 ASP (lavc)"),
   "FFMpeg4",
   "Lavcodec Mpeg4",
   COMPRESS_CQ,
@@ -157,7 +157,7 @@ COMPRES_PARAMS ffmpegMpeg4 = {
 };
 COMPRES_PARAMS ffmpegDV = {
   CodecDV,
-  "DV (lavc)",
+  QT_TR_NOOP("DV (lavc)"),
   "DV",
   "DV",
   COMPRESS_CQ,
@@ -173,7 +173,7 @@ COMPRES_PARAMS ffmpegDV = {
 };
 COMPRES_PARAMS ffmpegFLV1 = {
   CodecFLV1,
-  "FLV1 (lavc)",
+  QT_TR_NOOP("FLV1 (lavc)"),
   "FLV1",
   "FLV1",
   COMPRESS_CBR,
@@ -189,7 +189,7 @@ COMPRES_PARAMS ffmpegFLV1 = {
 };
 COMPRES_PARAMS ffmpegSnow = {
   CodecSnow,
-  "Snow (lavc)",
+  QT_TR_NOOP("Snow (lavc)"),
   "FFMpeg4",
   "Lavcodec Snow",
   COMPRESS_CQ,
@@ -205,7 +205,7 @@ COMPRES_PARAMS ffmpegSnow = {
 };
 COMPRES_PARAMS ffmpegFFHUFF = {
   CodecFFhuff,
-  "FF Huffyuv (lavc)",
+  QT_TR_NOOP("FF Huffyuv (lavc)"),
   "FFHUFF",
   "Lavcodec FF HUFFYUV",
   COMPRESS_CQ,
@@ -221,7 +221,7 @@ COMPRES_PARAMS ffmpegFFHUFF = {
 };
 COMPRES_PARAMS ffmpegHUFF = {
   CodecHuff,
-  "Huffyuv (lavc)",
+  QT_TR_NOOP("Huffyuv (lavc)"),
   "HUFF",
   "Lavcodec HUFFYUV",
   COMPRESS_CQ,
@@ -237,7 +237,7 @@ COMPRES_PARAMS ffmpegHUFF = {
 };
 COMPRES_PARAMS ffmpegFFV1 = {
   CodecFFV1,
-  "FFV1 (lavc)",
+  QT_TR_NOOP("FFV1 (lavc)"),
   "FFV1",
   "Lavcodec FFV1",
   COMPRESS_CQ,
@@ -255,7 +255,7 @@ static MJPEGConfig MjpegExtra = { 90, 0 };
 extern uint8_t DIA_mjpegCodecSetting (COMPRES_PARAMS * param);
 COMPRES_PARAMS MjpegCodec = {
   CodecMjpeg,
-  "MJPEG (lavc)",
+  QT_TR_NOOP("MJPEG (lavc)"),
   "Mjpeg",
   "Mjpeg (lavcodec)",
   COMPRESS_CQ,
@@ -312,7 +312,7 @@ FFcodecSetting ffmpeg1Extra = {
 
 COMPRES_PARAMS ffmpeg1Codec = {
   CodecXVCD,
-  "VCD (lavc)",
+  QT_TR_NOOP("VCD (lavc)"),
   "XVCD",
   "Lavcodec Mpeg1",
   COMPRESS_CQ,
@@ -372,7 +372,7 @@ FFcodecSetting ffmpeg2DVDExtra = {
 
 COMPRES_PARAMS ffmpeg2DVDCodec = {
   CodecXDVD,
-  "DVD (lavc)",
+  QT_TR_NOOP("DVD (lavc)"),
   "XDVD",
   "Lavcodec Mpeg2 (DVD)",
   COMPRESS_CQ,
@@ -432,7 +432,7 @@ FFcodecSetting ffmpeg2SVCDExtra = {
 
 COMPRES_PARAMS ffmpeg2SVCDCodec = {
   CodecXSVCD,
-  "SVCD (lavc)",
+  QT_TR_NOOP("SVCD (lavc)"),
   "XSVCD",
   "Lavcodec Mpeg2 (SVCD)",
   COMPRESS_CQ,
@@ -459,9 +459,9 @@ Mpeg2encParam VCDExtra = {
 
 COMPRES_PARAMS VCDCodec = {
   CodecVCD,
-  "VCD (mpeg2enc)",
+  QT_TR_NOOP("VCD (mpeg2enc)"),
   "VCD",
-  "Mpeg2enc(VCD)",
+  "Mpeg2enc (VCD)",
   COMPRESS_CBR,
   4,
   1500,
@@ -491,9 +491,9 @@ Mpeg2encParam SVCDExtra = {
 
 COMPRES_PARAMS SVCDCodec = {
   CodecSVCD,
-  "SVCD (mpeg2enc)",
+  QT_TR_NOOP("SVCD (mpeg2enc)"),
   "SVCD",
-  "Mpeg2enc(SVCD)",
+  "Mpeg2enc (SVCD)",
   COMPRESS_CQ,
   4,
   1500,
@@ -510,7 +510,7 @@ COMPRES_PARAMS SVCDCodec = {
 uint32_t RequantFactorExtra=1000; // 1000* the actual requant factor
 COMPRES_PARAMS RequantCodec = {
     CodecRequant,
-    "MPEG-2 requant",
+    QT_TR_NOOP("MPEG-2 requant"),
     "REQUANT",
     "Mpeg2 Requantizer",
     COMPRESS_CQ,
@@ -537,9 +537,9 @@ Mpeg2encParam DVDExtra = {
 
 COMPRES_PARAMS DVDCodec = {
   CodecDVD,
-  "DVD (mpeg2enc)",
+  QT_TR_NOOP("DVD (mpeg2enc)"),
   "DVD",
-  "Mpeg2enc(DVD)",
+  "Mpeg2enc (DVD)",
   COMPRESS_CQ,
   4,
   1500,
@@ -669,7 +669,7 @@ xvid4EncParam xvid4ExtraIPOD = {
 extern uint8_t DIA_xvid4 (COMPRES_PARAMS * incoming);
 COMPRES_PARAMS Xvid4Codec = {
   CodecXvid4,
-  "MPEG-4 ASP (Xvid4)",
+  QT_TR_NOOP("MPEG-4 ASP (Xvid4)"),
   "XVID4",
   "XVID 4 mpeg4",
   COMPRESS_CQ,
@@ -869,7 +869,7 @@ ADM_x264Param x264ExtraDefault=x264Extra;
 extern uint8_t DIA_x264 (COMPRES_PARAMS * conf);
 COMPRES_PARAMS x264Codec = {
   CodecX264,
-  "MPEG-4 AVC (x264)",
+  QT_TR_NOOP("MPEG-4 AVC (x264)"),
   "X264",
   "x264 h264 encoder",
   COMPRESS_AQ,
@@ -886,10 +886,10 @@ COMPRES_PARAMS x264Codec = {
 
 #endif
 COMPRES_PARAMS DUMMYONE =
-  { CodecDummy, "dummy", "dummy", "dummy", COMPRESS_CQ, 4, 1500, 700,1000, 0, 0,
+  { CodecDummy, QT_TR_NOOP("dummy"), "dummy", "dummy", COMPRESS_CQ, 4, 1500, 700,1000, 0, 0,
 NULL, 0 };
 COMPRES_PARAMS CopyCodec =
-  { CodecCopy, "Copy", "Copy", "Copy", COMPRESS_CQ, 4, 1500, 700,1000, 0, 0, NULL,
+  { CodecCopy, QT_TR_NOOP("Copy"), "Copy", "Copy", COMPRESS_CQ, 4, 1500, 700,1000, 0, 0, NULL,
 0 };
 
 COMPRES_PARAMS *internalVideoCodec[] = {

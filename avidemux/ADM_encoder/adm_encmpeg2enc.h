@@ -54,7 +54,7 @@ class EncoderMpeg2enc:public Encoder
     virtual uint8_t startPass1 (void);
     virtual const char *getCodecName (void) {return "MPEG";};
     virtual const char *getFCCHandler (void) {return "MPEG";};
-    virtual const char *getDisplayName (void) {return "MPEG";}; // FIXME
+    virtual const char *getDisplayName (void) {return QT_TR_NOOP("MPEG");}; // FIXME
             uint8_t verifyLog(const char *name,uint32_t nbFrame);
 
 };

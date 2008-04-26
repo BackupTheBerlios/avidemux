@@ -116,7 +116,7 @@ InstType Full
 installGtk${LANG_CODE}:
     SetOutPath $INSTDIR\share\locale\${LANG_CODE}\LC_MESSAGES
     File ..\..\..\avidemux_2.4_build\share\locale\${LANG_CODE}\LC_MESSAGES\avidemux.mo
-    File ..\..\..\avidemux_2.4_build\lib\locale\${LANG_CODE}\LC_MESSAGES\gtk20.mo
+    File ..\..\..\avidemux_2.4_build\share\locale\${LANG_CODE}\LC_MESSAGES\gtk20.mo
 
     WriteRegStr HKLM "${REGKEY}\Components" ${LANG_NAME} 1
 endGtk${LANG_CODE}:
@@ -138,8 +138,8 @@ endQt4${LANG_CODE}:
 
 !macro UninstallLanguage LANG_NAME LANG_CODE
     RmDir /r /REBOOTOK $INSTDIR\share\locale\${LANG_CODE}
-    RmDir /r /REBOOTOK $INSTDIR\lib\locale\${LANG_CODE}
     Delete /REBOOTOK $INSTDIR\i18n\avidemux_${LANG_CODE}.qm
+    Delete /REBOOTOK $INSTDIR\i18n\qt_${LANG_CODE}.qm
     
     DeleteRegValue HKLM "${REGKEY}\Components" ${LANG_NAME}
 !macroend
@@ -543,7 +543,6 @@ SectionEnd
 Section un.post UnSecUninstaller
     RmDir /REBOOTOK $INSTDIR\etc
     RmDir /REBOOTOK $INSTDIR\i18n
-    RmDir /REBOOTOK $INSTDIR\lib\locale
     RmDir /REBOOTOK $INSTDIR\lib
     RmDir /REBOOTOK $INSTDIR\share\locale
     RmDir /REBOOTOK $INSTDIR\share

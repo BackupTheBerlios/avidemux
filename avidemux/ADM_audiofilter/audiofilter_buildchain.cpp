@@ -403,7 +403,7 @@ AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
   {
     delete tmpfilter;
     tmpfilter=NULL;
-    GUI_Error_HIG("Encoder initialization failed", "Not activated."); 
+    GUI_Error_HIG(QT_TR_NOOP("Encoder initialization failed"), QT_TR_NOOP("Not activated."));
   }
   output=tmpfilter;
 

@@ -66,7 +66,7 @@ public:
   }
   const char *getDisplayName (void)
   {
-    return "YV12";
+    return QT_TR_NOOP("YV12");
   }
 
 };

@@ -101,8 +101,8 @@ uint32_t w,h,fps1000,fcc;
  		{
       			aprintf("**Pass 1:%lu\n",_togo);
       			_encode->startPass1 ();
-			encoding_gui->setCodec((char *)_encode->getCodecName());
-			encoding_gui->setPhasis("Pass one");
+			encoding_gui->setCodec(_encode->getCodecName());
+			encoding_gui->setPhasis(QT_TR_NOOP("Pass one"));
                         ADMBitstream bitstream(w*h*3);
                         bitstream.data=_videoBuffer;
       			//__________________________________
@@ -130,11 +130,11 @@ uint32_t w,h,fps1000,fcc;
       			printf("Pass2 ignition failed\n");
       			return 0;
 		}
-		encoding_gui->setPhasis("Pass 2");
+		encoding_gui->setPhasis(QT_TR_NOOP("Pass 2"));
 	}   //-------------------------/VBR-----------------------------------
 	else
 	{
-		encoding_gui->setPhasis("Encoding");
+		encoding_gui->setPhasis(QT_TR_NOOP("Encoding"));
 	}
   // init save avi
 

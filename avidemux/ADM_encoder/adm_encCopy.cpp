@@ -79,7 +79,7 @@ EncoderCopy::startPass1 (void)
 const char *
 EncoderCopy::getDisplayName (void)
 {
-  return "Copy";
+  return QT_TR_NOOP("Copy");
 }
 
 

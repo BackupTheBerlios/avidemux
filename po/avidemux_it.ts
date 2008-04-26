@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="it">
+<defaultcodec></defaultcodec>
 <context>
     <name></name>
     <message>
@@ -768,11 +769,6 @@
         <translation>_Qualità:</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_mjpeg.cpp" line="37"/>
-        <source>_Swap U&amp;V:</source>
-        <translation>_Inverti U&amp;V:</translation>
-    </message>
-    <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_postproc.cpp" line="40"/>
         <source>_Filter strength:</source>
         <translation>Intensità _filtro:</translation>
@@ -1088,11 +1084,6 @@
         <translation>Vai al tempo</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_mjpeg.cpp" line="39"/>
-        <source>Mjpeg Configuration</source>
-        <translation>Configurazione Mjpeg</translation>
-    </message>
-    <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_requant.cpp" line="51"/>
         <source>Requant Configuration</source>
         <translation>Configurazione Requant</translation>
@@ -1242,6 +1233,16 @@
         <source>Gettext</source>
         <translation>Gettext</translation>
     </message>
+    <message>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_mjpeg.cpp" line="37"/>
+        <source>_Swap U&amp;V</source>
+        <translation>_Inverti U e V</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_mjpeg.cpp" line="39"/>
+        <source>MJPEG Configuration</source>
+        <translation>Configurazione Mjpeg</translation>
+    </message>
 </context>
 <context>
     <name>@default</name>
@@ -1379,7 +1380,7 @@ Cambia il codec o usa il filtro mixer per ridurre i canali.</translation>
         <translation>MPEG video</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_editor/ADM_outputfmt.h" line="49"/>
+        <location filename="../avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp" line="131"/>
         <source>MP4</source>
         <translation>MP4</translation>
     </message>
@@ -1389,17 +1390,17 @@ Cambia il codec o usa il filtro mixer per ridurre i canali.</translation>
         <translation>OGM</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_editor/ADM_outputfmt.h" line="51"/>
+        <location filename="../avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp" line="130"/>
         <source>PSP</source>
         <translation>PSP</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_editor/ADM_outputfmt.h" line="52"/>
+        <location filename="../avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp" line="283"/>
         <source>FLV</source>
         <translation>FLV</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_editor/ADM_outputfmt.h" line="53"/>
+        <location filename="../avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp" line="132"/>
         <source>MKV</source>
         <translation>MKV</translation>
     </message>
@@ -4174,12 +4175,12 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="99"/>
         <source>Hz Stack fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiancamento semiquadri</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="99"/>
         <source>Put botj fields side by side.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mette due semiquadri uno accanto all&apos;altro.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="65"/>
@@ -4215,6 +4216,301 @@ It is needed to create PSP compatible video.</source>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="163"/>
         <source>x264 Configuration</source>
         <translation>Configurazione x264</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_audiofilter/audiofilter_buildchain.cpp" line="417"/>
+        <source>Encoder initialization failed</source>
+        <translation>Inizializzazione codificatore fallita</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_audiofilter/audiofilter_buildchain.cpp" line="417"/>
+        <source>Not activated.</source>
+        <translation>Non attivo.</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="13"/>
+        <source>YV12 (raw)</source>
+        <translation>YV12 (raw)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="111"/>
+        <source>H.263 (lavc)</source>
+        <translation>H.263 (lavc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="127"/>
+        <source>H.263+ (lavc)</source>
+        <translation>H.263+ (lavc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="143"/>
+        <source>MPEG-4 ASP (lavc)</source>
+        <translation>MPEG-4 ASP (lavc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="159"/>
+        <source>DV (lavc)</source>
+        <translation>DV (lavc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="175"/>
+        <source>FLV1 (lavc)</source>
+        <translation>FLV1 (lavc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="191"/>
+        <source>Snow (lavc)</source>
+        <translation>Snow (lavc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="207"/>
+        <source>FF Huffyuv (lavc)</source>
+        <translation>FF Huffyuv (lavc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="223"/>
+        <source>Huffyuv (lavc)</source>
+        <translation>Huffyuv (lavc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="239"/>
+        <source>FFV1 (lavc)</source>
+        <translation>FFV1 (lavc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="257"/>
+        <source>MJPEG (lavc)</source>
+        <translation>MJPEG (lavc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="314"/>
+        <source>VCD (lavc)</source>
+        <translation>VCD (lavc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="374"/>
+        <source>DVD (lavc)</source>
+        <translation>DVD (lavc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="434"/>
+        <source>SVCD (lavc)</source>
+        <translation>SVCD (lavc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="461"/>
+        <source>VCD (mpeg2enc)</source>
+        <translation>VCD (mpeg2enc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="493"/>
+        <source>SVCD (mpeg2enc)</source>
+        <translation>SVCD (mpeg2enc)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="512"/>
+        <source>MPEG-2 requant</source>
+        <translation>MPEG-2 requant</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="671"/>
+        <source>MPEG-4 ASP (Xvid4)</source>
+        <translation>MPEG-4 ASP (Xvid4)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="812"/>
+        <source>MPEG-4 AVC (x264)</source>
+        <translation>MPEG-4 AVC (x264)</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="829"/>
+        <source>dummy</source>
+        <translation>dummy</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="379"/>
+        <source>Copy</source>
+        <translation>Copia</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="485"/>
+        <source>DTS</source>
+        <translation>DTS</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="487"/>
+        <source>MP2</source>
+        <translation>MP2</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="488"/>
+        <source>MP3</source>
+        <translation>MP3</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="489"/>
+        <source>WMA</source>
+        <translation>WMA</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="490"/>
+        <source>LPCM</source>
+        <translation>LPCM</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="491"/>
+        <source>AC3</source>
+        <translation>AC3</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="492"/>
+        <source>Ogg Vorbis</source>
+        <translation>Ogg Vorbis</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="494"/>
+        <source>AAC</source>
+        <translation>AAC</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="495"/>
+        <source>QDM2</source>
+        <translation>QDM2</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="496"/>
+        <source>AMR-NB</source>
+        <translation>AMR-NB</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="497"/>
+        <source>MSADPCM</source>
+        <translation>MSADPCM</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="498"/>
+        <source>ULAW</source>
+        <translation>ULAW</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="499"/>
+        <source>IMA ADPCM</source>
+        <translation>IMA ADPCM</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="500"/>
+        <source>8-bit PCM</source>
+        <translation>PCM 8-bit</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="502"/>
+        <source>Unknown codec</source>
+        <translation>Codec sconosciuto</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_dummy/oplug_dummy.cpp" line="140"/>
+        <source>Dummy</source>
+        <translation>Dummy</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="373"/>
+        <source>Encoding</source>
+        <translation>Codifica in corso</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp" line="410"/>
+        <source>1st Pass</source>
+        <translation>1a passata</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp" line="467"/>
+        <source>2nd Pass</source>
+        <translation>2a passata</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpeg/op_mpegpass.cpp" line="222"/>
+        <source>---</source>
+        <translation>---</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpeg/op_mpegpass.cpp" line="223"/>
+        <source>Saving</source>
+        <translation>Salvataggio in corso</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="287"/>
+        <source>MPEG TS</source>
+        <translation>MPEG TS</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="288"/>
+        <source>MPEG VCD</source>
+        <translation>MPEG VCD</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="289"/>
+        <source>MPEG SVCD</source>
+        <translation>MPEG SVCD</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="290"/>
+        <source>MPEG DVD</source>
+        <translation>MPEG DVD</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="260"/>
+        <source>libmpeg2enc VCD</source>
+        <translation>VCD libmpeg2enc</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="263"/>
+        <source>libmpeg2enc SVCD</source>
+        <translation>SVCD libmpeg2enc</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="266"/>
+        <source>libmpeg2enc DVD</source>
+        <translation>DVD libmpeg2enc</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="269"/>
+        <source>FFmpeg MPEG-1 VBR</source>
+        <translation>MPEG-1 VBR FFmpeg</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="272"/>
+        <source>FFmpeg MPEG-2 SVCD VBR</source>
+        <translation>MPEG-2 SVCD VBR FFmpeg</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="275"/>
+        <source>FFmpeg MPEG-2 DVD VBR</source>
+        <translation>MPEG-2 DVD VBR FFmpeg</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="278"/>
+        <source>MPEG Requantizer</source>
+        <translation>MPEG Requantizer</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="286"/>
+        <source>MPEG ES</source>
+        <translation>MPEG ES</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="311"/>
+        <source>Pass 1/2</source>
+        <translation>Passata 1/2</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp" line="371"/>
+        <source>Pass 2/2</source>
+        <translation>Passata 2/2</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="539"/>
+        <source>DVD (mpeg2enc)</source>
+        <translation>DVD (mpeg2enc)</translation>
     </message>
 </context>
 <context>
@@ -4760,12 +5056,12 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidParticle.cpp" line="137"/>
         <source>DG@UWA format (includes shape info &amp; bounding box)</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato DG@UWA (include info sulla forma &amp; rettangolo di contenimento)</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidParticle.cpp" line="139"/>
         <source>AB@ODU format (includes shape info)</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato AB@ODU (include info sulla forma)</translation>
     </message>
 </context>
 <context>
@@ -5454,6 +5750,34 @@ Vuoi usare quella modalità?</translation>
         <source>Could not initialize audio</source>
         <translation>Impossibile avviare l&apos;audio</translation>
     </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_ogm/op_ogaudio.cpp" line="70"/>
+        <source>None</source>
+        <translation>Nessuno</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_ogm/op_ogaudio.cpp" line="90"/>
+        <source>Copy</source>
+        <translation>Copia</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_ogm/op_ogsave.cpp" line="119"/>
+        <source>OGM</source>
+        <translation>OGM</translation>
+    </message>
+</context>
+<context>
+    <name>ADM_ogmWriteCopy</name>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_ogm/op_ogsavecopy.cpp" line="69"/>
+        <source>Copy</source>
+        <translation>Copia</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_ogm/op_ogsavecopy.cpp" line="70"/>
+        <source>Saving...</source>
+        <translation>Salvataggio in corso...</translation>
+    </message>
 </context>
 <context>
     <name>ADM_ogmWriteProcess</name>
@@ -5468,6 +5792,21 @@ Vuoi usare quella modalità?</translation>
  Reuse the existing log-file ?</source>
         <translation>
  Riutilizzare il file log esistente?</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_ogm/op_ogsaveprocess.cpp" line="111"/>
+        <source>Pass one</source>
+        <translation>Passata 1</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_ogm/op_ogsaveprocess.cpp" line="139"/>
+        <source>Pass 2</source>
+        <translation>Passata 2</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_ogm/op_ogsaveprocess.cpp" line="143"/>
+        <source>Encoding</source>
+        <translation>Codifica in corso</translation>
     </message>
 </context>
 <context>
@@ -6008,7 +6347,7 @@ Vuoi usare quella modalità?</translation>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/encoding.ui" line="124"/>
         <source>None</source>
-        <translation>Nessuno</translation>
+        <translation>Nessuna</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/encoding.ui" line="177"/>
@@ -6224,7 +6563,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/props.ui" line="117"/>
         <source>Codec 4CC:</source>
-        <translation>Codec 4CC:</translation>
+        <translation>4CC Codec:</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/props.ui" line="127"/>
@@ -6662,6 +7001,30 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>EncoderCopy</name>
+    <message>
+        <location filename="../avidemux/ADM_encoder/adm_encCopy.cpp" line="91"/>
+        <source>Copy</source>
+        <translation>Copia</translation>
+    </message>
+</context>
+<context>
+    <name>EncoderDivx</name>
+    <message>
+        <location filename="../avidemux/ADM_encoder/adm_encdivx.h" line="52"/>
+        <source>DivX</source>
+        <translation>DivX</translation>
+    </message>
+</context>
+<context>
+    <name>EncoderFFMPEG</name>
+    <message>
+        <location filename="../avidemux/ADM_encoder/adm_encffmpeg.h" line="47"/>
+        <source>LavCodec</source>
+        <translation>LavCodec</translation>
+    </message>
+</context>
+<context>
     <name>EncoderFFMPEGDV</name>
     <message>
         <location filename="../avidemux/ADM_encoder/adm_encffmpeg.cpp" line="261"/>
@@ -6672,6 +7035,62 @@ p, li { white-space: pre-wrap; }
         <location filename="../avidemux/ADM_encoder/adm_encffmpeg.cpp" line="261"/>
         <source>At the moment, the DV codec only accepts 720*576@25</source>
         <translation>Al momento, il codec DV accetta solo 720*576@25</translation>
+    </message>
+</context>
+<context>
+    <name>EncoderMjpeg</name>
+    <message>
+        <location filename="../avidemux/ADM_encoder/adm_encmjpeg.h" line="60"/>
+        <source>MJPEG</source>
+        <translation>MJPEG</translation>
+    </message>
+</context>
+<context>
+    <name>EncoderMpeg2enc</name>
+    <message>
+        <location filename="../avidemux/ADM_encoder/adm_encmpeg2enc.h" line="57"/>
+        <source>MPEG</source>
+        <translation>MPEG</translation>
+    </message>
+</context>
+<context>
+    <name>EncoderRequant</name>
+    <message>
+        <location filename="../avidemux/ADM_encoder/adm_encRequant.cpp" line="98"/>
+        <source>Requant</source>
+        <translation>Requant</translation>
+    </message>
+</context>
+<context>
+    <name>EncoderX264</name>
+    <message>
+        <location filename="../avidemux/ADM_encoder/adm_encx264.h" line="65"/>
+        <source>x264</source>
+        <translation>x264</translation>
+    </message>
+</context>
+<context>
+    <name>EncoderXvid</name>
+    <message>
+        <location filename="../avidemux/ADM_encoder/adm_encxvid.h" line="61"/>
+        <source>Xvid</source>
+        <translation>Xvid</translation>
+    </message>
+</context>
+<context>
+    <name>EncoderXvid4</name>
+    <message>
+        <location filename="../avidemux/ADM_encoder/adm_encXvid4.h" line="62"/>
+        <source>Xvid4</source>
+        <translation>Xvid4</translation>
+    </message>
+</context>
+<context>
+    <name>EncoderYV12</name>
+    <message>
+        <location filename="../avidemux/ADM_encoder/adm_encyv12.h" line="69"/>
+        <source>YV12</source>
+        <translation>YV12</translation>
     </message>
 </context>
 <context>
@@ -6691,6 +7110,21 @@ p, li { white-space: pre-wrap; }
         <source>Cannot initiate save</source>
         <translation>Impossibile iniziare il salvataggio</translation>
     </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="256"/>
+        <source>None</source>
+        <translation>Nessuno</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="367"/>
+        <source>Copy</source>
+        <translation>Copia</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisave.cpp" line="369"/>
+        <source>AVI</source>
+        <translation>AVI</translation>
+    </message>
 </context>
 <context>
     <name>GenericAviSaveCopy</name>
@@ -6698,6 +7132,11 @@ p, li { white-space: pre-wrap; }
         <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisavecopy.cpp" line="96"/>
         <source>Cannot initiate save</source>
         <translation>Impossibile iniziare il salvataggio</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisavecopy.cpp" line="109"/>
+        <source>Saving</source>
+        <translation>Salvataggio in corso</translation>
     </message>
 </context>
 <context>
@@ -6707,6 +7146,11 @@ p, li { white-space: pre-wrap; }
         <source>Cannot initiate save</source>
         <translation>Impossibile iniziare il salvataggio</translation>
     </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisavecopy_pack.cpp" line="134"/>
+        <source>Saving</source>
+        <translation>Salvataggio in corso</translation>
+    </message>
 </context>
 <context>
     <name>GenericAviSaveCopyUnpack</name>
@@ -6714,6 +7158,11 @@ p, li { white-space: pre-wrap; }
         <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisavecopy_unpack.cpp" line="98"/>
         <source>Cannot initiate save</source>
         <translation>Impossibile iniziare il salvataggio</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_avisavecopy_unpack.cpp" line="111"/>
+        <source>Saving</source>
+        <translation>Salvataggio in corso</translation>
     </message>
 </context>
 <context>
@@ -6741,6 +7190,29 @@ p, li { white-space: pre-wrap; }
         <location filename="../avidemux/ADM_outputs/oplug_avi/op_saveprocess.cpp" line="152"/>
         <source>Aborting</source>
         <translation>Annullamento in corso</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_saveprocess.cpp" line="136"/>
+        <source>1st Pass</source>
+        <translation>1a passata</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_saveprocess.cpp" line="246"/>
+        <source>Encoding</source>
+        <translation>Codifica in corso</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_saveprocess.cpp" line="250"/>
+        <source>Encoding, 2nd pass</source>
+        <translation>Codifica, 2a passata</translation>
+    </message>
+</context>
+<context>
+    <name>GenericAviSaveSmart</name>
+    <message>
+        <location filename="../avidemux/ADM_outputs/oplug_avi/op_savesmart.cpp" line="107"/>
+        <source>Smart Copy</source>
+        <translation>Copia intelligente</translation>
     </message>
 </context>
 <context>
@@ -6774,7 +7246,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>MP4Header</name>
     <message>
-        <location filename="../avidemux/ADM_inputs/ADM_mp4/ADM_mp4Analyzer.cpp" line="589"/>
+        <location filename="../avidemux/ADM_inputs/ADM_mp4/ADM_mp4Analyzer.cpp" line="594"/>
         <source>Problem reading SVQ3 headers</source>
         <translation>Problema di lettura delle intestazioni SVQ3</translation>
     </message>

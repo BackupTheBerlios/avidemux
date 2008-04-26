@@ -128,7 +128,7 @@ _mainaviheader.dwMicroSecPerFrame=0;
 	if(!reuse)
  	{
 	
-      	guiSetPhasis ("1st Pass");
+      	guiSetPhasis (QT_TR_NOOP("1st Pass"));
       	aprintf("**Pass 1:%lu\n",frametogo);
      	buffer = new uint8_t[_incoming->getInfo ()->width *
 		    _incoming->getInfo ()->height * 3];
@@ -235,14 +235,14 @@ GenericAviSaveProcess::writeVideoChunk (uint32_t frame)
   // CBR or CQ
   if (frame == 0)
   {
-    encoding_gui->setCodec((char *)_encode->getDisplayName())  ;
+    encoding_gui->setCodec(_encode->getDisplayName())  ;
   if (!_encode->isDualPass ())
   {
-                          guiSetPhasis ("Encoding");
+                          guiSetPhasis (QT_TR_NOOP("Encoding"));
         }
   else
           {
-                          guiSetPhasis ("Encoding, 2nd pass");
+                          guiSetPhasis (QT_TR_NOOP("2nd Pass"));
         }
   }
   // first read

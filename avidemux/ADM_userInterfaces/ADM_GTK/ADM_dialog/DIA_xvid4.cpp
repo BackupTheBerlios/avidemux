@@ -1014,7 +1014,7 @@ create_dialog1 (void)
   gtk_container_add (GTK_CONTAINER (frame_par1), hbox_par1);
   gtk_container_set_border_width (GTK_CONTAINER (hbox_par1), 5);
 
-  checkbutton_par_asinput = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("As input"));
+  checkbutton_par_asinput = gtk_check_button_new_with_mnemonic (QT_TR_NOOP("As Input"));
   gtk_widget_show (checkbutton_par_asinput);
   gtk_box_pack_start (GTK_BOX (hbox_par1), checkbutton_par_asinput, FALSE, FALSE, 10);
   gtk_tooltips_set_tip (tooltips, checkbutton_par_asinput, QT_TR_NOOP("Get PAR from input video file"), NULL);

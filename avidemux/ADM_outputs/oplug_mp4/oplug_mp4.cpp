@@ -116,9 +116,9 @@ uint32_t sent=0;
 const char *containerTitle;
            switch(type)
            {
-             case ADM_PSP:muxerType=MUXER_PSP;containerTitle="PSP";break;
-             case ADM_MP4:muxerType=MUXER_MP4;containerTitle="MP4";break;
-             case ADM_MATROSKA:muxerType=MUXER_MATROSKA;containerTitle="MKV";break;
+             case ADM_PSP:muxerType=MUXER_PSP;containerTitle=QT_TR_NOOP("PSP");break;
+             case ADM_MP4:muxerType=MUXER_MP4;containerTitle=QT_TR_NOOP("MP4");break;
+             case ADM_MATROSKA:muxerType=MUXER_MATROSKA;containerTitle=QT_TR_NOOP("MKV");break;
              default:
                 ADM_assert(0);
            }
@@ -150,9 +150,9 @@ const char *containerTitle;
                
                   encoding_gui->setContainer(containerTitle);
                
-                encoding_gui->setAudioCodec("None");
+                encoding_gui->setAudioCodec(QT_TR_NOOP("None"));
                 if(!videoProcessMode())
-                        encoding_gui->setCodec("Copy");
+                        encoding_gui->setCodec(QT_TR_NOOP("Copy"));
                 else
                         encoding_gui->setCodec(_encode->getDisplayName());
                 TwoPassLogFile=new char[strlen(name)+6];
@@ -174,7 +174,7 @@ const char *containerTitle;
                                 goto stopit;
                 }else
                 {
-                        encoding_gui->setPhasis ("Encoding");
+                        encoding_gui->setPhasis (QT_TR_NOOP("Encoding"));
                 }
                 
                 info.width=_incoming->getInfo()->width;
@@ -250,11 +250,11 @@ preFilling:
                 if(audioProcessMode())
                         encoding_gui->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));
                 else
-                         encoding_gui->setAudioCodec("Copy");
+                         encoding_gui->setAudioCodec(QT_TR_NOOP("Copy"));
 
            }else
            {
-                encoding_gui->setAudioCodec("None");
+                encoding_gui->setAudioCodec(QT_TR_NOOP("None"));
            }
 // ____________Setup Muxer _____________________
            muxer= new lavMuxer;
@@ -271,7 +271,7 @@ preFilling:
           encoding_gui->setContainer(containerTitle);
          
           if(!videoProcessMode())
-                encoding_gui->setCodec("Copy");
+                encoding_gui->setCodec(QT_TR_NOOP("Copy"));
           else
                 encoding_gui->setCodec(_encode->getDisplayName());
            //
@@ -396,7 +396,7 @@ uint8_t prepareDualPass(uint32_t bufferSize,uint8_t *buffer,char *TwoPassLogFile
         if(!reuse)
         {
         
-                encoding_gui->setPhasis ("1st Pass");
+                encoding_gui->setPhasis (QT_TR_NOOP("1st Pass"));
                 aprintf("**Pass 1:%lu\n",total);
                 _encode->startPass1 ();
                 bitstream.data=buffer;
@@ -453,7 +453,7 @@ preFilling2:
                 return 0;
         }
         printf("First pass : send %u frames\n",sent);
-        encoding_gui->setPhasis ("2nd Pass");
+        encoding_gui->setPhasis (QT_TR_NOOP("2nd Pass"));
         return 1;
 }
 void end (void)

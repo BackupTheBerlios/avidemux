@@ -131,10 +131,10 @@ uint32_t sent=0;
                 }
 
                 // init compressor
-                encoding_gui->setContainer("Dummy");
-                encoding_gui->setAudioCodec("None");
+                encoding_gui->setContainer(QT_TR_NOOP("Dummy"));
+                encoding_gui->setAudioCodec(QT_TR_NOOP("None"));
                 if(!videoProcessMode())
-                        encoding_gui->setCodec("Copy");
+                        encoding_gui->setCodec(QT_TR_NOOP("Copy"));
                 else
                         encoding_gui->setCodec(_encode->getDisplayName());
                 
@@ -144,7 +144,7 @@ uint32_t sent=0;
                      goto  stopit;
                 };
 
-                encoding_gui->setPhasis ("Encoding");
+                encoding_gui->setPhasis (QT_TR_NOOP("Encoding"));
                 
                 
                 info.width=_incoming->getInfo()->width;
@@ -186,7 +186,7 @@ preFilling:
               }
          
           if(!videoProcessMode())
-                encoding_gui->setCodec("Copy");
+                encoding_gui->setCodec(QT_TR_NOOP("Copy"));
           else
                 encoding_gui->setCodec(_encode->getDisplayName());
            //

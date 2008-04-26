@@ -104,7 +104,7 @@ uint8_t error=0;
 		videoStream=new ogm_page(_fd,1);
 	
 		encoding_gui=new DIA_encoding(25000);
-                encoding_gui->setContainer("OGM");
+                encoding_gui->setContainer(QT_TR_NOOP("OGM"));
 		//______________ Write headers..._____________________
 		
 		if(!initVideo(name))

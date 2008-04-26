@@ -170,19 +170,19 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
 	muxer->forceRestamp();
   ///____________________________
   work=new DIA_encoding(avifileinfo->fps1000);
-  work->setCodec("Copy");
-  work->setAudioCodec("---");
-  work->setPhasis("Saving");
+  work->setCodec(QT_TR_NOOP("Copy"));
+  work->setAudioCodec(QT_TR_NOOP("---"));
+  work->setPhasis(QT_TR_NOOP("Saving"));
   if(!audioProcessMode())
-     work->setAudioCodec("Copy");
+     work->setAudioCodec(QT_TR_NOOP("Copy"));
   else
      work->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));
   switch(mux)
   {
-    case MUXER_TS: work->setContainer("Mpeg TS");break;
-    case MUXER_VCD: work->setContainer("Mpeg VCD");break;
-    case MUXER_SVCD: work->setContainer("Mpeg SVCD");break;
-    case MUXER_DVD: work->setContainer("Mpeg DVD");break;
+    case MUXER_TS: work->setContainer(QT_TR_NOOP("MPEG TS"));break;
+    case MUXER_VCD: work->setContainer(QT_TR_NOOP("MPEG VCD"));break;
+    case MUXER_SVCD: work->setContainer(QT_TR_NOOP("MPEG SVCD"));break;
+    case MUXER_DVD: work->setContainer(QT_TR_NOOP("MPEG DVD"));break;
     default:
         ADM_assert(0);
   }

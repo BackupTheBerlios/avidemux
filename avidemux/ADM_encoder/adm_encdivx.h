@@ -49,7 +49,7 @@ public:
   }
   virtual const char *getDisplayName (void)
   {
-    return "Divx";
+    return QT_TR_NOOP("DivX");
   }
 
 };

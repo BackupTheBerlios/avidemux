@@ -243,7 +243,7 @@ GenericAviSave::setupAudio (void)
   audio_filter=NULL;
    if(!currentaudiostream) 
    {
-   	encoding_gui->setAudioCodec("None");
+   	encoding_gui->setAudioCodec(QT_TR_NOOP("None"));
 	return 1;
    }
   printf (" mux mode : %d mux param %d\n", muxMode, muxParam);
@@ -258,7 +258,7 @@ GenericAviSave::setupAudio (void)
     {
       // else prepare the incoming raw stream
       // audio copy mode here
-      encoding_gui->setAudioCodec("Copy");
+      encoding_gui->setAudioCodec(QT_TR_NOOP("Copy"));
       audio_filter=buildAudioFilter( currentaudiostream,video_body->getTime (frameStart));
       if(!audio_filter) return 0;
     }
@@ -354,9 +354,9 @@ void
 GenericAviSave::guiStart (void)
 {
       encoding_gui=new DIA_encoding(25000);
-      encoding_gui->setCodec("Copy");
+      encoding_gui->setCodec(QT_TR_NOOP("Copy"));
       encoding_gui->setFrame (0,0,2 ,100); // FXMe
-      encoding_gui->setContainer("Avi");
+      encoding_gui->setContainer(QT_TR_NOOP("AVI"));
 
 }
 
@@ -472,24 +472,24 @@ const char *getStrFromAudioCodec( uint32_t codec)
 {
       switch(codec)
       {
-              case WAV_DTS: return (const char *)"DTS";
-              case WAV_PCM: return (const char *)"PCM";
-              case WAV_MP2: return (const char *)"MP2";
-              case WAV_MP3: return (const char *)"MP3";
-              case (WAV_WMA):  return (const char *)"WMA";
-              case (WAV_LPCM): return (const char *)"LPCM";	
-              case (WAV_AC3):  return (const char *)"AC3";
-              case (WAV_OGG): return (const char *)"Ogg Vorbis";
-              case (WAV_MP4): return (const char *)"MP4 audio";
-              case (WAV_AAC): return (const char *)"AAC";
-              case (WAV_QDM2): return (const char *)"QDM2";
-              case (WAV_AMRNB): return (const char *)"AMR narrow band";
-              case (WAV_MSADPCM): return (const char *)"MSADPCM";
-              case (WAV_ULAW): return (const char *)"ULAW";
-              case WAV_IMAADPCM: return (const char *)"IMA ADPCM";
-              case WAV_8BITS_UNSIGNED:return (const char *)"PCM 8bits";
+              case WAV_DTS: return QT_TR_NOOP("DTS");
+              case WAV_PCM: return QT_TR_NOOP("PCM");
+              case WAV_MP2: return QT_TR_NOOP("MP2");
+              case WAV_MP3: return QT_TR_NOOP("MP3");
+              case WAV_WMA:  return QT_TR_NOOP("WMA");
+              case WAV_LPCM: return QT_TR_NOOP("LPCM");	
+              case WAV_AC3:  return QT_TR_NOOP("AC3");
+              case WAV_OGG: return QT_TR_NOOP("Ogg Vorbis");
+              case WAV_MP4: return QT_TR_NOOP("MP4");
+              case WAV_AAC: return QT_TR_NOOP("AAC");
+              case WAV_QDM2: return QT_TR_NOOP("QDM2");
+              case WAV_AMRNB: return QT_TR_NOOP("AMR-NB");
+              case WAV_MSADPCM: return QT_TR_NOOP("MSADPCM");
+              case WAV_ULAW: return QT_TR_NOOP("ULAW");
+              case WAV_IMAADPCM: return QT_TR_NOOP("IMA ADPCM");
+              case WAV_8BITS_UNSIGNED:return QT_TR_NOOP("8-bit PCM");
       }
-      return (const char *)"Unknown codec";
+      return QT_TR_NOOP("Unknown codec");
 }
 
 //---------------------------------------

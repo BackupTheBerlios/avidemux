@@ -94,7 +94,7 @@ int value=4;;
   aImage=new ADMImage(_mainaviheader.dwWidth,_mainaviheader.dwHeight);
   _incoming = getFirstVideoFilter (frameStart,frameEnd-frameStart);
   encoding_gui->setFps(_incoming->getInfo()->fps1000);
-  encoding_gui->setPhasis("Smart Copy");
+  encoding_gui->setPhasis(QT_TR_NOOP("Smart Copy"));
   // B frame ?
     for(int i=frameStart;i<frameEnd;i++)
     {
