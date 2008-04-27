@@ -42,7 +42,6 @@ extern void UI_setVideoCodec(int i);
 // Some static stuff
 void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t param, uint32_t extraConf, uint8_t *extraData);
 static void encoderPrint(void);
-static const char *encoderGetName(void);
 
 #include "adm_encConfig.h"
 #include "adm_encoder.h"
@@ -77,8 +76,6 @@ static const char *encoderGetName(void);
 SelectCodecType currentCodecType = CodecCopy;
 int currentCodecIndex = 0;
 
-uint8_t loadVideoCodecConf (char *name);
-uint8_t saveVideoCodecConf (char *name);
 uint8_t mk_hex (uint8_t a, uint8_t b);
 
 CodecFamilty videoCodecGetFamily(void)
@@ -148,7 +145,7 @@ int videoCodecConfigureAVI(char *cmdString, uint32_t optSize, uint8_t * opt)
 		go = cs + equal + 1;
 		*(cs + equal) = 0;
 		iparam = atoi (cs + equal + 1);
-		printf ("codec conf is %s\n", cs);
+		printf ("Codec conf is %s\n", cs);
 
 		// search the codec
 		if (!strcasecmp (cs, "aq"))
@@ -324,11 +321,6 @@ void saveEncoderConfig(void)
 	prefs->set (CODECS_PREFERREDCODEC, AllVideoCodec[currentCodecIndex].tagName);
 }
 
-const char* encoderGetName(void)
-{
-	return AllVideoCodec[currentCodecIndex].tagName;
-}
-
 SelectCodecType videoCodecGetType(void)
 {
 	return currentCodecType;
@@ -348,7 +340,7 @@ int videoCodecSelectByName(const char *name)
 		if (!strcasecmp(name, AllVideoCodec[i].tagName))
 		{
 			printf ("\n Codec %s found\n", name);
-			videoCodecSetcodec (AllVideoCodec[i].codec);
+			videoCodecSetCodec(i);
 
 			return 1;
 		}
@@ -362,6 +354,38 @@ int videoCodecSelectByName(const char *name)
 
 	return 0;
 }
+
+int videoCodecPluginSelectByGuid(const char *guid)
+{
+	int encoderCount = encoderGetEncoderCount();
+
+	for (int i = 0; i < encoderCount; i++)
+	{
+		if (AllVideoCodec[i].codec == CodecExternal)
+		{
+			ADM_vidEnc_plugin *plugin = getVideoEncoderPlugin(AllVideoCodec[i].extra_param);
+			const char* encoderGuid = plugin->getEncoderGuid(plugin->encoderId);
+
+			if (strcmp(encoderGuid, guid) == 0)
+			{
+				printf ("Codec plugin %s (%s) found\n", plugin->getEncoderName(plugin->encoderId), encoderGuid);
+				videoCodecSetCodec(i);
+
+				return 1;
+			}
+		}
+	}
+
+	return 0;
+}
+
+const char* videoCodecPluginGetGuid(void)
+{
+	ADM_vidEnc_plugin *plugin = getVideoEncoderPlugin(AllVideoCodec[currentCodecIndex].extra_param);
+
+	return plugin->getEncoderGuid(plugin->encoderId);
+}
+
 const char *videoCodecGetMode(void)
 {
 	uint8_t *data;
@@ -396,20 +420,9 @@ const char *videoCodecGetMode(void)
 	return string;
 }
 
-const char *
-videoCodecGetName (void)
+const char *videoCodecGetName(void)
 {
-  int nb = encoderGetEncoderCount ();
-  for (uint32_t i = 0; i < nb; i++)
-    {
-      if (currentCodecType == AllVideoCodec[i].codec)
-	{
-	  return AllVideoCodec[i].tagName;
-	}
-
-    }
-  printf ("\n Mmmm get video codec name failed..\n");
-  return NULL;
+	return AllVideoCodec[currentCodecIndex].tagName;
 }
 
 ///
@@ -423,9 +436,10 @@ void videoCodecSelect(void)
 
 }
 
-void videoCodecSetcodec (SelectCodecType codec)
+void videoCodecSetCodec(int codecIndex)
 {
-	currentCodecType = codec;
+	currentCodecIndex = codecIndex;
+	currentCodecType = AllVideoCodec[codecIndex].codec;
 	encoderPrint();
 }
 
@@ -434,11 +448,9 @@ void videoCodecConfigureUI(int codecIndex)
 	if (codecIndex == -1)
 		codecIndex = currentCodecIndex;
 
-	printf ("Configuring codec: %d\n", codecIndex);
-
 	COMPRES_PARAMS *param = &AllVideoCodec[codecIndex];
 
-	if (currentCodecType == CodecExternal)
+	if (AllVideoCodec[codecIndex].codec == CodecExternal)
 	{
 		ADM_vidEnc_plugin *plugin = getVideoEncoderPlugin(param->extra_param);
 		vidEncOptions encodeOptions;
@@ -522,7 +534,7 @@ void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t param, uint32_t ext
 			ADM_assert(0);
 	}
 
-	if (zparam->extra_param)
+	if (zparam->codec == CodecExternal)
 	{
 		ADM_vidEnc_plugin *plugin = getVideoEncoderPlugin(zparam->extra_param);
 		vidEncOptions options;
@@ -546,10 +558,10 @@ void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t param, uint32_t ext
 	else if (extraConf && extraData && zparam->extraSettingsLen)
 	{
 		if (zparam->extraSettingsLen != extraConf)
-			printf("\n*** ERROR : Extra data for codec config has a different size!!! *****\n");
+			printf("*** ERROR : Extra data for codec config has a different size!!! *****\n");
 		else
 		{
-			printf ("\n using %u bytes of codec specific data...\n", extraConf);
+			printf ("using %u bytes of codec specific data...\n", extraConf);
 			memcpy (zparam->extraSettings, extraData, extraConf);
 		}
 	}
@@ -630,47 +642,53 @@ Encoder *getVideoEncoder(uint32_t w, uint32_t h, uint32_t globalHeaderFlag)
 */
 uint8_t loadVideoCodecConf (char *name)
 {
-	FILE *fd = NULL;
-	char str[4000];
-	char str_extra[4000];
-	char str_tmp[4000];
-	uint32_t nb;
-	uint32_t extraSize = 0;
-	uint8_t *extra = NULL;
-
-	fd = fopen (name, "rt");
-
-	if (!fd)
+	if (currentCodecType == CodecExternal)
+		videoCodecSetConf(strlen(name), (uint8_t*)name);
+	else
 	{
-		printf ("Trouble reading codec conf\n");
-		return 0;
-	}
+		FILE *fd = NULL;
+		char str[4000];
+		char str_extra[4000];
+		char str_tmp[4000];
+		uint32_t nb;
+		uint32_t extraSize = 0;
+		uint8_t *extra = NULL;
 
-	fscanf (fd, "%s\n", str);
-	// and video codec
-	fscanf (fd, "Video codec : %s\n", str);
-	videoCodecSelectByName (str);
+		fd = fopen (name, "rt");
 
-	fgets (str, 200, fd);		// here we got the conf
-	fscanf (fd, "Video extraConf size : %lu\n", &extraSize);
-
-	if (extraSize)
-	{
-		uint8_t *ptr;
-		fgets (str_tmp, 3999, fd);
-		ptr = (uint8_t *) str_tmp;
-
-		for (uint32_t k = 0; k < extraSize; k++)
+		if (!fd)
 		{
-			str_extra[k] = mk_hex (*ptr, *(ptr + 1));
-			ptr += 3;
+			printf ("Trouble reading codec conf\n");
+			return 0;
 		}
 
-		extra = (uint8_t *) str_extra;
+		fscanf (fd, "%s\n", str);
+		// and video codec
+		fscanf (fd, "Video codec : %s\n", str);
+		videoCodecSelectByName (str);
+
+		fgets (str, 200, fd);		// here we got the conf
+		fscanf (fd, "Video extraConf size : %lu\n", &extraSize);
+
+		if (extraSize)
+		{
+			uint8_t *ptr;
+			fgets (str_tmp, 3999, fd);
+			ptr = (uint8_t *) str_tmp;
+
+			for (uint32_t k = 0; k < extraSize; k++)
+			{
+				str_extra[k] = mk_hex (*ptr, *(ptr + 1));
+				ptr += 3;
+			}
+
+			extra = (uint8_t *) str_extra;
+		}
+
+		videoCodecSetConf(extraSize, extra);
+		fclose (fd);
 	}
 
-	videoCodecSetConf (str, extraSize, extra);
-	fclose (fd);
 	return 1;
 }
 
@@ -701,7 +719,7 @@ uint8_t loadVideoCodecConfString(char *cmd)
 		}
 
 		extra = (uint8_t *)str_extra;
-		videoCodecSetConf(str, extraSize, extra);
+		videoCodecSetConf(extraSize, extra);
 	}
 
 	return 1;
@@ -732,11 +750,6 @@ uint8_t mk_hex(uint8_t a, uint8_t b)
 
 uint8_t videoCodecGetConf (uint32_t * optSize, uint8_t ** data)
 {
-	static char conf[4000];
-	static char tmp[2000];
-	uint32_t confSize = 0;
-	conf[0] = 0;
-
 	*optSize = 0;
 	*data = NULL;
 
@@ -744,20 +757,31 @@ uint8_t videoCodecGetConf (uint32_t * optSize, uint8_t ** data)
 
 	if (param->extraSettingsLen)
 	{
-		*data = (uint8_t *) param->extraSettings;
+		*data = (uint8_t*)param->extraSettings;
 		*optSize = param->extraSettingsLen;
 	}
 
-	confSize = *optSize;
-	printf ("Conf size : %d\n", confSize);
+	printf ("Conf size: %d\n", *optSize);
+
 	return 1;
 }
 
-void videoCodecSetConf(char *name, uint32_t extraLen, uint8_t *extraData)
+void videoCodecSetConf(uint32_t extraLen, uint8_t *extraData)
 {
 	COMPRES_PARAMS *param = &AllVideoCodec[currentCodecIndex];
 
-	if (extraLen)
+	if (param->codec == CodecExternal)
+	{
+		if (param->extraSettings)
+			delete [] (char*)param->extraSettings;
+
+		param->extraSettings = new char[extraLen + 1];
+		param->extraSettingsLen = extraLen;
+
+		memcpy(param->extraSettings, extraData, extraLen);
+		((char*)param->extraSettings)[extraLen] = 0;
+	}
+	else if (extraLen)
 	{
 		if (extraLen != param->extraSettingsLen)
 		{

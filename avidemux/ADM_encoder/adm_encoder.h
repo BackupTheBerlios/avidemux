@@ -114,6 +114,4 @@ extern CodecFamilty videoCodecGetFamily (void);
 extern void videoCodecConfigureUI(int codecIndex = -1);
 extern int videoCodecConfigure (char *p, uint32_t i, uint8_t * c);
 extern void videoCodecSelect (void);
-extern void videoCodecSetcodec (SelectCodecType codec);
-extern uint8_t EncoderSaveMpeg (const char *name);
 #endif

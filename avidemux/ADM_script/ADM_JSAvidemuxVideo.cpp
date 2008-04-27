@@ -27,21 +27,15 @@
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_editor/ADM_outputfmt.h"
 #include "../ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
-
-
 #include "ADM_script/ADM_container.h"
 
 extern VF_FILTERS filterGetTagFromName(char *inname);
-//extern uint8_t indexMpeg(char *mpeg,char *file,uint8_t aid);
 extern uint8_t A_ListAllBlackFrames( char *file );
 extern uint8_t loadVideoCodecConfString( char *name);
 extern uint8_t ADM_saveRaw (const char *name);
 extern int A_saveJpg (char *name);
 extern uint8_t loadVideoCodecConf( char *name);
-extern int videoCodecConfigure(char *p,uint32_t i, uint8_t  *c);
-
 extern void filterCleanUp( void );
-
 
 JSPropertySpec ADM_JSAvidemuxVideo::avidemuxvideo_properties[] = 
 { 
@@ -56,6 +50,7 @@ JSFunctionSpec ADM_JSAvidemuxVideo::avidemuxvideo_methods[] =
         { "clearFilters", ClearFilters, 0, 0, 0 }, // Delete all filters
 	{ "addFilter", AddFilter, 10, 0, 0 },	// Add filter to filter chain
 	{ "codec", Codec, 3, 0, 0 },	// Set the video codec
+	{ "codecPlugin", codecPlugin, 3, 0, 0 },	// Set the video codec plugin
 	{ "codecConf", CodecConf, 1, 0, 0 },	// load video codec config
 	{ "save", Save, 1, 0, 0 },	// save video portion of the stream
 	{ "saveJpeg", SaveJPEG, 1, 0, 0 },	// save the current frame as a JPEG
@@ -288,21 +283,69 @@ JSBool ADM_JSAvidemuxVideo::Codec(JSContext *cx, JSObject *obj, uintN argc,
         return JS_TRUE;
 }// end Codec
 
+JSBool ADM_JSAvidemuxVideo::codecPlugin(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+	*rval = BOOLEAN_TO_JSVAL(false);
+
+	if (argc > 3)
+		return JS_FALSE;
+
+	printf("Codec Plugin ... \n");
+
+	if (!JSVAL_IS_STRING(argv[0]) || !JSVAL_IS_STRING(argv[1]) || !JSVAL_IS_STRING(argv[2]))
+		return JS_FALSE;
+
+	printf("[guid] %s\n", JS_GetStringBytes(JSVAL_TO_STRING(argv[0])));
+	printf("[desc] %s\n", JS_GetStringBytes(JSVAL_TO_STRING(argv[1])));
+	printf("[conf] %s\n", JS_GetStringBytes(JSVAL_TO_STRING(argv[2])));
+
+	char *guid = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
+	char *desc = JS_GetStringBytes(JSVAL_TO_STRING(argv[1]));
+	char *conf = JS_GetStringBytes(JSVAL_TO_STRING(argv[2]));
+
+	enterLock();
+
+	if (!videoCodecPluginSelectByGuid(guid))
+		*rval = BOOLEAN_TO_JSVAL(false);
+	else
+	{
+		// now do the conf
+		// format CBR=bitrate in kbits
+		//	  CQ=Q
+		//	  2 Pass=size
+		// We have to replace
+		if (!videoCodecConfigure(conf, 0, NULL))
+			*rval = BOOLEAN_TO_JSVAL(false);
+		else
+			*rval = BOOLEAN_TO_JSVAL(true);
+	}
+
+	leaveLock();
+
+	return JS_TRUE;
+}
+
 JSBool ADM_JSAvidemuxVideo::CodecConf(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
-{// begin CodecConf
-        *rval = BOOLEAN_TO_JSVAL(false);
-        if(argc != 1)
-                return JS_FALSE;
-        if(JSVAL_IS_STRING(argv[0]) == false)
-                return JS_FALSE;
-        char *pTempStr = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
-        printf("Codec Conf Video \"%s\"\n",pTempStr);
-        enterLock();
-        *rval = INT_TO_JSVAL(loadVideoCodecConf(pTempStr));
-        leaveLock();
-        return JS_TRUE;
-}// end CodecConf
+{
+	*rval = BOOLEAN_TO_JSVAL(false);
+
+	if (argc != 1)
+		return JS_FALSE;
+
+	if (!JSVAL_IS_STRING(argv[0]))
+		return JS_FALSE;
+
+	char *pTempStr = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
+
+	printf("Codec Conf Video \"%s\"\n", pTempStr);
+
+	enterLock();
+	*rval = INT_TO_JSVAL(loadVideoCodecConf(pTempStr));
+	leaveLock();
+
+	return JS_TRUE;
+}
 
 JSBool ADM_JSAvidemuxVideo::Save(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)

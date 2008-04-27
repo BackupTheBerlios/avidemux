@@ -38,6 +38,6 @@ void loadPlugins(void)
 {
 	char *pluginDir = ADM_getPluginPath();
 
-	loadVideoEncoderPlugins(ADM_VIDENC_UI_CLI, pluginDir);
+	loadVideoEncoderPlugins(ADM_VIDENC_UI_GTK, pluginDir);
 	delete [] pluginDir;
 }

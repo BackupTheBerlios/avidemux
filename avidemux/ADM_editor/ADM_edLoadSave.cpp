@@ -165,28 +165,33 @@ for (uint32_t i = 0; i < _nb_segment; i++)
 //___________________________
         qfprintf(fd,"\n//** Filters **\n");
         filterSaveScriptJS(fd);
+
 // Video codec
 //___________________________
-uint8_t  *extraData ;
-uint32_t extraDataSize;
-char *pth;
-        qfprintf(fd,"\n//** Video Codec conf **\n");
-        videoCodecGetConf(&extraDataSize,&extraData);
-        
-        pth= ADM_cleanupPath(name );
-        qfprintf(fd,"app.video.codec(\"%s\",\"%s\",\"",videoCodecGetName(),videoCodecGetMode());
-        ADM_dealloc(pth);
-        // Now deal with extra data
-        qfprintf(fd,"%d ",extraDataSize);
-        if(extraDataSize)
-        {
-                for(int i=0;i<extraDataSize;i++)
-                {
-                        qfprintf(fd,"%02x ",extraData[i]);
-                }
+		uint8_t *extraData;
+		uint32_t extraDataSize;
 
-        }
-        qfprintf(fd,"\");\n");
+		qfprintf(fd, "\n//** Video Codec conf **\n");
+		videoCodecGetConf(&extraDataSize, &extraData);
+
+		if (videoCodecGetType() == CodecExternal)
+		{
+			qfprintf(fd, "app.video.codecPlugin(\"%s\", \"%s\", \"%s\");\n", videoCodecPluginGetGuid(), videoCodecGetName(), videoCodecGetMode());
+			qfprintf(fd, "app.video.codecConf(\"%s\");\n", extraData);
+		}
+		else
+		{
+			qfprintf(fd, "app.video.codec(\"%s\", \"%s\", \"", videoCodecGetName(), videoCodecGetMode());
+
+			// Now deal with extra data
+			qfprintf(fd, "%d ", extraDataSize);
+
+			if (extraDataSize)
+				for(int i = 0; i < extraDataSize; i++)
+					qfprintf(fd, "%02x ", extraData[i]);
+
+			qfprintf(fd, "\");\n");
+		}
         
 // Audio Source
 //______________________________________________

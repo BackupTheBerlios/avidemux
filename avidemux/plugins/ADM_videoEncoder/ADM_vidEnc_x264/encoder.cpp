@@ -125,15 +125,17 @@ int x264Encoder::getOptions(vidEncOptions *encodeOptions, char *pluginOptions, i
 
 int x264Encoder::setOptions(vidEncOptions *encodeOptions, char *pluginOptions)
 {
-	if (_options.fromXml(pluginOptions))
-	{
-		memcpy(&_encodeOptions, encodeOptions, sizeof(vidEncOptions));
-		updateParameters();
+	bool success = true;
 
-		return 1;
-	}
-	else
-		return 0;
+	if (pluginOptions)
+		success = _options.fromXml(pluginOptions);
+
+	if (encodeOptions && success)
+		memcpy(&_encodeOptions, encodeOptions, sizeof(vidEncOptions));
+
+	updateParameters();
+
+	return success;
 }
 
 void x264Encoder::updateParameters(void)

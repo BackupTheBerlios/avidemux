@@ -1283,7 +1283,25 @@ char* x264Options::toXml(void)
 		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"accessUnitDelimiters", boolean2String(xmlBuffer, bufferSize, getAccessUnitDelimiters()));
 		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"spsIdentifier", number2String(xmlBuffer, bufferSize, getSpsIdentifier()));
 
-		xmlDocDumpFormatMemory(xmlDoc, &tempBuffer, &tempBufferSize, 1);
+		xmlDocDumpMemory(xmlDoc, &tempBuffer, &tempBufferSize);
+
+		// remove carriage returns (even though libxml was instructed not to format the XML)
+		xmlChar* bufferChar = tempBuffer;
+		int bufferCharIndex = 0;
+
+		while (*bufferChar != '\0')
+		{
+			if (*bufferChar == '\n')
+			{
+				memmove(bufferChar, bufferChar + 1, tempBufferSize - bufferCharIndex);
+				tempBufferSize--;
+			}
+			else if (*bufferChar == '\"')
+				*bufferChar = '\'';
+
+			bufferChar++;
+			bufferCharIndex++;
+		}
 
 		xml = new char[tempBufferSize + 1];
 		memcpy(xml, tempBuffer, tempBufferSize);

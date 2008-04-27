@@ -428,6 +428,8 @@ void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *o
 
 void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *options)
 {
+	encodeOptions->structSize = sizeof(vidEncOptions);
+
 	// General tab
 	switch (ui.encodingModeComboBox->currentIndex())
 	{

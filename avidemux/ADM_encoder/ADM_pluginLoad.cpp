@@ -123,7 +123,6 @@ int loadVideoEncoderPlugins(int uiType, const char *path)
 
 	memset(files, 0, sizeof(char *)*MAX_EXTERNAL_FILTER);
 	printf("[ADM_vidEnc_plugin] Scanning directory %s\n", path);
-	fflush(stdout);
 
 	if (!buildDirectoryContent(&nbFile, path, files, MAX_EXTERNAL_FILTER, SHARED_LIB_EXT))
 		printf("[ADM_vidEnc_plugin] Cannot parse plugin\n");
@@ -158,8 +157,10 @@ int loadVideoEncoderPlugins(int uiType, const char *path)
 
 		param->codec = CodecExternal;
 		param->menuName = displayName;
-		param->tagName = displayName;
+		param->tagName = codecName;
 		param->extra_param = i;
+		param->extraSettings = NULL;
+		param->extraSettingsLen = 0;
 
 		int length = plugin->getOptions(plugin->encoderId, NULL, NULL, 0);
 		char *pluginOptions = new char[length + 1];
@@ -174,9 +175,11 @@ int loadVideoEncoderPlugins(int uiType, const char *path)
 	return 1;
 }
 
-void updateCompressionParameters(COMPRES_PARAMS *params, int encodeMode, int encodeModeParameter, char* extraSettings, int extraSettingsLength)
+void updateCompressionParameters(COMPRES_PARAMS *params, int encodeMode, int encodeModeParameter, char *extraSettings, int extraSettingsLength)
 {
 	COMPRESSION_MODE compressMode = getCompressionMode(encodeMode);
+
+	params->mode = compressMode;
 
 	switch (compressMode)
 	{
