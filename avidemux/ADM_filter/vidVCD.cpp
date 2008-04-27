@@ -46,7 +46,7 @@
 #include "ADM_userInterfaces/ADM_commonUI/DIA_resizeWiz.h"
 #include "ADM_video/ADM_vidMisc.h"
 //___________________________________________
-extern FILTER videofilters[MAX_FILTER];
+extern FILTER videofilters[VF_MAX_FILTER];
 extern uint32_t nb_active_filter;
 extern ADM_Composer *video_body;
 
@@ -305,7 +305,7 @@ int targetx,targetxFinal,targetyPAL,targetyNTSC;
 	createResizeFromParam (getLastVideoFilter (), newx, newy);
 
 
-      videofilters[nb_active_filter].tag = VF_MPLAYERRESIZE;
+      videofilters[nb_active_filter].tag = VF_INVALID; //VF_FIXME
       videofilters[nb_active_filter].filter->getCoupledConf (&couple);
       videofilters[nb_active_filter].conf = couple;;
       nb_active_filter++;
@@ -318,7 +318,7 @@ int targetx,targetxFinal,targetyPAL,targetyNTSC;
 	create_addBorder (videofilters[nb_active_filter - 1].filter,
 			  cropx >> 1, cropx >> 1, cropy >> 1, cropy >> 1);
 
-      videofilters[nb_active_filter].tag = VF_ADDBORDER;
+      videofilters[nb_active_filter].tag = VF_INVALID;  // VF_FIXME
       videofilters[nb_active_filter].filter->getCoupledConf (&couple);
       videofilters[nb_active_filter].conf = couple;;
       nb_active_filter++;

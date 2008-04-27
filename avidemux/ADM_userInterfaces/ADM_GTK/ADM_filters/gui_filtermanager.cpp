@@ -50,9 +50,11 @@ extern AVDMGenericVideoStream *filterCreateFromTag (VF_FILTERS tag,
 						    in);
 extern const char  *filterGetNameFromTag(VF_FILTERS tag);
 //___________________________________________
-extern FILTER videofilters[MAX_FILTER];
+extern FILTER videofilters[VF_MAX_FILTER];
 extern uint32_t nb_active_filter;
-extern std::vector <FILTER_ENTRY> allfilters;
+extern std::vector <FilterDescriptor *> allfilters;
+extern std::vector <FilterDescriptor *> filterCategories[VF_MAX];
+
 
 extern ADM_Composer *video_body;
 //___________________________________________
@@ -89,10 +91,6 @@ int
 GUI_handleVFilter (void)
 {
 
-#ifndef HAVE_ENCODER
-    return 0;
-}
-#else
     getLastVideoFilter ();	// expand video to full size
 
     // sanity check
@@ -236,7 +234,7 @@ void on_action (gui_act action)
         AVDMGenericVideoStream *replace;
         CONFcouple *conf;
         conf = videofilters[action_parameter].conf;
-        if (videofilters[action_parameter].tag == VF_PARTIAL)	// cannot recurse
+        if (videofilters[action_parameter].tag == VF_PARTIAL_FILTER)	// cannot recurse
         {
             GUI_Error_HIG (QT_TR_NOOP("The filter is already partial"), NULL);
             break;
@@ -253,7 +251,7 @@ void on_action (gui_act action)
 			videofilters[action_parameter].filter = replace;
 			replace->getCoupledConf (&conf);
 			videofilters[action_parameter].conf = conf;
-			videofilters[action_parameter].tag = VF_PARTIAL;
+			videofilters[action_parameter].tag = VF_PARTIAL_FILTER;
 			getFirstVideoFilter ();
 			updateFilterList ();
 			setSelectionNumber(nb_active_filter-1, WID(treeview0), stores[0], action_parameter-1);
@@ -368,11 +366,10 @@ void on_action (gui_act action)
     } //end of switch
 }
 /*
- 	Pop-up a list of all available filters
-	Return the tag identifying the filter selected
+ 	\fn getFilterFromSelection
+	\brief returns the tag of the selected filter
 */
-VF_FILTERS
-getFilterFromSelection (void)
+VF_FILTERS getFilterFromSelection (void)
 {
     uint32_t sel = 0;
 	uint8_t ret = 0;
@@ -383,11 +380,15 @@ getFilterFromSelection (void)
     page++;
     if ((ret = getSelectionNumber (max, trees[page], stores[page], &sel)))
 	{
-        tag = allfilters[sel+startFilter[page]].tag;
+        tag = filterCategories[page-1][sel]->tag;
 	}
     return tag;
 }
-
+/**
+ * 	\fn createFilterDialog
+ *  \brief Create the dialog including list of all filters available on the left.
+ * 
+ */
 GtkWidget *
 createFilterDialog (void)
 {
@@ -397,7 +398,7 @@ createFilterDialog (void)
 #define CALLME_TOOLBAR(x,y) gtk_signal_connect(GTK_OBJECT(WID(x)),"clicked",  GTK_SIGNAL_FUNC(wrapToolButton), (void *) y);
 #define CALLME(x,y) gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x), y)
 
-	//CALLME (toolbuttonAdd, A_ADD);
+
         // Each of these triggers the following message:
         // Gtk-CRITICAL **: gtk_box_pack_end: assertion `child->parent == NULL' failed
         CALLME (buttonRemove,		A_REMOVE);
@@ -419,6 +420,8 @@ createFilterDialog (void)
         
 
     //create treeviews
+    // Treeview zero is reserved and does not contain
+    //
     trees[0]=lookup_widget(dialog,"treeview0");
     stores[0]=gtk_list_store_new (3, G_TYPE_STRING, G_TYPE_INT, G_TYPE_POINTER);
     #define LOOK(x) {trees[x]=lookup_widget(dialog,"treeview"#x);\
@@ -435,31 +438,26 @@ createFilterDialog (void)
     //load stores with filter names, get start filter for each page
     char *str=NULL;
     GtkTreeIter iter;
-    int current_tree=0;
-    for (uint32_t i = 0; i < allfilters.size(); i++)
+    
+    // Dispatch each category to the matching tree
+    for(int current_tree=0;current_tree< VF_MAX;current_tree++)
     {
-        if (allfilters[i].viewable==1)
-        {
-		
+    	 std::vector <FilterDescriptor *> vec=filterCategories[current_tree];
+    	for (uint32_t i = 0; i < vec.size(); i++)
+    	{		
 		 str = g_strconcat(
-				 "<span weight=\"bold\">", allfilters[i].name, "</span>\n",
-                 		//	"", allfilters[i].description, "", NULL);
-                 			"<span size=\"smaller\">", allfilters[i].description, "</span>", NULL);
+				 "<span weight=\"bold\">", vec[i]->name, "</span>\n",
+                 "<span size=\"smaller\">", vec[i]->description, "</span>", NULL);
 				
-            gtk_list_store_append (stores[current_tree], &iter);
-            gtk_list_store_set (stores[current_tree], &iter, 0, str ,-1);
+            gtk_list_store_append (stores[current_tree+1], &iter);
+            gtk_list_store_set (stores[current_tree+1], &iter, 0, str ,-1);
             g_free(str);
             max++;
-        }else
-        {
-                current_tree++;
-                if(current_tree>=NB_TREE) break;
-                startFilter[current_tree]=i+1;
-        }
+    	}
     }
 
     //setup treeviews
-    for(int i=0;i<NB_TREE;i++)
+    for(int i=0;i<VF_MAX+1;i++)
     {
         renderers[i] = gtk_cell_renderer_text_new();
    		columns[i] = gtk_tree_view_column_new_with_attributes (
@@ -502,9 +500,11 @@ createFilterDialog (void)
     }
     return dialog;
 }
-
-void
-updateFilterList (void)
+/**
+ * 	\fn updateFilterList
+ *  \brief Update the list of activated filters
+ */
+void updateFilterList (void)
 {
     g_signal_handler_block(stores[0], row_inserted_id);
     g_signal_handler_block(stores[0], row_deleted_id);
@@ -619,4 +619,4 @@ on_treeview0_row_inserted(GtkTreeModel *treemodel, GtkTreePath *arg1, GtkTreeIte
 
 }
 
-#endif
+

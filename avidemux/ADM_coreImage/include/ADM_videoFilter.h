@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
  
-#define ADM_FILTER_API_VERSION 1
+#define ADM_FILTER_API_VERSION 2
 /**
 	Note for filter writers :
 
@@ -91,34 +91,49 @@ typedef struct
 
 
 
- class AVDMGenericVideoStream
- {
-   protected:
-      	ADV_Info 					_info;
-   	  ADMImage   					*_uncompressed;
-	  AVDMGenericVideoStream 	*_in;
-/* not really used */
-          uint8_t		getPixel(int32_t x,int32_t y,uint8_t *data);
-          uint8_t		getPixelU(int32_t x,int32_t y,uint8_t *data);
-          uint8_t		setPixelU(uint8_t val,int32_t x,int32_t y,uint8_t *data);
-          uint8_t 	unPackChroma(uint8_t *ssrc,uint8_t *ddst);
-/* /not really used */
-   public:
-          virtual uint32_t   getPARWidth(void);
-          virtual uint32_t   getPARHeight(void);
+ class AVDMGenericVideoStream {
+protected:
+	ADV_Info _info;
+	ADMImage *_uncompressed;
+	AVDMGenericVideoStream *_in;
+	/* not really used */
+	uint8_t getPixel(int32_t x, int32_t y, uint8_t *data);
+	uint8_t getPixelU(int32_t x, int32_t y, uint8_t *data);
+	uint8_t setPixelU(uint8_t val, int32_t x, int32_t y, uint8_t *data);
+	uint8_t unPackChroma(uint8_t *ssrc, uint8_t *ddst);
+	/* /not really used */
+public:
+	virtual uint32_t getPARWidth(void);
+	virtual uint32_t getPARHeight(void);
 
-   	// return 1 -> conf changed need rebuild, 0 means conf not changed
-        virtual 	uint8_t 	configure( AVDMGenericVideoStream *instream)=0;
-          			AVDMGenericVideoStream( void)  {_uncompressed=NULL;_in=NULL;};
-  	virtual 		~AVDMGenericVideoStream( ) {};
-        virtual char 	*printConf(void) { static char *str=(char *)"."; return str;};
+	// return 1 -> conf changed need rebuild, 0 means conf not changed
+	virtual uint8_t configure(AVDMGenericVideoStream *instream)=0;
+	AVDMGenericVideoStream(void) {
+		_uncompressed=NULL;
+		_in=NULL;
+	}
+	;
+	virtual ~AVDMGenericVideoStream() {
+	}
+	;
+	virtual char *printConf(void) {
+		static char *str=(char *)".";
+		return str;
+	}
+	;
 
-        virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          							ADMImage *data,uint32_t *flags)=0;
-          	ADV_Info 	*getInfo( void ) { return &_info;};
-         virtual uint8_t	getCoupledConf( CONFcouple **couples)
-	  				{*couples=NULL;return 0;};
- };
+	virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+			ADMImage *data, uint32_t *flags)=0;
+	ADV_Info *getInfo(void) {
+		return &_info;
+	}
+	;
+	virtual uint8_t getCoupledConf(CONFcouple **couples) {
+		*couples=NULL;
+		return 0;
+	}
+	;
+};
 
 void     DIA_previewInit(uint32_t width, uint32_t height);
 uint8_t  DIA_previewUpdate(uint8_t *data);
@@ -189,5 +204,6 @@ typedef struct
  AVDMGenericVideoStream *getFirstCurrentVideoFilter( void);
 // 
 #include "ADM_videoFilterCache.h"
+ 
 #endif
 

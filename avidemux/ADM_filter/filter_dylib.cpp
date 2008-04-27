@@ -134,7 +134,7 @@ void tryLoading(TYPEOFHANDLE handle)
     ADM_assert(desc);
     
     VF_FILTERS id=filterGetTagFromName(name);
-    if(VF_DUMMY!=id)
+    if(VF_INVALID!=id)
     {
       printf("This filter(%s) is already registered as %u\n", name,id);
       CLOSELIB(handle);
@@ -144,7 +144,7 @@ void tryLoading(TYPEOFHANDLE handle)
     
     printf("Loaded filter %s, version %d\n",name,versionP());
   
-   registerFilterEx(name,(VF_FILTERS)dynTag++,1,createP,name,createFromScriptP,desc);
+//   registerFilterEx(name,(VF_FILTERS)dynTag++,1,createP,name,createFromScriptP,desc);
 
 }
 

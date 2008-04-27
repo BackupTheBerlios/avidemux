@@ -49,7 +49,7 @@
 
 #define MAX(a,b) ( (a)>(b) ? (a) : (b) )
 
-extern FILTER  videofilters[MAX_FILTER];
+extern FILTER  videofilters[VF_MAX_FILTER];
 extern uint32_t nb_active_filter;
 
 static void previewBlit(ADMImage *from,ADMImage *to,uint32_t startx,uint32_t starty);

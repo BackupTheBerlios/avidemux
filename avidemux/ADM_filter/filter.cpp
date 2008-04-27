@@ -38,11 +38,16 @@
 #include "ADM_osSupport/ADM_quota.h"
 //
 // exported vars
-std::vector <FILTER_ENTRY> allfilters;
+std::vector <FilterDescriptor *> allfilters;
+std::vector <FilterDescriptor *> filterCategories[VF_MAX];
+
 uint32_t nb_active_filter=0;
-FILTER  videofilters[MAX_FILTER];
+FILTER  videofilters[VF_MAX_FILTER];
+
+
 
 static uint32_t lastStart=0, lastNb=0;
+static uint32_t tagCount=VF_START_TAG;
 
 extern ADM_Composer *video_body;
 extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *conf, AVDMGenericVideoStream *in) ;
@@ -83,8 +88,8 @@ const char *name;
 	printf("\nVideo filters\n");
 	for(uint32_t i=0;i<allfilters.size();i++)
 	{
-		name=allfilters[ i].filtername;
-		if(allfilters[ i].viewable)
+		name=allfilters[i]->filterName;
+		
 		{
 			if(name)
 				printf("\t%s\n",name);
@@ -95,48 +100,47 @@ const char *name;
 VF_FILTERS filterGetTagFromName(char *inname)
 {
 const char *name;
-	VF_FILTERS filter=VF_DUMMY;
+	VF_FILTERS filter=VF_INVALID;
 	for(uint32_t i=0;i<allfilters.size();i++)
 	{
-		name=allfilters[ i].filtername;
-		if(allfilters[ i].viewable || allfilters[i].tag==VF_PARTIAL)
+		name=allfilters[ i]->filterName;
+		if( allfilters[i]->tag==VF_PARTIAL_FILTER)
 		{
 			if(name)
 			{
 				if(strlen(name))
 				{
 					if(!strcasecmp(name,inname))
-						return allfilters[ i].tag; 
+						return allfilters[ i]->tag; 
 				}
 			}
 		}
 	}
 	return filter;
 }
-void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable
-		,AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *)
-		,const char *filtername)
-{
-//        printf ("*nb_video_filter() = %d, max %d, name = %s\n", nb_video_filter(), (MAX_FILTER-1), name);
-        allfilters.push_back (FILTER_ENTRY (name, create, tag, viewable, filtername));
 
-        if(viewable==1)
-	{
-        	aprintf("\nRegistered filter %lu: %s",allfilters.size(),name);
-	}
-}
-void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
-		,AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *)
-		,const char *filtername,AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args),const char *desc)
+/**
+ * 	\fn registerFilterEx
+ *  \brief Register a video filter
+ */
+void registerFilterEx(const char *name,const char *filtername,VF_CATEGORY category,
+		AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *),
+		AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args),
+		const char *descText)
 {
-//    printf ("nb_video_filter = %d, max %d, name = %s\n", nb_video_filter, (MAX_FILTER-1), name);
-        allfilters.push_back (FILTER_ENTRY (name, create, tag, viewable,
-                                            filtername, VF_MISC,desc, create_from_script));
 
-        if(viewable==1)
-	{
-        	aprintf("\nRegistered filter %lu: %s",allfilters.size(),name);
-	}
+	FilterDescriptor *desc=new FilterDescriptor(tagCount++,filtername,name,
+												descText,
+												category,
+												create,
+												create_from_script);
+	
+		ADM_assert(desc->category<VF_MAX);
+	
+        allfilters.push_back (desc);
+        filterCategories[desc->category].push_back(desc);
+        
+        aprintf("[Filters] Registered filter %s\n",desc->name);
 
 
 }
@@ -264,25 +268,13 @@ AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, A
 	 AVDMGenericVideoStream *filter;
 
 			ADM_assert(tag!=VF_INVALID);
-                        if(tag>=VF_EXTERNAL_START)
-                        {
-                          // start from the end, it is an external filter 
-                          for(uint32_t i=allfilters.size()-1;i>=0;i--)
-                          {
-                              if(tag==allfilters[i].tag)
-                                {
-                                        filter=allfilters[i].create( in, couple);
-                                        return filter;
-                                }
-                          }
-                        } // else search forward
-                        else
+                       
                         {
                           for(unsigned int i=0;i<allfilters.size();i++)
                                   {
-                                          if(tag==allfilters[i].tag)
+                                          if(tag==allfilters[i]->tag)
                                                   {
-                                                          filter=allfilters[i].create( in, couple);
+                                                          filter=allfilters[i]->create( in, couple);
                                                           return filter;
                                                   }
                                   }
@@ -294,14 +286,14 @@ AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, A
 
 
 */
-const FILTER_ENTRY * filterGetEntryFromTag (VF_FILTERS tag)
+const FilterDescriptor * filterGetEntryFromTag (VF_FILTERS tag)
 {
     ADM_assert(tag!=VF_INVALID);
     for(unsigned int i=0;i<allfilters.size();i++)
     {
-        if(tag==allfilters[i].tag)
+        if(tag==allfilters[i]->tag)
         {
-            return &(allfilters[i]);
+            return (allfilters[i]);
         }
     }
     ADM_assert(0);
@@ -310,7 +302,7 @@ const FILTER_ENTRY * filterGetEntryFromTag (VF_FILTERS tag)
 
 const char  *filterGetNameFromTag(VF_FILTERS tag)
 {
-    const FILTER_ENTRY * entry = filterGetEntryFromTag (tag);
+    const FilterDescriptor * entry = filterGetEntryFromTag (tag);
     ADM_assert(entry);
     return entry->name;
 }
@@ -441,7 +433,7 @@ uint8_t 	filterAddScript(VF_FILTERS tag,uint32_t n,Arg *args)
 
 	for(unsigned int i=0;i<allfilters.size();i++)
 	{
-		if(tag==allfilters[i].tag)
+		if(tag==allfilters[i]->tag)
 		{
 			if(nb_active_filter<1)
 			{
@@ -450,12 +442,12 @@ uint8_t 	filterAddScript(VF_FILTERS tag,uint32_t n,Arg *args)
 			}
 			AVDMGenericVideoStream *filter=NULL;
 			CONFcouple *setup=NULL;
-			if(!allfilters[i].create_from_script)
+			if(!allfilters[i]->create_from_script)
 			{
 				printf("That filter cannot be created from script\n");
 				return 0;
 			}
-			filter=allfilters[i].create_from_script(videofilters[nb_active_filter-1].filter,n-1,&(args[1]));
+			filter=allfilters[i]->create_from_script(videofilters[nb_active_filter-1].filter,n-1,&(args[1]));
 			if(!filter) return 0;
 			videofilters[nb_active_filter].filter=filter;
 			videofilters[nb_active_filter].tag=tag;						
@@ -477,9 +469,9 @@ void filterSaveScriptJS(FILE *f)
                         qfprintf(f,"app.video.addFilter(");
                         for(unsigned int j=0;j<allfilters.size();j++)
                                 {
-                                        if(tag==allfilters[j].tag)
+                                        if(tag==allfilters[j]->tag)
                                         {       
-                                                qfprintf(f,"\"%s\"",allfilters[j].filtername);
+                                                qfprintf(f,"\"%s\"",allfilters[j]->filterName);
                                                 break;  
                                         }
                                 }

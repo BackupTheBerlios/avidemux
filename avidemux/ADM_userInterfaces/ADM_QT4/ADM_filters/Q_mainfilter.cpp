@@ -6,6 +6,8 @@
     * I.e.
     0--1000 : QT4 internal
     2000-3000: Filters
+                 Each family starts a category*100 then filter in the order they are in categories
+                 ** 10 Categories MAX !!
     3000-4000  filterFamilyClick Filter
     8000-9000  Active Filter
     
@@ -57,7 +59,9 @@ static int max=0;
 /******************************************************/
 extern FILTER videofilters[MAX_FILTER];
 extern uint32_t nb_active_filter;
-extern std::vector <FILTER_ENTRY> allfilters;
+extern std::vector <FilterDescriptor *> allfilters;
+extern std::vector <FilterDescriptor *> filterCategories[VF_MAX];
+
 
 extern const char  *filterGetNameFromTag(VF_FILTERS tag);
 extern ADM_Composer *video_body;
@@ -97,8 +101,8 @@ class filtermainWindow : public QDialog
 	void filterFamilyClick(int  item);
  private slots:
  private:
-        int startFilter[NB_TREE];
-        int filterSize[NB_TREE];
+        
+        
         void setSelected(int sel);
         void displayFamily(uint32_t family);
         void setupFilters(void);
@@ -127,8 +131,13 @@ void filtermainWindow::add( bool b)
      int itag=item->type();
      if(itag>=ALL_FILTER_BASE && itag < EXTERNAL_FILTER_BASE)
      {
-       tag=allfilters[itag-ALL_FILTER_BASE].tag;
-       
+    	 // Extract family & index
+    	 itag-=ALL_FILTER_BASE;
+    	 int index=itag%100;
+    	 int family=(itag-index)/100;
+    	 ADM_assert(family<VF_MAX);
+    	 ADM_assert(index<filterCategories[family].size());
+         tag=filterCategories[family][index]->tag;
      }else
      {
         ADM_assert(0); 
@@ -181,6 +190,7 @@ void filtermainWindow::remove( bool b)
                     videofilters[itag].conf = NULL;
             }
         // recreate derivated filters
+
         for (uint32_t i = itag ; i < nb_active_filter-1; i++)
         {
                     delete videofilters[i ].filter;
@@ -190,6 +200,7 @@ void filtermainWindow::remove( bool b)
                     videofilters[i ].conf = videofilters[i+1].conf;
                     videofilters[i ].tag = videofilters[i+1].tag;
         }
+        
         /* Delete last filter which is now at last filter -1 */
             delete videofilters[nb_active_filter - 1].filter;
             videofilters[nb_active_filter - 1].filter = NULL;
@@ -329,32 +340,24 @@ void filtermainWindow::filterFamilyClick(int  m)
 void filtermainWindow::displayFamily(uint32_t family)
 {
   printf("Family :%u\n",family);
-  
+  ADM_assert(family<VF_MAX);
+  std::vector <FilterDescriptor *> vec=filterCategories[family];
   availableList->clear();
   QColor colorgrey;
   colorgrey.setRgb(myBg,myBg,myBg);
   QBrush brush(colorgrey);
   QSize sz;
   
-  for (uint32_t i = 0; i < filterSize[family]; i++)
+  for (uint32_t i = 0; i < vec.size(); i++)
     {
-      int r=startFilter[family]+i;
-
-      if (allfilters[r].viewable==1)
-        {
           QString str; //="<b>";
-          str+=allfilters[r].name;
+          str+=vec[i]->name;
          
           QListWidgetItem *item;
-          if(family==NB_TREE-1)
-                item=new QListWidgetItem(str,availableList,EXTERNAL_FILTER_BASE+i);
-          else
-                item=new QListWidgetItem(str,availableList,ALL_FILTER_BASE+r);
-          item->setToolTip(allfilters[r].description);
+          item=new QListWidgetItem(str,availableList,ALL_FILTER_BASE+i+family*100);
+          item->setToolTip(vec[i]->description);
           if(i&1) item->setBackground(brush);
           availableList->addItem(item);
-          
-        }
      }
    
 }
@@ -406,10 +409,12 @@ void filtermainWindow::partial( bool b)
             GUI_Error_HIG (QT_TR_NOOP("The filter is already partial"), NULL);
             return;
         }
+
         replace =new ADMVideoPartial (videofilters[itag - 1].
                                       filter,
                                       videofilters[itag].tag,
                                       conf);
+        
         if(replace->configure (videofilters[itag - 1].filter))
         {
             delete videofilters[itag].filter;
@@ -429,34 +434,7 @@ void filtermainWindow::partial( bool b)
 */
 void filtermainWindow::setupFilters(void)
 {
-  int current_tree=-1;
-  int current_raw=0;;
   
-  max=0;
-  
-  for (uint32_t i = 0; i < allfilters.size(); i++)
-    {
-      if (allfilters[i].viewable==1)
-        {
-          current_raw++;
-          
-        }else 
-        {
-                current_tree++;
-                if(current_tree) filterSize[current_tree-1]=current_raw;
-                if(current_tree>=NB_TREE) break;
-                startFilter[current_tree]=i+1;
-                current_raw=0;
-                
-        }
-    }
-    ADM_assert(NB_TREE==8);
-    startFilter[NB_TREE-1]=2000;
-    filterSize[NB_TREE-1]=0;
-    for(int i=0;i<NB_TREE;i++)
-    {
-             printf("%d Start at %d size :%d\n",i,startFilter[i],filterSize[i]);
-    }
 }
 
 /**
@@ -494,9 +472,7 @@ void filtermainWindow::buildActiveFilterList(void)
   */
 filtermainWindow::filtermainWindow()     : QDialog()
  {
-        memset( startFilter,0,sizeof(int)*NB_TREE);
-        memset( filterSize,0,sizeof(int)*NB_TREE);
- 
+        
     ui.setupUi(this);
     setupFilters();  
       

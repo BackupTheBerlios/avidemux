@@ -37,7 +37,7 @@
 #include "avi_vars.h"
 // exported vars
 extern uint32_t nb_active_filter;
-extern FILTER  videofilters[MAX_FILTER];
+extern FILTER  videofilters[VF_MAX_FILTER];
 
 extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, AVDMGenericVideoStream *in);
 extern void filterCleanUp( void );
