@@ -57,7 +57,7 @@ static int max=0;
 #define EXTERNAL_FILTER_BASE  2000
 #define ACTIVE_FILTER_BASE    3000
 /******************************************************/
-extern FILTER videofilters[MAX_FILTER];
+extern FILTER videofilters[VF_MAX_FILTER];
 extern uint32_t nb_active_filter;
 extern std::vector <FilterDescriptor *> allfilters;
 extern std::vector <FilterDescriptor *> filterCategories[VF_MAX];
@@ -404,7 +404,7 @@ void filtermainWindow::partial( bool b)
         AVDMGenericVideoStream *replace;
         CONFcouple *conf;
         conf = videofilters[itag].conf;
-        if (videofilters[itag].tag == VF_PARTIAL)	// cannot recurse
+        if (videofilters[itag].tag == VF_PARTIAL_FILTER)	// cannot recurse
         {
             GUI_Error_HIG (QT_TR_NOOP("The filter is already partial"), NULL);
             return;
@@ -422,7 +422,7 @@ void filtermainWindow::partial( bool b)
             videofilters[itag].filter = replace;
             replace->getCoupledConf (&conf);
             videofilters[itag].conf = conf;
-            videofilters[itag].tag = VF_PARTIAL;
+            videofilters[itag].tag = VF_PARTIAL_FILTER;
             getFirstVideoFilter ();
             buildActiveFilterList ();   
         }
