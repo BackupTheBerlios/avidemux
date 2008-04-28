@@ -202,7 +202,7 @@ EncoderFFMPEGMpeg1::~EncoderFFMPEGMpeg1 ()
 
 //--------------------------------
 uint8_t
-EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
+EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
 
   ADM_assert (instream);

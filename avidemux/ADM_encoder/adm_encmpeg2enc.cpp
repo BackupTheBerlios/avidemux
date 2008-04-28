@@ -191,7 +191,7 @@ EncoderMpeg2enc::~EncoderMpeg2enc ()
 
 
 //--------------------------------
-uint8_t     EncoderMpeg2enc::configure (AVDMGenericVideoStream * instream)
+uint8_t     EncoderMpeg2enc::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
 
   ADM_assert (instream);

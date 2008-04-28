@@ -94,6 +94,7 @@ uint32_t  total_sample=0;
 ADMBitstream bitstream(0);
 uint32_t audioSum=0;
 DIA_encoding  *encoding;
+int reuse = 0;
 
         twoPass=new char[strlen(name)+6];
         twoFake=new char[strlen(name)+6];
@@ -229,7 +230,16 @@ DIA_encoding  *encoding;
       }
 
       encoder->setLogFile(twoPass,total);
-      if(!encoder->configure(_incoming))
+
+	  if (encoder->isDualPass())
+	  {
+		  printf("Verifying log file\n");
+
+		  if (encoder->verifyLog(twoPass, total) && GUI_Question(QT_TR_NOOP("Reuse the existing log file?")))
+			  reuse = 1;
+	  }
+
+      if(!encoder->configure(_incoming, reuse))
               goto finishvcdff;
 
       _buffer=new uint8_t[_page]; // Might overflow if _page only
@@ -282,15 +292,6 @@ DIA_encoding  *encoding;
         // pass 1
         if(encoder->isDualPass()) //Cannot be requant
         {
-                        FILE *fd;
-                        uint8_t reuse=0;
-                        
-                        printf("Verifying log file\n");
-                        if(encoder->verifyLog(twoPass,total))
-                          if(GUI_Question(QT_TR_NOOP("Reuse log file ?")))
-                                {
-                                        reuse=1;
-                                }
                         if(!reuse)
                         {
                                 encoding->setPhasis (QT_TR_NOOP("Pass 1/2"));

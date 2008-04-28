@@ -64,7 +64,7 @@ EncoderFFMPEGHuff::hasExtraHeaderData (uint32_t * l, uint8_t ** data)
 
 }
 uint8_t
-EncoderFFMPEGHuff::configure (AVDMGenericVideoStream * instream)
+EncoderFFMPEGHuff::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
   ADM_assert (instream);
   ADV_Info *info;
@@ -105,7 +105,7 @@ EncoderFFMPEGFFHuff::hasExtraHeaderData (uint32_t * l, uint8_t ** data)
 
 }
 uint8_t
-EncoderFFMPEGFFHuff::configure (AVDMGenericVideoStream * instream)
+EncoderFFMPEGFFHuff::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
   ADM_assert (instream);
   ADV_Info *info;
@@ -148,7 +148,7 @@ EncoderFFMPEGFFV1::hasExtraHeaderData (uint32_t * l, uint8_t ** data)
 
 }
 uint8_t
-EncoderFFMPEGFFV1::configure (AVDMGenericVideoStream * instream)
+EncoderFFMPEGFFV1::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
   ADM_assert (instream);
   ADV_Info *info;
@@ -187,7 +187,7 @@ EncodeFFMPEGSNow::hasExtraHeaderData (uint32_t * l, uint8_t ** data)
 
 }
 uint8_t
-EncodeFFMPEGSNow::configure (AVDMGenericVideoStream * instream)
+EncodeFFMPEGSNow::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
   ADM_assert (instream);
   ADV_Info *info;
@@ -229,7 +229,7 @@ EncoderFFMPEGDV::hasExtraHeaderData (uint32_t * l, uint8_t ** data)
 
 }
 uint8_t
-EncoderFFMPEGDV::configure (AVDMGenericVideoStream * instream)
+EncoderFFMPEGDV::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
   ADM_assert (instream);
   ADV_Info *info;
@@ -276,7 +276,7 @@ EncoderFFMPEGFLV1::hasExtraHeaderData (uint32_t * l, uint8_t ** data)
 
 }
 uint8_t
-EncoderFFMPEGFLV1::configure (AVDMGenericVideoStream * instream)
+EncoderFFMPEGFLV1::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
   ADM_assert (instream);
   ADV_Info *info;
@@ -344,7 +344,7 @@ EncoderFFMPEG::getCodecName (void)
   return NULL;
 }
 //--------------------------------
-uint8_t EncoderFFMPEG::configure (AVDMGenericVideoStream * instream)
+uint8_t EncoderFFMPEG::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
 
   ADM_assert (instream);

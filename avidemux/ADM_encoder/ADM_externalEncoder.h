@@ -28,12 +28,13 @@ class externalEncoder : public Encoder
 private:
 	ADM_vidEnc_plugin *_plugin;
 	bool _openPass;
+	char* _logFileName;
 
 public:
 	externalEncoder(COMPRES_PARAMS *params);
 	~externalEncoder();
 	virtual uint8_t isDualPass(void);
-	virtual uint8_t configure(AVDMGenericVideoStream * instream);
+	virtual uint8_t configure(AVDMGenericVideoStream * instream, int useExistingLogFile);
 	virtual uint8_t encode(uint32_t frame, ADMBitstream *out);
 	virtual uint8_t hasExtraHeaderData(uint32_t *l, uint8_t **data);
 	virtual uint8_t setLogFile(const char *p, uint32_t fr);

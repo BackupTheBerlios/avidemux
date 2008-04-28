@@ -456,6 +456,9 @@ void videoCodecConfigureUI(int codecIndex)
 		vidEncOptions encodeOptions;
 		vidEncVideoProperties properties;
 
+		memset(&properties, 0, sizeof(vidEncVideoProperties));
+		properties.structSize = sizeof(vidEncVideoProperties);
+
 		if (avifileinfo)
 		{
 			aviInfo info;
@@ -465,16 +468,9 @@ void videoCodecConfigureUI(int codecIndex)
 			properties.height = info.height;
 			properties.parWidth = video_body->getPARWidth();
 			properties.parHeight = video_body->getPARHeight();
+			properties.frameCount = info.nb_frames;
+			properties.fps1000 = info.fps1000;
 		}
-		else
-		{
-			properties.width = 0;
-			properties.height = 0;
-			properties.parWidth = 0;
-			properties.parHeight = 0;
-		}
-
-		properties.structSize = sizeof(vidEncVideoProperties);
 
 		if (plugin->isConfigurable(plugin->encoderId))
 			if (plugin->configure(plugin->encoderId, &properties))

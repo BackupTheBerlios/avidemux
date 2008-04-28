@@ -40,15 +40,16 @@
 		configGuiLoader *_loader;
 		x264Options _options;
 		vidEncOptions _encodeOptions;
+		vidEncVideoProperties _properties;
+		char *_logFileName;
 
 		x264_t *_handler;
 		x264_param_t _param;
 		x264_picture_t _picture;
 
-		int _width, _height;
 		uint32_t _currentFrame;
 		int _currentPass, _passCount;
-		bool _openPass;
+		bool _opened, _openPass;
 
 		uint8_t *_seiUserData;
 		uint32_t _seiUserDataLen;
@@ -58,7 +59,8 @@
 
 		void printParam(x264_param_t* x264Param);
 		void printCqm(const uint8_t cqm[], int size);
-		void updateParameters(void);
+		void updateEncodeParameters(vidEncVideoProperties *properties);
+		unsigned int calculateBitrate(unsigned int fps1000, unsigned int frameCount, unsigned int sizeInMb);
 
 	public:
 		x264Encoder(void);
@@ -73,7 +75,7 @@
 		int open(vidEncVideoProperties *properties);
 		int beginPass(void);
 		int getExtraHeaderData(uint8_t **data);
-		int encodeFrame(vidEncEncodeParams *encodeParams);
+		int encodeFrame(vidEncEncodeParameters *encodeParams);
 		int finishPass(void);
 		void close(void);
 	};
@@ -87,6 +89,6 @@
 	int x264Encoder_getCurrentPass(void);
 	int x264Encoder_open(vidEncVideoProperties *properties);
 	void x264Encoder_close(void);
-	int x264Encoder_encodeFrame(vidEncEncodeParams *encodeParams);
+	int x264Encoder_encodeFrame(vidEncEncodeParameters *encodeParams);
 #endif	// __cplusplus
 #endif	// encoder_h

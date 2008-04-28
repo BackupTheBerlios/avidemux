@@ -75,7 +75,7 @@ EncoderX264::hasExtraHeaderData (uint32_t * l, uint8_t ** data)
 }
 //--------------------------------
 uint8_t
-EncoderX264::configure (AVDMGenericVideoStream * instream)
+EncoderX264::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
   ADM_assert (instream);
   ADV_Info *info;

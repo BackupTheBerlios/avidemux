@@ -214,7 +214,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
           copy=new EncoderCopy(NULL);
           muxerMT context;
           
-          copy->configure(NULL);
+          copy->configure(NULL, 0);
           // 
           memset(&context,0,sizeof(context));
           context.videoEncoder=copy;
@@ -269,7 +269,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
             audioQueueMT context;
             uint8_t r;
             
-            copy->configure(NULL);
+            copy->configure(NULL, 0);
             pq=new PacketQueue("TS audioQ",5000,2*1024*1024);
             memset(&context,0,sizeof(context));
             context.audioEncoder=audio;

@@ -61,7 +61,7 @@ EncoderXvid4::~EncoderXvid4 ()
 };
 //--------------------------------
 uint8_t
-EncoderXvid4::configure (AVDMGenericVideoStream * instream)
+EncoderXvid4::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
   ADM_assert (instream);
   ADV_Info *info;

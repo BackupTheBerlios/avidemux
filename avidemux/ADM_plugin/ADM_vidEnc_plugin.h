@@ -19,8 +19,8 @@
 
 #define ADM_VIDENC_API_VERSION 1
 
-#define ADM_VIDENC_ERR_FAILED 0
 #define ADM_VIDENC_ERR_SUCCESS 1
+#define ADM_VIDENC_ERR_FAILED 0
 #define ADM_VIDENC_ERR_CLOSED -1
 #define ADM_VIDENC_ERR_ALREADY_OPEN -2
 #define ADM_VIDENC_ERR_INVALID_ENCODER_ID -3
@@ -52,7 +52,7 @@ typedef struct
 	int64_t ptsFrame;
 	unsigned int quantiser;
 	int frameType;
-} vidEncEncodeParams;
+} vidEncEncodeParameters;
 
 typedef struct
 {
@@ -61,6 +61,10 @@ typedef struct
 	unsigned int height;
 	unsigned int parWidth;
 	unsigned int parHeight;
+	unsigned int frameCount;
+	unsigned int fps1000;
+	const char* logFileName;
+	int useExistingLogFile;
 } vidEncVideoProperties;
 
 typedef struct
@@ -85,11 +89,11 @@ int vidEncGetOptions(int encoderId, vidEncOptions *encodeOptions, char *pluginOp
 int vidEncSetOptions(int encoderId, vidEncOptions *encodeOptions, char *pluginOptions);
 
 int vidEncGetPassCount(int encoderId);
-int vidEncGetLastPass(int encoderId);
+int vidEncGetCurrentPass(int encoderId);
 
 int vidEncOpen(int encoderId, vidEncVideoProperties *properties);
 int vidEncBeginPass(int encoderId);
-int vidEncEncodeFrame(int encoderId, vidEncEncodeParams *encodeParams);
+int vidEncEncodeFrame(int encoderId, vidEncEncodeParameters *encodeParams);
 int vidEndFinishPass(int encoderId);
 int vidEncClose(int encoderId);
 

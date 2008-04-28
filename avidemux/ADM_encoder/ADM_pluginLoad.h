@@ -40,7 +40,7 @@ typedef int _vidEncGetCurrentPass(int encoderId);
 
 typedef int _vidEncOpen(int encoderId, vidEncVideoProperties *properties);
 typedef int _vidEncBeginPass(int encoderId);
-typedef int _vidEncEncodeFrame(int encoderId, vidEncEncodeParams *encodeParams);
+typedef int _vidEncEncodeFrame(int encoderId, vidEncEncodeParameters *encodeParams);
 typedef int _vidFinishPass(int encoderId);
 typedef int _vidEncClose(int encoderId);
 

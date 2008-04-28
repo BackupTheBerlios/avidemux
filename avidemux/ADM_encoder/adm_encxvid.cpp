@@ -68,7 +68,7 @@ EncoderXvid::EncoderXvid (XVIDconfig * codecconfig)
 
 };
 //--------------------------------
-uint8_t EncoderXvid::configure (AVDMGenericVideoStream * instream)
+uint8_t EncoderXvid::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
   ADM_assert (instream);
   ADV_Info *

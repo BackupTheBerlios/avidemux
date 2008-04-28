@@ -42,7 +42,7 @@ public:
     EncoderXvid4 (COMPRES_PARAMS * codecconfig);
    ~EncoderXvid4 ();		// can be called twice if needed ..
   virtual uint8_t isDualPass (void);
-  virtual uint8_t configure (AVDMGenericVideoStream * instream);
+  virtual uint8_t configure (AVDMGenericVideoStream * instream, int useExistingLogFile);
  
   virtual uint8_t encode (uint32_t frame, ADMBitstream *out);
   virtual uint8_t setLogFile (const char *p, uint32_t fr);

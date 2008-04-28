@@ -132,7 +132,7 @@ uint8_t GenericAviSaveCopyPack::setupVideo (char *name)
  
  // Set up our copy codec ...
   copy=new EncoderCopy(NULL);
-  if(!copy->configure(_incoming))
+  if(!copy->configure(_incoming, 0))
   {
       printf("Copy cannot [configure] \n");
       return 0;

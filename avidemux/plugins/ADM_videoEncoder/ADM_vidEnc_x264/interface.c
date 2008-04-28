@@ -109,7 +109,7 @@ int vidEncBeginPass(int encoderId)
 	return x264Encoder_beginPass();
 }
 
-int vidEncEncodeFrame(int encoderId, vidEncEncodeParams *encodeParams)
+int vidEncEncodeFrame(int encoderId, vidEncEncodeParameters *encodeParams)
 {
 	return x264Encoder_encodeFrame(encodeParams);
 }

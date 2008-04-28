@@ -107,7 +107,7 @@ EncoderRequant::getFCCHandler (void)
 
 /****************************************************************/
 uint8_t
-EncoderRequant::configure (AVDMGenericVideoStream * instream)
+EncoderRequant::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
   aviInfo info;
   _in = instream;

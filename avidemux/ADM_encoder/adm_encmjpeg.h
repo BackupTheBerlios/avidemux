@@ -35,7 +35,7 @@ public:
   {
     return 0;
   };				// mjpeg is always monopass
-  virtual uint8_t configure (AVDMGenericVideoStream * instream);
+  virtual uint8_t configure (AVDMGenericVideoStream * instream, int useExistingLogFile);
   virtual uint8_t encode (uint32_t frame, ADMBitstream *out);
   virtual uint8_t setLogFile (const char *p, uint32_t fr);	// for dual pass only
   virtual uint8_t stop (void);

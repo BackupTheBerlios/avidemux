@@ -54,7 +54,7 @@ EncoderDivx::EncoderDivx (DIVXConfig * config)
 };
 //--------------------------------
 uint8_t
-EncoderDivx::configure (AVDMGenericVideoStream * instream)
+EncoderDivx::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
   //  COMPRES_PARAMS par;
 

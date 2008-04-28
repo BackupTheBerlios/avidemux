@@ -63,7 +63,22 @@ uint32_t w,h,fps1000,fcc;
    
  	_encode->setLogFile(TwoPassLogFile,_togo);
 	
-  	if (!_encode->configure (_incoming))
+	int reuse = 0;
+
+	if (_encode->isDualPass())
+	{
+		FILE *tmp;
+
+		if ((tmp = fopen(TwoPassLogFile,"rt")))
+		{
+			fclose(tmp);
+
+			if (GUI_Question(QT_TR_NOOP("Reuse the existing log file?")))
+				reuse = 1;
+		}
+	}
+
+  	if (!_encode->configure (_incoming, reuse))
     	{
       		delete 	_encode;
       		_encode = NULL;
@@ -83,19 +98,8 @@ uint32_t w,h,fps1000,fcc;
 	{
 		uint8_t *buffer;
 		uint32_t len, flag;
-		FILE *tmp;
-		uint8_t reuse=0;
 
 		aprintf("\n** Dual pass encoding**\n");
-
-		if((tmp=fopen(TwoPassLogFile,"rt")))
-		{
-			fclose(tmp);
-                        if(GUI_Question(QT_TR_NOOP("\n Reuse the existing log-file ?")))
-			{
-				reuse=1;
-			}
-		}
 	
 		if(!reuse)
  		{

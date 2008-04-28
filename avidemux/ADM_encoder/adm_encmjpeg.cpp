@@ -63,7 +63,7 @@ EncoderMjpeg::EncoderMjpeg (COMPRES_PARAMS * conf)
 };
 //--------------------------------
 uint8_t
-EncoderMjpeg::configure (AVDMGenericVideoStream * instream)
+EncoderMjpeg::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
   ADV_Info *info;
 //         int q,s;

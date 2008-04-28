@@ -138,7 +138,7 @@ uint32_t sent=0;
                 else
                         encoding_gui->setCodec(_encode->getDisplayName());
                 
-                if (!_encode->configure (_incoming))
+                if (!_encode->configure (_incoming, 0))
                 {
                       GUI_Error_HIG (QT_TR_NOOP("Filter init failed"), NULL);
                      goto  stopit;

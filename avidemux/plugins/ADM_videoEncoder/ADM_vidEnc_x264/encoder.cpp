@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <math.h>
+
 #include "config.h"
 #include "ADM_inttype.h"
 #include "ADM_files.h"
@@ -34,7 +36,7 @@ extern "C"
 	int x264Encoder_getCurrentPass(void) { return encoder.getCurrentPass(); }
 	int x264Encoder_open(vidEncVideoProperties *properties) { return encoder.open(properties); }
 	int x264Encoder_beginPass(void) { return encoder.beginPass(); }
-	int x264Encoder_encodeFrame(vidEncEncodeParams *encodeParams) { return encoder.encodeFrame(encodeParams); }
+	int x264Encoder_encodeFrame(vidEncEncodeParameters *encodeParams) { return encoder.encodeFrame(encodeParams); }
 	int x264Encoder_finishPass(void) { return encoder.finishPass(); }
 	void x264Encoder_close(void) { encoder.close(); }
 }
@@ -43,15 +45,23 @@ x264Encoder::x264Encoder(void)
 {
 	_loader = NULL;
 	_handler = NULL;
+	_opened = false;
+
 	_passCount = 1;
 	_currentPass = 0;
 	_openPass = false;
 
+	_logFileName = NULL;
+
+	_extraData = NULL;
+	_extraSize = 0;
+
+	_seiUserData = NULL;
+	_seiUserDataLen = 0;
+
 	_encodeOptions.structSize = sizeof(vidEncOptions);
 	_encodeOptions.encodeMode = ADM_VIDENC_MODE_AQP;
 	_encodeOptions.encodeModeParameter = 26;
-
-	updateParameters();
 }
 
 x264Encoder::~x264Encoder(void)
@@ -60,6 +70,9 @@ x264Encoder::~x264Encoder(void)
 
 	if (_loader)
 		delete _loader;
+
+	if (_logFileName)
+		delete [] _logFileName;
 }
 
 void x264Encoder::setUiType(int uiType)
@@ -125,6 +138,9 @@ int x264Encoder::getOptions(vidEncOptions *encodeOptions, char *pluginOptions, i
 
 int x264Encoder::setOptions(vidEncOptions *encodeOptions, char *pluginOptions)
 {
+	if (_opened)
+		return ADM_VIDENC_ERR_ALREADY_OPEN;
+
 	bool success = true;
 
 	if (pluginOptions)
@@ -133,41 +149,10 @@ int x264Encoder::setOptions(vidEncOptions *encodeOptions, char *pluginOptions)
 	if (encodeOptions && success)
 		memcpy(&_encodeOptions, encodeOptions, sizeof(vidEncOptions));
 
-	updateParameters();
-
-	return success;
-}
-
-void x264Encoder::updateParameters(void)
-{
-	x264_param_t *param = _options.getParameters();
-
-	memcpy(&_param, param, sizeof(x264_param_t));
-	delete param;
-
-	switch (_encodeOptions.encodeMode)
-	{
-		case ADM_VIDENC_MODE_CBR:
-			_param.rc.i_rc_method = X264_RC_ABR;
-			_param.rc.i_bitrate = _encodeOptions.encodeModeParameter;
-			break;
-		case ADM_VIDENC_MODE_CQP:
-			_param.rc.i_rc_method = X264_RC_CQP;
-			_param.rc.i_qp_constant = _encodeOptions.encodeModeParameter;
-			break;
-		case ADM_VIDENC_MODE_AQP:
-			_param.rc.i_rc_method = X264_RC_CRF;
-			_param.rc.f_rf_constant = _encodeOptions.encodeModeParameter;
-			break;
-		case ADM_VIDENC_MODE_2PASS_SIZE:
-			_param.rc.i_rc_method = X264_RC_ABR;
-			_param.rc.i_bitrate = _encodeOptions.encodeModeParameter;
-			break;
-		case ADM_VIDENC_MODE_2PASS_ABR:
-			_param.rc.i_rc_method = X264_RC_ABR;
-			_param.rc.i_bitrate = _encodeOptions.encodeModeParameter;
-			break;
-	}
+	if (success)
+		return ADM_VIDENC_ERR_SUCCESS;
+	else
+		return ADM_VIDENC_ERR_FAILED;
 }
 
 int x264Encoder::getCurrentPass(void)
@@ -182,44 +167,45 @@ int x264Encoder::getPassCount(void)
 
 int x264Encoder::open(vidEncVideoProperties *properties)
 {
-	if (_handler)
+	if (_opened)
 		return ADM_VIDENC_ERR_ALREADY_OPEN;
 
-	_param.i_width = _width = properties->width;
-	_param.i_height = _height = properties->height;
+	_opened = true;
+	_currentPass = 0;
 
-	// FIXME
-	_param.rc.i_rc_method = X264_RC_CRF;
-	_param.rc.f_rf_constant = 26;
-	_param.vui.i_sar_height = 1;
-	_param.vui.i_sar_width = 1;
+	memcpy(&_properties, properties, sizeof(vidEncVideoProperties));
+	_properties.logFileName = NULL;
 
-    _param.i_fps_num = 25000;
-    _param.i_fps_den = 1000;
+	if (_logFileName)
+		delete [] _logFileName;
 
-	//_param.rc.b_stat_read = 1;
-	//_param.rc.psz_stat_in = "C:\\Users\\Grant\\Desktop\\test.avi.stat";
+	_logFileName = new char[strlen(properties->logFileName) + 1];
+	strcpy(_logFileName, properties->logFileName);
+
+	updateEncodeParameters(&_properties);
+
+	_param.i_width = _properties.width;
+	_param.i_height = _properties.height;
+	_param.i_fps_num = _properties.fps1000;
+	_param.i_fps_den = 1000;
+
+	if (_options.getSarAsInput())
+	{
+		_param.vui.i_sar_width = _properties.parWidth;
+		_param.vui.i_sar_height = _properties.parHeight;
+	}
+
+	if (_passCount > 1 && properties->useExistingLogFile)
+		_currentPass++;
 
 	printParam(&_param);
-	printCqm((uint8_t*)&_param, sizeof(x264_param_t));
-	printf("\n");
 
-	_handler = x264_encoder_open(&_param);
-	_seiUserData = NULL;
-	_seiUserDataLen = 0;
-
-	_extraData = NULL;
-	_extraSize = 0;
-
-	if (_handler)
-		return ADM_VIDENC_ERR_SUCCESS;
-	else
-		return ADM_VIDENC_ERR_FAILED;
+	return ADM_VIDENC_ERR_SUCCESS;
 }
 
 int x264Encoder::beginPass(void)
 {
-	if (!_handler)
+	if (!_opened)
 		return ADM_VIDENC_ERR_CLOSED;
 
 	if (_openPass)
@@ -230,11 +216,50 @@ int x264Encoder::beginPass(void)
 
 	_openPass = true;
 	_currentPass++;
+
+	printf("[x264] begin pass %d/%d\n", _currentPass, _passCount);
+
+	if (_passCount > 1)
+	{
+		if (_currentPass == 1)
+		{
+			_param.rc.b_stat_write = 1;
+			_param.rc.b_stat_read = 0;
+			_param.rc.psz_stat_out = _logFileName;
+			printf("[x264] writing to %s\n", _logFileName);
+		}
+		else
+		{
+			_param.rc.b_stat_write = 0;
+			_param.rc.b_stat_read = 1;
+			_param.rc.psz_stat_in = _logFileName;
+			printf("[x264] reading from %s\n", _logFileName);
+		}
+	}
+	else
+	{
+		_param.rc.b_stat_write = 0;
+		_param.rc.b_stat_read = 0;
+	}
+
+	_handler = x264_encoder_open(&_param);
+	_seiUserData = NULL;
+	_seiUserDataLen = 0;
+
+	_extraData = NULL;
+	_extraSize = 0;
+
+	_currentFrame = 0;
+
+	if (_handler)
+		return ADM_VIDENC_ERR_SUCCESS;
+	else
+		return ADM_VIDENC_ERR_FAILED;
 }
 
-int x264Encoder::encodeFrame(vidEncEncodeParams *encodeParams)
+int x264Encoder::encodeFrame(vidEncEncodeParameters *encodeParams)
 {
-	if (!_handler)
+	if (!_opened)
 		return ADM_VIDENC_ERR_CLOSED;
 
 	x264_nal_t *nal;
@@ -246,11 +271,11 @@ int x264Encoder::encodeFrame(vidEncEncodeParams *encodeParams)
 	_picture.img.i_csp = X264_CSP_I420;
 	_picture.img.i_plane = 3;
 	_picture.img.plane[0] = encodeParams->frameData;	// Y
-	_picture.img.plane[2] = encodeParams->frameData + _width * _height;	// U
-	_picture.img.plane[1] = encodeParams->frameData + ((_width * _height * 5) >> 2);	// V
-	_picture.img.i_stride[0] = _width;
-	_picture.img.i_stride[1] = _width >> 1;
-	_picture.img.i_stride[2] = _width >> 1;
+	_picture.img.plane[2] = encodeParams->frameData + _param.i_width * _param.i_height;	// U
+	_picture.img.plane[1] = encodeParams->frameData + ((_param.i_width * _param.i_height * 5) >> 2);	// V
+	_picture.img.i_stride[0] = _param.i_width;
+	_picture.img.i_stride[1] = _param.i_width >> 1;
+	_picture.img.i_stride[2] = _param.i_width >> 1;
 	_picture.i_type = X264_TYPE_AUTO;
 	_picture.i_pts = _currentFrame++;
 
@@ -294,40 +319,40 @@ int x264Encoder::encodeFrame(vidEncEncodeParams *encodeParams)
 
 	switch (picture_out.i_type)
 	{
-	case X264_TYPE_IDR:
-		encodeParams->frameType = ADM_VIDENC_FRAMETYPE_IDR;
+		case X264_TYPE_IDR:
+			encodeParams->frameType = ADM_VIDENC_FRAMETYPE_IDR;
 
-		if(!_param.b_repeat_headers && _seiUserData && !picture_out.i_pts)
-		{
-			// Put our SEI front...
-			// first a temp location...
-			uint8_t tmpBuffer[size];
-			memcpy(tmpBuffer, encodeParams->encodedData, size);
+			if(!_param.b_repeat_headers && _seiUserData && !picture_out.i_pts)
+			{
+				// Put our SEI front...
+				// first a temp location...
+				uint8_t tmpBuffer[size];
+				memcpy(tmpBuffer, encodeParams->encodedData, size);
 
-			// Put back out SEI and add Size
-			encodeParams->encodedData[0] = (_seiUserDataLen >> 24) & 0xff;
-			encodeParams->encodedData[1] = (_seiUserDataLen >> 16) & 0xff;
-			encodeParams->encodedData[2] = (_seiUserDataLen >> 8) & 0xff;
-			encodeParams->encodedData[3] = (_seiUserDataLen >> 0) & 0xff;
+				// Put back out SEI and add Size
+				encodeParams->encodedData[0] = (_seiUserDataLen >> 24) & 0xff;
+				encodeParams->encodedData[1] = (_seiUserDataLen >> 16) & 0xff;
+				encodeParams->encodedData[2] = (_seiUserDataLen >> 8) & 0xff;
+				encodeParams->encodedData[3] = (_seiUserDataLen >> 0) & 0xff;
 
-			memcpy(encodeParams->encodedData + 4, _seiUserData, _seiUserDataLen);
-			memcpy(encodeParams->encodedData + 4 + _seiUserDataLen, tmpBuffer, size);
+				memcpy(encodeParams->encodedData + 4, _seiUserData, _seiUserDataLen);
+				memcpy(encodeParams->encodedData + 4 + _seiUserDataLen, tmpBuffer, size);
 
-			size += 4 + _seiUserDataLen;
-			encodeParams->encodedDataSize = size; // update total size
-		}
+				size += 4 + _seiUserDataLen;
+				encodeParams->encodedDataSize = size; // update total size
+			}
 
-		break;
-	case X264_TYPE_I:
-	case X264_TYPE_P:
-		encodeParams->frameType = ADM_VIDENC_FRAMETYPE_P;
-		break;
-	case X264_TYPE_B:
-	case X264_TYPE_BREF:
-		encodeParams->frameType = ADM_VIDENC_FRAMETYPE_B;
-		break;
-	default:
-		printf ("[x264] Unknown image type: %d\n", picture_out.i_type);
+			break;
+		case X264_TYPE_I:
+		case X264_TYPE_P:
+			encodeParams->frameType = ADM_VIDENC_FRAMETYPE_P;
+			break;
+		case X264_TYPE_B:
+		case X264_TYPE_BREF:
+			encodeParams->frameType = ADM_VIDENC_FRAMETYPE_B;
+			break;
+		default:
+			printf ("[x264] Unknown image type: %d\n", picture_out.i_type);
 	}
 
 	encodeParams->quantiser = picture_out.i_qpplus1;
@@ -337,7 +362,7 @@ int x264Encoder::encodeFrame(vidEncEncodeParams *encodeParams)
 
 int x264Encoder::getExtraHeaderData(uint8_t **data)
 {
-	if (!_handler)
+	if (!_opened)
 		return ADM_VIDENC_ERR_CLOSED;
 
 	return ADM_VIDENC_ERR_FAILED;
@@ -355,7 +380,7 @@ int x264Encoder::getExtraHeaderData(uint8_t **data)
 	uint8_t picParam[X264_MAX_HEADER_SIZE];
 	uint8_t seqParam[X264_MAX_HEADER_SIZE];
 	uint8_t sei[X264_MAX_HEADER_SIZE];
-	int picParamLen = 0, seqParamLen = 0, seiParamLen=0, len;
+	int picParamLen = 0, seqParamLen = 0, seiParamLen = 0, len;
 	int sz;
 
 	_extraData = new uint8_t[X264_MAX_HEADER_SIZE];
@@ -409,7 +434,7 @@ int x264Encoder::getExtraHeaderData(uint8_t **data)
 	_extraData[2] = seqParam[2];	//0x00; // profile_compatibility
 	_extraData[3] = seqParam[3];	//0x0D; // AVCLevelIndication
 	_extraData[4] = 0xFC + 3;	// lengthSizeMinusOne 
-	_extraData[5] = 0xE0 + 1;	// nonReferenceDegredationPriorityLow        
+	_extraData[5] = 0xE0 + 1;	// nonReferenceDegredationPriorityLow
 
 	offset = 6;
 	_extraData[offset] = seqParamLen >> 8;
@@ -448,15 +473,23 @@ int x264Encoder::getExtraHeaderData(uint8_t **data)
 
 int x264Encoder::finishPass(void)
 {
-	if (!_handler)
+	if (!_opened)
 		return ADM_VIDENC_ERR_CLOSED;
 
 	if (_openPass)
 		_openPass = false;
+
+	if (_handler)
+	{
+		x264_encoder_close(_handler);
+		_handler = NULL;
+	}
 }
 
 void x264Encoder::close(void)
 {
+	_opened = false;
+
 	if (_handler)
 	{
 		x264_encoder_close(_handler);
@@ -571,4 +604,58 @@ void x264Encoder::printCqm(const uint8_t cqm[], int size)
 {
 	for (int index = 0; index < size; index++)
 		printf("%d ", cqm[index]);
+}
+
+void x264Encoder::updateEncodeParameters(vidEncVideoProperties *properties)
+{
+	x264_param_t *param = _options.getParameters();
+
+	memcpy(&_param, param, sizeof(x264_param_t));
+	delete param;
+
+	switch (_encodeOptions.encodeMode)
+	{
+		case ADM_VIDENC_MODE_CBR:
+			_passCount = 1;
+			_param.rc.i_rc_method = X264_RC_ABR;
+			_param.rc.i_bitrate = _encodeOptions.encodeModeParameter;
+			break;
+		case ADM_VIDENC_MODE_CQP:
+			_passCount = 1;
+			_param.rc.i_rc_method = X264_RC_CQP;
+			_param.rc.i_qp_constant = _encodeOptions.encodeModeParameter;
+			break;
+		case ADM_VIDENC_MODE_AQP:
+			_passCount = 1;
+			_param.rc.i_rc_method = X264_RC_CRF;
+			_param.rc.f_rf_constant = _encodeOptions.encodeModeParameter;
+			break;
+		case ADM_VIDENC_MODE_2PASS_SIZE:
+			_passCount = 2;
+			_param.rc.i_rc_method = X264_RC_ABR;
+			_param.rc.i_bitrate = calculateBitrate(properties->fps1000, properties->frameCount, _encodeOptions.encodeModeParameter) / 1000;
+			break;
+		case ADM_VIDENC_MODE_2PASS_ABR:
+			_passCount = 2;
+			_param.rc.i_rc_method = X264_RC_ABR;
+			_param.rc.i_bitrate = _encodeOptions.encodeModeParameter;
+			break;
+	}
+}
+
+unsigned int x264Encoder::calculateBitrate(unsigned int fps1000, unsigned int frameCount, unsigned int sizeInMb)
+{
+	double db, ti;
+
+	db = sizeInMb;
+	db = db * 1024. * 1024. * 8.;
+	// now db is in bits
+
+	// compute duration
+	ti = frameCount;
+	ti *= 1000;
+	ti /= fps1000;	// nb sec
+	db = db / ti;
+
+	return (unsigned int)floor(db);
 }

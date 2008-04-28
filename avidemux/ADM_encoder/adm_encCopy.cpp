@@ -99,7 +99,7 @@ EncoderCopy::getFCCHandler (void)
 
 /****************************************************************/
 uint8_t
-EncoderCopy::configure (AVDMGenericVideoStream * instream)
+EncoderCopy::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
   aviInfo info;
   _in = instream;

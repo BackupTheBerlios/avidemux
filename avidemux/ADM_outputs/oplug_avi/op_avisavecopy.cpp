@@ -103,7 +103,7 @@ uint8_t GenericAviSaveCopy::setupVideo (char *name)
  encoding_gui->setPhasis(QT_TR_NOOP("Saving"));
  // Set up our copy codec ...
   copy=new EncoderCopy(NULL);
-  if(!copy->configure(_incoming))
+  if(!copy->configure(_incoming, 0))
   {
       printf("Copy cannot [configure] \n");
       return 0;

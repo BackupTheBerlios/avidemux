@@ -22,15 +22,18 @@ externalEncoder::externalEncoder(COMPRES_PARAMS *params)
 {
 	_plugin = getVideoEncoderPlugin(params->extra_param);
 	_openPass = false;
+	_logFileName = NULL;
 }
 
 externalEncoder::~externalEncoder()
 {
 	stop();
-	delete _plugin;
+
+	if (_logFileName)
+		delete [] _logFileName;
 }
 
-uint8_t externalEncoder::configure(AVDMGenericVideoStream *instream)
+uint8_t externalEncoder::configure(AVDMGenericVideoStream *instream, int useExistingLogFile)
 {
 	ADV_Info *info;
 
@@ -50,6 +53,10 @@ uint8_t externalEncoder::configure(AVDMGenericVideoStream *instream)
 	properties.height = _h;
 	properties.parWidth = instream->getPARWidth();
 	properties.parHeight = instream->getPARHeight();
+	properties.frameCount = info->nb_frames;
+	properties.fps1000 = info->fps1000;
+	properties.logFileName = _logFileName;
+	properties.useExistingLogFile = useExistingLogFile;
 
 	if (_plugin->open(_plugin->encoderId, &properties))
 		return 1;
@@ -62,15 +69,22 @@ uint8_t externalEncoder::encode(uint32_t frame, ADMBitstream *out)
 	uint32_t l, f;
 	int outLength, videoFrameType;
 	int64_t ptsFrame;
-	vidEncEncodeParams params;
+	vidEncEncodeParameters params;
+
+	if (!_openPass && !isDualPass())
+		if (startPass1() != ADM_VIDENC_ERR_SUCCESS)
+		{
+			printf ("[externalEncoder] Error starting first pass\n");
+			return 0;
+		}
 
 	if (!_in->getFrameNumberNoAlloc(frame, &l, _vbuffer, &f))
 	{
-		printf ("[VidEnc Plugin] Error: Cannot read incoming frame!\n");
+		printf ("[externalEncoder] Error reading incoming frame\n");
 		return 0;
 	}
 
-	params.structSize = sizeof(vidEncEncodeParams);
+	params.structSize = sizeof(vidEncEncodeParameters);
 	params.frameData = _vbuffer->data;
 	params.frameDataSize = 0;
 	params.encodedData = out->data;
@@ -132,7 +146,10 @@ uint8_t externalEncoder::startPass1(void)
 
 uint8_t externalEncoder::startPass2(void)
 {
-	_openPass = (_plugin->finishPass(_plugin->encoderId) && _plugin->beginPass(_plugin->encoderId));
+	if (_openPass)
+		_plugin->finishPass(_plugin->encoderId);
+
+	_openPass = (_plugin->beginPass(_plugin->encoderId) == ADM_VIDENC_ERR_SUCCESS);
 
 	return _openPass;
 }
@@ -160,5 +177,11 @@ uint8_t externalEncoder::stop(void)
 
 uint8_t externalEncoder::setLogFile(const char *p, uint32_t fr)
 {
+	if (_logFileName)
+		delete [] _logFileName;
+
+	_logFileName = new char[strlen(p) + 1];
+	strcpy(_logFileName, p);
+
 	return 1;
 }

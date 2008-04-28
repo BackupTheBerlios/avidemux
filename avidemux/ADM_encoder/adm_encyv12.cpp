@@ -46,7 +46,7 @@ EncoderYV12::~EncoderYV12 ()
 };
 //--------------------------------
 uint8_t
-EncoderYV12::configure (AVDMGenericVideoStream * instream)
+EncoderYV12::configure (AVDMGenericVideoStream * instream, int useExistingLogFile)
 {
   ADM_assert (instream);
   ADV_Info *info;

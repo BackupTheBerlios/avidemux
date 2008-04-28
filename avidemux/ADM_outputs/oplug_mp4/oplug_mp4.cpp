@@ -66,7 +66,7 @@ static char *twoPass=NULL;
 static char *twoFake=NULL;
 
 extern AVDMGenericAudioStream *mpt_getAudioStream(void);
-uint8_t prepareDualPass(uint32_t bufferSize,uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encoding_gui,Encoder *_encode,uint32_t total);
+uint8_t prepareDualPass(uint32_t bufferSize,uint8_t *buffer,DIA_encoding *encoding_gui,Encoder *_encode,uint32_t total,int reuse);
 uint8_t extractVolHeader(uint8_t *data,uint32_t dataSize,uint32_t *headerSize);
 extern void    UI_purge(void );
 /*
@@ -114,6 +114,8 @@ PacketQueue   *pq;//("MP4 audioQ",50,2*1024*1024);
 uint32_t    totalAudioSize=0;
 uint32_t sent=0;
 const char *containerTitle;
+int reuse = 0;
+
            switch(type)
            {
              case ADM_PSP:muxerType=MUXER_PSP;containerTitle=QT_TR_NOOP("PSP");break;
@@ -160,17 +162,31 @@ const char *containerTitle;
                 strcat(TwoPassLogFile,".stat");
                 _encode->setLogFile(TwoPassLogFile,total);
 
-                if (!_encode->configure (_incoming))
+				dualPass = _encode->isDualPass();
+
+				if (dualPass)
+				{
+					FILE *tmp;
+
+					if ((tmp = fopen(TwoPassLogFile,"rt")))
+					{
+						fclose(tmp);
+
+						if (GUI_Question(QT_TR_NOOP("Reuse the existing log file?")))
+							reuse = 1;
+					}
+				}
+
+                if (!_encode->configure (_incoming, reuse))
                 {
                       GUI_Error_HIG (QT_TR_NOOP("Filter init failed"), NULL);
                      goto  stopit;
-                };
+                }
 
-                dualPass=_encode->isDualPass();
                 if(dualPass)
                 {
                        
-                        if(!prepareDualPass(bitstream.bufferSize,videoBuffer,TwoPassLogFile,encoding_gui,_encode,total))
+                        if(!prepareDualPass(bitstream.bufferSize,videoBuffer,encoding_gui,_encode,total,reuse))
                                 goto stopit;
                 }else
                 {
@@ -373,26 +389,16 @@ stopit:
            deleteAudioFilter (audio);
            return ret;
 }
-uint8_t prepareDualPass(uint32_t bufferSize,uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encoding_gui,Encoder *_encode,uint32_t total)
+uint8_t prepareDualPass(uint32_t bufferSize,uint8_t *buffer,DIA_encoding *encoding_gui,Encoder *_encode,uint32_t total,int reuse)
 {
       uint32_t len, flag;
-      FILE *tmp;
-      uint8_t reuse=0,r;
+      uint8_t r;
       ADMBitstream bitstream(0);
       uint32_t prefill=0;
       uint32_t sent=0;
       
         aprintf("\n** Dual pass encoding**\n");
 
-        if((tmp=fopen(TwoPassLogFile,"rt")))
-        {
-                fclose(tmp);
-                if(GUI_Question(QT_TR_NOOP("\n Reuse the existing log-file ?")))
-                {
-                        reuse=1;
-                }
-        }
-        
         if(!reuse)
         {
         
