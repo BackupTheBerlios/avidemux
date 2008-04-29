@@ -22,7 +22,11 @@
 extern "C"
 {
 #include "x264.h"
+#include "ADM_vidEnc_plugin.h"
 }
+
+#define DEFAULT_ENCODE_MODE ADM_VIDENC_MODE_AQP
+#define DEFAULT_ENCODE_MODE_PARAMETER 26
 
 class x264Options
 {

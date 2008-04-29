@@ -61,8 +61,8 @@ x264Encoder::x264Encoder(void)
 	_seiUserDataLen = 0;
 
 	_encodeOptions.structSize = sizeof(vidEncOptions);
-	_encodeOptions.encodeMode = ADM_VIDENC_MODE_AQP;
-	_encodeOptions.encodeModeParameter = 26;
+	_encodeOptions.encodeMode = DEFAULT_ENCODE_MODE;
+	_encodeOptions.encodeModeParameter = DEFAULT_ENCODE_MODE_PARAMETER;
 }
 
 x264Encoder::~x264Encoder(void)

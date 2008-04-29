@@ -112,7 +112,19 @@ ENDIF (NOT Subversion_FOUND)
 SET(MSG_DISABLE_OPTION "Disabled per request")
 
 INCLUDE(admCheckRequiredLibs)
-INCLUDE(admCheckUserInterfaceLibs)
+INCLUDE(admCheckGtk)
+INCLUDE(admCheckQt4)
+
+checkGtk()
+IF (NOT GTK_FOUND OR NOT GTHREAD_FOUND)
+	SET(ADM_UI_GTK 0)
+ENDIF (NOT GTK_FOUND OR NOT GTHREAD_FOUND)
+
+checkQt4()
+IF (NOT QT4_FOUND)
+	SET(ADM_UI_QT4 0)
+ENDIF (NOT QT4_FOUND)
+
 INCLUDE(admCheckVideoCodecLibs)
 INCLUDE(admCheckAudioCodecLibs)
 INCLUDE(admCheckAudioDeviceLibs)

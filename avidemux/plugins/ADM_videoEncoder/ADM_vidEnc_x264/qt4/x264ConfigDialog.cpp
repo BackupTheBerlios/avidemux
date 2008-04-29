@@ -590,19 +590,16 @@ void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *o
 	options->setFullRangeSamples(ui.fullRangeSamplesCheckBox->isChecked());
 }
 
-extern "C"
+extern "C" int showX264ConfigDialog(vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options)
 {
-	int showX264ConfigDialog(vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options)
+	x264ConfigDialog dialog(properties, encodeOptions, options);
+
+	if (dialog.exec() == QDialog::Accepted)
 	{
-		x264ConfigDialog dialog(properties, encodeOptions, options);
+		dialog.saveSettings(encodeOptions, options);
 
-		if (dialog.exec() == QDialog::Accepted)
-		{
-			dialog.saveSettings(encodeOptions, options);
-
-			return 1;
-		}
-
-		return 0;
+		return 1;
 	}
+
+	return 0;
 }

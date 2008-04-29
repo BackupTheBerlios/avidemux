@@ -26,6 +26,8 @@ x264Options::x264Options(void)
 {
 	x264_param_default(&_param);
 	_param.rc.psz_rc_eq = strdup(_param.rc.psz_rc_eq);
+	_param.vui.i_sar_height = 1;
+	_param.vui.i_sar_width = 1;
 
 	_sarAsInput = false;
 }
