@@ -44,7 +44,7 @@ const char* vidEncGetEncoderType(int encoderId)
 
 const char* vidEncGetEncoderDescription(int encoderId)
 {
-	return "x264 encoder plugin for Avidemux (c) Mean/Gruntster";
+	return "x264 video encoder plugin for Avidemux (c) Mean/Gruntster";
 }
 
 const char* vidEncGetFourCC(int encoderId)
@@ -104,9 +104,9 @@ int vidEncOpen(int encoderId, vidEncVideoProperties *properties)
 	return x264Encoder_open(properties);
 }
 
-int vidEncBeginPass(int encoderId)
+int vidEncBeginPass(int encoderId, vidEncPassParameters *passParameters)
 {
-	return x264Encoder_beginPass();
+	return x264Encoder_beginPass(passParameters);
 }
 
 int vidEncEncodeFrame(int encoderId, vidEncEncodeParameters *encodeParams)

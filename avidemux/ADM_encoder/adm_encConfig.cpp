@@ -625,7 +625,7 @@ Encoder *getVideoEncoder(uint32_t w, uint32_t h, uint32_t globalHeaderFlag)
 		}
 #endif
 	case CodecExternal:
-		e = new externalEncoder(&AllVideoCodec[currentCodecIndex]);
+		e = new externalEncoder(&AllVideoCodec[currentCodecIndex], globalHeaderFlag);
 		break;
 	}
 	return e;

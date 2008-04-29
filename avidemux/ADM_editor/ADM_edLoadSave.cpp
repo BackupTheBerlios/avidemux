@@ -175,10 +175,7 @@ for (uint32_t i = 0; i < _nb_segment; i++)
 		videoCodecGetConf(&extraDataSize, &extraData);
 
 		if (videoCodecGetType() == CodecExternal)
-		{
-			qfprintf(fd, "app.video.codecPlugin(\"%s\", \"%s\", \"%s\");\n", videoCodecPluginGetGuid(), videoCodecGetName(), videoCodecGetMode());
-			qfprintf(fd, "app.video.codecConf(\"%s\");\n", extraData);
-		}
+			qfprintf(fd, "app.video.codecPlugin(\"%s\", \"%s\", \"%s\", \"%s\");\n", videoCodecPluginGetGuid(), videoCodecGetName(), videoCodecGetMode(), extraData);
 		else
 		{
 			qfprintf(fd, "app.video.codec(\"%s\", \"%s\", \"", videoCodecGetName(), videoCodecGetMode());

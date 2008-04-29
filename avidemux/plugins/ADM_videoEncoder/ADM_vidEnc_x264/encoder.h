@@ -43,9 +43,11 @@
 		vidEncVideoProperties _properties;
 		char *_logFileName;
 
-		x264_t *_handler;
+		x264_t *_handle;
 		x264_param_t _param;
 		x264_picture_t _picture;
+		uint8_t *_buffer;
+		int _bufferSize;
 
 		uint32_t _currentFrame;
 		int _currentPass, _passCount;
@@ -55,12 +57,13 @@
 		uint32_t _seiUserDataLen;
 
 		uint8_t *_extraData;
-		int _extraSize;
+		int _extraDataSize;
 
 		void printParam(x264_param_t* x264Param);
 		void printCqm(const uint8_t cqm[], int size);
 		void updateEncodeParameters(vidEncVideoProperties *properties);
 		unsigned int calculateBitrate(unsigned int fps1000, unsigned int frameCount, unsigned int sizeInMb);
+		int createHeader(void);
 
 	public:
 		x264Encoder(void);
@@ -73,8 +76,7 @@
 		int getCurrentPass(void);
 		int getPassCount(void);
 		int open(vidEncVideoProperties *properties);
-		int beginPass(void);
-		int getExtraHeaderData(uint8_t **data);
+		int beginPass(vidEncPassParameters *passParameters);
 		int encodeFrame(vidEncEncodeParameters *encodeParams);
 		int finishPass(void);
 		void close(void);

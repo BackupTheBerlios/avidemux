@@ -35,7 +35,7 @@ extern "C"
 	int x264Encoder_getPassCount(void) { return encoder.getPassCount(); }
 	int x264Encoder_getCurrentPass(void) { return encoder.getCurrentPass(); }
 	int x264Encoder_open(vidEncVideoProperties *properties) { return encoder.open(properties); }
-	int x264Encoder_beginPass(void) { return encoder.beginPass(); }
+	int x264Encoder_beginPass(vidEncPassParameters *passParameters) { return encoder.beginPass(passParameters); }
 	int x264Encoder_encodeFrame(vidEncEncodeParameters *encodeParams) { return encoder.encodeFrame(encodeParams); }
 	int x264Encoder_finishPass(void) { return encoder.finishPass(); }
 	void x264Encoder_close(void) { encoder.close(); }
@@ -44,7 +44,7 @@ extern "C"
 x264Encoder::x264Encoder(void)
 {
 	_loader = NULL;
-	_handler = NULL;
+	_handle = NULL;
 	_opened = false;
 
 	_passCount = 1;
@@ -52,9 +52,10 @@ x264Encoder::x264Encoder(void)
 	_openPass = false;
 
 	_logFileName = NULL;
+	_buffer = NULL;
 
 	_extraData = NULL;
-	_extraSize = 0;
+	_extraDataSize = 0;
 
 	_seiUserData = NULL;
 	_seiUserDataLen = 0;
@@ -73,6 +74,9 @@ x264Encoder::~x264Encoder(void)
 
 	if (_logFileName)
 		delete [] _logFileName;
+
+	if (_buffer)
+		delete [] _buffer;
 }
 
 void x264Encoder::setUiType(int uiType)
@@ -172,6 +176,8 @@ int x264Encoder::open(vidEncVideoProperties *properties)
 
 	_opened = true;
 	_currentPass = 0;
+	_bufferSize = properties->width * properties->height * 3;
+	_buffer = new uint8_t[_bufferSize];
 
 	memcpy(&_properties, properties, sizeof(vidEncVideoProperties));
 	_properties.logFileName = NULL;
@@ -195,6 +201,11 @@ int x264Encoder::open(vidEncVideoProperties *properties)
 		_param.vui.i_sar_height = _properties.parHeight;
 	}
 
+	if (properties->flags & ADM_VIDENC_FLAG_GLOBAL_HEADER)
+		_param.b_repeat_headers = 0;
+	else
+		_param.b_repeat_headers = 1;
+
 	if (_passCount > 1 && properties->useExistingLogFile)
 		_currentPass++;
 
@@ -203,7 +214,7 @@ int x264Encoder::open(vidEncVideoProperties *properties)
 	return ADM_VIDENC_ERR_SUCCESS;
 }
 
-int x264Encoder::beginPass(void)
+int x264Encoder::beginPass(vidEncPassParameters *passParameters)
 {
 	if (!_opened)
 		return ADM_VIDENC_ERR_CLOSED;
@@ -216,6 +227,7 @@ int x264Encoder::beginPass(void)
 
 	_openPass = true;
 	_currentPass++;
+	_currentFrame = 0;
 
 	printf("[x264] begin pass %d/%d\n", _currentPass, _passCount);
 
@@ -226,6 +238,7 @@ int x264Encoder::beginPass(void)
 			_param.rc.b_stat_write = 1;
 			_param.rc.b_stat_read = 0;
 			_param.rc.psz_stat_out = _logFileName;
+
 			printf("[x264] writing to %s\n", _logFileName);
 		}
 		else
@@ -233,6 +246,7 @@ int x264Encoder::beginPass(void)
 			_param.rc.b_stat_write = 0;
 			_param.rc.b_stat_read = 1;
 			_param.rc.psz_stat_in = _logFileName;
+
 			printf("[x264] reading from %s\n", _logFileName);
 		}
 	}
@@ -242,17 +256,24 @@ int x264Encoder::beginPass(void)
 		_param.rc.b_stat_read = 0;
 	}
 
-	_handler = x264_encoder_open(&_param);
-	_seiUserData = NULL;
-	_seiUserDataLen = 0;
+	_handle = x264_encoder_open(&_param);
 
-	_extraData = NULL;
-	_extraSize = 0;
+	if (_handle)
+	{
+		if (!_param.b_repeat_headers)
+		{
+			if (createHeader())
+			{
+				passParameters->structSize = sizeof(vidEncPassParameters);
+				passParameters->extraData = _extraData;
+				passParameters->extraDataSize = _extraDataSize;
+			}
+			else
+				return ADM_VIDENC_ERR_FAILED;
+		}
 
-	_currentFrame = 0;
-
-	if (_handler)
 		return ADM_VIDENC_ERR_SUCCESS;
+	}
 	else
 		return ADM_VIDENC_ERR_FAILED;
 }
@@ -279,7 +300,7 @@ int x264Encoder::encodeFrame(vidEncEncodeParameters *encodeParams)
 	_picture.i_type = X264_TYPE_AUTO;
 	_picture.i_pts = _currentFrame++;
 
-	if (x264_encoder_encode(_handler, &nal, &nalCount, &_picture, &picture_out) < 0)
+	if (x264_encoder_encode(_handle, &nal, &nalCount, &_picture, &picture_out) < 0)
 	{
 		printf("[x264] Error encoding\n");
 		return ADM_VIDENC_ERR_FAILED;
@@ -296,15 +317,15 @@ int x264Encoder::encodeFrame(vidEncEncodeParameters *encodeParams)
 		if (!_param.b_repeat_headers)
 			size += 4;
 
-		currentNal = x264_nal_encode(encodeParams->encodedData + size, &sizemax, _param.b_repeat_headers, &nal[i]);
+		currentNal = x264_nal_encode(_buffer + size, &sizemax, _param.b_repeat_headers, &nal[i]);
 
 		if (!_param.b_repeat_headers)
 		{
 			// Need to put size (assuming nal_size=4)
-			encodeParams->encodedData[size + 0 - 4] = (currentNal >> 24) & 0xff;
-			encodeParams->encodedData[size + 1 - 4] = (currentNal >> 16) & 0xff;
-			encodeParams->encodedData[size + 2 - 4] = (currentNal >> 8) & 0xff;
-			encodeParams->encodedData[size + 3 - 4] = (currentNal >> 0) & 0xff;
+			_buffer[size + 0 - 4] = (currentNal >> 24) & 0xff;
+			_buffer[size + 1 - 4] = (currentNal >> 16) & 0xff;
+			_buffer[size + 2 - 4] = (currentNal >> 8) & 0xff;
+			_buffer[size + 3 - 4] = (currentNal >> 0) & 0xff;
 		}
 
 		size += currentNal;
@@ -327,16 +348,16 @@ int x264Encoder::encodeFrame(vidEncEncodeParameters *encodeParams)
 				// Put our SEI front...
 				// first a temp location...
 				uint8_t tmpBuffer[size];
-				memcpy(tmpBuffer, encodeParams->encodedData, size);
+				memcpy(tmpBuffer, _buffer, size);
 
 				// Put back out SEI and add Size
-				encodeParams->encodedData[0] = (_seiUserDataLen >> 24) & 0xff;
-				encodeParams->encodedData[1] = (_seiUserDataLen >> 16) & 0xff;
-				encodeParams->encodedData[2] = (_seiUserDataLen >> 8) & 0xff;
-				encodeParams->encodedData[3] = (_seiUserDataLen >> 0) & 0xff;
+				_buffer[0] = (_seiUserDataLen >> 24) & 0xff;
+				_buffer[1] = (_seiUserDataLen >> 16) & 0xff;
+				_buffer[2] = (_seiUserDataLen >> 8) & 0xff;
+				_buffer[3] = (_seiUserDataLen >> 0) & 0xff;
 
-				memcpy(encodeParams->encodedData + 4, _seiUserData, _seiUserDataLen);
-				memcpy(encodeParams->encodedData + 4 + _seiUserDataLen, tmpBuffer, size);
+				memcpy(_buffer + 4, _seiUserData, _seiUserDataLen);
+				memcpy(_buffer + 4 + _seiUserDataLen, tmpBuffer, size);
 
 				size += 4 + _seiUserDataLen;
 				encodeParams->encodedDataSize = size; // update total size
@@ -356,23 +377,13 @@ int x264Encoder::encodeFrame(vidEncEncodeParameters *encodeParams)
 	}
 
 	encodeParams->quantiser = picture_out.i_qpplus1;
+	encodeParams->encodedData = _buffer;
 
 	return ADM_VIDENC_ERR_SUCCESS;
 }
 
-int x264Encoder::getExtraHeaderData(uint8_t **data)
+int x264Encoder::createHeader(void)
 {
-	if (!_opened)
-		return ADM_VIDENC_ERR_CLOSED;
-
-	return ADM_VIDENC_ERR_FAILED;
-
-	if (_extraData)
-	{
-		*data = _extraData;
-		return _extraSize;
-	}
-
 	x264_nal_t *nal;
 	int nalCount;
 	uint32_t offset = 0;
@@ -383,14 +394,20 @@ int x264Encoder::getExtraHeaderData(uint8_t **data)
 	int picParamLen = 0, seqParamLen = 0, seiParamLen = 0, len;
 	int sz;
 
-	_extraData = new uint8_t[X264_MAX_HEADER_SIZE];
-	_extraSize = 0;
+	if (!_handle)
+		return ADM_VIDENC_ERR_FAILED;
 
-	if (x264_encoder_headers(_handler, &nal, &nalCount))
+	if (x264_encoder_headers(_handle, &nal, &nalCount))
 	{
 		printf("[x264] Cannot create header\n");
 		return ADM_VIDENC_ERR_FAILED;
 	}
+
+	if (_extraData)
+		delete _extraData;
+
+	_extraData = new uint8_t[X264_MAX_HEADER_SIZE];
+	_extraDataSize = 0;
 
 	printf("[x264] Nal count: %d\n", nalCount);
 
@@ -416,6 +433,7 @@ int x264Encoder::getExtraHeaderData(uint8_t **data)
 		if (sz <= 0)
 		{
 			printf("[x264] Cannot encode nal header %d\n", i);
+
 			return ADM_VIDENC_ERR_FAILED;
 		}
 	}
@@ -463,12 +481,11 @@ int x264Encoder::getExtraHeaderData(uint8_t **data)
 		memcpy(_seiUserData, sei, _seiUserDataLen);
 	}
 
-	_extraSize = offset;
-	*data = _extraData;
+	_extraDataSize = offset;
+
+	printf("[x264] generated %d extra bytes for header\n", _extraDataSize);
 
 	//assert(offset < X264_MAX_HEADER_SIZE);
-
-	return _extraSize;
 }
 
 int x264Encoder::finishPass(void)
@@ -479,28 +496,38 @@ int x264Encoder::finishPass(void)
 	if (_openPass)
 		_openPass = false;
 
-	if (_handler)
+	if (_extraData)
 	{
-		x264_encoder_close(_handler);
-		_handler = NULL;
+		delete [] _extraData;
+		_extraData = NULL;
+		_extraDataSize = 0;
+	}
+
+	if (_seiUserData)
+	{
+		delete [] _seiUserData;
+		_seiUserData = NULL;
+		_seiUserDataLen = 0;
 	}
 }
 
 void x264Encoder::close(void)
 {
+	if (_openPass)
+		finishPass();
+
 	_opened = false;
 
-	if (_handler)
+	if (_handle)
 	{
-		x264_encoder_close(_handler);
-		_handler = NULL;
+		x264_encoder_close(_handle);
+		_handle = NULL;
 	}
 
-	if (_extraData)
+	if (_buffer)
 	{
-		delete [] _extraData;
-		_extraData = NULL;
-		_extraSize = 0;
+		delete [] _buffer;
+		_buffer = NULL;
 	}
 }
 

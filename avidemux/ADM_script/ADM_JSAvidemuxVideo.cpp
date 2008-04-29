@@ -50,7 +50,7 @@ JSFunctionSpec ADM_JSAvidemuxVideo::avidemuxvideo_methods[] =
         { "clearFilters", ClearFilters, 0, 0, 0 }, // Delete all filters
 	{ "addFilter", AddFilter, 10, 0, 0 },	// Add filter to filter chain
 	{ "codec", Codec, 3, 0, 0 },	// Set the video codec
-	{ "codecPlugin", codecPlugin, 3, 0, 0 },	// Set the video codec plugin
+	{ "codecPlugin", codecPlugin, 4, 0, 0 },	// Set the video codec plugin
 	{ "codecConf", CodecConf, 1, 0, 0 },	// load video codec config
 	{ "save", Save, 1, 0, 0 },	// save video portion of the stream
 	{ "saveJpeg", SaveJPEG, 1, 0, 0 },	// save the current frame as a JPEG
@@ -287,21 +287,23 @@ JSBool ADM_JSAvidemuxVideo::codecPlugin(JSContext *cx, JSObject *obj, uintN argc
 {
 	*rval = BOOLEAN_TO_JSVAL(false);
 
-	if (argc > 3)
+	if (argc != 4)
 		return JS_FALSE;
 
 	printf("Codec Plugin ... \n");
 
-	if (!JSVAL_IS_STRING(argv[0]) || !JSVAL_IS_STRING(argv[1]) || !JSVAL_IS_STRING(argv[2]))
+	if (!JSVAL_IS_STRING(argv[0]) || !JSVAL_IS_STRING(argv[1]) || !JSVAL_IS_STRING(argv[2]) || !JSVAL_IS_STRING(argv[3]))
 		return JS_FALSE;
-
-	printf("[guid] %s\n", JS_GetStringBytes(JSVAL_TO_STRING(argv[0])));
-	printf("[desc] %s\n", JS_GetStringBytes(JSVAL_TO_STRING(argv[1])));
-	printf("[conf] %s\n", JS_GetStringBytes(JSVAL_TO_STRING(argv[2])));
 
 	char *guid = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
 	char *desc = JS_GetStringBytes(JSVAL_TO_STRING(argv[1]));
 	char *conf = JS_GetStringBytes(JSVAL_TO_STRING(argv[2]));
+	char *data = JS_GetStringBytes(JSVAL_TO_STRING(argv[3]));
+
+	printf("[guid] %s\n", guid);
+	printf("[desc] %s\n", desc);
+	printf("[conf] %s\n", conf);
+	printf("[data] %s\n", data);
 
 	enterLock();
 
@@ -317,7 +319,12 @@ JSBool ADM_JSAvidemuxVideo::codecPlugin(JSContext *cx, JSObject *obj, uintN argc
 		if (!videoCodecConfigure(conf, 0, NULL))
 			*rval = BOOLEAN_TO_JSVAL(false);
 		else
-			*rval = BOOLEAN_TO_JSVAL(true);
+		{
+			if (!loadVideoCodecConf(data))
+				*rval = BOOLEAN_TO_JSVAL(false);
+			else
+				*rval = BOOLEAN_TO_JSVAL(true);
+		}
 	}
 
 	leaveLock();

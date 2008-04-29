@@ -29,9 +29,14 @@ private:
 	ADM_vidEnc_plugin *_plugin;
 	bool _openPass;
 	char* _logFileName;
+	bool _globalHeader;
+	uint8_t *_extraData;
+	int _extraDataSize;
+
+	uint8_t startPass(void);
 
 public:
-	externalEncoder(COMPRES_PARAMS *params);
+	externalEncoder(COMPRES_PARAMS *params, bool globalHeader);
 	~externalEncoder();
 	virtual uint8_t isDualPass(void);
 	virtual uint8_t configure(AVDMGenericVideoStream * instream, int useExistingLogFile);

@@ -42,6 +42,8 @@
 #define ADM_VIDENC_UI_GTK 1
 #define ADM_VIDENC_UI_QT 2
 
+#define ADM_VIDENC_FLAG_GLOBAL_HEADER 1
+
 typedef struct
 {
 	int structSize;
@@ -65,6 +67,7 @@ typedef struct
 	unsigned int fps1000;
 	const char* logFileName;
 	int useExistingLogFile;
+	unsigned int flags;
 } vidEncVideoProperties;
 
 typedef struct
@@ -73,6 +76,13 @@ typedef struct
 	unsigned int encodeMode;
 	int encodeModeParameter;
 } vidEncOptions;
+
+typedef struct
+{
+	int structSize;
+	uint8_t *extraData;
+	int extraDataSize;
+} vidEncPassParameters;
 
 int vidEncGetEncoders(int uiType, int **encoderIds);
 const char* vidEncGetEncoderName(int encoderId);
@@ -92,7 +102,7 @@ int vidEncGetPassCount(int encoderId);
 int vidEncGetCurrentPass(int encoderId);
 
 int vidEncOpen(int encoderId, vidEncVideoProperties *properties);
-int vidEncBeginPass(int encoderId);
+int vidEncBeginPass(int encoderId, vidEncPassParameters *passParameters);
 int vidEncEncodeFrame(int encoderId, vidEncEncodeParameters *encodeParams);
 int vidEndFinishPass(int encoderId);
 int vidEncClose(int encoderId);

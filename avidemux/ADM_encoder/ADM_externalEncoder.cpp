@@ -18,11 +18,12 @@
 #include "ADM_externalEncoder.h"
 #include "ADM_plugin/ADM_vidEnc_plugin.h"
 
-externalEncoder::externalEncoder(COMPRES_PARAMS *params)
+externalEncoder::externalEncoder(COMPRES_PARAMS *params, bool globalHeader)
 {
 	_plugin = getVideoEncoderPlugin(params->extra_param);
 	_openPass = false;
 	_logFileName = NULL;
+	_globalHeader = globalHeader;
 }
 
 externalEncoder::~externalEncoder()
@@ -48,6 +49,8 @@ uint8_t externalEncoder::configure(AVDMGenericVideoStream *instream, int useExis
 
 	vidEncVideoProperties properties;
 
+	memset(&properties, 0, sizeof(vidEncVideoProperties));
+
 	properties.structSize = sizeof(vidEncVideoProperties);
 	properties.width = _w;
 	properties.height = _h;
@@ -58,8 +61,16 @@ uint8_t externalEncoder::configure(AVDMGenericVideoStream *instream, int useExis
 	properties.logFileName = _logFileName;
 	properties.useExistingLogFile = useExistingLogFile;
 
+	if (_globalHeader)
+		properties.flags |= ADM_VIDENC_FLAG_GLOBAL_HEADER;
+
 	if (_plugin->open(_plugin->encoderId, &properties))
-		return 1;
+	{
+		if (!isDualPass())
+			return (startPass() == ADM_VIDENC_ERR_SUCCESS);
+		else
+			return 1;
+	}
 	else
 		return 0;
 }
@@ -71,13 +82,6 @@ uint8_t externalEncoder::encode(uint32_t frame, ADMBitstream *out)
 	int64_t ptsFrame;
 	vidEncEncodeParameters params;
 
-	if (!_openPass && !isDualPass())
-		if (startPass1() != ADM_VIDENC_ERR_SUCCESS)
-		{
-			printf ("[externalEncoder] Error starting first pass\n");
-			return 0;
-		}
-
 	if (!_in->getFrameNumberNoAlloc(frame, &l, _vbuffer, &f))
 	{
 		printf ("[externalEncoder] Error reading incoming frame\n");
@@ -86,29 +90,32 @@ uint8_t externalEncoder::encode(uint32_t frame, ADMBitstream *out)
 
 	params.structSize = sizeof(vidEncEncodeParameters);
 	params.frameData = _vbuffer->data;
-	params.frameDataSize = 0;
-	params.encodedData = out->data;
+	params.frameDataSize = ((_w + 15) & 0xffffff0) * ((_h + 15) & 0xfffffff0) * 2;
+	params.encodedData = NULL;
+	params.encodedDataSize = 0;
 
 	if (_plugin->encodeFrame(_plugin->encoderId, &params))
 	{
+		memcpy(out->data, params.encodedData, params.encodedDataSize);
+
 		out->len = params.encodedDataSize;
 		out->ptsFrame = params.ptsFrame;
 		out->out_quantizer = params.quantiser;
 
 		switch (params.frameType)
 		{
-		case ADM_VIDENC_FRAMETYPE_IDR:
-			out->flags = AVI_KEY_FRAME;
-			break;
-		case ADM_VIDENC_FRAMETYPE_B:
-			out->flags = AVI_B_FRAME;
-			break;
-		case ADM_VIDENC_FRAMETYPE_P:
-			out->flags = AVI_P_FRAME;
-			break;
-		default:
-			assert(0);
-			break;
+			case ADM_VIDENC_FRAMETYPE_IDR:
+				out->flags = AVI_KEY_FRAME;
+				break;
+			case ADM_VIDENC_FRAMETYPE_B:
+				out->flags = AVI_B_FRAME;
+				break;
+			case ADM_VIDENC_FRAMETYPE_P:
+				out->flags = AVI_P_FRAME;
+				break;
+			default:
+				assert(0);
+				break;
 		}
 
 		return 1;
@@ -137,11 +144,32 @@ uint8_t externalEncoder::isDualPass(void)
 	return _plugin->getPassCount(_plugin->encoderId) == 2;
 }
 
-uint8_t externalEncoder::startPass1(void)
+uint8_t externalEncoder::startPass(void)
 {
-	_openPass = (_plugin->beginPass(_plugin->encoderId) == ADM_VIDENC_ERR_SUCCESS);
+	vidEncPassParameters passParameters;
+
+	memset(&passParameters, 0, sizeof(vidEncPassParameters));
+	passParameters.structSize = sizeof(vidEncPassParameters);
+
+	_openPass = (_plugin->beginPass(_plugin->encoderId, &passParameters) == ADM_VIDENC_ERR_SUCCESS);
+
+	if (_openPass && _globalHeader)
+	{
+		_extraData = passParameters.extraData;
+		_extraDataSize = passParameters.extraDataSize;
+	}
+	else
+	{
+		_extraData = NULL;
+		_extraDataSize = 0;
+	}
 
 	return _openPass;
+}
+
+uint8_t externalEncoder::startPass1(void)
+{
+	return startPass();
 }
 
 uint8_t externalEncoder::startPass2(void)
@@ -149,20 +177,22 @@ uint8_t externalEncoder::startPass2(void)
 	if (_openPass)
 		_plugin->finishPass(_plugin->encoderId);
 
-	_openPass = (_plugin->beginPass(_plugin->encoderId) == ADM_VIDENC_ERR_SUCCESS);
-
-	return _openPass;
+	return startPass();
 }
 
 uint8_t externalEncoder::hasExtraHeaderData(uint32_t *l, uint8_t **data)
 {
-/*	int headerSize = _plugin->getExtraHeaderData(data);
+	printf ("[externalEncoder] %d extra header bytes\n", _extraDataSize);
 
-	*l = headerSize;
-	printf ("[VidEnc Plugin] %d extra header bytes\n", headerSize);
+	if (_globalHeader && _extraDataSize > 0)
+	{
+		*data = _extraData;
+		*l = _extraDataSize;
 
-	return (headerSize > 0); */
-	return 0;
+		return 1;
+	}
+	else
+		return 0;
 }
 
 uint8_t externalEncoder::stop(void)
