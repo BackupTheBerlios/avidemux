@@ -17,6 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <math.h>
+
 #include "x264ConfigDialog.h"
 #include "x264CustomMatrixDialog.h"
 #include "x264ZonesDialog.h"
@@ -392,16 +394,16 @@ void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *o
 	ui.quantiserMinSpinBox->setValue(options->getQuantiserMinimum());
 	ui.quantiserMaxSpinBox->setValue(options->getQuantiserMaximum());
 	ui.quantiserMaxStepSpinBox->setValue(options->getQuantiserStep());
-	ui.avgBitrateToleranceSpinBox->setValue((int)(options->getAverageBitrateTolerance() * 100));
+	ui.avgBitrateToleranceSpinBox->setValue((int)floor(options->getAverageBitrateTolerance() * 100 + .5));
 	ui.quantiserIpRatioSpinBox->setValue(options->getIpFrameQuantiser());
 	ui.quantiserPbRatioSpinBox->setValue(options->getPbFrameQuantiser());
 	ui.chromaLumaOffsetSpinBox->setValue(options->getChromaLumaQuantiserDifference());
-	ui.quantiserCurveCompressSpinBox->setValue((int)(options->getQuantiserCurveCompression() * 100));
+	ui.quantiserCurveCompressSpinBox->setValue((int)floor(options->getQuantiserCurveCompression() * 100 + .5));
 	ui.quantiserBeforeCompressSpinBox->setValue(options->getReduceFluxBeforeCurveCompression());
 	ui.quantiserAfterCompressSpinBox->setValue(options->getReduceFluxAfterCurveCompression());
 	ui.vbvMaxBitrateSpinBox->setValue(options->getVbvMaximumBitrate());
 	ui.vbvBufferSizeSpinBox->setValue(options->getVbvBufferSize());
-	ui.vbvBufferOccupancySpinBox->setValue((int)(options->getVbvInitialOccupancy() * 100));
+	ui.vbvBufferOccupancySpinBox->setValue((int)floor(options->getVbvInitialOccupancy() * 100 + .5));
 
 	// Output tab
 	if (!options->getIdcLevel())
@@ -557,16 +559,16 @@ void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *o
 	options->setQuantiserMinimum(ui.quantiserMinSpinBox->value());
 	options->setQuantiserMaximum(ui.quantiserMaxSpinBox->value());
 	options->setQuantiserStep(ui.quantiserMaxStepSpinBox->value());
-	options->setAverageBitrateTolerance(ui.avgBitrateToleranceSpinBox->value());
+	options->setAverageBitrateTolerance((float)ui.avgBitrateToleranceSpinBox->value() / 100);
 	options->setIpFrameQuantiser(ui.quantiserIpRatioSpinBox->value());
 	options->setPbFrameQuantiser(ui.quantiserPbRatioSpinBox->value());
 	options->setChromaLumaQuantiserDifference(ui.chromaLumaOffsetSpinBox->value());
-	options->setQuantiserCurveCompression(ui.quantiserCurveCompressSpinBox->value());
+	options->setQuantiserCurveCompression((float)ui.quantiserCurveCompressSpinBox->value() / 100);
 	options->setReduceFluxBeforeCurveCompression(ui.quantiserBeforeCompressSpinBox->value());
 	options->setReduceFluxAfterCurveCompression(ui.quantiserAfterCompressSpinBox->value());
 	options->setVbvMaximumBitrate(ui.vbvMaxBitrateSpinBox->value());
 	options->setVbvBufferSize(ui.vbvBufferSizeSpinBox->value());
-	options->setVbvInitialOccupancy(ui.vbvBufferOccupancySpinBox->value());
+	options->setVbvInitialOccupancy((float)ui.vbvBufferOccupancySpinBox->value() / 100);
 
 	// Output tab
 	options->setIdcLevel(idcLevel[ui.idcLevelComboBox->currentIndex()]);
