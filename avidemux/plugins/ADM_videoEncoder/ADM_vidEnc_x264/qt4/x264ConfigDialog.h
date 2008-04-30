@@ -43,7 +43,7 @@ private:
 	int getValueIndexInArray(uint8_t value, const uint8_t valueArray[], int elementCount);
 
 public:
-	x264ConfigDialog(vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options);
+	x264ConfigDialog(vidEncConfigParameters *configParameters, vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options);
 	void saveSettings(vidEncOptions *encodeOptions, x264Options *options);
 
 private slots:

@@ -31,7 +31,7 @@ typedef void _vidEncGetEncoderVersion(int encoderId, int *major, int *minor, int
 typedef const char* _vidEncGetEncoderGuid(int encoderId);
 
 typedef int _vidEncIsConfigurable(int encoderId);
-typedef int _vidEncConfigure(int encoderId, vidEncVideoProperties *properties);
+typedef int _vidEncConfigure(int encoderId, vidEncConfigParameters *configParameters, vidEncVideoProperties *properties);
 typedef int _vidEncGetOptions(int encoderId, vidEncOptions *encodeOptions, char *pluginOptions, int bufferSize);
 typedef int _vidEncSetOptions(int encoderId, vidEncOptions *encodeOptions, char *pluginOptions);
 

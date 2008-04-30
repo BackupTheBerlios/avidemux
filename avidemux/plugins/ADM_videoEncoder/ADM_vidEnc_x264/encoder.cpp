@@ -29,7 +29,7 @@ extern "C"
 {
 	void *encoders_getPointer(int uiType) { encoder.setUiType(uiType); return &encoders; } 
 	int x264Encoder_isConfigurable(void) { return encoder.isConfigurable(); }
-	int x264Encoder_configure(vidEncVideoProperties *properties) { return encoder.configure(properties); }
+	int x264Encoder_configure(vidEncConfigParameters *configParameters, vidEncVideoProperties *properties) { return encoder.configure(configParameters, properties); }
 	int x264Encoder_getOptions(vidEncOptions *encodeOptions, char *pluginOptions, int bufferSize) { return encoder.getOptions(encodeOptions, pluginOptions, bufferSize); };
 	int x264Encoder_setOptions(vidEncOptions *encodeOptions, char *pluginOptions) { return encoder.setOptions(encodeOptions, pluginOptions); };
 	int x264Encoder_getPassCount(void) { return encoder.getPassCount(); }
@@ -89,7 +89,7 @@ int x264Encoder::isConfigurable(void)
 	return (_uiType == ADM_VIDENC_UI_GTK || _uiType == ADM_VIDENC_UI_QT);
 }
 
-int x264Encoder::configure(vidEncVideoProperties *properties)
+int x264Encoder::configure(vidEncConfigParameters *configParameters, vidEncVideoProperties *properties)
 {
 	if (_loader == NULL)
 	{
@@ -117,7 +117,7 @@ int x264Encoder::configure(vidEncVideoProperties *properties)
 	}
 
 	if (_loader->isAvailable())
-		return _loader->showX264ConfigDialog(properties, &_encodeOptions, &_options);
+		return _loader->showX264ConfigDialog(configParameters, properties, &_encodeOptions, &_options);
 	else
 		return 0;
 }

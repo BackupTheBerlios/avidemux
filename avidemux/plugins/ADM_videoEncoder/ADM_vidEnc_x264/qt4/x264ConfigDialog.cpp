@@ -27,7 +27,8 @@
 #include "DIA_coreToolkit.h"
 #include "DIA_fileSel.h"
 
-x264ConfigDialog::x264ConfigDialog(vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options)
+x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options) :
+	QDialog((QWidget*)configParameters->parent, Qt::Dialog)
 {
 	static const int _predefinedARs[aspectRatioCount][2] = {{16, 15}, {64, 45}, {8, 9}, {32, 27}};
 
@@ -590,9 +591,9 @@ void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *o
 	options->setFullRangeSamples(ui.fullRangeSamplesCheckBox->isChecked());
 }
 
-extern "C" int showX264ConfigDialog(vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options)
+extern "C" int showX264ConfigDialog(vidEncConfigParameters *configParameters, vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options)
 {
-	x264ConfigDialog dialog(properties, encodeOptions, options);
+	x264ConfigDialog dialog(configParameters, properties, encodeOptions, options);
 
 	if (dialog.exec() == QDialog::Accepted)
 	{

@@ -40,3 +40,9 @@ void loadPlugins(void)
 	loadVideoEncoderPlugins(ADM_VIDENC_UI_CLI, pluginDir);
 	delete [] pluginDir;
 }
+
+void getMainWindowHandles(int *handle, int *nativeHandle)
+{
+	*handle = 0;
+	*nativeHandle = 0;
+}

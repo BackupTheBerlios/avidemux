@@ -74,9 +74,9 @@ int vidEncIsConfigurable(int encoderId)
 	return x264Encoder_isConfigurable();
 }
 
-int vidEncConfigure(int encoderId, vidEncVideoProperties *properties)
+int vidEncConfigure(int encoderId, vidEncConfigParameters *configParameters, vidEncVideoProperties *properties)
 {
-	return x264Encoder_configure(properties);
+	return x264Encoder_configure(configParameters, properties);
 }
 
 int vidEncGetOptions(int encoderId, vidEncOptions *encodeOptions, char *pluginOptions, int bufferSize)

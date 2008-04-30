@@ -1,11 +1,17 @@
 #include <stdio.h>
-
 #include <QApplication>
 #include <QtCore>
+#include <QtGui>
+
+#ifdef __APPLE__
+#include <Carbon/Carbon.h>
+#endif
 
 #include "ADM_inttype.h"
 #include "ADM_files.h"
 #include "ADM_encoder/ADM_pluginLoad.h"
+
+extern QWidget *QuiMainWindows;
 
 static QTranslator qtTranslator;
 static QTranslator avidemuxTranslator;
@@ -67,4 +73,15 @@ void loadPlugins(void)
 
 	loadVideoEncoderPlugins(ADM_VIDENC_UI_QT, pluginDir);
 	delete [] pluginDir;
+}
+
+void getMainWindowHandles(int *handle, int *nativeHandle)
+{
+	*handle = (int)QuiMainWindows;
+
+#if defined(__APPLE__)
+	*nativeHandle = (int)HIViewGetWindow(HIViewRef(QuiMainWindows->winId()));
+#else
+	*nativeHandle = (int)QuiMainWindows->winId();
+#endif
 }

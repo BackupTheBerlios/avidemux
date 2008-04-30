@@ -62,7 +62,7 @@ typedef enum
 
 static int _lastBitrate, _lastVideoSize;
 
-extern "C" int showX264ConfigDialog(vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options)
+extern "C" int showX264ConfigDialog(vidEncConfigParameters *configParameters, vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options)
 {
 	_lastBitrate = 1500;
 	_lastVideoSize = 700;
@@ -70,6 +70,7 @@ extern "C" int showX264ConfigDialog(vidEncVideoProperties *properties, vidEncOpt
 	GtkWidget *dialog = create_dialog1();
 
 	gtk_window_set_modal(GTK_WINDOW(dialog), 1);
+	gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(configParameters->parent));
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), WID(buttonResetDaults), ACTION_LOAD_DEFAULT);
 
 #if X264_BUILD >= 58

@@ -38,6 +38,7 @@ extern struct COMPRES_PARAMS *AllVideoCodec;
 extern int AllVideoCodecCount;
 extern uint8_t DIA_videoCodec(int *codecIndex);
 extern void UI_setVideoCodec(int i);
+extern void getMainWindowHandles(int *handle, int *nativeHandle);
 
 // Some static stuff
 void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t param, uint32_t extraConf, uint8_t *extraData);
@@ -455,6 +456,7 @@ void videoCodecConfigureUI(int codecIndex)
 		ADM_vidEnc_plugin *plugin = getVideoEncoderPlugin(param->extra_param);
 		vidEncOptions encodeOptions;
 		vidEncVideoProperties properties;
+		vidEncConfigParameters configParameters;
 
 		memset(&properties, 0, sizeof(vidEncVideoProperties));
 		properties.structSize = sizeof(vidEncVideoProperties);
@@ -472,8 +474,11 @@ void videoCodecConfigureUI(int codecIndex)
 			properties.fps1000 = info.fps1000;
 		}
 
+		configParameters.structSize = sizeof(vidEncConfigParameters);
+		getMainWindowHandles(&configParameters.parent, &configParameters.parentNative);
+
 		if (plugin->isConfigurable(plugin->encoderId))
-			if (plugin->configure(plugin->encoderId, &properties))
+			if (plugin->configure(plugin->encoderId, &configParameters, &properties))
 			{
 				int length = plugin->getOptions(plugin->encoderId, NULL, NULL, 0);
 				char *pluginOptions = new char[length + 1];

@@ -84,6 +84,13 @@ typedef struct
 	int extraDataSize;
 } vidEncPassParameters;
 
+typedef struct
+{
+	int structSize;
+	int parent;
+	int parentNative;
+} vidEncConfigParameters;
+
 int vidEncGetEncoders(int uiType, int **encoderIds);
 const char* vidEncGetEncoderName(int encoderId);
 const char* vidEncGetEncoderType(int encoderId);
@@ -94,7 +101,7 @@ void vidEncGetEncoderVersion(int encoderId, int *major, int *minor, int *patch);
 const char* vidEncGetEncoderGuid(int encoderId);
 
 int vidEncIsConfigurable(int encoderId);
-int vidEncConfigure(int encoderId, vidEncVideoProperties *properties);
+int vidEncConfigure(int encoderId, vidEncConfigParameters *configParameters, vidEncVideoProperties *properties);
 int vidEncGetOptions(int encoderId, vidEncOptions *encodeOptions, char *pluginOptions, int bufferSize);
 int vidEncSetOptions(int encoderId, vidEncOptions *encodeOptions, char *pluginOptions);
 

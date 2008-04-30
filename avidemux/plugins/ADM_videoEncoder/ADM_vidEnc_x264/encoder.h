@@ -70,7 +70,7 @@
 		~x264Encoder(void);
 		void setUiType(int uiType);
 		int isConfigurable(void);
-		int configure(vidEncVideoProperties *properties);
+		int configure(vidEncConfigParameters *configParameters, vidEncVideoProperties *properties);
 		int getOptions(vidEncOptions *encodeOptions, char *pluginOptions, int bufferSize);
 		int setOptions(vidEncOptions *encodeOptions, char *pluginOptions);
 		int getCurrentPass(void);
@@ -84,7 +84,7 @@
 #else
 	void *encoders_getPointer(int uiType);
 	int x264Encoder_isConfigurable(void);
-	int x264Encoder_configure(vidEncVideoProperties *properties);
+	int x264Encoder_configure(vidEncConfigParameters *configParameters, vidEncVideoProperties *properties);
 	int x264Encoder_getOptions(vidEncOptions *encodeOptions, char *pluginOptions, int bufferSize);
 	int x264Encoder_setOptions(vidEncOptions *encodeOptions, char *pluginOptions);
 	int x264Encoder_getPassCount(void);

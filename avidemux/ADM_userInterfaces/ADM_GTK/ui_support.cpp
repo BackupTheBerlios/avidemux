@@ -1,10 +1,20 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
 
+#ifdef __WIN32
+#include <gdk/gdkwin32.h>
+#elif defined(__APPLE__)
+extern "C" int getMainNSWindow(void);
+#else
+#include <gdk/gdkx.h>
+#endif
+
 #include "config.h"
 #include "ADM_inttype.h"
 #include "ADM_files.h"
 #include "ADM_encoder/ADM_pluginLoad.h"
+
+extern GtkWidget *guiRootWindow;
 
 #ifdef HAVE_GETTEXT
 #include <libintl.h>
@@ -40,4 +50,17 @@ void loadPlugins(void)
 
 	loadVideoEncoderPlugins(ADM_VIDENC_UI_GTK, pluginDir);
 	delete [] pluginDir;
+}
+
+void getMainWindowHandles(int *handle, int *nativeHandle)
+{
+	*handle = (int)guiRootWindow;
+
+#ifdef __WIN32
+	*nativeHandle = (int)guiRootWindow->window;
+#elif defined(__APPLE__)
+	*nativeHandle = (int)getMainNSWindow();
+#else
+	*nativeHandle = (int)guiRootWindow->window;
+#endif
 }
