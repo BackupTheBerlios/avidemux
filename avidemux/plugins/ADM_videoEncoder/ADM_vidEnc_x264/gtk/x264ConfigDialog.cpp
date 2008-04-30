@@ -23,7 +23,7 @@
 #include <libintl.h>
 #define _(x) gettext(x)
 #else
-#define _(x) #x
+#define _(x) x
 #endif
 
 #include "ADM_inttype.h"
@@ -117,7 +117,7 @@ extern "C" int showX264ConfigDialog(vidEncVideoProperties *properties, vidEncOpt
 	if (reply == GTK_RESPONSE_OK)
 	{
 		if (getCurrentEncodeMode(dialog) == ADM_VIDENC_MODE_CQP)
-			encodeOptions->encodeModeParameter = gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonQuantizer)));
+			encodeOptions->encodeModeParameter = (int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonQuantizer)));
 		else
 		{
 			char *str = gtk_editable_get_chars(GTK_EDITABLE(WID(entryTarget)), 0, -1);
@@ -223,10 +223,10 @@ int signalReceiver(GtkObject* object, gpointer user_data)
 		switch (modeIndex)
 		{
 			case 0:
-				encodeModeParameter = gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonQuantizer)));
+				encodeModeParameter = (int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonQuantizer)));
 				break;
 			case 1:
-				encodeModeParameter = gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonQuantizer)));
+				encodeModeParameter = (int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonQuantizer)));
 				break;
 			case 2:
 				encodeModeParameter = _lastBitrate;
@@ -343,28 +343,28 @@ void saveOptions(GtkWidget *dialog, x264Options *options)
 	options->setMixedReferences(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(WID(checkbuttonMixedRefs))));
 	options->setCabac(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(WID(checkbuttonCABAC))));
 
-	options->setTrellis(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonTrellis))));
-	options->setNoiseReduction(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonNoiseReduction))));
+	options->setTrellis((unsigned int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonTrellis))));
+	options->setNoiseReduction((unsigned int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonNoiseReduction))));
 
 	options->setLoopFilter(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(WID(checkbuttonDeblockingFilter))));
 	options->setChromaMotionEstimation(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(WID(checkbuttonChromaME))));
 
 	options->setQuantiserCurveCompression((float)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonBitrateVariability))) / 100);
-	options->setQuantiserMinimum(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonMinQp))));
-	options->setQuantiserMaximum(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonMaxQp))));
-	options->setQuantiserStep(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonQpStep))));
-	options->setScenecutThreshold(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonSceneCut))));
-	options->setGopMinimumSize(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonMinIdr))));
-	options->setGopMaximumSize(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonMaxIdr))));
-	options->setVbvMaximumBitrate(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonvbv_max_bitrate))));
-	options->setVbvBufferSize(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonvbv_buffer_size))));
+	options->setQuantiserMinimum((unsigned int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonMinQp))));
+	options->setQuantiserMaximum((unsigned int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonMaxQp))));
+	options->setQuantiserStep((unsigned int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonQpStep))));
+	options->setScenecutThreshold((unsigned int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonSceneCut))));
+	options->setGopMinimumSize((unsigned int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonMinIdr))));
+	options->setGopMaximumSize((unsigned int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonMaxIdr))));
+	options->setVbvMaximumBitrate((unsigned int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonvbv_max_bitrate))));
+	options->setVbvBufferSize((unsigned int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonvbv_buffer_size))));
 	options->setVbvInitialOccupancy((float)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonvbv_buffer_init))) / 100);
-	options->setReferenceFrames(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonMaxRefFrames))));
-	options->setBFrames(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonMaxBFrame))));
-	options->setBFrameBias(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonBias))));
-	options->setLoopFilterAlphaC0(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonStrength))));
-	options->setLoopFilterBeta(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonThreshold))));
-	options->setMotionVectorSearchRange(gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonRange))));
+	options->setReferenceFrames((unsigned int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonMaxRefFrames))));
+	options->setBFrames((unsigned int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonMaxBFrame))));
+	options->setBFrameBias((int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonBias))));
+	options->setLoopFilterAlphaC0((int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonStrength))));
+	options->setLoopFilterBeta((int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonThreshold))));
+	options->setMotionVectorSearchRange((unsigned int)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonRange))));
 
 	options->setMotionEstimationMethod(gtk_combo_box_get_active(GTK_COMBO_BOX(WID(comboboxMethod))));
 	options->setDirectPredictionMode(gtk_combo_box_get_active(GTK_COMBO_BOX(WID(comboboxDirectMode))));
@@ -1754,12 +1754,10 @@ create_dialog1 (void)
   buttonResetDaults = gtk_button_new_with_mnemonic (_("_Defaults"));
   gtk_widget_show (buttonResetDaults);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), buttonResetDaults, 0);
-  GTK_WIDGET_SET_FLAGS (buttonResetDaults, GTK_CAN_DEFAULT);
 
   cancelbutton1 = gtk_button_new_from_stock ("gtk-cancel");
   gtk_widget_show (cancelbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), cancelbutton1, GTK_RESPONSE_CANCEL);
-  GTK_WIDGET_SET_FLAGS (cancelbutton1, GTK_CAN_DEFAULT);
 
   okbutton1 = gtk_button_new_from_stock ("gtk-ok");
   gtk_widget_show (okbutton1);
@@ -1952,6 +1950,6 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, okbutton1, "okbutton1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, tooltips, "tooltips");
 
-  gtk_widget_grab_default (comboboxDirectMode);
+  gtk_widget_grab_default (okbutton1);
   return dialog1;
 }

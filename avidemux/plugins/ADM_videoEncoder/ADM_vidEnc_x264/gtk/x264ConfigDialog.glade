@@ -33,7 +33,6 @@
 	  <child>
 	    <widget class="GtkButton" id="buttonResetDaults">
 	      <property name="visible">True</property>
-	      <property name="can_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="label" translatable="yes">_Defaults</property>
 	      <property name="use_underline">True</property>
@@ -46,7 +45,6 @@
 	  <child>
 	    <widget class="GtkButton" id="cancelbutton1">
 	      <property name="visible">True</property>
-	      <property name="can_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="label">gtk-cancel</property>
 	      <property name="use_stock">True</property>
@@ -60,6 +58,7 @@
 	    <widget class="GtkButton" id="okbutton1">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
+	      <property name="has_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="label">gtk-ok</property>
 	      <property name="use_stock">True</property>
@@ -1883,7 +1882,6 @@ Exhaustive Search</property>
 				  <child>
 				    <widget class="GtkComboBox" id="comboboxDirectMode">
 				      <property name="visible">True</property>
-				      <property name="has_default">True</property>
 				      <property name="items" translatable="yes">None
 Spatial
 Temporal
