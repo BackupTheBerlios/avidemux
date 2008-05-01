@@ -17,111 +17,61 @@ Indexer progress dialog
  ***************************************************************************/
 #include <math.h>
 
-#include <QtCore/QVariant>
-#include <QtGui/QAction>
 #include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QDialog>
-#include <QtGui/QLabel>
-#include <QtGui/QProgressBar>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QWidget>
 
+#include "T_index_pg.h"
 #include "ADM_default.h"
-
-
 #include "ADM_videoFilter.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_encoder/adm_encoder.h"
 #include "DIA_idx_pg.h"
 #include "ADM_video/ADM_vidMisc.h"
-#include "ADM_video/ADM_vidMisc.h"
+
 extern void UI_purge( void );
 
-class Ui_iDialog
+void Ui_iDialog::setupUi(QDialog *Dialog)
 {
-public:
-    QWidget *verticalLayout;
-    QVBoxLayout *vboxLayout;
-    QLabel *labelTimeLeft;
-    QLabel *labelImages;
-    QProgressBar *progressBar;
+	Dialog->setObjectName(QString::fromUtf8("Dialog"));
+	verticalLayout = new QWidget(Dialog);
+	verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+	verticalLayout->setGeometry(QRect(9, 9, 215, 89));
+	vboxLayout = new QVBoxLayout(verticalLayout);
+	vboxLayout->setSpacing(6);
+	vboxLayout->setMargin(0);
+	vboxLayout->setObjectName(QString::fromUtf8("vboxLayout"));
+	labelTimeLeft = new QLabel(verticalLayout);
+	labelTimeLeft->setObjectName(QString::fromUtf8("labelTimeLeft"));
+	vboxLayout->addWidget(labelTimeLeft);
 
-    void setupUi(QDialog *Dialog)
-    {
-    Dialog->setObjectName(QString::fromUtf8("Dialog"));
-    verticalLayout = new QWidget(Dialog);
-    verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-    verticalLayout->setGeometry(QRect(9, 9, 215, 89));
-    vboxLayout = new QVBoxLayout(verticalLayout);
-    vboxLayout->setSpacing(6);
-    vboxLayout->setMargin(0);
-    vboxLayout->setObjectName(QString::fromUtf8("vboxLayout"));
-    labelTimeLeft = new QLabel(verticalLayout);
-    labelTimeLeft->setObjectName(QString::fromUtf8("labelTimeLeft"));
-    vboxLayout->addWidget(labelTimeLeft);
-    
-    labelImages = new QLabel(verticalLayout);
-    labelImages->setObjectName(QString::fromUtf8("labelImages"));
-    vboxLayout->addWidget(labelImages);
+	labelImages = new QLabel(verticalLayout);
+	labelImages->setObjectName(QString::fromUtf8("labelImages"));
+	vboxLayout->addWidget(labelImages);
 
-    progressBar = new QProgressBar(verticalLayout);
-    progressBar->setObjectName(QString::fromUtf8("progressBar"));
-    progressBar->setValue(0);
-    progressBar->setOrientation(Qt::Horizontal);
+	progressBar = new QProgressBar(verticalLayout);
+	progressBar->setObjectName(QString::fromUtf8("progressBar"));
+	progressBar->setValue(0);
+	progressBar->setOrientation(Qt::Horizontal);
 
-    vboxLayout->addWidget(progressBar);
+	vboxLayout->addWidget(progressBar);
 
+	QSize size(236, 111);
+	size = size.expandedTo(Dialog->minimumSizeHint());
+	Dialog->resize(size);
 
-    retranslateUi(Dialog);
+	QMetaObject::connectSlotsByName(Dialog);
+}
 
-    QSize size(236, 111);
-    size = size.expandedTo(Dialog->minimumSizeHint());
-    Dialog->resize(size);
+void Ui_iDialog::retranslateUi(QDialog *Dialog)
+{
+	Dialog->setWindowTitle(QApplication::translate("Dialog", "Indexing", 0, QApplication::UnicodeUTF8));
+	labelTimeLeft->setText(QApplication::translate("Dialog", "Time Left : Infinity", 0, QApplication::UnicodeUTF8));
+	labelImages->setText(QApplication::translate("Dialog", "# Images :", 0, QApplication::UnicodeUTF8));
 
+	Q_UNUSED(Dialog);
+}
 
-    QMetaObject::connectSlotsByName(Dialog);
-    } // setupUi
-
-    void retranslateUi(QDialog *Dialog)
-    {
-    Dialog->setWindowTitle(QApplication::translate("Dialog", "Indexing", 0, QApplication::UnicodeUTF8));
-    labelTimeLeft->setText(QApplication::translate("Dialog", "Time Left : Infinity", 0, QApplication::UnicodeUTF8));
-    labelImages->setText(QApplication::translate("Dialog", "# Images :", 0, QApplication::UnicodeUTF8));
-    
-    Q_UNUSED(Dialog);
-    } // retranslateUi
-
-};
-
-namespace Ui {
-    class Dialog: public Ui_iDialog {};
-} // namespace Ui
-
-
-
-class Ui_indexingDialog : public QDialog
- {
-     Q_OBJECT
- protected : 
-    int lock;
-    
- public:
-   int abted;
-   Ui_iDialog ui;
-     Ui_indexingDialog(const char *name);
-     ~Ui_indexingDialog();
-    void setTime(const char *f);
-    void setImage(const char *f);
-    void setETA(const char *f);
-    void setPercent(float f);
- public slots:
- private slots:
-
- private:
-     
- };
 static Ui_indexingDialog *dialog=NULL; 
+
 #if 0
 static gint on_destroy_abort(GtkObject * object, gpointer user_data)
 {

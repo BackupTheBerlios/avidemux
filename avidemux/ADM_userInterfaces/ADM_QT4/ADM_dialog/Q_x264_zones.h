@@ -1,3 +1,6 @@
+#ifndef Q_x264_zones_h
+#define Q_x264_zones_h
+
 #include "ui_x264_zones.h"
 
 class x264ZonesDialog : public QDialog
@@ -9,7 +12,5 @@ private:
 
 public:
 	x264ZonesDialog();
-
-private slots:
-
 };
+#endif	// Q_x264_zones_h

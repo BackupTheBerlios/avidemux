@@ -20,47 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 
-
-
-#define Ui_Dialog Ui_asharpDialog
-#include "ui_asharp.h"
-#undef Ui_Dialog
-
-#include "ADM_default.h"
-
-#include "ADM_image.h"
-#include "ADM_videoFilter.h"
-
-#include "DIA_flyDialog.h"
-#include "DIA_flyDialogQt4.h"
-#include "ADM_videoFilter/ADM_vidASharp_param.h"
-#include "DIA_flyAsharp.h"
+#include "Q_asharp.h"
 
 //
 //	Video is in YV12 Colorspace
 //
 //
-class Ui_asharpWindow : public QDialog
- {
-     Q_OBJECT
- protected : 
-    int lock;
- public:
-     flyASharp *myCrop;
-     ADM_QCanvas *canvas;
-     Ui_asharpWindow(ASHARP_PARAM *param,AVDMGenericVideoStream *in);
-     ~Ui_asharpWindow();
-     Ui_asharpDialog ui;
- public slots:
-      void gather(ASHARP_PARAM *param);
-      //void update(int i);
- private slots:
-   void sliderUpdate(int foo);
-   void valueChanged(int foo);
-
- private:
-     
- };
   Ui_asharpWindow::Ui_asharpWindow(ASHARP_PARAM *param,AVDMGenericVideoStream *in)
   {
     uint32_t width,height;

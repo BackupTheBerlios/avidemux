@@ -13,10 +13,7 @@
  ***************************************************************************/
 #include <math.h>
 
-#define Ui_Dialog Ui_encodingDialog
-#include "ui_encoding.h"
-#undef Ui_Dialog 
-
+#include "Q_encoding.h"
 #include "prefs.h"
 #include "DIA_working.h"
 #include "DIA_encoding.h"
@@ -26,55 +23,8 @@
 
 extern void UI_purge(void);
 static int stopReq=0;
-class encodingWindow : public QDialog
-{
-     Q_OBJECT
 
- public:
-     encodingWindow();
-     Ui_encodingDialog ui;
- public slots:
-	void buttonPressed(void ) { printf("StopReq\n");stopReq=1;}
-
-	void priorityChanged(int priorityLevel)
-	{
-	#ifndef __WIN32
-		if (getuid() != 0)
-		{
-			ui.comboBoxPriority->disconnect(SIGNAL(currentIndexChanged(int)));
-			ui.comboBoxPriority->setCurrentIndex(2);
-			connect(ui.checkBoxShutdown, SIGNAL(currentIndexChanged(int)), this, SLOT(priorityChanged(int)));
-
-			GUI_Error_HIG(QT_TR_NOOP("Privileges Required"), QT_TR_NOOP( "Root privileges are required to perform this operation."));
-
-			return;
-		}
-	#endif
-
-		setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
-	}
-
-	void shutdownChanged(int state)
-	{
-	#ifndef __WIN32
-		if (getuid() != 0)
-		{
-			ui.checkBoxShutdown->disconnect(SIGNAL(stateChanged(int)));
-			ui.checkBoxShutdown->setCheckState(Qt::Unchecked);
-			connect(ui.checkBoxShutdown, SIGNAL(stateChanged(int)), this, SLOT(shutdownChanged(int)));
-
-			GUI_Error_HIG(QT_TR_NOOP("Privileges Required"), QT_TR_NOOP( "Root privileges are required to perform this operation."));
-		}
-	#endif
-	}
-
-
- private slots:
- private:
-};
-
-
-encodingWindow::encodingWindow()     : QDialog()
+encodingWindow::encodingWindow() : QDialog()
  {
 	ui.setupUi(this);
 
@@ -88,7 +38,7 @@ encodingWindow::encodingWindow()     : QDialog()
 #endif
 
 	connect(ui.checkBoxShutdown, SIGNAL(stateChanged(int)), this, SLOT(shutdownChanged(int)));
-	connect( (ui.pushButton),SIGNAL(pressed()),this,SLOT(buttonPressed()));
+	connect(ui.pushButton, SIGNAL(pressed()), this, SLOT(buttonPressed()));
 	connect(ui.comboBoxPriority, SIGNAL(currentIndexChanged(int)), this, SLOT(priorityChanged(int)));
 
 	// set priority
@@ -106,6 +56,45 @@ encodingWindow::encodingWindow()     : QDialog()
 	ui.comboBoxPriority->setCurrentIndex(priority);
 #endif
  }
+
+void encodingWindow::buttonPressed(void)
+{
+	printf("StopReq\n");
+	stopReq=1;
+}
+
+void encodingWindow::priorityChanged(int priorityLevel)
+{
+#ifndef __WIN32
+	if (getuid() != 0)
+	{
+		ui.comboBoxPriority->disconnect(SIGNAL(currentIndexChanged(int)));
+		ui.comboBoxPriority->setCurrentIndex(2);
+		connect(ui.checkBoxShutdown, SIGNAL(currentIndexChanged(int)), this, SLOT(priorityChanged(int)));
+
+		GUI_Error_HIG(QT_TR_NOOP("Privileges Required"), QT_TR_NOOP( "Root privileges are required to perform this operation."));
+
+		return;
+	}
+#endif
+
+	setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
+}
+
+void encodingWindow::shutdownChanged(int state)
+{
+#ifndef __WIN32
+	if (getuid() != 0)
+	{
+		ui.checkBoxShutdown->disconnect(SIGNAL(stateChanged(int)));
+		ui.checkBoxShutdown->setCheckState(Qt::Unchecked);
+		connect(ui.checkBoxShutdown, SIGNAL(stateChanged(int)), this, SLOT(shutdownChanged(int)));
+
+		GUI_Error_HIG(QT_TR_NOOP("Privileges Required"), QT_TR_NOOP( "Root privileges are required to perform this operation."));
+	}
+#endif
+}
+
 //*******************************************
 #define WIDGET(x) (window->ui.x)
 #define WRITEM(x,y) window->ui.x->setText(y)

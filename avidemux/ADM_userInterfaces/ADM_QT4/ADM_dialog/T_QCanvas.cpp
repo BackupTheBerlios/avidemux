@@ -12,59 +12,43 @@
 *                                                                         *
 ***************************************************************************///
 
-#include <QtGui/QGraphicsView>
-#include <QtGui/QSlider>
+#include <QtGui/QPainter>
 
 #include "ADM_default.h"
-
-class  ADM_QCanvas : public QWidget
-{
-     Q_OBJECT
-     signals:
-        
-        
-   public slots:
-   public :
-         uint8_t *dataBuffer;
-  protected:
-         uint32_t _w,_h;
-  public:
-        ADM_QCanvas(QWidget *z,uint32_t w,uint32_t h)  ;
-        ~ADM_QCanvas() ;
-        void paintEvent(QPaintEvent *ev);
-        void changeSize(uint32_t w,uint32_t h);
-};
+#include "DIA_flyDialogQt4.h"
 
 void ADM_QCanvas::changeSize(uint32_t w,uint32_t h)
 {
 	_w=w;
 	_h=h;
 	dataBuffer=NULL;
-    resize(w,h);
+	resize(w,h);
 }
 
 ADM_QCanvas::ADM_QCanvas(QWidget *z,uint32_t w,uint32_t h) : QWidget(z) 
 {
-        _w=w;
-        _h=h;
-        dataBuffer=NULL;
-        resize(w,h);
+	_w=w;
+	_h=h;
+	dataBuffer=NULL;
+	resize(w,h);
 }
+
 ADM_QCanvas::~ADM_QCanvas() 
 {
 }
+
 /**
     \fn paintEvent( QPaintEvent *ev))
     \brief Repaint our "video" widget, ignore when accelRender is on
 */
 void ADM_QCanvas::paintEvent(QPaintEvent *ev)
 {
-    if(!dataBuffer)
-      return ;
+	if(!dataBuffer)
+		return ;
 
-    QImage image(dataBuffer,_w,_h,QImage::Format_RGB32);
-      QPainter painter(this);
-      painter.drawImage(QPoint(0,0),image);
-      painter.end();
+	QImage image(dataBuffer,_w,_h,QImage::Format_RGB32);
+	QPainter painter(this);
+	painter.drawImage(QPoint(0,0),image);
+	painter.end();
 }
 //EOF

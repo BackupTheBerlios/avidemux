@@ -13,8 +13,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QDialog>
-#include <QMessageBox>
+#include <QtGui/QDialog>
+#include <QtGui/QMessageBox>
 #include "DIA_coreToolkit.h"
 #include "DIA_coreUI_internal.h"
 #include "ADM_default.h"

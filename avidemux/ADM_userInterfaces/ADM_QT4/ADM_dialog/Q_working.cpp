@@ -11,29 +11,14 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#define Ui_Dialog Ui_workDialog
-#include "ui_working.h"
-#undef Ui_Dialog 
-#include "math.h"
+#include <math.h>
+
+#include "Q_working.h"
 #include "ADM_default.h"
 #include "ADM_video/ADM_vidMisc.h"
-
 #include "DIA_working.h"
-#include "ADM_video/ADM_vidMisc.h"
+
 extern void UI_purge(void);
-
-class workWindow : public QDialog
-{
-     Q_OBJECT
-
- public:
-     workWindow();
-     Ui_workDialog ui;
- public slots:
- private slots:
- private:
-};
-
 
 workWindow::workWindow()     : QDialog()
  {

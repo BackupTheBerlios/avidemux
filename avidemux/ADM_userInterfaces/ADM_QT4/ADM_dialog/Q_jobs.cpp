@@ -2,79 +2,21 @@
     Jobs dialog
     (c) Mean 2007
 */
-#include "ui_jobs.h"
 
-#include "ADM_default.h"
-
-
+#include "Q_jobs.h"
 #include "DIA_coreToolkit.h"
 
-static void             updateStatus(void);
+static void updateStatus(void);
 extern bool parseECMAScript(const char *name);
 static const char *StringStatus[]={QT_TR_NOOP("Ready"),QT_TR_NOOP("Succeeded"),QT_TR_NOOP("Failed"),QT_TR_NOOP("Deleted"),QT_TR_NOOP("Running")};
 
-
-typedef enum 
+ADM_Job_Descriptor::ADM_Job_Descriptor(void) 
 {
-        STATUS_READY=0,
-        STATUS_SUCCEED,
-        STATUS_FAILED,
-        STATUS_DELETED,
-        STATUS_RUNNING
-}JOB_STATUS;
+	status = STATUS_READY;
+	memset(&startDate, 0, sizeof(startDate));
+	memset(&endDate, 0, sizeof(startDate));
+}
 
-
-class ADM_Job_Descriptor
-{
-  public:
-  JOB_STATUS  status;
-  ADM_date    startDate;
-  ADM_date    endDate;
-  ADM_Job_Descriptor(void) 
-  {
-    status=STATUS_READY;
-    memset(&startDate,0,sizeof(startDate));
-    memset(&endDate,0,sizeof(startDate));
-  }
-  
-};
-
-typedef enum 
-{
-        COMMAND_DELETE_ALL=1,
-        COMMAND_DELETE=2,
-        COMMAND_RUN_ALL=3,
-        COMMAND_RUN=4
-};
-
-
-
-
-
-class jobsWindow : public QDialog
- {
-     Q_OBJECT
- protected : 
-        uint32_t        _nbJobs;
-        char            **_jobsName;
-        ADM_Job_Descriptor  *desc;
-        uint8_t             updateRows(void);
- public:
-                    jobsWindow(uint32_t n,char **j);
-                    ~jobsWindow();
-     Ui_Jobs        ui;
- public slots:
-      //void gather(void);
-      int RunOne(bool b);
-      int RunAll(bool b);
-      int DeleteOne(bool b);
-      int DeleteAll(bool b);
- private slots:
-   
-
- private:
-     
- };
  /**
           \fn jobsWindow
  */

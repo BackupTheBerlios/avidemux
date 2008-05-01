@@ -1,3 +1,6 @@
+#ifndef Q_x264_matrix_h
+#define Q_x264_matrix_h
+
 #include "ui_x264_matrix.h"
 
 class x264CustomMatrixDialog : public QDialog
@@ -9,7 +12,7 @@ private:
 
 	void setIntra4x4Luma(const uint8_t intra4x4Luma[]);
 	void setIntraChroma(const uint8_t intraChroma[]);
-	void setInterLuma(const uint8_t interLuma[]);
+	void setInter4x4Luma(const uint8_t inter4x4Luma[]);
 	void setInterChroma(const uint8_t interChroma[]);
 	void setIntra8x8Luma(const uint8_t intra8x8Luma[]);
 	void setInter8x8Luma(const uint8_t inter8x8Luma[]);
@@ -23,3 +26,4 @@ public:
 private slots:
 	void loadFileButton_pressed();
 };
+#endif	// Q_x264_matrix_h

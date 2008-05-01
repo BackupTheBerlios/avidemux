@@ -17,37 +17,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-#include "ui_x264_matrix.h"
+#include "Q_x264_matrix.h"
 #include "ADM_default.h"
 #include "DIA_fileSel.h"
 #include "DIA_coreToolkit.h"
 
 extern int x264_cqm_parse_file(const char *filename, uint8_t* cqm_4iy, uint8_t* cqm_4ic, uint8_t* cqm_4py, uint8_t* cqm_4pc, uint8_t* cqm_8iy, uint8_t* cqm_8py);
-
-class x264CustomMatrixDialog : public QDialog
-{
-	Q_OBJECT
-
-private:
-	Ui_x264CustomMatrixDialog ui;
-
-	void setIntra4x4Luma(const uint8_t intra4x4Luma[]);
-	void setIntraChroma(const uint8_t intraChroma[]);
-	void setInter4x4Luma(const uint8_t inter4x4Luma[]);
-	void setInterChroma(const uint8_t interChroma[]);
-	void setIntra8x8Luma(const uint8_t intra8x8Luma[]);
-	void setInter8x8Luma(const uint8_t inter8x8Luma[]);
-
-public:
-	x264CustomMatrixDialog(const uint8_t* intra4x4Luma, const uint8_t* intraChroma, const uint8_t* inter4x4Luma, 
-		const uint8_t* interChroma, const uint8_t* intra8x8Luma, const uint8_t* inter8x8Luma);
-	void getMatrix(uint8_t* intra4x4Luma, uint8_t* intra4x4Chroma, uint8_t* inter4x4Luma, 
-		uint8_t* inter4x4Chroma, uint8_t* intra8x8Luma, uint8_t* inter8x8Luma);
-
-private slots:
-	void loadFileButton_pressed();
-};
 
 x264CustomMatrixDialog::x264CustomMatrixDialog(const uint8_t intra4x4Luma[16], const uint8_t intraChroma[16], const uint8_t inter4x4Luma[16],
 											   const uint8_t interChroma[16], const uint8_t intra8x8Luma[64], const uint8_t inter8x8Luma[64])

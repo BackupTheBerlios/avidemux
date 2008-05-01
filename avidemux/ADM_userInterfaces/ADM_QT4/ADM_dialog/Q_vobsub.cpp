@@ -16,41 +16,13 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "ui_vobsub.h"
-
-#include "ADM_default.h"
-
-
+#include "Q_vobsub.h"
 #include "DIA_fileSel.h"
-#include "ADM_image.h"
-#include "ADM_videoFilter.h"
-
-
-#include "ADM_videoFilter/ADM_vobsubinfo.h"
-#include "ADM_videoFilter/ADM_vidVobSub.h"
 
 //
 //	Video is in YV12 Colorspace
 //
 //
-class Ui_vobsubWindow : public QDialog
- {
-     Q_OBJECT
- protected :
-	 vobSubParam *param;
-	 void  		 fillLanguage(const char *file);
- public:
-     Ui_vobsubWindow(vobSubParam *param);
-     ~Ui_vobsubWindow();
-     Ui_DialogVobSub ui;
-     
-     void  gather(void);
- public slots:
- private slots:
- 		void idxSel(bool i);
- private:
-     
- };
   Ui_vobsubWindow::Ui_vobsubWindow(vobSubParam *parm)
   {
     uint32_t width,height;

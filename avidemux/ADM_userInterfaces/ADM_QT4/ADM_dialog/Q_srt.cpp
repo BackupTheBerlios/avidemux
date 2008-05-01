@@ -16,51 +16,13 @@
  *                                                                         *
  ***************************************************************************/
 
-#define Ui_Dialog Ui_srtDialog
-#include "ui_srt.h"
-#undef Ui_Dialog
-
 #include "config.h"
-#include "ADM_default.h"
-
-
-#include "ADM_image.h"
-#include "ADM_videoFilter.h"
-
-#include "DIA_flyDialog.h"
-#include "DIA_flyDialogQt4.h"
-
-//#include "ADM_video/ADM_vidFont.h"
-class ADMfont;
-#include "ADM_videoFilter/ADM_vidSRT.h"
-
-#include "DIA_flySrtPos.h"
+#include "Q_srt.h"
 
 //
 //	Video is in YV12 Colorspace
 //
 //
-class Ui_srtWindow : public QDialog
- {
-     Q_OBJECT
- protected : 
-    int lock;
- public:
-     flySrtPos *myCrop;
-     ADM_QCanvas *canvas;
-     Ui_srtWindow(SRT_POS_PARAM *param,AVDMGenericVideoStream *in);
-     ~Ui_srtWindow();
-     Ui_srtDialog ui;
- public slots:
-      void gather(SRT_POS_PARAM *param);
-      //void update(int i);
- private slots:
-   void sliderUpdate(int foo);
-   void valueChanged(int foo);
-
- private:
-     
- };
   Ui_srtWindow::Ui_srtWindow(SRT_POS_PARAM *param,AVDMGenericVideoStream *in)
   {
     uint32_t width,height;

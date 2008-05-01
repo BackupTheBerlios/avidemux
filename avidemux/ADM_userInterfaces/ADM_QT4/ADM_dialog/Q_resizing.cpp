@@ -11,44 +11,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#define Ui_Dialog Ui_resizeDialog
-#include "ui_resizing.h"
-#undef Ui_Dialog
-#include "math.h"
-#include "ADM_default.h"
+
+#include <math.h>
+
+#include "Q_resizing.h"
 
 static double aspectRatio[2][3]={
                               {1.,0.888888,1.19}, // NTSC 1:1 4:3 16:9
                               {1.,1.066667,1.43} // PAL  1:1 4:3 16:9
                             };
 #define aprintf printf
-typedef struct resParam
-{
-    uint32_t width,height;
-    uint32_t originalWidth,originalHeight;
-    uint32_t fps1000;
-    uint32_t algo;
-    uint32_t pal;
-}resParam;
-
-class resizeWindow : public QDialog
- {
-     Q_OBJECT
- protected : 
-      resParam *_param;
- public:
-     resizeWindow(resParam *param);
-     Ui_resizeDialog ui;
- public slots:
-      void gather(void);
-      void update(int i);
- private slots:
-   
-
- private:
-     
- };
-
 
 resizeWindow::resizeWindow(resParam *param)     : QDialog()
  {

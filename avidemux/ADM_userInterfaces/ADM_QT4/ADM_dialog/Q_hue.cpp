@@ -20,45 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#define Ui_Dialog Ui_hueDialog
-#include "ui_hue.h"
-#undef Ui_Dialog
-
-#include "ADM_default.h"
-
-#include "ADM_image.h"
-#include "ADM_videoFilter.h"
-
-#include "DIA_flyDialog.h"
-#include "DIA_flyDialogQt4.h"
-#include "ADM_videoFilter/ADM_vidHue.h"
-#include "DIA_flyHue.h"
+#include "Q_hue.h"
 
 //
 //	Video is in YV12 Colorspace
 //
 //
-class Ui_hueWindow : public QDialog
- {
-     Q_OBJECT
- protected : 
-    int lock;
- public:
-     flyHue *myCrop;
-     ADM_QCanvas *canvas;
-     Ui_hueWindow(Hue_Param *param,AVDMGenericVideoStream *in);
-     ~Ui_hueWindow();
-     Ui_hueDialog ui;
- public slots:
-      void gather(Hue_Param *param);
-      //void update(int i);
- private slots:
-   void sliderUpdate(int foo);
-   void valueChanged(int foo);
-
- private:
-     
- };
   Ui_hueWindow::Ui_hueWindow(Hue_Param *param,AVDMGenericVideoStream *in)
   {
     uint32_t width,height;

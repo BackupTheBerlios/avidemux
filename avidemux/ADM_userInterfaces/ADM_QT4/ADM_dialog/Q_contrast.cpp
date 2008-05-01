@@ -20,47 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#define Ui_Dialog Ui_contrastDialog
-#include "ui_contrast.h"
-#undef Ui_Dialog
-
-#include "ADM_default.h"
-
-
-#include "ADM_image.h"
-#include "ADM_videoFilter.h"
-
-
-#include "DIA_flyDialog.h"
-#include "DIA_flyDialogQt4.h"
-#include "ADM_videoFilter/ADM_vidContrast.h"
-#include "DIA_flyContrast.h"
+#include "Q_contrast.h"
 
 //
 //	Video is in YV12 Colorspace
 //
 //
-class Ui_contrastWindow : public QDialog
- {
-     Q_OBJECT
- protected : 
-    int lock;
- public:
-     flyContrast *myCrop;
-     ADM_QCanvas *canvas;
-     Ui_contrastWindow(CONTRAST_PARAM *param,AVDMGenericVideoStream *in);
-     ~Ui_contrastWindow();
-     Ui_contrastDialog ui;
- public slots:
-      void gather(CONTRAST_PARAM *param);
-      //void update(int i);
- private slots:
-   void sliderUpdate(int foo);
-   void valueChanged(int foo);
-
- private:
-     
- };
   Ui_contrastWindow::Ui_contrastWindow(CONTRAST_PARAM *param,AVDMGenericVideoStream *in)
   {
     uint32_t width,height;

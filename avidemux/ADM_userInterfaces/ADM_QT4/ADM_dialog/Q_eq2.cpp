@@ -14,46 +14,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "ui_eq2.h"
-
-#include "ADM_default.h"
-
-
-#include "ADM_image.h"
-#include "ADM_videoFilter.h"
-
-#include "ADM_videoFilter/ADM_vidEq2.h"
-
-#include "DIA_flyDialog.h"
-#include "DIA_flyDialogQt4.h"
-#include "ADM_videoFilter/ADM_vidEq2.h"
-#include "DIA_flyEq2.h"
+#include "Q_eq2.h"
 
 //
 //	Video is in YV12 Colorspace
 //
 //
-class Ui_eq2Window : public QDialog
- {
-     Q_OBJECT
- protected : 
-    int lock;
- public:
-     flyEq2 *myCrop;
-     ADM_QCanvas *canvas;
-     Ui_eq2Window(Eq2_Param *param,AVDMGenericVideoStream *in);
-     ~Ui_eq2Window();
-     Ui_DialogEq2 ui;
- public slots:
-      void gather(Eq2_Param *param);
-      //void update(int i);
- private slots:
-   void sliderUpdate(int foo);
-   void valueChanged(int foo);
-
- private:
-     
- };
   Ui_eq2Window::Ui_eq2Window(Eq2_Param *param,AVDMGenericVideoStream *in)
   {
     uint32_t width,height;
@@ -116,7 +82,7 @@ void Ui_eq2Window::valueChanged( int f )
 //************************
 uint8_t flyEq2::upload(void)
 {
-Ui_DialogEq2 *w=(Ui_DialogEq2 *)_cookie;
+Ui_eq2Dialog *w=(Ui_eq2Dialog *)_cookie;
 
 
         sliderSet(Contrast,contrast);
@@ -134,7 +100,7 @@ Ui_DialogEq2 *w=(Ui_DialogEq2 *)_cookie;
 }
 uint8_t flyEq2::download(void)
 {
-Ui_DialogEq2 *w=(Ui_DialogEq2 *)_cookie;
+	Ui_eq2Dialog *w=(Ui_eq2Dialog *)_cookie;
 
         sliderGet(Contrast,contrast);
         sliderGet(Brightness,brightness);
