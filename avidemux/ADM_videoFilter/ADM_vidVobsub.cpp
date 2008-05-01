@@ -24,7 +24,7 @@
 #include "ADM_default.h"
 #include "ADM_videoFilter.h"
 #include "DIA_fileSel.h"
-#include "ADM_colorspace/colorspace.h"
+#include "ADM_colorspace.h"
 #include "ADM_vobsubinfo.h"
 #define VOBSUB "/capture/sub/phone.sub"
 

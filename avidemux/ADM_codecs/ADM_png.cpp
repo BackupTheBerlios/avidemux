@@ -24,7 +24,7 @@
 
 #include "ADM_default.h"
 
-#include "ADM_colorspace/colorspace.h"
+//#include "ADM_colorspace/colorspace.h"
 
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_png.h"

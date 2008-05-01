@@ -41,7 +41,7 @@
 #include <QX11Info>
 #endif
 
-#include "ADM_colorspace/ADM_rgb.h"
+#include "ADM_colorspace.h"
 #include "GUI_render.h"
 #include "GUI_accelRender.h"
 #include "prefs.h"

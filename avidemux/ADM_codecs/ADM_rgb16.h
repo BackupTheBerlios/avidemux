@@ -17,7 +17,7 @@
 #ifndef ADM_RGB16_H
 #define ADM_RGB16_H
 
-#include "ADM_colorspace/ADM_rgb.h"
+#include "ADM_colorspace.h"
 
 class decoderRGB16 : decoders
 {

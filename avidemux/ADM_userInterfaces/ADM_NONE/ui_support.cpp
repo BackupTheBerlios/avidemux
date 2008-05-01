@@ -41,7 +41,7 @@ void loadPlugins(void)
 	delete [] pluginDir;
 }
 
-void getMainWindowHandles(int *handle, int *nativeHandle)
+void getMainWindowHandles(long int *handle, long int *nativeHandle)
 {
 	*handle = 0;
 	*nativeHandle = 0;

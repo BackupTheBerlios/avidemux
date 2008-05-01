@@ -26,7 +26,7 @@
 #include "DIA_fileSel.h"
 #include "ADM_image.h"
 #include "ADM_videoFilter.h"
-#include "ADM_colorspace/ADM_rgb.h"
+
 
 #include "ADM_videoFilter/ADM_vobsubinfo.h"
 #include "ADM_videoFilter/ADM_vidVobSub.h"

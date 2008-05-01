@@ -26,7 +26,7 @@
 //#include "ADM_video/ADM_vidFont.h"
 class ADMfont;
 #include "ADM_videoFilter/ADM_vidSRT.h"
-#include "ADM_colorspace/colorspace.h"
+//#include "ADM_colorspace/colorspace.h"
 /*****************************************************************/
 extern int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b);
 extern int DIA_srtPos(AVDMGenericVideoStream *source,uint32_t *size,uint32_t *position);

@@ -23,7 +23,7 @@
 
 #include "ADM_videoFilter.h"
 #include "ADM_video/ADM_vidCommonFilter.h"
-#include "ADM_colorspace/ADM_rgb.h"
+#include "ADM_colorspace.h"
 #include "DIA_factory.h"
 
 static FILTER_PARAM logoParam={4,

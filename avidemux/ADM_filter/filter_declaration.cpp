@@ -52,7 +52,6 @@ printf(  "*********************\n");
 	REGISTERX(VF_TRANSFORM, "resize",QT_TR_NOOP("Resize"),QT_TR_NOOP("Picture resizer ported from Avisynth."), VF_RESIZE,1,res_create,resize_script);
   	REGISTERX(VF_TRANSFORM, "addblack",QT_TR_NOOP("Add black borders"),QT_TR_NOOP("Add pure black border(s). Enlarges the picture."),VF_ADDBORDER,1,addBorder_create,addBorder_script);
 	REGISTERX(VF_TRANSFORM, "blacken",QT_TR_NOOP("Blacken borders"),QT_TR_NOOP("Fill borders with pure black. Doesn't alter size."),VF_BLACKEN,1,bsmear_create,bsmear_script);
-  	REGISTERX(VF_TRANSFORM, "vflip",QT_TR_NOOP("Vertical flip"),QT_TR_NOOP("Vertically flip the picture."),VF_FLIP,1,flipv_create,flipv_script);
 	REGISTERX(VF_TRANSFORM, "rotate",QT_TR_NOOP("Rotate"),QT_TR_NOOP("Rotate the picture by 90, 180 or 270 degrees."),VF_ROTATE,1,rotate_create,rotate_script);
     REGISTERX(VF_TRANSFORM, "resamplefps",QT_TR_NOOP("Resample fps"),QT_TR_NOOP("Change framerate while keeping duration."),VF_RESAMPLE_FPS,1,resamplefps_create,resamplefps_script);                
     REGISTERX(VF_TRANSFORM, "reverse",QT_TR_NOOP("Reverse"),QT_TR_NOOP("Play video backward."),VF_REVERSE,1,reverse_create,reverse_script);

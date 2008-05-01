@@ -13,7 +13,7 @@
 #include "ADM_misc.h"
 
 #include "GUI_ui.h"
-#include "ADM_colorspace/ADM_rgb.h"
+#include "ADM_colorspace.h"
 
 static ADM_OUT_FORMAT format=ADM_AVI;
 static int audioCodec=0;

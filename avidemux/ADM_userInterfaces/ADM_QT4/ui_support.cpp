@@ -75,13 +75,13 @@ void loadPlugins(void)
 	delete [] pluginDir;
 }
 
-void getMainWindowHandles(int *handle, int *nativeHandle)
+void getMainWindowHandles(long int *handle, long int *nativeHandle)
 {
-	*handle = (int)QuiMainWindows;
+	*handle = (long int)QuiMainWindows;
 
 #if defined(__APPLE__)
-	*nativeHandle = (int)HIViewGetWindow(HIViewRef(QuiMainWindows->winId()));
+	*nativeHandle = (long int)HIViewGetWindow(HIViewRef(QuiMainWindows->winId()));
 #else
-	*nativeHandle = (int)QuiMainWindows->winId();
+	*nativeHandle = (long int)QuiMainWindows->winId();
 #endif
 }

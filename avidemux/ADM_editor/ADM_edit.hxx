@@ -34,6 +34,7 @@
  #include "ADM_image.h"
  #include "../ADM_editor/ADM_edCache.h"
  #include "ADM_pp.h"
+ #include "ADM_colorspace.h"
  
 #define MAX_SEG  	100 // Should be enougth
 #define MAX_VIDEO   100
@@ -80,7 +81,7 @@ typedef struct
 {
   	vidHeader 							*_aviheader;
   	decoders							*decoder;
-        COL_Generic2YV12                                                *color;
+    COL_Generic2YV12                    *color;
 
 	uint32_t  							_audio_size;
 	uint64_t							_audio_duration; //! IN SAMPLE

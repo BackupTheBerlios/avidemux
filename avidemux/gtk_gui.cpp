@@ -47,7 +47,7 @@
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_render.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
-#include "ADM_colorspace/colorspace.h"
+
 #include "ADM_audiodevice/audio_out.h"
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_busy.h"

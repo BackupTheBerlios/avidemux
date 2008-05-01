@@ -21,7 +21,7 @@
 
 #include <math.h>
 
-#include "config.h"
+
 #include "ADM_default.h"
 
 
@@ -30,7 +30,7 @@ extern "C" {
 #include "ADM_libraries/ADM_ffmpeg/ADM_libswscale/swscale.h"
 }
 
-#include "colorspace.h"
+#include "ADM_colorspace.h"
 
 /**
 	This is unoptimized because seldom called

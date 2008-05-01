@@ -17,7 +17,9 @@
  #ifndef __VIDEO_FILTERS__
  #define  __VIDEO_FILTERS__
 
-#include "ADM_script/adm_scanner.h" // To get MAXPARAM...
+//#include "ADM_script/adm_scanner.h" // To get MAXPARAM...
+#define MAXPARAM 40
+#warning fixme MAXPARAM defined twice
 
 typedef enum
 {
@@ -72,6 +74,11 @@ public:
 					
 			{
 				tag=0;
+			}
+			FilterDescriptor() :name(NULL),filterName(NULL),description(NULL),category(VF_MAX),create(NULL),create_from_script(NULL),
+						destroy(NULL),apiVersion(0),filterVersion(0)
+			{
+				
 			}
 };   
  	

@@ -1,7 +1,7 @@
 SET(ADM_videoFilter_SRCS 
 	ADM_lavpp_deint.cpp      ADM_vidDecTelecide.cpp      ADM_vidFields.cpp           ADM_vidMcDeint.cpp
 	ADM_vidPulldown.cpp       ADM_vidSwapSmart.cpp
-	ADM_vidAddBorder.cpp     ADM_vidDeintASM.cpp         ADM_vidFlipV.cpp            ADM_vidMosaic.cpp
+	ADM_vidAddBorder.cpp     ADM_vidDeintASM.cpp         ADM_vidMosaic.cpp
 	ADM_vidResampleFPS.cpp    ADM_vidUVSwap.cpp
 	ADM_vidASS.cpp           ADM_vidDeinterlace.cpp      ADM_vidFlux.cpp             ADM_vidMPLD3D.cpp
 	ADM_vidReverse.cpp        ADM_vidVlad.cpp

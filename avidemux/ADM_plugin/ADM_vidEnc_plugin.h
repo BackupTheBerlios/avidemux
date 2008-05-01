@@ -87,8 +87,8 @@ typedef struct
 typedef struct
 {
 	int structSize;
-	int parent;
-	int parentNative;
+	long int parent;
+	long int parentNative;
 } vidEncConfigParameters;
 
 int vidEncGetEncoders(int uiType, int **encoderIds);

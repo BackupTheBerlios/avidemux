@@ -19,9 +19,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
+
 #include "ADM_default.h"
-#include "colorspace.h"
+#include "ADM_colorspace.h"
 
 extern "C" {
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/avcodec.h"

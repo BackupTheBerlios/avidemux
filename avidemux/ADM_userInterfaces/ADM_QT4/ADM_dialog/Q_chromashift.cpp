@@ -29,7 +29,7 @@
 
 #include "ADM_image.h"
 #include "ADM_videoFilter.h"
-#include "ADM_colorspace/ADM_rgb.h"
+
 #include "DIA_flyDialog.h"
 #include "DIA_flyDialogQt4.h"
 #include "ADM_videoFilter/ADM_vidChromaShift_param.h"

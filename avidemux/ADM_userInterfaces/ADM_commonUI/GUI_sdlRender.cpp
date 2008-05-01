@@ -33,8 +33,8 @@ extern "C" {
 #include "SDL_syswm.h"
 }
 
-#include "ADM_colorspace/colorspace.h"
-#include "ADM_colorspace/ADM_rgb.h"
+#include "ADM_colorspace.h"
+
 #include "GUI_render.h"
 
 #include "GUI_accelRender.h"

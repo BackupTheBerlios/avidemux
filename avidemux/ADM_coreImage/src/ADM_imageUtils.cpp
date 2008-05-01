@@ -22,7 +22,7 @@
 #include "ADM_bitstream.h"
 
 #include "DIA_coreToolkit.h"
-#include "ADM_colorspace/colorspace.h"
+
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
 #include "ADM_codecs/ADM_codec.h"

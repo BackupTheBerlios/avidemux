@@ -29,8 +29,8 @@
 class ADMfont;
 #include "ADM_videoFilter/ADM_vidSRT.h"
 
-#include "ADM_colorspace/ADM_rgb.h"
-#include "ADM_colorspace/colorspace.h"
+
+#include "ADM_colorspace.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER

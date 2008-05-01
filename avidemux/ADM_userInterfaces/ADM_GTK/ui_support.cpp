@@ -52,15 +52,15 @@ void loadPlugins(void)
 	delete [] pluginDir;
 }
 
-void getMainWindowHandles(int *handle, int *nativeHandle)
+void getMainWindowHandles(long int *handle,long int *nativeHandle)
 {
-	*handle = (int)guiRootWindow;
+	*handle = (long int)guiRootWindow;
 
 #ifdef __WIN32
-	*nativeHandle = (int)guiRootWindow->window;
+	*nativeHandle = (long int)guiRootWindow->window;
 #elif defined(__APPLE__)
-	*nativeHandle = (int)getMainNSWindow();
+	*nativeHandle = (long int)getMainNSWindow();
 #else
-	*nativeHandle = (int)guiRootWindow->window;
+	*nativeHandle = (long int)guiRootWindow->window;
 #endif
 }

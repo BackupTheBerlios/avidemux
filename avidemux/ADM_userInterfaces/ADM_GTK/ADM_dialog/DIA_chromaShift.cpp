@@ -19,7 +19,7 @@
 
 #include "ADM_image.h"
 #include "ADM_videoFilter.h"
-#include "ADM_colorspace/ADM_rgb.h"
+
 #include "ADM_assert.h"
 #include "DIA_flyDialog.h"
 #include "ADM_videoFilter/ADM_vidChromaShift_param.h"

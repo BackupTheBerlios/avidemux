@@ -31,7 +31,7 @@ extern "C"
 #undef BIG_ENDIAN
 #endif
 
-#include "ADM_colorspace/colorspace.h"
+//#include "ADM_colorspace/colorspace.h"
 
 #ifdef USE_XX_XVID
 #include "xvid.h"

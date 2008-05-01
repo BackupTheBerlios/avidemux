@@ -16,18 +16,44 @@
  ***************************************************************************/
 
 #include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
+//********** Class Definition ************
+ class ADMVideoFlipV : public AVDMGenericVideoStream 
+ {
 
-#include "ADM_videoFilter.h"
-#include "ADM_vidFlipV.h"
+protected:
+	AVDMGenericVideoStream *_in;
+	virtual char *printConf(void);
 
+public:
 
+	ADMVideoFlipV(AVDMGenericVideoStream *in, CONFcouple *setup);
+	virtual ~ADMVideoFlipV();
+	virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+			ADMImage *data, uint32_t *flags);
+	virtual uint8_t configure(AVDMGenericVideoStream *instream) 
+	{
+		UNUSED_ARG(instream);
+		return 1;
+	};
+};
+
+//********** Register chunk ************
 static FILTER_PARAM flipParam={0,{""}};
 
 
 SCRIPT_CREATE(flipv_script,ADMVideoFlipV,flipParam);
 BUILD_CREATE(flipv_create,ADMVideoFlipV);
- 
 
+VF_DEFINE_FILTER(ADMVideoFlipV,
+				"flipV",
+				QT_TR_NOOP("Vertical flip"),
+				1,
+				flipv_create,
+				flipv_script,
+				VF_TRANSFORM,
+				QT_TR_NOOP("Vertically flip the picture."));
+//************************************
 char *ADMVideoFlipV::printConf( void )
 {
  	static char buf[50];
@@ -57,54 +83,54 @@ uint8_t ADMVideoFlipV::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *flags)
 {
 
-	if(frame>= _info.nb_frames) return 0;
+	if (frame>= _info.nb_frames)
+		return 0;
 	// read uncompressed frame
-	if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
+	if (!_in->getFrameNumberNoAlloc(frame, len, _uncompressed, flags))
+		return 0;
 
-         uint8_t *in,*out;
-         uint32_t stride=_info.width;
-         uint32_t h=_info.height;
-         uint32_t page,qpage;
-        
+	uint8_t *in, *out;
+	uint32_t stride=_info.width;
+	uint32_t h=_info.height;
+	uint32_t page, qpage;
 
-	  
-         page=stride*h;
-         qpage=page>>2;
-         
-         in=YPLANE(_uncompressed);
-         out=YPLANE(data)+(h-1)*stride;
-         // flip y
-         for(uint32_t y=h;y>0;y--)
-         {
-		 memcpy(out,in,stride);
-		 in+=stride;
-		 out-=stride;
+	page=stride*h;
+	qpage=page>>2;
+
+	in=YPLANE(_uncompressed);
+	out=YPLANE(data)+(h-1)*stride;
+	// flip y
+	for (uint32_t y=h; y>0; y--) 
+	{
+		memcpy(out,in,stride);
+		in+=stride;
+		out-=stride;
 	}
 	// Flip U & V			         
-        stride>>=1;
-	in=UPLANE(_uncompressed);	
-        out=UPLANE(data)+qpage-stride;
-         // flip u
-         for(uint32_t y=h>>1;y>0;y--)
-         {
-		 memcpy(out,in,stride);
-		 in+=stride;
-		 out-=stride;
+	stride>>=1;
+	in=UPLANE(_uncompressed);
+	out=UPLANE(data)+qpage-stride;
+	// flip u
+	for (uint32_t y=h>>1; y>0; y--) 
+	{
+		memcpy(out,in,stride);
+		in+=stride;
+		out-=stride;
 	}
 	in=VPLANE(_uncompressed);
-        out=VPLANE(data)+qpage-stride;
-       
-      
-         // flip u
-         for(uint32_t y=h>>1;y>0;y--)
-         {
-		 memcpy(out,in,stride);
-		 in+=stride;
-		 out-=stride;
-	}   
+	out=VPLANE(data)+qpage-stride;
+
+	// flip u
+	for (uint32_t y=h>>1; y>0; y--)
+	{
+		memcpy(out,in,stride);
+		in+=stride;
+		out-=stride;
+	}
 	data->copyInfo(_uncompressed);
 	return 1;
 }
+//EOF
 
 
 

@@ -36,7 +36,7 @@
 
 #include "ADM_default.h"
 
-#include "ADM_colorspace/colorspace.h"
+
 #include "GUI_render.h"
 
 #include "GUI_accelRender.h"

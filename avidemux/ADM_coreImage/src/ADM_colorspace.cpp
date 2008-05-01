@@ -14,9 +14,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
+
 #include "ADM_default.h"
-#include "colorspace.h"
+#include "ADM_colorspace.h"
 
 
 extern "C" {

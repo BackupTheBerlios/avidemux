@@ -23,12 +23,14 @@
 #include "ADM_assert.h"
 #include "config.h"
 #include "fourcc.h"
-
+#include "DIA_fileSel.h"
+#include "ADM_dynamicLoading.h"
 
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_videoFilter.h"
 #include "ADM_video/ADM_videoNull.h"
 #include "ADM_videoFilter_internal.h"
+#include "ADM_videoFilterDynamic.h"
 #include "ADM_video/ADM_vidPartial.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_render.h"
 
@@ -37,9 +39,21 @@
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_osSupport/ADM_quota.h"
 //
+class ADM_vf_pluginLoader : public ADM_LibWrapper
+{
+	public:
+		VF_getDescriptor		*getDesc;
+		ADM_vf_pluginLoader(const char *file) : ADM_LibWrapper()
+		{
+				getDesc=NULL;
+				if(loadLibrary(file))
+					getDesc=(VF_getDescriptor *)getSymbol("ADM_VF_getDescriptor");
+		};
+};
 // exported vars
 std::vector <FilterDescriptor *> allfilters;
 std::vector <FilterDescriptor *> filterCategories[VF_MAX];
+std::vector <ADM_vf_pluginLoader *> pluginLoaderQueue;
 
 uint32_t nb_active_filter=0;
 FILTER  videofilters[VF_MAX_FILTER];
@@ -78,7 +92,7 @@ void filterCleanUp( void )
 		  	delete videofilters[i].filter;
 			if(videofilters[i].conf) delete videofilters[i].conf;
              videofilters[i].conf=NULL;
-             videofilters[i].filter=NULL;  		
+             videofilters[i].filter=NULL;
 	}
    nb_active_filter=0;
 }
@@ -89,7 +103,7 @@ const char *name;
 	for(uint32_t i=0;i<allfilters.size();i++)
 	{
 		name=allfilters[i]->filterName;
-		
+
 		{
 			if(name)
 				printf("\t%s\n",name);
@@ -111,14 +125,85 @@ const char *name;
 				if(strlen(name))
 				{
 					if(!strcasecmp(name,inname))
-						return allfilters[ i]->tag; 
+						return allfilters[ i]->tag;
 				}
 			}
 		}
 	}
 	return filter;
 }
+/**
+ * 	\fn tryLoadingFilterPlugin
+ *  \brief try to load the plugin given as argument..
+ */
 
+#define Fail(x) {printf(#x"\n");goto er;}
+static bool tryLoadingFilterPlugin(const char *file)
+{
+	ADM_vf_pluginLoader *dll=new ADM_vf_pluginLoader(file);
+
+	FilterDescriptor *desc=NULL;
+	FilterDescriptor *myDesc=NULL;
+	if(!dll->getDesc) Fail(nogetdesc);
+
+	desc=dll->getDesc();
+	if(!desc) Fail(GetDescriptor);
+	// Check the API version
+	if(desc->apiVersion!=ADM_FILTER_API_VERSION) Fail(WrongAPI);
+	// Duplicate it, just in case...
+	myDesc=new FilterDescriptor();
+	memcpy(myDesc,desc,sizeof(*myDesc));
+	// push it !
+	myDesc->tag=tagCount++;
+	ADM_assert(myDesc->category<VF_MAX);
+
+    allfilters.push_back (myDesc);
+    filterCategories[myDesc->category].push_back(myDesc);
+    pluginLoaderQueue.push_back(dll); // Needed for cleanup. FIXME TODO Delete it.
+    aprintf("[Filters] Registered filter %s as  %s\n",file,desc->name);
+    return true;
+	// Tag it
+	// Fail!
+er:
+	delete dll;
+	return false;
+
+}
+/**
+ * 	\fn ADM_vf_loadPlugins
+ *  \brief load all audio plugins
+ */
+uint8_t ADM_vf_loadPlugins(const char *path)
+{
+#define MAX_EXTERNAL_FILTER 50
+
+#ifdef __WIN32
+#define SHARED_LIB_EXT "dll"
+#elif defined(__APPLE__)
+#define SHARED_LIB_EXT "dylib"
+#else
+#define SHARED_LIB_EXT "so"
+#endif
+
+	char *files[MAX_EXTERNAL_FILTER];
+	uint32_t nbFile;
+
+	memset(files,0,sizeof(char *)*MAX_EXTERNAL_FILTER);
+	printf("[ADM_vf_plugin] Scanning directory %s\n",path);
+
+	if(!buildDirectoryContent(&nbFile, path, files, MAX_EXTERNAL_FILTER, SHARED_LIB_EXT))
+	{
+		printf("[ADM_vf_plugin] Cannot parse plugin\n");
+		return 0;
+	}
+
+	for(int i=0;i<nbFile;i++)
+		tryLoadingFilterPlugin(files[i]);
+
+	printf("[ADM_vf_plugin] Scanning done\n");
+
+	return 1;
+}
 /**
  * 	\fn registerFilterEx
  *  \brief Register a video filter
@@ -134,12 +219,12 @@ void registerFilterEx(const char *name,const char *filtername,VF_CATEGORY catego
 												category,
 												create,
 												create_from_script);
-	
+
 		ADM_assert(desc->category<VF_MAX);
-	
+
         allfilters.push_back (desc);
         filterCategories[desc->category].push_back(desc);
-        
+
         aprintf("[Filters] Registered filter %s\n",desc->name);
 
 
@@ -249,7 +334,7 @@ void updateVideoFilters(void )
                     AVDMGenericVideoStream *old;
                             old= videofilters[i].filter;
                             tag=videofilters[i].tag;
-  
+
                             videofilters[i].filter=filterCreateFromTag(tag,
                                                 videofilters[i].conf,
                                                 videofilters[i-1].filter);
@@ -268,7 +353,7 @@ AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, A
 	 AVDMGenericVideoStream *filter;
 
 			ADM_assert(tag!=VF_INVALID);
-                       
+
                         {
                           for(unsigned int i=0;i<allfilters.size();i++)
                                   {
@@ -280,7 +365,7 @@ AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, A
                                   }
                         }
 			ADM_assert(0);
-			return NULL;                      
+			return NULL;
 }
 /*
 
@@ -297,7 +382,7 @@ const FilterDescriptor * filterGetEntryFromTag (VF_FILTERS tag)
         }
     }
     ADM_assert(0);
-    return NULL;                      
+    return NULL;
 }
 
 const char  *filterGetNameFromTag(VF_FILTERS tag)
@@ -308,14 +393,14 @@ const char  *filterGetNameFromTag(VF_FILTERS tag)
 }
 /*____________________________________
 	Save and load current set of filters
-	
+
 	We save/load the tag that identifies the filter
 	and a raw hex dump of its config
 		+ comment and name in clear text
-	____________________________________ 
+	____________________________________
 */
 
-/*---------------------------------------*/	 
+/*---------------------------------------*/
 
 
 //______________________________________________________
@@ -347,7 +432,7 @@ int trans[MAXPARAM];
 						}
 					}
 					if(found==-1)
-					{	
+					{
 						printf("Param : %s not found or incorrect\n",param->param[i]);
 						 return NULL;
 					}
@@ -401,7 +486,7 @@ int trans[MAXPARAM];
 				}
 			}
 			if(found==-1)
-			{	
+			{
 				printf("Param : %s not found or incorrect\n",param->param[i]);
 				 return NULL;
 			}
@@ -421,7 +506,7 @@ int trans[MAXPARAM];
 		}
 		return couple;
 	}
-	
+
 }
 uint8_t 	filterAddScript(VF_FILTERS tag,uint32_t n,Arg *args)
 {
@@ -438,7 +523,7 @@ uint8_t 	filterAddScript(VF_FILTERS tag,uint32_t n,Arg *args)
 			if(nb_active_filter<1)
 			{
   		 		nb_active_filter=1;
-  		 		videofilters[0].filter=  new AVDMVideoStreamNull(video_body,0,info.nb_frames);	
+  		 		videofilters[0].filter=  new AVDMVideoStreamNull(video_body,0,info.nb_frames);
 			}
 			AVDMGenericVideoStream *filter=NULL;
 			CONFcouple *setup=NULL;
@@ -450,7 +535,7 @@ uint8_t 	filterAddScript(VF_FILTERS tag,uint32_t n,Arg *args)
 			filter=allfilters[i]->create_from_script(videofilters[nb_active_filter-1].filter,n-1,&(args[1]));
 			if(!filter) return 0;
 			videofilters[nb_active_filter].filter=filter;
-			videofilters[nb_active_filter].tag=tag;						
+			videofilters[nb_active_filter].tag=tag;
 			filter->getCoupledConf(&setup);
 			videofilters[nb_active_filter].conf=setup;
 			nb_active_filter++;
@@ -470,9 +555,9 @@ void filterSaveScriptJS(FILE *f)
                         for(unsigned int j=0;j<allfilters.size();j++)
                                 {
                                         if(tag==allfilters[j]->tag)
-                                        {       
+                                        {
                                                 qfprintf(f,"\"%s\"",allfilters[j]->filterName);
-                                                break;  
+                                                break;
                                         }
                                 }
                         // get args
@@ -491,9 +576,9 @@ void filterSaveScriptJS(FILE *f)
                                 }
                                 delete couple;
                         }
-                        qfprintf(f,");\n");                      
-                
+                        qfprintf(f,");\n");
+
                 }
-                
-}               	
+
+}
 // EOF

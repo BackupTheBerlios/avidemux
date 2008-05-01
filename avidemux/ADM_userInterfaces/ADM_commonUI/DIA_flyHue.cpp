@@ -28,7 +28,7 @@
 #include <stdio.h>
 
 #include "ADM_default.h"
-#include "ADM_colorspace/ADM_rgb.h"
+
 #include "ADM_image.h"
 #include "ADM_videoFilter.h"
 #include "ADM_videoFilter/ADM_vidHue.h"

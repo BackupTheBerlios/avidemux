@@ -161,8 +161,7 @@ SET(ADM_SUBDIR
 	ADM_video
 	ADM_audiodevice
 	ADM_ocr
-	ADM_colorspace)
-
+)
 FOREACH(_current ${ADM_SUBDIR})
 	ADD_SUBDIRECTORY(${_current})
 	ADD_ADMLIB_ALL_TARGETS(${_current})
@@ -234,8 +233,7 @@ ADD_ADMLIB_ALL_TARGETS(
 	ADM_lvemux
 	ADM_utilities
 	ADM_xvidratectl
-	ADM_colorspace)
-
+)
 ADD_LIB_ALL_TARGETS(
 	ADM_smjs
 	ADM_libavutil

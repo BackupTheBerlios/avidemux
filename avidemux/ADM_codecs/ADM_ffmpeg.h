@@ -21,7 +21,7 @@
 
 #ifndef __FFMPEG_ENC__
 #define   __FFMPEG_ENC__
-#include "ADM_colorspace/ADM_colorspace.h"
+#include "ADM_colorspace.h"
 typedef enum
 {
   FF_MSMP4V3 = 1,

@@ -24,6 +24,7 @@
  ***************************************************************************/
 #ifndef ADM_FLY_DIALOG_H
 #define ADM_FLY_DIALOG_H
+#include "ADM_colorspace.h"
 enum ResizeMethod {
     RESIZE_NONE = 0,	// No automatic resize
 	RESIZE_AUTO = 1,	// Resize image when convenient (YUV: after filter, RGB: before applying filter)

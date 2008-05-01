@@ -1,10 +1,15 @@
 SET(ADM_coreImage_SRCS 
-	ADM_confCouple.cpp
-	ADM_videoFilter.cpp
-	ADM_videoFilterCache.cpp
-	ADM_image.cpp
-	ADM_imageUtils.cpp
-	ADM_imageResizer.cpp
+	ADM_confCouple.cpp  
+        ADM_videoFilter.cpp  
+        ADM_videoFilterCache.cpp
+        ADM_image.cpp  
+        ADM_imageUtils.cpp
+        ADM_imageResizer.cpp
+        yuv.cpp
+        rgb2yuv.cpp
+        ADM_colorspace.cpp
+        ADM_rgb.cpp
+        
 )
 
 ADD_LIBRARY(ADM_coreImage SHARED ${ADM_coreImage_SRCS})

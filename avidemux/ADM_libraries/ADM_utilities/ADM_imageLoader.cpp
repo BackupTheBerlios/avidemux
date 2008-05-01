@@ -16,7 +16,7 @@
 #include "ADM_default.h"
 
 #include "ADM_lavcodec.h"
-#include "ADM_colorspace/colorspace.h"
+//#include "ADM_colorspace/colorspace.h"
 #include "ADM_image.h"
 
 #include "ADM_codecs/ADM_codec.h"

@@ -36,7 +36,7 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_videoFilter.h"
 #include "DIA_fileSel.h"
-#include "ADM_colorspace/colorspace.h"
+
 
 #include "ADM_videoFilter/ADM_vobsubinfo.h"
 #include "ADM_videoFilter/ADM_vidVobSub.h"

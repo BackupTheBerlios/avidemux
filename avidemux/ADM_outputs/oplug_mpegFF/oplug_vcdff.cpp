@@ -34,7 +34,7 @@ extern "C" {
 #include "avi_vars.h"
 #include "prototype.h"
 
-#include "ADM_colorspace/colorspace.h"
+//#include "ADM_colorspace/colorspace.h"
 #include "DIA_coreToolkit.h"
 #include "ADM_videoFilter.h"
 #include "ADM_videoFilter_internal.h"

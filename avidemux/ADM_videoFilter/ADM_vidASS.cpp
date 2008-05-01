@@ -16,7 +16,7 @@
 #include "ADM_videoFilter.h"
 #include "ADM_video/ADM_vidCommonFilter.h"
 #include "ADM_vidASS.h"
-#include "ADM_colorspace/ADM_rgb.h"
+#include "ADM_colorspace.h"
 #include "DIA_factory.h"
 
 #ifdef USE_FREETYPE

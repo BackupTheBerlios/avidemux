@@ -32,7 +32,7 @@
 #endif
 
 #include "prefs.h"
-#include "../../ADM_colorspace/ADM_rgb.h"
+#include "ADM_colorspace.h"
 
 
 extern uint8_t BitBlit(uint8_t *dst, uint32_t pitchDest,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height);

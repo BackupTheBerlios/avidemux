@@ -4,6 +4,7 @@ MESSAGE("#####################################")
 MESSAGE("")
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7 FATAL_ERROR)
+cmake_policy(VERSION 2.4)
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
 
 PROJECT(Avidemux)

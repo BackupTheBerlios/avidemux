@@ -14,7 +14,7 @@
 
 #include "ADM_default.h"
 
-#include "ADM_colorspace/ADM_rgb.h"
+
 #include "GUI_render.h"
 #include "ADM_videoFilter.h"
 #include "DIA_flyDialog.h"

@@ -22,7 +22,7 @@
 
 
 #include "../ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_colorspace/ADM_rgb.h"
+
 
 #include "ADM_image.h"
 #include "ADM_videoFilter.h"

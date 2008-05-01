@@ -16,12 +16,12 @@
  ***************************************************************************/
 
 #include "config.h"
+#if 0 // OBSOLETE
 
 #include "ADM_default.h"
 
 #include "ADM_videoFilter.h"
 #include "ADM_videoFilter/ADM_vidFlipV.h"
-
 
 //#define REDUCED
 //adm_fast_memcpy myAdmMemcpy=memcpy;
@@ -137,5 +137,5 @@ uint8_t ADMVideoFlipV::getFrameNumberNoAlloc(uint32_t frame,
 	return 1;
 }
 
-
+#endif
 
