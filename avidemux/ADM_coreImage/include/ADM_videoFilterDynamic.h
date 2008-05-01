@@ -36,8 +36,8 @@ typedef FilterDescriptor *(VF_getDescriptor)(void);
 #ifdef QT_TR_NOOP
 #undef QT_TR_NOOP
 #endif
-extern const char* translate(const char *__domainname, const char *__msgid);
-#define QT_TR_NOOP(String) translate ("avidemux", String)
+// FIXME TODO extern const char* translate(const char *__domainname, const char *__msgid);
+#define QT_TR_NOOP(String) String //translate ("avidemux", String)
 
 
 #endif
