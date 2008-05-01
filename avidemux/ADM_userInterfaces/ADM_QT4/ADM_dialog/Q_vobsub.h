@@ -25,5 +25,4 @@ public:
 private slots:
 	void idxSel(bool i);
 };
-
 #endif	// Q_vobsub_h

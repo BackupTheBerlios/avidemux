@@ -37,10 +37,6 @@ typedef enum
   CodecXDVD,
   CodecXvid4,
   CodecFFhuff,
-
-#ifdef USE_X264
-  CodecX264,
-#endif
   CodecYV12,
   CodecRequant,
   CodecDV,

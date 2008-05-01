@@ -24,7 +24,7 @@ ADM_DISPLAY("GTK+      " "${ADM_UI_GTK}")
 ADM_DISPLAY("Qt 4      " "${ADM_UI_QT4}")
 
 MESSAGE("***  Video Codec  ***")
-ADM_DISPLAY("x264      " "${USE_X264}")
+ADM_DISPLAY("x264      " "$ENV{ADM_HAVE_X264}")
 ADM_DISPLAY("Xvid      " "${USE_XVID_4}")
 
 MESSAGE("***  Audio Codec  ***")

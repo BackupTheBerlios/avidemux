@@ -444,11 +444,6 @@ IF (USE_XVID_4)
 	ADD_LIB_ALL_TARGETS("${XVID_LIBRARY_DIR}")
 ENDIF (USE_XVID_4)
 
-# x264
-IF (USE_X264)
-	ADD_LIB_ALL_TARGETS("${X264_LIBRARY_DIR}")
-ENDIF (USE_X264)
-
 ###########################################
 # UI Specific
 ###########################################

@@ -16,5 +16,4 @@ class encodingWindow : public QDialog
 	void priorityChanged(int priorityLevel);
 	void shutdownChanged(int state);
 };
-
 #endif	// Q_encoding_h

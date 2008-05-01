@@ -619,16 +619,6 @@ Encoder *getVideoEncoder(uint32_t w, uint32_t h, uint32_t globalHeaderFlag)
 		e = new EncoderXvid4 (&Xvid4Codec);
 		break;
 #endif
-#ifdef USE_X264
-	case CodecX264:
-#warning GROSS HACK
-		{
-			x264Extra.globalHeader = globalHeaderFlag;
-			e = new EncoderX264 (&x264Codec);
-			x264Extra.globalHeader = 0;
-			break;
-		}
-#endif
 	case CodecExternal:
 		e = new externalEncoder(&AllVideoCodec[currentCodecIndex], globalHeaderFlag);
 		break;
@@ -803,18 +793,6 @@ void videoCodecSetConf(uint32_t extraLen, uint8_t *extraData)
 void setIpod_Xvid4Preset(void)
 {
 	memcpy(&xvid4Extra,&xvid4ExtraIPOD,sizeof(xvid4ExtraIPOD)); 
-}
-#endif
-
-#ifdef USE_X264
-/**
-    \fn     setPSP_X264Preset(void)
-    \brief  set x264 codec conf to the PSP preset
-*/
-void setPSP_X264Preset(void)
-{
-	memcpy(&x264Extra, &x264ExtraPSP, sizeof(x264ExtraPSP)); 
-	printf("Cabac: %u\n", x264Extra.CABAC);
 }
 #endif
 

@@ -165,11 +165,12 @@ uint8_t A_autoDrive(Action action)
                           break;
                     case ACT_AUTO_PSP_H264:
                     {
-#ifdef USE_X264
+						// FIXME
+/*#ifdef USE_X264
                           videoCodecSelectByName("X264"); 
                           setPSP_X264Preset(); 
                           setVideoEncoderSettings(COMPRESS_CBR,768,0,NULL);
-#endif
+#endif */
                           fq=48000;
                     }
                     break;

@@ -1,7 +1,9 @@
 #include <stdio.h>
-#include <QApplication>
-#include <QtCore>
-#include <QtGui>
+#include <QtCore/QMap>
+#include <QtCore/QLocale>
+#include <QtCore/QTranslator>
+#include <QtGui/QApplication>
+#include <QtGui/QWidget>
 
 #ifdef __APPLE__
 #include <Carbon/Carbon.h>

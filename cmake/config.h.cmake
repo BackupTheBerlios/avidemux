@@ -87,9 +87,6 @@
 /* Vorbis detected */
 #cmakedefine USE_VORBIS
 
-/* use x264 encoder */
-#cmakedefine USE_X264
-
 #if ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK || ${CONFIG_HEADER_TYPE} == ADM_BUILD_QT4
 /* XVideo detected */
 #cmakedefine USE_XV
