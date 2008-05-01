@@ -562,12 +562,12 @@ void x264Options::setMotionVectorSearchRange(unsigned int motionVectorSearchRang
 		_param.analyse.i_me_range = motionVectorSearchRange;
 }
 
-unsigned int x264Options::getMotionVectorLength(void)
+int x264Options::getMotionVectorLength(void)
 {
 	return _param.analyse.i_mv_range;
 }
 
-void x264Options::setMotionVectorLength(unsigned int motionVectorLength)
+void x264Options::setMotionVectorLength(int motionVectorLength)
 {
 	if (motionVectorLength == -1 || (motionVectorLength >= 32 && motionVectorLength <= 512))
 		_param.analyse.i_mv_range = motionVectorLength;

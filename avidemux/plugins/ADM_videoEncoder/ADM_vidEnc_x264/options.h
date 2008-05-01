@@ -188,8 +188,8 @@ public:
 	unsigned int getMotionVectorSearchRange(void);
 	void setMotionVectorSearchRange(unsigned int motionVectorSearchRange);
 
-	unsigned int getMotionVectorLength(void);
-	void setMotionVectorLength(unsigned int motionVectorLength);
+	int getMotionVectorLength(void);
+	void setMotionVectorLength(int motionVectorLength);
 
 	int getMotionVectorThreadBuffer(void);
 	void setMotionVectorThreadBuffer(int motionVectorThreadBuffer);
