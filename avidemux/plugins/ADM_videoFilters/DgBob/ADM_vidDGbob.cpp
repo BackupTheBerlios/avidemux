@@ -21,15 +21,17 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "config.h"
-#include "ADM_default.h"
-#include "ADM_videoFilter.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
-#include "ADM_vidDGbob_param.h"
+#include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
 #include "DIA_factory.h"
+typedef struct DGBobparam
+{
+        uint32_t  thresh;// low=more flickering, less jaggie
+        uint32_t  order; //0 : Bottom field first, 1 top field first        
+        uint32_t  mode;  // 0 keep # of frames, 1 *2 fps & *2 frame, 2  #*2, fps*150% slow motion
+        uint32_t  ap;    // Extra artifact check, better not to use
+}DGBobparam;
 
 class DGbob : public AVDMGenericVideoStream
 {
@@ -51,10 +53,23 @@ public:
         uint8_t         getCoupledConf( CONFcouple **couples);
 };
 
+
+//********** Register chunk ************
 static FILTER_PARAM dgbobParam={4,{"order","mode","thresh","ap"}};
+
 
 BUILD_CREATE(dgbob_create,DGbob);
 SCRIPT_CREATE(dgbob_script,DGbob,dgbobParam);
+
+VF_DEFINE_FILTER(ADMVideoFlipV,
+				"dgbob",
+				QT_TR_NOOP("DG Bob"),
+				1,
+				dgbob_create,
+				dgbob_script,
+				VF_INTERLACING,
+				QT_TR_NOOP("Donald Graft Bob."));
+//************************************
 
 /*************************************/
 uint8_t DGbob::configure(AVDMGenericVideoStream *in)

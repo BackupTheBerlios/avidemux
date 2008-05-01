@@ -25,12 +25,9 @@
   Ported to avidemux by mean
   Same license as original (?GPL)
 */
-#include "config.h"
+
 #include "ADM_default.h"
-
-
-#include "ADM_videoFilter.h"
-
+#include "ADM_videoFilterDynamic.h"
 #include "DIA_factory.h"
 //************************************************
 #define MIN(a,b) ((a) > (b) ? (b) : (a))
@@ -72,10 +69,20 @@ class  ADMVideoYadif:public AVDMGenericVideoStream
  }     ;
 
 static FILTER_PARAM yadifParam={2,{"mode","order"}};
-
+//************************************
 
 SCRIPT_CREATE(yadif_script,ADMVideoYadif,yadifParam);
 BUILD_CREATE(yadif_create,ADMVideoYadif);
+VF_DEFINE_FILTER(ADMVideoChromaV,
+                "YADIF",
+                QT_TR_NOOP("yadif"),
+                1,
+                yadif_create,
+                yadif_script,
+                VF_INTERLACING,
+                QT_TR_NOOP("Yet Another DeInterlacer. Ported from MPlayer."));
+
+//************************************
 //
 static void filter_plane(int mode, uint8_t *dst, int dst_stride, const uint8_t *prev0, const uint8_t *cur0, const uint8_t *next0, int refs, int w, int h, int parity, int tff, int mmx);
 

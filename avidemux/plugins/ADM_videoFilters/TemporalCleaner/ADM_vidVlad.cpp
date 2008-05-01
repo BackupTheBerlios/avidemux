@@ -20,9 +20,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 #include "ADM_default.h"
-#include "ADM_videoFilter.h"
+#include "ADM_videoFilterDynamic.h"
+#include "DIA_factory.h"
+
 #include "ADM_vidVlad.h"
 
 #include "DIA_factory.h"
@@ -67,7 +68,16 @@ static FILTER_PARAM vladParam={2,{"ythresholdMask","cthresholdMask"}};
 
 SCRIPT_CREATE(vladsmooth_script,AVDMVideoVlad,vladParam);
 BUILD_CREATE(vladsmooth_create,AVDMVideoVlad);
-
+//*************************************
+VF_DEFINE_FILTER(AVDMVideoVlad,
+                "temporalcleaner",
+                QT_TR_NOOP("Temporal Cleaner"),
+                1,
+                vladsmooth_create,
+                vladsmooth_script,
+                VF_NOISE,
+                QT_TR_NOOP("Vlad59's Avisynth port of Jim Casaburi's denoiser."));
+//*************************************
 
 char *AVDMVideoVlad::printConf(void)
 {

@@ -16,18 +16,15 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
 #include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
 
 #include <math.h>
 
 #include "ADM_videoFilter.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
 #include "DIA_enter.h"
-
 #include "DIA_factory.h"
 
 #define MUL 1
@@ -44,28 +41,38 @@ extern uint8_t PutHintingData(unsigned char *video, unsigned int hint);
 class vidHardPDRemoval:public AVDMGenericVideoStream
 {
 
-protected:
-  virtual char *printConf (void);
-  VideoCache *vidCache;
-  BLEND_REMOVER_PARAM *_param;
-  uint32_t              _lastRemoved;
-  ADMImage              *cand1,*cand2,*rebuild;
-public:
+    protected:
+        virtual char *printConf ( void );
+        VideoCache *vidCache;
+        BLEND_REMOVER_PARAM *_param;
+        uint32_t              _lastRemoved;
+        ADMImage              *cand1,*cand2,*rebuild;
+    public:
 
-                        vidHardPDRemoval (AVDMGenericVideoStream * in, CONFcouple * setup);
+        vidHardPDRemoval ( AVDMGenericVideoStream * in, CONFcouple * setup );
         virtual         ~vidHardPDRemoval ();
-  virtual uint8_t getFrameNumberNoAlloc (uint32_t frame, uint32_t * len,
-                                         ADMImage * data, uint32_t * flags);
-  uint8_t configure (AVDMGenericVideoStream * instream);
-  virtual uint8_t getCoupledConf (CONFcouple ** couples);
+        virtual uint8_t getFrameNumberNoAlloc ( uint32_t frame, uint32_t * len,
+                                                ADMImage * data, uint32_t * flags );
+        uint8_t configure ( AVDMGenericVideoStream * instream );
+        virtual uint8_t getCoupledConf ( CONFcouple ** couples );
 
 };
-
+//***************************
 static FILTER_PARAM field_unblend_template =
-  { 4,"threshold","show","noise","identical"};
+    { 4,"threshold","show","noise","identical"};
 
-BUILD_CREATE (hardivtc_create, vidHardPDRemoval);
-SCRIPT_CREATE (hardivtc_script, vidHardPDRemoval, field_unblend_template);
+BUILD_CREATE ( hardivtc_create, vidHardPDRemoval );
+SCRIPT_CREATE ( hardivtc_script, vidHardPDRemoval, field_unblend_template );
+VF_DEFINE_FILTER ( ADMVideoChromaV,
+                   "unblend",
+                   QT_TR_NOOP ( "Unblend" ),
+                   1,
+                   hardivtc_create,
+                   hardivtc_script,
+                   VF_COLORS,
+                   QT_TR_NOOP ( "Try to unblend fields." ) );
+
+
 //*************************************
 uint8_t vidHardPDRemoval::configure (AVDMGenericVideoStream * in)
 {

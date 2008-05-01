@@ -9,19 +9,12 @@
 
 #include <math.h>
 
-#include "config.h"
 #include "ADM_default.h"
-
-#include "DIA_coreToolkit.h"
-#include "ADM_videoFilter.h"
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
-#include "ADM_vidFade_param.h"
-
+#include "ADM_videoFilterDynamic.h"
+#include "DIA_enter.h"
 #include "DIA_factory.h"
-
+#include "DIA_coreToolkit.h"
+#include "ADM_vidFade_param.h"
 class AVDM_Fade : public AVDMGenericVideoStream
 {
   VideoCache      *vidCache;
@@ -46,6 +39,14 @@ static FILTER_PARAM fadeParam={4,{"startFade","endFade","inOut","toBlack"}};
 BUILD_CREATE(fade_create,AVDM_Fade);
 SCRIPT_CREATE(fade_script,AVDM_Fade,fadeParam);
 
+VF_DEFINE_FILTER(AVDM_Fade,
+                "fade",
+                QT_TR_NOOP("Fade"),
+                1,
+                fade_create,
+                fade_script,
+                VF_TRANSFORM,
+                QT_TR_NOOP("Fade in/out."));
 /*************************************/
 uint8_t AVDM_Fade::configure(AVDMGenericVideoStream *in)
 {

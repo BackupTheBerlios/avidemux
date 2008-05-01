@@ -16,9 +16,8 @@
  ***************************************************************************/
 
 #include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
 
-
-#include "ADM_videoFilter.h"
 #include "ADM_vidChroma.h"
 
 
@@ -26,11 +25,17 @@ static FILTER_PARAM nullParam={0,{""}};
 
 
 SCRIPT_CREATE(chromaU_script,ADMVideoChromaU,nullParam);
-SCRIPT_CREATE(chromaV_script,ADMVideoChromaV,nullParam);
-
 BUILD_CREATE(chromaU_create,ADMVideoChromaU);
-BUILD_CREATE(chromaV_create,ADMVideoChromaV);
 
+
+VF_DEFINE_FILTER(ADMVideoChromaU,
+				"chromau",
+				QT_TR_NOOP("Chroma U"),
+				1,
+				chromaU_create,
+				chromaU_script,
+				VF_COLORS,
+				QT_TR_NOOP("Keep chroma U only."));
 
 char *ADMVideoChromaU::printConf( void )
 {
@@ -104,87 +109,4 @@ uint32_t page;
 		 memset(VPLANE(data),0x80,page>>2);
 }
 
-//---______________________________________________---------v--------------
-//---______________________________________________---------v--------------
-//---______________________________________________---------v--------------
-//---______________________________________________---------v--------------
-//---______________________________________________---------v--------------
-//---______________________________________________---------v--------------
-//---______________________________________________---------v--------------
-//---______________________________________________---------v--------------
-
-
-
-
-char *ADMVideoChromaV::printConf( void )
-{
- 	static char buf[50];
-
- 	sprintf((char *)buf," chroma v only");
-        return buf;
-}
-
-//_______________________________________________________________
-
-ADMVideoChromaV::ADMVideoChromaV(
-									AVDMGenericVideoStream *in,CONFcouple *setup)
-{
-    UNUSED_ARG(setup);
-
-	_in=in;
-	memcpy(&_info,_in->getInfo(),sizeof(_info));
-	_info.encoding=1;
- 
-
-}
-ADMVideoChromaV::~ADMVideoChromaV()
-{
-
-	
-
-}
-
-//
-//	Remove y and v just keep U and expand it
-//
-   uint8_t ADMVideoChromaV::getFrameNumberNoAlloc(uint32_t frame,
-				uint32_t *len,
-   				ADMImage *data,
-				uint32_t *flags)
-{
-uint32_t w,x;
-uint32_t page;
-		if(frame>= _info.nb_frames) return 0;
-       		if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
-		
-		page= _info.width*_info.height;
-		*len=(page*3)>>1;
-
-
-		// now expand  u
-		uint8_t *y,*v,*y2;
-
-		y=YPLANE(data);
-		y2=y+_info.width;
-		v=VPLANE(data);
-		for(w= _info.height>>1;w>0;w--)
-		{
-			for(x= _info.width>>1;x>0;x--)
-			{
-				*y=*v;
-				*y2=*v;
-				*(y+1)=*v;
-				*(y2+1)=*v;
-				v++;
-				y+=2;
-				y2+=2;
-			}
-                	y+=_info.width;
-			y2+=_info.width;
-       		 }
-
-		 // Remove chroma u & v
-		 memset(UPLANE(data),0x80,page>>2);
-		 memset(VPLANE(data),0x80,page>>2);
-}
 

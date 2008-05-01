@@ -16,18 +16,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 #include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
 #include <math.h>
-
-
-#include "ADM_videoFilter.h"
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
 #include "DIA_enter.h"
-
 #include "DIA_factory.h"
 #include "ADM_vidBlendRemoval_param.h"
 #define MUL 1
@@ -60,6 +52,15 @@ static FILTER_PARAM field_unblend_template =
 
 BUILD_CREATE (blendremove_create, vidBlendRemoval);
 SCRIPT_CREATE (blendremove_script, vidBlendRemoval, field_unblend_template);
+//*************************************
+VF_DEFINE_FILTER(vidBlendRemoval,
+                "blendremoval",
+                QT_TR_NOOP("Blend Removal"),
+                1,
+                blendremove_create,
+                blendremove_script,
+                VF_COLORS,
+                QT_TR_NOOP("Try to remove blending."));
 //*************************************
 uint8_t vidBlendRemoval::configure (AVDMGenericVideoStream * in)
 {

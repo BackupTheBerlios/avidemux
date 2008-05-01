@@ -390,6 +390,7 @@ public:
 };
 
 /*************************************************/
+#ifndef ADM_MINIMAL_UI_INTERFACE
 #include "ADM_encoder/ADM_vidEncode.hxx"
 typedef diaElem  *(CREATE_BITRATE_T)(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip);
 class diaElemBitrateBase : public diaElem
@@ -416,7 +417,7 @@ public:
   
   void updateMe(void);
 };
-
+#endif
 /*************************************************/
 typedef diaElem *CREATE_FILE_T(uint32_t writeMode,char **filename,const char *toggleTitle,  const char *defaultSuffix ,const char *tip);
 class diaElemFileBase : public diaElem

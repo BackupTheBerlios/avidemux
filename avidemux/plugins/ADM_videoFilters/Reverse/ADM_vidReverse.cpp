@@ -8,12 +8,7 @@
  ***************************************************************************/
 
 #include "ADM_default.h"
-
-#include "ADM_videoFilter.h"
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
+#include "ADM_videoFilterDynamic.h"
 
 
 class AVDM_Reverse : public AVDMGenericVideoStream
@@ -36,6 +31,14 @@ static FILTER_PARAM reverseParam={0,{""}};
 BUILD_CREATE(reverse_create,AVDM_Reverse);
 SCRIPT_CREATE(reverse_script,AVDM_Reverse,reverseParam);
 
+VF_DEFINE_FILTER(AVDM_Reverse,
+                "reverse",
+                QT_TR_NOOP("Reverse"),
+                1,
+                reverse_create,
+                reverse_script,
+                VF_TRANSFORM,
+                QT_TR_NOOP("Play video backward."));
 /*************************************/
 
 uint8_t AVDM_Reverse::configure(AVDMGenericVideoStream *in)

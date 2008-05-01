@@ -17,10 +17,8 @@
 
 #include <math.h>
 
-#include "config.h"
 #include "ADM_default.h"
-
-#include "ADM_videoFilter.h"
+#include "ADM_videoFilterDynamic.h"
 #include "DIA_enter.h"
 #include "DIA_factory.h"
 
@@ -49,9 +47,19 @@ class  ADMVideoResampleFPS:public AVDMGenericVideoStream
 
              uint8_t     getCoupledConf( CONFcouple **couples);
 }     ;
-
+//***********************************
 SCRIPT_CREATE(resamplefps_script,ADMVideoResampleFPS,ResampParam);
 BUILD_CREATE(resamplefps_create,ADMVideoResampleFPS);
+
+VF_DEFINE_FILTER(ADMVideoResampleFPS,
+                "resamplefps",
+                QT_TR_NOOP("Resample fps"),
+                1,
+                resamplefps_create,
+                resamplefps_script,
+                VF_TRANSFORM,
+                QT_TR_NOOP("Change framerate while keeping duration."));
+//***********************************
 
 AVDMGenericVideoStream *createResampleFps(AVDMGenericVideoStream *in,uint32_t targetfps1000)
 {

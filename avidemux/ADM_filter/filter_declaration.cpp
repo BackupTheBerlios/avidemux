@@ -53,11 +53,7 @@ printf(  "*********************\n");
   	REGISTERX(VF_TRANSFORM, "addblack",QT_TR_NOOP("Add black borders"),QT_TR_NOOP("Add pure black border(s). Enlarges the picture."),VF_ADDBORDER,1,addBorder_create,addBorder_script);
 	REGISTERX(VF_TRANSFORM, "blacken",QT_TR_NOOP("Blacken borders"),QT_TR_NOOP("Fill borders with pure black. Doesn't alter size."),VF_BLACKEN,1,bsmear_create,bsmear_script);
 	REGISTERX(VF_TRANSFORM, "rotate",QT_TR_NOOP("Rotate"),QT_TR_NOOP("Rotate the picture by 90, 180 or 270 degrees."),VF_ROTATE,1,rotate_create,rotate_script);
-    REGISTERX(VF_TRANSFORM, "resamplefps",QT_TR_NOOP("Resample fps"),QT_TR_NOOP("Change framerate while keeping duration."),VF_RESAMPLE_FPS,1,resamplefps_create,resamplefps_script);                
-    REGISTERX(VF_TRANSFORM, "reverse",QT_TR_NOOP("Reverse"),QT_TR_NOOP("Play video backward."),VF_REVERSE,1,reverse_create,reverse_script);
-    REGISTERX(VF_TRANSFORM, "fade",QT_TR_NOOP("Fade"),QT_TR_NOOP("Fade in/out."),VF_FADE,1,fade_create,fade_script);     
 
-    REGISTERX(VF_INTERLACING, "YADIF",QT_TR_NOOP("yadif"),QT_TR_NOOP("Yet Another DeInterlacer. Ported from MPlayer."),VF_YADIF,1,yadif_create,yadif_script);
     REGISTERX(VF_INTERLACING, "mcdeinterlace",QT_TR_NOOP("mcDeinterlace"),QT_TR_NOOP("Motion compensation deinterlacer. Ported from MPlayer."),VF_MCDEINT,1,mcdeint_create,mcdeint_script);
 	REGISTERX(VF_INTERLACING, "deinterlace",QT_TR_NOOP("Deinterlace"),QT_TR_NOOP("Mask interlacing artifacts. Port of Smart deinterlace."),VF_DEINTERLACE,1,deinterlace_create,deinterlace_script);
 	REGISTERX(VF_INTERLACING, "kerneldeint",QT_TR_NOOP("KernelDeint"),QT_TR_NOOP("Kernel deinterlacer by Donald Graft."),VF_KRNDEINT,1,kerneldeint_create,kerneldeint_script);
@@ -66,7 +62,6 @@ printf(  "*********************\n");
 	REGISTERX(VF_INTERLACING, "telecide",QT_TR_NOOP("Decomb Telecide"),QT_TR_NOOP("Great deinterlacing package including IVTC."),VF_DECOMB,1,decomb_create,decomb_script);
 	REGISTERX(VF_INTERLACING, "decimate",QT_TR_NOOP("Decomb Decimate"),QT_TR_NOOP("Useful to remove dupes left by Telecide."),VF_DECIMATE,1,decimate_create,decimate_script);
 	REGISTERX(VF_INTERLACING, "pulldown",QT_TR_NOOP("Pulldown"),QT_TR_NOOP("Convert 24 fps to 30 fps by repeating fields."),VF_PULLDOWN,1,pulldown_create,pulldown_script);	
-	REGISTERX(VF_INTERLACING, "dgbob","DGBob",QT_TR_NOOP("Bobber - convert each field into a full sized frame."),VF_DGBOB,1,dgbob_create,dgbob_script);
     REGISTERX(VF_INTERLACING, "palfieldshift",QT_TR_NOOP("PAL field shift"),QT_TR_NOOP("Shift fields by one. Useful for some PAL movies."),VF_PALSHIFT,1,addPALShift_create,addPALShift_script);	
 	REGISTERX(VF_INTERLACING, "palsmart",QT_TR_NOOP("PAL smart"),QT_TR_NOOP("Smartly revert non constant PAL field shift."),VF_TELECIDE,1,telecide_create,telecide_script);
 
@@ -99,8 +94,6 @@ printf(  "*********************\n");
     REGISTERX(VF_COLORS, "chromashift",QT_TR_NOOP("Chroma shift"),QT_TR_NOOP("Shift chroma U/V to fix badly synced luma/chroma."),VF_CHROMASHIFT,1,create_chromashift,chromashift_script);
 
     REGISTERX(VF_COLORS, "lumaonly",QT_TR_NOOP("Luma only"),QT_TR_NOOP("Convert picture to greyscale (black and white)."),VF_LUMA,1,luma_create,luma_script);
-    REGISTERX(VF_COLORS, "chromauonly",QT_TR_NOOP("Chroma U only"),QT_TR_NOOP("Convert picture to grey, keeping only chroma U."),VF_CHROMAU,1,chromaU_create,chromaU_script);
-    REGISTERX(VF_COLORS, "chromavonly",QT_TR_NOOP("Chroma V only"),QT_TR_NOOP("Convert picture to grey, keeping only chroma V."),VF_CHROMAV,1,chromaV_create,chromaV_script);
    
     REGISTERX(VF_COLORS, "delta",QT_TR_NOOP("Luma delta"),QT_TR_NOOP("Difference between current and previous picture."),VF_DELTA,1,delta_create,delta_script);
     REGISTERX(VF_COLORS, "coloryuv",QT_TR_NOOP("Avisynth ColorYUV"),QT_TR_NOOP("Alter colors (auto white balance etc...). Ported from Avisynth."),VF_COLOR_YUV,1,coloryuv_create,coloryuv_script);
@@ -109,9 +102,7 @@ printf(  "*********************\n");
     REGISTERX(VF_NOISE, "mpdenoise3d",QT_TR_NOOP("MPlayer denoise3d"),QT_TR_NOOP("Reduce noise, smooth image, increase compressibility."),VF_MPLLQD3D,1,MPD3Dlow_create,MPD3Dlow_script);
 	REGISTERX(VF_NOISE, "mphqdenoise3d",QT_TR_NOOP("MPlayer hqdn3d"),QT_TR_NOOP("High quality version of denoise3d. Slower but more precise."),VF_MPLHQD3D,1,MPD3D_create,MPD3D_script);
 	REGISTERX(VF_NOISE, "fluxsmooth",QT_TR_NOOP("FluxSmooth"),QT_TR_NOOP("Spatio-temporal cleaner by Ross Thomas."),VF_FLUXSMOOTH,1,fluxsmooth_create,fluxsmooth_script);
-#ifdef ADM_CPU_X86
-    	REGISTERX(VF_NOISE, "temporalcleaner",QT_TR_NOOP("Temporal Cleaner"),QT_TR_NOOP("Vlad59's Avisynth port of Jim Casaburi's denoiser."),VF_VLADSMOOTH,1,vladsmooth_create,vladsmooth_script);
-#endif
+
 	REGISTERX(VF_NOISE, "denoise",QT_TR_NOOP("Denoise"),QT_TR_NOOP("Port of Transcode DNR."),VF_DENOISE,1,denoise_create,denoise_script);
 	REGISTERX(VF_NOISE, "stabilize",QT_TR_NOOP("Stabilize"),QT_TR_NOOP("Light denoiser."),VF_STABILIZE,1,stabilize_create,stabilize_script);
     REGISTERX(VF_NOISE, "cnr2",QT_TR_NOOP("Cnr2"),QT_TR_NOOP("Chroma noise reduction filter by MarcFD/Tritical."),VF_CNR2,1,cnr2_create,cnr2_script);	
@@ -145,7 +136,6 @@ printf(  "*********************\n");
 
         //*********************
  
-    REGISTERX(VF_MISC, "blendremover",QT_TR_NOOP("Blend remover"),QT_TR_NOOP("Remove blend between previous and next picture."),VF_BLENDREMOVAL,1,blendremove_create,blendremove_script);
     REGISTERX(VF_MISC, "hardivtcremove",QT_TR_NOOP("Hard pulldown removal"),QT_TR_NOOP("Remove IVTC that has been analog captured or resized."),VF_HARDIVTC,1,hardivtc_create,hardivtc_script);
     REGISTERX(VF_MISC, "whirl",QT_TR_NOOP("Whirl"),QT_TR_NOOP("Useless whirlwind effect."),VF_WHIRL,1,whirl_create,whirl_script);
     REGISTERX(VF_MISC, "mosaic",QT_TR_NOOP("Mosaic"),QT_TR_NOOP("Split the picture into tiny thumbnails."),VF_MOSAIC,1,     mosaic_create,mosaic_script);
