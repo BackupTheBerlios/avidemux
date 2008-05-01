@@ -17,9 +17,7 @@
  #ifndef __VIDEO_FILTERS__
  #define  __VIDEO_FILTERS__
 
-//#include "ADM_script/adm_scanner.h" // To get MAXPARAM...
-#define MAXPARAM 40
-#warning fixme MAXPARAM defined twice
+#include "ADM_videoFilter_iface.h"
 
 typedef enum
 {

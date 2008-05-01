@@ -21,7 +21,6 @@ int PushParam(APM_TYPE, char *value);
 int Call(char *string);
 
 
-#define MAXPARAM 40
 #endif
 //END
 

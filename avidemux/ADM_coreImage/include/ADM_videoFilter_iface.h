@@ -45,6 +45,7 @@
  }Arg;
  
  
+#define MAXPARAM 40
  
 #endif
 
