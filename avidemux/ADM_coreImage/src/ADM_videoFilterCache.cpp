@@ -14,11 +14,11 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_videoFilter.h"
 
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
-
+#if 1
+#define aprintf(...) {}
+#else
+#define aprintf printf
+#endif
 
 VideoCache::VideoCache(uint32_t nb,AVDMGenericVideoStream *in)
 {
