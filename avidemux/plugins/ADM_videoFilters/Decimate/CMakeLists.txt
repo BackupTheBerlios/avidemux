@@ -1,7 +1,7 @@
 INCLUDE(vf_plugin)
 
 
-SET(ADM_vf_decimate_SRCS ADM_vidDecDec.cpp)
+SET(ADM_vf_decimate_SRCS ADM_vidDecDec.cpp  videoFunctions.cpp)
 
 ADD_LIBRARY(ADM_vf_decimate SHARED ${ADM_vf_decimate_SRCS})
 

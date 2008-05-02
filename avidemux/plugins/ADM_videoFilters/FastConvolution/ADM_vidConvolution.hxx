@@ -110,7 +110,8 @@
 
                                 AVDMFastVideoMedian(  AVDMGenericVideoStream *in,CONFcouple *setup) :
                                 AVDMFastVideoConvolution(  in,setup) {};
-                  virtual char 	*printConf(void);
+#warning FIXME: string constants cannot be used as char
+								virtual char     *printConf(void) { return const_cast<char*>("ERROR");};
  }      ;
 
 //EOF

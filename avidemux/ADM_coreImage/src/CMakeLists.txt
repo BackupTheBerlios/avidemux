@@ -10,7 +10,7 @@ SET(ADM_coreImage_SRCS
         ADM_colorspace.cpp
         ADM_rgb.cpp
         ADM_pp.cpp
-        
+        ADM_print.cpp
 )
 
 ADD_LIBRARY(ADM_coreImage SHARED ${ADM_coreImage_SRCS})
@@ -19,5 +19,5 @@ IF (APPLE)
 	TARGET_LINK_LIBRARIES(ADM_coreImage -Wl,-read_only_relocs,suppress)
 ENDIF (APPLE)
 
-TARGET_LINK_LIBRARIES(ADM_coreImage ADM_core ADM_coreUI ADM_libswscale)
+TARGET_LINK_LIBRARIES(ADM_coreImage ADM_core ADM_coreUI ADM_libswscale ADM_libpostproc)
 INSTALL(TARGETS ADM_coreImage RUNTIME DESTINATION ${BIN_DIR} LIBRARY DESTINATION lib)

@@ -12,16 +12,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
-#include "fourcc.h"
-#include "ADM_default.h"
-#include <math.h>
-
 
 #include "ADM_image.h"
-
 #include "ADM_print_priv.h"
+
 // Borrowed from decomb
 // Borrowed from the author of IT.dll, whose name I
 // could not determine.
