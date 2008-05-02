@@ -1,18 +1,17 @@
 SET(ADM_videoFilter_SRCS 
-	ADM_lavpp_deint.cpp      ADM_vidDecTelecide.cpp      ADM_vidFields.cpp           ADM_vidMcDeint.cpp
+	ADM_lavpp_deint.cpp      ADM_vidFields.cpp           
 	ADM_vidPulldown.cpp       ADM_vidSwapSmart.cpp
-	ADM_vidAddBorder.cpp     ADM_vidDeintASM.cpp         ADM_vidMosaic.cpp
-	ADM_vidUVSwap.cpp
-	ADM_vidASS.cpp           ADM_vidDeinterlace.cpp      ADM_vidFlux.cpp             ADM_vidMPLD3D.cpp
-	ADM_vidDenoise.cpp          ADM_vidForcedPP.cpp         ADM_vidMPLD3Dlow.cpp
+	ADM_vidDeintASM.cpp         ADM_vidMosaic.cpp
+	ADM_vidASS.cpp           ADM_vidDeinterlace.cpp      ADM_vidFlux.cpp             
+	ADM_vidDenoise.cpp          
 	ADM_vidRotate.cpp         ADM_vidWhirl.cpp
 	ADM_vidMSharpen.cpp
 	ADM_vidSeparateField.cpp  
 	ADM_vidBSmear.cpp        ADM_vidDropOut.cpp          ADM_vidKernelDeint.cpp      ADM_vidMsmooth.cpp
 	ADM_vidSoften.cpp
-	ADM_vidLargeMedian.cpp      ADM_vidPalShift.cpp
+	ADM_vidPalShift.cpp
 	ADM_vidStabilize.cpp
-	ADM_vidDecDec.cpp        ADM_vidFastConvolution.cpp  ADM_vidLuma.cpp             ADM_vidPalSmart.cpp
+	ADM_vidPalSmart.cpp
 	ADM_vidSwapFields.cpp
 	ADM_guiResize.cpp  ADM_resizebis.cpp  ADM_resizeter.cpp  ADM_vidResize.cpp
 	ADM_vidMPLResize.cpp
@@ -29,7 +28,6 @@ SET(ADM_videoFilter_SRCS
 	ADM_vidEq2.cpp
 	ADM_vidContrast.cpp
 	ADM_vidDelta.cpp
-	ADM_vidUnblend.cpp
 	ADM_vidAsharp.cpp
 	ADM_vidVobsub.cpp
 	ADM_vidVobSubRender.cpp

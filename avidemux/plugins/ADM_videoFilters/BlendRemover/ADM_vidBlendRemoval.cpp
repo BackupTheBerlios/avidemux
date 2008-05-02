@@ -50,15 +50,11 @@ public:
 static FILTER_PARAM field_unblend_template =
   { 4,"threshold","show","noise","identical"};
 
-BUILD_CREATE (blendremove_create, vidBlendRemoval);
-SCRIPT_CREATE (blendremove_script, vidBlendRemoval, field_unblend_template);
 //*************************************
-VF_DEFINE_FILTER(vidBlendRemoval,
-                "blendremoval",
+VF_DEFINE_FILTER(vidBlendRemoval,field_unblend_template,
+                blendremoval,
                 QT_TR_NOOP("Blend Removal"),
                 1,
-                blendremove_create,
-                blendremove_script,
                 VF_COLORS,
                 QT_TR_NOOP("Try to remove blending."));
 //*************************************

@@ -19,21 +19,22 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
 #include "ADM_default.h"
-
-
-#include "ADM_videoFilter.h"
-
-#include"ADM_vidLargeMedian.h"
+#include "ADM_videoFilterDynamic.h"
+#include "ADM_vidLargeMedian.h"
 #include "DIA_factory.h"
 
 static FILTER_PARAM nullParam={2,{"chroma","luma"}};
 
 
-SCRIPT_CREATE(largeMedian_script,ADMVideoLargeMedian,nullParam);
-BUILD_CREATE(largeMedian_create,ADMVideoLargeMedian);
-
+//********** Register chunk ************
+VF_DEFINE_FILTER(ADMVideoLargeMedian,nullParam,
+                largemedian,
+                QT_TR_NOOP("Median (5x5)"),
+                1,
+                VF_NOISE,
+                QT_TR_NOOP("Median kernel 5x5. Good for reducing chroma noise."));
+//****************************************
 //_______________________________________________________________
 
 ADMVideoLargeMedian::ADMVideoLargeMedian(

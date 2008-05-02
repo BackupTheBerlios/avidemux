@@ -14,22 +14,25 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-#include "ADM_default.h"
 
+#include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
 #include "DIA_coreToolkit.h"
-#include "ADM_videoFilter.h"
 #include "ADM_vidAddBorder.h"
-#include "ADM_video/ADM_vidCommonFilter.h"
-#include "ADM_videoFilter.h"
+
+
 
 #include "DIA_factory.h"
 
 static FILTER_PARAM cropParam={4,{"left","right","top","bottom"}};
 
 
-SCRIPT_CREATE(addBorder_script,AVDMVideoAddBorder,cropParam);
-BUILD_CREATE(addBorder_create,AVDMVideoAddBorder);
+VF_DEFINE_FILTER(AVDMVideoAddBorder,cropParam,
+                addblack,
+                QT_TR_NOOP("Add black borders"),
+                1,
+                VF_TRANSFORM,
+                QT_TR_NOOP("Add pure black border(s)."));
 
 char *AVDMVideoAddBorder::printConf( void )
 {

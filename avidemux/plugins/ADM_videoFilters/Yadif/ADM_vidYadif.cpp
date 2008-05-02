@@ -71,14 +71,10 @@ class  ADMVideoYadif:public AVDMGenericVideoStream
 static FILTER_PARAM yadifParam={2,{"mode","order"}};
 //************************************
 
-SCRIPT_CREATE(yadif_script,ADMVideoYadif,yadifParam);
-BUILD_CREATE(yadif_create,ADMVideoYadif);
-VF_DEFINE_FILTER(ADMVideoChromaV,
-                "YADIF",
+VF_DEFINE_FILTER(ADMVideoYadif,yadifParam,
+                YADIF,
                 QT_TR_NOOP("yadif"),
                 1,
-                yadif_create,
-                yadif_script,
                 VF_INTERLACING,
                 QT_TR_NOOP("Yet Another DeInterlacer. Ported from MPlayer."));
 
@@ -87,28 +83,6 @@ VF_DEFINE_FILTER(ADMVideoChromaV,
 static void filter_plane(int mode, uint8_t *dst, int dst_stride, const uint8_t *prev0, const uint8_t *cur0, const uint8_t *next0, int refs, int w, int h, int parity, int tff, int mmx);
 
 
-/*   Hook to build it as a dll */
-extern "C"
-{
-SCRIPT_CREATE(FILTER_create_fromscript,ADMVideoYadif,yadifParam);
-BUILD_CREATE(FILTER_create,ADMVideoYadif);
-char *FILTER_getName(void)
-{
-	return "DynYadif";
-}
-char *FILTER_getDesc(void)
-{
-	return "YADIF";
-}
-uint32_t FILTER_getVersion(void)
-{
-  return 1; 
-}
-uint32_t FILTER_getAPIVersion(void)
-{
-  return ADM_FILTER_API_VERSION; 
-}
-}
 //***************************************************
 //***************************************************
 char *ADMVideoYadif::printConf( void )

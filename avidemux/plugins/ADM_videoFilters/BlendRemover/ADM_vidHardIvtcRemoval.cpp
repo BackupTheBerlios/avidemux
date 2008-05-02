@@ -61,14 +61,10 @@ class vidHardPDRemoval:public AVDMGenericVideoStream
 static FILTER_PARAM field_unblend_template =
     { 4,"threshold","show","noise","identical"};
 
-BUILD_CREATE ( hardivtc_create, vidHardPDRemoval );
-SCRIPT_CREATE ( hardivtc_script, vidHardPDRemoval, field_unblend_template );
-VF_DEFINE_FILTER ( ADMVideoChromaV,
-                   "unblend",
+VF_DEFINE_FILTER ( vidHardPDRemoval,field_unblend_template,
+                   unblend,
                    QT_TR_NOOP ( "Unblend" ),
                    1,
-                   hardivtc_create,
-                   hardivtc_script,
                    VF_COLORS,
                    QT_TR_NOOP ( "Try to unblend fields." ) );
 

@@ -15,20 +15,10 @@
 //             2 Verti deblock
 //             4 Dering
 // strength between 0 and 5
-#include "config.h"
- 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
 
 
 #include "ADM_lavcodec.h"
-#include "ADM_assert.h"
-
 #include "ADM_default.h"
-
-
 #include "ADM_pp.h"
 
 

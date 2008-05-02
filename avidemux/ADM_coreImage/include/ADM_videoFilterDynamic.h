@@ -20,15 +20,17 @@
 
 typedef FilterDescriptor *(VF_getDescriptor)(void);
 
-#define VF_DEFINE_FILTER(myClass,name,displayname,version,createFunction,createFunctionFromScript,category,description) \
+#define VF_DEFINE_FILTER(myClass,myParam,name,displayname,version,category,description) \
+    SCRIPT_CREATE(name##_script,myClass,myParam); \
+    BUILD_CREATE(name##_create,myClass); \
 	static FilterDescriptor descriptor_vf_id_##myClass (\
 								0, \
-								name, \
+								#name, \
 								displayname, \
 								description, \
 								category, \
-								createFunction, \
-								createFunctionFromScript, \
+								name##_create, \
+								name##_script, \
 								ADM_FILTER_API_VERSION); \
     extern "C" { 	FilterDescriptor *ADM_VF_getDescriptor(void) {return &descriptor_vf_id_##myClass ;}};							
 

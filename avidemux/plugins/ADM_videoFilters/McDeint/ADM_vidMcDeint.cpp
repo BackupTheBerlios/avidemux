@@ -21,17 +21,10 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#include "config.h"
 #include "ADM_default.h"
 #include "ADM_lavcodec.h"
-
-
-#include "ADM_videoFilter.h"
-
-#include "ADM_videoFilter.h"
-
+#include "ADM_videoFilterDynamic.h"
 #include "ADM_vidMcDeint_param.h"
-
 #include "DIA_factory.h"
 
 static FILTER_PARAM mcDeintParam={3,{"mode","qp","initial_parity"}};
@@ -73,8 +66,16 @@ class  AVDMVideoMCDeint:public AVDMGenericVideoStream
   virtual uint8_t getCoupledConf( CONFcouple **couples);
  }     ;
 
-SCRIPT_CREATE(mcdeint_script,AVDMVideoMCDeint,mcDeintParam);
-BUILD_CREATE(mcdeint_create,AVDMVideoMCDeint);
+//********** Register chunk ************
+
+    
+
+VF_DEFINE_FILTER(AVDMVideoMCDeint,mcDeintParam,
+                mcdeinterlace,
+                QT_TR_NOOP("mcDeinterlace"),
+                1,
+                VF_INTERLACING,
+                QT_TR_NOOP("Motion compensation deinterlacer. Ported from MPlayer."));
 
 static void filter(struct vf_priv_s *p, uint8_t *dst[3], uint8_t *src[3], int dst_stride[3], int src_stride[3], int width, int height);
 

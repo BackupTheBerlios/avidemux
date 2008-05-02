@@ -16,19 +16,20 @@
  ***************************************************************************/
 
 #include "ADM_default.h"
-
-#include "ADM_videoFilter.h"
+#include "ADM_videoFilterDynamic.h"
 #include "ADM_vidLuma.h"
 
 
 static FILTER_PARAM nullParam={0,{""}};
 
-
-SCRIPT_CREATE(luma_script,ADMVideoLuma,nullParam);
-BUILD_CREATE(luma_create,ADMVideoLuma);
-
- 
-
+//********** Register chunk ************
+VF_DEFINE_FILTER(ADMVideoLuma,nullParam,
+                lumaonly,
+                QT_TR_NOOP("Luma only"),
+                1,
+                VF_COLORS,
+                QT_TR_NOOP("Convert picture to greyscale (black and white)."));
+//****************************************
 char *ADMVideoLuma::printConf( void )
 {
  	static char buf[50];

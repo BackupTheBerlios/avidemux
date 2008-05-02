@@ -48,15 +48,10 @@ class  ADMVideoResampleFPS:public AVDMGenericVideoStream
              uint8_t     getCoupledConf( CONFcouple **couples);
 }     ;
 //***********************************
-SCRIPT_CREATE(resamplefps_script,ADMVideoResampleFPS,ResampParam);
-BUILD_CREATE(resamplefps_create,ADMVideoResampleFPS);
-
-VF_DEFINE_FILTER(ADMVideoResampleFPS,
-                "resamplefps",
+VF_DEFINE_FILTER(ADMVideoResampleFPS,ResampParam,
+                resamplefps,
                 QT_TR_NOOP("Resample fps"),
                 1,
-                resamplefps_create,
-                resamplefps_script,
                 VF_TRANSFORM,
                 QT_TR_NOOP("Change framerate while keeping duration."));
 //***********************************

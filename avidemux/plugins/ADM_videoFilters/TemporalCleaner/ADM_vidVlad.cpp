@@ -66,15 +66,11 @@ static void ProcessYPlane_C( unsigned char *source,
 static FILTER_PARAM vladParam={2,{"ythresholdMask","cthresholdMask"}};
 
 
-SCRIPT_CREATE(vladsmooth_script,AVDMVideoVlad,vladParam);
-BUILD_CREATE(vladsmooth_create,AVDMVideoVlad);
 //*************************************
-VF_DEFINE_FILTER(AVDMVideoVlad,
-                "temporalcleaner",
+VF_DEFINE_FILTER(AVDMVideoVlad,vladParam,
+                temporalcleaner,
                 QT_TR_NOOP("Temporal Cleaner"),
                 1,
-                vladsmooth_create,
-                vladsmooth_script,
                 VF_NOISE,
                 QT_TR_NOOP("Vlad59's Avisynth port of Jim Casaburi's denoiser."));
 //*************************************

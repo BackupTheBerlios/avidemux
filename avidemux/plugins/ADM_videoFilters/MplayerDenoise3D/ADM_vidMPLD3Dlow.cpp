@@ -17,26 +17,23 @@ Daniel Moreno <comac@comac.darktech.org>
  *                                                                         *
  ***************************************************************************/
 #include <math.h>
-
-#include "config.h"
 #include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
 
-
-#include "ADM_videoFilter.h"
 #include "ADM_vidMPLD3Dlow.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
 
 #include "DIA_factory.h"
-
+#define aprintf(...) {}
 static FILTER_PARAM mp3Param={3,{"param1","param2","param3"}};
 
-
-SCRIPT_CREATE(MPD3Dlow_script,ADMVideoMPD3Dlow,mp3Param);
-BUILD_CREATE(MPD3Dlow_create,ADMVideoMPD3Dlow);
-
+//********** Register chunk ************
+VF_DEFINE_FILTER(ADMVideoMPD3Dlow,mp3Param,
+                mpdenoise3d,
+                QT_TR_NOOP("MPlayer denoise3d"),
+                1,
+                VF_NOISE,
+                QT_TR_NOOP("Reduce noise, smooth image, increase compressibility."));
 #define PARAM1_DEFAULT 4.0
 #define PARAM2_DEFAULT 3.0
 #define PARAM3_DEFAULT 6.0

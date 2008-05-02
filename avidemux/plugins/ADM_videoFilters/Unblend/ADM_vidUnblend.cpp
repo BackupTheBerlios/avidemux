@@ -4,15 +4,12 @@
 //      Probably GPL
 //
 //
-#include "ADM_default.h"
+
 #include <math.h>
 
+#include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
 
-#include "ADM_videoFilter.h"
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
 #include "ADM_vidUnblend_param.h"
 
 class vidUnblend:public AVDMGenericVideoStream
@@ -44,8 +41,14 @@ public:
 static FILTER_PARAM unblend_template =
   { 3,"show","threshold","dthresh" };
 
-BUILD_CREATE (unblend_create, vidUnblend);
-SCRIPT_CREATE (unblend_script, vidUnblend, unblend_template);
+//********** Register chunk ************
+VF_DEFINE_FILTER(vidUnblend,unblend_template,
+                unblend,
+                QT_TR_NOOP("Median (5x5)"),
+                1,
+                VF_NOISE,
+                QT_TR_NOOP("Unblend by Bach"));
+//****************************************
 //*************************************
 uint8_t vidUnblend::configure (AVDMGenericVideoStream * in)
 {

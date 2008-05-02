@@ -14,19 +14,22 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-#include "ADM_default.h"
 
-#include "ADM_videoFilter.h"
+#include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
 #include "ADM_vidUVSwap.h"
 
 
 static FILTER_PARAM nullParam={0,{""}};
 
 
-SCRIPT_CREATE(swapuv_script,ADMVideoUVSwap,nullParam);
-BUILD_CREATE(swapuv_create,ADMVideoUVSwap);
-
+VF_DEFINE_FILTER(ADMVideoUVSwap,nullParam,
+                swapuv,
+                QT_TR_NOOP("Swap U and V"),
+                1,
+                VF_COLORS,
+                QT_TR_NOOP("Invert chroma U and chroma V."));
+//*********************************
 char *ADMVideoUVSwap::printConf( void )
 {
  	static char buf[50];

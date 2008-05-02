@@ -24,16 +24,11 @@
 static FILTER_PARAM nullParam={0,{""}};
 
 
-SCRIPT_CREATE(chromaU_script,ADMVideoChromaU,nullParam);
-BUILD_CREATE(chromaU_create,ADMVideoChromaU);
 
-
-VF_DEFINE_FILTER(ADMVideoChromaU,
-				"chromau",
+VF_DEFINE_FILTER(ADMVideoChromaU,nullParam,
+				chromau,
 				QT_TR_NOOP("Chroma U"),
 				1,
-				chromaU_create,
-				chromaU_script,
 				VF_COLORS,
 				QT_TR_NOOP("Keep chroma U only."));
 

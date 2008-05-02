@@ -40,16 +40,11 @@
 	Donald Graft
 	neuron2@attbi.com.
 */
-#include "config.h"
+
 #include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
 
-#include "ADM_videoFilter.h"
-#include "ADM_vidField.h"
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
-
+#define aprintf(...) {}
 #include "DIA_factory.h"
 
 
@@ -96,12 +91,8 @@ int isse_scenechange_8(const uint8_t *c_plane,const  uint8_t *tplane, int height
 
 
 
-static FILTER_PARAM decdecParam={5,{"cycle","mode","quality","threshold","threshold2"}};
 
 
-
-
-extern uint8_t DIA_getDecombDecimate(DECIMATE_PARAM *param);
 
 #define BLKSIZE 32
 //________________________________
@@ -155,16 +146,17 @@ public:
 };
 
 
+//********** Register chunk ************
 
-BUILD_CREATE(decimate_create,Decimate);
+static FILTER_PARAM decdecParam={5,{"cycle","mode","quality","threshold","threshold2"}};
+VF_DEFINE_FILTER(Decimate,decdecParam,
+                decimate,
+                QT_TR_NOOP("Decomb Decimate"),
+                1,
+                VF_INTERLACING,
+                QT_TR_NOOP("Useful to remove dupes left by Telecide."));
 
-/*
-PClip _child, int _cycle, int _mode, double _threshold, double _threshold2,
-				int _quality, const char * _ovr, bool _show, bool _debug, IScriptEnvironment* env) 
-GenericVideoFilter(_child), cycle(_cycle), mode(_mode), threshold(_threshold),
-threshold2(_threshold2), quality(_quality), ovr(_ovr), show(_show), debug(_debug)
-*/	
-SCRIPT_CREATE(decimate_script,Decimate,decdecParam);
+
 uint8_t Decimate::configure(AVDMGenericVideoStream *in)
 {
 	_in=in;

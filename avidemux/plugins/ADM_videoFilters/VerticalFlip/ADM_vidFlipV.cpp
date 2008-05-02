@@ -42,15 +42,10 @@ public:
 static FILTER_PARAM flipParam={0,{""}};
 
 
-SCRIPT_CREATE(flipv_script,ADMVideoFlipV,flipParam);
-BUILD_CREATE(flipv_create,ADMVideoFlipV);
-
-VF_DEFINE_FILTER(ADMVideoFlipV,
-				"flipV",
+VF_DEFINE_FILTER(ADMVideoFlipV,flipParam,
+				flipV,
 				QT_TR_NOOP("Vertical flip"),
 				1,
-				flipv_create,
-				flipv_script,
 				VF_TRANSFORM,
 				QT_TR_NOOP("Vertically flip the picture."));
 //************************************

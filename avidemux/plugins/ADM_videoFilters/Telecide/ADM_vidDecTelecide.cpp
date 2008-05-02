@@ -30,26 +30,32 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#include "config.h"
 #include "ADM_default.h"
-
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
-#include "ADM_videoFilter.h"
+#include "ADM_videoFilterDynamic.h"
 
 #include "ADM_vidDecTelecide.h"
 #include "DIA_factory.h"
+
+#define aprintf(...) {}
 
 static FILTER_PARAM decomb_template={16,{"order","back","guide",
 	 	 	"gthresh","post","chroma","vthresh",
 			"bthresh","dthresh","blend",
 			"nt","y0","y1","hints",
 			"show","debug"}};
-BUILD_CREATE(decomb_create,Telecide);
-SCRIPT_CREATE(decomb_script,Telecide,decomb_template);
-extern uint8_t DIA_getDecombTelecide(TelecideParam *param);
+
+
+
+//********** Register chunk ************
+
+VF_DEFINE_FILTER(Telecide,decomb_template,
+                telecide,
+                QT_TR_NOOP("Decomb Telecide"),
+                1,
+                VF_INTERLACING,
+                QT_TR_NOOP("Great deinterlacing package including IVTC."));
+
+
 
 uint8_t Telecide::configure(AVDMGenericVideoStream *in)
 {

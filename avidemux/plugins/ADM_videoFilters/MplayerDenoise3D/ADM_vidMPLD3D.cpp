@@ -17,24 +17,22 @@ Daniel Moreno <comac@comac.darktech.org>
  *                                                                         *
  ***************************************************************************/
 #include <math.h>
-
-#include "config.h"
 #include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
 
-#include "ADM_videoFilter.h"
 #include "ADM_vidMPLD3D.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
 
 #include "DIA_factory.h"
 static FILTER_PARAM mp3Param={3,{"param1","param2","param3"}};
-
-
-SCRIPT_CREATE(MPD3D_script,ADMVideoMPD3D,mp3Param);
-
-BUILD_CREATE(MPD3D_create,ADMVideoMPD3D);
+#define aprintf(...) {}
+//********** Register chunk ************
+VF_DEFINE_FILTER(ADMVideoMPD3D,mp3Param,
+                mphqdenoise3d,
+                QT_TR_NOOP("MPlayer hqdn3d"),
+                1,
+                VF_NOISE,
+                QT_TR_NOOP("High quality version of denoise3d. Slower but more precise."));
 
 #define PARAM1_DEFAULT 4.0
 #define PARAM2_DEFAULT 3.0

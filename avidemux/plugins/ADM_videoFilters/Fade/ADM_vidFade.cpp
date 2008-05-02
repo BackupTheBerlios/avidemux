@@ -36,15 +36,10 @@ class AVDM_Fade : public AVDMGenericVideoStream
 
 static FILTER_PARAM fadeParam={4,{"startFade","endFade","inOut","toBlack"}};
 
-BUILD_CREATE(fade_create,AVDM_Fade);
-SCRIPT_CREATE(fade_script,AVDM_Fade,fadeParam);
-
-VF_DEFINE_FILTER(AVDM_Fade,
-                "fade",
+VF_DEFINE_FILTER(AVDM_Fade,fadeParam,
+                fade,
                 QT_TR_NOOP("Fade"),
                 1,
-                fade_create,
-                fade_script,
                 VF_TRANSFORM,
                 QT_TR_NOOP("Fade in/out."));
 /*************************************/

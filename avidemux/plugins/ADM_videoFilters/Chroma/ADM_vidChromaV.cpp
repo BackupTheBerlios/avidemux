@@ -25,18 +25,12 @@ static FILTER_PARAM nullParam={0,{""}};
 
 
 
-SCRIPT_CREATE(chromaV_script,ADMVideoChromaV,nullParam);
-BUILD_CREATE(chromaV_create,ADMVideoChromaV);
-
-
-VF_DEFINE_FILTER(ADMVideoChromaV,
-				"chromav",
-				QT_TR_NOOP("Chroma V"),
-				1,
-				chromaV_create,
-				chromaV_script,
-				VF_COLORS,
-				QT_TR_NOOP("Keep chroma V only."));
+VF_DEFINE_FILTER ( ADMVideoChromaV,nullParam,
+                   chromav,
+                   QT_TR_NOOP ( "Chroma V" ),
+                   1,
+                   VF_COLORS,
+                   QT_TR_NOOP ( "Keep chroma V only." ) );
 
 
 

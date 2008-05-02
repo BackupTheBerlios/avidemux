@@ -58,15 +58,10 @@ public:
 static FILTER_PARAM dgbobParam={4,{"order","mode","thresh","ap"}};
 
 
-BUILD_CREATE(dgbob_create,DGbob);
-SCRIPT_CREATE(dgbob_script,DGbob,dgbobParam);
-
-VF_DEFINE_FILTER(ADMVideoFlipV,
-				"dgbob",
+VF_DEFINE_FILTER(DGbob,dgbobParam,
+				dgbob,
 				QT_TR_NOOP("DG Bob"),
 				1,
-				dgbob_create,
-				dgbob_script,
 				VF_INTERLACING,
 				QT_TR_NOOP("Donald Graft Bob."));
 //************************************

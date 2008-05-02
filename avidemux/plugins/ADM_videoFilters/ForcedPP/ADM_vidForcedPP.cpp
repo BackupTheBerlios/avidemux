@@ -12,18 +12,11 @@
 //
 //
 
-#include "config.h"
 #include "ADM_default.h"
-
-#include "ADM_videoFilter.h"
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
+#include "ADM_videoFilterDynamic.h"
 
 #include "ADM_vidForcedPP.h"
 #include "DIA_enter.h"
-
 #include "DIA_factory.h"
 
 // FIXME
@@ -32,12 +25,15 @@
 
 
 static FILTER_PARAM ppParam={3,{"postProcType","postProcStrength","forcedQuant"}};
+//********** Register chunk ************
 
-
-SCRIPT_CREATE(forcedpp_script,ADMVideoForcedPP,ppParam);
-BUILD_CREATE(forcedpp_create,ADMVideoForcedPP);
-
-
+VF_DEFINE_FILTER(ADMVideoForcedPP,ppParam,
+                forcedpp,
+                QT_TR_NOOP("Forced postprocessing"),
+                1,
+                VF_NOISE,
+                QT_TR_NOOP("Apply blind postprocessing.."));
+//********** Register chunk ************
 uint8_t ADMVideoForcedPP::configure( AVDMGenericVideoStream *instream)
 {
 	_in=instream;

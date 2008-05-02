@@ -9,6 +9,7 @@ SET(ADM_coreImage_SRCS
         rgb2yuv.cpp
         ADM_colorspace.cpp
         ADM_rgb.cpp
+        ADM_pp.cpp
         
 )
 

@@ -28,15 +28,10 @@ class AVDM_Reverse : public AVDMGenericVideoStream
 
 static FILTER_PARAM reverseParam={0,{""}};
 
-BUILD_CREATE(reverse_create,AVDM_Reverse);
-SCRIPT_CREATE(reverse_script,AVDM_Reverse,reverseParam);
-
-VF_DEFINE_FILTER(AVDM_Reverse,
-                "reverse",
+VF_DEFINE_FILTER(AVDM_Reverse,reverseParam,
+                reverse,
                 QT_TR_NOOP("Reverse"),
                 1,
-                reverse_create,
-                reverse_script,
                 VF_TRANSFORM,
                 QT_TR_NOOP("Play video backward."));
 /*************************************/
