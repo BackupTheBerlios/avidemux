@@ -14,23 +14,8 @@
  ***************************************************************************/
 
 #include "config.h"
-
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#include <QDialog>
-#include <QMessageBox>
-#include <QGridLayout>
-#include <QPushButton>
-#include <QComboBox>
-#include <QLabel>
-
+#include "T_button.h"
 #include "ADM_default.h"
-#include "DIA_factory.h"
-#include "ADM_assert.h"
 
 extern const char *shortkey(const char *);
 namespace ADM_Qt4Factory
@@ -48,35 +33,16 @@ class diaElemButton : public diaElem
   void      enable(uint32_t onoff) ;
 };
 
-
-class  ADM_Qbutton : public QWidget
+ADM_Qbutton::ADM_Qbutton(QWidget *z,QGridLayout *layout,const char *blah,int line,ADM_FAC_CALLBACK *cb, void *cookie) : QWidget(z) 
 {
-     Q_OBJECT
-    
-  signals:
-        
-        
-   public slots:
-        void clicked(bool i);
-  protected :
-          ADM_FAC_CALLBACK *_cb;
-          void *_cookie;
-  public:
-         QPushButton *button;
-        
-        ADM_Qbutton(QWidget *z,QGridLayout *layout,const char *blah,int line,ADM_FAC_CALLBACK *cb, void *cookie) : QWidget(z) 
-        {
-          
-           _cb=cb;
-           _cookie=cookie;
-           button=new QPushButton(QString::fromUtf8(blah),z);
-           button->show();
-           layout->addWidget(button,line,0);
-           QObject::connect(button, SIGNAL(clicked(bool)), this, SLOT(clicked(bool )));
-        }
-        virtual ~ADM_Qbutton() ;
-        
-};
+	_cb=cb;
+	_cookie=cookie;
+	button=new QPushButton(QString::fromUtf8(blah),z);
+	button->show();
+	layout->addWidget(button,line,0);
+	QObject::connect(button, SIGNAL(clicked(bool)), this, SLOT(clicked(bool )));
+}
+
 void ADM_Qbutton::clicked(bool i)
 {
     _cb(_cookie);

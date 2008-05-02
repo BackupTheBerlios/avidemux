@@ -15,20 +15,12 @@
 
 #include "config.h"
 
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#include <QDialog>
-#include <QSpinBox>
-#include <QGridLayout>
-#include <QLabel>
+#include <QtGui/QSpinBox>
+#include <QtGui/QGridLayout>
+#include <QtGui/QLabel>
 
 #include "ADM_default.h"
 #include "DIA_factory.h"
-#include "ADM_assert.h"
 
 extern const char *shortkey(const char *);
 

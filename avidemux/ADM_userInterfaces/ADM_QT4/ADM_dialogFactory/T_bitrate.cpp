@@ -14,23 +14,9 @@
  ***************************************************************************/
 
 #include "config.h"
-
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#include <QDialog>
-#include <QMessageBox>
-#include <QGridLayout>
-#include <QSpinBox>
-#include <QComboBox>
-#include <QLabel>
-
+#include "T_bitrate.h"
 #include "ADM_default.h"
 #include "DIA_factory.h"
-#include "ADM_assert.h"
 
 extern const char *shortkey(const char *);
 
@@ -38,9 +24,7 @@ namespace ADM_Qt4Factory
 {
 class diaElemBitrate : public diaElemBitrateBase
 {
-protected:
 public:
-  
   diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip=NULL);
   virtual ~diaElemBitrate() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
@@ -50,73 +34,50 @@ public:
   void updateMe(void);
 };
 
-class  ADM_Qbitrate : public QWidget
+ADM_Qbitrate::ADM_Qbitrate(QWidget *z,COMPRES_PARAMS *p,uint32_t mq,QGridLayout *layout,int line) : QWidget(z) 
 {
-     Q_OBJECT
-    
-  signals:
-        
-        
-   public slots:
-        void comboChanged(int i);
-  public:
-        QSpinBox        *box;
-        QComboBox       *combo;
-        QLabel          *text1;
-        QLabel          *text2;
-        COMPRES_PARAMS  *compress;
-        uint32_t        maxQ;
-        ADM_Qbitrate(QWidget *z,COMPRES_PARAMS *p,uint32_t mq,QGridLayout *layout,int line) : QWidget(z) 
-        {
-          
-           compress=p;
-           combo=new QComboBox(z);
-           
-           maxQ=mq;
-           int index=0,set=-1;
+	compress=p;
+	combo=new QComboBox(z);
+
+	maxQ=mq;
+	int index=0,set=-1;
 #define add(x,z,y) if(compress->capabilities & ADM_ENC_CAP_##x) {combo->addItem(QString::fromUtf8(y));\
-						if(p->mode==COMPRESS_##z) set=index;\
-						index++;}
-  
-  add(CBR,CBR,QT_TR_NOOP("Constant Bitrate"));
-  add(CQ,CQ,QT_TR_NOOP("Constant Quality"));
-  add(SAME,SAME,QT_TR_NOOP("Same Quantizer as Input"));
-  add(AQ,AQ,QT_TR_NOOP("Average Quantizer"));
-  add(2PASS,2PASS,QT_TR_NOOP("Two Pass - Video Size"));
-  add(2PASS_BR,2PASS_BITRATE,QT_TR_NOOP("Two Pass - Average Bitrate"));
-  
-           combo->show();
-           
-           text1=new QLabel( QString::fromUtf8(QT_TR_NOOP("Encoding mode")),z);
-          text1->setBuddy(combo);
-          text1->show();
-          
-           box=new QSpinBox(z);
-           box->show();
-           
-           text2=new QLabel( QString::fromUtf8(QT_TR_NOOP("Bitrate")),z);
-           text2->setBuddy(combo);
-          
-          
-          layout->addWidget(text1,line,0);
-          layout->addWidget(combo,line,1);
-          
-          layout->addWidget(text2,line+1,0);
-          layout->addWidget(box,line+1,1);
-       
-       
-          if(set!=-1) 
-          {
-        	  	combo->setCurrentIndex(set);
-        	  	comboChanged(set);
-          }
-          QObject::connect(combo, SIGNAL(currentIndexChanged(int )), this, SLOT(comboChanged(int )));
-          
-          
-        }
-        virtual ~ADM_Qbitrate() ;
-        void readBack(void);
-};
+	if(p->mode==COMPRESS_##z) set=index;\
+	index++;}
+
+	add(CBR,CBR,QT_TR_NOOP("Constant Bitrate"));
+	add(CQ,CQ,QT_TR_NOOP("Constant Quality"));
+	add(SAME,SAME,QT_TR_NOOP("Same Quantizer as Input"));
+	add(AQ,AQ,QT_TR_NOOP("Average Quantizer"));
+	add(2PASS,2PASS,QT_TR_NOOP("Two Pass - Video Size"));
+	add(2PASS_BR,2PASS_BITRATE,QT_TR_NOOP("Two Pass - Average Bitrate"));
+
+	combo->show();
+
+	text1=new QLabel( QString::fromUtf8(QT_TR_NOOP("Encoding mode")),z);
+	text1->setBuddy(combo);
+	text1->show();
+
+	box=new QSpinBox(z);
+	box->show();
+
+	text2=new QLabel( QString::fromUtf8(QT_TR_NOOP("Bitrate")),z);
+	text2->setBuddy(combo);
+
+	layout->addWidget(text1,line,0);
+	layout->addWidget(combo,line,1);
+
+	layout->addWidget(text2,line+1,0);
+	layout->addWidget(box,line+1,1);
+
+	if(set!=-1) 
+	{
+		combo->setCurrentIndex(set);
+		comboChanged(set);
+	}
+
+	QObject::connect(combo, SIGNAL(currentIndexChanged(int )), this, SLOT(comboChanged(int )));
+}
 
 /**
  * 	\fn 	readPullDown

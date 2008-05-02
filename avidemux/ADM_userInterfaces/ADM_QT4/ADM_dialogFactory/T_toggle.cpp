@@ -13,26 +13,15 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QtGui/QGridLayout>
+#include <QtGui/QSpinBox>
+
 #include "config.h"
-
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#include <QDialog>
-#include <QMessageBox>
-#include <QGridLayout>
-#include <QCheckBox>
-#include <QSpinBox>
-
+#include "T_toggle.h"
 #include "ADM_default.h"
 #include "DIA_factory.h"
-#include "ADM_assert.h"
 
 extern const char *shortkey(const char *);
-
 
 namespace ADM_qt4Factory
 {
@@ -85,53 +74,31 @@ public:
   void      enable(uint32_t onoff) ;
 };
 
-
-
-typedef enum
+void ADM_QCheckBox::changed(int i)
 {
-    TT_TOGGLE,TT_TOGGLE_UINT,TT_TOGGLE_INT
-  
-}TOG_TYPE;
-class ADM_QCheckBox : public QCheckBox
+	switch(_type)
+	{
+		case TT_TOGGLE:
+			((diaElemToggle *)_toggle)->updateMe();break;
+		case TT_TOGGLE_UINT:
+			((diaElemToggleUint *)_toggle)->updateMe();break;
+		case TT_TOGGLE_INT:
+			((diaElemToggleInt *)_toggle)->updateMe();break;
+		default:
+			ADM_assert(0);
+	}
+}
+
+ADM_QCheckBox::ADM_QCheckBox(const QString & str,QWidget *root,void *toggle,TOG_TYPE type) : QCheckBox(str,root)
 {
-      Q_OBJECT
-    
-  signals:
-  protected:
-        void     *_toggle;
-        TOG_TYPE _type;
-        
-   public slots:
-        void changed(int i)
-        {
-          switch(_type)
-          {
-            case TT_TOGGLE:
-                              ((diaElemToggle *)_toggle)->updateMe();break;
-            case TT_TOGGLE_UINT:
-                              ((diaElemToggleUint *)_toggle)->updateMe();break;
-            case TT_TOGGLE_INT:
-                              ((diaElemToggleInt *)_toggle)->updateMe();break;
-            default:
-                  ADM_assert(0);
-          }
-        }
-  public:
-  ADM_QCheckBox(const QString & str,QWidget *root,void *toggle,TOG_TYPE type) : QCheckBox(str,root)
-  {
-    _toggle=toggle;
-    _type=type;
-  }
-  void connectMe(void)
-  {
-    QObject::connect(this, SIGNAL(stateChanged(int)), this, SLOT(changed(int )));
-  }
-  
-};
+	_toggle=toggle;
+	_type=type;
+}
 
-/**/
-
-
+void ADM_QCheckBox::connectMe(void)
+{
+	QObject::connect(this, SIGNAL(stateChanged(int)), this, SLOT(changed(int )));
+}
 
 diaElemToggle::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip)
   : diaElemToggleBase()

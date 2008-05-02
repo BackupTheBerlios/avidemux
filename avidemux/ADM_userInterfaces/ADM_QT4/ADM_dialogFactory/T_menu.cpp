@@ -14,54 +14,22 @@
  ***************************************************************************/
 
 #include "config.h"
-
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#include <QDialog>
-#include <QComboBox>
-#include <QLabel>
-#include <QGridLayout>
-
+#include "T_menu.h"
 #include "ADM_default.h"
-#include "DIA_factory.h"
-#include "ADM_assert.h"
 
-#include <QCheckBox>
-
+#include <QtGui/QGridLayout>
+#include <QtGui/QLabel>
 
 extern const char *shortkey(const char *);
 
 namespace ADM_qt4Factory
 {
-class diaElemMenuDynamic : public diaElemMenuDynamicBase
-{
-protected:
-	
-
-public:
-  diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
-               diaMenuEntryDynamic **menu,const char *tip=NULL);
-  
-  virtual   ~diaElemMenuDynamic() ;
-  void      setMe(void *dialog, void *opaque,uint32_t line);
-  void      getMe(void);
-  virtual uint8_t   link(diaMenuEntryDynamic *entry,uint32_t onoff,diaElem *w);
-  virtual void      updateMe(void);
-  virtual void      enable(uint32_t onoff) ;
-  virtual void      finalize(void);
-};
-//**********************
 class diaElemMenu : public diaElemMenuBase
 {
 protected:
-	
-
 	diaElemMenuDynamic  *dyna;
 	diaMenuEntryDynamic  **menus;	
+
 public:
   diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
                const diaMenuEntry *menu,const char *tip=NULL);
@@ -77,33 +45,20 @@ public:
 
 /**/
 
-  class ADM_QComboBox : public QComboBox
+ADM_QComboBox::ADM_QComboBox(QWidget *root,diaElemMenuDynamic *menu) : QComboBox(root)
 {
-      Q_OBJECT
-    
-  signals:
-        
-        
-   public slots:
-        void changed(int i)
-        {
-          _menu->updateMe();
-        }
-  protected:
-        diaElemMenuDynamic *_menu;
-  public:
-  ADM_QComboBox(QWidget *root,diaElemMenuDynamic *menu) : QComboBox(root)
-  {
-    _menu=menu;
-  }
-  void connectMe(void)
-  {
-    QObject::connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(changed(int )));
-  }
-  
-};
+	_menu=menu;
+}
 
-/**/
+void ADM_QComboBox::changed(int i)
+{
+	_menu->updateMe();
+}
+
+void ADM_QComboBox::connectMe(void)
+{
+	QObject::connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(changed(int )));
+}
 
 diaElemMenu::diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
                const diaMenuEntry *menu,const char *tip)

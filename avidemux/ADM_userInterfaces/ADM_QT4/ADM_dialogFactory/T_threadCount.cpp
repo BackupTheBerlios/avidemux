@@ -14,18 +14,11 @@ Handle dialog factory element : Thread Count
 ***************************************************************************/
 
 #include "config.h"
-
-#include <QGridLayout>
-#include <QLabel>
-#include <QRadioButton>
-#include <QButtonGroup>
-#include <QSpinBox>
-
+#include "T_threadCount.h"
 #include "ADM_default.h"
 #include "DIA_factory.h"
 
 extern const char* shortkey(const char*);
-
 
 namespace ADM_qt4Factory
 {
@@ -41,87 +34,69 @@ public:
   void getMe(void);
 };
 
-class ADM_QthreadCount : public QWidget
+void ADM_QthreadCount::radioGroupChanged(QAbstractButton *s)
 {
-	Q_OBJECT
+	spinBox->setEnabled(radiobutton3->isChecked());
+}
 
-signals:
+ADM_QthreadCount::ADM_QthreadCount(QWidget *widget, const char *title, uint32_t value, QGridLayout *layout, int line) : QWidget(widget) 
+{
+	radiobutton1 = new QRadioButton(QString::fromUtf8(QT_TR_NOOP("Disabled")), widget);
+	radiobutton2 = new QRadioButton(QString::fromUtf8(QT_TR_NOOP("Auto-detect")), widget);
+	radiobutton3 = new QRadioButton(QString::fromUtf8(QT_TR_NOOP("Custom")), widget);
 
-public slots:
+	buttonGroup = new QButtonGroup;
+	buttonGroup->addButton(radiobutton1);
+	buttonGroup->addButton(radiobutton2);
+	buttonGroup->addButton(radiobutton3);
 
-	void radioGroupChanged(QAbstractButton *s)
+	spinBox = new QSpinBox();
+	spinBox->setRange(2, 32);
+
+	text = new QLabel(QString::fromUtf8(title), widget);
+	text->setBuddy(radiobutton1);
+
+	layout->addWidget(text, line, 0);
+	layout->addWidget(radiobutton1, line, 1);
+	layout->addWidget(radiobutton2, line, 2);
+	layout->addWidget(radiobutton3, line, 3);
+	layout->addWidget(spinBox, line, 4);
+
+	QObject::connect(buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(radioGroupChanged(QAbstractButton*)));
+
+	spinBox->setEnabled(value > 1);
+
+	if (value == 0)
+		radiobutton2->setChecked(true);
+	else if (value == 1)
+		radiobutton1->setChecked(true);
+	else
 	{
-		spinBox->setEnabled(radiobutton3->isChecked());
+		radiobutton3->setChecked(true);
+		spinBox->setValue(value);
 	}
+}
 
-public:
+ADM_QthreadCount::~ADM_QthreadCount() 
+{
+	if (buttonGroup)
+		delete buttonGroup;
 
-	QLabel *text;
-	QRadioButton *radiobutton1;
-	QRadioButton *radiobutton2;
-	QRadioButton *radiobutton3;
-	QButtonGroup *buttonGroup;
-	QSpinBox *spinBox;
+	if (radiobutton1)
+		delete radiobutton1;
 
-	ADM_QthreadCount(QWidget *widget, const char *title, uint32_t value, QGridLayout *layout, int line) : QWidget(widget) 
-	{
-		radiobutton1 = new QRadioButton(QString::fromUtf8(QT_TR_NOOP("Disabled")), widget);
-		radiobutton2 = new QRadioButton(QString::fromUtf8(QT_TR_NOOP("Auto-detect")), widget);
-		radiobutton3 = new QRadioButton(QString::fromUtf8(QT_TR_NOOP("Custom")), widget);
+	if (radiobutton2)
+		delete radiobutton2;
 
-		buttonGroup = new QButtonGroup;
-		buttonGroup->addButton(radiobutton1);
-		buttonGroup->addButton(radiobutton2);
-		buttonGroup->addButton(radiobutton3);
+	if (radiobutton3)
+		delete radiobutton3;
 
-		spinBox = new QSpinBox();
-		spinBox->setRange(2, 32);
+	if (spinBox)
+		delete spinBox;
 
-		text = new QLabel(QString::fromUtf8(title), widget);
-		text->setBuddy(radiobutton1);
-
-		layout->addWidget(text, line, 0);
-		layout->addWidget(radiobutton1, line, 1);
-		layout->addWidget(radiobutton2, line, 2);
-		layout->addWidget(radiobutton3, line, 3);
-		layout->addWidget(spinBox, line, 4);
-
-		QObject::connect(buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(radioGroupChanged(QAbstractButton*)));
-
-		spinBox->setEnabled(value > 1);
-
-		if (value == 0)
-			radiobutton2->setChecked(true);
-		else if (value == 1)
-			radiobutton1->setChecked(true);
-		else
-		{
-			radiobutton3->setChecked(true);
-			spinBox->setValue(value);
-		}
-	}
-
-	~ADM_QthreadCount() 
-	{
-		if (buttonGroup)
-			delete buttonGroup;
-
-		if (radiobutton1)
-			delete radiobutton1;
-
-		if (radiobutton2)
-			delete radiobutton2;
-
-		if (radiobutton3)
-			delete radiobutton3;
-
-		if (spinBox)
-			delete spinBox;
-
-		if (text)
-			delete text;
-	}
-};
+	if (text)
+		delete text;
+}
 
 diaElemThreadCount::diaElemThreadCount(uint32_t *value, const char *title, const char *tip) : diaElem(ELEM_THREAD_COUNT)
 {

@@ -15,20 +15,9 @@
 
 #include "config.h"
 
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#include <QDialog>
-#include <QMessageBox>
-#include <QGridLayout>
-#include <QCheckBox>
-
 #include "ADM_default.h"
 #include "DIA_factory.h"
-#include "ADM_assert.h"
+
 namespace ADM_qt4Factory
 {
 class diaElemHex : public diaElem

@@ -14,32 +14,18 @@
  ***************************************************************************/
 
 #include "config.h"
-
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#include <QDialog>
-#include <QSpinBox>
-#include <QGridLayout>
-#include <QLabel>
-#include <QSlider>
-
+#include "T_slider.h"
 #include "ADM_default.h"
 #include "DIA_factory.h"
-#include "ADM_assert.h"
 
+#include <QtGui/QGridLayout>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QLabel>
 
 extern const char *shortkey(const char *);
 
-
-
 namespace ADM_qt4Factory
 {
-
-
 class diaElemUSlider : public diaElemSliderBase
 {
   protected:
@@ -68,29 +54,10 @@ public:
   
 };
 
-
-//********************************************************************
-
-class SpinSlider : public QWidget
+int SpinSlider::value()
 {
-    Q_OBJECT
-
-public:
-    SpinSlider (QWidget * parent = 0);
-    int value() const { return spinner->value(); }
-
-signals:
-    void valueChanged (int value);
-
-public slots:
-    void setValue (int value);
-    void setMinimum (int value);
-    void setMaximum (int value);
-
-private:
-    QSlider * slider;
-    QSpinBox * spinner;
-};
+	return spinner->value();
+}
 
 SpinSlider::SpinSlider (QWidget * parent)
     : QWidget (parent)

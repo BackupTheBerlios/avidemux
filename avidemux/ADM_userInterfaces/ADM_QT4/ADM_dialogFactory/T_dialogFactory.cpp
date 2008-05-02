@@ -12,39 +12,17 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QtGui/QDialogButtonBox>
+#include <QtGui/QGridLayout>
+#include <QtGui/QSpacerItem>
+#include <QtGui/QTabWidget>
+
 #include "config.h"
-
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#include <QDialog>
-#include <QMessageBox>
-#include <QGridLayout>
-#include <QDialogButtonBox>
-#include <QDialogButtonBox>
-#include <QPushButton>
-#include <QTabWidget>
-
+#include "T_dialogFactory.h"
 #include "ADM_default.h"
 #include "DIA_factory.h"
 #include "DIA_coreToolkit.h"
 #include "DIA_coreUI_internal.h"
-
-#include "ADM_assert.h"
-
-class factoryWindow : public QDialog
-{
-     Q_OBJECT
-
- public:
-     factoryWindow();
- public slots:
- private slots:
- private:
-};
 
 static void insertTab(uint32_t index, diaElemTabs *tab, QTabWidget *wtab);
 factoryWindow::factoryWindow()     : QDialog()
