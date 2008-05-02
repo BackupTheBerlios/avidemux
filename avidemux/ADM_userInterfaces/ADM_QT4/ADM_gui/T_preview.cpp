@@ -15,38 +15,23 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
- 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <time.h>
-#include <sys/time.h>
-
-#include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
 #include <QtGui/QFrame>
-#include <QtGui/QGraphicsView>
-#include <QtGui/QSlider>
-#include <QMessageBox>
-#include <QPainter>
-#include <QImage>
+#include <QtGui/QImage>
+#include <QtGui/QPainter>
+
 /* Probably on unix/X11 ..*/
 #ifdef __APPLE__
 #include <Carbon/Carbon.h>
 #elif !defined(__WIN32)
-#include <QX11Info>
+#include <QtGui/QX11Info>
 #endif
 
+#include "T_preview.h"
 #include "ADM_colorspace.h"
 #include "GUI_render.h"
 #include "GUI_accelRender.h"
 #include "prefs.h"
 #include "ADM_assert.h"
-#include "ui_gui2.h"
     
 void UI_QT4VideoWidget(QFrame *host);
 static QFrame *hostFrame=NULL;
@@ -77,45 +62,30 @@ static uint32_t displayW=0,displayH=0;
   It is a base QWidget where the image will be put by painter.
 
 */
-class  ADM_Qvideo : public QWidget
-{
-     Q_OBJECT
-    
-  signals:
-        
-        
-   public slots:
-        
-  public:
-        ADM_Qvideo(QWidget *z) : QWidget(z) 
-        {
-          
-        }
-        ~ADM_Qvideo() {};
-        /**
-            \fn paintEvent( QPaintEvent *ev))
-            \brief Repaint our "video" widget, ignore when accelRender is on
-        */
-        void paintEvent(QPaintEvent *ev)
-        {
-          if(!displayW || !displayH || !rgbDataBuffer || accelRender)
-            return ;
 
-          if(accelRender) 
-          {
-            if(lastImage)
-            {
-              accelRender->display(lastImage,displayW,displayH);
-            }
-          }else
-          {
-            QImage image(rgbDataBuffer,displayW,displayH,QImage::Format_RGB32);
-              QPainter painter(this);
-              painter.drawImage(QPoint(0,0),image);
-              painter.end();
-          }
-        }
-};
+ADM_Qvideo::ADM_Qvideo(QWidget *z) : QWidget(z) {}
+ADM_Qvideo::~ADM_Qvideo() {}
+
+void ADM_Qvideo::paintEvent(QPaintEvent *ev)
+{
+	if(!displayW || !displayH || !rgbDataBuffer || accelRender)
+		return ;
+
+	if(accelRender) 
+	{
+		if(lastImage)
+		{
+			accelRender->display(lastImage,displayW,displayH);
+		}
+	}else
+	{
+		QImage image(rgbDataBuffer,displayW,displayH,QImage::Format_RGB32);
+		QPainter painter(this);
+		painter.drawImage(QPoint(0,0),image);
+		painter.end();
+	}
+}
+
 ADM_Qvideo *videoWindow=NULL;
 //****************************************************************************************************
 void UI_QT4VideoWidget(QFrame *host)

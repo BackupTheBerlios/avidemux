@@ -13,23 +13,10 @@
  ***************************************************************************/
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QFrame>
-#include <QtGui/QGraphicsView>
-#include <QtGui/QMainWindow>
-#include <QtGui/QSlider>
-#include <QtGui/QStatusBar>
-#include <QtGui/QWidget>
 #include <QtGui/QKeyEvent>
-#include <QtGui/QValidator>
+#include <QtGui/QGraphicsView>
 
-#include "ADM_qslider.h"
+#include "Q_gui2.h"
 #include "ADM_default.h"
 
 #include "ADM_codecs/ADM_codec.h"
@@ -71,8 +58,6 @@ static int currentFrame = 0;
 extern uint8_t AVDM_setVolume(int volume);
 #endif
 
-#include "ui_gui2.h"
-
 #define WIDGET(x)  (((MainWindow *)QuiMainWindows)->ui.x)
 
 #define CONNECT(object,zzz) connect( (ui.object),SIGNAL(triggered()),this,SLOT(buttonPressed()));
@@ -106,131 +91,101 @@ void UI_updateTimeCount(uint32_t curFrame,uint32_t fps);
     Declare the class that will be our main window
 
 */
-class MainWindow : public QMainWindow
+
+void MainWindow::comboChanged(int z)
 {
-	Q_OBJECT
+	const char *source=qPrintable(sender()->objectName());
 
-public:
-	MainWindow();
-	virtual ~MainWindow();	
-	void buildCustomMenu(void);
-	
-	Ui_MainWindow ui;
-
-public slots:
-	void timeChanged(int);
-	void buttonPressed(void);
-	void custom(void);
-	void toolButtonPressed(bool z);
-
-	void comboChanged(int z)
+	if(!strcmp(source,"comboBoxVideo"))  
 	{
-		const char *source=qPrintable(sender()->objectName());
-
-		if(!strcmp(source,"comboBoxVideo"))  
+		bool b=FALSE;
+		if(ui.comboBoxVideo->currentIndex())
 		{
-			bool b=FALSE;
-			if(ui.comboBoxVideo->currentIndex())
-			{
-				b=TRUE;
-			}
-			ui.pushButtonVideoConf->setEnabled(b);
-			ui.pushButtonVideoFilter->setEnabled(b);
-			HandleAction (ACT_VideoCodecChanged) ;
+			b=TRUE;
 		}
-		else if(!strcmp(source,"comboBoxAudio"))  
+		ui.pushButtonVideoConf->setEnabled(b);
+		ui.pushButtonVideoFilter->setEnabled(b);
+		HandleAction (ACT_VideoCodecChanged) ;
+	}
+	else if(!strcmp(source,"comboBoxAudio"))  
+	{
+		bool b=FALSE;
+		if(ui.comboBoxAudio->currentIndex())
 		{
-			bool b=FALSE;
-			if(ui.comboBoxAudio->currentIndex())
-			{
-				b=TRUE;
-			}
-			ui.pushButtonAudioConf->setEnabled(b);
-			ui.pushButtonAudioFilter->setEnabled(b);
-			HandleAction (ACT_AudioCodecChanged) ;
+			b=TRUE;
 		}
-		else
-			printf("From +: %s\n",source);
+		ui.pushButtonAudioConf->setEnabled(b);
+		ui.pushButtonAudioFilter->setEnabled(b);
+		HandleAction (ACT_AudioCodecChanged) ;
 	}
+	else
+		printf("From +: %s\n",source);
+}
 
-	void sliderValueChanged(int u) 
-	{
-		if(!_upd_in_progres)
-			HandleAction(ACT_Scale);
-	}
+void MainWindow::sliderValueChanged(int u) 
+{
+	if(!_upd_in_progres)
+		HandleAction(ACT_Scale);
+}
 
-	void sliderMoved(int value)
-	{
-		SliderIsShifted = shiftKeyHeld;
-	}
+void MainWindow::sliderMoved(int value)
+{
+	SliderIsShifted = shiftKeyHeld;
+}
 
-	void sliderReleased(void)
-	{
-		SliderIsShifted = 0;
-	}
+void MainWindow::sliderReleased(void)
+{
+	SliderIsShifted = 0;
+}
 
-	void volumeChange( int u )
-	{
+void MainWindow::volumeChange( int u )
+{
 #ifdef HAVE_AUDIO
-		if (_upd_in_progres || !ui.toolButtonAudioToggle->isChecked())
-			return;
+	if (_upd_in_progres || !ui.toolButtonAudioToggle->isChecked())
+		return;
 
-		_upd_in_progres++;
+	_upd_in_progres++;
 
-		int vol = ui.horizontalSlider_2->value();
+	int vol = ui.horizontalSlider_2->value();
 
-		AVDM_setVolume(vol);
-		_upd_in_progres--;
+	AVDM_setVolume(vol);
+	_upd_in_progres--;
 #endif
-	}
+}
 
-	void audioToggled(bool checked)
-	{
+void MainWindow::audioToggled(bool checked)
+{
 #ifdef HAVE_AUDIO
-		if (checked)
-			AVDM_setVolume(ui.horizontalSlider_2->value());
-		else
-			AVDM_setVolume(0);
+	if (checked)
+		AVDM_setVolume(ui.horizontalSlider_2->value());
+	else
+		AVDM_setVolume(0);
 #endif
-	}
+}
 
-	void previewModeChanged(QAction *action)
-	{
-		HandleAction(ACT_PreviewChanged);
-	}
+void MainWindow::previewModeChanged(QAction *action)
+{
+	HandleAction(ACT_PreviewChanged);
+}
 
-	void previousIntraFrame(void);
-	void nextIntraFrame(void);
+void MainWindow::timeChangeFinished(void)
+{
+	this->setFocus(Qt::OtherFocusReason);
+}
 
-	void timeChangeFinished(void)
-	{
-		this->setFocus(Qt::OtherFocusReason);
-	}
+void MainWindow::currentFrameChanged(void)
+{
+	HandleAction(ACT_JumpToFrame);
 
-	void currentFrameChanged(void)
-	{
-		HandleAction(ACT_JumpToFrame);
+	this->setFocus(Qt::OtherFocusReason);
+}
 
-		this->setFocus(Qt::OtherFocusReason);
-	}
+void MainWindow::currentTimeChanged(void)
+{
+	HandleAction(ACT_JumpToTime);
 
-	void currentTimeChanged(void)
-	{
-		HandleAction(ACT_JumpToTime);
-
-		this->setFocus(Qt::OtherFocusReason);
-	}
-
-protected:
-	void clearCustomMenu(void);
-	bool eventFilter(QObject* watched, QEvent* event);
-	void mousePressEvent(QMouseEvent* event);
-
-private slots:
-
-private:
-
-};
+	this->setFocus(Qt::OtherFocusReason);
+}
 
 
 MainWindow::MainWindow() : QMainWindow()

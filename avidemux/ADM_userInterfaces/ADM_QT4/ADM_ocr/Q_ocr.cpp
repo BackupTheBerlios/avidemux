@@ -16,104 +16,54 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-#include <math.h>
+#include "Q_ocr.h"
 
-#include "ui_ocr.h"
-
-#include "ADM_default.h"
-
-#include "DIA_fileSel.h"
-#include "ADM_image.h"
-#include "ADM_videoFilter.h"
-
-
-#include "ADM_videoFilter/ADM_vobsubinfo.h"
-#include "ADM_videoFilter/ADM_vidVobSub.h"
-
-#include "ADM_ocr/ADM_ocr.h"
-#include "ADM_ocr/ADM_ocrInternal.h"
-#include "ui_ocr.h"
-#include "../ADM_dialog/DIA_flyDialogQt4.h"
 extern void UI_purge(void);
 
 //*********************************************
-class Ui_ocrWindow : public QDialog
- {
-     Q_OBJECT
- protected :
-	 
- public:
-     Ui_ocrWindow(void);
-     ~Ui_ocrWindow();
-     Ui_DialogOcr ui;
      
-     uint32_t _w,_h;
-     uint8_t *data;
-     ADM_QCanvas *canvas;
-     admGlyph *_glyph,*_head;
-     char *_decodedString;
-     
-     ADM_QCanvas *smallCanvas;
-     ReplyType _reply;
-     
-     void setGlyph(admGlyph *glyph,admGlyph *head,char *decodedString)
-     {
-    	 		_glyph=glyph;
-    	 		_head=head;
-    	 		_decodedString=decodedString;
-     }
-     void dialogReturn(ReplyType r)
-     {
-    	 _reply=r;
-    	 accept();
-     }
-     
-     void resizeSmall(uint32_t w,uint32_t h,uint8_t *smallData)
-     {
-    	 	smallCanvas->changeSize(w*2,h*2);
-    		smallCanvas->dataBuffer=smallData;
-    		QGraphicsView *graphicsView=ui.smallView;
-    		
-    		graphicsView->resize(w*2, h*2);
-    		smallCanvas->setMinimumSize(w*2,h*2);
-    		smallCanvas->resize(w*2, h*2); 
-     }
-     
- public slots:
- 		void pushButtonCalibrate(bool i);
- 		void pushButtonSkipAll(bool i);
- 		void pushButtonSkip(bool i);
- 		void pushButtonIgnore(bool i);
- 		
- 		void pushButtonOk(bool i);
- 		void pushButtonClose(bool i);
+void Ui_ocrWindow::setGlyph(admGlyph *glyph,admGlyph *head,char *decodedString)
+{
+	_glyph=glyph;
+	_head=head;
+	_decodedString=decodedString;
+}
 
- private slots:
- private:
-     
- };
-  Ui_ocrWindow::Ui_ocrWindow(void)
-  {
-        ui.setupUi(this);
-        ui.textEdit->setReadOnly(TRUE);
-        data=NULL;
-        _w=_h=100;
-        canvas=new ADM_QCanvas(ui.bigView,_w,_h);
-        smallCanvas= new ADM_QCanvas(ui.smallView,_w,_h);
+void Ui_ocrWindow::dialogReturn(ReplyType r)
+{
+	_reply=r;
+	accept();
+}
+
+void Ui_ocrWindow::resizeSmall(uint32_t w,uint32_t h,uint8_t *smallData)
+{
+	smallCanvas->changeSize(w*2,h*2);
+	smallCanvas->dataBuffer=smallData;
+	QGraphicsView *graphicsView=ui.smallView;
+
+	graphicsView->resize(w*2, h*2);
+	smallCanvas->setMinimumSize(w*2,h*2);
+	smallCanvas->resize(w*2, h*2); 
+}
+
+Ui_ocrWindow::Ui_ocrWindow(void)
+{
+	ui.setupUi(this);
+	ui.textEdit->setReadOnly(TRUE);
+	data=NULL;
+	_w=_h=100;
+	canvas=new ADM_QCanvas(ui.bigView,_w,_h);
+	smallCanvas= new ADM_QCanvas(ui.smallView,_w,_h);
 #define BUTTON(x)   connect(ui.x,SIGNAL(clicked(bool)),this,SLOT(x(bool)))
-        BUTTON(pushButtonCalibrate);
-        BUTTON(pushButtonSkipAll);
-        BUTTON(pushButtonSkip);
-        BUTTON(pushButtonIgnore);
-        BUTTON(pushButtonOk);
-        BUTTON(pushButtonClose);
-        _glyph=_head=NULL;
-        _decodedString=NULL;
-        //ui.lineEdit->setBuddy(ui.pushButtonOk);
-        
-
-  }
+	BUTTON(pushButtonCalibrate);
+	BUTTON(pushButtonSkipAll);
+	BUTTON(pushButtonSkip);
+	BUTTON(pushButtonIgnore);
+	BUTTON(pushButtonOk);
+	BUTTON(pushButtonClose);
+	_glyph=_head=NULL;
+	_decodedString=NULL;
+}
 //***********************************************
 
 void  Ui_ocrWindow::pushButtonSkip(bool i)

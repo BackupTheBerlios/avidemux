@@ -12,11 +12,8 @@ Custom slider
 *                                                                         *
 ***************************************************************************/
 
-#include "config.h"
-
-#include <math.h>
-#include <QPainter>
-#include <QSlider>
+#include <QtGui/QPainter>
+#include <QtGui/QSlider>
 
 #include "ADM_qslider.h"
 

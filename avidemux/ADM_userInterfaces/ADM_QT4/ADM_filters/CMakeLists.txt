@@ -1,9 +1,11 @@
 SET(ADM_LIB ADM_filtersQt4)
 
-SET(${ADM_LIB}_SRCS filter_none.cpp  filter_rsc.cpp)
+QT4_WRAP_UI(${ADM_LIB}_header  mainfilter.ui)
+QT4_WRAP_CPP(${ADM_LIB}_source  Q_mainfilter.h)
+QT4_ADD_RESOURCES(${ADM_LIB}_resource  filter.qrc)
 
-SET(${ADM_LIB}_Q mainfilter)
+SET(${ADM_LIB}_SRCS
+	filter_none.cpp  Q_mainfilter.cpp  ${${ADM_LIB}_header}  ${${ADM_LIB}_source}  ${${ADM_LIB}_resource})
 
-INCLUDE(adm_qt4)
-
-Q_RCC(filter)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+ADD_ADM_LIB_QT4_TARGET(${ADM_LIB} ${${ADM_LIB}_SRCS})

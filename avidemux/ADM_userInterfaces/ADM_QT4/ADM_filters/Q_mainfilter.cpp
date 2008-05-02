@@ -26,11 +26,7 @@
 #include "config.h"
 #include <vector>
 
-#define Ui_Dialog Ui_mainFilterDialog
-#include "ui_mainfilter.h"
-#undef Ui_Dialog
-#include "QStringListModel" 
-#include "QColor" 
+#include "Q_mainfilter.h"
 #include "ADM_default.h"
 #include "DIA_fileSel.h"
 
@@ -67,46 +63,7 @@ extern const char  *filterGetNameFromTag(VF_FILTERS tag);
 extern ADM_Composer *video_body;
 extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *conf, AVDMGenericVideoStream *in) ;
 /*******************************************************/
-class filtermainWindow : public QDialog
-{
-     Q_OBJECT
 
- public:
-     filtermainWindow();
- //    virtual ~filtermainWindow();
-     void             buildActiveFilterList(void);
-     Ui_mainFilterDialog ui;
-     
-     
-     
-     QListWidget      *availableList;
-     QListWidget      *activeList;
-     
-     
-     
- public slots:
-        void VCD(bool b);
-        void DVD(bool b);
-        void SVCD(bool b);
-        void halfD1(bool b);
-        void add(bool b);
-        void up(bool b);
-        void down(bool b);
-        void remove(bool b);
-        void configure(bool b);
-        void partial(bool b);
-        void activeDoubleClick( QListWidgetItem  *item);
-        void allDoubleClick( QListWidgetItem  *item);
-	void filterFamilyClick(QListWidgetItem *item);
-	void filterFamilyClick(int  item);
- private slots:
- private:
-        
-        
-        void setSelected(int sel);
-        void displayFamily(uint32_t family);
-        void setupFilters(void);
-};
 /**
         \fn     void setSelected(int sel)
         \brief  Set the sel line as selected in the active filter window
