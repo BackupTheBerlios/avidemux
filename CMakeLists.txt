@@ -11,6 +11,10 @@ endif (COMMAND cmake_policy)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
 
+IF (NOT CMAKE_CXX_COMPILER_WORKS MATCHES "^${CMAKE_CXX_COMPILER_WORKS}$")
+	SET(FRESH_BUILD 1)
+ENDIF (NOT CMAKE_CXX_COMPILER_WORKS MATCHES "^${CMAKE_CXX_COMPILER_WORKS}$")
+
 PROJECT(Avidemux)
 
 IF (${Avidemux_SOURCE_DIR} MATCHES ${Avidemux_BINARY_DIR})
@@ -19,10 +23,11 @@ IF (${Avidemux_SOURCE_DIR} MATCHES ${Avidemux_BINARY_DIR})
 	MESSAGE(FATAL_ERROR "in-tree-build detected")
 ENDIF (${Avidemux_SOURCE_DIR} MATCHES ${Avidemux_BINARY_DIR})
 
-INCLUDE(CheckCXXCompilerFlag)
 INCLUDE(admConfigHelper)
 
-MESSAGE("")
+IF (FRESH_BUILD)
+	MESSAGE("")
+ENDIF (FRESH_BUILD)
 
 ########################################
 # Global options
@@ -138,21 +143,25 @@ INCLUDE(admCheckMiscLibs)
 ########################################
 # Check functions and includes
 ########################################
-MESSAGE(STATUS "Checking system headers")
-MESSAGE(STATUS "***********************")
+IF (NOT SYSTEM_HEADERS_CHECKED)
+	MESSAGE(STATUS "Checking system headers")
+	MESSAGE(STATUS "***********************")
 
-INCLUDE(CheckIncludeFiles)
-INCLUDE(CheckFunctionExists)
+	INCLUDE(CheckIncludeFiles)
+	INCLUDE(CheckFunctionExists)
 
-CHECK_FUNCTION_EXISTS(gettimeofday HAVE_GETTIMEOFDAY)
+	CHECK_FUNCTION_EXISTS(gettimeofday HAVE_GETTIMEOFDAY)
 
-CHECK_INCLUDE_FILES(byteswap.h   HAVE_BYTESWAP_H)	# libavutil
-CHECK_INCLUDE_FILES(inttypes.h   HAVE_INTTYPES_H)	# internal use, mpeg2enc, mplex
-CHECK_INCLUDE_FILES(stdint.h     HAVE_STDINT_H)		# internal use, mpeg2enc, mplex
-CHECK_INCLUDE_FILES(sys/types.h  HAVE_SYS_TYPES_H)	# mad, mpeg2enc
-CHECK_INCLUDE_FILES(malloc.h     HAVE_MALLOC_H)		# libavcodec, libavutil, libpostproc, libswscale, mplex
+	CHECK_INCLUDE_FILES(byteswap.h   HAVE_BYTESWAP_H)	# libavutil
+	CHECK_INCLUDE_FILES(inttypes.h   HAVE_INTTYPES_H)	# internal use, mpeg2enc, mplex
+	CHECK_INCLUDE_FILES(stdint.h     HAVE_STDINT_H)		# internal use, mpeg2enc, mplex
+	CHECK_INCLUDE_FILES(sys/types.h  HAVE_SYS_TYPES_H)	# mad, mpeg2enc
+	CHECK_INCLUDE_FILES(malloc.h     HAVE_MALLOC_H)		# libavcodec, libavutil, libpostproc, libswscale, mplex
+	SET(SYSTEM_HEADERS_CHECKED 1 CACHE BOOL "")
+	MARK_AS_ADVANCED(SYSTEM_HEADERS_CHECKED)
 
-MESSAGE("")
+	MESSAGE("")
+ENDIF (NOT SYSTEM_HEADERS_CHECKED)
 
 ########################################
 # Debug Summary
