@@ -139,7 +139,11 @@ namespace ADM_QT4_fileSel
 		{
 			const char *s = fileName.toUtf8().constData();
 			strncpy(target, s, max);
+
+			return 1;
 		}
+
+		return 0;
 	}
 
 	/**

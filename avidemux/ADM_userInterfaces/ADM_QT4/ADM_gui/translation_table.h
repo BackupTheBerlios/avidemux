@@ -14,7 +14,7 @@ PROCESS(actionSave_video,ACT_SaveAvi) \
 PROCESS(actionSave_BMP,ACT_SaveImg) \
 PROCESS(actionSave_jpeg,ACT_SaveJPG) \
 PROCESS(actionLoad_run_project,ACT_RunScript) \
-PROCESS(actionSave_project,ACT_DUMMY) \
+PROCESS(actionSave_project,ACT_SaveCurrentWork) \
 PROCESS(actionSave_project_as,ACT_SaveWork) \
 PROCESS(actionConnect_to_AvsProxy,ACT_AVS_PROXY) \
 PROCESS(actionReset_Edits,ACT_ResetSegments) \
@@ -34,7 +34,7 @@ PROCESS(actionSecondary_Track,ACT_SecondAudioTrack) \
 PROCESS(actionBuild_VBR_time_map,ACT_AudioMap) \
 PROCESS(actionSave_2,ACT_SaveWave) \
 PROCESS(actionEncoder_2,ACT_SelectEncoder) \
-PROCESS(actionFilters_2,ACT_DUMMY) \
+PROCESS(actionFilters_2,ACT_AudioFilters) \
 PROCESS(actionCalculator,ACT_DUMMY) \
 PROCESS(actionRebuild_I_B_Frames,ACT_RebuildKF) \
 PROCESS(actionBitrate_histogram,ACT_BitRate) \
@@ -73,7 +73,6 @@ PROCESS(actionShow_Joblist,ACT_HANDLE_JOB)
 PROCESS(actionPrevious_intra_frame,ACT_PreviousKFrame) \
 PROCESS(actionNext_intra_frame,ACT_NextKFrame) \
 PROCESS(actionZoom_4_1,ACT_ZOOM_4_1) \
-PROCESS(actionMain_toolbar,ACT_SaveCurrentWork) \
 PROCESS(actionA_V_toolbar,ACT_DUMMY)
 #endif
 

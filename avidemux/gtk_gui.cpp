@@ -2241,7 +2241,7 @@ void A_Resync(void)
 uint8_t  DIA_job_select(char **jobname, char **filename);
 void A_addJob(void)
 {
-        char *name,*fullname,*base,*final=NULL;
+        char *name=NULL,*fullname,*base,*final=NULL;
 
         if(!DIA_job_select(&name,&final)) return;
         if(!name || !final) return;

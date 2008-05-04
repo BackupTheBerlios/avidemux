@@ -27,15 +27,14 @@ jobsWindow::jobsWindow(uint32_t n,char **j)     : QDialog()
      _jobsName=j;
      desc=new ADM_Job_Descriptor[n];
      // Setup display
-#define WIDGET(x) ui.x
-     WIDGET(tableWidget)->setRowCount(_nbJobs);
-     WIDGET(tableWidget)->setColumnCount(4);
+	 ui.tableWidget->setRowCount(_nbJobs);
+     ui.tableWidget->setColumnCount(4);
 
      // Set headers
       QStringList headers;
      headers << QT_TR_NOOP("Job Name") << QT_TR_NOOP("Status") << QT_TR_NOOP("Start Time") << QT_TR_NOOP("End Time"); 
      
-     WIDGET(tableWidget)->setVerticalHeaderLabels(headers);
+     ui.tableWidget->setVerticalHeaderLabels(headers);
      updateRows();
     
 #define CNX(x) connect( ui.pushButton##x,SIGNAL(clicked(bool)),this,SLOT(x(bool)))
@@ -48,22 +47,10 @@ jobsWindow::jobsWindow(uint32_t n,char **j)     : QDialog()
  /**
     \fn ~jobsWindow
  */
- jobsWindow::~jobsWindow()
- {
-   
-        // Now delete the "deleted" jobs
-        for(int i=0;i<_nbJobs;i++)
-        {
-                if(desc[i].status==STATUS_DELETED)
-                {
-                        unlink(_jobsName[i]);
-                }
-
-        }
-        delete [] desc;
-        desc=NULL;
-
- }
+jobsWindow::~jobsWindow()
+{
+	delete [] desc;
+}
  /*
     There is maybe a huge mem leak here
  */
@@ -78,26 +65,23 @@ static void ADM_setText(const char *txt,uint32_t col, uint32_t row,QTableWidget 
       \fn updateRaw
       \brief update display for raw x
  */
-uint8_t jobsWindow::updateRows(void)
+void jobsWindow::updateRows(void)
 {
-   WIDGET(tableWidget)->clear();
+   ui.tableWidget->clear();
    ADM_Job_Descriptor *j;
    char str[20];
    for(int i=0;i<_nbJobs;i++)
    {
       j=&(desc[i]);
-      ADM_setText(ADM_GetFileName(_jobsName[i]),0,i,WIDGET(tableWidget));
-      ADM_setText(StringStatus[j->status],1,i,WIDGET(tableWidget));
+      ADM_setText(ADM_GetFileName(_jobsName[i]),0,i,ui.tableWidget);
+      ADM_setText(StringStatus[j->status],1,i,ui.tableWidget);
       
       sprintf(str,"%02u:%02u:%02u",j->startDate.hours,j->startDate.minutes,j->startDate.seconds);
-      ADM_setText(str,2,i,WIDGET(tableWidget));
+      ADM_setText(str,2,i,ui.tableWidget);
       
       sprintf(str,"%02u:%02u:%02u",j->endDate.hours,j->endDate.minutes,j->endDate.seconds);
-      ADM_setText(str,3,i,WIDGET(tableWidget));
-
+      ADM_setText(str,3,i,ui.tableWidget);
    }
-   
-      return 1;
 }
 
                                                                  
@@ -106,84 +90,94 @@ uint8_t jobsWindow::updateRows(void)
       \fn deleteOne
       \brief delete one job
 */
-int jobsWindow::DeleteOne(bool b)
+void jobsWindow::DeleteOne(bool b)
 {
-  int sel=WIDGET(tableWidget)->currentRow();
-        if(sel<=0 || sel>=_nbJobs) return 0;
-        if(GUI_Confirmation_HIG(QT_TR_NOOP("Sure!"),QT_TR_NOOP("Delete job"),QT_TR_NOOP("Are you sure you want to delete %s job ?"),ADM_GetFileName(_jobsName[sel])))
-        {
-                desc[sel].status=STATUS_DELETED;
-        }
-        updateRows();
-        return 0;
-}         
+	int sel = ui.tableWidget->currentRow();
+
+	if (sel >= 0 && sel < _nbJobs)
+	{
+		if (GUI_Confirmation_HIG(QT_TR_NOOP("Sure!"), QT_TR_NOOP("Delete job"), QT_TR_NOOP("Are you sure you want to delete %s job?"), ADM_GetFileName(_jobsName[sel])))
+		{
+			desc[sel].status = STATUS_DELETED;
+			unlink(_jobsName[sel]);
+			updateRows();
+		}
+	}
+}
 /**
       \fn deleteAll
       \brief delete all job
 */
-int jobsWindow::DeleteAll(bool b)
+void jobsWindow::DeleteAll(bool b)
 {
-  if(!GUI_Confirmation_HIG(QT_TR_NOOP("Sure!"),QT_TR_NOOP("Delete *all* job"),QT_TR_NOOP("Are you sure you want to delete ALL jobs ?")))
-  {
-          return 0;
-  }
-  for(int sel=0;sel<_nbJobs;sel++)
-  {
-        desc[sel].status=STATUS_DELETED;
-   
-  }
-  updateRows();
-  return 0;
-}                                                                 
+	if (GUI_Confirmation_HIG(QT_TR_NOOP("Sure!"), QT_TR_NOOP("Delete *all* job"), QT_TR_NOOP("Are you sure you want to delete ALL jobs?")))
+	{
+		for(int sel = 0; sel < _nbJobs; sel++)
+		{
+			desc[sel].status = STATUS_DELETED;
+			unlink(_jobsName[sel]);
+		}
+
+		updateRows();
+	}
+}
                                                         
 /**
       \fn runOne
       \brief Run one job
 */
-int jobsWindow::RunOne(bool b)
+void jobsWindow::RunOne(bool b)
 {
-  int sel=WIDGET(tableWidget)->currentRow();
-  printf("Selected %d\n",sel);
-  if(sel<0) return 0;
-  if(sel>=_nbJobs) return 0;
-  
-  if(desc[sel].status==STATUS_SUCCEED) 
-  {
-    GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Already done"),QT_TR_NOOP("This script has already been successfully executed."));
-    return 0;
-  }
+	int sel = ui.tableWidget->currentRow();
+	printf("Selected %d\n", sel);
 
-  desc[sel].status=STATUS_RUNNING;
-  updateRows();
-  GUI_Quiet();
-  TLK_getDate(&(desc[sel].startDate));
-  if(parseECMAScript(_jobsName[sel])) desc[sel].status=STATUS_SUCCEED;
-  else desc[sel].status=STATUS_FAILED;
-  TLK_getDate(&(desc[sel].endDate));
-  updateRows();
-  GUI_Verbose();
-  return 0;
+	if(sel >= 0 && sel < _nbJobs)
+	{
+		if(desc[sel].status == STATUS_SUCCEED)
+			GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Already done"),QT_TR_NOOP("This script has already been successfully executed."));
+		else
+		{
+			desc[sel].status=STATUS_RUNNING;
+			updateRows();
+			GUI_Quiet();
+			TLK_getDate(&(desc[sel].startDate));
+
+			if(parseECMAScript(_jobsName[sel]))
+				desc[sel].status=STATUS_SUCCEED;
+			else
+				desc[sel].status=STATUS_FAILED;
+
+			TLK_getDate(&(desc[sel].endDate));
+			updateRows();
+			GUI_Verbose();
+		}
+	}
 }
 /**
       \fn RunAll
       \brief Run all jobs
 */
-int jobsWindow::RunAll(bool b)
+void jobsWindow::RunAll(bool b)
 {
-  for(int sel=0;sel<_nbJobs;sel++)
-  {
-    if(desc[sel].status==STATUS_SUCCEED) continue;
-    desc[sel].status=STATUS_RUNNING;
-    updateRows();
-    GUI_Quiet();
-    TLK_getDate(&(desc[sel].startDate));
-    if(parseECMAScript(_jobsName[sel])) desc[sel].status=STATUS_SUCCEED;
-    else desc[sel].status=STATUS_FAILED;
-    TLK_getDate(&(desc[sel].endDate));
-    updateRows();
-    GUI_Verbose();
-  }
-  return 0;
+	for(int sel=0;sel<_nbJobs;sel++)
+	{
+		if(desc[sel].status == STATUS_SUCCEED || desc[sel].status == STATUS_DELETED)
+			continue;
+
+		desc[sel].status=STATUS_RUNNING;
+		updateRows();
+		GUI_Quiet();
+		TLK_getDate(&(desc[sel].startDate));
+
+		if(parseECMAScript(_jobsName[sel]))
+			desc[sel].status=STATUS_SUCCEED;
+		else
+			desc[sel].status=STATUS_FAILED;
+
+		TLK_getDate(&(desc[sel].endDate));
+		updateRows();
+		GUI_Verbose();
+	}
 }
 
 /**

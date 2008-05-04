@@ -32,7 +32,7 @@ protected:
 	char **_jobsName;
 	ADM_Job_Descriptor *desc;
 
-	uint8_t updateRows(void);
+	void updateRows(void);
 
 public:
 	jobsWindow(uint32_t n, char **j);
@@ -40,9 +40,9 @@ public:
 	Ui_jobsDialog ui;
 
 public slots:
-	int RunOne(bool b);
-	int RunAll(bool b);
-	int DeleteOne(bool b);
-	int DeleteAll(bool b);
+      void RunOne(bool b);
+      void RunAll(bool b);
+      void DeleteOne(bool b);
+      void DeleteAll(bool b);
 };
 #endif	// Q_jobs_h
