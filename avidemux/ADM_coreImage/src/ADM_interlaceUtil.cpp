@@ -28,18 +28,19 @@ Skip factor=2
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
 #include "ADM_default.h"
 
-#include "ADM_editor/ADM_edit.hxx"
+//#include "ADM_editor/ADM_edit.hxx"
 #include "ADM_videoFilter.h"
-#include "ADM_video/ADM_vidCommonFilter.h"
+//#include "ADM_video/ADM_vidCommonFilter.h"
 
 //#define MMX_TRACE
-#define ASM_ILACING
+#warning remove mmxmacro and debug asm
+//#define ASM_ILACING
 
 
-#include "mmx_macros.h"
+#include "ADM_mmxMacros.h"
 
 
 

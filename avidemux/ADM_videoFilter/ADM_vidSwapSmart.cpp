@@ -23,7 +23,7 @@ Swap each line  (shift up for odd, down for even)
 
 #include "ADM_videoFilter.h"
 #include "ADM_vidSwapSmart.h"
-#include "ADM_video/ADM_interlaced.h"
+#include "ADM_interlaced.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER

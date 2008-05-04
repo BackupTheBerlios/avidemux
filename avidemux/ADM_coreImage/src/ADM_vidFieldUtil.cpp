@@ -23,7 +23,7 @@ Some functions to manipulate fields
 
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_videoFilter.h"
-#include "ADM_video/ADM_vidFieldUtil.h"
+#include "ADM_vidFieldUtil.h"
 
 
 void vidFieldDecimate(uint8_t *src,uint8_t *target, uint32_t linessrc, uint32_t width)

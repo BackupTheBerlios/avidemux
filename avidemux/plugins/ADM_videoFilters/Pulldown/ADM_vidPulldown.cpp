@@ -22,19 +22,24 @@
 
 #include "ADM_default.h"
 
-#include "ADM_videoFilter.h"
-#include "ADM_video/ADM_vidFieldUtil.h"
+#include "ADM_videoFilterDynamic.h"
+#include "ADM_vidFieldUtil.h"
+#include "ADM_interlaced.h"
 #include "ADM_vidPulldown.h"
-#include "ADM_video/ADM_interlaced.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
+#define aprintf(...) {}
 
 
 static FILTER_PARAM swapParam={0,{""}};
-SCRIPT_CREATE(pulldown_script,ADMVideoPullDown,swapParam);
-BUILD_CREATE(pulldown_create,ADMVideoPullDown);
+//********** Register chunk ************
+
+VF_DEFINE_FILTER(ADMVideoPullDown,swapParam,
+                pulldown,
+                QT_TR_NOOP("Pulldown"),
+                1,
+                VF_INTERLACING,
+                QT_TR_NOOP("Convert 24 fps to 30 fps by repeating fields."));
+//********** Register chunk ************
 
 char *ADMVideoPullDown::printConf( void )
 {

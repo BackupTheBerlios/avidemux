@@ -21,10 +21,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
 #include "ADM_default.h"
 
-#include "ADM_videoFilter.h"
+#include "ADM_videoFilterDynamic.h"
 #include "ADM_vidDenoise.h"
 
 
@@ -33,16 +33,21 @@
 static FILTER_PARAM denoiseParam={5,{"lumaLock","lumaThreshold","chromaLock","chromaThreshold",
 					"sceneChange"}};
 
+//********** Register chunk ************
 
-SCRIPT_CREATE(denoise_script,ADMVideoDenoise,denoiseParam);
+VF_DEFINE_FILTER(ADMVideoDenoise,denoiseParam,
+                denoise,
+                QT_TR_NOOP("Denoise"),
+                1,
+                VF_NOISE,
+                QT_TR_NOOP("Port of Transcode DNR."));
+//********** Register chunk ************
 
-uint8_t distMatrix[256][256];
-uint32_t fixMul[16];
 
 //static uint8_t matrixReady=0;
 //static uint8_t doOnePix(uint8_t *in,uint8_t *out,uint8_t *lock,uint8_t *nb);
 
-BUILD_CREATE(denoise_create,ADMVideoDenoise);
+
 char *ADMVideoDenoise::printConf( void )
 {
  	static char buf[50];
@@ -55,8 +60,11 @@ char *ADMVideoDenoise::printConf( void )
                 	_param->chromaThreshold);
         return buf;
 }
-void buildDistMatrix( void );
-void buildDistMatrix( void )
+static uint8_t distMatrix[256][256];
+static uint32_t fixMul[16];
+static bool distMatrixDone=false;
+
+static void buildDistMatrix( void )
 {
 int d;	
 	for(uint32_t y=255;y>0;y--)
@@ -81,7 +89,11 @@ ADMVideoDenoise::ADMVideoDenoise(
 									AVDMGenericVideoStream *in,CONFcouple *couples)
 {
 
-
+    if(distMatrixDone==false)
+    {
+        buildDistMatrix();
+        distMatrixDone=true;
+    }
   	_in=in;		
    	memcpy(&_info,_in->getInfo(),sizeof(_info));  			 	
     uint32_t page;

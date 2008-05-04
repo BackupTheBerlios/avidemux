@@ -59,7 +59,6 @@ printf(  "*********************\n");
     REGISTERX(VF_INTERLACING, "tdeint",QT_TR_NOOP("TDeint"),QT_TR_NOOP("Motion adaptative deinterlacer by Tritical."),VF_TDEINT,1,tdeint_create,tdeint_script);
     REGISTERX(VF_INTERLACING, "lavcppdeint",QT_TR_NOOP("libavcodec deinterlacer"),QT_TR_NOOP("All FFmpeg deinterlace filters (bicubic, median, ...)."),VF_LAVPP_DEINT,1,lavppdeint_create,lavppdeint_script);
 	
-	REGISTERX(VF_INTERLACING, "pulldown",QT_TR_NOOP("Pulldown"),QT_TR_NOOP("Convert 24 fps to 30 fps by repeating fields."),VF_PULLDOWN,1,pulldown_create,pulldown_script);	
     REGISTERX(VF_INTERLACING, "palfieldshift",QT_TR_NOOP("PAL field shift"),QT_TR_NOOP("Shift fields by one. Useful for some PAL movies."),VF_PALSHIFT,1,addPALShift_create,addPALShift_script);	
 	REGISTERX(VF_INTERLACING, "palsmart",QT_TR_NOOP("PAL smart"),QT_TR_NOOP("Smartly revert non constant PAL field shift."),VF_TELECIDE,1,telecide_create,telecide_script);
 
@@ -67,7 +66,6 @@ printf(  "*********************\n");
         
         
 	
-	REGISTERX(VF_INTERLACING, "drop",QT_TR_NOOP("Drop"),QT_TR_NOOP("Drop damaged fields (e.g. from VHS capture)."),VF_DROPOUT,1,dropout_create,dropout_script);
 	REGISTERX(VF_INTERLACING, "swapfields",QT_TR_NOOP("Swap fields"),QT_TR_NOOP("Swap top and bottom fields."),VF_SWAPFIELDS,1,swapfield_create,swapfield_script);
 	REGISTERX(VF_INTERLACING, "smartswapfield",QT_TR_NOOP("Smart swap fields"),QT_TR_NOOP("Smartly swap fields. Needed when field order changes."),VF_SMARTSWAPFIELDS,1,swapsmart_create,swapsmart_script);
 
@@ -91,7 +89,7 @@ printf(  "*********************\n");
     REGISTERX(VF_COLORS, "chromashift",QT_TR_NOOP("Chroma shift"),QT_TR_NOOP("Shift chroma U/V to fix badly synced luma/chroma."),VF_CHROMASHIFT,1,create_chromashift,chromashift_script);
 
    
-    REGISTERX(VF_COLORS, "delta",QT_TR_NOOP("Luma delta"),QT_TR_NOOP("Difference between current and previous picture."),VF_DELTA,1,delta_create,delta_script);
+    
     REGISTERX(VF_COLORS, "coloryuv",QT_TR_NOOP("Avisynth ColorYUV"),QT_TR_NOOP("Alter colors (auto white balance etc...). Ported from Avisynth."),VF_COLOR_YUV,1,coloryuv_create,coloryuv_script);
 
     
@@ -99,7 +97,7 @@ printf(  "*********************\n");
 	
 	REGISTERX(VF_NOISE, "fluxsmooth",QT_TR_NOOP("FluxSmooth"),QT_TR_NOOP("Spatio-temporal cleaner by Ross Thomas."),VF_FLUXSMOOTH,1,fluxsmooth_create,fluxsmooth_script);
 
-	REGISTERX(VF_NOISE, "denoise",QT_TR_NOOP("Denoise"),QT_TR_NOOP("Port of Transcode DNR."),VF_DENOISE,1,denoise_create,denoise_script);
+	
 	REGISTERX(VF_NOISE, "stabilize",QT_TR_NOOP("Stabilize"),QT_TR_NOOP("Light denoiser."),VF_STABILIZE,1,stabilize_create,stabilize_script);
     REGISTERX(VF_NOISE, "cnr2",QT_TR_NOOP("Cnr2"),QT_TR_NOOP("Chroma noise reduction filter by MarcFD/Tritical."),VF_CNR2,1,cnr2_create,cnr2_script);	
 
@@ -129,7 +127,7 @@ printf(  "*********************\n");
 
         //*********************
  
-    REGISTERX(VF_MISC, "hardivtcremove",QT_TR_NOOP("Hard pulldown removal"),QT_TR_NOOP("Remove IVTC that has been analog captured or resized."),VF_HARDIVTC,1,hardivtc_create,hardivtc_script);
+   
     REGISTERX(VF_MISC, "whirl",QT_TR_NOOP("Whirl"),QT_TR_NOOP("Useless whirlwind effect."),VF_WHIRL,1,whirl_create,whirl_script);
     REGISTERX(VF_MISC, "mosaic",QT_TR_NOOP("Mosaic"),QT_TR_NOOP("Split the picture into tiny thumbnails."),VF_MOSAIC,1,     mosaic_create,mosaic_script);
     REGISTERX(VF_MISC, "mpdelogo",QT_TR_NOOP("MPlayer delogo"),QT_TR_NOOP("Blend a logo by interpolating its surrounding box."),VF_MPDELOGO,1,mpdelogo_create,mpdelogo_script);

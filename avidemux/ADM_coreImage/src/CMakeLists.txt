@@ -11,6 +11,8 @@ SET(ADM_coreImage_SRCS
         ADM_rgb.cpp
         ADM_pp.cpp
         ADM_print.cpp
+        ADM_vidFieldUtil.cpp
+        ADM_interlaceUtil.cpp
 )
 
 ADD_LIBRARY(ADM_coreImage SHARED ${ADM_coreImage_SRCS})

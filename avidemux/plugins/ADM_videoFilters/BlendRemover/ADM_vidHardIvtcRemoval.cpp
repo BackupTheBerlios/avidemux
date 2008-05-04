@@ -62,12 +62,11 @@ static FILTER_PARAM field_unblend_template =
     { 4,"threshold","show","noise","identical"};
 
 VF_DEFINE_FILTER ( vidHardPDRemoval,field_unblend_template,
-                   unblend,
-                   QT_TR_NOOP ( "Unblend" ),
+                   hardivtcremove,
+                   QT_TR_NOOP ( ""Hard pulldown removal"" ),
                    1,
-                   VF_COLORS,
-                   QT_TR_NOOP ( "Try to unblend fields." ) );
-
+                   VF_ITERLACING,
+                   QT_TR_NOOP ( "Remove IVTC that has been analog captured or resized.") );
 
 //*************************************
 uint8_t vidHardPDRemoval::configure (AVDMGenericVideoStream * in)

@@ -24,7 +24,7 @@ Same idea as for avisynth separatefield
 
 
 #include "ADM_videoFilter.h"
-#include "ADM_video/ADM_vidFieldUtil.h"
+#include "ADM_vidFieldUtil.h"
 #include "ADM_vidSeparateField.h"
 
 

@@ -14,23 +14,27 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-#include "ADM_default.h"
 
-#include "ADM_videoFilter.h"
+#include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
 #include "ADM_vidDropOut.h"
 #include "DIA_factory.h"
-
+#define aprintf(...) {}
 static FILTER_PARAM dropParam={1,{"threshold"}};
 
+//********** Register chunk ************
 
-SCRIPT_CREATE(dropout_script,ADMVideoDropOut,dropParam);
-
+VF_DEFINE_FILTER(ADMVideoDropOut,dropParam,
+                drop,
+                QT_TR_NOOP("Drop"),
+                1,
+                VF_INTERLACING,
+                QT_TR_NOOP("Drop damaged fields (e.g. from VHS capture)."));
+//********** Register chunk ************
 
 //extern uint8_t distMatrix[256][256];
-extern uint32_t fixMul[16];
+//extern uint32_t fixMul[16];
 
-BUILD_CREATE(dropout_create,ADMVideoDropOut);
 //_______________________________________________________________
  
 

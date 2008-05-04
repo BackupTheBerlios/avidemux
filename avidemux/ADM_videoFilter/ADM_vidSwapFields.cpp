@@ -22,7 +22,7 @@ Swap each line  (shift up for odd, down for even)
 
 
 #include "ADM_videoFilter.h"
-#include "ADM_video/ADM_vidFieldUtil.h"
+#include "ADM_vidFieldUtil.h"
 #include "ADM_vidSwapFields.h"
 
 

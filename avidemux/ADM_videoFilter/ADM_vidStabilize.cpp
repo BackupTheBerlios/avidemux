@@ -29,12 +29,30 @@ static FILTER_PARAM stabParam={1,{"param"}};
 
 
 SCRIPT_CREATE(stabilize_script,ADMVideoStabilize,stabParam);
-extern uint8_t distMatrix[256][256];
-extern uint32_t fixMul[16];
-
 BUILD_CREATE(stabilize_create,ADMVideoStabilize);
 
+static uint8_t distMatrix[256][256];
+static uint32_t fixMul[16];
+static bool distMatrixDone=false;
 
+static void buildDistMatrix( void )
+{
+int d;  
+    for(uint32_t y=255;y>0;y--)
+    for(uint32_t x=255;x>0;x--)
+    {
+          d=x-y;
+          if(d<0) d=-d;
+          distMatrix[x][y]=d;
+        
+    }
+
+     for(int i=1;i<16;i++)
+                        {
+                                        fixMul[i]=(1<<16)/i;
+                        }
+
+}
 
 char 	*ADMVideoStabilize::printConf(void)
 {
@@ -58,6 +76,11 @@ int i;
 //--------------------------------------------------------	
 ADMVideoStabilize::ADMVideoStabilize(AVDMGenericVideoStream *in,CONFcouple *couples)
 {
+if(distMatrixDone==false)
+        {
+            buildDistMatrix();
+            distMatrixDone=true;
+        }
   //uint32_t frame;
   _uncompressed=NULL;
   _in=in;

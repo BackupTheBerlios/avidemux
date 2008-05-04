@@ -28,7 +28,7 @@
 #ifdef ADM_CPU_X86
 //	#define DEBUG_DEINT 1
 //	#define MMX_TRACE 1
-	#include "ADM_video/mmx_macros.h"
+	#include "ADM_mmxMacros.h"
 
  void myDeintASM(void);
 

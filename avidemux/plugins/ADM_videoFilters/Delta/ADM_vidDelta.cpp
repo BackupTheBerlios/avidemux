@@ -7,15 +7,9 @@
 
 #include "ADM_default.h"
 
-#include "ADM_videoFilter.h"
+#include "ADM_videoFilterDynamic.h"
+#define aprintf(...) {}
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
-
-//#include "ADM_vidCNR2_param.h"
-
-//#define SUBST 1
 
 class vidDelta:public AVDMGenericVideoStream
 {
@@ -39,9 +33,15 @@ public:
 static FILTER_PARAM delta_template =
   { 0 };
 
-BUILD_CREATE (delta_create, vidDelta);
-SCRIPT_CREATE (delta_script, vidDelta, delta_template);
+//********** Register chunk ************
 
+VF_DEFINE_FILTER(vidDelta,delta_template,
+                delta,
+                QT_TR_NOOP("Luma delta"),
+                1,
+                VF_COLORS,
+                QT_TR_NOOP("Difference between current and previous picture."));
+//********** Register chunk ************
 
 /*************************************/
 uint8_t vidDelta::configure (AVDMGenericVideoStream * in)

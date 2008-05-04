@@ -61,7 +61,6 @@ extern void registerVideoFilters( void );
 extern void filterCleanUp( void );
 extern void register_Encoders( void )  ;
 
-extern void  buildDistMatrix( void );
 extern void initScaleTab( void );
 extern uint8_t initGUI( void );
 extern void destroyGUI(void);
@@ -275,7 +274,6 @@ int main(int argc, char *argv[])
     AVDM_audioInit();
 #endif
 
-    buildDistMatrix();
     initScaleTab();
 
     if(SpidermonkeyInit() == true)
