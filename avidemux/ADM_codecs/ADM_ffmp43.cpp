@@ -43,7 +43,7 @@ extern int ADM_cpu_num_processors(void);
 AVCodec *codec=avcodec_find_decoder(x);\
 if(!codec) {GUI_Error_HIG("Codec",QT_TR_NOOP("Internal error finding codec"#x));ADM_assert(0);} \
   codecId=x; \
-  _context->workaround_bugs=1*FF_BUG_AUTODETECT +1*FF_BUG_NO_PADDING;/**/ \
+  _context->workaround_bugs=1*FF_BUG_AUTODETECT +0*FF_BUG_NO_PADDING;/**/ \
   _context->error_concealment=3; \
   if (avcodec_open(_context, codec) < 0)  \
                       { \
@@ -444,6 +444,7 @@ decoderFFDiv3::decoderFFDiv3 (uint32_t w, uint32_t h):decoderFF (w, h)
   _refCopy = 1;			// YUV420 only
   WRAP_Open (CODEC_ID_MSMPEG4V3);
 }
+//**************************************************
 decoderFFMpeg4VopPacked::decoderFFMpeg4VopPacked (uint32_t w, uint32_t h):decoderFF (w,
 	   h)
 {
@@ -454,6 +455,18 @@ decoderFFMpeg4VopPacked::decoderFFMpeg4VopPacked (uint32_t w, uint32_t h):decode
   WRAP_Open (CODEC_ID_MPEG4);
   printf("[lavc] Non low delay mpeg4 decoder initialized\n");
 }
+uint8_t decoderFFMpeg4VopPacked::uncompress (ADMCompressedImage * in, ADMImage * out)
+{
+    // For pseudo startcode
+    if(in->dataLength)
+    {
+        in->data[in->dataLength]=0;
+        in->data[in->dataLength+1]=0;
+    }
+    return decoderFF::uncompress(in,out);
+
+}
+
 decoderFFMpeg4::decoderFFMpeg4 (uint32_t w, uint32_t h, uint32_t fcc,uint32_t l, uint8_t * d):decoderFF (w,
 	   h)
 {
@@ -470,6 +483,18 @@ decoderFFMpeg4::decoderFFMpeg4 (uint32_t w, uint32_t h, uint32_t fcc,uint32_t l,
   //  _context->flags|=FF_DEBUG_VIS_MV;
   WRAP_Open (CODEC_ID_MPEG4);
 }
+uint8_t decoderFFMpeg4::uncompress (ADMCompressedImage * in, ADMImage * out)
+{
+    // For pseudo startcode
+    if(in->dataLength)
+    {
+        in->data[in->dataLength]=0;
+        in->data[in->dataLength+1]=0;
+    }
+    return decoderFF::uncompress(in,out);
+
+}
+//************************************
 decoderFFDV::decoderFFDV (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,
 	   h)
 {

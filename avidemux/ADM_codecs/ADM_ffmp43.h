@@ -90,6 +90,7 @@ protected:
 
 public:
   decoderFFMpeg4VopPacked (uint32_t w, uint32_t h);
+  uint8_t uncompress (ADMCompressedImage * in, ADMImage * out);
   // mpeg4 can have B-frame
   virtual uint8_t bFramePossible (void)
   {
@@ -108,6 +109,7 @@ protected:
 
 public:
   decoderFFMpeg4 (uint32_t w, uint32_t h, uint32_t fcc,uint32_t l, uint8_t * d);
+  uint8_t uncompress (ADMCompressedImage * in, ADMImage * out);
   // mpeg4 can have B-frame
   virtual uint8_t bFramePossible (void)
   {
