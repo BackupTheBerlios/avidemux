@@ -138,6 +138,14 @@ MACRO (APPEND_FLAGS _flags)
 	FOREACH (_flag ${ARGN})
 		SET(${_flags} "${${_flags}} ${_flag}")
 	ENDFOREACH (_flag ${ARGN})
+
+	STRING(SUBSTRING "${${_flags}}" 0 1 firstChar)
+
+	IF (${firstChar} STREQUAL " ")
+		STRING(LENGTH "${${_flags}}" stringLength)
+		MATH(EXPR stringLength "${stringLength} - 1")
+		STRING(SUBSTRING "${${_flags}}" 1 ${stringLength} ${_flags})
+	ENDIF (${firstChar} STREQUAL " ")
 ENDMACRO (APPEND_FLAGS)
 
 

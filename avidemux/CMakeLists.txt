@@ -150,14 +150,13 @@ ADD_SOURCE_CFLAGS(main.cpp "-DADM_SUBVERSION=${ADM_SUBVERSION}")
 # Compile and link general subdirs
 ########################################
 SET(ADM_SUBDIR 
-	ADM_filter
 	ADM_audiofilter
 	ADM_editor
 	ADM_audiocodec
 	ADM_audio
 	ADM_script
-	ADM_videoFilter
 	ADM_filter
+	ADM_videoFilter
 	ADM_video
 	ADM_audiodevice
 	ADM_ocr
