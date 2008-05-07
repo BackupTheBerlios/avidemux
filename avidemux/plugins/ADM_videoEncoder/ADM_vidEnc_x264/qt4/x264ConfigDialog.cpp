@@ -48,6 +48,8 @@ x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vid
 
 	ui.setupUi(this);
 
+	connect(ui.defaultButton, SIGNAL(pressed()), this, SLOT(defaultButton_pressed()));
+
 	// General tab
 	lastBitrate = 1500;
 	lastVideoSize = 700;
@@ -65,6 +67,10 @@ x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vid
 	connect(ui.dct8x8CheckBox, SIGNAL(toggled(bool)), this, SLOT(dct8x8CheckBox_toggled(bool)));
 	connect(ui.p8x8CheckBox, SIGNAL(toggled(bool)), this, SLOT(p8x8CheckBox_toggled(bool)));
 
+#if X264_BUILD >= 57
+	ui.meMethodComboBox->addItem(QT_TR_NOOP("Hadamard Exhaustive Search"));
+#endif X264_BUILD >= 57
+
 	// Frame tab
 	connect(ui.loopFilterCheckBox, SIGNAL(toggled(bool)), this, SLOT(loopFilterCheckBox_toggled(bool)));
 	connect(ui.cabacCheckBox, SIGNAL(toggled(bool)), this, SLOT(cabacCheckBox_toggled(bool)));
@@ -79,6 +85,20 @@ x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vid
 	connect(ui.frameTypeFileButton, SIGNAL(pressed()), this, SLOT(frameTypeFileButton_pressed()));	
 
 	loadSettings(encodeOptions, options);
+}
+
+void x264ConfigDialog::defaultButton_pressed()
+{
+	if (GUI_Question(QT_TR_NOOP("Are you sure you wish to reset all options to defaults?")))
+	{
+		x264Options defaultOptions;
+		vidEncOptions defaultEncodeOptions;
+
+		defaultEncodeOptions.encodeMode = DEFAULT_ENCODE_MODE;
+		defaultEncodeOptions.encodeModeParameter = DEFAULT_ENCODE_MODE_PARAMETER;
+
+		loadSettings(&defaultEncodeOptions, &defaultOptions);
+	}
 }
 
 // General tab
@@ -294,6 +314,7 @@ void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *o
 
 		if (!predefined)
 		{
+			ui.sarCustomRadioButton->setChecked(true);
 			ui.sarCustomSpinBox1->setValue(options->getSarWidth());
 			ui.sarCustomSpinBox2->setValue(options->getSarHeight());
 		}

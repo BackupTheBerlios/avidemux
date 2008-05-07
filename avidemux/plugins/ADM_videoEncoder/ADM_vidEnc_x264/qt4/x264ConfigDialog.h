@@ -47,6 +47,8 @@ public:
 	void saveSettings(vidEncOptions *encodeOptions, x264Options *options);
 
 private slots:
+	void defaultButton_pressed();
+
 	// General tab
 	void encodingModeComboBox_currentIndexChanged(int index);
 	void quantiserSlider_valueChanged(int value);

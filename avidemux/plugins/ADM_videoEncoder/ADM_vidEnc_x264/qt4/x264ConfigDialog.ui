@@ -390,7 +390,7 @@
             <item row="0" column="0" >
              <widget class="QRadioButton" name="sarCustomRadioButton" >
               <property name="text" >
-               <string>Custom</string>
+               <string>Custom:</string>
               </property>
               <property name="checked" >
                <bool>true</bool>
@@ -496,7 +496,7 @@
             <item row="1" column="0" >
              <widget class="QRadioButton" name="sarPredefinedRadioButton" >
               <property name="text" >
-               <string>Predefined Aspect Ratio</string>
+               <string>Predefined Aspect Ratio:</string>
               </property>
              </widget>
             </item>
@@ -533,6 +533,85 @@
                   <string>32:27 (NTSC 16:9)</string>
                  </property>
                 </item>
+               </widget>
+              </item>
+              <item>
+               <spacer>
+                <property name="orientation" >
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" >
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_17" >
+         <property name="title" >
+          <string>Threading</string>
+         </property>
+         <layout class="QVBoxLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item>
+           <layout class="QVBoxLayout" >
+            <property name="margin" >
+             <number>0</number>
+            </property>
+            <property name="spacing" >
+             <number>6</number>
+            </property>
+            <item>
+             <widget class="QRadioButton" name="threadDisableRadioButton" >
+              <property name="text" >
+               <string>Disable</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="threadAutoDetectRadioButton" >
+              <property name="text" >
+               <string>Auto-detect</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" >
+              <property name="margin" >
+               <number>0</number>
+              </property>
+              <property name="spacing" >
+               <number>6</number>
+              </property>
+              <item>
+               <widget class="QRadioButton" name="threadCustomRadioButton" >
+                <property name="text" >
+                 <string>Custom:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="threadCustomSpinBox" >
+                <property name="maximum" >
+                 <number>32</number>
+                </property>
+                <property name="minimum" >
+                 <number>2</number>
+                </property>
                </widget>
               </item>
               <item>
@@ -806,11 +885,6 @@
                   <item>
                    <property name="text" >
                     <string>Exhaustive Search</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text" >
-                    <string>Hadamard Exhaustive Search</string>
                    </property>
                   </item>
                  </widget>
@@ -3901,6 +3975,13 @@
      <property name="spacing" >
       <number>6</number>
      </property>
+     <item>
+      <widget class="QPushButton" name="defaultButton" >
+       <property name="text" >
+        <string>Defaults</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer>
        <property name="orientation" >

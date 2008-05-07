@@ -260,11 +260,13 @@ public:
 	float getPbFrameQuantiser(void);
 	void setPbFrameQuantiser(float pbFrameQuantiser);
 
+#if X264_BUILD >= 59
 	unsigned int getAdaptiveQuantiserMode(void);
 	void setAdaptiveQuantiserMode(unsigned int adaptiveQuantiserMode);
 
 	float getAdaptiveQuantiserStrength(void);
 	void setAdaptiveQuantiserStrength(float adaptiveQuantiserStrength);
+#endif
 
 	char* getRateControlEquation(void);
 	void setRateControlEquation(char* rateControlEquation);

@@ -817,6 +817,7 @@ void x264Options::setPbFrameQuantiser(float pbFrameQuantiser)
 		_param.rc.f_pb_factor = pbFrameQuantiser;
 }
 
+#if X264_BUILD >= 59
 unsigned int x264Options::getAdaptiveQuantiserMode(void)
 {
 	return _param.rc.i_aq_mode;
@@ -837,6 +838,7 @@ void x264Options::setAdaptiveQuantiserStrength(float adaptiveQuantiserStrength)
 {
 	_param.rc.f_aq_strength = adaptiveQuantiserStrength;
 }
+#endif
 
 char* x264Options::getRateControlEquation(void)
 {
@@ -1193,17 +1195,20 @@ char* x264Options::toXml(void)
 			case X264_ME_DIA:
 				strcpy((char*)xmlBuffer, "diamond");
 				break;
-			case X264_ME_HEX:
-				strcpy((char*)xmlBuffer, "hexagonal");
-				break;
 			case X264_ME_UMH:
 				strcpy((char*)xmlBuffer, "multi-hexagonal");
 				break;
 			case X264_ME_ESA:
 				strcpy((char*)xmlBuffer, "exhaustive");
 				break;
+#if X264_BUILD >= 57
 			case X264_ME_TESA:
 				strcpy((char*)xmlBuffer, "hadamard");
+				break;
+#endif
+			case X264_ME_HEX:
+			default:
+				strcpy((char*)xmlBuffer, "hexagonal");
 				break;
 		}
 
@@ -1250,6 +1255,7 @@ char* x264Options::toXml(void)
 		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"ipFrameQuantiser", number2String(xmlBuffer, bufferSize, getIpFrameQuantiser()));
 		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"pbFrameQuantiser", number2String(xmlBuffer, bufferSize, getPbFrameQuantiser()));
 
+#if X264_BUILD >= 59
 		switch (getAdaptiveQuantiserMode())
 		{
 			case X264_AQ_NONE:
@@ -1265,6 +1271,7 @@ char* x264Options::toXml(void)
 
 		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"adaptiveQuantiserMode", xmlBuffer);
 		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"adaptiveQuantiserStrength", number2String(xmlBuffer, bufferSize, getAdaptiveQuantiserStrength()));
+#endif
 		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"rateControlEquation", (xmlChar*)getRateControlEquation());
 		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"quantiserCurveCompression", number2String(xmlBuffer, bufferSize, getQuantiserCurveCompression()));
 		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"reduceFluxBeforeCurveCompression", number2String(xmlBuffer, bufferSize, getReduceFluxBeforeCurveCompression()));
@@ -1676,8 +1683,10 @@ void x264Options::parseAnalyseOptions(xmlNode* node)
 					motionEstimationMethod = X264_ME_UMH;
 				else if (strcmp(content, "exhaustive") == 0)
 					motionEstimationMethod = X264_ME_ESA;
+#if X264_BUILD >= 57
 				else if (strcmp(content, "hadamard") == 0)
 					motionEstimationMethod = X264_ME_TESA;
+#endif
 
 				setMotionEstimationMethod(motionEstimationMethod);
 			}
@@ -1756,6 +1765,7 @@ void x264Options::parseRateControlOptions(xmlNode* node)
 				setIpFrameQuantiser(atof(content));
 			else if (strcmp((char*)xmlChild->name, "pbFrameQuantiser") == 0)
 				setPbFrameQuantiser(atof(content));
+#if X264_BUILD >= 59
 			else if (strcmp((char*)xmlChild->name, "adaptiveQuantiserMode") == 0)
 			{
 				int adaptiveQuantiserMode = 0;
@@ -1771,6 +1781,7 @@ void x264Options::parseRateControlOptions(xmlNode* node)
 			}
 			else if (strcmp((char*)xmlChild->name, "adaptiveQuantiserStrength") == 0)
 				setAdaptiveQuantiserStrength(atof(content));
+#endif
 			else if (strcmp((char*)xmlChild->name, "rateControlEquation") == 0)
 				setRateControlEquation(content);
 			else if (strcmp((char*)xmlChild->name, "quantiserCurveCompression") == 0)

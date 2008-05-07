@@ -29,7 +29,7 @@
 				<xs:element name="vui">
 					<xs:complexType>
 						<xs:sequence>
-              <xs:element name="sarAsInput" type="xs:boolean"/>
+							<xs:element name="sarAsInput" type="xs:boolean"/>
 							<xs:element name="sarHeight" type="uint"/>
 							<xs:element name="sarWidth" type="uint"/>
 							<xs:element name="overscan">
