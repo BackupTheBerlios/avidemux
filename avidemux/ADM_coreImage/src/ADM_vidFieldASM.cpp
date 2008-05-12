@@ -32,9 +32,9 @@
 
  void myDeintASM(void);
 
- static int32_t _l_w,_l_h,_l_all;
- static uint8_t *_l_p,*_l_c,*_l_n;
- static uint8_t *_l_e,*_l_e2;
+ static int32_t _l_w,_l_h,_l_all asm(MANGLE(_l_all));
+ static uint8_t *_l_p asm(MANGLE(_l_p)), *_l_c asm(MANGLE(_l_c)),*_l_n asm(MANGLE(_l_n));
+ static uint8_t *_l_e asm(MANGLE(_l_e)), *_l_e2 asm(MANGLE(_l_e2));
 #define EXPAND(x) (x)+((x)<<16)+((x)<<32) +((x)<<48)
 static mmx_t _mmTHRESH1;
 static mmx_t _mmTHRESH2;

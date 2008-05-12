@@ -21,7 +21,7 @@
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavcodec.cpp" line="108"/>
         <source>Motion Estimation</source>
-        <translation>Stima movimento</translation>
+        <translation>Valutazione movimento</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_xvid4.cpp" line="59"/>
@@ -1243,6 +1243,21 @@
         <source>MJPEG Configuration</source>
         <translation>Configurazione Mjpeg</translation>
     </message>
+    <message>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_DVDff.cpp" line="63"/>
+        <source>VCD 40 kB</source>
+        <translation>VCD 40 kB</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_DVDff.cpp" line="64"/>
+        <source>SVCD 112 kB</source>
+        <translation>SVCD 112 kB</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_DVDff.cpp" line="65"/>
+        <source>DVD 224 kB</source>
+        <translation>DVD 224 kB</translation>
+    </message>
 </context>
 <context>
     <name>@default</name>
@@ -1993,22 +2008,22 @@ Spostare il segnalibro A.</translation>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="97"/>
         <source>Motion Estimation</source>
-        <translation>Stima movimento</translation>
+        <translation>Valutazione movimento</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="114"/>
         <source>Disabled</source>
-        <translation>Disattivo</translation>
+        <translation>Disattivato</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_prefs.cpp" line="244"/>
         <source>Low</source>
-        <translation>Bassa</translation>
+        <translation>Basso</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_prefs.cpp" line="240"/>
         <source>High</source>
-        <translation>Alta</translation>
+        <translation>Alto</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="118"/>
@@ -5715,7 +5730,7 @@ Vuoi usare quella modalità?</translation>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialogFactory/T_threadCount.cpp" line="53"/>
         <source>Disabled</source>
-        <translation>Disattivo</translation>
+        <translation>Disattivato</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialogFactory/T_threadCount.cpp" line="54"/>
@@ -7203,8 +7218,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../avidemux/ADM_outputs/oplug_avi/op_saveprocess.cpp" line="250"/>
-        <source>Encoding, 2nd pass</source>
-        <translation>Codifica, 2a passata</translation>
+        <source>2nd Pass</source>
+        <translation>2a passata</translation>
     </message>
 </context>
 <context>
@@ -7491,7 +7506,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1718"/>
         <source>Del</source>
-        <translation type="unfinished"></translation>
+        <translation>Canc</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1732"/>
@@ -7526,7 +7541,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1768"/>
         <source>Alt+Return</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+Invio</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1776"/>
@@ -7539,47 +7554,47 @@ p, li { white-space: pre-wrap; }
         <translation>Salva video</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1787"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1790"/>
         <source>Save &amp;BMP Image...</source>
         <translation>Salva immagine &amp;BMP...</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1793"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1796"/>
         <source>Save BMP Image</source>
         <translation>Salva immagine BMP</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1798"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1801"/>
         <source>Save &amp;JPEG Image...</source>
         <translation>Salva immagine &amp;JPEG...</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1804"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1807"/>
         <source>Save JPEG Image</source>
         <translation>Salva immagine JPEG</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1812"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1815"/>
         <source>&amp;Load/Run Project...</source>
         <translation>&amp;Carica/esegui progetto...</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1818"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1821"/>
         <source>Load/Run Project</source>
         <translation>Carica/esegui progetto</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1826"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1829"/>
         <source>Save &amp;Project</source>
         <translation>Salva &amp;progetto</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1832"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1835"/>
         <source>Save Project</source>
         <translation>Salva progetto</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1835"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="1785"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
@@ -7886,7 +7901,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="2194"/>
         <source>End</source>
-        <translation type="unfinished"></translation>
+        <translation>Fine</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/gui2.ui" line="2202"/>
@@ -8412,59 +8427,59 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>jobsWindow</name>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="106"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="100"/>
         <source>Job Name</source>
         <translation>Nome attività</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="106"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="100"/>
         <source>Status</source>
         <translation>Stato</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="106"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="100"/>
         <source>Start Time</source>
         <translation>Tempo di inizio</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="106"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="100"/>
         <source>End Time</source>
         <translation>Tempo di fine</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="196"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="178"/>
         <source>Sure!</source>
         <translation>Sicuro!</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="183"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="164"/>
         <source>Delete job</source>
         <translation>Elimina attività</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="183"/>
-        <source>Are you sure you want to delete %s job ?</source>
-        <translation>Sei sicuro di voler eliminare l&apos;attività %s?</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="196"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="178"/>
         <source>Delete *all* job</source>
         <translation>Elimina *tutte* le attività</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="196"/>
-        <source>Are you sure you want to delete ALL jobs ?</source>
-        <translation>Sei sicuro di voler eliminare TUTTE le attività?</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="222"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="202"/>
         <source>Already done</source>
         <translation>Già fatto</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="222"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="202"/>
         <source>This script has already been successfully executed.</source>
         <translation>Questo script è stato già eseguito con successo.</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="164"/>
+        <source>Are you sure you want to delete %s job?</source>
+        <translation>Sei sicuro di voler eliminare l&apos;attività %s?</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/Q_jobs.cpp" line="178"/>
+        <source>Are you sure you want to delete ALL jobs?</source>
+        <translation>Sei sicuro di voler eliminare TUTTE le attività?</translation>
     </message>
 </context>
 <context>

@@ -23,6 +23,7 @@ at amistry@am-productions.biz
 #include <dirent.h>
 #include <string.h>
 #endif
+#include <cstring>
 #include "StdFile.h"
 
 // create a non file bit for unix

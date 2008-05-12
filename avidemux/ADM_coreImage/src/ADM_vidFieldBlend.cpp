@@ -24,15 +24,15 @@
 #include "ADM_vidField.h"
 
 #ifdef ADM_CPU_X86_64
-static int64_t _l_w,_l_h;
+static int64_t _l_w asm(MANGLE(_l_w)), _l_h asm(MANGLE(_l_h));
 #else
- static int32_t _l_w,_l_h;
+ static int32_t _l_w asm(MANGLE(_l_w)), _l_h asm(MANGLE(_l_h));
 #endif
- static uint8_t *_l_p,*_l_c,*_l_n;
- static uint8_t *_l_e,*_l_e2;
+ static uint8_t *_l_p asm(MANGLE(_l_p)), *_l_c asm(MANGLE(_l_c)), *_l_n asm(MANGLE(_l_n));
+ static uint8_t *_l_e asm(MANGLE(_l_e)), *_l_e2 asm(MANGLE(_l_e2));
 #define EXPAND(x) (x)+((x)<<16)+((x)<<32) +((x)<<48)
-static uint64_t  __attribute__((used)) _mmTHRESH1=EXPAND((uint64_t )THRES1);
-static uint64_t  __attribute__((used)) full_ones=0xFFFFFFFFFFFFFFFFLL;
+static uint64_t  __attribute__((used)) _mmTHRESH1 asm(MANGLE(_mmTHRESH1)) =EXPAND((uint64_t )THRES1);
+static uint64_t  __attribute__((used)) full_ones asm(MANGLE(full_ones)) =0xFFFFFFFFFFFFFFFFLL;
 
 
 static void myBlendASM(void);

@@ -160,7 +160,7 @@ uint8_t ADMVideoResampleFPS::getCoupledConf( CONFcouple **couples)
                 return 1;
 }
 #ifdef ADM_CPU_X86
-static uint64_t low,high;
+static uint64_t low asm(MANGLE(low)), high asm(MANGLE(high));
 static void blendMMX(uint8_t *src, uint8_t *src2, uint8_t *dst, uint8_t alpha, uint8_t beta,uint32_t count)
 {
 uint32_t left=count&3;

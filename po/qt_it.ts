@@ -3191,7 +3191,7 @@ Please choose a different file name.</source>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="289"/>
         <source>Esc</source>
-        <translation type="unfinished"></translation>
+        <translation>Esc</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="290"/>
@@ -3211,7 +3211,7 @@ Please choose a different file name.</source>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="293"/>
         <source>Return</source>
-        <translation type="unfinished"></translation>
+        <translation>Invio</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="294"/>
@@ -3226,7 +3226,7 @@ Please choose a different file name.</source>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="296"/>
         <source>Del</source>
-        <translation type="unfinished"></translation>
+        <translation>Canc</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="297"/>
@@ -3246,32 +3246,32 @@ Please choose a different file name.</source>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="300"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Home</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="301"/>
         <source>End</source>
-        <translation type="unfinished"></translation>
+        <translation>Fine</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="302"/>
         <source>Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Sinistra</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="303"/>
         <source>Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Su</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="304"/>
         <source>Right</source>
-        <translation type="unfinished"></translation>
+        <translation>Destra</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="305"/>
         <source>Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Giù</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="306"/>
@@ -3566,12 +3566,12 @@ Please choose a different file name.</source>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="373"/>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Sì</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="374"/>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>No</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="378"/>
@@ -3611,17 +3611,17 @@ Please choose a different file name.</source>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="1020"/>
         <source>Ctrl</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="1024"/>
         <source>Shift</source>
-        <translation type="unfinished"></translation>
+        <translation>Maiusc</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="1022"/>
         <source>Alt</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="1018"/>
@@ -3631,7 +3631,7 @@ Please choose a different file name.</source>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="994"/>
         <source>+</source>
-        <translation type="unfinished"></translation>
+        <translation>+</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="1039"/>

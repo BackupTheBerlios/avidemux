@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: avidemux\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-10-04 22:09+0300\n"
-"PO-Revision-Date: 2008-04-10 23:59+0100\n"
+"PO-Revision-Date: 2008-05-03 15:18+0100\n"
 "Last-Translator: \n"
 "Language-Team: it\n"
 "MIME-Version: 1.0\n"
@@ -1691,8 +1691,9 @@ msgid "Encoding"
 msgstr "Codifica in corso"
 
 #: avidemux/ADM_outputs/oplug_avi/op_saveprocess.cpp:250
-msgid "Encoding, 2nd pass"
-msgstr "Codifica, 2a passata"
+#: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:467
+msgid "2nd Pass"
+msgstr "2a passata"
 
 #: avidemux/ADM_outputs/oplug_avi/op_savesmart.cpp:107
 msgid "Smart Copy"
@@ -1760,10 +1761,6 @@ msgstr "La frequenza deve essere 44100, 22050 o 11025 Hz."
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:253
 msgid "Cannot initialize the audio stream"
 msgstr "Impossibile inizializzare il flusso audio"
-
-#: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:467
-msgid "2nd Pass"
-msgstr "2a passata"
 
 #: avidemux/ADM_outputs/oplug_mpeg/op_mpegpass.cpp:89
 msgid "This is not MPEG compatible"
@@ -2278,6 +2275,18 @@ msgstr "TFF interlacciato"
 msgid "Interlaced BFF"
 msgstr "BFF interlacciato"
 
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_DVDff.cpp:63
+msgid "VCD 40 kB"
+msgstr "VCD 40 kB"
+
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_DVDff.cpp:64
+msgid "SVCD 112 kB"
+msgstr "SVCD 112 kB"
+
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_DVDff.cpp:65
+msgid "DVD 224 kB"
+msgstr "DVD 224 kB"
+
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_DVDff.cpp:70
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_SVCD.cpp:60
 msgid "Ma_x. bitrate:"
@@ -2345,6 +2354,22 @@ msgstr "_Secondi:"
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_gototime.cpp:32
 msgid "Go to Time"
 msgstr "Vai al tempo"
+
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_jobs_save.cpp:6
+msgid "_Job name:"
+msgstr "Nome _attività:"
+
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_jobs_save.cpp:7
+msgid "Output _File:"
+msgstr "_File in uscita:"
+
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_jobs_save.cpp:7
+msgid "Select Video To Write"
+msgstr "Seleziona il video da scrivere"
+
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_jobs_save.cpp:10
+msgid "Save Job"
+msgstr "Salva attività"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavcodec.cpp:52
 msgid "Full"
@@ -2452,7 +2477,7 @@ msgstr "Profilo semplice avanzato"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavcodec.cpp:108
 msgid "Motion Estimation"
-msgstr "Stima movimento"
+msgstr "Valutazione movimento"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavcodec.cpp:112
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid.cpp:309
@@ -3908,7 +3933,6 @@ msgid "Configure codec"
 msgstr "Configura codec"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_asharp.cpp:71
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_chromaShift.cpp:67
 msgid "ASHARP"
 msgstr "ASHARP"
 
@@ -4011,7 +4035,7 @@ msgstr "DVD5"
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_x264.cpp:855
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/FAC_threadCount.cpp:87
 msgid "Custom"
-msgstr "Personalizzata"
+msgstr "Personale"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_calculator.cpp:571
 msgid "Track _1:"
@@ -4060,6 +4084,10 @@ msgstr "0.0"
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_calculator.cpp:710
 msgid "<b>Result</b>"
 msgstr "<b>Risultato</b>"
+
+#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_chromaShift.cpp:67
+msgid "Chroma Shift"
+msgstr "Traslazione croma"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_chromaShift.cpp:184
 msgid "ChromaShift"
@@ -4539,56 +4567,6 @@ msgstr "Esegui tutte le attività"
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs.cpp:302
 msgid "Run Job"
 msgstr "Esegui attività"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:49
-msgid "Select Video to Write"
-msgstr "Seleziona il video da scrivere"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:63
-msgid "Invalid filename"
-msgstr "Nome file non valido"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:63
-msgid "Please select or enter a valid filename."
-msgstr "Seleziona o inserisci un nome file valido."
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:69
-msgid "Invalid jobname"
-msgstr "Nome attività non valido"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:69
-msgid "Please select or enter a valid jobname."
-msgstr "Seleziona o inserisci un nome attività valido."
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:110
-msgid "Save Job"
-msgstr "Salva attività"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:131
-msgid "Select the output file"
-msgstr "Seleziona il file di uscita"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:145
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/DIA_filesel.cpp:90
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/DIA_filesel.cpp:244
-msgid "_Browse..."
-msgstr "_Cerca..."
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:154
-msgid "Job name displayed in the job list and used as the script filename"
-msgstr "Nome attività visualizzato nella lista attività e usato come nome del file script"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:163
-msgid "Filename of the audio/video output"
-msgstr "Nome del file audio/video in uscita"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:166
-msgid "_Job name:"
-msgstr "Nome _attività:"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:173
-msgid "Output _file:"
-msgstr "_File in uscita:"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_mpdelogo.cpp:379
 msgid "Mplayer Delogo"
@@ -5351,7 +5329,7 @@ msgstr "Imposta il massimo numero di fotogrammi-B consecutivi. Questa opzione de
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_x264.cpp:1143
 msgid "Bidirectional ME"
-msgstr "Stima movimento bidirezionale"
+msgstr "Valutazione movimento bidirezionale"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_x264.cpp:1148
 msgid "Optimise both motion vectors in B-frames. This will improve quality but take more time for encoding."
@@ -5371,7 +5349,7 @@ msgstr "DCT adattativo"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_x264.cpp:1163
 msgid "Use fewer B-frames if needed. This is always recommended. If not enabled, the codec will always use the maximum number of consecutive B-frames."
-msgstr "Usa meno fotogrammi-B se necessario. Sempre consigliato. Se disattivo, il codec userà sempre il numero massimo di fotogrammi-B consecutivi."
+msgstr "Usa meno fotogrammi-B se necessario. Sempre consigliato. Se disattivato, il codec userà sempre il numero massimo di fotogrammi-B consecutivi."
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_x264.cpp:1166
 msgid "Use as Reference"
@@ -5575,7 +5553,7 @@ msgstr "Matrice JVT"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_x264.cpp:1674
 msgid "Custom Matrix"
-msgstr "Matrice personalizzata"
+msgstr "Matrice personale"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_x264.cpp:1684
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid4.cpp:1128
@@ -5586,11 +5564,11 @@ msgstr "Apri file CQM"
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid4.cpp:1136
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid4.cpp:1568
 msgid "Edit Custom Matrix"
-msgstr "Modifica matrice personalizzata"
+msgstr "Modifica matrice personale"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_x264.cpp:1695
 msgid "Edit loaded custom quantization matrix file"
-msgstr "Modifica la matrice di quantizzazione personalizzata caricata"
+msgstr "Modifica la matrice di quantizzazione personale caricata"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_x264.cpp:1697
 msgid "<b>Quantization Matrices</b>"
@@ -5912,7 +5890,7 @@ msgstr "Movimento c_roma"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid4.cpp:950
 msgid "Use chroma information to estimate motion"
-msgstr "Usa informazioni cromatiche per calcolare il movimento"
+msgstr "Usa informazioni cromatiche per valutare il movimento"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid4.cpp:952
 msgid "_4MV"
@@ -6015,11 +5993,11 @@ msgstr "I quantizzatori MPEG (leggermente più lenti) producono immagini più ni
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid4.cpp:1097
 msgid "_Custom Matrix"
-msgstr "Matrice _personalizzata"
+msgstr "Matrice _personale"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid4.cpp:1107
 msgid "Load Custom Matrix:  "
-msgstr "Carica matrice personalizzata: "
+msgstr "Carica matrice personale: "
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_xvid4.cpp:1153
 msgid "I-frame quantizer - Min:"
@@ -6153,6 +6131,11 @@ msgstr "<b>Matrice Inter</b>"
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/DIA_color.cpp:71
 msgid "Select Color"
 msgstr "Seleziona colore"
+
+#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/DIA_filesel.cpp:90
+#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/DIA_filesel.cpp:244
+msgid "_Browse..."
+msgstr "_Cerca..."
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/FAC_bitrate.cpp:99
 msgid "_Encoding mode:"
