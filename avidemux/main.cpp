@@ -37,7 +37,7 @@
 extern void xvid4_init(void);
 #endif
 
-extern uint8_t filterDynLoad(const char *path);
+
 
 extern void  ADM_lavInit();
 extern void  ADM_lavDestroy();
@@ -61,7 +61,6 @@ extern void registerVideoFilters( void );
 extern void filterCleanUp( void );
 extern void register_Encoders( void )  ;
 
-extern void initScaleTab( void );
 extern uint8_t initGUI( void );
 extern void destroyGUI(void);
 extern uint8_t initFileSelector(void);
@@ -220,20 +219,6 @@ int main(int argc, char *argv[])
      registerVideoFilters();
 #endif
 
-	// Try load load external filter
-	uint32_t loadpref=0;
-	char *dynloadPath=NULL;
-
-	prefs->get(FILTERS_AUTOLOAD_ACTIVE,&loadpref);
-	prefs->get(FILTERS_AUTOLOAD_PATH,&dynloadPath);
-
-	if(loadpref && dynloadPath)
-	{
-		filterDynLoad(dynloadPath);
-	}
-
-	ADM_dealloc(dynloadPath);
-
 	//***************Plugins *********************
 	// Load system wide audio decoder plugin
 #ifdef __APPLE__
@@ -273,8 +258,6 @@ int main(int argc, char *argv[])
 #ifdef HAVE_AUDIO
     AVDM_audioInit();
 #endif
-
-    initScaleTab();
 
     if(SpidermonkeyInit() == true)
         printf("Spidermonkey initialized.\n");

@@ -111,14 +111,19 @@ const char *name;
 	}
 
 }
-VF_FILTERS filterGetTagFromName(char *inname)
+/**
+ *      \fn filterGetTagFromName
+ *      \Brief returns the tag associated with a name, invalid otherwise
+ */
+VF_FILTERS filterGetTagFromName(const char *inname)
 {
 const char *name;
+int max=allfilters.size();
 	VF_FILTERS filter=VF_INVALID;
-	for(uint32_t i=0;i<allfilters.size();i++)
+	for(uint32_t i=0;i<max;i++)
 	{
 		name=allfilters[ i]->filterName;
-		if( allfilters[i]->tag==VF_PARTIAL_FILTER)
+		if(1) // allfilters[i]->tag==VF_PARTIAL_FILTER)
 		{
 			if(name)
 			{
@@ -175,7 +180,7 @@ er:
  */
 uint8_t ADM_vf_loadPlugins(const char *path)
 {
-#define MAX_EXTERNAL_FILTER 50
+#define MAX_EXTERNAL_FILTER 100
 
 #ifdef __WIN32
 #define SHARED_LIB_EXT "dll"
@@ -367,6 +372,7 @@ AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, A
 			ADM_assert(0);
 			return NULL;
 }
+
 /*
 
 

@@ -25,8 +25,8 @@ typedef FilterDescriptor *(VF_getDescriptor)(void);
     BUILD_CREATE(name##_create,myClass); \
 	static FilterDescriptor descriptor_vf_id_##myClass (\
 								0, \
-								#name, \
 								displayname, \
+                                                                #name, \
 								description, \
 								category, \
 								name##_create, \

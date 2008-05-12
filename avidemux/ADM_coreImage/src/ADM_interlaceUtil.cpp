@@ -33,7 +33,6 @@ Skip factor=2
 
 //#include "ADM_editor/ADM_edit.hxx"
 #include "ADM_videoFilter.h"
-//#include "ADM_video/ADM_vidCommonFilter.h"
 
 //#define MMX_TRACE
 #warning remove mmxmacro and debug asm

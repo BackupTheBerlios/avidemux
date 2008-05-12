@@ -2610,15 +2610,5 @@ uint8_t  ADMImage::saveAsJpg(const char *filename)
         delete [] buffer;
         return 1;
 }
-#include "ADM_videoFilter.h"
-#include "ADM_video/ADM_vidCommonFilter.h"
-BUILD_CREATE(res_create,AVDMVideoStreamResize);
-BUILD_CREATE(crop_create,AVDMVideoStreamCrop);
-BUILD_CREATE(bsmear_create,AVDMVideoStreamBSMear);
 //
-AVDMGenericVideoStream *create_addBorder(AVDMGenericVideoStream *in,uint32_t x,uint32_t x2,uint32_t y,uint32_t y2)
-{
-    return NULL; //new AVDMVideoAddBorder(in,x,x2,y,y2);
-}
-
 // EOF

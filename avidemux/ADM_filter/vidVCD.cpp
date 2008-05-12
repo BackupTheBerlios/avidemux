@@ -149,10 +149,10 @@ uint8_t setHalfD1 (void)
 }
 
 
-extern AVDMGenericVideoStream *create_addBorder (AVDMGenericVideoStream * in,
+extern AVDMGenericVideoStream *create_addBorder (VF_FILTERS *o, AVDMGenericVideoStream * in,
 						 uint32_t x, uint32_t x2,
 						 uint32_t y, uint32_t y2);
-extern AVDMGenericVideoStream *createResizeFromParam (AVDMGenericVideoStream *
+extern AVDMGenericVideoStream *createResizeFromParam (VF_FILTERS *o, AVDMGenericVideoStream *
 						      in, uint32_t x,
 						      uint32_t y);
 //
@@ -301,11 +301,12 @@ int targetx,targetxFinal,targetyPAL,targetyNTSC;
   CONFcouple *couple;
   if (newx != info->width || newy != info->height)
     {
+      VF_FILTERS rtag=VF_INVALID;
       videofilters[nb_active_filter].filter =
-	createResizeFromParam (getLastVideoFilter (), newx, newy);
+	createResizeFromParam (&rtag,getLastVideoFilter (), newx, newy);
+      if(! videofilters[nb_active_filter].filter) return 0;
 
-
-      videofilters[nb_active_filter].tag = VF_INVALID; //VF_FIXME
+      videofilters[nb_active_filter].tag = rtag;
       videofilters[nb_active_filter].filter->getCoupledConf (&couple);
       videofilters[nb_active_filter].conf = couple;;
       nb_active_filter++;
@@ -314,11 +315,12 @@ int targetx,targetxFinal,targetyPAL,targetyNTSC;
 
   if (cropx || cropy)
     {
+      VF_FILTERS ctag=VF_INVALID;
       videofilters[nb_active_filter].filter =
-	create_addBorder (videofilters[nb_active_filter - 1].filter,
+	create_addBorder (&ctag,videofilters[nb_active_filter - 1].filter,
 			  cropx >> 1, cropx >> 1, cropy >> 1, cropy >> 1);
-
-      videofilters[nb_active_filter].tag = VF_INVALID;  // VF_FIXME
+      if(! videofilters[nb_active_filter].filter) return 0;
+      videofilters[nb_active_filter].tag = ctag;
       videofilters[nb_active_filter].filter->getCoupledConf (&couple);
       videofilters[nb_active_filter].conf = couple;;
       nb_active_filter++;

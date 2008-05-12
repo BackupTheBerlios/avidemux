@@ -12,6 +12,9 @@ SET(ADM_coreImage_SRCS
         ADM_pp.cpp
         ADM_print.cpp
         ADM_vidFieldUtil.cpp
+        ADM_vidFields.cpp
+        ADM_vidFieldASM.cpp
+        ADM_vidFieldBlend.cpp
         ADM_interlaceUtil.cpp
 )
 

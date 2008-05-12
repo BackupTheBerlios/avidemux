@@ -11,7 +11,6 @@
 
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_videoFilter.h"
-#include "ADM_video/ADM_vidCommonFilter.h"
 
 
 extern "C" {

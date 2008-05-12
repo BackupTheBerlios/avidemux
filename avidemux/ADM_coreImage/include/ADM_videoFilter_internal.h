@@ -94,7 +94,7 @@ public:
 FILTER      *getCurrentVideoFilterList (uint32_t * count);
 const FilterDescriptor * filterGetEntryFromTag (VF_FILTERS tag);
 const char *filterGetNameFromTag(VF_FILTERS tag);
-VF_FILTERS 	filterGetTagFromName(char *inname);
+VF_FILTERS 	filterGetTagFromName(const char *inname);
 uint8_t 	filterAddScript(VF_FILTERS tags,uint32_t n,Arg *args);
 
 /* Statically register filters */

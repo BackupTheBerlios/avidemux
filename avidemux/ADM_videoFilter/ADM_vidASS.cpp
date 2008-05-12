@@ -14,7 +14,6 @@
 #include "ADM_default.h"
 #include "DIA_coreToolkit.h"
 #include "ADM_videoFilter.h"
-#include "ADM_video/ADM_vidCommonFilter.h"
 #include "ADM_vidASS.h"
 #include "ADM_colorspace.h"
 #include "DIA_factory.h"

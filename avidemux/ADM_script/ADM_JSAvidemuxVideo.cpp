@@ -29,7 +29,7 @@
 #include "../ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
 #include "ADM_script/ADM_container.h"
 
-extern VF_FILTERS filterGetTagFromName(char *inname);
+extern VF_FILTERS filterGetTagFromName(const char *inname);
 extern uint8_t A_ListAllBlackFrames( char *file );
 extern uint8_t loadVideoCodecConfString( char *name);
 extern uint8_t ADM_saveRaw (const char *name);
