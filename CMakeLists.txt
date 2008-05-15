@@ -7,6 +7,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7 FATAL_ERROR)
 
 if (COMMAND cmake_policy)
 	cmake_policy(VERSION 2.4)
+	cmake_policy(SET CMP0003 NEW)
 endif (COMMAND cmake_policy)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
@@ -47,10 +48,6 @@ IF (CYGWIN)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mwin32")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwin32")
 ENDIF (CYGWIN)
-
-IF (MINGW AND COMMAND cmake_policy)
-	cmake_policy(SET CMP0003 NEW)
-ENDIF (MINGW AND COMMAND cmake_policy)
 
 IF (ADM_CPU_ALTIVEC)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ADM_ALTIVEC_FLAGS}")
@@ -199,7 +196,13 @@ MESSAGE("")
 # Directories to build
 ########################################
 ADD_SUBDIRECTORY(avidemux)
-ADD_SUBDIRECTORY(avidemux/plugins)
+
+OPTION(PLUGINS "" ON)
+
+IF (PLUGINS)
+	ADD_SUBDIRECTORY(avidemux/plugins)
+ENDIF (PLUGINS)
+
 ADD_SUBDIRECTORY(po)
 
 ########################################

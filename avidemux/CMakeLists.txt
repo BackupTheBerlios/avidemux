@@ -250,8 +250,13 @@ IF (ADM_DEBUG AND FIND_LEAKS)
 ENDIF (ADM_DEBUG AND FIND_LEAKS)
 
 IF (APPLE AND USE_SDL)
-	TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_libsdl_gtk)
-	TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_libsdl_qt4)
+	IF (ADM_UI_GTK)
+		TARGET_LINK_LIBRARIES(avidemux2_gtk ADM_libsdl_gtk)
+	ENDIF (ADM_UI_GTK)
+
+	IF (ADM_UI_QT4)
+		TARGET_LINK_LIBRARIES(avidemux2_qt4 ADM_libsdl_qt4)
+	ENDIF (ADM_UI_QT4)
 ENDIF (APPLE AND USE_SDL)
 
 ###########################################
