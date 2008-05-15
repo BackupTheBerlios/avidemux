@@ -28,6 +28,7 @@ x264Options::x264Options(void)
 	_param.rc.psz_rc_eq = strdup(_param.rc.psz_rc_eq);
 	_param.vui.i_sar_height = 1;
 	_param.vui.i_sar_width = 1;
+	_param.i_threads = 0;	// set to auto-detect, default is disabled
 
 	_sarAsInput = false;
 }

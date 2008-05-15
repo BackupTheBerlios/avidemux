@@ -420,7 +420,7 @@
 									</xs:restriction>
 								</xs:simpleType>
 							</xs:element>
-							<xs:element name="adaptiveQuantiserMode">
+							<xs:element name="adaptiveQuantiserMode" minOccurs="0">
 								<xs:simpleType>
 									<xs:restriction base="xs:string">
 										<xs:enumeration value="none"/>
@@ -429,7 +429,7 @@
 									</xs:restriction>
 								</xs:simpleType>
 							</xs:element>
-							<xs:element name="adaptiveQuantiserStrength" type="xs:float"/>
+							<xs:element name="adaptiveQuantiserStrength" type="xs:float" minOccurs="0"/>
 							<xs:element name="rateControlEquation" type="xs:string"/>
 							<xs:element name="quantiserCurveCompression">
 								<xs:simpleType>

@@ -48,7 +48,7 @@ x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vid
 
 	ui.setupUi(this);
 
-	connect(ui.defaultButton, SIGNAL(pressed()), this, SLOT(defaultButton_pressed()));
+	//connect(ui.defaultButton, SIGNAL(pressed()), this, SLOT(defaultButton_pressed()));
 
 	// General tab
 	lastBitrate = 1500;
@@ -69,7 +69,7 @@ x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vid
 
 #if X264_BUILD >= 57
 	ui.meMethodComboBox->addItem(QT_TR_NOOP("Hadamard Exhaustive Search"));
-#endif X264_BUILD >= 57
+#endif	// X264_BUILD >= 57
 
 	// Frame tab
 	connect(ui.loopFilterCheckBox, SIGNAL(toggled(bool)), this, SLOT(loopFilterCheckBox_toggled(bool)));
@@ -79,7 +79,12 @@ x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vid
 	connect(ui.trellisCheckBox, SIGNAL(toggled(bool)), this, SLOT(trellisCheckBox_toggled(bool)));
 	connect(ui.matrixCustomEditButton, SIGNAL(pressed()), this, SLOT(matrixCustomEditButton_pressed()));
 
-	// Advanced Rate Control
+	// Quantiser tab
+#if X264_BUILD < 59
+	ui.aqGroupBox->setEnabled(false);
+#endif
+
+	// Advanced tab
 	connect(ui.zoneAddButton, SIGNAL(pressed()), this, SLOT(zoneAddButton_pressed()));
 	connect(ui.zoneEditButton, SIGNAL(pressed()), this, SLOT(zoneEditButton_pressed()));
 	connect(ui.frameTypeFileButton, SIGNAL(pressed()), this, SLOT(frameTypeFileButton_pressed()));	
@@ -180,7 +185,10 @@ void x264ConfigDialog::meSpinBox_valueChanged(int value)
 void x264ConfigDialog::dct8x8CheckBox_toggled(bool checked)
 {
 	if (!checked)
+	{
 		ui.i8x8CheckBox->setChecked(false);
+		ui.i8x8CheckBox->setEnabled(false);
+	}
 }
 
 void x264ConfigDialog::p8x8CheckBox_toggled(bool checked)
@@ -320,6 +328,19 @@ void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *o
 		}
 	}
 
+	switch (options->getThreads())
+	{
+		case 0:
+			ui.threadAutoDetectRadioButton->setChecked(true);
+			break;
+		case 1:
+			ui.threadDisableRadioButton->setChecked(true);
+			break;
+		default:
+			ui.threadCustomRadioButton->setChecked(true);
+			ui.threadCustomSpinBox->setValue(options->getThreads());
+	}
+
 	// Motion Estimation tab
 	ui.meSpinBox->setValue(options->getSubpixelRefinement());
 	ui.rdoCheckBox->setChecked(options->getBFrameRdo());
@@ -349,13 +370,15 @@ void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *o
 	else
 		ui.predictSizeComboBox->setCurrentIndex(options->getDirectPredictionSize());
 
+	// Prediction tab
 	ui.weightedPredictCheckBox->setChecked(options->getWeightedPrediction());
-	ui.dct8x8CheckBox->setChecked(options->getDct8x8());
 	ui.p8x8CheckBox->setChecked(options->getPartitionP8x8());
 	ui.b8x8CheckBox->setChecked(options->getPartitionB8x8());
 	ui.p4x4CheckBox->setChecked(options->getPartitionP4x4());
 	ui.i8x8CheckBox->setChecked(options->getPartitionI8x8());
 	ui.i4x4CheckBox->setChecked(options->getPartitionI4x4());
+	ui.dct8x8CheckBox->setChecked(options->getDct8x8());
+	dct8x8CheckBox_toggled(options->getDct8x8());
 
 	// Frame tab
 	ui.cabacCheckBox->setChecked(options->getCabac());
@@ -423,6 +446,25 @@ void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *o
 	ui.quantiserCurveCompressSpinBox->setValue((int)floor(options->getQuantiserCurveCompression() * 100 + .5));
 	ui.quantiserBeforeCompressSpinBox->setValue(options->getReduceFluxBeforeCurveCompression());
 	ui.quantiserAfterCompressSpinBox->setValue(options->getReduceFluxAfterCurveCompression());
+
+#if X264_BUILD >= 59
+	switch (options->getAdaptiveQuantiserMode())
+	{
+		case X264_AQ_NONE:
+			ui.aqModeComboBox->setCurrentIndex(0);
+			break;
+		case X264_AQ_LOCAL:
+			ui.aqModeComboBox->setCurrentIndex(1);
+			break;
+		case X264_AQ_GLOBAL:
+			ui.aqModeComboBox->setCurrentIndex(2);
+			break;
+	}
+
+	ui.aqStrengthSpinBox->setValue(options->getAdaptiveQuantiserStrength());
+#endif	// X264_BUILD >= 59
+
+	// Advanced tab
 	ui.vbvMaxBitrateSpinBox->setValue(options->getVbvMaximumBitrate());
 	ui.vbvBufferSizeSpinBox->setValue(options->getVbvBufferSize());
 	ui.vbvBufferOccupancySpinBox->setValue((int)floor(options->getVbvInitialOccupancy() * 100 + .5));
@@ -497,6 +539,13 @@ void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *o
 		options->setSarWidth(1);
 		options->setSarHeight(1);
 	}
+
+	if (ui.threadAutoDetectRadioButton->isChecked())
+		options->setThreads(0);
+	else if (ui.threadDisableRadioButton->isChecked())
+		options->setThreads(1);
+	else
+		options->setThreads(ui.threadCustomSpinBox->value());
 
 	// Motion Estimation tab
 	options->setSubpixelRefinement(ui.meSpinBox->value());
@@ -588,6 +637,25 @@ void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *o
 	options->setQuantiserCurveCompression((float)ui.quantiserCurveCompressSpinBox->value() / 100);
 	options->setReduceFluxBeforeCurveCompression(ui.quantiserBeforeCompressSpinBox->value());
 	options->setReduceFluxAfterCurveCompression(ui.quantiserAfterCompressSpinBox->value());
+
+#if X264_BUILD >= 59
+	switch (ui.aqModeComboBox->currentIndex())
+	{
+		case 0:
+			options->setAdaptiveQuantiserMode(X264_AQ_NONE);
+			break;
+		case 1:
+			options->setAdaptiveQuantiserMode(X264_AQ_LOCAL);
+			break;
+		case 2:
+			options->setAdaptiveQuantiserMode(X264_AQ_GLOBAL);
+			break;
+	}
+
+	options->setAdaptiveQuantiserStrength(ui.aqStrengthSpinBox->value());
+#endif	// X264_BUILD >= 59
+
+	// Advanced tab
 	options->setVbvMaximumBitrate(ui.vbvMaxBitrateSpinBox->value());
 	options->setVbvBufferSize(ui.vbvBufferSizeSpinBox->value());
 	options->setVbvInitialOccupancy((float)ui.vbvBufferOccupancySpinBox->value() / 100);
