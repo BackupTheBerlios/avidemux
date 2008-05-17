@@ -15,7 +15,7 @@
 #include "ADM_toolkitGtk.h"
 #include "DIA_factory.h"
 #include "DIA_fileSel.h"
-#include "prefs.h"
+//#include "prefs.h"
 namespace ADM_GtkFactory
 {
 class diaElemFile : public diaElemFileBase
@@ -50,7 +50,6 @@ public:
 static void fileRead(void *w,void *p);
 static void dirSel(void *w,void *p);
 
-#include "prefs.h"
 
 diaElemFile::diaElemFile(uint32_t writemode,char **filename,const char *toggleTitle,
                          const char * defaultSuffix,const char *selectFileDesc)
@@ -162,6 +161,8 @@ void diaElemFile::changeFile(void)
       if (!*txt && defaultSuffix)
       {
           const char * lastfilename;
+#if 0
+#warning FIXME
           if (prefs->get(LASTFILES_FILE1,(ADM_filename **)&lastfilename))
           {
               strcpy (newname, lastfilename);
@@ -180,6 +181,7 @@ void diaElemFile::changeFile(void)
                   --cptr;
               }
           }
+#endif
       }
       t = FileSel_SelectWrite(tip,buffer,MAX_SEL,txt);
   }

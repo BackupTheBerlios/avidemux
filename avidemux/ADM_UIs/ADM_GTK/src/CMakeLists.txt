@@ -21,11 +21,11 @@ SET(${ADM_LIB}_SRCS
         ADM_gladeSupport.cpp  
         choice.cpp       
         toolkit_dialog.cpp
-        TLK_filesel.cpp
         toolkit.cpp
 )
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../include)
 ADD_LIBRARY(${ADM_LIB} SHARED ${${ADM_LIB}_SRCS})
 TARGET_LINK_LIBRARIES(${ADM_LIB} ${GTK_LDFLAGS})
 TARGET_LINK_LIBRARIES(${ADM_LIB} ADM_core)
+TARGET_LINK_LIBRARIES(${ADM_LIB} ADM_coreUI)
 ADD_TARGET_CFLAGS(${ADM_LIB} ${GTK_CFLAGS})
