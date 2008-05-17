@@ -163,6 +163,9 @@ void   diaElemMenu::enable(uint32_t onoff)
 void diaElemMenu::finalize(void)
 { 
 }
+void   diaElemMenu::updateMe(void)
+{
+}
 //*****************
 diaElemFile::diaElemFile(uint32_t write,char **filename,const char *toggleTitle,
                          const char *defaultSuffix, const char *tip)
@@ -205,6 +208,12 @@ void diaElemBitrate::getMe(void)
 {
  
 }
+void diaElemFile::changeFile(void)
+{
+}
+void diaElemBitrate::setMaxQz(uint32_t qz)
+{
+}
 //******************************************************
 diaElemReadOnlyText::diaElemReadOnlyText(const char *readyOnly,const char *toggleTitle,const char *tip)
   : diaElem(ELEM_ROTEXT)
@@ -240,6 +249,8 @@ void diaElemNotch::setMe(void *dialog, void *opaque,uint32_t line)
 {
   
 }
+ void diaElemNotch::getMe(void) {};
+
 //******************************************************
 diaElemDirSelect::diaElemDirSelect(char **filename,const char *toggleTitle,const char *tip)  : diaElemDirSelectBase() {}
 diaElemDirSelect::~diaElemDirSelect() {}
@@ -372,6 +383,12 @@ void diaElemToggleInt::setMe(void *dialog, void *opaque,uint32_t line)
 void diaElemToggleInt::getMe(void)
 {
   
+}
+void   diaElemToggleInt::finalize(void)
+{
+}
+void   diaElemToggleInt::enable(uint32_t onoff)
+{
 }
 //*********************************************************
 diaElemButton:: diaElemButton(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void *cookie,const char *tip)
