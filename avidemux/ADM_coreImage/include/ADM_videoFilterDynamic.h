@@ -19,7 +19,12 @@
 #include "ADM_videoFilter_internal.h"
 
 typedef FilterDescriptor *(VF_getDescriptor)(void);
-
+/*
+ *      This macro is used to automatically construct the struct describing a filter.
+ *      It is to be used for filters that are ui agnostic i.e. they have no UI at all
+ *      or use dialogFactory.
+ * 
+ */
 #define VF_DEFINE_FILTER(myClass,myParam,name,displayname,version,category,description) \
     SCRIPT_CREATE(name##_script,myClass,myParam); \
     BUILD_CREATE(name##_create,myClass); \
@@ -31,8 +36,27 @@ typedef FilterDescriptor *(VF_getDescriptor)(void);
 								category, \
 								name##_create, \
 								name##_script, \
-								ADM_FILTER_API_VERSION); \
-    extern "C" { 	FilterDescriptor *ADM_VF_getDescriptor(void) {return &descriptor_vf_id_##myClass ;}};							
+								ADM_FILTER_API_VERSION, \
+                                                                ADM_UI_ALL); \
+    extern "C" { 	FilterDescriptor *ADM_VF_getDescriptor(void) {return &descriptor_vf_id_##myClass ;}};
+/*
+ *      Same as above, but this filter is using a specific UI and cannot be used for another UI 
+ */
+    
+#define VF_DEFINE_FILTER_UI(ui,myClass,myParam,name,displayname,version,category,description) \
+    SCRIPT_CREATE(name##_script,myClass,myParam); \
+    BUILD_CREATE(name##_create,myClass); \
+        static FilterDescriptor descriptor_vf_id_##myClass (\
+                                                                0, \
+                                                                displayname, \
+                                                                #name, \
+                                                                description, \
+                                                                category, \
+                                                                name##_create, \
+                                                                name##_script, \
+                                                                ADM_FILTER_API_VERSION, \
+                                                                ui); \
+    extern "C" {        FilterDescriptor *ADM_VF_getDescriptor(void) {return &descriptor_vf_id_##myClass ;}};                                                   
 
 /* Hook, filters cannot include config.h as they are framework independant */
 #ifdef QT_TR_NOOP

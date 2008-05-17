@@ -19,7 +19,6 @@
 #ifndef ADM_COREUI_TOOLKIT__
 #define ADM_COREUI_TOOLKIT__
 
-
 typedef enum 
 {
         ADM_LOG_NONE=0,

@@ -24,8 +24,8 @@
 #include "DIA_factory.h"
 #include "ADM_vidFlux.h"
 
-static int16_t scaletab[16] asm(MANGLE(scaletab));
-static uint64_t scaletab_MMX[65536] asm(MANGLE(scaletab_MMX));
+static int16_t FUNNY_MANGLE(scaletab[16]);
+static uint64_t FUNNY_MANGLE(scaletab_MMX[65535]);
 
 void initScaleTab( void )
 {
@@ -60,20 +60,20 @@ VF_DEFINE_FILTER(ADMVideoFlux,fluxParam,
 //********** Register chunk ************
 
 
-static uint64_t spat_thresh asm(MANGLE(spat_thresh)) ASM_CONST =0LL;
-static uint64_t temp_thresh asm(MANGLE(temp_thresh)) ASM_CONST =0LL;
-static uint64_t ASM_CONST _l_counter_init asm(MANGLE(_l_counter_init)),
-	_l_indexer asm(MANGLE(_l_indexer)), _l_prev_pels asm(MANGLE(_l_prev_pels)),
-	_l_next_pels asm(MANGLE(_l_next_pels));
-static long int _l_src_pitch asm(MANGLE(_l_src_pitch)) ASM_CONST =0;
-static long int _l_dst_pitch asm(MANGLE(_l_dst_pitch)) ASM_CONST =0;
-static int _l_xmax asm(MANGLE(_l_xmax)) ASM_CONST=0;
+static uint64_t FUNNY_MANGLE(spat_thresh) ASM_CONST =0LL;
+static uint64_t FUNNY_MANGLE(temp_thresh) ASM_CONST =0LL;
+static uint64_t ASM_CONST FUNNY_MANGLE(_l_counter_init),
+	FUNNY_MANGLE(_l_indexer), FUNNY_MANGLE(_l_prev_pels),
+	FUNNY_MANGLE(_l_next_pels);
+static long int FUNNY_MANGLE(_l_src_pitch) ASM_CONST =0;
+static long int FUNNY_MANGLE(_l_dst_pitch) ASM_CONST =0;
+static int FUNNY_MANGLE(_l_xmax) ASM_CONST=0;
 
-static int ycnt asm(MANGLE(ycnt));
-static	uint8_t * _l_currp asm(MANGLE(_l_currp));
-static	 uint8_t * _l_prevp asm(MANGLE(_l_prevp));
-static	 uint8_t * _l_nextp asm(MANGLE(_l_nextp));
-static	 uint8_t * _l_destp asm(MANGLE(_l_destp));
+static int FUNNY_MANGLE(ycnt);
+static	uint8_t * FUNNY_MANGLE(_l_currp);
+static	 uint8_t * FUNNY_MANGLE(_l_prevp);
+static	 uint8_t * FUNNY_MANGLE(_l_nextp);
+static	 uint8_t * FUNNY_MANGLE(_l_destp);
 
 static uint32_t size;
 

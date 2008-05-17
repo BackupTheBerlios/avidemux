@@ -86,13 +86,8 @@ VF_DEFINE_FILTER(AVDMVideoStreamMPResize,mpresizeParam,
                 VF_TRANSFORM,
                 QT_TR_NOOP("Change image size. Faster than Avisynth's Resize."));
 //****************************************
-static uint8_t DIA_resize(uint32_t *width,uint32_t *height,uint32_t *algo,uint32_t originalw, uint32_t originalh,uint32_t fps)
-  {
-    
-    return 0;
-  }
 static int getResizeParams(uint32_t * w, uint32_t * h, uint32_t * algo,uint32_t ow,uint32_t oh,uint32_t fps);
-
+extern uint8_t DIA_resize(uint32_t *width,uint32_t *height,uint32_t *alg,uint32_t originalw, uint32_t originalh,uint32_t fps1000);
 
 uint8_t AVDMVideoStreamMPResize::configure(AVDMGenericVideoStream * instream)
 {

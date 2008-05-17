@@ -27,8 +27,8 @@
 extern uint32_t nb_active_filter;
 extern FILTER  videofilters[VF_MAX_FILTER];
 extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, AVDMGenericVideoStream *in);
-#include "ADM_video/ADM_vidCommonFilter.h"
-BUILD_CREATE(crop_create,AVDMVideoStreamCrop);
+//#include "ADM_video/ADM_vidCommonFilter.h"
+//BUILD_CREATE(crop_create,AVDMVideoStreamCrop);
 
 /**
  *      \fn insertFilter

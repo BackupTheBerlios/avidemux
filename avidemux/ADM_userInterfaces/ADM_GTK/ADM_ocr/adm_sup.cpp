@@ -1,9 +1,9 @@
-#include "toolkit_gtk.h"
 //#include "unistd.h"
+#include "ADM_toolkitGtk.h"
+
 
 #include "ADM_toolkit/toolkit.hxx"
-#include "../ADM_GTK/ADM_toolkit_gtk/toolkit_gtk.h"
-#include "../ADM_GTK/ADM_toolkit_gtk/toolkit_gtk_include.h"
+
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"

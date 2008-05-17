@@ -7,7 +7,7 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-#include "../ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "ADM_toolkitGtk.h"
 #include "ADM_default.h"
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \

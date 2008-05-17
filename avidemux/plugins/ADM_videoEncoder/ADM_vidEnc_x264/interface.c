@@ -20,7 +20,7 @@
 
 int vidEncGetEncoders(int uiType, int** encoderIds)
 {
-	if (uiType == ADM_VIDENC_UI_CLI || uiType == ADM_VIDENC_UI_GTK || uiType == ADM_VIDENC_UI_QT)
+	if (uiType == ADM_UI_CLI || uiType == ADM_UI_CLI || uiType == ADM_UI_CLI)
 	{
 		*encoderIds = encoders_getPointer(uiType);
 		return ADM_VIDENC_ERR_SUCCESS;

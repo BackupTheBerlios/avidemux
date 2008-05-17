@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
  
-#define ADM_FILTER_API_VERSION 2
+#define ADM_FILTER_API_VERSION 3
 /**
 	Note for filter writers :
 
@@ -59,11 +59,7 @@ typedef struct
     uint32_t				algo;
 }RESIZE_PARAMS;
 
-typedef struct
-{
- 	uint32_t left,right;
- 	uint32_t top,bottom;
-}CROP_PARAMS;
+
 
 typedef struct
 {

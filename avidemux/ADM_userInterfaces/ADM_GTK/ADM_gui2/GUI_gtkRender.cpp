@@ -28,7 +28,7 @@ extern "C"
 #else
 #include <gdk/gdkx.h>
 #endif
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "ADM_toolkitGtk.h"
 
 #include "ADM_misc.h"
 

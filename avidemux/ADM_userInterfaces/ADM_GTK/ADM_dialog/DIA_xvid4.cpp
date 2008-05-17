@@ -1,4 +1,5 @@
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "config.h"
+#include "ADM_toolkitGtk.h"
 #include "DIA_fileSel.h"
 #include "DIA_coreToolkit.h"
 

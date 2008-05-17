@@ -16,12 +16,20 @@
  ***************************************************************************/
 #ifndef __ADDBORDER__
 #define     __ADDBORDER__
+
+
+typedef struct
+{
+        uint32_t left,right;
+        uint32_t top,bottom;
+}ADDBORDER_PARAMS;
+
   class  AVDMVideoAddBorder:public AVDMGenericVideoStream
  {
 
  protected:
               virtual char        *printConf(void);
-              CROP_PARAMS         *_param;
+              ADDBORDER_PARAMS         *_param;
  public:
 
                                     AVDMVideoAddBorder(  AVDMGenericVideoStream *in,CONFcouple *setup);

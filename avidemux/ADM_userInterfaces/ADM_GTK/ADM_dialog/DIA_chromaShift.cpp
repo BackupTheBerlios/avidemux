@@ -14,7 +14,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "ADM_toolkitGtk.h"
 
 
 #include "ADM_image.h"

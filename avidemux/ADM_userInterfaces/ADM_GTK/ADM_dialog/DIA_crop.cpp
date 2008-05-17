@@ -20,7 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "ADM_toolkitGtk.h"
+
 
 
 #include "ADM_image.h"
@@ -29,7 +30,7 @@
 
 #include "DIA_flyDialog.h"
 #include "DIA_flyCrop.h"
-
+#if 0
 static GtkWidget	*create_dialog1 (void);
 
 /* Link between UI and core */
@@ -419,3 +420,4 @@ create_dialog1 (void)
   return dialog1;
 }
 
+#endif

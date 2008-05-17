@@ -15,8 +15,8 @@
  ***************************************************************************/
 
 #include <math.h>
+#include "ADM_toolkitGtk.h"
 
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 #include "../ADM_commonUI/GUI_render.h"
 #include "gui_action.hxx"
 

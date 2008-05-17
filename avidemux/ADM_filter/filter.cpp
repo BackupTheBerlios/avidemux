@@ -39,6 +39,9 @@
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_osSupport/ADM_quota.h"
 //
+
+extern ADM_UI_TYPE UI_GetCurrentUI(void);
+
 class ADM_vf_pluginLoader : public ADM_LibWrapper
 {
 	public:
@@ -155,6 +158,7 @@ static bool tryLoadingFilterPlugin(const char *file)
 	if(!desc) Fail(GetDescriptor);
 	// Check the API version
 	if(desc->apiVersion!=ADM_FILTER_API_VERSION) Fail(WrongAPI);
+	if(!(desc->uiFlags & UI_GetCurrentUI())) Fail(WrongUI);
 	// Duplicate it, just in case...
 	myDesc=new FilterDescriptor();
 	memcpy(myDesc,desc,sizeof(*myDesc));
@@ -176,7 +180,7 @@ er:
 }
 /**
  * 	\fn ADM_vf_loadPlugins
- *  \brief load all audio plugins
+ *  \brief load all video plugins
  */
 uint8_t ADM_vf_loadPlugins(const char *path)
 {

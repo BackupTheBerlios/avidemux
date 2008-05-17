@@ -12,7 +12,7 @@
 #include "ADM_inttype.h"
 #include "ADM_files.h"
 #include "ADM_encoder/ADM_pluginLoad.h"
-
+#include "DIA_uiTypes.h"
 extern QWidget *QuiMainWindows;
 
 static QTranslator qtTranslator;
@@ -68,13 +68,9 @@ void getUIDescription(char* desc)
 {
 	sprintf(desc, "Qt4 (%s)", qVersion());
 }
-
-void loadPlugins(void)
+ADM_UI_TYPE UI_GetCurrentUI(void)
 {
-	char *pluginDir = ADM_getPluginPath();
-
-	loadVideoEncoderPlugins(ADM_VIDENC_UI_QT, pluginDir);
-	delete [] pluginDir;
+  return ADM_UI_QT4;
 }
 
 void getMainWindowHandles(long int *handle, long int *nativeHandle)

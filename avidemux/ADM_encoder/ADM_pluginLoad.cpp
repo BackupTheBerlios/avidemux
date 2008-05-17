@@ -103,6 +103,19 @@ static int loadVideoEncoderPlugin(int uiType, const char *file)
 	return success;
 }
 /**
+ *      \fn loadPlugins
+ *      \brief load plugin
+ */
+extern ADM_UI_TYPE UI_GetCurrentUI(void); //FIXME
+void loadPlugins(void)
+{
+        char *pluginDir = ADM_getPluginPath();
+
+        loadVideoEncoderPlugins(UI_GetCurrentUI(), pluginDir);
+        delete [] pluginDir;
+}
+
+/**
  * 	\fn ADM_vidEnc_loadPlugins
  *  \brief load all audio plugins
  */

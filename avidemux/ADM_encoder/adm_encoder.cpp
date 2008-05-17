@@ -19,7 +19,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-
+#include "DIA_uiTypes.h"
 #include "gui_action.hxx"
 #ifdef USE_FFMPEG
 #include "ADM_lavcodec.h"

@@ -19,7 +19,7 @@ http://savannah.nongnu.org/cvs/?group=mldonkey
  *                                                                         *
  ***************************************************************************/
 
-#include "toolkit_gtk.h"
+#include "ADM_toolkitGtk.h"
 #include "ADM_tray.h"
 extern "C"
 {

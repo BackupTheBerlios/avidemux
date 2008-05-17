@@ -4,6 +4,7 @@
 #include "ADM_inttype.h"
 #include "ADM_files.h"
 #include "ADM_encoder/ADM_pluginLoad.h"
+#include "DIA_uiTypes.h"
 
 #ifdef HAVE_GETTEXT
 #include <libintl.h>
@@ -33,12 +34,9 @@ void getUIDescription(char* desc)
 	sprintf(desc, "CLI");
 }
 
-void loadPlugins(void)
+ADM_UI_TYPE UI_GetCurrentUI(void)
 {
-	char *pluginDir = ADM_getPluginPath();
-
-	loadVideoEncoderPlugins(ADM_VIDENC_UI_CLI, pluginDir);
-	delete [] pluginDir;
+  return ADM_UI_CLI;
 }
 
 void getMainWindowHandles(long int *handle, long int *nativeHandle)

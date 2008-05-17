@@ -1,4 +1,4 @@
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "ADM_toolkitGtk.h"
 #include "DIA_coreToolkit.h"
 
 static GtkWidget       *create_dialog1 (void);

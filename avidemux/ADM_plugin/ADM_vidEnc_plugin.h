@@ -38,9 +38,7 @@
 #define ADM_VIDENC_FRAMETYPE_B 1
 #define ADM_VIDENC_FRAMETYPE_P 2
 
-#define ADM_VIDENC_UI_CLI 0
-#define ADM_VIDENC_UI_GTK 1
-#define ADM_VIDENC_UI_QT 2
+#include "DIA_uiTypes.h"
 
 #define ADM_VIDENC_FLAG_GLOBAL_HEADER 1
 

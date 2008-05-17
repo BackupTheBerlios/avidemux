@@ -7,7 +7,7 @@
 #include "DIA_flyDialog.h"
 #include "DIA_flyDialogQt4.h"
 #include "DIA_flyCrop.h"
-
+#if 0
 class Ui_cropWindow : public QDialog
 {
 	Q_OBJECT
@@ -33,3 +33,5 @@ private slots:
 };
 
 #endif	// Q_crop_h
+#endif
+

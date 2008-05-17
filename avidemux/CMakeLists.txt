@@ -187,6 +187,7 @@ ADD_ADMLIB_ALL_TARGETS(${ADM_OUTPUTS})
 # Construct ADM_inputs
 ###########################################
 ADD_SUBDIRECTORY(ADM_inputs)
+ADD_SUBDIRECTORY(ADM_UIs)
 
 SET(ADM_INPUTS
 	ADM_asf
@@ -269,9 +270,10 @@ TARGET_LINK_LIBRARIES(avidemux2_cli
 	ADM_commonUI_cli
 	ADM_ocr_cli
 	ADM_dialogNone_cli
-	ADM_dialogFactoryNone_cli
 	ADM_dialogFiltersNone_cli
-	ADM_dialogGuiNone_cli)
+	ADM_dialogGuiNone_cli
+        ADM_UICli
+)
 
 IF (ADM_UI_GTK)
 	TARGET_LINK_LIBRARIES(avidemux2_gtk
@@ -281,10 +283,11 @@ IF (ADM_UI_GTK)
 		ADM_ocrGtk_gtk
 		ADM_dialogGtk_gtk
 		ADM_filtersGtk_gtk
-		ADM_dialogFactoryGtk_gtk
 		ADM_gui2Gtk_gtk
-		ADM_toolkitGtk_gtk
-		ADM_commonUI_gtk)
+		ADM_commonUI_gtk
+                ADM_toolkitGtk_gtk
+                ADM_UIGtk
+                )
 ENDIF (ADM_UI_GTK)
 
 IF (ADM_UI_QT4)
@@ -294,10 +297,12 @@ IF (ADM_UI_QT4)
 		ADM_ocr_qt4
 		ADM_ocrQt4_qt4
 		ADM_dialogQt4_qt4
-		ADM_dialogFactoryQt4_qt4
 		ADM_guiQt4_qt4
 		ADM_filtersQt4_qt4
-		ADM_commonUI_qt4)
+		ADM_commonUI_qt4
+		ADM_dialogQt4_qt4
+                ADM_UIQT4
+)
 ENDIF (ADM_UI_QT4)
 
 ADD_ADMLIB_ALL_TARGETS(ADM_utilities)

@@ -56,7 +56,7 @@ extern int automation(void);
 int SliderIsShifted = 0;
 
 int DIA_coloryuv(COLOR_YUV_PARAM *param) {return 0;}
-int DIA_getCropParams(  char *name,CROP_PARAMS *param,AVDMGenericVideoStream *in) {return 0;}
+
 
 #ifdef USE_XX_XVID 
 #include "xvid.h"

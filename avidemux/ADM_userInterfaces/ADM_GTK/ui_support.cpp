@@ -44,12 +44,9 @@ void getUIDescription(char* desc)
 	sprintf(desc, "GTK+ (%i.%i.%i)", gtk_major_version, gtk_minor_version, gtk_micro_version);
 }
 
-void loadPlugins(void)
+ADM_UI_TYPE UI_GetCurrentUI(void)
 {
-	char *pluginDir = ADM_getPluginPath();
-
-	loadVideoEncoderPlugins(ADM_VIDENC_UI_GTK, pluginDir);
-	delete [] pluginDir;
+  return ADM_UI_GTK;
 }
 
 void getMainWindowHandles(long int *handle,long int *nativeHandle)

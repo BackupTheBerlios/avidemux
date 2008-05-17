@@ -19,7 +19,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#if 0
 #include "Q_crop.h"
 
 //
@@ -168,4 +168,4 @@ int DIA_getCropParams(	char *name,CROP_PARAMS *param,AVDMGenericVideoStream *in)
 //____________________________________
 // EOF
 
-
+#endif

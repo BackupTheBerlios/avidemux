@@ -23,9 +23,33 @@
 #include "ADM_default.h"
 
 #include "ADM_videoFilter.h"
-#include "ADM_video/ADM_vidCommonFilter.h"
 
 
+typedef struct
+{
+        uint32_t left,right;
+        uint32_t top,bottom;
+}CROP_PARAMS;
+
+class  AVDMVideoStreamCrop:public AVDMGenericVideoStream
+ {
+
+ protected:
+                CROP_PARAMS          *_param;
+
+ public:
+
+                                AVDMVideoStreamCrop(  AVDMGenericVideoStream *in,CONFcouple *couples);
+        virtual                 ~AVDMVideoStreamCrop();
+        virtual uint8_t         getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+                                                                ADMImage *data,uint32_t *flags);
+        virtual char    *printConf(void) ;
+                  uint8_t       configure( AVDMGenericVideoStream *instream);
+          virtual uint8_t       getCoupledConf( CONFcouple **couples);
+
+
+ }     ;
+ 
 static FILTER_PARAM cropParam={4,{"left","right","top","bottom"}};
 
 

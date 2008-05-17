@@ -18,8 +18,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
 
+#include "ADM_toolkitGtk.h"
 
 #include "DIA_busy.h"
 

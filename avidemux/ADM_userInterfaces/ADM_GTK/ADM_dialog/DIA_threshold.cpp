@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "ADM_toolkitGtk.h"
 
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_videoFilter.h"

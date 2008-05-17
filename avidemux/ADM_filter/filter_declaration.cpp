@@ -43,7 +43,7 @@ printf(  "*********************\n");
 
 //ko -- ko -- ko -- ko ko --ko -ko
 	
-REGISTERX(VF_TRANSFORM, "crop",QT_TR_NOOP("Crop"),QT_TR_NOOP("Remove lines from top/bottom/left/right."),VF_CROP,1,crop_create,crop_script);  
+// VF_FIXME REGISTERX(VF_TRANSFORM, "crop",QT_TR_NOOP("Crop"),QT_TR_NOOP("Remove lines from top/bottom/left/right."),VF_CROP,1,crop_create,crop_script);  
 REGISTERX(VF_TRANSFORM, "rotate",QT_TR_NOOP("Rotate"),QT_TR_NOOP("Rotate the picture by 90, 180 or 270 degrees."),VF_ROTATE,1,rotate_create,rotate_script);
 REGISTERX(VF_INTERLACING, "tdeint",QT_TR_NOOP("TDeint"),QT_TR_NOOP("Motion adaptative deinterlacer by Tritical."),VF_TDEINT,1,tdeint_create,tdeint_script);
 

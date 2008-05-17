@@ -55,7 +55,7 @@ AVDMVideoAddBorder::AVDMVideoAddBorder(  AVDMGenericVideoStream *in,CONFcouple *
 		if(couples)
 		{
 
-			 _param=NEW(CROP_PARAMS);
+			 _param=NEW(ADDBORDER_PARAMS);
 
 				GET(left);
 				GET(right);
@@ -66,7 +66,7 @@ AVDMVideoAddBorder::AVDMVideoAddBorder(  AVDMGenericVideoStream *in,CONFcouple *
 		}	
 			else 			
 		{	// default parameter	
-				_param=NEW(CROP_PARAMS);
+				_param=NEW(ADDBORDER_PARAMS);
 				_param->left=_param->top=
 				_param->right=_param->bottom=0;
 		}				
@@ -89,7 +89,7 @@ AVDMVideoAddBorder::AVDMVideoAddBorder(  AVDMGenericVideoStream *in,uint32_t x,u
  	_in=in;		
    	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
 
-				_param=NEW(CROP_PARAMS);
+				_param=NEW(ADDBORDER_PARAMS);
 				_param->left=x;
 				_param->top=y;
 				_param->right=x2;

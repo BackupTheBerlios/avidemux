@@ -13,7 +13,7 @@
  ***************************************************************************/
 #include <math.h>
 
-#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "ADM_toolkitGtk.h"
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_UI
 #include "ADM_osSupport/ADM_debug.h"

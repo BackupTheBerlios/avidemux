@@ -10,7 +10,7 @@
 #include <gtk/gtk.h>
 
 #include "ADM_default.h"
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "ADM_gladeSupport.h"
 #include "../ADM_toolkit_gtk/jogshuttle.h"
 #include "../ADM_toolkit_gtk/gtkmarkscale.h"
 

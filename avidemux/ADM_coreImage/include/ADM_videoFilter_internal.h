@@ -16,7 +16,7 @@
  ***************************************************************************/
  #ifndef __VIDEO_FILTERS__
  #define  __VIDEO_FILTERS__
-
+#include "DIA_uiTypes.h"
 #include "ADM_videoFilter_iface.h"
 
 typedef enum
@@ -53,6 +53,7 @@ public:
 			const void (*destroy)(AVDMGenericVideoStream *old); /* Maybe needed ...*/
 		
 			const uint32_t apiVersion;
+			const uint32_t uiFlags;
 			const uint32_t filterVersion;
 			VF_FILTERS tag;
 			
@@ -64,17 +65,19 @@ public:
 					VF_CATEGORY category,
 					AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *),
 					AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args),
-					uint32_t apiVersion=ADM_FILTER_API_VERSION,uint32_t filterVersion=1):
+					uint32_t apiVersion=ADM_FILTER_API_VERSION,
+					uint32_t uiFlags=ADM_UI_ALL,uint32_t filterVersion=1):
 						tag(tag),
 						name(name),filterName(filtername),description(descTex),category(category),
 						create(create),create_from_script(create_from_script),destroy(NULL),
-						apiVersion(apiVersion),filterVersion(filterVersion)
+						apiVersion(apiVersion),uiFlags(uiFlags),
+						filterVersion(filterVersion)
 					
 			{
 				tag=0;
 			}
 			FilterDescriptor() :name(NULL),filterName(NULL),description(NULL),category(VF_MAX),create(NULL),create_from_script(NULL),
-						destroy(NULL),apiVersion(0),filterVersion(0)
+						destroy(NULL),apiVersion(0),uiFlags(0),filterVersion(0)
 			{
 				
 			}

@@ -64,13 +64,14 @@ Skip factor=2
 #if defined(ADM_CPU_X86) && defined(ASM_ILACING)
 
 static uint32_t      ADMVideo_interlaceCount_MMX( uint8_t *src ,uint32_t w, uint32_t h);
-static uint8_t *_l_p asm(MANGLE(_l_p)) =NULL;
-static uint8_t *_l_c asm(MANGLE(_l_c)) =NULL;
-static uint8_t *_l_n asm(MANGLE(_l_n)) =NULL;
+static uint8_t * FUNNY_MANGLE(_l_p)  =NULL;
+static uint8_t * FUNNY_MANGLE(_l_c) =NULL;
+static uint8_t * FUNNY_MANGLE(_l_n) =NULL;
 
-static int64_t _l_h asm(MANGLE(_l_h));
+static int64_t FUNNY_MANGLE(_l_h)
 
-static mmx_t _lthresh,_added,_total asm(MANGLE(_total)),_lwrd;
+static mmx_t _lthresh,_added,_lwrd;
+static mmx_t  FUNNY_MANGLE(_total) ;
 static mmx_t _l255;
 static mmx_t _l0;
 
