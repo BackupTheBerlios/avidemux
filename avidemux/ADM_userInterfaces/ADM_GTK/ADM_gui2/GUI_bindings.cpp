@@ -38,7 +38,7 @@
 #include "DIA_coreToolkit.h"
 
 extern uint8_t UI_getPhysicalScreenSize(void* window, uint32_t *w,uint32_t *h);
-
+extern void ADM_initUIGtk(GtkWidget *guiRootWindow);
 
 #define WOD(x) lookup_widget (guiRootWindow,#x)
 
@@ -312,7 +312,7 @@ uint32_t w,h;
 #endif
 
 		gtk_register_dialog(guiRootWindow);
-					
+		ADM_initUIGtk(guiRootWindow);			
 		// and seek global sub entity
 		ret= bindGUI();		
 		if(ret) gtk_widget_show(guiRootWindow);

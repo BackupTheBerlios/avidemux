@@ -24,7 +24,7 @@
 #endif
 
 
-extern GtkWidget *guiRootWindow;
+static  GtkWidget *guiRootWindow=NULL;
 
 GtkWidget *GUI_PixmapButtonDefault(GdkWindow * window, const gchar ** xpm,
                                   const gchar * tooltip);
@@ -35,7 +35,15 @@ GtkWidget *GUI_PixmapButton(GdkWindow * window, const gchar ** xpm,
 
 
 GtkTooltips *tooltips = NULL;
-
+/**
+ *      \fn ADM_initUIGtk
+ *      \brief Init the library with application windows id
+ */
+void ADM_initUIGtk(GtkWidget *window)
+{
+    
+    guiRootWindow=window;
+}
 
 //
 //_______________________________
