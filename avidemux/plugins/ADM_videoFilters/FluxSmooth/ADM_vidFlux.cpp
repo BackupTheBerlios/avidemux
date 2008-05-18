@@ -24,8 +24,8 @@
 #include "DIA_factory.h"
 #include "ADM_vidFlux.h"
 
-static int16_t FUNNY_MANGLE(scaletab[16]);
-static uint64_t FUNNY_MANGLE(scaletab_MMX[65535]);
+static int16_t FUNNY_MANGLE_ARRAY(scaletab, 16);
+static uint64_t FUNNY_MANGLE_ARRAY(scaletab_MMX, 65535);
 
 void initScaleTab( void )
 {

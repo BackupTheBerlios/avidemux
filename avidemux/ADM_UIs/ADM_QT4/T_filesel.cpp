@@ -15,7 +15,7 @@
 
 #include "T_filesel.h"
 #include "ADM_default.h"
-#include "prefs.h"
+//#include "prefs.h"
 #include "DIA_factory.h"
 #include "DIA_fileSel.h"
 
@@ -66,6 +66,8 @@ void ADM_Qfilesel::buttonPressed(QAbstractButton *s)
 			r=FileSel_SelectRead(selectDesc,buffer,MAX_SEL,txt);
 			break;
 		case ADM_FILEMODE_WRITE:
+#warning FIXME
+#if 0
 			if (defaultSuffix)
 			{
 				const char * lastfilename;
@@ -88,6 +90,7 @@ void ADM_Qfilesel::buttonPressed(QAbstractButton *s)
 					}
 				}
 			}
+#endif
 			r=FileSel_SelectWrite(selectDesc,buffer,MAX_SEL,txt);
 			break;
 

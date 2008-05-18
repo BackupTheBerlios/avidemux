@@ -8,7 +8,7 @@ MACRO(FIND_MSGFMT)
             FIND_PROGRAM(MSGFMT_EXECUTABLE ${MSGFMT_NAME})
 
             IF (NOT MSGFMT_EXECUTABLE)
-              MESSAGE(FATAL_ERROR "${MSGFMT_NAME} not found - po files can't be processed")
+              MESSAGE(STATUS "WARNING: ${MSGFMT_NAME} not found - po files can't be processed")
               SET(MSGFMT_NOT_FOUND "1")     # to avoid double checking in one cmake run
             ENDIF (NOT MSGFMT_EXECUTABLE)
 

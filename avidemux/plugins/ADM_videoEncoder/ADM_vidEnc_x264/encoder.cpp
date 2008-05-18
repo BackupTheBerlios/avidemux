@@ -86,7 +86,7 @@ void x264Encoder::setUiType(int uiType)
 
 int x264Encoder::isConfigurable(void)
 {
-	return (_uiType == ADM_VIDENC_UI_GTK || _uiType == ADM_VIDENC_UI_QT);
+	return (_uiType == ADM_UI_GTK || _uiType == ADM_UI_QT4);
 }
 
 int x264Encoder::configure(vidEncConfigParameters *configParameters, vidEncVideoProperties *properties)
@@ -96,7 +96,7 @@ int x264Encoder::configure(vidEncConfigParameters *configParameters, vidEncVideo
 		char* pluginPath = ADM_getPluginPath();
 		const char* configGuiLibName;
 
-		if (_uiType == ADM_VIDENC_UI_GTK)
+		if (_uiType == ADM_UI_GTK)
 			configGuiLibName = GTK_PLUGIN_NAME;
 		else
 			configGuiLibName = QT_PLUGIN_NAME;
