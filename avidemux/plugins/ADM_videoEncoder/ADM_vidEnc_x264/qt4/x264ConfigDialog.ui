@@ -3315,7 +3315,14 @@
              <number>6</number>
             </property>
             <item>
-             <widget class="QListView" name="listView" />
+             <widget class="QTableView" name="zoneTableView" >
+              <property name="selectionMode" >
+               <enum>QAbstractItemView::SingleSelection</enum>
+              </property>
+              <property name="selectionBehavior" >
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+             </widget>
             </item>
             <item>
              <layout class="QVBoxLayout" >
@@ -4258,7 +4265,6 @@
   <tabstop>quantiserCurveCompressSpinBox</tabstop>
   <tabstop>quantiserBeforeCompressSpinBox</tabstop>
   <tabstop>quantiserAfterCompressSpinBox</tabstop>
-  <tabstop>listView</tabstop>
   <tabstop>zoneAddButton</tabstop>
   <tabstop>zoneEditButton</tabstop>
   <tabstop>zoneDeleteButton</tabstop>

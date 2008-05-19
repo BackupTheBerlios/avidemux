@@ -45,8 +45,6 @@
 // Ugly but sooo usefull
 extern uint32_t frameStart,frameEnd;
 static uint32_t edFrameStart,edFrameEnd;
-uint8_t loadVideoCodecConf( char *name);
-uint8_t saveVideoCodecConf( char *name);
 const char *getCurrentContainerAsString(void);
 
 uint8_t ADM_Composer::getMarkers(uint32_t *start, uint32_t *end)

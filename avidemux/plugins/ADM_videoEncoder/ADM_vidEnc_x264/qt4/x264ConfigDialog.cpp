@@ -21,7 +21,6 @@
 
 #include "x264ConfigDialog.h"
 #include "x264CustomMatrixDialog.h"
-#include "x264ZonesDialog.h"
 
 #include "ADM_default.h"
 #include "DIA_coreToolkit.h"
@@ -47,8 +46,6 @@ x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vid
 	memcpy(colourMatrix, _colourMatrix, sizeof(colourMatrix));	
 
 	ui.setupUi(this);
-
-	//connect(ui.defaultButton, SIGNAL(pressed()), this, SLOT(defaultButton_pressed()));
 
 	// General tab
 	lastBitrate = 1500;
@@ -85,13 +82,23 @@ x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vid
 #endif
 
 	// Advanced tab
+	ui.zoneTableView->sortByColumn(0, Qt::AscendingOrder);
+	ui.zoneTableView->setModel(&_zoneTableModel);
+	ui.zoneTableView->setItemDelegate(&_zoneTableDelegate);
+
+	ui.zoneTableView->setColumnWidth(0, 80);
+	ui.zoneTableView->setColumnWidth(1, 80);
+	ui.zoneTableView->setColumnWidth(2, 100);
+	ui.zoneTableView->setColumnWidth(3, 80);
+
 	connect(ui.zoneAddButton, SIGNAL(pressed()), this, SLOT(zoneAddButton_pressed()));
 	connect(ui.zoneEditButton, SIGNAL(pressed()), this, SLOT(zoneEditButton_pressed()));
+	connect(ui.zoneDeleteButton, SIGNAL(pressed()), this, SLOT(zoneDeleteButton_pressed()));
 	connect(ui.frameTypeFileButton, SIGNAL(pressed()), this, SLOT(frameTypeFileButton_pressed()));	
 
 	loadSettings(encodeOptions, options);
 }
-
+/*
 void x264ConfigDialog::defaultButton_pressed()
 {
 	if (GUI_Question(QT_TR_NOOP("Are you sure you wish to reset all options to defaults?")))
@@ -105,7 +112,7 @@ void x264ConfigDialog::defaultButton_pressed()
 		loadSettings(&defaultEncodeOptions, &defaultOptions);
 	}
 }
-
+*/
 // General tab
 void x264ConfigDialog::encodingModeComboBox_currentIndexChanged(int index)
 {
@@ -236,20 +243,20 @@ void x264ConfigDialog::matrixCustomEditButton_pressed()
 
 void x264ConfigDialog::zoneAddButton_pressed()
 {
-	x264ZonesDialog dialog;
-
-	if (dialog.exec() == QDialog::Accepted)
-	{
-	}
+	_zoneTableModel.insertRows(0, 1, QModelIndex());
+	ui.zoneTableView->selectRow(0);
+	ui.zoneTableView->edit(ui.zoneTableView->currentIndex());
 }
 
 void x264ConfigDialog::zoneEditButton_pressed()
 {
-	x264ZonesDialog dialog;
+	ui.zoneTableView->edit(ui.zoneTableView->currentIndex());
+}
 
-	if (dialog.exec() == QDialog::Accepted)
-	{
-	}
+void x264ConfigDialog::zoneDeleteButton_pressed()
+{
+	if (ui.zoneTableView->currentIndex().row() >= 0 && GUI_Question(QT_TR_NOOP("Are you sure you wish to delete the selected zone?")))
+		_zoneTableModel.removeRows(ui.zoneTableView->currentIndex().row(), 1, QModelIndex());
 }
 
 void x264ConfigDialog::frameTypeFileButton_pressed()
@@ -469,6 +476,19 @@ void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *o
 	ui.vbvBufferSizeSpinBox->setValue(options->getVbvBufferSize());
 	ui.vbvBufferOccupancySpinBox->setValue((int)floor(options->getVbvInitialOccupancy() * 100 + .5));
 
+	_zoneTableModel.removeRows();
+
+	int zoneCount = options->getZoneCount();
+
+	if (zoneCount)
+	{
+		x264ZoneOptions** zoneOptions = options->getZones();
+
+		_zoneTableModel.insertRows(0, zoneCount, QModelIndex(), zoneOptions);
+
+		delete [] zoneOptions;
+	}
+
 	// Output tab
 	if (!options->getIdcLevel())
 		options->setIdcLevel(51);
@@ -660,13 +680,16 @@ void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *o
 	options->setVbvBufferSize(ui.vbvBufferSizeSpinBox->value());
 	options->setVbvInitialOccupancy((float)ui.vbvBufferOccupancySpinBox->value() / 100);
 
+	options->clearZones();
+
+	QList<x264ZoneOptions*> zoneOptions = _zoneTableModel.getList();
+
+	for (int zone = 0; zone < zoneOptions.count(); zone++)
+		options->addZone(zoneOptions[zone]);
+
 	// Output tab
 	options->setIdcLevel(idcLevel[ui.idcLevelComboBox->currentIndex()]);
-
-	bool ok;
-	options->setSpsIdentifier(ui.spsiComboBox->currentText().toInt(&ok));
-	assert(ok);
-
+	options->setSpsIdentifier(ui.spsiComboBox->currentText().toInt());
 	options->setDeterministic(ui.repeatabilityCheckBox->isChecked());
 	options->setAccessUnitDelimiters(ui.accessUnitCheckBox->isChecked());
 	options->setComputePsnr(ui.psnrCheckBox->isChecked());

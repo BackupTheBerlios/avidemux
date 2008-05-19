@@ -544,15 +544,7 @@ void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t param, uint32_t ext
 		options.encodeMode = getVideoEncodePluginMode(mode);
 		options.encodeModeParameter = param;
 
-		if (zparam->extraSettings)
-			delete [] (char*)zparam->extraSettings;
-
-		zparam->extraSettings = extraData;
-
-		if (extraData)
-			zparam->extraSettingsLen = strlen((char*)extraData);
-		else
-			zparam->extraSettingsLen = 0;
+		videoCodecSetConf(0, extraData);
 
 		plugin->setOptions(plugin->encoderId, &options, (char*)zparam->extraSettings);
 	}
@@ -766,11 +758,16 @@ void videoCodecSetConf(uint32_t extraLen, uint8_t *extraData)
 		if (param->extraSettings)
 			delete [] (char*)param->extraSettings;
 
-		param->extraSettings = new char[extraLen + 1];
-		param->extraSettingsLen = extraLen;
-
-		memcpy(param->extraSettings, extraData, extraLen);
-		((char*)param->extraSettings)[extraLen] = 0;
+		if (extraData)
+		{
+			param->extraSettingsLen = strlen((char*)extraData);
+			param->extraSettings = ADM_strdup((char*)extraData);
+		}
+		else
+		{
+			param->extraSettings = NULL;
+			param->extraSettingsLen = 0;
+		}
 	}
 	else if (extraLen)
 	{
@@ -781,7 +778,7 @@ void videoCodecSetConf(uint32_t extraLen, uint8_t *extraData)
 			ADM_assert(0);
 		}
 
-		memcpy (param->extraSettings, extraData, param->extraSettingsLen);
+		memcpy(param->extraSettings, extraData, param->extraSettingsLen);
 	}
 }
 

@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <math.h>
 #include <libxml/parser.h>
 #include <libxml/xmlschemas.h>
 
@@ -36,7 +37,9 @@ x264Options::x264Options(void)
 x264Options::~x264Options(void)
 {
 	if (_param.rc.psz_rc_eq)
-		free(_param.rc.psz_rc_eq);
+		delete [] _param.rc.psz_rc_eq;
+
+	clearZones();
 }
 
 x264_param_t* x264Options::getParameters(void)
@@ -45,6 +48,15 @@ x264_param_t* x264Options::getParameters(void)
 
 	memcpy(param, &_param, sizeof(x264_param_t));
 	param->rc.psz_rc_eq = strdup(_param.rc.psz_rc_eq);
+	param->rc.i_zones = getZoneCount();
+
+	if (param->rc.i_zones)
+	{
+		param->rc.zones = new x264_zone_t[param->rc.i_zones];
+
+		for (int zone = 0; zone < param->rc.i_zones; zone++)
+			_zoneOptions[zone]->setX264Zone(&param->rc.zones[zone]);
+	}
 
 	return param;
 }
@@ -846,7 +858,7 @@ char* x264Options::getRateControlEquation(void)
 	return _param.rc.psz_rc_eq;
 }
 
-void x264Options::setRateControlEquation(char* rateControlEquation)
+void x264Options::setRateControlEquation(char *rateControlEquation)
 {
 	if (_param.rc.psz_rc_eq)
 		free(_param.rc.psz_rc_eq);
@@ -889,7 +901,33 @@ void x264Options::setReduceFluxAfterCurveCompression(float reduceFluxAfterCurveC
 
 unsigned int x264Options::getZoneCount(void)
 {
-	return _param.rc.i_zones;
+	return _zoneOptions.size();
+}
+
+x264ZoneOptions** x264Options::getZones(void)
+{
+	unsigned int zoneCount = getZoneCount();
+	x264ZoneOptions **zoneOptions = new x264ZoneOptions*[zoneCount];
+
+	for (int zone = 0; zone < zoneCount; zone++)
+		zoneOptions[zone] = _zoneOptions[zone]->clone();
+
+	return zoneOptions;
+}
+
+void x264Options::clearZones(void)
+{
+	for (int zone = 0; zone < getZoneCount(); zone++)
+		delete _zoneOptions[zone];
+
+	_zoneOptions.clear();
+}
+
+void x264Options::addZone(x264ZoneOptions *zoneOptions)
+{
+	x264ZoneOptions *clonedOptions = zoneOptions->clone();
+
+	_zoneOptions.push_back(clonedOptions);
 }
 
 bool x264Options::getAccessUnitDelimiters(void)
@@ -926,11 +964,11 @@ char* x264Options::toXml(void)
 	xmlDocPtr xmlDoc = xmlNewDoc((const xmlChar*)"1.0");
 	xmlNodePtr xmlNodeRoot;
 	xmlNodePtr xmlNodeChild, xmlNodeChild2;
-	xmlChar* tempBuffer;
+	xmlChar *tempBuffer;
 	int tempBufferSize;
 	const int bufferSize = 100;
 	xmlChar xmlBuffer[bufferSize + 1];
-	char* xml = NULL;
+	char *xml = NULL;
 
 	while (true)
 	{
@@ -1282,12 +1320,25 @@ char* x264Options::toXml(void)
 
 		if (zoneCount)
 		{
-			xmlNodeChild2 = xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"zone", NULL);
+			x264ZoneOptions** zoneOptions = getZones();
 
 			for (int zoneIndex = 0; zoneIndex < zoneCount; zoneIndex++)
 			{
+				xmlNodeChild2 = xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"zone", NULL);
+				x264ZoneOptions* option = zoneOptions[zoneIndex];
 
+				xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"frameStart", number2String(xmlBuffer, bufferSize, option->getFrameStart()));
+				xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"frameEnd", number2String(xmlBuffer, bufferSize, option->getFrameEnd()));
+
+				if (zoneOptions[zoneIndex]->getZoneMode() == ZONE_MODE_QUANTISER)
+					xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"quantiser", number2String(xmlBuffer, bufferSize, option->getZoneParameter()));
+				else
+					xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"bitrateFactor", number2String(xmlBuffer, bufferSize, option->getZoneParameter() / 100.f));
+
+				delete option;
 			}
+
+			delete [] zoneOptions;
 		}
 
 		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"accessUnitDelimiters", boolean2String(xmlBuffer, bufferSize, getAccessUnitDelimiters()));
@@ -1325,10 +1376,12 @@ char* x264Options::toXml(void)
 	return xml;
 }
 
-int x264Options::fromXml(char* xml)
+int x264Options::fromXml(char *xml)
 {
-	const char* schemaFile = "x264Param.xsd";
-	char* pluginDir = ADM_getPluginPath();
+	clearZones();
+
+	const char *schemaFile = "x264Param.xsd";
+	char *pluginDir = ADM_getPluginPath();
 	char schemaPath[strlen(pluginDir) + strlen(PLUGIN_SUBDIR) + 1 + strlen(schemaFile) + 1];
 	bool success = false;
 
@@ -1477,7 +1530,7 @@ int x264Options::fromXml(char* xml)
 	return success;
 }
 
-void x264Options::parseVuiOptions(xmlNode* node)
+void x264Options::parseVuiOptions(xmlNode *node)
 {
 	for (xmlNode *xmlChild = node->children; xmlChild; xmlChild = xmlChild->next)
 	{
@@ -1602,7 +1655,7 @@ void x264Options::parseVuiOptions(xmlNode* node)
 	}
 }
 
-void x264Options::parseCqmOption(xmlNode* node, uint8_t cqm[])
+void x264Options::parseCqmOption(xmlNode *node, uint8_t cqm[])
 {
 	int index = 0;
 
@@ -1620,7 +1673,7 @@ void x264Options::parseCqmOption(xmlNode* node, uint8_t cqm[])
 	}
 }
 
-void x264Options::parseAnalyseOptions(xmlNode* node)
+void x264Options::parseAnalyseOptions(xmlNode *node)
 {
 	for (xmlNode *xmlChild = node->children; xmlChild; xmlChild = xmlChild->next)
 	{
@@ -1740,7 +1793,7 @@ void x264Options::parseAnalyseOptions(xmlNode* node)
 	}
 }
 
-void x264Options::parseRateControlOptions(xmlNode* node)
+void x264Options::parseRateControlOptions(xmlNode *node)
 {
 	for (xmlNode *xmlChild = node->children; xmlChild; xmlChild = xmlChild->next)
 	{
@@ -1791,6 +1844,8 @@ void x264Options::parseRateControlOptions(xmlNode* node)
 				setReduceFluxBeforeCurveCompression(atof(content));
 			else if (strcmp((char*)xmlChild->name, "reduceFluxAfterCurveCompression") == 0)
 				setReduceFluxAfterCurveCompression(atof(content));
+			else if (strcmp((char*)xmlChild->name, "zone") == 0)
+				parseZoneOptions(xmlChild);
 			else
 				printf("%s\n", xmlChild->name);
 
@@ -1799,29 +1854,52 @@ void x264Options::parseRateControlOptions(xmlNode* node)
 	}
 }
 
+void x264Options::parseZoneOptions(xmlNode *zoneNode)
+{
+	x264ZoneOptions option;
 
-xmlChar* x264Options::number2String(xmlChar* buffer, size_t size, int number)
+	for (xmlNode *xmlChild = zoneNode->children; xmlChild; xmlChild = xmlChild->next)
+	{
+		char *content = (char*)xmlNodeGetContent(xmlChild);
+
+		if (strcmp((char*)xmlChild->name, "frameStart") == 0)
+			option.setFrameRange(atoi(content), option.getFrameEnd());
+		else if (strcmp((char*)xmlChild->name, "frameEnd") == 0)
+			option.setFrameRange(option.getFrameStart(), atoi(content));
+		else if (strcmp((char*)xmlChild->name, "quantiser") == 0)
+			option.setQuantiser(atoi(content));
+		else if (strcmp((char*)xmlChild->name, "bitrateFactor") == 0)
+			option.setBitrateFactor((int)floor(atoi(content) * 100 + .5));
+
+		xmlFree(content);
+	}
+
+	addZone(&option);
+}
+
+
+xmlChar* x264Options::number2String(xmlChar *buffer, size_t size, int number)
 {
 	snprintf((char*)buffer, size, "%d", number);
 
 	return buffer;
 }
 
-xmlChar* x264Options::number2String(xmlChar* buffer, size_t size, unsigned int number)
+xmlChar* x264Options::number2String(xmlChar *buffer, size_t size, unsigned int number)
 {
 	snprintf((char*)buffer, size, "%d", number);
 
 	return buffer;
 }
 
-xmlChar* x264Options::number2String(xmlChar* buffer, size_t size, float number)
+xmlChar* x264Options::number2String(xmlChar *buffer, size_t size, float number)
 {
 	snprintf((char*)buffer, size, "%f", number);
 
 	return buffer;
 }
 
-xmlChar* x264Options::boolean2String(xmlChar* buffer, size_t size, bool boolean)
+xmlChar* x264Options::boolean2String(xmlChar *buffer, size_t size, bool boolean)
 {
 	if (boolean)
 		strcpy((char*)buffer, "true");
@@ -1831,7 +1909,7 @@ xmlChar* x264Options::boolean2String(xmlChar* buffer, size_t size, bool boolean)
 	return buffer;
 }
 
-bool x264Options::string2Boolean(char* buffer)
+bool x264Options::string2Boolean(char *buffer)
 {
 	return (strcmp(buffer, "true") == 0);
 }

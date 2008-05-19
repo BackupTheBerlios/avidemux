@@ -310,22 +310,7 @@ JSBool ADM_JSAvidemuxVideo::codecPlugin(JSContext *cx, JSObject *obj, uintN argc
 	if (!videoCodecPluginSelectByGuid(guid))
 		*rval = BOOLEAN_TO_JSVAL(false);
 	else
-	{
-		// now do the conf
-		// format CBR=bitrate in kbits
-		//	  CQ=Q
-		//	  2 Pass=size
-		// We have to replace
-		if (!videoCodecConfigure(conf, 0, NULL))
-			*rval = BOOLEAN_TO_JSVAL(false);
-		else
-		{
-			if (!loadVideoCodecConf(data))
-				*rval = BOOLEAN_TO_JSVAL(false);
-			else
-				*rval = BOOLEAN_TO_JSVAL(true);
-		}
-	}
+		*rval = BOOLEAN_TO_JSVAL(videoCodecConfigure(conf, 0, (uint8_t*)data));
 
 	leaveLock();
 

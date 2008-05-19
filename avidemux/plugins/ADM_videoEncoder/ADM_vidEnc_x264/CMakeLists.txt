@@ -14,7 +14,7 @@ IF (X264_FOUND)
 		SET(QT_PLUGIN_NAME "ADM_vidEnc_x264_Qt")
 		SET(GTK_PLUGIN_NAME "ADM_vidEnc_x264_Gtk")
 		SET(PLUGIN_SUBDIR "x264")
-		SET(ADM_vidEnc_x264_SRCS interface.c configGuiLoader.cpp encoder.cpp guiHelper.cpp options.cpp)
+		SET(ADM_vidEnc_x264_SRCS interface.c configGuiLoader.cpp encoder.cpp guiHelper.cpp options.cpp zoneOptions.cpp)
 
 		CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config.h")
 

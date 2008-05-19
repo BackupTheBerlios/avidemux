@@ -4,9 +4,12 @@ INCLUDE(admPluginVideoEncoder)
 checkQt4()
 
 IF (QT4_FOUND)
-	QT4_WRAP_UI(x264Qt_headers x264ConfigDialog.ui x264CustomMatrixDialog.ui x264ZonesDialog.ui)
-	QT4_WRAP_CPP(x264Qt_source x264ConfigDialog.h x264CustomMatrixDialog.h x264ZonesDialog.h)
-	SET(ADM_vidEnc_x264_Qt_SRCS ${x264Qt_headers} ${x264Qt_source} x264ConfigDialog.cpp x264CustomMatrixDialog.cpp x264ZonesDialog.cpp)
+	QT4_WRAP_UI(x264Qt_headers
+		x264ConfigDialog.ui x264CustomMatrixDialog.ui)
+	QT4_WRAP_CPP(x264Qt_source
+		x264ConfigDialog.h x264CustomMatrixDialog.h x264ZoneTableModel.h x264ZoneTableDelegate.h)
+	SET(ADM_vidEnc_x264_Qt_SRCS 
+		${x264Qt_headers} ${x264Qt_source} x264ConfigDialog.cpp x264CustomMatrixDialog.cpp x264ZoneTableModel.cpp x264ZoneTableDelegate.cpp)
 	
 	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${QT_INCLUDE_DIR})
 	ADD_LIBRARY(${QT_PLUGIN_NAME} SHARED ${ADM_vidEnc_x264_Qt_SRCS})

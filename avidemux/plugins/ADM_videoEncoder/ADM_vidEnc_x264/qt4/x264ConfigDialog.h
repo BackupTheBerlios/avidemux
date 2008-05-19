@@ -3,6 +3,8 @@
 
 #include "ui_x264ConfigDialog.h"
 #include "../options.h"
+#include "x264ZoneTableModel.h"
+#include "x264ZoneTableDelegate.h"
 
 extern "C"
 {
@@ -15,6 +17,8 @@ class x264ConfigDialog : public QDialog
 
 private:
 	Ui_x264ConfigDialog ui;
+	x264ZoneTableModel _zoneTableModel;
+	x264ZoneTableDelegate _zoneTableDelegate;
 
 	static const int aspectRatioCount = 4;
 	int predefinedARs[aspectRatioCount][2];
@@ -47,8 +51,6 @@ public:
 	void saveSettings(vidEncOptions *encodeOptions, x264Options *options);
 
 private slots:
-	void defaultButton_pressed();
-
 	// General tab
 	void encodingModeComboBox_currentIndexChanged(int index);
 	void quantiserSlider_valueChanged(int value);
@@ -72,6 +74,7 @@ private slots:
 	// Advanced Rate Control tab
 	void zoneAddButton_pressed();
 	void zoneEditButton_pressed();
+	void zoneDeleteButton_pressed();
 	void frameTypeFileButton_pressed();
 };
 #endif	// x264ConfigDialog_h

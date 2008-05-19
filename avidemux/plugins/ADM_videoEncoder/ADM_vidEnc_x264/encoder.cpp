@@ -63,6 +63,8 @@ x264Encoder::x264Encoder(void)
 	_encodeOptions.structSize = sizeof(vidEncOptions);
 	_encodeOptions.encodeMode = DEFAULT_ENCODE_MODE;
 	_encodeOptions.encodeModeParameter = DEFAULT_ENCODE_MODE_PARAMETER;
+
+	memset(&_param, 0, sizeof(x264_param_t));
 }
 
 x264Encoder::~x264Encoder(void)
@@ -77,6 +79,12 @@ x264Encoder::~x264Encoder(void)
 
 	if (_buffer)
 		delete [] _buffer;
+
+	if (_param.rc.psz_rc_eq)
+		delete [] _param.rc.psz_rc_eq;
+
+	if (_param.rc.zones)
+		delete [] _param.rc.zones;
 }
 
 void x264Encoder::setUiType(int uiType)
@@ -373,7 +381,7 @@ int x264Encoder::encodeFrame(vidEncEncodeParameters *encodeParams)
 			encodeParams->frameType = ADM_VIDENC_FRAMETYPE_B;
 			break;
 		default:
-			printf ("[x264] Unknown image type: %d\n", picture_out.i_type);
+			printf("[x264] Unknown image type: %d\n", picture_out.i_type);
 	}
 
 	encodeParams->quantiser = picture_out.i_qpplus1;
@@ -611,6 +619,8 @@ void x264Encoder::printParam(x264_param_t *x264Param)
 	printf("[x264] rc.i_vbv_max_bitrate = %d\n", x264Param->rc.i_vbv_max_bitrate);
 	printf("[x264] rc.i_vbv_buffer_size = %d\n", x264Param->rc.i_vbv_buffer_size);
 	printf("[x264] rc.f_vbv_buffer_init = %f\n", x264Param->rc.f_vbv_buffer_init);
+	printf("[x264] rc.i_zones = %d\n", x264Param->rc.i_zones);
+	printf("[x264] rc.psz_rc_eq = %s\n", x264Param->rc.psz_rc_eq);
 
 	printf("[x264] i_level_idc = %d\n", x264Param->i_level_idc);
 	printf("[x264] i_sps_id = %d\n", x264Param->i_sps_id);

@@ -17,7 +17,10 @@
 #ifndef options_h
 #define options_h
 
+#include <vector>
 #include <libxml/tree.h>
+
+#include "zoneOptions.h"
 
 extern "C"
 {
@@ -32,17 +35,19 @@ class x264Options
 {
 private:
 	x264_param_t _param;
+	std::vector<x264ZoneOptions*> _zoneOptions;
 	bool _sarAsInput;
 
-	xmlChar* number2String(xmlChar* buffer, size_t size, int number);
-	xmlChar* number2String(xmlChar* buffer, size_t size, unsigned int number);
-	xmlChar* number2String(xmlChar* buffer, size_t size, float number);
-	xmlChar* boolean2String(xmlChar* buffer, size_t size, bool boolean);
-	bool string2Boolean(char* buffer);
-	void parseVuiOptions(xmlNode* node);
-	void parseCqmOption(xmlNode* node, uint8_t cqm[]);
-	void parseAnalyseOptions(xmlNode* node);
-	void parseRateControlOptions(xmlNode* node);
+	xmlChar* number2String(xmlChar *buffer, size_t size, int number);
+	xmlChar* number2String(xmlChar *buffer, size_t size, unsigned int number);
+	xmlChar* number2String(xmlChar *buffer, size_t size, float number);
+	xmlChar* boolean2String(xmlChar *buffer, size_t size, bool boolean);
+	bool string2Boolean(char *buffer);
+	void parseVuiOptions(xmlNode *node);
+	void parseCqmOption(xmlNode *node, uint8_t cqm[]);
+	void parseAnalyseOptions(xmlNode *node);
+	void parseRateControlOptions(xmlNode *node);
+	void parseZoneOptions(xmlNode *zoneNode);
 
 public:
 	x264Options(void);
@@ -269,7 +274,7 @@ public:
 #endif
 
 	char* getRateControlEquation(void);
-	void setRateControlEquation(char* rateControlEquation);
+	void setRateControlEquation(char *rateControlEquation);
 
 	float getQuantiserCurveCompression(void);
 	void setQuantiserCurveCompression(float quantiserCurveCompression);
@@ -281,6 +286,9 @@ public:
 	void setReduceFluxAfterCurveCompression(float reduceFluxAfterCurveCompression);
 
 	unsigned int getZoneCount(void);
+	x264ZoneOptions** getZones(void);
+	void clearZones(void);
+	void addZone(x264ZoneOptions *zoneOptions);
 
 	bool getAccessUnitDelimiters(void);
 	void setAccessUnitDelimiters(bool accessUnitDelimiters);
@@ -289,7 +297,7 @@ public:
 	void setSpsIdentifier(unsigned int spsIdentifier);
 
 	char* toXml(void);
-	int fromXml(char* xml);
+	int fromXml(char *xml);
 };
 
 #endif	// options_h
