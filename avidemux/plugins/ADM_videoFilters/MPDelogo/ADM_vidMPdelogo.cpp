@@ -6,11 +6,11 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
 #include "ADM_default.h"
 
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_videoFilter.h"
+
+#include "ADM_videoFilterDynamic.h"
 
 
 extern "C" {
@@ -18,8 +18,6 @@ extern "C" {
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavutil/avutil.h"
 #include "ADM_libraries/ADM_ffmpeg/ADM_libswscale/swscale.h"
 }
-
-
 
 #include "ADM_vidMPdelogo.h"
 
@@ -47,9 +45,17 @@ class  ADMVideoMPdelogo:public AVDMGenericVideoStream
 extern uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in);
 
 static FILTER_PARAM mpdelogoParam={6,{"xoff","yoff","lw","lh","band","show"}};
+//REGISTERX(VF_MISC, "mpdelogo",QT_TR_NOOP("MPlayer delogo"),
+//QT_TR_NOOP("Blend a logo by interpolating its surrounding box."),VF_MPDELOGO,1,mpdelogo_create,mpdelogo_script);
+//******************************************
+VF_DEFINE_FILTER(ADMVideoMPdelogo,mpdelogoParam,
+    mpdelogo,
+                QT_TR_NOOP("MPlayer delogo"),
+                1,
+                VF_MISC,
+                QT_TR_NOOP("Blend a logo by interpolating its surrounding box."));
 
-BUILD_CREATE(mpdelogo_create,ADMVideoMPdelogo);
-SCRIPT_CREATE(mpdelogo_script,ADMVideoMPdelogo,mpdelogoParam);
+//******************************************
 
 
 uint8_t ADMVideoMPdelogo::configure(AVDMGenericVideoStream * instream)

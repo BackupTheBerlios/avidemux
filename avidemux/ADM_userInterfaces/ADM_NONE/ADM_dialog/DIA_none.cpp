@@ -25,11 +25,11 @@
 #include "ADM_assert.h"
 
 #include "ADM_videoFilter.h"
-#include "ADM_video/ADM_vidCNR2_param.h"
-#include "ADM_video/ADM_vidColorYuv_param.h"
+
+
 #include "ADM_video/ADM_vidPartial_param.h"
-#include "ADM_video/ADM_vidEqualizer.h"
-#include "ADM_video/ADM_vidMPdelogo.h"
+
+
 
 #include "ADM_videoFilter/ADM_vidAnimated_param.h"
 #include "ADM_videoFilter/ADM_vidASharp_param.h"
@@ -55,7 +55,7 @@ extern int automation(void);
 
 int SliderIsShifted = 0;
 
-int DIA_coloryuv(COLOR_YUV_PARAM *param) {return 0;}
+
 
 
 #ifdef USE_XX_XVID 
@@ -65,13 +65,12 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 #endif
 
 uint8_t DIA_animated(ANIMATED_PARAM *param) {return 0;}
-uint8_t DIA_cnr2(CNR2Param *param) {return 0;}
+
 uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in) {return 0;}
 uint8_t DIA_getEQ2Param(Eq2_Param *param, AVDMGenericVideoStream *in) {return 0;}
-uint8_t DIA_getEqualizer(EqualizerParam *param, ADMImage *image) {return 0;}
-uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in) {return 0;}
+
 uint8_t DIA_getHue(Hue_Param *param, AVDMGenericVideoStream *in) {return 0;}
-uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in) {return 0;}
+
 uint8_t DIA_getPartial(PARTIAL_CONFIG *param,AVDMGenericVideoStream *son,AVDMGenericVideoStream *previous) {return 0;}
 uint8_t DIA_pipe(char **cmd,char **param) {return 0;}
 uint8_t DIA_vobsub(vobSubParam *param) {return 0;}

@@ -23,16 +23,12 @@
 
 #include "ADM_toolkitGtk.h"
 
-#include "avi_vars.h"
-
-
-
 #include "ADM_image.h"
 #include "ADM_videoFilter.h"
-#include "ADM_video/ADM_vidEqualizer.h"
-
+#include "ADM_vidEqualizer.h"
+#include "ADM_colorspace.h"
 extern "C" {
-#include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/avcodec.h"
+#include "../../../ADM_libraries/ADM_ffmpeg/ADM_lavcodec/avcodec.h"
 }
 
 static ColYuvRgb    *rgbConv=NULL;
@@ -97,7 +93,7 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in)
 	imgsrc=new ADMImage(w,h);
         imgdisplay=new ADMImage(w,h);
 	
-        if(curframe<max) max=curframe;
+        //if(curframe<max) max=curframe;
         
 	ADM_assert(in->getFrameNumberNoAlloc(max, &l, imgsrc,&f));
         memcpy(imgdisplay->data+w*h,imgsrc->data+w*h,(w*h)>>1);

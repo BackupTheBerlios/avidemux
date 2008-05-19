@@ -16,10 +16,10 @@
 #include "config.h"
 #include "ADM_default.h"
 #include "ADM_videoFilter.h"
-#include "ADM_video/ADM_vidCNR2_param.h"
-#include "ADM_video/ADM_vidColorYuv_param.h"
-#include "ADM_video/ADM_vidEqualizer.h"
-#include "ADM_video/ADM_vidMPdelogo.h"
+
+
+
+
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_audiofilter/audioencoder.h"
@@ -29,11 +29,9 @@
 int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 		      uint32_t * br,uint32_t *fsize,xvidEncParam *param){return 0;}
 #endif
-int     DIA_coloryuv(COLOR_YUV_PARAM *param){return 0;}
-uint8_t DIA_cnr2(CNR2Param *param){return 0;}
-uint8_t DIA_getEqualizer(EqualizerParam *param, ADMImage *image){return 0;}
-uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in){return 0;}
-uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in){return 0;}
+
+
+
 uint8_t DIA_videoCodec(int *codecIndex) {return 0;}
 uint8_t DIA_audioCodec( AUDIOENCODER *codec ) {return 0;}
 uint8_t DIA_quota(char *) {return 0;}

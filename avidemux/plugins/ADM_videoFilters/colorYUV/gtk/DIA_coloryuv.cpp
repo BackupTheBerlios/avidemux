@@ -3,13 +3,7 @@
  */
 
 #include "ADM_toolkitGtk.h"
-#include "fourcc.h"
-#include "ADM_audio/aviaudio.hxx"
-#include "ADM_audiofilter/audioprocess.hxx"
-#include "ADM_audiofilter/audioeng_buildfilters.h"
-#include "ADM_gladeSupport.h"
-
-#include "ADM_video/ADM_vidColorYuv_param.h"
+#include "ADM_vidColorYuv_param.h"
 
 static GtkWidget    *        create_dialog1 (void);
 

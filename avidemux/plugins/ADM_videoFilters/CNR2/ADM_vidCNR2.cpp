@@ -36,17 +36,8 @@
 //         20/07/2002 - ver 2.0  - Avisynth filter coded (from scratch)
 
 #include <math.h>
-
-#include "config.h"
 #include "ADM_default.h"
-
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_videoFilter.h"
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
-#include "ADM_videoFilter.h"
+#include "ADM_videoFilterDynamic.h"
 
 #include "ADM_vidCNR2_param.h"
 
@@ -84,8 +75,15 @@ static FILTER_PARAM cnr2_template =
   { 9, {"scdthr", "ln", "lm", "un", "um", "vn", "vm", "sceneChroma",
 	"mode"} };
 
-BUILD_CREATE (cnr2_create, vidCNR2);
-SCRIPT_CREATE (cnr2_script, vidCNR2, cnr2_template);
+//REGISTERX(VF_NOISE, "cnr2",QT_TR_NOOP("Cnr2"),
+//QT_TR_NOOP("Chroma noise reduction filter by MarcFD/Tritical."),VF_CNR2,1,cnr2_create,cnr2_script);
+VF_DEFINE_FILTER(vidCNR2,cnr2_template,
+                cnr2,
+                QT_TR_NOOP("Cnr2"),
+                1,
+                VF_NOISE,
+                QT_TR_NOOP("Chroma noise reduction filter by MarcFD/Tritical.."));
+
 
 extern uint8_t DIA_cnr2(CNR2Param *param);
 /*************************************/

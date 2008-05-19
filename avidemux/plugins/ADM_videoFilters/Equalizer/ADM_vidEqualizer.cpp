@@ -10,21 +10,21 @@
 #include "ADM_default.h"
 #include <math.h>
 
-
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_videoFilter.h"
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
-
+#include "ADM_videoFilterDynamic.h"
 #include "ADM_vidEqualizer.h"
 
 
 static FILTER_PARAM equalizer_template={8,{"0","1","2","3"
 					,"4","5","6","7"}};
-BUILD_CREATE(equalizer_create,vidEqualizer);
-SCRIPT_CREATE(equalizer_script,vidEqualizer,equalizer_template);
+//REGISTERX(VF_COLORS, "equalizer",QT_TR_NOOP("Luma equalizer"),
+//QT_TR_NOOP("Luma correction filter with histogram."),VF_EQUALIZER,1,equalizer_create,equalizer_script);
+VF_DEFINE_FILTER(vidEqualizer,equalizer_template,
+                equalizer,
+                QT_TR_NOOP("Luma equalizer"),
+                1,
+                VF_COLORS,
+                QT_TR_NOOP("Luma correction filter with histogram."));
+
 
 extern uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *incoming);
 

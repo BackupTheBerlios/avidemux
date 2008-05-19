@@ -47,14 +47,7 @@
 #include <math.h>
 
 #include "ADM_default.h"
-
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_videoFilter.h"
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
-
+#include "ADM_videoFilterDynamic.h"
 #include "ADM_vidColorYuv.h"
 
 
@@ -67,9 +60,18 @@ static FILTER_PARAM coloryuv_template={19,
     "matrix","levels","opt",
     "colorbars","analyze","autowhite","autogain",
     }};
-BUILD_CREATE(coloryuv_create,ADMVideoColorYuv);
-SCRIPT_CREATE(coloryuv_script,ADMVideoColorYuv,coloryuv_template);
+//REGISTERX(VF_COLORS, "coloryuv",QT_TR_NOOP("Avisynth ColorYUV"),QT_TR_NOOP
+//    ("Alter colors (auto white balance etc...). Ported from Avisynth."),VF_COLOR_YUV,1,coloryuv_create,coloryuv_script);
 
+//******************************************
+VF_DEFINE_FILTER(ADMVideoColorYuv,coloryuv_template,
+                coloryuv,
+                QT_TR_NOOP("Avisynth ColorYUV"),
+                1,
+                VF_COLORS,
+                QT_TR_NOOP("Alter colors (auto white balance etc...). Ported from Avisynth."));
+
+//******************************************
 uint8_t ADMVideoColorYuv::configure(AVDMGenericVideoStream *in)
 {
 

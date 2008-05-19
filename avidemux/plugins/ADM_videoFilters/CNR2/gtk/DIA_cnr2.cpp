@@ -12,10 +12,7 @@
 //
 
 #include "ADM_toolkitGtk.h"
-
-
-
-#include "ADM_video/ADM_vidCNR2_param.h"
+#include "ADM_vidCNR2_param.h"
 
 static GtkWidget        *create_dialog1 (void);
 
