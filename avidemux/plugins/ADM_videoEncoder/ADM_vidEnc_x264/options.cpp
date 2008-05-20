@@ -37,7 +37,7 @@ x264Options::x264Options(void)
 x264Options::~x264Options(void)
 {
 	if (_param.rc.psz_rc_eq)
-		delete [] _param.rc.psz_rc_eq;
+		free(_param.rc.psz_rc_eq);
 
 	clearZones();
 }
@@ -858,7 +858,7 @@ char* x264Options::getRateControlEquation(void)
 	return _param.rc.psz_rc_eq;
 }
 
-void x264Options::setRateControlEquation(char *rateControlEquation)
+void x264Options::setRateControlEquation(const char *rateControlEquation)
 {
 	if (_param.rc.psz_rc_eq)
 		free(_param.rc.psz_rc_eq);

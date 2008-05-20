@@ -112,7 +112,7 @@
      </property>
      <property name="sizeHint" >
       <size>
-       <width>460</width>
+       <width>491</width>
        <height>10</height>
       </size>
      </property>
@@ -3378,7 +3378,7 @@
          <property name="title" >
           <string>Advanced</string>
          </property>
-         <layout class="QVBoxLayout" >
+         <layout class="QHBoxLayout" >
           <property name="margin" >
            <number>9</number>
           </property>
@@ -3386,55 +3386,18 @@
            <number>6</number>
           </property>
           <item>
-           <layout class="QGridLayout" >
-            <property name="margin" >
-             <number>0</number>
+           <widget class="QLabel" name="label_33" >
+            <property name="text" >
+             <string>Rate Control Equation:</string>
             </property>
-            <property name="spacing" >
-             <number>6</number>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="rateControlEqLineEdit" >
+            <property name="text" >
+             <string/>
             </property>
-            <item row="0" column="1" >
-             <layout class="QHBoxLayout" >
-              <property name="margin" >
-               <number>0</number>
-              </property>
-              <property name="spacing" >
-               <number>6</number>
-              </property>
-              <item>
-               <widget class="QLineEdit" name="frameTypeFileLineEdit" />
-              </item>
-              <item>
-               <widget class="QPushButton" name="frameTypeFileButton" >
-                <property name="text" >
-                 <string>...</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="1" column="0" >
-             <widget class="QLabel" name="label_33" >
-              <property name="text" >
-               <string>Rate Control Equation:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1" >
-             <widget class="QLineEdit" name="rateControlEqLineEdit" >
-              <property name="text" >
-               <string>blurCplx^(1-qComp)</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0" >
-             <widget class="QLabel" name="label_34" >
-              <property name="text" >
-               <string>Frame Type and Quantiser File:</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -4268,8 +4231,6 @@
   <tabstop>zoneAddButton</tabstop>
   <tabstop>zoneEditButton</tabstop>
   <tabstop>zoneDeleteButton</tabstop>
-  <tabstop>frameTypeFileLineEdit</tabstop>
-  <tabstop>frameTypeFileButton</tabstop>
   <tabstop>rateControlEqLineEdit</tabstop>
   <tabstop>idcLevelComboBox</tabstop>
   <tabstop>spsiComboBox</tabstop>

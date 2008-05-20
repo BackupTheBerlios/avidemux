@@ -75,6 +75,5 @@ private slots:
 	void zoneAddButton_pressed();
 	void zoneEditButton_pressed();
 	void zoneDeleteButton_pressed();
-	void frameTypeFileButton_pressed();
 };
 #endif	// x264ConfigDialog_h

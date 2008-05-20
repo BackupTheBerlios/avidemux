@@ -384,7 +384,7 @@ int x264Encoder::encodeFrame(vidEncEncodeParameters *encodeParams)
 			printf("[x264] Unknown image type: %d\n", picture_out.i_type);
 	}
 
-	encodeParams->quantiser = picture_out.i_qpplus1;
+	encodeParams->quantiser = picture_out.i_qpplus1 - 1;
 	encodeParams->encodedData = _buffer;
 
 	return ADM_VIDENC_ERR_SUCCESS;

@@ -94,7 +94,6 @@ x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vid
 	connect(ui.zoneAddButton, SIGNAL(pressed()), this, SLOT(zoneAddButton_pressed()));
 	connect(ui.zoneEditButton, SIGNAL(pressed()), this, SLOT(zoneEditButton_pressed()));
 	connect(ui.zoneDeleteButton, SIGNAL(pressed()), this, SLOT(zoneDeleteButton_pressed()));
-	connect(ui.frameTypeFileButton, SIGNAL(pressed()), this, SLOT(frameTypeFileButton_pressed()));	
 
 	loadSettings(encodeOptions, options);
 }
@@ -257,14 +256,6 @@ void x264ConfigDialog::zoneDeleteButton_pressed()
 {
 	if (ui.zoneTableView->currentIndex().row() >= 0 && GUI_Question(QT_TR_NOOP("Are you sure you wish to delete the selected zone?")))
 		_zoneTableModel.removeRows(ui.zoneTableView->currentIndex().row(), 1, QModelIndex());
-}
-
-void x264ConfigDialog::frameTypeFileButton_pressed()
-{
-	char frameTypeFileName[1024];
-
-	if (FileSel_SelectRead(QT_TR_NOOP("Select Frame Type/Quantiser File"), frameTypeFileName, 1023, NULL) && ADM_fileExist(frameTypeFileName))
-		ui.frameTypeFileLineEdit->setText(frameTypeFileName);
 }
 
 int x264ConfigDialog::getValueIndexInArray(uint8_t value, const uint8_t valueArray[], int elementCount)
@@ -489,6 +480,8 @@ void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *o
 		delete [] zoneOptions;
 	}
 
+	ui.rateControlEqLineEdit->setText(options->getRateControlEquation());
+
 	// Output tab
 	if (!options->getIdcLevel())
 		options->setIdcLevel(51);
@@ -686,6 +679,8 @@ void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *o
 
 	for (int zone = 0; zone < zoneOptions.count(); zone++)
 		options->addZone(zoneOptions[zone]);
+
+	options->setRateControlEquation(ui.rateControlEqLineEdit->text().toUtf8().constData());
 
 	// Output tab
 	options->setIdcLevel(idcLevel[ui.idcLevelComboBox->currentIndex()]);

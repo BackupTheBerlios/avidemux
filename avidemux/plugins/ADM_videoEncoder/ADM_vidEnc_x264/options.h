@@ -274,7 +274,7 @@ public:
 #endif
 
 	char* getRateControlEquation(void);
-	void setRateControlEquation(char *rateControlEquation);
+	void setRateControlEquation(const char *rateControlEquation);
 
 	float getQuantiserCurveCompression(void);
 	void setQuantiserCurveCompression(float quantiserCurveCompression);
