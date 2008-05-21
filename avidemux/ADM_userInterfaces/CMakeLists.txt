@@ -1,5 +1,6 @@
 subdirs(PREORDER ADM_NONE)
 subdirs(PREORDER ADM_commonUI)
+subdirs(PREORDER ADM_render)
 
 if(GTK_FOUND)
 subdirs(PREORDER ADM_GTK)

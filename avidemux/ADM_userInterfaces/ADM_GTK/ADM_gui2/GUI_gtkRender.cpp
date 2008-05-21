@@ -32,8 +32,8 @@ extern "C"
 
 #include "ADM_misc.h"
 
-#include "../ADM_commonUI/GUI_render.h"
-#include "../ADM_commonUI/GUI_accelRender.h"
+#include "../ADM_render/GUI_render.h"
+#include "../ADM_render/GUI_accelRender.h"
 
 #include "ADM_colorspace.h"
 #include "ADM_libraries/ADM_ffmpeg/ADM_libswscale/ADM_mp.h"

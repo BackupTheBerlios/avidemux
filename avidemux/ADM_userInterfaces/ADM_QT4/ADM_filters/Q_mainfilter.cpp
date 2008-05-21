@@ -34,7 +34,7 @@
 #include "ADM_audiodevice/audio_out.h"
 #include "ADM_audio/ADM_audiodef.h"
 
-#include "GUI_render.h"
+#include "ADM_userInterfaces/ADM_render/GUI_render.h"
 
 #include "DIA_coreToolkit.h"
 #include "ADM_editor/ADM_edit.hxx"

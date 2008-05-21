@@ -21,6 +21,7 @@
 #include "config.h"
 #include "ADM_assert.h"
 #include "GUI_render.h"
+#include "GUI_renderInternal.h"
 #include "GUI_accelRender.h"
 
 #ifdef USE_XV
@@ -31,40 +32,94 @@
 #include "GUI_sdlRender.h"
 #endif
 
-#include "prefs.h"
+
 #include "ADM_colorspace.h"
 
 
-extern uint8_t BitBlit(uint8_t *dst, uint32_t pitchDest,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height);
-extern void UI_purge(void);
+extern ColYuvRgb rgbConverter; // Declared in UI_xxx as it is not the same between GTK and QT (RGB vs BGR or whatever)
+
+
 
 static uint8_t	updateWindowSize(void * win, uint32_t w, uint32_t h);
 static uint8_t  GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h);
 
+// Used by flyDialog
 void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
 
 //_____________________________________
-extern ColYuvRgb rgbConverter; // Declared in UI_xxx as it is not the same between GTK and QT (RGB vs BGR or whatever)
+
 //_____________________________________
 static AccelRender    *accel_mode=NULL;
 static uint8_t        *accelSurface=NULL;
 //_______________________________________
 
-static uint8_t 	            *screenBuffer=NULL;
-static uint8_t		    *lastImage=NULL;
-static void                 *draw=NULL;
-static uint32_t 	     renderW=0,renderH=0; /* Zoomed/display size */
-static uint32_t              phyW=0,phyH=0; /* Unzoomed size, only used when accel can do hw resize */
-static renderZoom            lastZoom;
-static uint8_t               _lock=0;
+static uint8_t 	*screenBuffer=NULL;
+static uint8_t		*lastImage=NULL;
+static void           *draw=NULL;
+static uint32_t 	 renderW=0,renderH=0; /* Zoomed/display size */
+static uint32_t         phyW=0,phyH=0; /* Unzoomed size, only used when accel can do hw resize */
+static renderZoom       lastZoom;
+static uint8_t          _lock=0;
+
+static const UI_FUNCTIONS_T *HookFunc=NULL;
 //_______________________________________
+/**
+ *      \fn ADM_renderLibInit
+ *      \brief Initialize the renderlib with the needed external functions
+ * 
+ */
+uint8_t ADM_renderLibInit(const UI_FUNCTIONS_T *funcs)
+  {
+    HookFunc=funcs;
+    ADM_assert(funcs->apiVersion==ADM_RENDER_API_VERSION_NUMBER);
+    return 1;
+  }
+//**************************************
+//**************************************
+//**************************************
+#define RENDER_CHECK(x) {ADM_assert(HookFunc);ADM_assert(HookFunc->x);}
+static void MUI_purge(void) 
+{
+  RENDER_CHECK(UI_purge); 
+  HookFunc->UI_purge();
+ }
+static void MUI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo)
+{
+  RENDER_CHECK(UI_getWindowInfo);
+  HookFunc->UI_getWindowInfo(draw, xinfo);
+}
+static void MUI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
+{
+   RENDER_CHECK(UI_updateDrawWindowSize);
+   HookFunc->UI_updateDrawWindowSize(win,w,h);
+}
+static  void MUI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr)
+{
+    RENDER_CHECK(UI_rgbDraw);
+    HookFunc->UI_rgbDraw(widg, w,  h,ptr);
+  
+}
+static  void *MUI_getDrawWidget(void)
+{
+  RENDER_CHECK(UI_getDrawWidget);
+  return HookFunc->UI_getDrawWidget();
+}
+static   ADM_RENDER_TYPE MUI_getPreferredRender(void)
+{
+  RENDER_CHECK(UI_getPreferredRender);
+  return HookFunc->UI_getPreferredRender();
+}
+//**************************************
+//**************************************
+//**************************************
+
 /**
 	Render init, initialize internals. Constuctor like function
 
 */
 uint8_t renderInit( void )
 {
-	draw=UI_getDrawWidget(  );
+	draw=MUI_getDrawWidget(  );
 	return 1;
 }
 
@@ -109,7 +164,7 @@ uint8_t renderResize(uint32_t w, uint32_t h,uint32_t pw, uint32_t ph)
         phyH=ph;
   
         updateWindowSize( draw,w,h);
-        UI_purge();
+        MUI_purge();
         return 1;
 }
 /**
@@ -203,7 +258,8 @@ uint8_t r=0;
 		return 1;
 	}
 #endif	
- 
+	render=MUI_getPreferredRender();
+#if 0	
         if(prefs->get(DEVICE_VIDEODEVICE,&renderI)!=RC_OK)
         {       
                 render=RENDER_GTK;
@@ -211,8 +267,9 @@ uint8_t r=0;
         {
                 render=(ADM_RENDER_TYPE)renderI;
         }
+#endif        
         GUI_WindowInfo xinfo;
-        UI_getWindowInfo(draw, &xinfo);
+        MUI_getWindowInfo(draw, &xinfo);
         switch(render)
         {
         
@@ -306,7 +363,7 @@ uint8_t	updateWindowSize(void * win, uint32_t w, uint32_t h)
     renderW = w;
     renderH = h;
 
-    UI_updateDrawWindowSize(win,w,h);
+    MUI_updateDrawWindowSize(win,w,h);
     rgbConverter.reset(w,h);
     return 1;
 }
@@ -320,6 +377,6 @@ uint8_t GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h)
 void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg)
 {
     
-    UI_rgbDraw(widg,w,h,dis);
+    MUI_rgbDraw(widg,w,h,dis);
 }
 //EOF

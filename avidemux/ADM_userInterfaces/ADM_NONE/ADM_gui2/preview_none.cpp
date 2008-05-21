@@ -12,7 +12,7 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_videoFilter.h"
 
-#include "GUI_render.h"
+#include "ADM_userInterfaces/ADM_render/GUI_render.h"
 
 void UI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr) {}
 void UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h) {}

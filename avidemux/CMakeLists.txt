@@ -273,6 +273,7 @@ TARGET_LINK_LIBRARIES(avidemux2_cli
 	ADM_dialogFiltersNone_cli
 	ADM_dialogGuiNone_cli
         ADM_UICli
+        ADM_render_cli
 )
 
 IF (ADM_UI_GTK)
@@ -287,6 +288,7 @@ IF (ADM_UI_GTK)
 		ADM_commonUI_gtk
                 ADM_toolkitGtk_gtk
                 ADM_UIGtk
+                ADM_render_gtk
                 )
 ENDIF (ADM_UI_GTK)
 
@@ -302,6 +304,7 @@ IF (ADM_UI_QT4)
 		ADM_commonUI_qt4
 		ADM_dialogQt4_qt4
                 ADM_UIQT4
+                ADM_render_qt4
 )
 ENDIF (ADM_UI_QT4)
 

@@ -17,7 +17,7 @@
 #include <math.h>
 #include "ADM_toolkitGtk.h"
 
-#include "../ADM_commonUI/GUI_render.h"
+#include "../ADM_render/GUI_render.h"
 #include "gui_action.hxx"
 
 #include "ADM_osSupport/ADM_debugID.h"
@@ -36,10 +36,10 @@
 #include "../ADM_toolkit_gtk/ADM_jogshuttle.h"
 #include "gtkgui.h"
 #include "DIA_coreToolkit.h"
-
+#include "ADM_userInterfaces/ADM_render/GUI_renderInternal.h"
 extern uint8_t UI_getPhysicalScreenSize(void* window, uint32_t *w,uint32_t *h);
 extern void ADM_initUIGtk(GtkWidget *guiRootWindow);
-
+extern  ADM_RENDER_TYPE UI_getPreferredRender(void);;
 #define WOD(x) lookup_widget (guiRootWindow,#x)
 
 void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm,
@@ -331,6 +331,9 @@ uint32_t w,h;
                 physical_jog_shuttle = &(PhysicalJogShuttle::getInstance());
                 physical_jog_shuttle->registerCBs (NULL, jogButton, jogDial, jogRing);
 #endif 
+                
+                
+                
 	return ret;
 }
 
@@ -1277,12 +1280,30 @@ gboolean UI_SliderReleased(GtkWidget *widget, GdkEventButton *event, gpointer us
 	SliderIsShifted=FALSE;
 	return FALSE;
 }
+/****/
 extern int global_argc;
 extern char **global_argv;
 typedef gboolean GCALL       (void *);
 extern int automation(void );
+//********************************************
 extern void initTranslator(void);
+static const UI_FUNCTIONS_T UI_Hooks=
+    {
+        ADM_RENDER_API_VERSION_NUMBER,
+        UI_purge,
+        UI_getWindowInfo,
+        UI_updateDrawWindowSize,
+        UI_rgbDraw,
+        UI_getDrawWidget,
+        UI_getPreferredRender
+        
+    };
 
+/**
+ *      \fn UI_Init
+ *      \brief Entry point. Initialize renderLib.
+ * 
+ */
 int UI_Init(int argc, char **argv)
 {
 	initTranslator();
@@ -1296,6 +1317,10 @@ int UI_Init(int argc, char **argv)
     global_argc=argc;
     global_argv=argv;
       
+    
+
+    ADM_renderLibInit(&UI_Hooks);
+    
     gtk_init(&global_argc, &global_argv);
     gdk_rgb_init();
     

@@ -47,7 +47,7 @@
 
 #include "ADM_ocr/ADM_ocr.h"
 #include "ADM_ocr/ADM_ocrInternal.h"
-
+#include "ADM_userInterfaces/ADM_render/GUI_renderInternal.h"
 extern int global_argc;
 extern char **global_argv;
 extern void initTranslator(void);
@@ -137,14 +137,27 @@ uint8_t ADM_ocrUiEnd(void *d) {	return 0;}
 void *ADM_ocrUiSetup(void) {return 0;}
 uint8_t ADM_ocrSetRedrawSize(void *ui,uint32_t w,uint32_t h) {return 0;}
 ReplyType glyphToText(admGlyph *glyph,admGlyph *head,char *decodedString) {return ReplyOk;}
+extern void UI_purge(void);
+extern ADM_RENDER_TYPE UI_getPreferredRender(void);
 
+static const UI_FUNCTIONS_T UI_Hooks=
+    {
+        ADM_RENDER_API_VERSION_NUMBER,
+        UI_purge,
+        UI_getWindowInfo,
+        UI_updateDrawWindowSize,
+        UI_rgbDraw,
+        UI_getDrawWidget,
+        UI_getPreferredRender
+        
+    };
 int UI_Init(int nargc, char **nargv)
 {
 	initTranslator();
 
 	global_argc = nargc;
 	global_argv = nargv;
-
+        ADM_renderLibInit(&UI_Hooks);
 	return 0;
 }
 

@@ -32,7 +32,7 @@
 #include "ADM_videoFilter_internal.h"
 #include "ADM_videoFilterDynamic.h"
 #include "ADM_video/ADM_vidPartial.h"
-#include "ADM_userInterfaces/ADM_commonUI/GUI_render.h"
+#include "ADM_userInterfaces/ADM_render/GUI_render.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_PREVIEW

@@ -45,7 +45,7 @@
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"
 #include "ADM_encoder/adm_encConfig.h"
-#include "ADM_userInterfaces/ADM_commonUI/GUI_render.h"
+#include "ADM_userInterfaces/ADM_render/GUI_render.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
 
 #include "ADM_audiodevice/audio_out.h"
@@ -2610,5 +2610,45 @@ uint8_t  ADMImage::saveAsJpg(const char *filename)
         delete [] buffer;
         return 1;
 }
+/**
+ *      \fn UI_getPreferredRender
+ *      \brief Returns to render lib the user preferred rendering method
+ * 
+ */
+ADM_RENDER_TYPE UI_getPreferredRender(void)
+{
+  char *displ;
+  unsigned int renderI;
+  ADM_RENDER_TYPE render;
+
+#if !defined __WIN32 && !defined(__APPLE__)
+        // First check if local
+        // We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
+        // in that case we do not even try to use accel
+        
+        // Win32 and Mac/Qt4 don't have DISPLAY
+        displ=getenv("DISPLAY");
+        if(!displ)
+        {
+                return RENDER_GTK;
+        }
+        if(strcmp(displ,":0") && strcmp(displ,":0.0"))
+        {
+                printf("Looks like remote display, no Xv :%s\n",displ);
+                return RENDER_GTK;
+        }
+#endif  
+ 
+        if(prefs->get(DEVICE_VIDEODEVICE,&renderI)!=RC_OK)
+        {       
+                render=RENDER_GTK;
+        }else
+        {
+                render=(ADM_RENDER_TYPE)renderI;
+        }
+
+        return render;
+}
+
 //
 // EOF

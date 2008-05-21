@@ -28,8 +28,8 @@
 
 #include "T_preview.h"
 #include "ADM_colorspace.h"
-#include "GUI_render.h"
-#include "GUI_accelRender.h"
+#include "../ADM_render/GUI_render.h"
+#include "../ADM_render/GUI_accelRender.h"
 #include "prefs.h"
 #include "ADM_assert.h"
     

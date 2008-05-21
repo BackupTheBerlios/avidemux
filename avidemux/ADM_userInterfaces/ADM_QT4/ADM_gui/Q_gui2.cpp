@@ -25,7 +25,8 @@
 #include "DIA_fileSel.h"
 #include "ADM_video/ADM_vidMisc.h"
 #include "prefs.h"
-#include "ADM_video/ADM_vidMisc.h"
+
+#include "ADM_userInterfaces/ADM_render/GUI_renderInternal.h"
 extern int global_argc;
 extern char **global_argv;
 
@@ -41,6 +42,7 @@ extern void UI_QT4VideoWidget(QFrame *frame);
 extern void loadTranslator(void);
 extern void initTranslator(void);
 extern void destroyTranslator(void);
+extern ADM_RENDER_TYPE UI_getPreferredRender(void);
 
 int SliderIsShifted=0;
 static void setupMenus(void);
@@ -86,7 +88,7 @@ static Action searchTranslationTable(const char *name);
 int UI_readCurTime(uint16_t &hh, uint16_t &mm, uint16_t &ss, uint16_t &ms);
 void UI_updateFrameCount(uint32_t curFrame);
 void UI_updateTimeCount(uint32_t curFrame,uint32_t fps);
-
+extern void UI_purge(void);
 /*
     Declare the class that will be our main window
 
@@ -498,14 +500,24 @@ MainWindow::~MainWindow()
 {
 	clearCustomMenu();
 }
-
+static const UI_FUNCTIONS_T UI_Hooks=
+    {
+        ADM_RENDER_API_VERSION_NUMBER,
+        UI_purge,
+        UI_getWindowInfo,
+        UI_updateDrawWindowSize,
+        UI_rgbDraw,
+        UI_getDrawWidget,
+        UI_getPreferredRender
+        
+    };
 int UI_Init(int nargc,char **nargv)
 {
 	initTranslator();
 
 	global_argc=nargc;
 	global_argv=nargv;
-
+	ADM_renderLibInit(&UI_Hooks);
 	return 0;
 }
 QWidget *QuiMainWindows=NULL;
