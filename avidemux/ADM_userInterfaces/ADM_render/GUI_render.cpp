@@ -36,8 +36,12 @@
 #include "ADM_colorspace.h"
 
 
-extern ColYuvRgb rgbConverter; // Declared in UI_xxx as it is not the same between GTK and QT (RGB vs BGR or whatever)
 
+static ColYuvRgb rgbConverter(640,480
+#if (ADM_UI_TYPE==QT4)
+,1
+#endif
+);
 
 
 static uint8_t	updateWindowSize(void * win, uint32_t w, uint32_t h);
@@ -241,33 +245,8 @@ ADM_RENDER_TYPE render;
 uint8_t r=0;
 	ADM_assert(!accel_mode);
         
-#if !defined __WIN32 && !defined(__APPLE__)
-	// First check if local
-	// We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
-	// in that case we do not even try to use accel
-	
-	// Win32 and Mac/Qt4 don't have DISPLAY
-	displ=getenv("DISPLAY");
-	if(!displ)
-	{
-		return 0;
-	}
-	if(strcmp(displ,":0") && strcmp(displ,":0.0"))
-	{
-		printf("Looks like remote display, no Xv :%s\n",displ);
-		return 1;
-	}
-#endif	
+
 	render=MUI_getPreferredRender();
-#if 0	
-        if(prefs->get(DEVICE_VIDEODEVICE,&renderI)!=RC_OK)
-        {       
-                render=RENDER_GTK;
-        }else
-        {
-                render=(ADM_RENDER_TYPE)renderI;
-        }
-#endif        
         GUI_WindowInfo xinfo;
         MUI_getWindowInfo(draw, &xinfo);
         switch(render)

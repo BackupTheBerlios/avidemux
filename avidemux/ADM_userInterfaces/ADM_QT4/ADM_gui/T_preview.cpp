@@ -38,7 +38,7 @@ static QFrame *hostFrame=NULL;
 static AccelRender *accelRender=NULL;
 static uint8_t *lastImage=NULL;
 extern QWidget *QuiMainWindows;
- ColYuvRgb rgbConverter(640,480,1);
+ 
 extern void UI_purge( void );
 
 void DIA_previewInit(uint32_t width, uint32_t height) {}

@@ -48,7 +48,7 @@ extern uint8_t UI_getPhysicalScreenSize(void* window, uint32_t *w, uint32_t *h);
 extern int maxWindowWidth, maxWindowHeight; // from GUI_bindings.cpp
 #endif
 
-ColYuvRgb rgbConverter(640,480);
+
 uint32_t lastW,lastH;
 /**
     \brief return pointer to the drawing widget that displays video
