@@ -37,6 +37,9 @@ void gtk_write_entry_float(GtkWidget *entry, float value);
 void gtk_register_dialog(GtkWidget *newdialog);
 void gtk_unregister_dialog(GtkWidget *newdialog);
 void gtk_transient(GtkWidget *widget);
+/* Some resizing function helpers */
+float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
+void  UI_centreCanvasWindow(GtkWindow *window, GtkWidget *canvas, int newCanvasWidth, int newCanvasHeight);
 
 #define WID(x) lookup_widget(dialog,#x)
 #define RADIO_SET(widget_name,value) gtk_toggle_button_set_active \
