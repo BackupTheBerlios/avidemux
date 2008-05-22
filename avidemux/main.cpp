@@ -50,7 +50,7 @@ extern "C" {
 	#include "SDL.h"
 }
 
-#include "ADM_userInterfaces/ADM_commonUI/GUI_sdlRender.h"
+#include "ADM_userInterfaces/ADM_render/GUI_sdlRender.h"
 #endif
 
 
