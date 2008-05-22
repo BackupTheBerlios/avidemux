@@ -507,7 +507,7 @@ char     *globalGlyphName=NULL;
 
 			#if defined(__WIN32) && defined(USE_SDL)
 				// Initialise SDL again as driver may have changed
-				initSdl();
+				initSdl(render);
 			#endif
 	}
 

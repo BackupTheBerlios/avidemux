@@ -34,16 +34,10 @@ extern "C" {
 }
 
 #include "ADM_colorspace.h"
-
 #include "GUI_render.h"
-
 #include "GUI_accelRender.h"
 #include "GUI_sdlRender.h"
 #include "ADM_assert.h"
-
-#ifdef __WIN32
-#include "prefs.h"
-#endif
 
 #ifdef __APPLE__
 extern "C"
@@ -350,7 +344,7 @@ int page=w*h;
         return 1;
 }
 
-void initSdl(void)
+void initSdl(int videoDevice)
 {
 	printf("\n");
 	quitSdl();
@@ -360,17 +354,15 @@ void initSdl(void)
     printf("[SDL] Version: %u.%u.%u\n",SDL_Linked_Version()->major, SDL_Linked_Version()->minor, SDL_Linked_Version()->patch);
 
 #ifdef __WIN32
-	uint32_t videoDevice = RENDER_LAST;
-
-	if(!prefs->get(DEVICE_VIDEODEVICE, &videoDevice) || videoDevice != RENDER_DIRECTX)
-	{
-		printf("[SDL] Setting video driver to Microsoft Windows GDI\n");
-		putenv("SDL_VIDEODRIVER=windib");
-	}
-	else
+	if(videoDevice == RENDER_DIRECTX)
 	{
 		printf("[SDL] Setting video driver to Microsoft DirectX\n");
 		putenv("SDL_VIDEODRIVER=directx");
+	}
+	else
+	{
+		printf("[SDL] Setting video driver to Microsoft Windows GDI\n");
+		putenv("SDL_VIDEODRIVER=windib");
 	}
 #endif
 

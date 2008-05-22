@@ -14,7 +14,7 @@
 
 #include <math.h>
 
-#include "Q_resizing.h"
+#include "resizing.h"
 
 static double aspectRatio[2][3]={
                               {1.,0.888888,1.19}, // NTSC 1:1 4:3 16:9

@@ -186,7 +186,11 @@ int main(int argc, char *argv[])
 	register_Encoders();
 
 #ifdef USE_SDL
-	initSdl();
+	uint32_t videoDevice = RENDER_LAST;
+
+	prefs->get(DEVICE_VIDEODEVICE, &videoDevice);
+
+	initSdl(videoDevice);
 #endif
 
 	atexit(onexit);

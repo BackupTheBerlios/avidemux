@@ -31,6 +31,6 @@ class sdlAccelRender: public AccelRender
               			uint8_t hasHwZoom(void) {return 1;}
 };
 
-void initSdl(void);
+void initSdl(int videoDevice);
 void quitSdl(void);
 #endif
