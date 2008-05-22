@@ -35,12 +35,13 @@
 
 #include "ADM_colorspace.h"
 
+#include "DIA_uiTypes.h"
 
 
 static ColYuvRgb rgbConverter(640,480
-#if (ADM_UI_TYPE==QT4)
-,1
-#endif
+#if ADM_UI_TYPE_BUILD == 4 // QT4 FIXME
+    ,1
+#endif    
 );
 
 
