@@ -51,7 +51,12 @@ void x264Options::cleanUp(void)
 		_param.rc.psz_rc_eq = NULL;
 	}
 
-	clearPresetConfiguration();
+	if (_configurationName)
+	{
+		free(_configurationName);
+		_configurationName = NULL;
+	}
+
 	clearZones();
 }
 
@@ -112,7 +117,7 @@ void x264Options::clearPresetConfiguration(void)
 	if (_configurationName)
 		free(_configurationName);
 
-	_configurationName = "<custom>";
+	_configurationName = strdup("<custom>");
 	_configurationType = CONFIG_CUSTOM;
 }
 
