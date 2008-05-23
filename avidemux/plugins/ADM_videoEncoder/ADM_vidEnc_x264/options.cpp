@@ -1,6 +1,13 @@
  /***************************************************************************
                                x264Options.cpp
 
+	These settings are intended for scripting and can contain a Preset 
+	Configuration block.  If this block exists then "internal" settings are
+	ignored and an external configuration file should be read instead, 
+	e.g. PlayStation Portable profile.  However, if the external file is 
+	missing, internal settings have to be used and will reflect a snapshot
+	of the external configuration file at the time the script was generated.
+
     begin                : Mon Apr 21 2008
     copyright            : (C) 2008 by gruntster
  ***************************************************************************/
@@ -25,21 +32,42 @@
 
 x264Options::x264Options(void)
 {
-	x264_param_default(&_param);
-	_param.rc.psz_rc_eq = strdup(_param.rc.psz_rc_eq);
-	_param.vui.i_sar_height = 1;
-	_param.vui.i_sar_width = 1;
-	_param.i_threads = 0;	// set to auto-detect, default is disabled
+	_configurationName = NULL;
+	memset(&_param, 0, sizeof(x264_param_t));
 
-	_sarAsInput = false;
+	reset();
 }
 
 x264Options::~x264Options(void)
 {
-	if (_param.rc.psz_rc_eq)
-		free(_param.rc.psz_rc_eq);
+	cleanUp();
+}
 
+void x264Options::cleanUp(void)
+{
+	if (_param.rc.psz_rc_eq)
+	{
+		free(_param.rc.psz_rc_eq);
+		_param.rc.psz_rc_eq = NULL;
+	}
+
+	clearPresetConfiguration();
 	clearZones();
+}
+
+void x264Options::reset(void)
+{
+	cleanUp();
+
+	x264_param_default(&_param);
+	_param.rc.psz_rc_eq = strdup(_param.rc.psz_rc_eq);
+	_param.vui.i_sar_height = 1;
+	_param.vui.i_sar_width = 1;
+	_param.i_threads = 0;	// set to auto-detect; default is disabled
+
+	_sarAsInput = false;
+
+	setPresetConfiguration("<default>", CONFIG_DEFAULT);
 }
 
 x264_param_t* x264Options::getParameters(void)
@@ -59,6 +87,33 @@ x264_param_t* x264Options::getParameters(void)
 	}
 
 	return param;
+}
+
+void x264Options::getPresetConfiguration(char** configurationName, configType *configurationType)
+{
+	if (_configurationName)
+		*configurationName = strdup(_configurationName);
+	else
+		*configurationName = NULL;
+
+	*configurationType = _configurationType;
+}
+
+void x264Options::setPresetConfiguration(const char* configurationName, configType configurationType)
+{
+	clearPresetConfiguration();
+
+	_configurationName = strdup(configurationName);
+	_configurationType = configurationType;
+}
+
+void x264Options::clearPresetConfiguration(void)
+{
+	if (_configurationName)
+		free(_configurationName);
+
+	_configurationName = "<custom>";
+	_configurationType = CONFIG_CUSTOM;
 }
 
 int x264Options::getThreads(void)
@@ -962,10 +1017,7 @@ void x264Options::setSpsIdentifier(unsigned int spsIdentifier)
 char* x264Options::toXml(void)
 {
 	xmlDocPtr xmlDoc = xmlNewDoc((const xmlChar*)"1.0");
-	xmlNodePtr xmlNodeRoot;
-	xmlNodePtr xmlNodeChild, xmlNodeChild2;
-	xmlChar *tempBuffer;
-	int tempBufferSize;
+	xmlNodePtr xmlNodeRoot, xmlNodeChild;
 	const int bufferSize = 100;
 	xmlChar xmlBuffer[bufferSize + 1];
 	char *xml = NULL;
@@ -975,399 +1027,29 @@ char* x264Options::toXml(void)
 		if (!xmlDoc)
 			break;
 
-		if (!(xmlNodeRoot = xmlNewDocNode(xmlDoc, NULL, (xmlChar*)"x264Param", NULL)))
+		if (!(xmlNodeRoot = xmlNewDocNode(xmlDoc, NULL, (xmlChar*)"x264Config", NULL)))
 			break;
 
 		xmlDocSetRootElement(xmlDoc, xmlNodeRoot);
 
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"threads", number2String(xmlBuffer, bufferSize, getThreads()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"deterministic", boolean2String(xmlBuffer, bufferSize, getDeterministic()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"idcLevel", number2String(xmlBuffer, bufferSize, getIdcLevel()));
-
-		xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"vui", NULL);
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"sarAsInput", boolean2String(xmlBuffer, bufferSize, getSarAsInput()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"sarHeight", number2String(xmlBuffer, bufferSize, getSarHeight()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"sarWidth", number2String(xmlBuffer, bufferSize, getSarWidth()));
-
-		switch (getOverscan())
+		if (_configurationType != CONFIG_CUSTOM)
 		{
-			case 0:
-				strcpy((char*)xmlBuffer, "undefined");
-				break;
-			case 1:
-				strcpy((char*)xmlBuffer, "show");
-				break;
-			case 2:
-				strcpy((char*)xmlBuffer, "crop");
-				break;
+			xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"presetConfiguration", NULL);
+
+			xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"name", (xmlChar*)_configurationName);
+
+			if (_configurationType == CONFIG_USER)
+				strcpy((char*)xmlBuffer, "user");
+			else if (_configurationType == CONFIG_SYSTEM)
+				strcpy((char*)xmlBuffer, "system");
+			else
+				strcpy((char*)xmlBuffer, "default");
+
+			xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"type", xmlBuffer);
 		}
 
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"overscan", xmlBuffer);
-
-		switch (getVideoFormat())
-		{
-			case 0:
-				strcpy((char*)xmlBuffer, "component");
-				break;
-			case 1:
-				strcpy((char*)xmlBuffer, "pal");
-				break;
-			case 2:
-				strcpy((char*)xmlBuffer, "ntsc");
-				break;
-			case 3:
-				strcpy((char*)xmlBuffer, "secam");
-				break;
-			case 4:
-				strcpy((char*)xmlBuffer, "mac");
-				break;
-			case 5:
-				strcpy((char*)xmlBuffer, "undefined");
-				break;
-		}
-
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"videoFormat", xmlBuffer);
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"fullRangeSamples", boolean2String(xmlBuffer, bufferSize, getFullRangeSamples()));
-
-		switch (getColorPrimaries())
-		{
-			case 1:
-				strcpy((char*)xmlBuffer, "bt709");
-				break;
-			case 2:
-				strcpy((char*)xmlBuffer, "undefined");
-				break;
-			case 4:
-				strcpy((char*)xmlBuffer, "bt470m");
-				break;
-			case 5:
-				strcpy((char*)xmlBuffer, "bt470bg");
-				break;
-			case 6:
-				strcpy((char*)xmlBuffer, "smpte170m");
-				break;
-			case 7:
-				strcpy((char*)xmlBuffer, "smpte240m");
-				break;
-			case 8:
-				strcpy((char*)xmlBuffer, "film");
-				break;
-		}
-
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"colorPrimaries", xmlBuffer);
-
-		switch (getTransfer())
-		{
-			case 1:
-				strcpy((char*)xmlBuffer, "bt709");
-				break;
-			case 2:
-				strcpy((char*)xmlBuffer, "undefined");
-				break;
-			case 4:
-				strcpy((char*)xmlBuffer, "bt470m");
-				break;
-			case 5:
-				strcpy((char*)xmlBuffer, "bt470bg");
-				break;
-			case 6:
-				strcpy((char*)xmlBuffer, "smpte170m");
-				break;
-			case 7:
-				strcpy((char*)xmlBuffer, "smpte240m");
-				break;
-			case 8:
-				strcpy((char*)xmlBuffer, "linear");
-				break;
-			case 9:
-				strcpy((char*)xmlBuffer, "log100");
-				break;
-			case 10:
-				strcpy((char*)xmlBuffer, "log316");
-				break;
-		}
-
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"transfer", xmlBuffer);
-
-		switch (getColorMatrix())
-		{
-			case 0:
-				strcpy((char*)xmlBuffer, "gbr");
-				break;
-			case 1:
-				strcpy((char*)xmlBuffer, "bt709");
-				break;
-			case 2:
-				strcpy((char*)xmlBuffer, "undefined");
-				break;
-			case 4:
-				strcpy((char*)xmlBuffer, "fcc");
-				break;
-			case 5:
-				strcpy((char*)xmlBuffer, "bt470bg");
-				break;
-			case 6:
-				strcpy((char*)xmlBuffer, "smpte170m");
-				break;
-			case 7:
-				strcpy((char*)xmlBuffer, "smpte240m");
-				break;
-			case 8:
-				strcpy((char*)xmlBuffer, "ycgco");
-				break;
-		}
-
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"colorMatrix", xmlBuffer);
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"chromaSampleLocation", number2String(xmlBuffer, bufferSize, getChromaSampleLocation()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"referenceFrames", number2String(xmlBuffer, bufferSize, getReferenceFrames()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"gopMaximumSize", number2String(xmlBuffer, bufferSize, getGopMaximumSize()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"gopMinimumSize", number2String(xmlBuffer, bufferSize, getGopMinimumSize()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"scenecutThreshold", number2String(xmlBuffer, bufferSize, getScenecutThreshold()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"preScenecutDetection", boolean2String(xmlBuffer, bufferSize, getPreScenecutDetection()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"bFrames", number2String(xmlBuffer, bufferSize, getBFrames()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"adaptiveBframeDecision", boolean2String(xmlBuffer, bufferSize, getAdaptiveBFrameDecision()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"bFrameBias", number2String(xmlBuffer, bufferSize, getBFrameBias()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"bFrameReferences", number2String(xmlBuffer, bufferSize, getBFrameReferences()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"loopFilter", boolean2String(xmlBuffer, bufferSize, getLoopFilter()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"loopFilterAlphaC0", number2String(xmlBuffer, bufferSize, getLoopFilterAlphaC0()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"loopFilterBeta", number2String(xmlBuffer, bufferSize, getLoopFilterBeta()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"cabac", boolean2String(xmlBuffer, bufferSize, getCabac()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"interlaced", boolean2String(xmlBuffer, bufferSize, getInterlaced()));
-
-		switch (getCqmPreset())
-		{
-			case X264_CQM_FLAT:
-				strcpy((char*)xmlBuffer, "flat");
-				break;
-			case X264_CQM_JVT:
-				strcpy((char*)xmlBuffer, "jvt");
-				break;
-			case X264_CQM_CUSTOM:
-				strcpy((char*)xmlBuffer, "custom");
-				break;
-		}
-
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"cqmPreset", xmlBuffer);
-
-		uint8_t* intra4x4Luma = getIntra4x4Luma();
-		uint8_t* intraChroma = getIntraChroma();
-		uint8_t* inter4x4Luma = getInter4x4Luma();
-		uint8_t* interChroma = getInterChroma();
-		uint8_t* intra8x8Luma = getIntra8x8Luma();
-		uint8_t* inter8x8Luma = getInter8x8Luma();
-
-		xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"intra4x4Luma", NULL);
-
-		for (int i = 0; i < 16; i++)
-			xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"value", number2String(xmlBuffer, bufferSize, intra4x4Luma[i]));
-
-		xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"intraChroma", NULL);
-
-		for (int i = 0; i < 16; i++)
-			xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"value", number2String(xmlBuffer, bufferSize, intraChroma[i]));
-
-		xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"inter4x4Luma", NULL);
-
-		for (int i = 0; i < 16; i++)
-			xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"value", number2String(xmlBuffer, bufferSize, inter4x4Luma[i]));
-
-		xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"interChroma", NULL);
-
-		for (int i = 0; i < 16; i++)
-			xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"value", number2String(xmlBuffer, bufferSize, interChroma[i]));
-
-		xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"intra8x8Luma", NULL);
-
-		for (int i = 0; i < 64; i++)
-			xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"value", number2String(xmlBuffer, bufferSize, intra8x8Luma[i]));
-
-		xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"inter8x8Luma", NULL);
-
-		for (int i = 0; i < 64; i++)
-			xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"value", number2String(xmlBuffer, bufferSize, inter8x8Luma[i]));
-
-		xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"analyse", NULL);
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"partitionI4x4", boolean2String(xmlBuffer, bufferSize, getPartitionI4x4()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"partitionI8x8", boolean2String(xmlBuffer, bufferSize, getPartitionI8x8()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"partitionP8x8", boolean2String(xmlBuffer, bufferSize, getPartitionP8x8()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"partitionP4x4", boolean2String(xmlBuffer, bufferSize, getPartitionP4x4()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"partitionB8x8", boolean2String(xmlBuffer, bufferSize, getPartitionB8x8()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"dct8x8", boolean2String(xmlBuffer, bufferSize, getDct8x8()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"weightedPrediction", boolean2String(xmlBuffer, bufferSize, getWeightedPrediction()));
-
-		switch (getDirectPredictionMode())
-		{
-			case X264_DIRECT_PRED_NONE:
-				strcpy((char*)xmlBuffer, "none");
-				break;
-			case X264_DIRECT_PRED_SPATIAL:
-				strcpy((char*)xmlBuffer, "spatial");
-				break;
-			case X264_DIRECT_PRED_TEMPORAL:
-				strcpy((char*)xmlBuffer, "temporal");
-				break;
-			case X264_DIRECT_PRED_AUTO:
-				strcpy((char*)xmlBuffer, "auto");
-				break;
-		}
-
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"directPredictionMode", xmlBuffer);
-
-		switch (getDirectPredictionSize())
-		{
-			case 0:
-				strcpy((char*)xmlBuffer, "4x4");
-				break;
-			case 1:
-				strcpy((char*)xmlBuffer, "8x8");
-				break;
-			case -1:
-				strcpy((char*)xmlBuffer, "smallest");
-				break;
-		}
-
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"directPredictionSize", xmlBuffer);
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"chromaLumaQuantiserDifference", number2String(xmlBuffer, bufferSize, getChromaLumaQuantiserDifference()));
-
-		switch (getMotionEstimationMethod())
-		{
-			case X264_ME_DIA:
-				strcpy((char*)xmlBuffer, "diamond");
-				break;
-			case X264_ME_UMH:
-				strcpy((char*)xmlBuffer, "multi-hexagonal");
-				break;
-			case X264_ME_ESA:
-				strcpy((char*)xmlBuffer, "exhaustive");
-				break;
-#if X264_BUILD >= 57
-			case X264_ME_TESA:
-				strcpy((char*)xmlBuffer, "hadamard");
-				break;
-#endif
-			case X264_ME_HEX:
-			default:
-				strcpy((char*)xmlBuffer, "hexagonal");
-				break;
-		}
-
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"motionEstimationMethod", xmlBuffer);
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"motionVectorSearchRange", number2String(xmlBuffer, bufferSize, getMotionVectorSearchRange()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"motionVectorLength", number2String(xmlBuffer, bufferSize, getMotionVectorLength()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"motionVectorThreadBuffer", number2String(xmlBuffer, bufferSize, getMotionVectorThreadBuffer()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"subpixelRefinement", number2String(xmlBuffer, bufferSize, getSubpixelRefinement()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"bidirectionalMotionEstimation", boolean2String(xmlBuffer, bufferSize, getBidirectionalMotionEstimation()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"chromaMotionEstimation", boolean2String(xmlBuffer, bufferSize, getChromaMotionEstimation()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"bFrameRdo", boolean2String(xmlBuffer, bufferSize, getBFrameRdo()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"mixedReferences", boolean2String(xmlBuffer, bufferSize, getMixedReferences()));
-
-		switch (getTrellis())
-		{
-			case 0:
-				strcpy((char*)xmlBuffer, "disabled");
-				break;
-			case 1:
-				strcpy((char*)xmlBuffer, "finalMacroblock");
-				break;
-			case 2:
-				strcpy((char*)xmlBuffer, "allModeDecisions");
-				break;
-		}
-
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"trellis", xmlBuffer);
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"fastPSkip", boolean2String(xmlBuffer, bufferSize, getFastPSkip()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"dctDecimate", boolean2String(xmlBuffer, bufferSize, getDctDecimate()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"noiseReduction", number2String(xmlBuffer, bufferSize, getNoiseReduction()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"interLumaDeadzone", number2String(xmlBuffer, bufferSize, getInterLumaDeadzone()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"intraLumaDeadzone", number2String(xmlBuffer, bufferSize, getIntraLumaDeadzone()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"computePsnr", boolean2String(xmlBuffer, bufferSize, getComputePsnr()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"computeSsim", boolean2String(xmlBuffer, bufferSize, getComputeSsim()));
-
-		xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"rateControl", NULL);
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"quantiserMinimum", number2String(xmlBuffer, bufferSize, getQuantiserMinimum()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"quantiserMaximum", number2String(xmlBuffer, bufferSize, getQuantiserMaximum()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"quantiserStep", number2String(xmlBuffer, bufferSize, getQuantiserStep()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"averageBitrateTolerance", number2String(xmlBuffer, bufferSize, getAverageBitrateTolerance()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"vbvMaximumBitrate", number2String(xmlBuffer, bufferSize, getVbvMaximumBitrate()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"vbvBufferSize", number2String(xmlBuffer, bufferSize, getVbvBufferSize()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"vbvInitialOccupancy", number2String(xmlBuffer, bufferSize, getVbvInitialOccupancy()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"ipFrameQuantiser", number2String(xmlBuffer, bufferSize, getIpFrameQuantiser()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"pbFrameQuantiser", number2String(xmlBuffer, bufferSize, getPbFrameQuantiser()));
-
-#if X264_BUILD >= 59
-		switch (getAdaptiveQuantiserMode())
-		{
-			case X264_AQ_NONE:
-				strcpy((char*)xmlBuffer, "none");
-				break;
-			case X264_AQ_LOCAL:
-				strcpy((char*)xmlBuffer, "local");
-				break;
-			case X264_AQ_GLOBAL:
-				strcpy((char*)xmlBuffer, "global");
-				break;
-		}
-
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"adaptiveQuantiserMode", xmlBuffer);
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"adaptiveQuantiserStrength", number2String(xmlBuffer, bufferSize, getAdaptiveQuantiserStrength()));
-#endif
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"rateControlEquation", (xmlChar*)getRateControlEquation());
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"quantiserCurveCompression", number2String(xmlBuffer, bufferSize, getQuantiserCurveCompression()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"reduceFluxBeforeCurveCompression", number2String(xmlBuffer, bufferSize, getReduceFluxBeforeCurveCompression()));
-		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"reduceFluxAfterCurveCompression", number2String(xmlBuffer, bufferSize, getReduceFluxAfterCurveCompression()));
-
-		int zoneCount = getZoneCount();
-
-		if (zoneCount)
-		{
-			x264ZoneOptions** zoneOptions = getZones();
-
-			for (int zoneIndex = 0; zoneIndex < zoneCount; zoneIndex++)
-			{
-				xmlNodeChild2 = xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"zone", NULL);
-				x264ZoneOptions* option = zoneOptions[zoneIndex];
-
-				xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"frameStart", number2String(xmlBuffer, bufferSize, option->getFrameStart()));
-				xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"frameEnd", number2String(xmlBuffer, bufferSize, option->getFrameEnd()));
-
-				if (zoneOptions[zoneIndex]->getZoneMode() == ZONE_MODE_QUANTISER)
-					xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"quantiser", number2String(xmlBuffer, bufferSize, option->getZoneParameter()));
-				else
-					xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"bitrateFactor", number2String(xmlBuffer, bufferSize, option->getZoneParameter() / 100.f));
-
-				delete option;
-			}
-
-			delete [] zoneOptions;
-		}
-
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"accessUnitDelimiters", boolean2String(xmlBuffer, bufferSize, getAccessUnitDelimiters()));
-		xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"spsIdentifier", number2String(xmlBuffer, bufferSize, getSpsIdentifier()));
-
-		xmlDocDumpMemory(xmlDoc, &tempBuffer, &tempBufferSize);
-
-		// remove carriage returns (even though libxml was instructed not to format the XML)
-		xmlChar* bufferChar = tempBuffer;
-		int bufferCharIndex = 0;
-
-		while (*bufferChar != '\0')
-		{
-			if (*bufferChar == '\n')
-			{
-				memmove(bufferChar, bufferChar + 1, tempBufferSize - bufferCharIndex);
-				tempBufferSize--;
-			}
-			else if (*bufferChar == '\"')
-				*bufferChar = '\'';
-
-			bufferChar++;
-			bufferCharIndex++;
-		}
-
-		xml = new char[tempBufferSize + 1];
-		memcpy(xml, tempBuffer, tempBufferSize);
-		xml[tempBufferSize] = 0;
-
+		addX264OptionsToXml(xmlNodeRoot);
+		xml = dumpXmlDocToMemory(xmlDoc);
 		xmlFreeDoc(xmlDoc);
 
 		break;
@@ -1376,10 +1058,413 @@ char* x264Options::toXml(void)
 	return xml;
 }
 
-int x264Options::fromXml(char *xml)
+char* x264Options::dumpXmlDocToMemory(xmlDocPtr xmlDoc)
 {
-	clearZones();
+	xmlChar *tempBuffer;
+	int tempBufferSize;
+	char *xml = NULL;
 
+	xmlDocDumpMemory(xmlDoc, &tempBuffer, &tempBufferSize);
+
+	// remove carriage returns (even though libxml was instructed not to format the XML)
+	xmlChar* bufferChar = tempBuffer;
+	int bufferCharIndex = 0;
+
+	while (*bufferChar != '\0')
+	{
+		if (*bufferChar == '\n')
+		{
+			memmove(bufferChar, bufferChar + 1, tempBufferSize - bufferCharIndex);
+			tempBufferSize--;
+		}
+		else if (*bufferChar == '\"')
+			*bufferChar = '\'';
+
+		bufferChar++;
+		bufferCharIndex++;
+	}
+
+	xml = new char[tempBufferSize + 1];
+	memcpy(xml, tempBuffer, tempBufferSize);
+	xml[tempBufferSize] = 0;
+
+	return xml;
+}
+
+void x264Options::addX264OptionsToXml(xmlNodePtr xmlNodeRoot)
+{
+	const int bufferSize = 100;
+	xmlChar xmlBuffer[bufferSize + 1];
+	xmlNodePtr xmlNodeChild, xmlNodeChild2;
+
+	xmlNodeRoot = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"x264Options", NULL);
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"threads", number2String(xmlBuffer, bufferSize, getThreads()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"deterministic", boolean2String(xmlBuffer, bufferSize, getDeterministic()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"idcLevel", number2String(xmlBuffer, bufferSize, getIdcLevel()));
+
+	xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"vui", NULL);
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"sarAsInput", boolean2String(xmlBuffer, bufferSize, getSarAsInput()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"sarHeight", number2String(xmlBuffer, bufferSize, getSarHeight()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"sarWidth", number2String(xmlBuffer, bufferSize, getSarWidth()));
+
+	switch (getOverscan())
+	{
+		case 0:
+			strcpy((char*)xmlBuffer, "undefined");
+			break;
+		case 1:
+			strcpy((char*)xmlBuffer, "show");
+			break;
+		case 2:
+			strcpy((char*)xmlBuffer, "crop");
+			break;
+	}
+
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"overscan", xmlBuffer);
+
+	switch (getVideoFormat())
+	{
+		case 0:
+			strcpy((char*)xmlBuffer, "component");
+			break;
+		case 1:
+			strcpy((char*)xmlBuffer, "pal");
+			break;
+		case 2:
+			strcpy((char*)xmlBuffer, "ntsc");
+			break;
+		case 3:
+			strcpy((char*)xmlBuffer, "secam");
+			break;
+		case 4:
+			strcpy((char*)xmlBuffer, "mac");
+			break;
+		case 5:
+			strcpy((char*)xmlBuffer, "undefined");
+			break;
+	}
+
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"videoFormat", xmlBuffer);
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"fullRangeSamples", boolean2String(xmlBuffer, bufferSize, getFullRangeSamples()));
+
+	switch (getColorPrimaries())
+	{
+		case 1:
+			strcpy((char*)xmlBuffer, "bt709");
+			break;
+		case 2:
+			strcpy((char*)xmlBuffer, "undefined");
+			break;
+		case 4:
+			strcpy((char*)xmlBuffer, "bt470m");
+			break;
+		case 5:
+			strcpy((char*)xmlBuffer, "bt470bg");
+			break;
+		case 6:
+			strcpy((char*)xmlBuffer, "smpte170m");
+			break;
+		case 7:
+			strcpy((char*)xmlBuffer, "smpte240m");
+			break;
+		case 8:
+			strcpy((char*)xmlBuffer, "film");
+			break;
+	}
+
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"colorPrimaries", xmlBuffer);
+
+	switch (getTransfer())
+	{
+		case 1:
+			strcpy((char*)xmlBuffer, "bt709");
+			break;
+		case 2:
+			strcpy((char*)xmlBuffer, "undefined");
+			break;
+		case 4:
+			strcpy((char*)xmlBuffer, "bt470m");
+			break;
+		case 5:
+			strcpy((char*)xmlBuffer, "bt470bg");
+			break;
+		case 6:
+			strcpy((char*)xmlBuffer, "smpte170m");
+			break;
+		case 7:
+			strcpy((char*)xmlBuffer, "smpte240m");
+			break;
+		case 8:
+			strcpy((char*)xmlBuffer, "linear");
+			break;
+		case 9:
+			strcpy((char*)xmlBuffer, "log100");
+			break;
+		case 10:
+			strcpy((char*)xmlBuffer, "log316");
+			break;
+	}
+
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"transfer", xmlBuffer);
+
+	switch (getColorMatrix())
+	{
+		case 0:
+			strcpy((char*)xmlBuffer, "gbr");
+			break;
+		case 1:
+			strcpy((char*)xmlBuffer, "bt709");
+			break;
+		case 2:
+			strcpy((char*)xmlBuffer, "undefined");
+			break;
+		case 4:
+			strcpy((char*)xmlBuffer, "fcc");
+			break;
+		case 5:
+			strcpy((char*)xmlBuffer, "bt470bg");
+			break;
+		case 6:
+			strcpy((char*)xmlBuffer, "smpte170m");
+			break;
+		case 7:
+			strcpy((char*)xmlBuffer, "smpte240m");
+			break;
+		case 8:
+			strcpy((char*)xmlBuffer, "ycgco");
+			break;
+	}
+
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"colorMatrix", xmlBuffer);
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"chromaSampleLocation", number2String(xmlBuffer, bufferSize, getChromaSampleLocation()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"referenceFrames", number2String(xmlBuffer, bufferSize, getReferenceFrames()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"gopMaximumSize", number2String(xmlBuffer, bufferSize, getGopMaximumSize()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"gopMinimumSize", number2String(xmlBuffer, bufferSize, getGopMinimumSize()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"scenecutThreshold", number2String(xmlBuffer, bufferSize, getScenecutThreshold()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"preScenecutDetection", boolean2String(xmlBuffer, bufferSize, getPreScenecutDetection()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"bFrames", number2String(xmlBuffer, bufferSize, getBFrames()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"adaptiveBframeDecision", boolean2String(xmlBuffer, bufferSize, getAdaptiveBFrameDecision()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"bFrameBias", number2String(xmlBuffer, bufferSize, getBFrameBias()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"bFrameReferences", number2String(xmlBuffer, bufferSize, getBFrameReferences()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"loopFilter", boolean2String(xmlBuffer, bufferSize, getLoopFilter()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"loopFilterAlphaC0", number2String(xmlBuffer, bufferSize, getLoopFilterAlphaC0()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"loopFilterBeta", number2String(xmlBuffer, bufferSize, getLoopFilterBeta()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"cabac", boolean2String(xmlBuffer, bufferSize, getCabac()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"interlaced", boolean2String(xmlBuffer, bufferSize, getInterlaced()));
+
+	switch (getCqmPreset())
+	{
+		case X264_CQM_FLAT:
+			strcpy((char*)xmlBuffer, "flat");
+			break;
+		case X264_CQM_JVT:
+			strcpy((char*)xmlBuffer, "jvt");
+			break;
+		case X264_CQM_CUSTOM:
+			strcpy((char*)xmlBuffer, "custom");
+			break;
+	}
+
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"cqmPreset", xmlBuffer);
+
+	uint8_t* intra4x4Luma = getIntra4x4Luma();
+	uint8_t* intraChroma = getIntraChroma();
+	uint8_t* inter4x4Luma = getInter4x4Luma();
+	uint8_t* interChroma = getInterChroma();
+	uint8_t* intra8x8Luma = getIntra8x8Luma();
+	uint8_t* inter8x8Luma = getInter8x8Luma();
+
+	xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"intra4x4Luma", NULL);
+
+	for (int i = 0; i < 16; i++)
+		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"value", number2String(xmlBuffer, bufferSize, intra4x4Luma[i]));
+
+	xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"intraChroma", NULL);
+
+	for (int i = 0; i < 16; i++)
+		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"value", number2String(xmlBuffer, bufferSize, intraChroma[i]));
+
+	xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"inter4x4Luma", NULL);
+
+	for (int i = 0; i < 16; i++)
+		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"value", number2String(xmlBuffer, bufferSize, inter4x4Luma[i]));
+
+	xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"interChroma", NULL);
+
+	for (int i = 0; i < 16; i++)
+		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"value", number2String(xmlBuffer, bufferSize, interChroma[i]));
+
+	xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"intra8x8Luma", NULL);
+
+	for (int i = 0; i < 64; i++)
+		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"value", number2String(xmlBuffer, bufferSize, intra8x8Luma[i]));
+
+	xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"inter8x8Luma", NULL);
+
+	for (int i = 0; i < 64; i++)
+		xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"value", number2String(xmlBuffer, bufferSize, inter8x8Luma[i]));
+
+	xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"analyse", NULL);
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"partitionI4x4", boolean2String(xmlBuffer, bufferSize, getPartitionI4x4()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"partitionI8x8", boolean2String(xmlBuffer, bufferSize, getPartitionI8x8()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"partitionP8x8", boolean2String(xmlBuffer, bufferSize, getPartitionP8x8()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"partitionP4x4", boolean2String(xmlBuffer, bufferSize, getPartitionP4x4()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"partitionB8x8", boolean2String(xmlBuffer, bufferSize, getPartitionB8x8()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"dct8x8", boolean2String(xmlBuffer, bufferSize, getDct8x8()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"weightedPrediction", boolean2String(xmlBuffer, bufferSize, getWeightedPrediction()));
+
+	switch (getDirectPredictionMode())
+	{
+		case X264_DIRECT_PRED_NONE:
+			strcpy((char*)xmlBuffer, "none");
+			break;
+		case X264_DIRECT_PRED_SPATIAL:
+			strcpy((char*)xmlBuffer, "spatial");
+			break;
+		case X264_DIRECT_PRED_TEMPORAL:
+			strcpy((char*)xmlBuffer, "temporal");
+			break;
+		case X264_DIRECT_PRED_AUTO:
+			strcpy((char*)xmlBuffer, "auto");
+			break;
+	}
+
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"directPredictionMode", xmlBuffer);
+
+	switch (getDirectPredictionSize())
+	{
+		case 0:
+			strcpy((char*)xmlBuffer, "4x4");
+			break;
+		case 1:
+			strcpy((char*)xmlBuffer, "8x8");
+			break;
+		case -1:
+			strcpy((char*)xmlBuffer, "smallest");
+			break;
+	}
+
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"directPredictionSize", xmlBuffer);
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"chromaLumaQuantiserDifference", number2String(xmlBuffer, bufferSize, getChromaLumaQuantiserDifference()));
+
+	switch (getMotionEstimationMethod())
+	{
+		case X264_ME_DIA:
+			strcpy((char*)xmlBuffer, "diamond");
+			break;
+		case X264_ME_UMH:
+			strcpy((char*)xmlBuffer, "multi-hexagonal");
+			break;
+		case X264_ME_ESA:
+			strcpy((char*)xmlBuffer, "exhaustive");
+			break;
+#if X264_BUILD >= 57
+		case X264_ME_TESA:
+			strcpy((char*)xmlBuffer, "hadamard");
+			break;
+#endif
+		case X264_ME_HEX:
+		default:
+			strcpy((char*)xmlBuffer, "hexagonal");
+			break;
+	}
+
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"motionEstimationMethod", xmlBuffer);
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"motionVectorSearchRange", number2String(xmlBuffer, bufferSize, getMotionVectorSearchRange()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"motionVectorLength", number2String(xmlBuffer, bufferSize, getMotionVectorLength()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"motionVectorThreadBuffer", number2String(xmlBuffer, bufferSize, getMotionVectorThreadBuffer()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"subpixelRefinement", number2String(xmlBuffer, bufferSize, getSubpixelRefinement()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"bidirectionalMotionEstimation", boolean2String(xmlBuffer, bufferSize, getBidirectionalMotionEstimation()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"chromaMotionEstimation", boolean2String(xmlBuffer, bufferSize, getChromaMotionEstimation()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"bFrameRdo", boolean2String(xmlBuffer, bufferSize, getBFrameRdo()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"mixedReferences", boolean2String(xmlBuffer, bufferSize, getMixedReferences()));
+
+	switch (getTrellis())
+	{
+		case 0:
+			strcpy((char*)xmlBuffer, "disabled");
+			break;
+		case 1:
+			strcpy((char*)xmlBuffer, "finalMacroblock");
+			break;
+		case 2:
+			strcpy((char*)xmlBuffer, "allModeDecisions");
+			break;
+	}
+
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"trellis", xmlBuffer);
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"fastPSkip", boolean2String(xmlBuffer, bufferSize, getFastPSkip()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"dctDecimate", boolean2String(xmlBuffer, bufferSize, getDctDecimate()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"noiseReduction", number2String(xmlBuffer, bufferSize, getNoiseReduction()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"interLumaDeadzone", number2String(xmlBuffer, bufferSize, getInterLumaDeadzone()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"intraLumaDeadzone", number2String(xmlBuffer, bufferSize, getIntraLumaDeadzone()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"computePsnr", boolean2String(xmlBuffer, bufferSize, getComputePsnr()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"computeSsim", boolean2String(xmlBuffer, bufferSize, getComputeSsim()));
+
+	xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"rateControl", NULL);
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"quantiserMinimum", number2String(xmlBuffer, bufferSize, getQuantiserMinimum()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"quantiserMaximum", number2String(xmlBuffer, bufferSize, getQuantiserMaximum()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"quantiserStep", number2String(xmlBuffer, bufferSize, getQuantiserStep()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"averageBitrateTolerance", number2String(xmlBuffer, bufferSize, getAverageBitrateTolerance()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"vbvMaximumBitrate", number2String(xmlBuffer, bufferSize, getVbvMaximumBitrate()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"vbvBufferSize", number2String(xmlBuffer, bufferSize, getVbvBufferSize()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"vbvInitialOccupancy", number2String(xmlBuffer, bufferSize, getVbvInitialOccupancy()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"ipFrameQuantiser", number2String(xmlBuffer, bufferSize, getIpFrameQuantiser()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"pbFrameQuantiser", number2String(xmlBuffer, bufferSize, getPbFrameQuantiser()));
+
+#if X264_BUILD >= 59
+	switch (getAdaptiveQuantiserMode())
+	{
+		case X264_AQ_NONE:
+			strcpy((char*)xmlBuffer, "none");
+			break;
+		case X264_AQ_LOCAL:
+			strcpy((char*)xmlBuffer, "local");
+			break;
+		case X264_AQ_GLOBAL:
+			strcpy((char*)xmlBuffer, "global");
+			break;
+	}
+
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"adaptiveQuantiserMode", xmlBuffer);
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"adaptiveQuantiserStrength", number2String(xmlBuffer, bufferSize, getAdaptiveQuantiserStrength()));
+#endif
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"rateControlEquation", (xmlChar*)getRateControlEquation());
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"quantiserCurveCompression", number2String(xmlBuffer, bufferSize, getQuantiserCurveCompression()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"reduceFluxBeforeCurveCompression", number2String(xmlBuffer, bufferSize, getReduceFluxBeforeCurveCompression()));
+	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"reduceFluxAfterCurveCompression", number2String(xmlBuffer, bufferSize, getReduceFluxAfterCurveCompression()));
+
+	int zoneCount = getZoneCount();
+
+	if (zoneCount)
+	{
+		x264ZoneOptions** zoneOptions = getZones();
+
+		for (int zoneIndex = 0; zoneIndex < zoneCount; zoneIndex++)
+		{
+			xmlNodeChild2 = xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"zone", NULL);
+			x264ZoneOptions* option = zoneOptions[zoneIndex];
+
+			xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"frameStart", number2String(xmlBuffer, bufferSize, option->getFrameStart()));
+			xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"frameEnd", number2String(xmlBuffer, bufferSize, option->getFrameEnd()));
+
+			if (zoneOptions[zoneIndex]->getZoneMode() == ZONE_MODE_QUANTISER)
+				xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"quantiser", number2String(xmlBuffer, bufferSize, option->getZoneParameter()));
+			else
+				xmlNewChild(xmlNodeChild2, NULL, (xmlChar*)"bitrateFactor", number2String(xmlBuffer, bufferSize, option->getZoneParameter() / 100.f));
+
+			delete option;
+		}
+
+		delete [] zoneOptions;
+	}
+
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"accessUnitDelimiters", boolean2String(xmlBuffer, bufferSize, getAccessUnitDelimiters()));
+	xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"spsIdentifier", number2String(xmlBuffer, bufferSize, getSpsIdentifier()));
+}
+
+bool x264Options::validateXml(xmlDocPtr doc)
+{
 	const char *schemaFile = "x264Param.xsd";
 	char *pluginDir = ADM_getPluginPath();
 	char schemaPath[strlen(pluginDir) + strlen(PLUGIN_SUBDIR) + 1 + strlen(schemaFile) + 1];
@@ -1391,8 +1476,6 @@ int x264Options::fromXml(char *xml)
 	strcat(schemaPath, schemaFile);
 	delete [] pluginDir;
 
-	// Validate XML
-	xmlDocPtr doc = xmlReadMemory(xml, strlen(xml), "x264.xml", NULL, 0);
 	xmlSchemaParserCtxtPtr xmlSchemaParserCtxt = xmlSchemaNewParserCtxt(schemaPath);
 	xmlSchemaPtr xmlSchema = xmlSchemaParse(xmlSchemaParserCtxt);
 
@@ -1409,8 +1492,19 @@ int x264Options::fromXml(char *xml)
 	else
  		xmlSchemaFree(xmlSchema);
 
-	// Read XML
-	if (success)
+	return success;
+}
+
+int x264Options::fromXml(const char *xml)
+{
+	bool success = false;
+
+	clearPresetConfiguration();
+	clearZones();
+
+	xmlDocPtr doc = xmlReadMemory(xml, strlen(xml), "x264.xml", NULL, 0);
+
+	if (success = validateXml(doc))
 	{
 		xmlNode *xmlNodeRoot = xmlDocGetRootElement(doc);
 
@@ -1420,105 +1514,10 @@ int x264Options::fromXml(char *xml)
 			{
 				char *content = (char*)xmlNodeGetContent(xmlChild);
 
-				if (strcmp((char*)xmlChild->name, "threads") == 0)
-					setThreads(atoi(content));
-				else if (strcmp((char*)xmlChild->name, "deterministic") == 0)
-					setDeterministic(string2Boolean(content));
-				else if (strcmp((char*)xmlChild->name, "idcLevel") == 0)
-					setIdcLevel(atoi(content));
-				else if (strcmp((char*)xmlChild->name, "vui") == 0)
-					parseVuiOptions(xmlChild);
-				else if (strcmp((char*)xmlChild->name, "referenceFrames") == 0)
-					setReferenceFrames(atoi(content));
-				else if (strcmp((char*)xmlChild->name, "gopMaximumSize") == 0)
-					setGopMaximumSize(atoi(content));
-				else if (strcmp((char*)xmlChild->name, "gopMinimumSize") == 0)
-					setGopMinimumSize(atoi(content));
-				else if (strcmp((char*)xmlChild->name, "scenecutThreshold") == 0)
-					setScenecutThreshold(atoi(content));
-				else if (strcmp((char*)xmlChild->name, "preScenecutDetection") == 0)
-					setPreScenecutDetection(string2Boolean(content));
-				else if (strcmp((char*)xmlChild->name, "bFrames") == 0)
-					setBFrames(atoi(content));
-				else if (strcmp((char*)xmlChild->name, "adaptiveBframeDecision") == 0)
-					setAdaptiveBFrameDecision(string2Boolean(content));
-				else if (strcmp((char*)xmlChild->name, "bFrameBias") == 0)
-					setBFrameBias(atoi(content));
-				else if (strcmp((char*)xmlChild->name, "bFrameReferences") == 0)
-					setBFrameReferences(atoi(content));
-				else if (strcmp((char*)xmlChild->name, "loopFilter") == 0)
-					setLoopFilter(string2Boolean(content));
-				else if (strcmp((char*)xmlChild->name, "loopFilterAlphaC0") == 0)
-					setLoopFilterAlphaC0(atoi(content));
-				else if (strcmp((char*)xmlChild->name, "loopFilterBeta") == 0)
-					setLoopFilterBeta(atoi(content));
-				else if (strcmp((char*)xmlChild->name, "cabac") == 0)
-					setCabac(string2Boolean(content));
-				else if (strcmp((char*)xmlChild->name, "interlaced") == 0)
-					setInterlaced(string2Boolean(content));
-				else if (strcmp((char*)xmlChild->name, "cqmPreset") == 0)
-				{
-					int cqmPreset = 0;
-
-					if (strcmp(content, "flat") == 0)
-						cqmPreset = X264_CQM_FLAT;
-					else if (strcmp(content, "jvt") == 0)
-						cqmPreset = X264_CQM_JVT;
-					else if (strcmp(content, "custom") == 0)
-						cqmPreset = X264_CQM_CUSTOM;
-
-					setCqmPreset(cqmPreset);
-				}
-				else if (strcmp((char*)xmlChild->name, "intra4x4Luma") == 0)
-				{
-					uint8_t intra4x4Luma[16];
-
-					parseCqmOption(xmlChild, intra4x4Luma);
-					setIntra4x4Luma(intra4x4Luma);
-				}
-				else if (strcmp((char*)xmlChild->name, "intraChroma") == 0)
-				{
-					uint8_t intraChroma[16];
-
-					parseCqmOption(xmlChild, intraChroma);
-					setIntraChroma(intraChroma);
-				}
-				else if (strcmp((char*)xmlChild->name, "inter4x4Luma") == 0)
-				{
-					uint8_t inter4x4Luma[16];
-
-					parseCqmOption(xmlChild, inter4x4Luma);
-					setInter4x4Luma(inter4x4Luma);
-				}
-				else if (strcmp((char*)xmlChild->name, "interChroma") == 0)
-				{
-					uint8_t interChroma[16];
-
-					parseCqmOption(xmlChild, interChroma);
-					setInterChroma(interChroma);
-				}
-				else if (strcmp((char*)xmlChild->name, "intra8x8Luma") == 0)
-				{
-					uint8_t intra8x8Luma[64];
-
-					parseCqmOption(xmlChild, intra8x8Luma);
-					setIntra8x8Luma(intra8x8Luma);
-				}
-				else if (strcmp((char*)xmlChild->name, "inter8x8Luma") == 0)
-				{
-					uint8_t inter8x8Luma[64];
-
-					parseCqmOption(xmlChild, inter8x8Luma);
-					setInter8x8Luma(inter8x8Luma);
-				}
-				else if (strcmp((char*)xmlChild->name, "analyse") == 0)
-					parseAnalyseOptions(xmlChild);
-				else if (strcmp((char*)xmlChild->name, "rateControl") == 0)
-					parseRateControlOptions(xmlChild);
-				else if (strcmp((char*)xmlChild->name, "accessUnitDelimiters") == 0)
-					setAccessUnitDelimiters(string2Boolean(content));
-				else if (strcmp((char*)xmlChild->name, "spsIdentifier") == 0)
-					setSpsIdentifier(atoi(content));
+				if (strcmp((char*)xmlChild->name, "presetConfiguration") == 0)
+					parsePresetConfiguration(xmlChild);
+				else if (strcmp((char*)xmlChild->name, "x264Options") == 0)
+					parseX264Options(xmlChild);
 
 				xmlFree(content);
 			}
@@ -1528,6 +1527,150 @@ int x264Options::fromXml(char *xml)
 	xmlFreeDoc(doc);
 
 	return success;
+}
+
+void x264Options::parsePresetConfiguration(xmlNode *node)
+{
+	char* name = NULL;
+	configType type = CONFIG_CUSTOM;
+
+	for (xmlNode *xmlChild = node->children; xmlChild; xmlChild = xmlChild->next)
+	{
+		if (xmlChild->type == XML_ELEMENT_NODE)
+		{
+			char *content = (char*)xmlNodeGetContent(xmlChild);
+
+			if (strcmp((char*)xmlChild->name, "name") == 0)
+				name = strdup((char*)content);
+			else if (strcmp((char*)xmlChild->name, "type") == 0)
+			{
+				if (strcmp(content, "user") == 0)
+					type = CONFIG_USER;
+				else if (strcmp(content, "system") == 0)
+					type = CONFIG_SYSTEM;
+				else
+					type = CONFIG_DEFAULT;
+			}
+
+			xmlFree(content);
+		}
+	}
+
+	setPresetConfiguration(name, type);
+	free(name);
+}
+
+void x264Options::parseX264Options(xmlNode *node)
+{
+	for (xmlNode *xmlChild = node->children; xmlChild; xmlChild = xmlChild->next)
+	{
+		if (xmlChild->type == XML_ELEMENT_NODE)
+		{
+			char *content = (char*)xmlNodeGetContent(xmlChild);
+
+			if (strcmp((char*)xmlChild->name, "threads") == 0)
+				setThreads(atoi(content));
+			else if (strcmp((char*)xmlChild->name, "deterministic") == 0)
+				setDeterministic(string2Boolean(content));
+			else if (strcmp((char*)xmlChild->name, "idcLevel") == 0)
+				setIdcLevel(atoi(content));
+			else if (strcmp((char*)xmlChild->name, "vui") == 0)
+				parseVuiOptions(xmlChild);
+			else if (strcmp((char*)xmlChild->name, "referenceFrames") == 0)
+				setReferenceFrames(atoi(content));
+			else if (strcmp((char*)xmlChild->name, "gopMaximumSize") == 0)
+				setGopMaximumSize(atoi(content));
+			else if (strcmp((char*)xmlChild->name, "gopMinimumSize") == 0)
+				setGopMinimumSize(atoi(content));
+			else if (strcmp((char*)xmlChild->name, "scenecutThreshold") == 0)
+				setScenecutThreshold(atoi(content));
+			else if (strcmp((char*)xmlChild->name, "preScenecutDetection") == 0)
+				setPreScenecutDetection(string2Boolean(content));
+			else if (strcmp((char*)xmlChild->name, "bFrames") == 0)
+				setBFrames(atoi(content));
+			else if (strcmp((char*)xmlChild->name, "adaptiveBframeDecision") == 0)
+				setAdaptiveBFrameDecision(string2Boolean(content));
+			else if (strcmp((char*)xmlChild->name, "bFrameBias") == 0)
+				setBFrameBias(atoi(content));
+			else if (strcmp((char*)xmlChild->name, "bFrameReferences") == 0)
+				setBFrameReferences(atoi(content));
+			else if (strcmp((char*)xmlChild->name, "loopFilter") == 0)
+				setLoopFilter(string2Boolean(content));
+			else if (strcmp((char*)xmlChild->name, "loopFilterAlphaC0") == 0)
+				setLoopFilterAlphaC0(atoi(content));
+			else if (strcmp((char*)xmlChild->name, "loopFilterBeta") == 0)
+				setLoopFilterBeta(atoi(content));
+			else if (strcmp((char*)xmlChild->name, "cabac") == 0)
+				setCabac(string2Boolean(content));
+			else if (strcmp((char*)xmlChild->name, "interlaced") == 0)
+				setInterlaced(string2Boolean(content));
+			else if (strcmp((char*)xmlChild->name, "cqmPreset") == 0)
+			{
+				int cqmPreset = 0;
+
+				if (strcmp(content, "flat") == 0)
+					cqmPreset = X264_CQM_FLAT;
+				else if (strcmp(content, "jvt") == 0)
+					cqmPreset = X264_CQM_JVT;
+				else if (strcmp(content, "custom") == 0)
+					cqmPreset = X264_CQM_CUSTOM;
+
+				setCqmPreset(cqmPreset);
+			}
+			else if (strcmp((char*)xmlChild->name, "intra4x4Luma") == 0)
+			{
+				uint8_t intra4x4Luma[16];
+
+				parseCqmOption(xmlChild, intra4x4Luma);
+				setIntra4x4Luma(intra4x4Luma);
+			}
+			else if (strcmp((char*)xmlChild->name, "intraChroma") == 0)
+			{
+				uint8_t intraChroma[16];
+
+				parseCqmOption(xmlChild, intraChroma);
+				setIntraChroma(intraChroma);
+			}
+			else if (strcmp((char*)xmlChild->name, "inter4x4Luma") == 0)
+			{
+				uint8_t inter4x4Luma[16];
+
+				parseCqmOption(xmlChild, inter4x4Luma);
+				setInter4x4Luma(inter4x4Luma);
+			}
+			else if (strcmp((char*)xmlChild->name, "interChroma") == 0)
+			{
+				uint8_t interChroma[16];
+
+				parseCqmOption(xmlChild, interChroma);
+				setInterChroma(interChroma);
+			}
+			else if (strcmp((char*)xmlChild->name, "intra8x8Luma") == 0)
+			{
+				uint8_t intra8x8Luma[64];
+
+				parseCqmOption(xmlChild, intra8x8Luma);
+				setIntra8x8Luma(intra8x8Luma);
+			}
+			else if (strcmp((char*)xmlChild->name, "inter8x8Luma") == 0)
+			{
+				uint8_t inter8x8Luma[64];
+
+				parseCqmOption(xmlChild, inter8x8Luma);
+				setInter8x8Luma(inter8x8Luma);
+			}
+			else if (strcmp((char*)xmlChild->name, "analyse") == 0)
+				parseAnalyseOptions(xmlChild);
+			else if (strcmp((char*)xmlChild->name, "rateControl") == 0)
+				parseRateControlOptions(xmlChild);
+			else if (strcmp((char*)xmlChild->name, "accessUnitDelimiters") == 0)
+				setAccessUnitDelimiters(string2Boolean(content));
+			else if (strcmp((char*)xmlChild->name, "spsIdentifier") == 0)
+				setSpsIdentifier(atoi(content));
+
+			xmlFree(content);
+		}
+	}
 }
 
 void x264Options::parseVuiOptions(xmlNode *node)

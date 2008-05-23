@@ -14,12 +14,13 @@ IF (X264_FOUND)
 		SET(QT_PLUGIN_NAME "ADM_vidEnc_x264_Qt")
 		SET(GTK_PLUGIN_NAME "ADM_vidEnc_x264_Gtk")
 		SET(PLUGIN_SUBDIR "x264")
-		SET(ADM_vidEnc_x264_SRCS interface.c configGuiLoader.cpp encoder.cpp guiHelper.cpp options.cpp zoneOptions.cpp)
+		SET(ADM_vidEnc_x264_SRCS interface.c configGuiLoader.cpp encoder.cpp guiHelper.cpp options.cpp presetOptions.cpp zoneOptions.cpp)
 
 		CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config.h")
 
 		ADD_SUBDIRECTORY(gtk)
 		ADD_SUBDIRECTORY(qt4)
+		ADD_SUBDIRECTORY(xml)
 		ADD_LIBRARY(ADM_vidEnc_x264 SHARED ${ADM_vidEnc_x264_SRCS})
 		TARGET_LINK_LIBRARIES(ADM_vidEnc_x264 ADM_core ${X264_LIBRARY_DIR} ${LIBXML2_LIBRARIES})
 

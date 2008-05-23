@@ -17,8 +17,9 @@ class x264ConfigDialog : public QDialog
 
 private:
 	Ui_x264ConfigDialog ui;
-	x264ZoneTableModel _zoneTableModel;
-	x264ZoneTableDelegate _zoneTableDelegate;
+	x264ZoneTableModel zoneTableModel;
+	x264ZoneTableDelegate zoneTableDelegate;
+	bool disableGenericSlots;
 
 	static const int aspectRatioCount = 4;
 	int predefinedARs[aspectRatioCount][2];
@@ -43,14 +44,28 @@ private:
 	uint8_t inter4x4Luma[16], interChroma[16];
 	uint8_t intra8x8Luma[64], inter8x8Luma[64];
 
+	void fillConfigurationComboBox(void);
+	bool selectConfiguration(QString *selectFile, configType configurationType);
+	bool loadPresetSettings(vidEncOptions *encodeOptions, x264Options *options);
 	void loadSettings(vidEncOptions *encodeOptions, x264Options *options);
 	int getValueIndexInArray(uint8_t value, const uint8_t valueArray[], int elementCount);
+	QString getUserConfigDirectory(void);
+	QString getSystemConfigDirectory(void);
 
 public:
 	x264ConfigDialog(vidEncConfigParameters *configParameters, vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options);
 	void saveSettings(vidEncOptions *encodeOptions, x264Options *options);
 
 private slots:
+	void generic_currentIndexChanged(int index);
+	void generic_valueChanged(int value);
+	void generic_pressed(void);
+	void generic_textEdited(QString text);
+
+	void configurationComboBox_currentIndexChanged(int index);
+	void saveAsButton_pressed(void);
+	void deleteButton_pressed(void);
+
 	// General tab
 	void encodingModeComboBox_currentIndexChanged(int index);
 	void quantiserSlider_valueChanged(int value);

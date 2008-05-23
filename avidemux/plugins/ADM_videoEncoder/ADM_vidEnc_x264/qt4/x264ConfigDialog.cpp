@@ -18,17 +18,28 @@
  ***************************************************************************/
 
 #include <math.h>
+#include <QtGui/QFileDialog>
 
+#include "../config.h"
+#include "../presetOptions.h"
 #include "x264ConfigDialog.h"
 #include "x264CustomMatrixDialog.h"
 
-#include "ADM_default.h"
+#include "ADM_inttype.h"
+#include "ADM_files.h"
 #include "DIA_coreToolkit.h"
 #include "DIA_fileSel.h"
+
+// Stay away from ADM_assert.h since it hacks memory functions.
+// Duplicating ADM_mkdir declaration here instead.
+extern "C" {
+extern uint8_t ADM_mkdir(const char *name);
+}
 
 x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options) :
 	QDialog((QWidget*)configParameters->parent, Qt::Dialog)
 {
+	disableGenericSlots = false;
 	static const int _predefinedARs[aspectRatioCount][2] = {{16, 15}, {64, 45}, {8, 9}, {32, 27}};
 
 	// Mappings for x264 array index -> UI combobox index
@@ -46,6 +57,10 @@ x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vid
 	memcpy(colourMatrix, _colourMatrix, sizeof(colourMatrix));	
 
 	ui.setupUi(this);
+
+	connect(ui.configurationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configurationComboBox_currentIndexChanged(int)));
+	connect(ui.saveAsButton, SIGNAL(pressed()), this, SLOT(saveAsButton_pressed()));
+	connect(ui.deleteButton, SIGNAL(pressed()), this, SLOT(deleteButton_pressed()));
 
 	// General tab
 	lastBitrate = 1500;
@@ -83,8 +98,8 @@ x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vid
 
 	// Advanced tab
 	ui.zoneTableView->sortByColumn(0, Qt::AscendingOrder);
-	ui.zoneTableView->setModel(&_zoneTableModel);
-	ui.zoneTableView->setItemDelegate(&_zoneTableDelegate);
+	ui.zoneTableView->setModel(&zoneTableModel);
+	ui.zoneTableView->setItemDelegate(&zoneTableDelegate);
 
 	ui.zoneTableView->setColumnWidth(0, 80);
 	ui.zoneTableView->setColumnWidth(1, 80);
@@ -95,23 +110,225 @@ x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vid
 	connect(ui.zoneEditButton, SIGNAL(pressed()), this, SLOT(zoneEditButton_pressed()));
 	connect(ui.zoneDeleteButton, SIGNAL(pressed()), this, SLOT(zoneDeleteButton_pressed()));
 
-	loadSettings(encodeOptions, options);
-}
-/*
-void x264ConfigDialog::defaultButton_pressed()
-{
-	if (GUI_Question(QT_TR_NOOP("Are you sure you wish to reset all options to defaults?")))
+	QWidgetList widgetList = QApplication::allWidgets();
+
+	for (int widgetIndex = 0; widgetIndex < widgetList.size(); widgetIndex++)
 	{
-		x264Options defaultOptions;
-		vidEncOptions defaultEncodeOptions;
+		QWidget *widget = widgetList.at(widgetIndex);
 
-		defaultEncodeOptions.encodeMode = DEFAULT_ENCODE_MODE;
-		defaultEncodeOptions.encodeModeParameter = DEFAULT_ENCODE_MODE_PARAMETER;
+		if (widget->parentWidget() != NULL && widget->parentWidget()->parentWidget() != NULL && 
+			widget->parentWidget()->parentWidget()->parentWidget() != NULL &&
+			widget->parentWidget()->parentWidget()->parentWidget()->parentWidget() == ui.tabWidget)
+		{
+			if (widget->inherits("QComboBox"))
+				connect(widget, SIGNAL(currentIndexChanged(int)), this, SLOT(generic_currentIndexChanged(int)));
+			else if (widget->inherits("QSpinBox"))
+				connect(widget, SIGNAL(valueChanged(int)), this, SLOT(generic_valueChanged(int)));
+			else if (widget->inherits("QAbstractButton"))
+				connect(widget, SIGNAL(pressed()), this, SLOT(generic_pressed()));
+			else if (widget->inherits("QLineEdit"))
+				connect(widget, SIGNAL(textEdited(QString)), this, SLOT(generic_textEdited(QString)));
+		}
+	}
 
-		loadSettings(&defaultEncodeOptions, &defaultOptions);
+	fillConfigurationComboBox();
+
+	if (!loadPresetSettings(encodeOptions, options))
+		loadSettings(encodeOptions, options);
+}
+
+void x264ConfigDialog::fillConfigurationComboBox(void)
+{
+	bool origDisableGenericSlots = disableGenericSlots;
+	QMap<QString, int> configs;
+	QStringList filter("*.xml");
+	QStringList list = QDir(getUserConfigDirectory()).entryList(filter, QDir::Files | QDir::Readable);
+
+	disableGenericSlots = true;
+
+	for (int item = 0; item < list.size(); item++)
+		configs.insert(QFileInfo(list[item]).baseName(), CONFIG_USER);
+
+	list = QDir(getSystemConfigDirectory()).entryList(filter, QDir::Files | QDir::Readable);
+
+	for (int item = 0; item < list.size(); item++)
+		configs.insert(QFileInfo(list[item]).baseName(), CONFIG_SYSTEM);
+
+	ui.configurationComboBox->clear();
+	ui.configurationComboBox->addItem(QT_TR_NOOP("<default>"), CONFIG_DEFAULT);
+	ui.configurationComboBox->addItem(QT_TR_NOOP("<custom>"), CONFIG_CUSTOM);
+
+	QMap<QString, int>::const_iterator mapIterator = configs.constBegin();
+
+	while (mapIterator != configs.constEnd())
+	{
+		ui.configurationComboBox->addItem(mapIterator.key(), mapIterator.value());
+		mapIterator++;
+	}
+
+	disableGenericSlots = origDisableGenericSlots;
+}
+
+bool x264ConfigDialog::selectConfiguration(QString *selectFile, configType configurationType)
+{
+	bool success = false;
+	bool origDisableGenericSlots = disableGenericSlots;
+
+	disableGenericSlots = true;
+
+	if (configurationType == CONFIG_DEFAULT)
+	{
+		ui.configurationComboBox->setCurrentIndex(0);
+		success = true;
+	}
+	else
+	{
+		for (int index = 0; index < ui.configurationComboBox->count(); index++)
+		{
+			if (ui.configurationComboBox->itemText(index) == selectFile && ui.configurationComboBox->itemData(index).toInt() == configurationType)
+			{
+				ui.configurationComboBox->setCurrentIndex(index);
+				success = true;
+				break;
+			}
+		}
+
+		if (!success)
+			ui.configurationComboBox->setCurrentIndex(1);
+	}
+
+	disableGenericSlots = origDisableGenericSlots;
+
+	return success;
+}
+
+void x264ConfigDialog::generic_currentIndexChanged(int index)
+{
+	if (!disableGenericSlots)
+		ui.configurationComboBox->setCurrentIndex(1);
+}
+
+void x264ConfigDialog::generic_valueChanged(int value)
+{
+	if (!disableGenericSlots)
+		ui.configurationComboBox->setCurrentIndex(1);
+}
+
+void x264ConfigDialog::generic_pressed(void)
+{
+	if (!disableGenericSlots)
+		ui.configurationComboBox->setCurrentIndex(1);
+}
+
+void x264ConfigDialog::generic_textEdited(QString text)
+{
+	if (!disableGenericSlots)
+		ui.configurationComboBox->setCurrentIndex(1);
+}
+
+void x264ConfigDialog::configurationComboBox_currentIndexChanged(int index)
+{
+	bool origDisableGenericSlots = disableGenericSlots;
+
+	disableGenericSlots = true;
+
+	if (index == 0)		// default
+	{
+		ui.deleteButton->setEnabled(false);
+
+		x264PresetOptions defaultOptions;
+		vidEncOptions *defaultEncodeOptions = defaultOptions.getEncodeOptions();
+
+		loadSettings(defaultEncodeOptions, &defaultOptions);
+
+		delete defaultEncodeOptions;
+	}
+	else if (index == 1)	// custom
+		ui.deleteButton->setEnabled(false);
+	else
+	{
+		int configType = ui.configurationComboBox->itemData(index).toInt();
+		QString configFileName;
+
+		ui.deleteButton->setEnabled(configType == CONFIG_USER);
+
+		if (configType == CONFIG_SYSTEM)
+			configFileName = QFileInfo(getSystemConfigDirectory(), ui.configurationComboBox->itemText(index) + ".xml").filePath();
+		else	// CONFIG_USER
+			configFileName = QFileInfo(getUserConfigDirectory(), ui.configurationComboBox->itemText(index) + ".xml").filePath();
+
+		QFile configFile(configFileName);
+
+		if (configFile.exists())
+		{
+			configFile.open(QIODevice::ReadOnly | QIODevice::Text);
+
+			QByteArray fileContents = configFile.readAll();
+			x264PresetOptions options;
+			vidEncOptions *encodeOptions;
+
+			configFile.close();
+			options.fromXml(fileContents.constData());
+			encodeOptions = options.getEncodeOptions();
+
+			loadSettings(encodeOptions, &options);
+
+			delete encodeOptions;
+		}
+		else
+			ui.configurationComboBox->setCurrentIndex(0);
+	}
+
+	disableGenericSlots = origDisableGenericSlots;
+}
+
+void x264ConfigDialog::saveAsButton_pressed(void)
+{
+	char *configDirectory = ADM_getHomeRelativePath("x264");
+
+	ADM_mkdir(configDirectory);
+
+	QString configFileName = QFileDialog::getSaveFileName(this, QT_TR_NOOP("Save As"), configDirectory, QT_TR_NOOP("x264 Configuration File (*.xml)"));
+
+	if (!configFileName.isNull())
+	{
+		QFile configFile(configFileName);
+		vidEncOptions encodeOptions;
+		x264PresetOptions presetOptions;
+
+		configFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
+		saveSettings(&encodeOptions, &presetOptions);
+		presetOptions.setEncodeOptions(&encodeOptions);
+
+		char* xml = presetOptions.toXml();
+
+		configFile.write(xml, strlen(xml));
+		configFile.close();
+
+		delete [] xml;
+
+		fillConfigurationComboBox();
+		selectConfiguration(&QFileInfo(configFileName).baseName(), CONFIG_USER);
+	}
+
+	delete [] configDirectory;
+}
+
+void x264ConfigDialog::deleteButton_pressed(void)
+{
+	QString configFileName = QFileInfo(getUserConfigDirectory(), ui.configurationComboBox->currentText() + ".xml").filePath();
+	QFile configFile(configFileName);
+
+	if (GUI_Question(QT_TR_NOOP("Are you sure you wish to delete the selected configuration?")) && configFile.exists())
+	{
+		disableGenericSlots = true;
+		configFile.remove();
+		ui.configurationComboBox->removeItem(ui.configurationComboBox->currentIndex());
+		disableGenericSlots = false;
+		ui.configurationComboBox->setCurrentIndex(0);	// default
 	}
 }
-*/
+
 // General tab
 void x264ConfigDialog::encodingModeComboBox_currentIndexChanged(int index)
 {
@@ -242,7 +459,7 @@ void x264ConfigDialog::matrixCustomEditButton_pressed()
 
 void x264ConfigDialog::zoneAddButton_pressed()
 {
-	_zoneTableModel.insertRows(0, 1, QModelIndex());
+	zoneTableModel.insertRows(0, 1, QModelIndex());
 	ui.zoneTableView->selectRow(0);
 	ui.zoneTableView->edit(ui.zoneTableView->currentIndex());
 }
@@ -255,7 +472,7 @@ void x264ConfigDialog::zoneEditButton_pressed()
 void x264ConfigDialog::zoneDeleteButton_pressed()
 {
 	if (ui.zoneTableView->currentIndex().row() >= 0 && GUI_Question(QT_TR_NOOP("Are you sure you wish to delete the selected zone?")))
-		_zoneTableModel.removeRows(ui.zoneTableView->currentIndex().row(), 1, QModelIndex());
+		zoneTableModel.removeRows(ui.zoneTableView->currentIndex().row(), 1, QModelIndex());
 }
 
 int x264ConfigDialog::getValueIndexInArray(uint8_t value, const uint8_t valueArray[], int elementCount)
@@ -274,8 +491,34 @@ int x264ConfigDialog::getValueIndexInArray(uint8_t value, const uint8_t valueArr
 	return valueIndex;
 }
 
+bool x264ConfigDialog::loadPresetSettings(vidEncOptions *encodeOptions, x264Options *options)
+{
+	bool origDisableGenericSlots = disableGenericSlots;
+	char *configurationName;
+	configType configurationType;
+
+	disableGenericSlots = true;
+	options->getPresetConfiguration(&configurationName, &configurationType);		
+
+	bool foundConfig = selectConfiguration(&QString(configurationName), configurationType);
+
+	if (!foundConfig)
+		printf("Configuration %s (type %d) could not be found.  Using snapshot.\n", configurationName, configurationType);
+
+	if (configurationName)
+		free(configurationName);
+
+	disableGenericSlots = origDisableGenericSlots;
+
+	return (foundConfig && configurationType != CONFIG_CUSTOM);
+}
+
 void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *options)
 {
+	bool origDisableGenericSlots = disableGenericSlots;
+
+	disableGenericSlots = true;
+
 	// General tab
 	switch (encodeOptions->encodeMode)
 	{
@@ -467,7 +710,7 @@ void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *o
 	ui.vbvBufferSizeSpinBox->setValue(options->getVbvBufferSize());
 	ui.vbvBufferOccupancySpinBox->setValue((int)floor(options->getVbvInitialOccupancy() * 100 + .5));
 
-	_zoneTableModel.removeRows();
+	zoneTableModel.removeRows();
 
 	int zoneCount = options->getZoneCount();
 
@@ -475,7 +718,7 @@ void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *o
 	{
 		x264ZoneOptions** zoneOptions = options->getZones();
 
-		_zoneTableModel.insertRows(0, zoneCount, QModelIndex(), zoneOptions);
+		zoneTableModel.insertRows(0, zoneCount, QModelIndex(), zoneOptions);
 
 		delete [] zoneOptions;
 	}
@@ -503,6 +746,8 @@ void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *o
 	ui.colourMatrixComboBox->setCurrentIndex(getValueIndexInArray(options->getColorMatrix(), colourMatrix, colourMatrixCount));
 	ui.chromaSampleSpinBox->setValue(options->getChromaSampleLocation());
 	ui.fullRangeSamplesCheckBox->setChecked(options->getFullRangeSamples());
+
+	disableGenericSlots = origDisableGenericSlots;
 }
 
 void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *options)
@@ -534,6 +779,9 @@ void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *o
 			break;
 	}
 
+	configType configurationType = (configType)ui.configurationComboBox->itemData(ui.configurationComboBox->currentIndex()).toInt();
+
+	options->setPresetConfiguration(ui.configurationComboBox->currentText().toUtf8().constData(), configurationType);
 	options->setSarAsInput(ui.sarAsInputRadioButton->isChecked());
 
 	if (ui.sarCustomRadioButton->isChecked())
@@ -675,7 +923,7 @@ void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *o
 
 	options->clearZones();
 
-	QList<x264ZoneOptions*> zoneOptions = _zoneTableModel.getList();
+	QList<x264ZoneOptions*> zoneOptions = zoneTableModel.getList();
 
 	for (int zone = 0; zone < zoneOptions.count(); zone++)
 		options->addZone(zoneOptions[zone]);
@@ -696,6 +944,26 @@ void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *o
 	options->setColorMatrix(colourMatrix[ui.colourMatrixComboBox->currentIndex()]);
 	options->setChromaSampleLocation(ui.chromaSampleSpinBox->value());
 	options->setFullRangeSamples(ui.fullRangeSamplesCheckBox->isChecked());
+}
+
+QString x264ConfigDialog::getUserConfigDirectory(void)
+{
+	char *userConfigDirectory = ADM_getHomeRelativePath("x264");
+	QString qstring = QString(userConfigDirectory);
+
+	delete [] userConfigDirectory;
+
+	return qstring;
+}
+
+QString x264ConfigDialog::getSystemConfigDirectory(void)
+{
+	char* pluginPath = ADM_getPluginPath();
+	QString qstring = QString(pluginPath).append("/").append(PLUGIN_SUBDIR);
+
+	delete [] pluginPath;
+
+	return qstring;
 }
 
 extern "C" int showX264ConfigDialog(vidEncConfigParameters *configParameters, vidEncVideoProperties *properties, vidEncOptions *encodeOptions, x264Options *options)

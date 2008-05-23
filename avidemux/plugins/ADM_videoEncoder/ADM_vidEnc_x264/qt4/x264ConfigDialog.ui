@@ -54,23 +54,13 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBox" >
+      <widget class="QComboBox" name="configurationComboBox" >
        <property name="minimumSize" >
         <size>
          <width>200</width>
          <height>0</height>
         </size>
        </property>
-       <item>
-        <property name="text" >
-         <string>&lt;default></string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>&lt;custom></string>
-        </property>
-       </item>
       </widget>
      </item>
      <item>
@@ -123,7 +113,7 @@
      <property name="currentIndex" >
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab" >
+     <widget class="QWidget" name="tab_1" >
       <attribute name="title" >
        <string>General</string>
       </attribute>
@@ -780,7 +770,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_6" >
+     <widget class="QWidget" name="tab_2" >
       <attribute name="title" >
        <string>Motion</string>
       </attribute>
@@ -1365,7 +1355,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_8" >
+     <widget class="QWidget" name="tab_3" >
       <attribute name="title" >
        <string>Partition</string>
       </attribute>
@@ -2013,7 +2003,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_7" >
+     <widget class="QWidget" name="tab_5" >
       <attribute name="title" >
        <string>Analysis</string>
       </attribute>
@@ -2370,7 +2360,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2" >
+     <widget class="QWidget" name="tab_6" >
       <attribute name="title" >
        <string>Quantiser</string>
       </attribute>
@@ -3016,7 +3006,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_5" >
+     <widget class="QWidget" name="tab_7" >
       <attribute name="title" >
        <string>Advanced</string>
       </attribute>
@@ -3404,7 +3394,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_3" >
+     <widget class="QWidget" name="tab_8" >
       <attribute name="title" >
        <string>Output</string>
       </attribute>
