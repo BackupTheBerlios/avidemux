@@ -39,7 +39,7 @@
 #include "ADM_userInterfaces/ADM_render/GUI_render.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
-
+#include "ADM_preview.h"
 //___________________________________
 #define AUDIO_PRELOAD 150
 //___________________________________

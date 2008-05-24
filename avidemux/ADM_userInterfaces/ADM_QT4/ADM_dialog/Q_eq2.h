@@ -6,7 +6,7 @@
 #include "ADM_videoFilter.h"
 #include "ADM_videoFilter/ADM_vidEq2.h"
 #include "DIA_flyDialog.h"
-#include "DIA_flyDialogQt4.h"
+#include "ADM_UIs/ADM_QT4/include/DIA_flyDialogQt4.h"
 #include "DIA_flyEq2.h"
 
 class Ui_eq2Window : public QDialog

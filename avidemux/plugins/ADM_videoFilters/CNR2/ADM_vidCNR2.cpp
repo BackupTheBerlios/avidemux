@@ -77,7 +77,7 @@ static FILTER_PARAM cnr2_template =
 
 //REGISTERX(VF_NOISE, "cnr2",QT_TR_NOOP("Cnr2"),
 //QT_TR_NOOP("Chroma noise reduction filter by MarcFD/Tritical."),VF_CNR2,1,cnr2_create,cnr2_script);
-VF_DEFINE_FILTER(vidCNR2,cnr2_template,
+VF_DEFINE_FILTER_UI(vidCNR2,cnr2_template,
                 cnr2,
                 QT_TR_NOOP("Cnr2"),
                 1,

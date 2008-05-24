@@ -14,7 +14,7 @@
 
 #include "ADM_toolkitGtk.h"
 #include "ADM_videoFilter.h"
-#include "DIA_flyDialog.h"
+#include "DIA_flyDialogGtk.h"
 #include "DIA_factory.h"
 
 
@@ -29,7 +29,7 @@ extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
 extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
 extern void UI_centreCanvasWindow(GtkWindow *window, GtkWidget *canvas, int newCanvasWidth, int newCanvasHeight);
 
-void ADM_flyDialog::postInit(uint8_t reInit)
+void ADM_flyDialogGtk::postInit(uint8_t reInit)
 {
 	if (_slider)
 	{
@@ -49,7 +49,7 @@ void ADM_flyDialog::postInit(uint8_t reInit)
 #endif
 }
 
-uint8_t  ADM_flyDialog::cleanup2(void)
+uint8_t  ADM_flyDialogGtk::cleanup2(void)
 {
 #ifdef USE_JOG
 	physical_jog_shuttle->deregisterCBs (this);
@@ -57,7 +57,7 @@ uint8_t  ADM_flyDialog::cleanup2(void)
 }
 
 #ifdef USE_JOG
-void ADM_flyDialog::jogDial (void * my_data, signed short offset)
+void ADM_flyDialogGtk::jogDial (void * my_data, signed short offset)
 {
     ADM_flyDialog * myFly = static_cast <ADM_flyDialog *> (my_data);
     myFly->sliderSet (myFly->sliderGet() + offset);
@@ -77,7 +77,7 @@ static gboolean on_jogRingTimer (gpointer data)
     return TRUE;
 }
 
-void ADM_flyDialog::jogRing (void * my_data, gfloat angle)
+void ADM_flyDialogGtk::jogRing (void * my_data, gfloat angle)
 {
     if (jogRingTimerID)
     {
@@ -95,14 +95,14 @@ void ADM_flyDialog::jogRing (void * my_data, gfloat angle)
 }
 #endif
 
-float ADM_flyDialog::calcZoomFactor(void)
+float ADM_flyDialogGtk::calcZoomFactor(void)
 {
 	GtkWindow *window = (GtkWindow*)gtk_widget_get_ancestor((GtkWidget*)_canvas, GTK_TYPE_WINDOW);
 
 	return UI_calcZoomToFitScreen(window, (GtkWidget*)_canvas, _w, _h);
 }
 
-uint8_t  ADM_flyDialog::display(void)
+uint8_t  ADM_flyDialogGtk::display(void)
 {
 	ADM_assert(_canvas);
 	ADM_assert(_rgbBufferOut);
@@ -112,13 +112,13 @@ uint8_t  ADM_flyDialog::display(void)
 	return 1; 
 }
 
-uint32_t ADM_flyDialog::sliderGet(void)
+uint32_t ADM_flyDialogGtk::sliderGet(void)
 {
 	ADM_assert(_slider);
 	return (uint32_t)gtk_range_get_value (GTK_RANGE(_slider));
 }
 
-uint8_t ADM_flyDialog::sliderSet(uint32_t value)
+uint8_t ADM_flyDialogGtk::sliderSet(uint32_t value)
 {
 	ADM_assert(_slider);
 
@@ -127,12 +127,12 @@ uint8_t ADM_flyDialog::sliderSet(uint32_t value)
 	return 1; 
 }
 
-uint8_t ADM_flyDialog::isRgbInverted(void)
+uint8_t ADM_flyDialogGtk::isRgbInverted(void)
 {
 	return 0; 
 }
 
-void ADM_flyDialog::setupMenus (const void * params, 
+void ADM_flyDialogGtk::setupMenus (const void * params, 
                                 const MenuMapping * menu_mapping,
                                 uint32_t menu_mapping_count)
 {
@@ -169,7 +169,7 @@ void ADM_flyDialog::setupMenus (const void * params,
     }
 }
 
-uint32_t ADM_flyDialog::getMenuValue (const MenuMapping * mm)
+uint32_t ADM_flyDialogGtk::getMenuValue (const MenuMapping * mm)
 {
     ADM_assert (_cookie); // should be the dialog pointer
     GtkDialog * dialog = static_cast <GtkDialog *> (_cookie);
@@ -181,7 +181,7 @@ uint32_t ADM_flyDialog::getMenuValue (const MenuMapping * mm)
     return (mm->menu [currValue].val);
 }
 
-void ADM_flyDialog::getMenuValues (void * params,
+void ADM_flyDialogGtk::getMenuValues ( void * params,
                                    const MenuMapping * menu_mapping,
                                    uint32_t menu_mapping_count)
 {
@@ -196,7 +196,7 @@ void ADM_flyDialog::getMenuValues (void * params,
 }
 
 const MenuMapping *
-ADM_flyDialog::lookupMenu (const char * widgetName,
+ADM_flyDialogGtk::lookupMenu (const char * widgetName,
                            const MenuMapping * menu_mapping,
                            uint32_t menu_mapping_count)
 {

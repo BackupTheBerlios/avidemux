@@ -18,7 +18,7 @@ static FILTER_PARAM equalizer_template={8,{"0","1","2","3"
 					,"4","5","6","7"}};
 //REGISTERX(VF_COLORS, "equalizer",QT_TR_NOOP("Luma equalizer"),
 //QT_TR_NOOP("Luma correction filter with histogram."),VF_EQUALIZER,1,equalizer_create,equalizer_script);
-VF_DEFINE_FILTER(vidEqualizer,equalizer_template,
+VF_DEFINE_FILTER_UI(vidEqualizer,equalizer_template,
                 equalizer,
                 QT_TR_NOOP("Luma equalizer"),
                 1,

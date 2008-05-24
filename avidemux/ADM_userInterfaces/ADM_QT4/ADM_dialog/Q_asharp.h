@@ -6,7 +6,7 @@
 #include "ADM_videoFilter.h"
 #include "ADM_videoFilter/ADM_vidASharp_param.h"
 #include "DIA_flyDialog.h"
-#include "DIA_flyDialogQt4.h"
+#include "ADM_UIs/ADM_QT4/include/DIA_flyDialogQt4.h"
 #include "DIA_flyAsharp.h"
 
 class Ui_asharpWindow : public QDialog

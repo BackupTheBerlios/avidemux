@@ -16,6 +16,7 @@ SET(ADM_coreImage_SRCS
         ADM_vidFieldASM.cpp
         ADM_vidFieldBlend.cpp
         ADM_interlaceUtil.cpp
+        DIA_flyDialog.cpp
 )
 
 ADD_LIBRARY(ADM_coreImage SHARED ${ADM_coreImage_SRCS})

@@ -39,7 +39,7 @@
 
 
 static ColYuvRgb rgbConverter(640,480
-#if ADM_UI_TYPE_BUILD == 4 // QT4 FIXME
+#if ADM_UI_TYPE_BUILD == ADM_UI_QT4 
     ,1
 #endif    
 );

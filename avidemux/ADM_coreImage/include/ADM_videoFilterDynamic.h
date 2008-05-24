@@ -42,8 +42,10 @@ typedef FilterDescriptor *(VF_getDescriptor)(void);
 /*
  *      Same as above, but this filter is using a specific UI and cannot be used for another UI 
  */
-    
-#define VF_DEFINE_FILTER_UI(ui,myClass,myParam,name,displayname,version,category,description) \
+#ifndef  ADM_UI_TYPE_BUILD 
+#define VF_DEFINE_FILTER_UI ADM_UI_TYPE_BUILD_IS_NOT_DEFINED
+#else
+#define VF_DEFINE_FILTER_UI(myClass,myParam,name,displayname,version,category,description) \
     SCRIPT_CREATE(name##_script,myClass,myParam); \
     BUILD_CREATE(name##_create,myClass); \
         static FilterDescriptor descriptor_vf_id_##myClass (\
@@ -55,9 +57,9 @@ typedef FilterDescriptor *(VF_getDescriptor)(void);
                                                                 name##_create, \
                                                                 name##_script, \
                                                                 ADM_FILTER_API_VERSION, \
-                                                                ui); \
+                                                                ADM_UI_TYPE_BUILD); \
     extern "C" {        FilterDescriptor *ADM_VF_getDescriptor(void) {return &descriptor_vf_id_##myClass ;}};                                                   
-
+#endif
 /* Hook, filters cannot include config.h as they are framework independant */
 #ifdef QT_TR_NOOP
 #undef QT_TR_NOOP

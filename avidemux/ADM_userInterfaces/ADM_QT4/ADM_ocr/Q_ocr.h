@@ -6,7 +6,7 @@
 #include "ADM_videoFilter.h"
 #include "ADM_ocr/ADM_ocr.h"
 #include "ADM_ocr/ADM_ocrInternal.h"
-#include "../ADM_dialog/DIA_flyDialogQt4.h"
+#include "ADM_UIs/ADM_QT4/include/DIA_flyDialogQt4.h"
 
 class Ui_ocrWindow : public QDialog
 {

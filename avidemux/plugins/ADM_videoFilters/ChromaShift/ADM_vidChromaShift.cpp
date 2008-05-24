@@ -32,7 +32,7 @@ REGISTERX(VF_COLORS, "chromashift",QT_TR_NOOP("Chroma shift")
 SCRIPT_CREATE(chromashift_script,ADMVideoChromaShift,cshiftParam);
 BUILD_CREATE(create_chromashift,ADMVideoChromaShift);
 */
-VF_DEFINE_FILTER(ADMVideoChromaShift,cshiftParam,
+VF_DEFINE_FILTER_UI(ADMVideoChromaShift,cshiftParam,
     chromashift,
                 QT_TR_NOOP("Chroma shift"),
                 1,

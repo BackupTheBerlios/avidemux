@@ -38,6 +38,7 @@
 #define MODULE_NAME MODULE_PREVIEW
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_osSupport/ADM_quota.h"
+#include "ADM_preview.h"
 //
 
 extern ADM_UI_TYPE UI_GetCurrentUI(void);
@@ -145,7 +146,7 @@ int max=allfilters.size();
  *  \brief try to load the plugin given as argument..
  */
 
-#define Fail(x) {printf(#x"\n");goto er;}
+#define Fail(x) {printf("%s:"#x"\n",file);goto er;}
 static bool tryLoadingFilterPlugin(const char *file)
 {
 	ADM_vf_pluginLoader *dll=new ADM_vf_pluginLoader(file);
@@ -169,7 +170,7 @@ static bool tryLoadingFilterPlugin(const char *file)
     allfilters.push_back (myDesc);
     filterCategories[myDesc->category].push_back(myDesc);
     pluginLoaderQueue.push_back(dll); // Needed for cleanup. FIXME TODO Delete it.
-    aprintf("[Filters] Registered filter %s as  %s\n",file,desc->name);
+    printf("[Filters] Registered filter %s as  %s\n",file,desc->name);
     return true;
 	// Tag it
 	// Fail!

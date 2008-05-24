@@ -34,7 +34,7 @@
 static FILTER_PARAM mpresizeParam={3,{"w","h","algo"}};
 
 //********** Register chunk ************
-VF_DEFINE_FILTER(AVDMVideoStreamResize,mpresizeParam,
+VF_DEFINE_FILTER_UI(AVDMVideoStreamResize,mpresizeParam,
                 resize,
                 QT_TR_NOOP("Resize"),
                 1,

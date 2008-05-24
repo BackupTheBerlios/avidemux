@@ -9,7 +9,7 @@ class ADMfont;
 #include "ADM_videoFilter.h"
 #include "ADM_videoFilter/ADM_vidSRT.h"
 #include "DIA_flyDialog.h"
-#include "DIA_flyDialogQt4.h"
+#include "ADM_UIs/ADM_QT4/include/DIA_flyDialogQt4.h"
 #include "DIA_flySrtPos.h"
 
 class Ui_srtWindow : public QDialog

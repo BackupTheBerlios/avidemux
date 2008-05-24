@@ -14,8 +14,6 @@
 
 #include "ADM_default.h"
 
-
-#include "ADM_userInterfaces/ADM_render/GUI_render.h"
 #include "ADM_videoFilter.h"
 #include "DIA_flyDialog.h"
 #include "ADM_assert.h"

@@ -22,7 +22,7 @@
 #include "DIA_flyDialog.h"
 #include "DIA_flyDialogQt4.h"
 
-void ADM_flyDialog::postInit(uint8_t reInit)
+void ADM_flyDialogQt4::postInit(uint8_t reInit)
 {
 	QWidget *graphicsView = ((ADM_QCanvas*)_canvas)->parentWidget();
 	QSlider  *slider=(QSlider *)_slider;
@@ -33,9 +33,9 @@ void ADM_flyDialog::postInit(uint8_t reInit)
 	slider->setMaximum(nbFrames);
 }
 
-float ADM_flyDialog::calcZoomFactor(void) {return 1;}
+float ADM_flyDialogQt4::calcZoomFactor(void) {return 1;}
 
-uint8_t  ADM_flyDialog::display(void)
+uint8_t  ADM_flyDialogQt4::display(void)
 {
    ADM_QCanvas *view=(ADM_QCanvas *)_canvas;
    ADM_assert(view);
@@ -47,27 +47,42 @@ uint8_t  ADM_flyDialog::display(void)
    view->repaint();
   return 1; 
 }
-uint32_t ADM_flyDialog::sliderGet(void)
+uint32_t ADM_flyDialogQt4::sliderGet(void)
 {
   QSlider  *slide=(QSlider *)_slider;
   ADM_assert(slide);
   return slide->value();
   
 }
-uint8_t     ADM_flyDialog::sliderSet(uint32_t value)
+uint8_t     ADM_flyDialogQt4::sliderSet(uint32_t value)
 {
   QSlider  *slide=(QSlider *)_slider;
   ADM_assert(slide);
   slide->setValue(value);
   return 1; 
 }
-uint8_t  ADM_flyDialog::isRgbInverted(void)
+uint8_t  ADM_flyDialogQt4::isRgbInverted(void)
 {
   return 1; 
 }
-uint8_t ADM_flyDialog::cleanup2(void)
+uint8_t ADM_flyDialogQt4::cleanup2(void)
 {
   return 1; 
 }
+/** WTF are these ???? */
+  void    ADM_flyDialogQt4::setupMenus (const void * params,
+                       const MenuMapping * menu_mapping,
+                      uint32_t menu_mapping_count) 
+  {ADM_assert(0);return ;};
+  void  ADM_flyDialogQt4::getMenuValues ( void * mm,
+                  const MenuMapping * menu_mapping,
+                  uint32_t menu_mapping_count)
+  {ADM_assert(0);return;};
+  uint32_t  ADM_flyDialogQt4::getMenuValue (const MenuMapping * mm)  
+  {ADM_assert(0);return 0;};                    
+   const MenuMapping *ADM_flyDialogQt4::lookupMenu (const char * widgetName,
+                                             const MenuMapping * menu_mapping,
+                                             uint32_t menu_mapping_count)  
+  {ADM_assert(0);return NULL;};
 
 //EOF

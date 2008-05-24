@@ -64,7 +64,7 @@ static FILTER_PARAM coloryuv_template={19,
 //    ("Alter colors (auto white balance etc...). Ported from Avisynth."),VF_COLOR_YUV,1,coloryuv_create,coloryuv_script);
 
 //******************************************
-VF_DEFINE_FILTER(ADMVideoColorYuv,coloryuv_template,
+VF_DEFINE_FILTER_UI(ADMVideoColorYuv,coloryuv_template,
                 coloryuv,
                 QT_TR_NOOP("Avisynth ColorYUV"),
                 1,

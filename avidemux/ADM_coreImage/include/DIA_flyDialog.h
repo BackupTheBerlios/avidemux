@@ -26,7 +26,7 @@
 #define ADM_FLY_DIALOG_H
 #include "ADM_colorspace.h"
 enum ResizeMethod {
-    RESIZE_NONE = 0,	// No automatic resize
+        RESIZE_NONE = 0,	// No automatic resize
 	RESIZE_AUTO = 1,	// Resize image when convenient (YUV: after filter, RGB: before applying filter)
 	RESIZE_LAST = 2		// Resize image after filter has been applied (slower for RGB)
 };
@@ -46,37 +46,29 @@ typedef float gfloat;
 class ADM_flyDialog
 {
   protected:
-          uint32_t _w,_h, _zoomW, _zoomH;
-          float _zoom;
-          uint32_t _zoomChangeCount;
+          uint32_t      _w, _h, _zoomW, _zoomH;
+          float         _zoom;
+          uint32_t      _zoomChangeCount;
           AVDMGenericVideoStream *_in;
-  
-          ADMImage *_yuvBuffer;
-          ADMImage *_yuvBufferOut;
-          uint8_t  *_rgbBuffer;
-          uint8_t  *_rgbBufferOut;
-		  uint8_t  *_rgbBufferDisplay;
-          uint8_t  _isYuvProcessing;
-		  ResizeMethod _resizeMethod;
-		  ADMImageResizer *_resizer;
+      
+          ADMImage      *_yuvBuffer;
+          ADMImage      *_yuvBufferOut;
+          uint8_t       *_rgbBuffer;
+          uint8_t       *_rgbBufferOut;
+          uint8_t       *_rgbBufferDisplay;
+          uint8_t       _isYuvProcessing;
+          ResizeMethod  _resizeMethod;
+          ADMImageResizer *_resizer;
 
-  virtual void postInit(uint8_t reInit);
-		  float calcZoomFactor(void);
+  
+  
           void copyYuvFinalToRgb(void);
           void copyYuvScratchToRgb(void);
-		  void copyRgbFinalToDisplay(void);
-          void setupMenus (const void * params,
-                           const MenuMapping * menu_mapping,
-                           uint32_t menu_mapping_count);
-          void getMenuValues (void * params,
-                              const MenuMapping * menu_mapping,
-                              uint32_t menu_mapping_count);
+          void copyRgbFinalToDisplay(void);
+          
   public:
           void recomputeSize(void);
-          uint32_t getMenuValue (const MenuMapping * mm);
-          const MenuMapping * lookupMenu (const char * widgetName,
-                                          const MenuMapping * menu_mapping,
-                                          uint32_t menu_mapping_count);
+         
   public:
           void    *_cookie; // whatever
           void    *_slider; // widget
@@ -92,13 +84,13 @@ class ADM_flyDialog
   virtual uint8_t    sliderChanged(void);
         /* This is GTK/QT/whatever dependant */
           
-          uint8_t  display(void);
-          uint32_t sliderGet(void);
-          uint8_t  sliderSet(uint32_t value);
-          uint8_t  isRgbInverted(void);
+  
+          
+          
+  
   virtual uint8_t  update(void) {};
-          uint8_t  cleanup(void);
-  virtual uint8_t  cleanup2(void);
+            uint8_t  cleanup(void);
+  
 
 #ifdef USE_JOG
   static void jogDial (void * my_data, signed short offset);
@@ -108,6 +100,29 @@ class ADM_flyDialog
           ADM_flyDialog(uint32_t width, uint32_t height, AVDMGenericVideoStream *in,
                              void *canvas, void *slider, int yuv, ResizeMethod resizeMethod);
   virtual ~ADM_flyDialog(void);
-};
+// UI dependant part
+// They are not defined as pure to avoid unresolved problem, especially on win32.
+// You should never use flyDialog as is, but using the macro to pull flyDialogGtk/flyDialogQt4/... 
+  virtual uint8_t  cleanup2(void) {ADM_assert(0);return 0;};
+  virtual uint8_t  isRgbInverted(void){ADM_assert(0);return 0;};;
+  virtual uint8_t  display(void){ADM_assert(0);return 0;};;
+  virtual float   calcZoomFactor(void){ADM_assert(0);return 0;};;
+  virtual uint32_t sliderGet(void){ADM_assert(0);return 0;};;
+  virtual uint8_t  sliderSet(uint32_t value)  {ADM_assert(0);return 0;};
+  virtual void    postInit(uint8_t reInit){ADM_assert(0);return ;};;
+  virtual void    setupMenus (const void * params,
+                         const MenuMapping * menu_mapping,
+                        uint32_t menu_mapping_count) {ADM_assert(0);return ;};
+  virtual void  getMenuValues ( void * mm,
+                    const MenuMapping * menu_mapping,
+                    uint32_t menu_mapping_count) {ADM_assert(0);return;};
+  virtual uint32_t  getMenuValue (const MenuMapping * mm)  {ADM_assert(0);return 0;};                    
+  virtual  const MenuMapping *lookupMenu (const char * widgetName,
+                                               const MenuMapping * menu_mapping,
+                                               uint32_t menu_mapping_count)  {ADM_assert(0);return NULL;};
+             
+                    
+ 
+ };
 
 #endif

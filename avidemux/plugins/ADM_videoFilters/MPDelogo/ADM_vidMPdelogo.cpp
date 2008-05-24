@@ -48,8 +48,8 @@ static FILTER_PARAM mpdelogoParam={6,{"xoff","yoff","lw","lh","band","show"}};
 //REGISTERX(VF_MISC, "mpdelogo",QT_TR_NOOP("MPlayer delogo"),
 //QT_TR_NOOP("Blend a logo by interpolating its surrounding box."),VF_MPDELOGO,1,mpdelogo_create,mpdelogo_script);
 //******************************************
-VF_DEFINE_FILTER(ADMVideoMPdelogo,mpdelogoParam,
-    mpdelogo,
+VF_DEFINE_FILTER_UI(ADMVideoMPdelogo,mpdelogoParam,
+                mpdelogo,
                 QT_TR_NOOP("MPlayer delogo"),
                 1,
                 VF_MISC,

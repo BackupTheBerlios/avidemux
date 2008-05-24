@@ -40,6 +40,8 @@
 #include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
 
 #include "ADM_video/ADM_vidMisc.h"
+#include "ADM_preview.h"
+
 extern void    UI_purge(void );
 //____________________________________
 

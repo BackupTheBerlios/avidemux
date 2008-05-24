@@ -61,7 +61,7 @@
 #include "ADM_codecs/ADM_ffmpeg.h"
 #include "ADM_libraries/ADM_libmpeg2enc/ADM_mpeg2enc.h"
 #include "ADM_video/ADM_vidMisc.h"
-
+#include "ADM_preview.h"
 void A_handleSecondTrack (int tracktype);
 int A_delete(uint32_t start, uint32_t end);
 void A_saveImg (char *name);

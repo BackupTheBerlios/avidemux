@@ -1,5 +1,7 @@
-/****************************************************************************
- copyright            : (C) 2001 by mean
+/** **************************************************************************
+     \file GUI_render.h
+     \brief Lib to draw stuff on screen.
+    copyright            : (C) 2001--2008 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -20,6 +22,7 @@
 #include "ADM_image.h"
 
 class AVDMGenericVideoStream;
+
 typedef struct
 {
     void *display;
@@ -30,14 +33,6 @@ typedef struct
 	int height;
 } GUI_WindowInfo;
 
-typedef enum 
-{
-    ADM_PREVIEW_NONE, 
-    ADM_PREVIEW_OUTPUT,
-    ADM_PREVIEW_SIDE,
-    ADM_PREVIEW_TOP,
-    ADM_PREVIEW_SEPARATE
-}ADM_PREVIEW_MODE;
 
 typedef enum 
 {
@@ -49,27 +44,8 @@ typedef enum
         ZOOM_INVALID
 }renderZoom;
 
-
-ADM_PREVIEW_MODE getPreviewMode(void);
-void             setPreviewMode(ADM_PREVIEW_MODE preview);
-void             changePreviewZoom(renderZoom nzoom);
-
-class admPreview
-{
-  public:
-      static uint8_t update(uint32_t framenum);
-      static void start(void);
-      static void stop(void);
-      static void setMainDimension(uint32_t, uint32_t );
-      static void updateFilters(AVDMGenericVideoStream *first,AVDMGenericVideoStream *last);
-      static void deferDisplay(uint32_t onoff,uint32_t startat);
-      static void displayNow(uint32_t framenum);
-      static void cleanUp(void);  
-      static ADMImage *getBuffer(void);
-};
-
 uint8_t renderInit( void );
-void renderDestroy(void);
+void   renderDestroy(void);
 uint8_t renderResize(uint32_t w, uint32_t h,uint32_t phyW,uint32_t phyH);
 uint8_t renderRefresh(void);
 uint8_t renderExpose(void);
@@ -83,11 +59,14 @@ uint8_t renderHasAccelZoom(void);
 uint8_t renderLock(void);
 uint8_t renderUnlock(void);
 
+/* These functions are trampolined through render as they are UI dependant */
+
 void *UI_getDrawWidget(void);
 void UI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr);
 void UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h);
 void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo);
 
+/* The list of render engine we support. Warning the list is UI dependant, i.e. for example on macOsX, the GTK version can do Xv, but the QT4 one cannot */
 typedef enum 
 {
         RENDER_GTK=0,

@@ -1,7 +1,7 @@
 SET(ADM_LIB ADM_dialogGtk)
 
 SET(${ADM_LIB}_SRCS
-	DIA_about.cpp     DIA_calculator.cpp   DIA_crop.cpp       DIA_flyDialog.cpp  DIA_preview.cpp     DIA_srt.cpp      DIA_xvid4.cpp
+	DIA_about.cpp     DIA_calculator.cpp   DIA_crop.cpp       DIA_preview.cpp     DIA_srt.cpp      DIA_xvid4.cpp
 	DIA_acodec.cpp    DIA_encoding.cpp   DIA_hue.cpp        DIA_ocr.cpp       DIA_properties.cpp  DIA_vcodec.cpp   DIA_xvid.cpp
 	DIA_eq2.cpp        DIA_idx_pg.cpp     DIA_partial.cpp   DIA_quota.cpp       DIA_vobsub.cpp
 	DIA_asharp.cpp    DIA_jobs.cpp       DIA_pause.cpp     DIA_recent.cpp      DIA_working.cpp
