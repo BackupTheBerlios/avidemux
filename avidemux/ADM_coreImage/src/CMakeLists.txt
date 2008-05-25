@@ -20,7 +20,7 @@ SET(ADM_coreImage_SRCS
 )
 
 ADD_LIBRARY(ADM_coreImage SHARED ${ADM_coreImage_SRCS})
-
+ADD_SOURCE_CFLAGS(DIA_flyDialog.cpp " -DADM_UI_TYPE_BUILD=99")
 IF (APPLE)
 	TARGET_LINK_LIBRARIES(ADM_coreImage -Wl,-read_only_relocs,suppress)
 ENDIF (APPLE)

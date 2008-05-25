@@ -24,7 +24,20 @@
  ***************************************************************************/
 #ifndef ADM_FLY_DIALOG_H
 #define ADM_FLY_DIALOG_H
+
+#if !defined(ADM_UI_TYPE_BUILD)
+#error No ADM_UI_TYPE_BUILD defined
+#endif
+#include "DIA_uiTypes.h"
+
+#if ADM_UI_TYPE_BUILD == ADM_UI_QT4
+        #include <QtGui/QWidget>
+        #include <QtGui/QDialog>
+#endif 
+
+#include "ADM_default.h"
 #include "ADM_colorspace.h"
+#include "ADM_videoFilter.h"
 enum ResizeMethod {
         RESIZE_NONE = 0,	// No automatic resize
 	RESIZE_AUTO = 1,	// Resize image when convenient (YUV: after filter, RGB: before applying filter)
@@ -61,7 +74,7 @@ class ADM_flyDialog
           ADMImageResizer *_resizer;
 
   
-  
+          void EndConstructor(void);
           void copyYuvFinalToRgb(void);
           void copyYuvScratchToRgb(void);
           void copyRgbFinalToDisplay(void);
@@ -120,9 +133,30 @@ class ADM_flyDialog
   virtual  const MenuMapping *lookupMenu (const char * widgetName,
                                                const MenuMapping * menu_mapping,
                                                uint32_t menu_mapping_count)  {ADM_assert(0);return NULL;};
-             
-                    
+};          
+#ifdef ADM_UI_TYPE_BUILD
+#if ADM_UI_TYPE_BUILD == ADM_UI_QT4
+  #include "DIA_flyDialogQt4.h"
+  #define FLY_DIALOG_TYPE ADM_flyDialogQt4
+#else 
+  #if ADM_UI_TYPE_BUILD == ADM_UI_GTK
+    #include "DIA_flyDialogGtk.h"
+    #define FLY_DIALOG_TYPE ADM_flyDialogGtk
+  #else 
+    #if ADM_UI_TYPE_BUILD == ADM_UI_CLI
+      #include "DIA_flyDialogCli.h"
+      #define FLY_DIALOG_TYPE ADM_flyDialogCli
+    #else
+        #if ADM_UI_TYPE_BUILD != ADM_UI_NONE
+#error unknown UI type
+        #endif
+    #endif //CLI
+  #endif //GTK
+#endif // QT
+#else
+  #define FLY_DIALOG_TYPE ADM_UI_TYPE_BUILD_IS_NOT_DEFINED
+#endif
  
- };
+ 
 
 #endif

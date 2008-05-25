@@ -93,7 +93,7 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in)
 	imgsrc=new ADMImage(w,h);
         imgdisplay=new ADMImage(w,h);
 	
-        //if(curframe<max) max=curframe;
+        max=max/2;
         
 	ADM_assert(in->getFrameNumberNoAlloc(max, &l, imgsrc,&f));
         memcpy(imgdisplay->data+w*h,imgsrc->data+w*h,(w*h)>>1);

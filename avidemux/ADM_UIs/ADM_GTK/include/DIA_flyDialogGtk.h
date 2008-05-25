@@ -28,6 +28,8 @@
 class ADM_flyDialogGtk : public ADM_flyDialog
 {
 public:
+  ADM_flyDialogGtk(uint32_t width, uint32_t height, AVDMGenericVideoStream *in,
+                              void *canvas, void *slider, int yuv, ResizeMethod resizeMethod);
   virtual uint8_t  cleanup2(void);
   virtual uint8_t  isRgbInverted(void);
   virtual uint8_t  display(void);

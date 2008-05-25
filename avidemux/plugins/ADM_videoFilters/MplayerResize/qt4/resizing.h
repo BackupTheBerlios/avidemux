@@ -21,6 +21,7 @@ protected:
 
 public:
 	resizeWindow(resParam *param);
+	~resizeWindow();
 	Ui_resizeDialog ui;
 
 public slots:

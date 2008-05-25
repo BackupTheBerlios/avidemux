@@ -21,6 +21,12 @@
 #include "ADM_videoFilter.h"
 #include "DIA_flyDialog.h"
 #include "DIA_flyDialogQt4.h"
+  ADM_flyDialogQt4::ADM_flyDialogQt4(uint32_t width, uint32_t height, AVDMGenericVideoStream *in,
+                              void *canvas, void *slider, int yuv, ResizeMethod resizeMethod):
+                                ADM_flyDialog(width,height,in,canvas,slider,yuv,resizeMethod) 
+{
+        EndConstructor();
+}
 
 void ADM_flyDialogQt4::postInit(uint8_t reInit)
 {

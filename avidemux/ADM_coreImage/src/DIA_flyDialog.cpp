@@ -39,13 +39,10 @@ ADM_flyDialog::ADM_flyDialog(uint32_t width,uint32_t height,AVDMGenericVideoStre
 	_cookie = NULL;
 	_resizeMethod = resizeMethod;
         _zoomChangeCount = 0;
+        _resizer=NULL;
+        _rgbBufferDisplay=NULL;
 
-	if (isRgbInverted())
-		_rgb=new ColYuvRgb(_w,_h,1);
-	else
-		_rgb=new ColYuvRgb(_w,_h);
-
-	_rgb->reset(_w,_h);
+	_rgb=NULL;
 
 	_yuvBuffer=new ADMImage(_w,_h);
 
@@ -62,45 +59,59 @@ ADM_flyDialog::ADM_flyDialog(uint32_t width,uint32_t height,AVDMGenericVideoStre
 
 	_rgbBufferOut =new uint8_t [_w*_h*4];
 
-	if (_resizeMethod == RESIZE_AUTO || _resizeMethod == RESIZE_LAST)
-	{
-		_zoom = calcZoomFactor();
+	
 
-		if (_zoom == 1)
-			_resizeMethod = RESIZE_NONE;
-		else
-		{
-			_zoomW = uint32_t (_w * _zoom);
-			_zoomH = uint32_t (_h * _zoom);
-		}
-	}
-        else
-		_zoom = 1;
-
-	if (_resizeMethod == RESIZE_AUTO || _resizeMethod == RESIZE_LAST)
-	{
-		PixelFormat sourceColour;
-
-		if (_resizeMethod == RESIZE_AUTO || _isYuvProcessing)
-			sourceColour = PIX_FMT_YUV420P;
-		else
-			sourceColour = PIX_FMT_RGB32;
-
-		_resizer = new ADMImageResizer(_w, _h, _zoomW, _zoomH, sourceColour, PIX_FMT_RGB32);
-		_rgbBufferDisplay = new uint8_t[_w * _h * 4];
-	}
-	else
-	{
-		_zoomW = _w;
-		_zoomH = _h;
-
-		_resizer = NULL;
-		_rgbBufferDisplay = NULL;
-	}
-
-	postInit (false);
+	
 }
+/**
+ *      \fn Endconstructor
+ *      \brief We call some virtual functions in the constructor; it does not work, so we do the 2nd part of the constructor here
+ */
+void ADM_flyDialog::EndConstructor(void)
+  {
+    if (isRgbInverted())
+                _rgb=new ColYuvRgb(_w,_h,1);
+        else
+                _rgb=new ColYuvRgb(_w,_h);
 
+        _rgb->reset(_w,_h);
+        if (_resizeMethod == RESIZE_AUTO || _resizeMethod == RESIZE_LAST)
+                {
+                        _zoom = calcZoomFactor();
+
+                        if (_zoom == 1)
+                                _resizeMethod = RESIZE_NONE;
+                        else
+                        {
+                                _zoomW = uint32_t (_w * _zoom);
+                                _zoomH = uint32_t (_h * _zoom);
+                        }
+                }
+                else
+                        _zoom = 1;
+
+                if (_resizeMethod == RESIZE_AUTO || _resizeMethod == RESIZE_LAST)
+                {
+                        PixelFormat sourceColour;
+
+                        if (_resizeMethod == RESIZE_AUTO || _isYuvProcessing)
+                                sourceColour = PIX_FMT_YUV420P;
+                        else
+                                sourceColour = PIX_FMT_RGB32;
+
+                        _resizer = new ADMImageResizer(_w, _h, _zoomW, _zoomH, sourceColour, PIX_FMT_RGB32);
+                        _rgbBufferDisplay = new uint8_t[_w * _h * 4];
+                }
+                else
+                {
+                        _zoomW = _w;
+                        _zoomH = _h;
+
+                        _resizer = NULL;
+                        _rgbBufferDisplay = NULL;
+                }
+                postInit (false);
+  }
 void ADM_flyDialog::recomputeSize(void)
 {
     float new_zoom = calcZoomFactor();
@@ -189,7 +200,8 @@ uint8_t ADM_flyDialog::cleanup(void)
 */
 ADM_flyDialog::~ADM_flyDialog(void)
 {
-  cleanup2();
+  
+  // FIXME cleanup2();
   cleanup(); 
 }
 

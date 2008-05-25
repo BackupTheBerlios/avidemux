@@ -209,5 +209,10 @@ ADM_flyDialogGtk::lookupMenu (const char * widgetName,
 
     return 0;
 }
-
+ADM_flyDialogGtk::ADM_flyDialogGtk(uint32_t width, uint32_t height, AVDMGenericVideoStream *in,
+                              void *canvas, void *slider, int yuv, ResizeMethod resizeMethod):
+                                ADM_flyDialog(width,height,in,canvas,slider,yuv,resizeMethod) 
+{
+    EndConstructor();
+};
 //EOF

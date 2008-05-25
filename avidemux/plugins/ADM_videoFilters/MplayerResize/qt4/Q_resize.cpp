@@ -21,7 +21,10 @@ static double aspectRatio[2][3]={
                               {1.,1.066667,1.43} // PAL  1:1 4:3 16:9
                             };
 #define aprintf printf
-
+resizeWindow::~resizeWindow()
+  {
+    
+  }
 resizeWindow::resizeWindow(resParam *param)     : QDialog()
  {
      ui.setupUi(this);

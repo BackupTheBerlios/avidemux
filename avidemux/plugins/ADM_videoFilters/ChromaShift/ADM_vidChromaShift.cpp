@@ -16,10 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "ADM_default.h"
-
-
+#include "DIA_flyDialog.h"
 #include "ADM_videoFilterDynamic.h"
+
 #include "ADM_vidChromaShift.h"
 
 

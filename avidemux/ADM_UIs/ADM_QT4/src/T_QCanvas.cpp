@@ -13,8 +13,12 @@
 ***************************************************************************///
 
 #include <QtGui/QPainter>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QSlider>
 
 #include "ADM_default.h"
+
+#include "ADM_videoFilter.h"
 #include "DIA_flyDialogQt4.h"
 
 void ADM_QCanvas::changeSize(uint32_t w,uint32_t h)

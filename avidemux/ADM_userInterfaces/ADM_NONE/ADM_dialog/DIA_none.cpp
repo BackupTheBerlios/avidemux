@@ -32,11 +32,13 @@
 
 
 #include "ADM_videoFilter/ADM_vidAnimated_param.h"
+#if 0
 #include "ADM_videoFilter/ADM_vidASharp_param.h"
 #include "ADM_videoFilter/ADM_vidChromaShift_param.h"
 #include "ADM_videoFilter/ADM_vidContrast.h"
 #include "ADM_videoFilter/ADM_vidEq2.h"
 #include "ADM_videoFilter/ADM_vidHue.h"
+#endif
 #include "ADM_videoFilter/ADM_vobsubinfo.h"
 #include "ADM_videoFilter/ADM_vidVobSub.h"
 
@@ -66,10 +68,7 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 
 uint8_t DIA_animated(ANIMATED_PARAM *param) {return 0;}
 
-uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in) {return 0;}
-uint8_t DIA_getEQ2Param(Eq2_Param *param, AVDMGenericVideoStream *in) {return 0;}
 
-uint8_t DIA_getHue(Hue_Param *param, AVDMGenericVideoStream *in) {return 0;}
 
 uint8_t DIA_getPartial(PARTIAL_CONFIG *param,AVDMGenericVideoStream *son,AVDMGenericVideoStream *previous) {return 0;}
 uint8_t DIA_pipe(char **cmd,char **param) {return 0;}
@@ -94,12 +93,9 @@ uint8_t DIA_kerneldeint(uint32_t *order, uint32_t *threshold, uint32_t *sharp,
                           uint32_t *twoway, uint32_t *map) {return 0;}
 uint8_t DIA_4entries(char *title,uint32_t *left,uint32_t *right,uint32_t *top,uint32_t *bottom) {return 0;}
 uint8_t DIA_videoCodec(int *codecIndex) {return 0;}
-uint8_t DIA_getChromaShift( AVDMGenericVideoStream *instream,CHROMASHIFT_PARAM *param ) {return 0;}
-uint8_t DIA_contrast(AVDMGenericVideoStream *astream,CONTRAST_PARAM *param) {return 0;}
 uint8_t DIA_audioCodec( AUDIOENCODER *codec ) {return 0;}
 uint8_t DIA_dnr(uint32_t *llock,uint32_t *lthresh, uint32_t *clock,
 			uint32_t *cthresh, uint32_t *scene) {return 0;}
-int DIA_srtPos(AVDMGenericVideoStream *source,uint32_t *size,uint32_t *position) {return 0;}
 int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b) {return 0;}			
 uint8_t DIA_glyphEdit(void) {return 0;}
 struct THRESHOLD_PARAM;

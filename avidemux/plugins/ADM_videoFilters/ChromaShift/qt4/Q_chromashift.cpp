@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include "Q_chromashift.h"
-
+#include <math.h>
 Ui_chromaShiftWindow::Ui_chromaShiftWindow(CHROMASHIFT_PARAM *param,AVDMGenericVideoStream *in)
   {
     uint32_t width,height;
@@ -112,6 +112,7 @@ uint8_t DIA_getChromaShift( AVDMGenericVideoStream *in,CHROMASHIFT_PARAM    *par
         }
         return ret;
 }
+
 //____________________________________
 // EOF
 

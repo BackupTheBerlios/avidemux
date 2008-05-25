@@ -14,12 +14,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifndef ADM_FLY_DIALOG_CLI4H
-#define ADM_FLY_DIALOG_CLIH
+#ifndef ADM_FLY_DIALOG_CLI_H
+#define ADM_FLY_DIALOG_CLI_H
 #include "DIA_flyDialog.h"
 class ADM_flyDialogCli : public ADM_flyDialog
 {
 public:
+  ADM_flyDialogCli(uint32_t width, uint32_t height, AVDMGenericVideoStream *in,
+                              void *canvas, void *slider, int yuv, ResizeMethod resizeMethod):
+                                ADM_flyDialog(width,height,in,canvas,slider,yuv,resizeMethod) {};
+
   virtual uint8_t  cleanup2(void);
   virtual uint8_t  isRgbInverted(void);
   virtual uint8_t  display(void);
