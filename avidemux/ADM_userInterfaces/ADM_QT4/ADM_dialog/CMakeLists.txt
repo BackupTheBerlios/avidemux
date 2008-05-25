@@ -22,7 +22,7 @@ SET(${ADM_LIB}_SRCS ${${ADM_LIB}_SRCS}
 	${${ADM_LIB}_headers}  ${${ADM_LIB}_source}  ${${ADM_LIB}_resource}  Q_about.cpp  Q_asharp.cpp
 	Q_contrast.cpp  Q_crop.cpp  Q_encoding.cpp  Q_eq2.cpp  Q_hue.cpp  Q_license.cpp
 	Q_jobs.cpp  Q_props.cpp   Q_vobsub.cpp  Q_working.cpp   T_index_pg.cpp
-	T_QCanvas.cpp  alert_qt4.cpp  DIA_busy.cpp  DIA_none.cpp  DIA_xvid4.cpp  OCR_none.cpp)
+	alert_qt4.cpp  DIA_busy.cpp  DIA_none.cpp  DIA_xvid4.cpp  OCR_none.cpp)
 
 ADD_DEFINITIONS(-DADM_SUBVERSION=${ADM_SUBVERSION})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
