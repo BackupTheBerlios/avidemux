@@ -4,11 +4,6 @@ SET(ADM_videoFilter_SRCS
 	ADM_vidTdeint.cpp
 	ADM_vidAnimated.cpp
 	ADM_vidDvbSub.cpp
-	ADM_vidHue.cpp
-	ADM_vidCrop.cpp
-	ADM_vidEq2.cpp
-	ADM_vidContrast.cpp
-	ADM_vidAsharp.cpp
 	ADM_vidVobsub.cpp
 	ADM_vidVobSubRender.cpp
 	ADM_vobsubinfo.cpp

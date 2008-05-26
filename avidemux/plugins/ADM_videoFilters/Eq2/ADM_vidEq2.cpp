@@ -16,15 +16,11 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 #include "ADM_default.h"
-#include <math.h>
-
-
-#include "ADM_videoFilter.h"
+#include "ADM_videoFilterDynamic.h"
 #include "DIA_factory.h"
 
-
+#include <math.h>
 
 #include "ADM_vidEq2.h"
 static FILTER_PARAM Eq2Param={8,{"contrast","brightness","saturation",
@@ -55,9 +51,13 @@ class  ADMVideoEq2:public AVDMGenericVideoStream
              uint8_t     getCoupledConf( CONFcouple **couples);
 }     ;
 
-SCRIPT_CREATE(Eq2_script,ADMVideoEq2,Eq2Param);
-BUILD_CREATE(Eq2_create,ADMVideoEq2);
 
+VF_DEFINE_FILTER_UI(ADMVideoEq2,Eq2Param,
+    eq2,
+                                QT_TR_NOOP("MPlayer eq2"),
+                                1,
+                                VF_COLORS,
+                                QT_TR_NOOP("Adjust contrast, brightness, saturation and gamma."));
 
 uint8_t ADMVideoEq2::configure(AVDMGenericVideoStream *in)
 {

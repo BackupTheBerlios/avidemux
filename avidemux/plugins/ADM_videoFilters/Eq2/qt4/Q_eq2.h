@@ -1,12 +1,10 @@
 #ifndef Q_eq2_h
 #define Q_eq2_h
-
+#include "DIA_flyDialog.h"
 #include "ui_eq2.h"
 #include "ADM_image.h"
-#include "ADM_videoFilter.h"
-#include "ADM_videoFilter/ADM_vidEq2.h"
-#include "DIA_flyDialog.h"
-#include "ADM_UIs/ADM_QT4/include/DIA_flyDialogQt4.h"
+
+#include "ADM_vidEq2.h"
 #include "DIA_flyEq2.h"
 
 class Ui_eq2Window : public QDialog

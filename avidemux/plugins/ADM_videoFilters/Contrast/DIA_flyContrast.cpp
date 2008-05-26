@@ -15,14 +15,12 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "DIA_flyDialog.h"
 #include "ADM_default.h"
 
-//#include "ADM_colorspace/ADM_rgb.h"
-
 #include "ADM_image.h"
-#include "ADM_videoFilter.h"
-#include "ADM_videoFilter/ADM_vidContrast.h"
-#include "DIA_flyDialog.h"
+#include "ADM_videoFilterDynamic.h"
+#include "ADM_vidContrast.h"
 #include "DIA_flyContrast.h"
 /************* COMMON PART *********************/
 uint8_t  flyContrast::update(void)

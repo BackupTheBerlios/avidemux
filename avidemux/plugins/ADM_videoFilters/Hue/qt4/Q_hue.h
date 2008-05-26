@@ -1,12 +1,12 @@
 #ifndef Q_hue_h
 #define Q_hue_h
-
+#include "DIA_flyDialog.h"
 #include "ui_hue.h"
 #include "ADM_image.h"
 #include "ADM_videoFilter.h"
-#include "ADM_videoFilter/ADM_vidHue.h"
-#include "DIA_flyDialog.h"
-#include "ADM_UIs/ADM_QT4/include/DIA_flyDialogQt4.h"
+#include "ADM_vidHue.h"
+
+#include "DIA_flyDialogQt4.h"
 #include "DIA_flyHue.h"
 
 class Ui_hueWindow : public QDialog

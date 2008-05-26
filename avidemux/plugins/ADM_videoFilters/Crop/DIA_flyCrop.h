@@ -1,6 +1,6 @@
 #ifndef FLY_CROP_H
 #define FLY_CROP_H
-class flyCrop : public ADM_flyDialog
+class flyCrop : public FLY_DIALOG_TYPE
 {
   
   public:
@@ -11,6 +11,6 @@ class flyCrop : public ADM_flyDialog
    uint8_t    upload(void);
    uint8_t    autocrop(void);
    flyCrop (uint32_t width,uint32_t height,AVDMGenericVideoStream *in,
-                                    void *canvas, void *slider) : ADM_flyDialog(width, height,in,canvas, slider,0,RESIZE_LAST) {};
+                                    void *canvas, void *slider) : FLY_DIALOG_TYPE(width, height,in,canvas, slider,0,RESIZE_LAST) {};
 };
 #endif

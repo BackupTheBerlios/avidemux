@@ -1,12 +1,12 @@
 #ifndef Q_contrast_h
 #define Q_contrast_h
-
+#include "DIA_flyDialog.h"
 #include "ui_contrast.h"
 #include "ADM_image.h"
 #include "ADM_videoFilter.h"
-#include "ADM_videoFilter/ADM_vidContrast.h"
-#include "DIA_flyDialog.h"
-#include "ADM_UIs/ADM_QT4/include/DIA_flyDialogQt4.h"
+#include "ADM_vidContrast.h"
+
+
 #include "DIA_flyContrast.h"
 
 class Ui_contrastWindow : public QDialog

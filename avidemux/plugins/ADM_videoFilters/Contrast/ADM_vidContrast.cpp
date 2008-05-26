@@ -14,22 +14,23 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 #include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
+#include "DIA_factory.h"
+#include "ADM_vidContrast.h"
 #include <math.h>
-
-
-#include "ADM_videoFilter.h"
-#include "ADM_videoFilter/ADM_vidContrast.h"
-
 static FILTER_PARAM contrastParam =
   { 5, {"offset", "coef", "doLuma", "doChromaU", "doChromaV"} };
 
+//REGISTERX(VF_COLORS, "contrast",QT_TR_NOOP("Contrast"),
+//    QT_TR_NOOP("Adjust contrast, brightness and colors."),VF_CONTRAST,1,contrast_create,contrast_script);
 
-SCRIPT_CREATE (contrast_script, ADMVideoContrast, contrastParam);
-
-BUILD_CREATE (contrast_create, ADMVideoContrast);
-
+VF_DEFINE_FILTER_UI(ADMVideoContrast,contrastParam,
+    contrast,
+                                QT_TR_NOOP("Contrast"),
+                                1,
+                                VF_COLORS,
+                                QT_TR_NOOP("Adjust contrast, brightness and colors."));
 char *
 ADMVideoContrast::printConf (void)
 {

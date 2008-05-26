@@ -1,13 +1,14 @@
 #ifndef Q_crop_h
 #define Q_crop_h
-
+#include "DIA_flyDialog.h"
 #include "ui_crop.h"
 #include "ADM_image.h"
 #include "ADM_videoFilter.h"
-#include "DIA_flyDialog.h"
+
 #include "DIA_flyDialogQt4.h"
 #include "DIA_flyCrop.h"
-#if 0
+#include "ADM_vidCrop_param.h"
+#if 1
 class Ui_cropWindow : public QDialog
 {
 	Q_OBJECT

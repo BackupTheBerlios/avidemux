@@ -12,16 +12,10 @@
  *                                                                         *
  ***************************************************************************/
 #include "ADM_default.h"
-#include <math.h>
-
-
-#include "ADM_videoFilter.h"
-
-
-#include "DIA_enter.h"
-
-
+#include "ADM_videoFilterDynamic.h"
+#include "DIA_factory.h"
 #include "ADM_vidHue.h"
+#include "math.h"
 static FILTER_PARAM HueParam={2,{"hue","saturation"}};
 
 extern uint8_t DIA_getHue(Hue_Param *param, AVDMGenericVideoStream *in);
@@ -48,8 +42,14 @@ class  ADMVideoHue:public AVDMGenericVideoStream
              uint8_t     getCoupledConf( CONFcouple **couples);
 }     ;
 
-SCRIPT_CREATE(hue_script,ADMVideoHue,HueParam);
-BUILD_CREATE(hue_create,ADMVideoHue);
+
+VF_DEFINE_FILTER_UI(ADMVideoHue,
+          HueParam,
+          hue,
+          QT_TR_NOOP("MPlayer hue"),
+          1,
+          VF_COLORS,
+          QT_TR_NOOP("Adjust hue and saturation."));
 
 void HueProcess_C(uint8_t *udst, uint8_t *vdst, uint8_t *usrc, uint8_t *vsrc, int dststride, int srcstride,
 		    int w, int h, float hue, float sat)

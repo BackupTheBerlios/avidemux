@@ -23,13 +23,8 @@
         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "ADM_default.h"
-
-#include "ADM_videoFilter.h"
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
+#include "DIA_flyDialog.h"
+#include "ADM_videoFilterDynamic.h"
 
 #include "ADM_vidASharp_param.h"
 class ASharp : public AVDMGenericVideoStream
@@ -53,11 +48,20 @@ public:
         uint8_t         getFrameNumberNoAlloc(uint32_t frame, uint32_t *len, ADMImage *data,uint32_t *flags);
 };
 
-BUILD_CREATE(asharp_create,ASharp);
+
 static FILTER_PARAM asharp_param={4,{"t", "b","d", "bf"}};
 
 
-SCRIPT_CREATE(asharp_script,ASharp,asharp_param);
+//REGISTERX(VF_SHARPNESS, "asharp",QT_TR_NOOP("asharp"),QT_TR_NOOP(""
+//    "Adaptative sharpener by MarcFD."),VF_ASHARP,1,asharp_create,asharp_script);
+VF_DEFINE_FILTER_UI(ASharp,asharp_param,
+    asharp,
+                                QT_TR_NOOP("asharp"),
+                                1,
+                                VF_SHARPNESS,
+                                QT_TR_NOOP("Adaptative sharpener by MarcFD."));
+
+
 //_______________________________________________
 
 ASharp::ASharp(AVDMGenericVideoStream *in,CONFcouple *couples)

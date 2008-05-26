@@ -18,21 +18,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-
-
-#include "config.h"
-
-
-#include <string.h>
-#include <stdio.h>
-
-#include "ADM_default.h"
-
-#include "ADM_image.h"
-#include "ADM_videoFilter.h"
-#include "ADM_videoFilter/ADM_vidHue.h"
 #include "DIA_flyDialog.h"
+#include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
+#include "DIA_factory.h"
+
+#include "ADM_vidHue.h"
+
 #include "DIA_flyHue.h"
 
 #include "ADM_assert.h"

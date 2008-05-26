@@ -15,12 +15,8 @@
  *                                                                         *
  ***************************************************************************/
 #include "ADM_toolkitGtk.h"
-#include "fourcc.h"
-
-
-
 #include "ADM_videoFilter.h"
-#include "ADM_videoFilter/ADM_vidContrast.h"
+#include "ADM_vidContrast.h"
 
 
 #include "DIA_flyDialog.h"

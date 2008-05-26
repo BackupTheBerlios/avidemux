@@ -43,20 +43,9 @@ printf(  "*********************\n");
 
 //ko -- ko -- ko -- ko ko --ko -ko
 	
-// VF_FIXME REGISTERX(VF_TRANSFORM, "crop",QT_TR_NOOP("Crop"),QT_TR_NOOP("Remove lines from top/bottom/left/right."),VF_CROP,1,crop_create,crop_script);  
+  
 REGISTERX(VF_TRANSFORM, "rotate",QT_TR_NOOP("Rotate"),QT_TR_NOOP("Rotate the picture by 90, 180 or 270 degrees."),VF_ROTATE,1,rotate_create,rotate_script);
 REGISTERX(VF_INTERLACING, "tdeint",QT_TR_NOOP("TDeint"),QT_TR_NOOP("Motion adaptative deinterlacer by Tritical."),VF_TDEINT,1,tdeint_create,tdeint_script);
-
-//FLyDyalog
-#if 0
-    REGISTERX(VF_COLORS, "eq2",QT_TR_NOOP("MPlayer eq2"),QT_TR_NOOP("Adjust contrast, brightness, saturation and gamma."),VF_EQ2,1,Eq2_create,Eq2_script);
-    REGISTERX(VF_COLORS, "hue",QT_TR_NOOP("MPlayer hue"),QT_TR_NOOP("Adjust hue and saturation."),VF_HUE,1,hue_create,hue_script);
-    REGISTERX(VF_COLORS, "contrast",QT_TR_NOOP("Contrast"),QT_TR_NOOP("Adjust contrast, brightness and colors."),VF_CONTRAST,1,contrast_create,contrast_script);
-    REGISTERX(VF_SHARPNESS, "asharp",QT_TR_NOOP("asharp"),QT_TR_NOOP("Adaptative sharpener by MarcFD."),VF_ASHARP,1,asharp_create,asharp_script);    
-#endif    
-
-// Custom UI    
-	
 
 
 REGISTERX(VF_MISC, "animatedmenu",QT_TR_NOOP("Animated Menu"), QT_TR_NOOP("Create a video made of 6 mini windows, very useful to do DVD menus."),

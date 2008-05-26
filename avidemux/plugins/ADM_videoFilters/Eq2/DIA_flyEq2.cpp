@@ -14,17 +14,12 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-#include <string.h>
-#include <stdio.h>
 #include <math.h>
-#include "ADM_default.h"
 
-
-#include "ADM_image.h"
-#include "ADM_videoFilter.h"
-#include "ADM_videoFilter/ADM_vidContrast.h"
 #include "DIA_flyDialog.h"
+#include "ADM_videoFilterDynamic.h"
+#include "ADM_vidEq2.h"
+
 #include "DIA_flyEq2.h"
 
 /************* COMMON PART *********************/

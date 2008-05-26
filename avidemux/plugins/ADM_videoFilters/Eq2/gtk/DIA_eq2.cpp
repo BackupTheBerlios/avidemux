@@ -16,12 +16,14 @@
  *                                                                         *
  ***************************************************************************/
 #include "ADM_toolkitGtk.h"
+#include "DIA_flyDialog.h"
+
 
 #include "ADM_image.h"
 #include "ADM_videoFilter.h"
 
-#include "ADM_videoFilter/ADM_vidEq2.h"
-#include "DIA_flyDialog.h"
+#include "ADM_vidEq2.h"
+
 #include "DIA_flyEq2.h"
 
 

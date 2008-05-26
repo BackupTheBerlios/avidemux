@@ -14,8 +14,8 @@
  ***************************************************************************/
 #ifndef FLY_EQ2_H
 #define FLY_EQ2_H
-#include "ADM_videoFilter/ADM_vidEq2.h"
-class flyEq2 : public ADM_flyDialog
+#include "ADM_vidEq2.h"
+class flyEq2 : public FLY_DIALOG_TYPE
 {
   
   public:
@@ -26,7 +26,7 @@ class flyEq2 : public ADM_flyDialog
    uint8_t    upload(void);
    uint8_t    update(void);
    			  flyEq2 (uint32_t width,uint32_t height,AVDMGenericVideoStream *in, void *canvas, void *slider) : 
-                                    	ADM_flyDialog(width, height,in,canvas, slider,1,RESIZE_AUTO)
+   			 FLY_DIALOG_TYPE(width, height,in,canvas, slider,1,RESIZE_AUTO)
                     {
                       
                     };

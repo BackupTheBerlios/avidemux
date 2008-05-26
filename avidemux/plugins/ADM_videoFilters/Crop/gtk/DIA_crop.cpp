@@ -22,15 +22,14 @@
 
 #include "ADM_toolkitGtk.h"
 
-
-
 #include "ADM_image.h"
 #include "ADM_videoFilter.h"
 
-
 #include "DIA_flyDialog.h"
 #include "DIA_flyCrop.h"
-#if 0
+#include "ADM_vidCrop_param.h"
+
+#if 1
 static GtkWidget	*create_dialog1 (void);
 
 /* Link between UI and core */

@@ -19,18 +19,12 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
 #include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
+#include "DIA_factory.h"
 
-#include "ADM_videoFilter.h"
 
-
-typedef struct
-{
-        uint32_t left,right;
-        uint32_t top,bottom;
-}CROP_PARAMS;
-
+#include "ADM_vidCrop_param.h"
 class  AVDMVideoStreamCrop:public AVDMGenericVideoStream
  {
 
@@ -53,7 +47,13 @@ class  AVDMVideoStreamCrop:public AVDMGenericVideoStream
 static FILTER_PARAM cropParam={4,{"left","right","top","bottom"}};
 
 
-SCRIPT_CREATE(crop_script,AVDMVideoStreamCrop,cropParam);
+VF_DEFINE_FILTER_UI(AVDMVideoStreamCrop,cropParam,
+    crop,
+                                QT_TR_NOOP("Crop"),
+                                1,
+                                VF_TRANSFORM,
+                                QT_TR_NOOP("Remove lines from top/bottom/left/right."));
+
 
 char *AVDMVideoStreamCrop::printConf( void )
 {

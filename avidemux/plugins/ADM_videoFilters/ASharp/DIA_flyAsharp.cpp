@@ -19,15 +19,14 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "DIA_flyDialog.h"
 #include "ADM_default.h"
 
-
 #include "ADM_image.h"
-#include "ADM_videoFilter.h"
-#include "ADM_videoFilter/ADM_vidASharp_param.h"
-#include "DIA_flyDialog.h"
+#include "ADM_videoFilterDynamic.h"
+#include "ADM_vidASharp_param.h"
 #include "DIA_flyAsharp.h"
-#include "ADM_assert.h"
+
 
 /************* COMMON PART *********************/
 uint8_t  flyASharp::update(void)
