@@ -15,9 +15,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-
-#ifdef USE_FREETYPE
 #include <math.h>
 
 #include "ADM_default.h"
@@ -25,12 +22,10 @@
 
 #include "ADM_videoFilter.h"
 
-#include "ADM_video/ADM_vidFont.h"
-#include "ADM_videoFilter/ADM_vidSRT.h"
+#include "ADM_vidFont.h"
+#include "ADM_vidSRT.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
+#define aprintf(...) {}
 
 #define SUB_OUT 0xf0000000
 #define ALPHA
@@ -60,7 +55,7 @@ uint32_t absFrame=frame+_info.orgFrame;
 
 	//		printf("\n Stabilize : %lu\n",frame);
           _uncompressed=data;
-	if(frame>=_info.nb_frames) 
+	if(frame>=_info.nb_frames)
 	{
 		printf("Filter : out of bound!\n");
 		return 0;
@@ -79,12 +74,12 @@ uint32_t absFrame=frame+_info.orgFrame;
 	      {
 	      		aprintf("Sub: cached %lu %lu %lu\n",time,_subs[_oldline].startTime,_subs[_oldline].endTime);
 			blend(YPLANE(data),_conf->_baseLine); // re-use it
-			return 1;	
+			return 1;
 
 	      }
 	      srch=search(time);
 	      // we got the right one
-     
+
 	      if(srch!=SUB_OUT) // we got something...
 			{
 					_oldline=srch;
@@ -121,8 +116,8 @@ uint32_t	ADMVideoSubtitle::search(uint32_t time)
 //______________________________________
 void ADMVideoSubtitle::displayString(subLine *string)
 {
- 
-	uint32_t base=0;	
+
+	uint32_t base=0;
 	uint32_t nbLine=0;
 	uint32_t i=0;
 	uint32_t overflow=0;
@@ -141,27 +136,27 @@ void ADMVideoSubtitle::displayString(subLine *string)
 	switch(nbLine)
 	{
 		case 0:
-			base=2*_conf->_fontsize;; // 1 or 2 lines we dont use the upper line		
+			base=2*_conf->_fontsize;; // 1 or 2 lines we dont use the upper line
 			break;
 		case 1:
-			base=_conf->_fontsize;; // 1 or 2 lines we dont use the upper line		
+			base=_conf->_fontsize;; // 1 or 2 lines we dont use the upper line
 			break;
 		default:
                         base=0;
                         break;
-	}	
-		
+	}
+
 	aprintf("Sub: %d lines to render\n",nbLine);
 	// scan and display each line
 	for(i=0;i<nbLine;i++)
 	{
-		
+
 			if(string->lineSize[i]!=displayLine(string->string[i],base,string->lineSize[i]))
                                 overflow=1;
 			base+=_conf->_fontsize;
-		
+
 	}
-        if(overflow && _conf->_selfAdjustable) 
+        if(overflow && _conf->_selfAdjustable)
         {
                 printf("Do autosplit\n");
                 doAutoSplit(string);
@@ -178,7 +173,7 @@ void ADMVideoSubtitle::displayString(subLine *string)
         while(top<_info.height && !isDirty(top)) top++;
         if(top>_conf->_fontsize>>1) top-=_conf->_fontsize>>1;
         memset(&(_dirty[0]),0,top); // Clear top
-        
+
         // Then bottom
         limit=(SRT_MAX_LINE+1)*_conf->_fontsize;
         if(limit>=_info.height) limit=_info.height-1;
@@ -190,7 +185,7 @@ void ADMVideoSubtitle::displayString(subLine *string)
         ADM_assert(bottom<=limit);
         memset(&(_dirty[bottom]),0,limit-bottom+1);
         //printf("Top:%d bottom :%d limit:%d\n",top,bottom,limit);
-	
+
 }
 uint8_t ADMVideoSubtitle::isDirty(int line)
 {
@@ -207,7 +202,7 @@ uint8_t ADMVideoSubtitle::isDirty(int line)
 */
 void ADMVideoSubtitle::doAutoSplit(subLine *string)
 {
-        uint32_t base=0;    
+        uint32_t base=0;
         uint32_t nbLine=0;
         uint32_t i=0;
         int      total=0,start,end,pivot;
@@ -217,7 +212,7 @@ void ADMVideoSubtitle::doAutoSplit(subLine *string)
 
         // Merge all strings into one
 
-        for(int i=0;i<nbLine;i++) 
+        for(int i=0;i<nbLine;i++)
                 total+=1+string->lineSize[i];
 
         ADM_GLYPH_T allwords[total];
@@ -226,7 +221,7 @@ void ADMVideoSubtitle::doAutoSplit(subLine *string)
         int         nbWords=0;
         //
         start=0;
-        for(int i=0;i<nbLine;i++) 
+        for(int i=0;i<nbLine;i++)
         {
                 memcpy(&(allwords[start]),string->string[i],string->lineSize[i]*sizeof(ADM_GLYPH_T));
                 start+=string->lineSize[i];
@@ -244,7 +239,7 @@ void ADMVideoSubtitle::doAutoSplit(subLine *string)
         for(i=0;i<end;i++)
                 printf("%c",allwords[i]);
         printf(">\n");
-        
+
         // Split into words
         pivot=0;
         int car;
@@ -259,7 +254,7 @@ void ADMVideoSubtitle::doAutoSplit(subLine *string)
                         }
                 pivot++;
         }
-        printf("Found %d words\n",nbWords); 
+        printf("Found %d words\n",nbWords);
         // Now  split
         int nbSentence=0,len;
         pivot=0;
@@ -293,14 +288,14 @@ void ADMVideoSubtitle::doAutoSplit(subLine *string)
                 printf("\n");
         }
         // now display
-        
+
         switch(nbSentence)
         {
                 case 0:
-                        base=2*_conf->_fontsize;; // 1 or 2 lines we dont use the upper line            
+                        base=2*_conf->_fontsize;; // 1 or 2 lines we dont use the upper line
                         break;
                 case 1:
-                        base=_conf->_fontsize;; // 1 or 2 lines we dont use the upper line              
+                        base=_conf->_fontsize;; // 1 or 2 lines we dont use the upper line
                         break;
                 default:
                         base=0;
@@ -317,7 +312,7 @@ void ADMVideoSubtitle::doAutoSplit(subLine *string)
                         base+=_conf->_fontsize;
         }
         printf("/Display\n");
-        
+
 }
 /*
         Once we have the subtitle built, we do the u& v planes
@@ -347,12 +342,12 @@ uint8_t ADMVideoSubtitle::doChroma(void)
         lowPass(src,dst,_info.width,_info.height);
         lowPass(tmp,src,_info.width>>1,_info.height>>1);
 
-        if (_conf->_useBackgroundColor) 
+        if (_conf->_useBackgroundColor)
         {
                 decimate(_bgMaskBuffer,_bgBitmapBuffer,_info.width,_info.height);
                 //lowPass(tmp,_bgBitmapBuffer,_info.width>>1,_info.height>>1);
         }
-  
+
 }
 /*
         Clear the buffers in case we do a new sub or
@@ -375,7 +370,7 @@ uint8_t ADMVideoSubtitle::clearBuffers(void)
 uint32_t ADMVideoSubtitle::displayLine(ADM_GLYPH_T *string,uint32_t line, uint32_t len)
 {
   // n first chars in string that can "fit" in this line
- 
+
 
 	//uint32_t pixstart;
 	uint8_t *target;
@@ -391,7 +386,7 @@ uint32_t ADMVideoSubtitle::displayLine(ADM_GLYPH_T *string,uint32_t line, uint32
 	}
 
 
-  
+
 	uint32_t w=0,next;
 	int ww;
 
@@ -432,7 +427,7 @@ uint32_t ADMVideoSubtitle::displayLine(ADM_GLYPH_T *string,uint32_t line, uint32
 				}
 				w=w+ww;
 			}
-      
+
 	}
 _abt:
 	//Now we can render it at its final position
@@ -474,25 +469,25 @@ _abt:
 				}
 				w=w+ww;
 			}
-      
+
 	}
 
   {
     if (_conf->_useBackgroundColor) {
       //Create background info
-      
+
       int32_t delta=_info.width*line+((_info.width-w)>>1);
       uint8_t *bitmapTarget=_bitmapBuffer+delta;
       uint8_t *maskTarget=_maskBuffer+delta;
       //uint8_t *bgBitmapTarget=_bgBitmapBuffer+delta;
       uint8_t *bgMaskTarget=_bgMaskBuffer+delta;
-      
+
       delta=3*_info.width;
       bitmapTarget+=delta;
       maskTarget+=delta;
       //bgBitmapTarget+=delta;
       bgMaskTarget+=delta;
-      
+
       for (uint32_t i=0;i<_conf->_fontsize;i++) {
 	//memset(bgTarget,1,w);
 	for (uint32_t j=0;j<w;j++) {
@@ -511,9 +506,9 @@ _abt:
 
     }
   }
-	
 
- 
+
+
   return len;
 }
 //--------------------------------------------------------------------
@@ -538,44 +533,44 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 	hei=(SRT_MAX_LINE+1)*_conf->_fontsize;
 	if(hei>=_info.height-1) hei=_info.height-1;
 	hei*=_info.width;  // max height of our subtitle
-	
+
 
 	aprintf("Sub:Rendering : %d %d %d (yuv)\n",_conf->_Y_percent,_conf->_U_percent,_conf->_V_percent);
-	
+
 	// keep a little margin for renderin
 	// to render f y or g
 	if((baseLine) > _conf->_fontsize)
 		baseLine-=_conf->_fontsize>>1;
-	
-		
+
+
 	//__________________________
-		
+
 		// Shadow ..
 		uint8_t *shadow=target;
 		uint32_t shadow_pos;
-		
+
 		shadow_pos=_conf->_fontsize/10;
 		start=_info.width*baseLine;  // base line in final image
 		// mask out left and right
-		mask=_maskBuffer; 
-				
+		mask=_maskBuffer;
+
  		shadow+=start+(1+_info.width)*shadow_pos;
   		for( y=hei;y>0;y--)
 		{
-     		 if(*mask) 
+     		 if(*mask)
 		 {
 				if(*mask>LUMA_LEVEL)
 				{
 					val=*shadow;
 					val=(val*SHADOW_UP)/SHADOW_DOWN;
 					*shadow=(uint8_t )val;
-				}				
-     		 } 	  
-      
+				}
+     		 }
+
 		shadow++;
 		mask++;
 		}
-	
+
 	// /Shadow
 	//__________________________
 	start=_info.width*baseLine;  // base line in final image
@@ -587,7 +582,7 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 	mask=_maskBuffer;
   	bgMask=_bgMaskBuffer;
  	target+=start;
-        // clip 
+        // clip
         if(hei+start>_info.width*_info.height)
         {
                 hei=_info.width*_info.height-start;
@@ -613,12 +608,12 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
                                         val>>=8;
                                         *target=(uint8_t )val;
                                 }
-                                else 
+                                else
                                         { *target=0; }
-                        } else 
+                        } else
                         if(*bgMask)
                         {
-                                if(_conf->_useBackgroundColor) 
+                                if(_conf->_useBackgroundColor)
                                 {
                                         *target=(uint8_t )_conf->_bg_Y_percent;
                                 }
@@ -629,24 +624,24 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
                                         {
                                                 case BLEND_SOLID: break;
                                                 case BLEND_DIMMER: *target=(*target*3)>>2;break;
-                                                case BLEND_DOTTED: 
+                                                case BLEND_DOTTED:
                                                 {
                                                         int odd;
                                                                 odd= y%_info.width;
                                                                 odd=odd&1;
                                                                 odd+=(1&(y/_info.width));
                                                                 odd&=1;
-                                                                if(odd) *target=0; 
+                                                                if(odd) *target=0;
                                                 }
                                         }
                                 }
-                        
+
                 target++;
                 mask++;
                 bgMask++;
               }
         }
-	
+
 
 // do u & v
 	int8_t *ctarget;
@@ -685,7 +680,7 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 			} \
                 } \
              else if (_conf->_useBackgroundColor && *bgMask) {*target=(uint8_t)bg_val;}
-	     
+
 #define RENDER	     \
 	\
 	for( y=hei;y>0;y--) \
@@ -696,7 +691,7 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 		mask++; \
 	bgMask++; \
 	} \
-	
+
 	RENDER;
 
 	mask=_bitmapBuffer;
@@ -780,4 +775,4 @@ uint8_t ADMVideoSubtitle::decimate(uint8_t *src, uint8_t *dst, uint32_t w, uint3
 	return 1;
 }
 
-#endif
+

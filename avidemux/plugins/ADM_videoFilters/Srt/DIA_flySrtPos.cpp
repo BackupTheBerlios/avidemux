@@ -12,23 +12,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-#ifdef USE_FREETYPE
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <math.h>
-#include "ADM_default.h"
-//#include "ADM_colorspace/ADM_rgb.h"
-#include "ADM_image.h"
-
-#include "ADM_videoFilter.h"
-class ADMfont;
-//#include "ADM_video/ADM_vidFont.h"
-#include "ADM_videoFilter/ADM_vidSRT.h"
-
+#include "DIA_uiTypes.h"
 #include "DIA_flyDialog.h"
+#include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
+class ADMfont;
+#include "ADM_vidSRT.h"
 #include "DIA_flySrtPos.h"
 /*********  COMMON PART *********/
 uint8_t    flySrtPos::process(void)
@@ -62,6 +52,5 @@ uint8_t    flySrtPos::update(void)
 	copyYuvFinalToRgb();
     display();
 }
-#endif
 //EOF
 

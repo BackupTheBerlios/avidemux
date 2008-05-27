@@ -1,3 +1,5 @@
+
+PROJECT("Avidemux_2.5")
 MESSAGE("#####################################")
 MESSAGE("Configure Started")
 MESSAGE("#####################################")

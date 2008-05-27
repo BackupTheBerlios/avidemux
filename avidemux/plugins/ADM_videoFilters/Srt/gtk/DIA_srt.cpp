@@ -14,30 +14,19 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
-#ifdef USE_FREETYPE
 #include "ADM_toolkitGtk.h"
+#include "DIA_flyDialog.h"
 
 
 #include "DIA_fileSel.h"
 
-#include "ADM_editor/ADM_edit.hxx"
 #include "ADM_videoFilter.h"
 
-//#include "ADM_video/ADM_vidFont.h"
 class ADMfont;
-#include "ADM_videoFilter/ADM_vidSRT.h"
-
-
+#include "ADM_vidSRT.h"
+#include "DIA_flySrtPos.h"
 #include "ADM_colorspace.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
-
-#include "DIA_flyDialog.h"
-#include "DIA_flySrtPos.h"
 
 
 static void read( void );
@@ -272,4 +261,3 @@ create_dialog1 (void)
 }
 
 //-------------------------------
-#endif //FREETYPE

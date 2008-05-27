@@ -14,11 +14,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 #include "ADM_default.h"
-#include "ADM_videoFilter.h"
-#include "ADM_assert.h"
-        
+#include "ADM_videoFilterDynamic.h"
 #include "DIA_factory.h"
 
 typedef struct ROTATE_PARAM
@@ -46,8 +43,18 @@ class  ADMVideoRotate:public AVDMGenericVideoStream
 static FILTER_PARAM rotpParam={3,{"width","height","angle"}};
 
 
-SCRIPT_CREATE(rotate_script,ADMVideoRotate,rotpParam);
-BUILD_CREATE(rotate_create,ADMVideoRotate);
+//********** Register chunk ************
+static FILTER_PARAM flipParam={0,{""}};
+
+//REGISTERX(VF_TRANSFORM, "rotate",QT_TR_NOOP("Rotate"),QT_TR_NOOP(
+//    "Rotate the picture by 90, 180 or 270 degrees."),VF_ROTATE,1,rotate_create,rotate_script);
+VF_DEFINE_FILTER(ADMVideoRotate,flipParam,
+                                rotate,
+                                QT_TR_NOOP("Rotate"),
+                                1,
+                                VF_TRANSFORM,
+                                QT_TR_NOOP("Rotate the picture by 90, 180 or 270 degrees."));
+//************************************
 
 static void do_rotate(ADMImage *source,ADMImage *target,uint32_t angle);
 

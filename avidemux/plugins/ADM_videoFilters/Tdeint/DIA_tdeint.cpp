@@ -14,13 +14,10 @@
 
 #include <math.h>
 
-#include "config.h"
 #include "ADM_default.h"
-
-
-
+#include "ADM_videoFilterDynamic.h"
 #include "DIA_factory.h"
-#include "ADM_videoFilter/ADM_vidTDeint_param.h"
+#include "ADM_vidTDeint_param.h"
 /**
       \fn DIA_tdeint
       \brief Dialog for tdeint filter

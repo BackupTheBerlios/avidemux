@@ -31,18 +31,12 @@
 **   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#include "config.h"
 #include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
 #include <math.h>
 
-
-#include "ADM_videoFilter.h"
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
 #include "DIA_factory.h"
-
+#define aprintf(...) {}
 
 #define min MIN
 #define max MAX
@@ -149,10 +143,17 @@ static FILTER_PARAM tdeint_template =
 
   };
 
-BUILD_CREATE (tdeint_create, vidTDeint);
-SCRIPT_CREATE (tdeint_script, vidTDeint, tdeint_template);
+//********** Register chunk ************
 
 
+
+VF_DEFINE_FILTER(vidTDeint,tdeint_template,
+    tdeint,
+                                QT_TR_NOOP("TDeint"),
+                                1,
+                                VF_INTERLACING,
+                                QT_TR_NOOP("Motion adaptative deinterlacer by Tritical."));
+//************************************
 
 #include "ADM_vidTdeint_util.txt"
 extern uint8_t  DIA_tdeint(TDEINT_PARAM *param);

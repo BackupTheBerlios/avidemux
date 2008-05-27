@@ -1,7 +1,7 @@
 //
 // C++ Implementation: ADM_vidForcedPP
 //
-// Description: 
+// Description:
 //
 //	Force postprocessing assuming constant quant & image type
 //	Uselefull on some badly authored DVD for example
@@ -11,22 +11,15 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#include "config.h"
 
-#ifdef USE_FREETYPE
 #include "ADM_default.h"
-#include "ADM_userInterfaces/ADM_render/GUI_render.h"
-#include "ADM_videoFilter.h"
-#include "DIA_flyDialog.h"
-
-
-
+#include "ADM_videoFilterDynamic.h"
+#include "DIA_coreToolkit.h"
+#include "ADM_vidFont.h"
+#include "ADM_vidSRT.h"
+#define ADM_MINIMAL_UI_INTERFACE
 #include "DIA_factory.h"
-#include "ADM_encoder/ADM_vidEncode.hxx"
-//#include "ADM_video/ADM_vidFont.h"
-class ADMfont;
-#include "ADM_videoFilter/ADM_vidSRT.h"
-//#include "ADM_colorspace/colorspace.h"
+#include "ADM_colorspace.h"
 /*****************************************************************/
 extern int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b);
 extern int DIA_srtPos(AVDMGenericVideoStream *source,uint32_t *size,uint32_t *position);
@@ -45,13 +38,13 @@ typedef struct unicd
 	{(char *)"Czech"	,(char *)"ISO-8859-2"},	// cz
 	{(char *)"German"	,(char *)"ISO-8859-9"}		// german ?
 	,{(char *)"Slovene"	,(char *)"CP1250"}		// UTF8
-        
+
         ,{(char *)"UTF16"	,(char *)"UTF16"}		// UTF8
 	,{(char *)"UTF8"	,(char *)"UTF8"}		// UTF8
 	,{(char *)"Chinese Traditionnal(Big5)"	,(char *)"CP950"}		// UTF8
 	,{(char *)"Chinese Simplified (GB2312)"	,(char *)"CP936"}		// UTF8
 };
-typedef struct 
+typedef struct
 {
   AVDMGenericVideoStream *source;
   uint32_t               *size;
@@ -75,18 +68,18 @@ diaMenuEntry encoding[]={
   Mitem(5),
   Mitem(6),
   Mitem(7),
-};       
+};
 
 #define PX(x) &(param->x)
   diaElemFile subtitle(0,(char **)PX(_subname),QT_TR_NOOP("_Subtitle file:"), NULL, QT_TR_NOOP("Select Subtitle file"));
   diaElemFile font(0,(char **)PX(_fontname),QT_TR_NOOP("_Font (TTF):"), NULL, QT_TR_NOOP("Select TTF file"));
   int colors[3]={param->_Y_percent,param->_U_percent,param->_V_percent};
-  
+
   uint32_t fontSize=param->_fontsize;
   uint32_t baseLine=param->_baseLine;
-  
+
   sizePosition sizePos={source,&fontSize,&baseLine};
-  
+
   uint32_t myEncoding=0;
       // convert internal to display
       if(param->_charset)
@@ -100,7 +93,7 @@ diaMenuEntry encoding[]={
       diaElemButton    setBase(QT_TR_NOOP("Set Size and _Position"), sizePositionCallback,&sizePos);
       diaElemToggle    autoSplit(PX(_selfAdjustable),QT_TR_NOOP("_Auto split"));
       diaElemInteger   delay(PX(_delay),QT_TR_NOOP("_Delay (ms):"),-100000,100000);
-         
+
       diaElem *tabs[]={&subtitle,&font,&encodingM,&color,&setBase,&autoSplit,&delay};
       if( diaFactoryRun(QT_TR_NOOP("Subtitler"),7,tabs))
 	{
@@ -121,13 +114,13 @@ diaMenuEntry encoding[]={
 */
 void colorCallBack(void *cookie)
 {
-  
+
       int32_t *colors=(int32_t *)cookie;
-        
+
         uint8_t r,g,b;
         uint8_t y;
         int8_t u,v;
-  
+
         y=colors[0];
         u=colors[1];
         v=colors[2];
@@ -153,5 +146,4 @@ void sizePositionCallback(void *cookie)
     printf("Size and position invoked\n");
     DIA_srtPos(sz->source,sz->size,sz->position);
 }
-#endif
 // EOF

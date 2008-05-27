@@ -17,7 +17,6 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifdef USE_FREETYPE
 
 #define SRT_MAX_LINE 3
 #define SRT_MAX_LINE_LENGTH 512
@@ -125,4 +124,3 @@ typedef struct SUBCONF
 			virtual uint8_t 	configure( AVDMGenericVideoStream *instream);
 							
  }     ;
-#endif

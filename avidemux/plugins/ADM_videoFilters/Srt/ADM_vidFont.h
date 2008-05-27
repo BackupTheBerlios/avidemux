@@ -14,7 +14,6 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- #ifdef USE_FREETYPE
 #undef free
 #undef alloc
 #undef realloc
@@ -50,4 +49,3 @@
 
 };
 
-#endif

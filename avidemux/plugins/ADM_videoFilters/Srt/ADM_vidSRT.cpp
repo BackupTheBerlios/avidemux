@@ -14,47 +14,43 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-#include "config.h"
-
-#ifdef USE_FREETYPE
 #include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
+
 #include "DIA_coreToolkit.h"
-#include "ADM_videoFilter.h"
 
-#include "ADM_video/ADM_vidFont.h"
-#include "ADM_videoFilter/ADM_vidSRT.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
+#include "ADM_vidFont.h"
+#include "ADM_vidSRT.h"
 
-#include "prefs.h"
+#define aprintf(...) {}
+//#include "prefs.h"
 
 static FILTER_PARAM subParam={15,{"_fontsize","_subname","_fontname","_charset",
 				"_baseLine","_Y_percent","_U_percent","_V_percent",
 				"_selfAdjustable","_delay","_useBackgroundColor","_bg_Y_percent",
       				"_bg_U_percent","_bg_V_percent","_blend"}};
 
-SCRIPT_CREATE(subtitle_script,ADMVideoSubtitle,subParam);
-
-BUILD_CREATE(subtitle_create,ADMVideoSubtitle);
-
 //__________________________________________________________________
+VF_DEFINE_FILTER_UI(ADMVideoSubtitle,subParam,
+    subtitle,
+                QT_TR_NOOP("Subtitler"),
+                1,
+                VF_SUBTITLE,
+                QT_TR_NOOP("Add srt/sub subtitles to the picture."));
 
 //_______________________________________________________________
 
-//__________________________________________________________________
 
 char 								*ADMVideoSubtitle::printConf(void)
  {
 	  	static char buf[50];
- 	
+
  				sprintf((char *)buf,"Subtitle ");
         return buf;
 	}
 
-//--------------------------------------------------------	
+//--------------------------------------------------------
 ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couples)
 {
 
@@ -75,7 +71,7 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
  	_line=0;
 	_oldframe=0;
 	_oldline=0;
-	_font = new ADMfont();	
+	_font = new ADMfont();
 	if(couples)
 	{
                 int32_t b;
@@ -112,9 +108,9 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
                     char *ft,*sub;
                         ft=(char *)ADM_alloc(500);
                         sub=(char *)ADM_alloc(500);
-                        strcpy(ft,(char *)_conf->_subname); 
+                        strcpy(ft,(char *)_conf->_subname);
                         _conf->_subname=(ADM_filename *)ft;
-                        strcpy(sub,(char *)_conf->_fontname); 
+                        strcpy(sub,(char *)_conf->_fontname);
                         _conf->_fontname=(ADM_filename *)sub;
 
                         sub=(char *)ADM_alloc(500);
@@ -134,44 +130,44 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 			_conf->_fontname[0]=0;
 			_conf->_subname[0]=0;
 			_conf->_charset[0]=0;
-			
-			
+
+
 			_conf->_baseLine=_info.height-24*SRT_MAX_LINE;
 			_conf->_Y_percent=255;
 			_conf->_U_percent=0;
 			_conf->_V_percent=0;
-                        _conf->_fontsize=24; 
+                        _conf->_fontsize=24;
 			_conf->_selfAdjustable=0;
 			_conf->_delay=0;
 			_conf->_useBackgroundColor=0;
-			
+
 			_conf->_bg_Y_percent=0;
 			_conf->_bg_U_percent=0;
 			_conf->_bg_V_percent=0;
                         _conf->_blend=BLEND_SOLID;
-
+#if 0
 			prefs->get(FILTERS_SUBTITLE_FONTSIZE,&(_conf->_fontsize));
 			prefs->get(FILTERS_SUBTITLE_YPERCENT,&(_conf->_Y_percent));
 			prefs->get(FILTERS_SUBTITLE_UPERCENT,&(_conf->_U_percent));
 			prefs->get(FILTERS_SUBTITLE_VPERCENT,&(_conf->_V_percent));
-			prefs->get(FILTERS_SUBTITLE_SELFADJUSTABLE,&(_conf->_selfAdjustable));			
+			prefs->get(FILTERS_SUBTITLE_SELFADJUSTABLE,&(_conf->_selfAdjustable));
 			prefs->get(FILTERS_SUBTITLE_USEBACKGROUNDCOLOR,&(_conf->_useBackgroundColor));
-			
+
 			// _conf->_fontname, ... are used as memory for a dialog
 			// later. we can't used the length of the current string
 			{ char *tmp;
 			   prefs->get(FILTERS_SUBTITLE_FONTNAME,&tmp);
 			   strcpy((char *)_conf->_fontname,tmp);
 			   ADM_dealloc(tmp);
-			   
+
 			   prefs->get(FILTERS_SUBTITLE_CHARSET,&tmp);
-			   strcpy(_conf->_charset,tmp); 
+			   strcpy(_conf->_charset,tmp);
                            ADM_dealloc(tmp);
 			}
-			
+#endif
 	}
 
-  
+
   	_info.encoding=1;
 
 
@@ -197,7 +193,7 @@ unsigned char c,d;
                           GUI_Error_HIG(QT_TR_NOOP("Could not open subtitle file"), NULL);
 				return 0;
 			}
-			// Try to detect utf16 files			
+			// Try to detect utf16 files
 			c=fgetc(_fd);
 			// Skip utf identifier if any
 			if( (c&0xef)==0xef)
@@ -218,13 +214,13 @@ unsigned char c,d;
 			}
 
   // Apply delay to subtitles
-  
+
   aprintf("[debug] DELAY %d\n", _conf->_delay);
   if(_conf->_delay)
   {
   	int32_t newStartTime;
 	int32_t newEndTime;
-	for(uint32_t i=0;i<_line;i++) 
+	for(uint32_t i=0;i<_line;i++)
 	{
 		aprintf("[debug] BEFORE DELAY (%d) %d %d\n",i, _subs[i].startTime,_subs[i].endTime);
 		newStartTime=_subs[i].startTime;
@@ -294,13 +290,13 @@ ADMVideoSubtitle::~ADMVideoSubtitle()
 				_maskBuffer=0;
 			}
 
- 		if(_bgBitmapBuffer) 
+ 		if(_bgBitmapBuffer)
 			{
 				delete [] _bgBitmapBuffer;
 				_bgBitmapBuffer=0;
 			}
- 
-		if(_bgMaskBuffer) 
+
+		if(_bgMaskBuffer)
 			{
 				delete [] _bgMaskBuffer;
 				_bgMaskBuffer=0;
@@ -323,14 +319,14 @@ ADMVideoSubtitle::~ADMVideoSubtitle()
 					if(_subs[i].nbLine)
 					{
 					for(uint32_t k=0;k<_subs[i].nbLine;k++)
-					{					
+					{
 						if(_subs[i].string[k])
 						{
 							delete [] _subs[i].string[k];
 							_subs[i].string[k]=NULL;
 						}
-					}					
-					
+					}
+
 					delete _subs[i].string;
 					_subs[i].string=NULL;
 					delete _subs[i].lineSize;
@@ -356,17 +352,17 @@ ADMVideoSubtitle::~ADMVideoSubtitle()
 }
 
 uint8_t DIA_srt(AVDMGenericVideoStream *source, SUBCONF *param);
-    
+
 uint8_t ADMVideoSubtitle::configure(AVDMGenericVideoStream *instream)
 {
-  
+
   UNUSED_ARG(instream);
 //char c;
 uint8_t ret=0;
 int charset=0;
 uint32_t l,f;
 
-                        
+
           if(DIA_srt(	instream,_conf))
           {
             printf("\n Font : %s", _conf->_fontname);
@@ -380,7 +376,7 @@ uint32_t l,f;
 
             loadSubtitle();
             loadFont();
-                        
+#if 0
             prefs->set(FILTERS_SUBTITLE_FONTNAME,
                     (ADM_filename *)_conf->_fontname);
             prefs->set(FILTERS_SUBTITLE_CHARSET,
@@ -393,10 +389,11 @@ uint32_t l,f;
                         _conf->_selfAdjustable);
             prefs->set(FILTERS_SUBTITLE_USEBACKGROUNDCOLOR,
                         _conf->_useBackgroundColor);
+#endif
             ret=1;
         }
         return ret;
 
 }
-#endif
+
 
