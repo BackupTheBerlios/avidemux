@@ -116,23 +116,15 @@ class ADM_flyDialog
 // UI dependant part
 // They are not defined as pure to avoid unresolved problem, especially on win32.
 // You should never use flyDialog as is, but using the macro to pull flyDialogGtk/flyDialogQt4/... 
-  virtual uint8_t  cleanup2(void) {ADM_assert(0);return 0;};
-  virtual uint8_t  isRgbInverted(void){ADM_assert(0);return 0;};;
-  virtual uint8_t  display(void){ADM_assert(0);return 0;};;
-  virtual float   calcZoomFactor(void){ADM_assert(0);return 0;};;
-  virtual uint32_t sliderGet(void){ADM_assert(0);return 0;};;
-  virtual uint8_t  sliderSet(uint32_t value)  {ADM_assert(0);return 0;};
-  virtual void    postInit(uint8_t reInit){ADM_assert(0);return ;};;
-  virtual void    setupMenus (const void * params,
-                         const MenuMapping * menu_mapping,
-                        uint32_t menu_mapping_count) {ADM_assert(0);return ;};
-  virtual void  getMenuValues ( void * mm,
-                    const MenuMapping * menu_mapping,
-                    uint32_t menu_mapping_count) {ADM_assert(0);return;};
-  virtual uint32_t  getMenuValue (const MenuMapping * mm)  {ADM_assert(0);return 0;};                    
-  virtual  const MenuMapping *lookupMenu (const char * widgetName,
-                                               const MenuMapping * menu_mapping,
-                                               uint32_t menu_mapping_count)  {ADM_assert(0);return NULL;};
+  
+  virtual uint8_t  isRgbInverted(void)=0;
+  virtual uint8_t  display(void)=0;
+  virtual float   calcZoomFactor(void)=0;
+  virtual uint32_t sliderGet(void)=0;
+  virtual uint8_t  sliderSet(uint32_t value) =0;
+  virtual void    postInit(uint8_t reInit)=0;
+  
+  
 };          
 #ifdef ADM_UI_TYPE_BUILD
 #if ADM_UI_TYPE_BUILD == ADM_UI_QT4

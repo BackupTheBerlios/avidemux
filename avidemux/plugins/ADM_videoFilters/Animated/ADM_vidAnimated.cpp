@@ -12,13 +12,10 @@
  *                                                                         *
  ***************************************************************************/
 #include "ADM_default.h"
+#include "DIA_coreToolkit.h"
+#include "ADM_videoFilterDynamic.h"
 
-#include "ADM_videoFilter.h"
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
-
+#include "DIA_factory.h"
 
 #include "ADM_vidAnimated.h"
 #include "ADM_inputs/ADM_inpics/ADM_pics.h"
@@ -28,9 +25,18 @@ static FILTER_PARAM animated_template={10,
     "tc3","tc4","tc5",
     "isNTSC","backgroundImg","vignetteW","vignetteH"
     }};
-BUILD_CREATE(animated_create,ADMVideoAnimated);
-SCRIPT_CREATE(animated_script,ADMVideoAnimated,animated_template);
 
+//REGISTERX(VF_MISC, "animatedmenu",QT_TR_NOOP("Animated Menu"), QT_TR_NOOP("Create a video made of 6 mini windows, very useful to do DVD menus."),
+//        VF_ANIMATED,1,animated_create,animated_script);
+
+//********************************************
+VF_DEFINE_FILTER(ADMVideoAnimated,cropParam,
+    animatedmenu,
+                QT_TR_NOOP("Animated Menu"),
+                1,
+                VF_MISC,
+                QT_TR_NOOP("Create a video made of 6 mini windows, very useful to do DVD menus."));
+//********************************************
 #define LOOKUP 4
 #define CACHE_SIZE (LOOKUP*2+3)
 

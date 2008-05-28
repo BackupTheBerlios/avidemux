@@ -1,6 +1,4 @@
 SET(ADM_videoFilter_SRCS 
-	ADM_vidASS.cpp               
-	ADM_vidAnimated.cpp
 	ADM_vidDvbSub.cpp
 	ADM_vidVobsub.cpp
 	ADM_vidVobSubRender.cpp

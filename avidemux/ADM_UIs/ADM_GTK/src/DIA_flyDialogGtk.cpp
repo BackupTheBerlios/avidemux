@@ -29,6 +29,17 @@ extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
 extern float UI_calcZoomToFitScreen(GtkWindow* window, GtkWidget* drawingArea, uint32_t imageWidth, uint32_t imageHeight);
 extern void UI_centreCanvasWindow(GtkWindow *window, GtkWidget *canvas, int newCanvasWidth, int newCanvasHeight);
 
+/**
+ *      \fn flyDialogGtk constructor
+ * 
+ */
+
+ADM_flyDialogGtk::ADM_flyDialogGtk(uint32_t width, uint32_t height, AVDMGenericVideoStream *in,
+                              void *canvas, void *slider, int yuv, ResizeMethod resizeMethod):
+                                ADM_flyDialog(width,height,in,canvas,slider,yuv,resizeMethod)
+  {
+  
+  }
 void ADM_flyDialogGtk::postInit(uint8_t reInit)
 {
 	if (_slider)
@@ -49,10 +60,10 @@ void ADM_flyDialogGtk::postInit(uint8_t reInit)
 #endif
 }
 
-uint8_t  ADM_flyDialogGtk::cleanup2(void)
+ADM_flyDialogGtk::~ADM_flyDialogGtk(void)
 {
 #ifdef USE_JOG
-	physical_jog_shuttle->deregisterCBs (this);
+        physical_jog_shuttle->deregisterCBs (this);
 #endif
 }
 
@@ -132,87 +143,5 @@ uint8_t ADM_flyDialogGtk::isRgbInverted(void)
 	return 0; 
 }
 
-void ADM_flyDialogGtk::setupMenus (const void * params, 
-                                const MenuMapping * menu_mapping,
-                                uint32_t menu_mapping_count)
-{
-    // Fill in menus
 
-    ADM_assert (_cookie); // should be the dialog pointer
-    GtkDialog * dialog = static_cast <GtkDialog *> (_cookie);
-
-    for (int menu_index = 0; menu_index < menu_mapping_count; menu_index++)
-    {
-        const MenuMapping & mm = menu_mapping [menu_index];
-        const uint32_t * theParam
-            = (reinterpret_cast <const uint32_t *>
-               (mm.paramOffset + reinterpret_cast <const char *> (params)));
-        // printf ("setupMenus: %s: params %p + offset 0x%x = %p\n",
-        //         mm.widgetName, params, mm.paramOffset, theParam);
-
-        GtkComboBox * combo
-            = GTK_COMBO_BOX (lookup_widget (GTK_WIDGET(dialog),
-                                            mm.widgetName));
-        int found = -1;
-        for (int item_index = 0; item_index < mm.count; item_index++)
-        {
-            gtk_combo_box_append_text (combo, mm.menu [item_index].text);
-            if (mm.menu [item_index].val == *theParam)
-            {
-                gtk_combo_box_set_active (combo, item_index);
-                found = item_index;
-            }
-        }
-
-        // printf ("setupMenus: %s: current is %d (%d)\n",
-        //         mm.widgetName, found, *theParam);
-    }
-}
-
-uint32_t ADM_flyDialogGtk::getMenuValue (const MenuMapping * mm)
-{
-    ADM_assert (_cookie); // should be the dialog pointer
-    GtkDialog * dialog = static_cast <GtkDialog *> (_cookie);
-    GtkComboBox * combo
-        = GTK_COMBO_BOX (lookup_widget (GTK_WIDGET(dialog), mm->widgetName));
-    uint32_t currValue = gtk_combo_box_get_active (combo);
-    ADM_assert (currValue < mm->count);
-
-    return (mm->menu [currValue].val);
-}
-
-void ADM_flyDialogGtk::getMenuValues ( void * params,
-                                   const MenuMapping * menu_mapping,
-                                   uint32_t menu_mapping_count)
-{
-    for (int menu_index = 0; menu_index < menu_mapping_count; menu_index++)
-    {
-        const MenuMapping & mm = menu_mapping [menu_index];
-        uint32_t * theParam = reinterpret_cast <uint32_t *>
-                              (mm.paramOffset
-                               + reinterpret_cast <char *> (params));
-        *theParam = getMenuValue (&mm);
-    }
-}
-
-const MenuMapping *
-ADM_flyDialogGtk::lookupMenu (const char * widgetName,
-                           const MenuMapping * menu_mapping,
-                           uint32_t menu_mapping_count)
-{
-    for (int menu_index = 0; menu_index < menu_mapping_count; menu_index++)
-    {
-        const MenuMapping * mm = menu_mapping + menu_index;
-        if (strcmp (mm->widgetName, widgetName) == 0)
-            return mm;
-    }
-
-    return 0;
-}
-ADM_flyDialogGtk::ADM_flyDialogGtk(uint32_t width, uint32_t height, AVDMGenericVideoStream *in,
-                              void *canvas, void *slider, int yuv, ResizeMethod resizeMethod):
-                                ADM_flyDialog(width,height,in,canvas,slider,yuv,resizeMethod) 
-{
-    EndConstructor();
-};
 //EOF

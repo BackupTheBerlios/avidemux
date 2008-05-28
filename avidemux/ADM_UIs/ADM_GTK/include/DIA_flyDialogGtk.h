@@ -30,23 +30,13 @@ class ADM_flyDialogGtk : public ADM_flyDialog
 public:
   ADM_flyDialogGtk(uint32_t width, uint32_t height, AVDMGenericVideoStream *in,
                               void *canvas, void *slider, int yuv, ResizeMethod resizeMethod);
-  virtual uint8_t  cleanup2(void);
+  virtual           ~ADM_flyDialogGtk(void);
   virtual uint8_t  isRgbInverted(void);
   virtual uint8_t  display(void);
   virtual float   calcZoomFactor(void);
   virtual uint32_t sliderGet(void);
   virtual uint8_t  sliderSet(uint32_t value);
   virtual void    postInit(uint8_t reInit);
-  virtual void    setupMenus (const void * params,
-                         const MenuMapping * menu_mapping,
-                        uint32_t menu_mapping_count) ;
-  virtual void  getMenuValues ( void * mm,
-                    const MenuMapping * menu_mapping,
-                    uint32_t menu_mapping_count) ;
-  virtual  const MenuMapping *lookupMenu (const char * widgetName,
-                                               const MenuMapping * menu_mapping,
-                                               uint32_t menu_mapping_count) ;
-  virtual uint32_t  getMenuValue (const MenuMapping * mm) ;          
-};
+  };
 
 #endif

@@ -71,24 +71,6 @@ uint8_t  ADM_flyDialogQt4::isRgbInverted(void)
 {
   return 1; 
 }
-uint8_t ADM_flyDialogQt4::cleanup2(void)
-{
-  return 1; 
-}
-/** WTF are these ???? */
-  void    ADM_flyDialogQt4::setupMenus (const void * params,
-                       const MenuMapping * menu_mapping,
-                      uint32_t menu_mapping_count) 
-  {ADM_assert(0);return ;};
-  void  ADM_flyDialogQt4::getMenuValues ( void * mm,
-                  const MenuMapping * menu_mapping,
-                  uint32_t menu_mapping_count)
-  {ADM_assert(0);return;};
-  uint32_t  ADM_flyDialogQt4::getMenuValue (const MenuMapping * mm)  
-  {ADM_assert(0);return 0;};                    
-   const MenuMapping *ADM_flyDialogQt4::lookupMenu (const char * widgetName,
-                                             const MenuMapping * menu_mapping,
-                                             uint32_t menu_mapping_count)  
-  {ADM_assert(0);return NULL;};
+
 
 //EOF

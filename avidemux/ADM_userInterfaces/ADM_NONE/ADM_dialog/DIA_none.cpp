@@ -30,15 +30,6 @@
 #include "ADM_video/ADM_vidPartial_param.h"
 
 
-
-#include "ADM_videoFilter/ADM_vidAnimated_param.h"
-#if 0
-#include "ADM_videoFilter/ADM_vidASharp_param.h"
-#include "ADM_videoFilter/ADM_vidChromaShift_param.h"
-#include "ADM_videoFilter/ADM_vidContrast.h"
-#include "ADM_videoFilter/ADM_vidEq2.h"
-#include "ADM_videoFilter/ADM_vidHue.h"
-#endif
 #include "ADM_videoFilter/ADM_vobsubinfo.h"
 #include "ADM_videoFilter/ADM_vidVobSub.h"
 
@@ -66,7 +57,7 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 		      uint32_t * br,uint32_t *fsize,xvidEncParam *param) {return 0;}
 #endif
 
-uint8_t DIA_animated(ANIMATED_PARAM *param) {return 0;}
+
 
 
 

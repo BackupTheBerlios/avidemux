@@ -7,10 +7,6 @@ subdirs (PREORDER ADM_smjs)
 subdirs (PREORDER ADM_utilities)
 subdirs (PREORDER ADM_xvidratectl)
 
-if(USE_FREETYPE)
-	subdirs (PREORDER ADM_libass)
-endif(USE_FREETYPE)
-
 if (ADM_DEBUG AND FIND_LEAKS)
 	subdirs (PREORDER ADM_nvwa)
 endif (ADM_DEBUG AND FIND_LEAKS)

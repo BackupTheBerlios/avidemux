@@ -10,11 +10,11 @@
 #ifndef _ADM_ASS_H
 #define _ADM_ASS_H
 
-#ifdef USE_FREETYPE
+
 
 extern "C"
 {
-#include "ADM_libraries/ADM_libass/ass.h"
+#include "ADM_libass/ass.h"
 }
 #include "ADM_vidAss_Params.h" 
 class ADMVideoSubASS : public AVDMGenericVideoStream 
@@ -33,5 +33,5 @@ public:
         uint8_t configure(AVDMGenericVideoStream *instream);
         uint8_t	getCoupledConf(CONFcouple **conf);
 };
-#endif /* USE_FREETYPE */
+
 #endif

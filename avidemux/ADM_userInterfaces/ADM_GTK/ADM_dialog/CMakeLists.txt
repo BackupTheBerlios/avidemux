@@ -5,7 +5,7 @@ DIA_about.cpp
  DIA_calculator.cpp  
  DIA_preview.cpp    
  DIA_xvid4.cpp
-DIA_acodec.cpp   
+ DIA_acodec.cpp   
  DIA_encoding.cpp  
  DIA_ocr.cpp      
  DIA_properties.cpp 
@@ -19,18 +19,19 @@ DIA_acodec.cpp
  DIA_pause.cpp    
  DIA_recent.cpp     
  DIA_working.cpp
-DIA_busy.cpp     
+ DIA_busy.cpp     
  DIA_exLame.cpp    
  DIA_pipe.cpp     
  DIA_resize.cpp
+ toolkit_dialog.cpp
+ TLK_filesel.cpp
+)
+SET(OBSOLETE_SRCS
 DIA_threshold.cpp
  DIA_SwissArmyKnife.cpp
  DIA_particle.cpp
  DIA_eraser.cpp
-        toolkit_dialog.cpp
-        TLK_filesel.cpp
-)
-SET(OBSOLETE_SRCS
+
  DIA_hue.cpp       
  DIA_srt.cpp     
  DIA_crop.cpp      

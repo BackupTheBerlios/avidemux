@@ -10,15 +10,15 @@
   Initial port from MPlayer by Moonz
 
 */
-#include "config.h"
 #include "ADM_default.h"
+#include "ADM_videoFilterDynamic.h"
 #include "DIA_coreToolkit.h"
-#include "ADM_videoFilter.h"
+
 #include "ADM_vidASS.h"
 #include "ADM_colorspace.h"
 #include "DIA_factory.h"
 
-#ifdef USE_FREETYPE
+
 
 #ifndef DIR_SEP
 # ifdef WIN32
@@ -37,8 +37,18 @@ static FILTER_PARAM assParam={7,
           /* ADM_filename */ "fonts_dir",
           /* ADM_filename */ "subfile" }};
 
-SCRIPT_CREATE(ass_script,ADMVideoSubASS,assParam);
-BUILD_CREATE(ass_create,ADMVideoSubASS);
+//********** Register chunk ************
+//REGISTERX(VF_SUBTITLE, "ass",QT_TR_NOOP("ASS"),
+//    QT_TR_NOOP("Add ASS/SSA subtitles to the picture."),VF_ASS,1,ass_create,ass_script);
+
+
+VF_DEFINE_FILTER(ADMVideoSubASS,assParam,
+                                ass,
+                                QT_TR_NOOP("ASS"),
+                                1,
+                                VF_SUBTITLE,
+                                QT_TR_NOOP("Add ASS/SSA subtitles to the picture."));
+//************************************
 
 char *ADMVideoSubASS::printConf() 
 {
@@ -359,5 +369,5 @@ uint8_t	ADMVideoSubASS::getCoupledConf(CONFcouple **conf)
         return 1;
 }
 /************************************************/
-#endif /* USE_FREETYPE */
+
 
