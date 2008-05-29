@@ -94,7 +94,6 @@ class ADM_flyDialog
   virtual uint8_t    upload(void)=0;
           /* /filter dependant */
   
-  virtual uint8_t    sliderChanged(void);
         /* This is GTK/QT/whatever dependant */
           
   
@@ -123,6 +122,7 @@ class ADM_flyDialog
   virtual uint32_t sliderGet(void)=0;
   virtual uint8_t  sliderSet(uint32_t value) =0;
   virtual void    postInit(uint8_t reInit)=0;
+  virtual uint8_t    sliderChanged(void)=0;
   
   
 };          
