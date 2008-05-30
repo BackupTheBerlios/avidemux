@@ -108,7 +108,7 @@ uint8_t xvid4Encoder::encode(ADMImage * in,ADMBitstream * out)
 
 void xvid4_init (void);
 /*
-	System wide init, do it once for all 
+	System wide init, do it once for all
 */
 void
 xvid4_init (void)
@@ -286,7 +286,7 @@ xvid4Encoder::preAmble (uint8_t * in)
   /* Bind output buffer */
 
   xvid_enc_frame.length = 0;
-  if (_param.mpegQuantizer)
+  if (_param.mpegQuantizer || _param.useCustomIntra || _param.useCustomInter)
     xvid_enc_frame.vol_flags |= XVID_VOL_MPEGQUANT;
   if (_param.interlaced)
     xvid_enc_frame.vol_flags |= XVID_VOL_INTERLACING;
@@ -309,7 +309,7 @@ xvid4Encoder::preAmble (uint8_t * in)
   SVOP (chroma_opt, CHROMAOPT);
   //SVOP(  1      ,HALFPEL);
   xvid_enc_frame.vop_flags |= XVID_VOP_HALFPEL;
-  // ME 
+  // ME
   if (_param.chroma_me)
     {
       xvid_enc_frame.motion |= XVID_ME_CHROMA_BVOP;
@@ -386,9 +386,9 @@ xvid4Encoder::preAmble (uint8_t * in)
       xvid_enc_frame.par = XVID_PAR_11_VGA;
 
   /* Custome matrices */
-  if(_param.useCustomIntra) 
+  if(_param.useCustomIntra)
   {
-  if(!xvid_enc_frame.quant_intra_matrix)  
+  if(!xvid_enc_frame.quant_intra_matrix)
       printf("[xvid] Using custom intra matrix\n");
       xvid_enc_frame.quant_intra_matrix=_param.intraMatrix;
   }
@@ -415,7 +415,7 @@ xvid4Encoder::postAmble (ADMBitstream * out)
 
     }
   out->out_quantizer = xvid_enc_stats.quant;
-  out->ptsFrame= xvid_framenum; 
+  out->ptsFrame= xvid_framenum;
   return 1;
 }
 
