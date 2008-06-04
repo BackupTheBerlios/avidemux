@@ -2,7 +2,7 @@ INCLUDE(vf_plugin)
 
 
 SET(ADM_vf_Mosaic_SRCS ADM_vidMosaic.cpp)
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../../../")
+INCLUDE_DIRECTORIES("${AVIDEMUX_SOURCE_DIR}/avidemux/")
 ADD_LIBRARY(ADM_vf_Mosaic SHARED ${ADM_vf_Mosaic_SRCS})
 TARGET_LINK_LIBRARIES(ADM_vf_Mosaic ADM_libswscale)
 TARGET_LINK_LIBRARIES(ADM_vf_Mosaic ADM_libavcodec)

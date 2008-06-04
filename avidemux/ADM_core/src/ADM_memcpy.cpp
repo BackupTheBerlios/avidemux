@@ -376,7 +376,7 @@ static void *linux_kernel_memcpy(void *to, const void *from, size_t len) {
 #endif /* ARCH_X86 */
 
 static struct {
-  char *name;
+  const char *name;
   void *(* function)(void *to, const void *from, size_t len);
 
   uint64_t time; /* This type could be used for non-MSC build too! */
@@ -407,7 +407,7 @@ static unsigned long long int rdtsc(void)
   unsigned long long int x;
 
   /* that should prevent us from trying cpuid with old cpus */
- 
+
     __asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));
     return x;
  }
@@ -466,6 +466,6 @@ uint8_t ADM_InitMemcpy(void)
 	if(CpuCaps::hasSSE()) probe(sse_memcpy,"sse");
 #endif
 #endif
-	return 1; 
+	return 1;
 }
 }

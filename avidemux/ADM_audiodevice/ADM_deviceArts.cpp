@@ -31,12 +31,12 @@ uint8_t artsInitialized=0;
 //
 //_______________________________________________
 uint8_t  artsAudioDevice::stop(void) {
-		if(!_stream)  
+		if(!_stream)
 		{
 			printf("\n Arts: no stream\n");
 			return 0;
 		}
-		
+
 		arts_close_stream(_stream);
 		// apparently arts 3.2 alpha does not like this
 	   	//arts_free();
@@ -49,7 +49,7 @@ uint8_t  artsAudioDevice::stop(void) {
 //
 //
 //_______________________________________________
-uint8_t artsAudioDevice::init(uint8_t channels, uint32_t fq) 
+uint8_t artsAudioDevice::init(uint8_t channels, uint32_t fq)
 {
 	_channels = channels;
 
@@ -61,7 +61,7 @@ uint8_t artsAudioDevice::init(uint8_t channels, uint32_t fq)
     printf("\n Arts  : %lu Hz, %lu channels", fq, channels);
 	if(!artsInitialized)
 	{
-		if(arts_init()) 
+		if(arts_init())
 		{
 			printf("\n Error initializing artsd\n");
 			return 0;
@@ -80,8 +80,8 @@ uint8_t artsAudioDevice::init(uint8_t channels, uint32_t fq)
 	arts_stream_set(_stream, ARTS_P_BLOCKING, 1);
 	arts_stream_set(_stream, ARTS_P_BUFFER_TIME, 50); // Ask for 1 sec buffer
 	//arts_stream_set(_stream,  ARTS_P_PACKET_SETTINGS, (11<<16)+10);
-	
-	
+
+
     return 1;
 }
 

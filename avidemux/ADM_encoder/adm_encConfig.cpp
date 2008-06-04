@@ -79,6 +79,21 @@ int currentCodecIndex = 0;
 
 uint8_t mk_hex (uint8_t a, uint8_t b);
 
+/**
+ *      \fn getCodecParamFromTag
+ *      \brief Returns the codec descriptor from its tag. It is usefull only for internal filters.
+ */
+static COMPRES_PARAMS* getCodecParamFromTag(    SelectCodecType tag)
+{
+    if(tag==CodecExternal) return NULL;
+    for(int i=0;i<AllVideoCodecCount;i++)
+      {
+        COMPRES_PARAMS *r=&(AllVideoCodec[i]);
+        if(r->codec==tag) return r;
+      }
+    return NULL;
+  
+}
 CodecFamilty videoCodecGetFamily(void)
 {
 	if (currentCodecType == CodecXVCD || currentCodecType == CodecXSVCD || currentCodecType == CodecXDVD)
@@ -563,7 +578,7 @@ void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t param, uint32_t ext
 Encoder *getVideoEncoder(uint32_t w, uint32_t h, uint32_t globalHeaderFlag)
 {
 	Encoder *e = NULL;
-
+	COMPRES_PARAMS *desc=getCodecParamFromTag(currentCodecType);
 	switch (currentCodecType)
 	{
 	case CodecCopy:
@@ -574,28 +589,28 @@ Encoder *getVideoEncoder(uint32_t w, uint32_t h, uint32_t globalHeaderFlag)
 		e = new EncoderYV12 ();
 		break;
 	case CodecFF:
-		e = new EncoderFFMPEG (FF_MPEG4, &ffmpegMpeg4);
+		e = new EncoderFFMPEG (FF_MPEG4, desc);
 		break;
 	case CodecMjpeg:
 		e = new EncoderMjpeg (&MjpegCodec);
 		break;
 	case CodecFFhuff:
-		e = new EncoderFFMPEGFFHuff (&ffmpegFFHUFF);
+		e = new EncoderFFMPEGFFHuff (desc);
 		break;
 	case CodecHuff:
-		e = new EncoderFFMPEGHuff (&ffmpegHUFF);
+		e = new EncoderFFMPEGHuff (desc);
 		break;
 	case CodecFLV1:
-		e = new EncoderFFMPEGFLV1 (&ffmpegFLV1);
+		e = new EncoderFFMPEGFLV1 (desc);
 		break;
 	case CodecFFV1:
-		e = new EncoderFFMPEGFFV1 (&ffmpegFFV1);
+		e = new EncoderFFMPEGFFV1 (desc);
 		break;
 	case CodecDV:
-		e = new EncoderFFMPEGDV (&ffmpegDV);
+		e = new EncoderFFMPEGDV (desc);
 		break;
 	case CodecSnow:
-		e = new EncodeFFMPEGSNow (&ffmpegSnow);
+		e = new EncodeFFMPEGSNow (desc);
 		break;
 	case CodecH263:
 		if (!((w == 128) && (h == 96)) && !((w == 176) && (h == 144)))
@@ -604,11 +619,11 @@ Encoder *getVideoEncoder(uint32_t w, uint32_t h, uint32_t globalHeaderFlag)
 			return 0;
 		}
 
-		e = new EncoderFFMPEG (FF_H263, &ffmpegH263Codec);
+		e = new EncoderFFMPEG (FF_H263, desc);
 		break;
 #ifdef USE_XVID_4
 	case CodecXvid4:
-		e = new EncoderXvid4 (&Xvid4Codec);
+		e = new EncoderXvid4 (desc);
 		break;
 #endif
 	case CodecExternal:

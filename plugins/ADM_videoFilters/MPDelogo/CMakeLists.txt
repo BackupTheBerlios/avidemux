@@ -8,7 +8,7 @@ ADM_vidMPdelogo.cpp
 INCLUDE(vf_plugin_gtk)
 
 SET(mpdelogoGtk_SRCS gtk/DIA_mpdelogo.cpp )
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../../../")
+INCLUDE_DIRECTORIES("${AVIDEMUX_SOURCE_DIR}/avidemux/")
 
 INIT_VIDEOFILTER_PLUGIN_GTK(  ADM_vf_mpdelogo_gtk 
                 ${mpdelogoGtk_SRCS} ${mpdelogoCommon_SRCS})

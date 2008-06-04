@@ -41,7 +41,7 @@ public:
         setStatus(int working);
 
 };*/
-static char *animated[]={
+static const char *animated[]={
     "film1.png","film3.png","film5.png","film7.png","film9.png",
     "film11.png","film13.png","film15.png","film17.png","film19.png",
     "film21.png","film23.png"};

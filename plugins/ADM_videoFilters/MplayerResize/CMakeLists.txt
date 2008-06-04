@@ -6,8 +6,8 @@ SET(resizeCommonQT_SRCS qt4/Q_resize.cpp)
 SET(resizeCommonQT_Headers qt4/Q_resize.h)
 SET(resizeCommonQT_UI qt4/resizing)
 
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../../../")
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../")
+INCLUDE_DIRECTORIES("${AVIDEMUX_SOURCE_DIR}/avidemux/")
+#INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../")
 
 INCLUDE(vf_plugin_gtk)
 INIT_VIDEOFILTER_PLUGIN_GTK(ADM_vf_mplayerResize_gtk ${resizeCommonGtk_SRCS} ${resizeCommon_SRCS})
