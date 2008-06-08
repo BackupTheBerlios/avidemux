@@ -41,6 +41,9 @@
 #include "config.h"
 
 #ifdef USE_JOG
+#include <stdlib.h>
+#include <sys/time.h>
+#include <string.h>
 #include <string>
 using std::string;
 #include <iostream>
