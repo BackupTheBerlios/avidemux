@@ -14,7 +14,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 
 
 #ifndef ADM_MKV_H
@@ -25,7 +25,7 @@
 #include "ADM_inputs/ADM_matroska/ADM_ebml.h"
 
 
-typedef struct 
+typedef struct
 {
     uint64_t pos;
     uint32_t size;
@@ -33,11 +33,11 @@ typedef struct
     uint32_t timeCode;  // In fact it is delta between DTS and PTS for audio...
 }mkvIndex;
 //**********************************************
-typedef struct 
+typedef struct
 {
   /* Index in mkv */
   uint32_t  streamIndex;
-  
+
   /* Used for audio */
   WAVHeader wavHeader;
   uint32_t  nbPackets;
@@ -49,7 +49,7 @@ typedef struct
   uint32_t  _nbIndex;  // current size of the index
   uint32_t  _indexMax; // Max size of the index
   uint32_t  _sizeInBytes; // Approximate size in bytes of that stream
-  uint32_t  _defaultFrameDuration; // in us!
+  uint32_t  _defaultFrameDuration; // Duration of ONE frame in us!
 }mkvTrak;
 
 #define MKV_MAX_LACES 20 // ?
@@ -63,9 +63,8 @@ class mkvAudio : public AVDMGenericAudioStream
     mkvIndex                    *_clusters;
     uint32_t                    _nbClusters;
     uint32_t                    _currentCluster;
-    
+
     uint32_t                    _frameDurationInSample; // Nb Samples per frame
-    
     uint32_t                    _currentLace;
     uint32_t                    _maxLace;
     uint32_t                    _Laces[MKV_MAX_LACES];
@@ -75,8 +74,8 @@ class mkvAudio : public AVDMGenericAudioStream
     uint32_t                    _curTimeCode;
   public:
                                 mkvAudio(const char *name,mkvTrak *track,mkvIndex *clust,uint32_t nbClusters);
-                                
-                                
+
+
     virtual                     ~mkvAudio();
     virtual uint32_t            read(uint32_t len,uint8_t *buffer);
     virtual uint8_t             goTo(uint32_t newoffset);
@@ -92,7 +91,7 @@ class mkvAudio : public AVDMGenericAudioStream
 class mkvHeader         :public vidHeader
 {
   protected:
-                                
+
     ADM_ebml_file           *_parser;
     char                    *_filename;
     mkvTrak                 _tracks[ADM_MKV_MAX_TRACKS+1];
@@ -100,31 +99,31 @@ class mkvHeader         :public vidHeader
     mkvIndex                    *_clusters;
     uint32_t                    _nbClusters;
     uint32_t                    _clustersCeil;
- 
+
     uint32_t                _nbAudioTrack;
     uint32_t                _currentAudioTrack;
     uint32_t                _reordered;
-    
+
     uint8_t                 checkHeader(void *head,uint32_t headlen);
     uint8_t                 analyzeTracks(void *head,uint32_t headlen);
     uint8_t                 analyzeOneTrack(void *head,uint32_t headlen);
     uint8_t                 walk(void *seed);
     int                     searchTrackFromTid(uint32_t tid);
     //
-    uint8_t                 reformatVorbisHeader(mkvTrak *trk);  
+    uint8_t                 reformatVorbisHeader(mkvTrak *trk);
     // Indexers
-    
+
     uint8_t                 addIndexEntry(uint32_t track,uint64_t where, uint32_t size,uint32_t flags,
                                             uint32_t timecodeMS);
     uint8_t                 videoIndexer(ADM_ebml_file *parser);
     uint8_t                 readCue(ADM_ebml_file *parser);
     uint8_t                 indexClusters(ADM_ebml_file *parser);
     uint8_t                 indexBlock(ADM_ebml_file *parser,uint32_t count,uint32_t timecodeMS);
-    
+
     uint8_t                 changeAudioStream(uint32_t newstream);
     uint32_t                getCurrentAudioStreamNumber(void);
     uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos);
-    
+    uint8_t                 rescaleTrack(mkvTrak *track,uint32_t durationMs);
   public:
 
       uint8_t               hasPtsDts(void) {return 1;} // Return 1 if the container gives PTS & DTS info

@@ -65,6 +65,7 @@ extern uint32_t 				audioProcessMode(void);
 extern AVDMGenericAudioStream 	*currentaudiostream;;
 
 static 				uint8_t *_buffer=NULL,*_outbuffer=NULL;
+extern uint8_t isVP6Compatible (uint32_t fourcc);
 
 /*
  * 		\fn    Oplug_flv
@@ -129,15 +130,10 @@ uint32_t sent=0;
 
            info.fcc=*(uint32_t *)_encode->getCodecName(); //FIXME
            //
-           const char *supportedVideo[3]={"FLV1","VP6F","VP6 "};
            int supported=0;
-           for(int i=0;i<3;i++)
-           {
-        	   if(fourCC::check(info.fcc,(uint8_t *)supportedVideo[i]))
-        	   {
-        		   	supported=1;
-        	   }
-           }
+           if(isVP6Compatible(info.fcc)) supported=1;
+           if(fourCC::check(info.fcc,(const uint8_t *)"FLV1")) supported=1;
+
            if(!supported)
            {
         	   GUI_Error_HIG(QT_TR_NOOP("Unsupported video"),QT_TR_NOOP("Only FLV1 and VP6 video are supported"));

@@ -62,6 +62,9 @@ uint64_t  _curDTS;
 
 static uint8_t ADM_4cc_to_lavcodec(const char *fcc, CodecID *outlavid);
 static uint8_t ADM_WaveTag_to_lavcodec(uint32_t tag, CodecID *outlavid);
+
+extern uint8_t isVP6Compatible (uint32_t fourcc);
+
 // convert in in us to out in 90Khz tick
 int64_t adm_90k( double in)
 {
@@ -174,14 +177,14 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 					 	 c->codec->name=ADM_strdup("FLV1");
 					 }else
 					 {
-						 if(fourCC::check(info->fcc,(uint8_t *)"VP6F"))
+					         if(isVP6Compatible(info->fcc))
 						 			{
 							 		 c->codec_id=CODEC_ID_VP6F;
 					 				 c->codec->name=ADM_strdup("VP6F");
 						 			}
 						 else
 							 ADM_assert(0);
-					 
+ 
 					 }
 					 
 					 break;

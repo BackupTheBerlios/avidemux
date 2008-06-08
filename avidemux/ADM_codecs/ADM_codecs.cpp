@@ -150,6 +150,23 @@ isMSMpeg4Compatible (uint32_t fourcc)
 
 #undef CHECK
 }
+uint8_t isVP6Compatible (uint32_t fourcc)
+{
+
+#define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
+						{divx3=1; }
+
+  uint8_t divx3 = 0;
+
+  CHECK ("VP6F");
+  CHECK ("VP6 ");
+  CHECK ("VP61");
+  CHECK ("VP62");
+
+  return divx3;
+
+#undef CHECK
+}
 uint8_t
 isDVCompatible (uint32_t fourcc)
 {
@@ -363,8 +380,7 @@ if (fourCC::check (fcc, (uint8_t *) "MJPG")
       return (decoders *) (new decoderFFAMV (w, h,extraLen,extraData));
     }
 
-    
-  if (fourCC::check (fcc, (uint8_t *) "VP6F"))
+    if (isVP6Compatible(fcc))
     {
       printf ("\n using VP6F codec\n");
       return (decoders *) (new decoderFFVP6F (w, h,extraLen,extraData));

@@ -37,14 +37,14 @@ class entryDesc
           uint32_t     trackNo;
           uint32_t     trackType;
           uint32_t     extraDataLen;
-          
+
           uint32_t fcc;
           uint32_t w,h,fps;
           uint32_t fq,chan,bpp;
           uint32_t defaultDuration;
           float    trackScale;
           uint8_t *extraData;
-          
+
           void dump(void);
 };
 /* Prototypes */
@@ -86,7 +86,7 @@ void entryDesc::dump(void)
 /**
       \fn analyzeOneTrack
       \brief Grab info about the track (it is a recursive function !)
-              
+
 */
 uint8_t mkvHeader::analyzeOneTrack(void *head,uint32_t headlen)
 {
@@ -96,12 +96,12 @@ entryDesc entry;
       /* Set some defaults value */
 
       entry.chan=2;
-      
+
       entryWalk(  (ADM_ebml_file *)head,headlen,&entry);
       entry.dump();
       if(entry.trackType==1 &&  !_isvideopresent)
       {
-        _isvideopresent=1; 
+        _isvideopresent=1;
         if(entry.defaultDuration)
         {
             _tracks[0]._defaultFrameDuration=entry.defaultDuration;
@@ -114,13 +114,13 @@ entryDesc entry;
             _videostream.dwRate=(uint32_t)inv;
         }else
         {
-          printf("[MKV] No duration, assuming 25 fps\n"); 
+          printf("[MKV] No duration, assuming 25 fps\n");
           _videostream.dwScale=1000;
           _videostream.dwRate=25000;
 
         }
-    
-        _mainaviheader.dwMicroSecPerFrame=(uint32_t)floor(50);;     
+
+        _mainaviheader.dwMicroSecPerFrame=(uint32_t)floor(50);;
         _videostream.fccType=fourCC::get((uint8_t *)"vids");
         _video_bih.biBitCount=24;
         _videostream.dwInitialFrames= 0;
@@ -128,7 +128,7 @@ entryDesc entry;
         _video_bih.biWidth=_mainaviheader.dwWidth=entry.w;
         _video_bih.biHeight=_mainaviheader.dwHeight=entry.h;
         _videostream.fccHandler=_video_bih.biCompression=entry.fcc;
-        
+
         // if it is vfw...
         if(fourCC::check(entry.fcc,(uint8_t *)"VFWX") && entry.extraData && entry.extraDataLen>=sizeof(ADM_BITMAPINFOHEADER))
         {
@@ -136,24 +136,24 @@ entryDesc entry;
           delete [] _tracks[0].extraData;
           entry.extraData=NULL;
           entry.extraDataLen=0;
-          
+
           _videostream.fccHandler=_video_bih.biCompression;
           _mainaviheader.dwWidth=  _video_bih.biWidth;
-          _mainaviheader.dwHeight= _video_bih.biHeight;    
-          
+          _mainaviheader.dwHeight= _video_bih.biHeight;
+
         } // FIXME there can be real extradata after bitmapinfoheader
-        
-        _tracks[0].extraData=entry.extraData; 
-        _tracks[0].extraDataLen=entry.extraDataLen;       
+
+        _tracks[0].extraData=entry.extraData;
+        _tracks[0].extraDataLen=entry.extraDataLen;
         _tracks[0].streamIndex=entry.trackNo;
-        
+
         return 1;
       }
       if(entry.trackType==2 && _nbAudioTrack<ADM_MKV_MAX_TRACKS)
       {
          uint32_t  streamIndex;
          mkvTrak *t=&(_tracks[1+_nbAudioTrack]);
-         
+
          t->wavHeader.encoding=entry.fcc;
          t->wavHeader.channels=entry.chan;
          t->wavHeader.frequency=entry.fq;
@@ -165,15 +165,15 @@ entryDesc entry;
          if(entry.defaultDuration)
           t->_defaultFrameDuration=entry.defaultDuration;
          else
-           t->_defaultFrameDuration=24000;
+           t->_defaultFrameDuration=0;
         _nbAudioTrack++;
         return 1;
       }
       if(entry.extraData) delete [] entry.extraData;
       return 1;
-  
+
 }
-  
+
 /**
     \fn entryWalk
     \brief walk a trackEntry atom and grabs all infos. Store them in entry
@@ -184,7 +184,7 @@ uint8_t entryWalk(ADM_ebml_file *head,uint32_t headlen,entryDesc *entry)
    uint64_t id,len;
   ADM_MKV_TYPE type;
   const char *ss;
-  
+
   while(!father.finished())
   {
       father.readElemId(&id,&len);
@@ -196,7 +196,7 @@ uint8_t entryWalk(ADM_ebml_file *head,uint32_t headlen,entryDesc *entry)
       }
       switch(id)
       {
-        
+
         case  MKV_TRACK_NUMBER: entry->trackNo=father.readUnsignedInt(len);break;
         case  MKV_TRACK_TYPE: entry->trackType=father.readUnsignedInt(len);break;
 
@@ -225,13 +225,13 @@ uint8_t entryWalk(ADM_ebml_file *head,uint32_t headlen,entryDesc *entry)
                   father.readBin(codec,len);
                   codec[len]=0;
                   entry->fcc=ADM_mkvCodecToFourcc((char *)codec);
-                  
+
             }
                   break;
         default: printf("[MKV]not handled %s\n",ss);
-                  father.skip(len);  
+                  father.skip(len);
         }
-        
+
       }
   return 1;
 }//EOF

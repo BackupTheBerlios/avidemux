@@ -82,7 +82,7 @@ int fourCC::check(uint8_t * in, uint8_t * cc)
 #if defined( ADM_BIG_ENDIAN)
     if (*inb == (uint32_t) mmioFOURCC(*(cc+3), *(cc + 2), *(cc + 1), *(cc + 0)))
 #else
-    if (*inb == (uint32_t) mmioFOURCC(*cc, *(cc + 1), *(cc + 2), *(cc + 3)))	
+    if (*inb == (uint32_t) mmioFOURCC(*cc, *(cc + 1), *(cc + 2), *(cc + 3)))
 #endif
       {
 	  return 1;
@@ -102,7 +102,7 @@ uint32_t fourCC::get(uint8_t * cc)
     return inb;
 }
 
-int fourCC::check(uint8_t * cc, uint32_t in)
+int fourCC::check(const uint8_t * cc, uint32_t in)
 {
 
     if (in == (uint32_t) mmioFOURCC(*cc, *(cc + 1), *(cc + 2), *(cc + 3)))
@@ -113,7 +113,7 @@ int fourCC::check(uint8_t * cc, uint32_t in)
     return 0;
 }
 
-int fourCC::check(uint32_t in, uint8_t * cc)
+int fourCC::check(uint32_t in, const uint8_t * cc)
 {
     return check(cc, in);
 

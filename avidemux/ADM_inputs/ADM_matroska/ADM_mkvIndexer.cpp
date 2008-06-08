@@ -44,7 +44,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
   uint64_t id;
   ADM_MKV_TYPE type;
   const char *ss;
-  
+
    parser->seek(0);
    DIA_working *work=new DIA_working("Matroska Images");
    // Start with a small index, it will grow automatically afterward
@@ -73,8 +73,8 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
       //printf("\t\tFound %s\n",ss);
       switch(id)
       {
-                default: 
-                case MKV_TIMECODE: 
+                default:
+                case MKV_TIMECODE:
                   //printf("Skipping %s\n",ss);
                   cluster.skip(len);
                   break;
@@ -101,7 +101,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
                                 switch(id)
                                 {
                                   default: blockGroup.skip(len);
-                                  case MKV_BLOCK : 
+                                  case MKV_BLOCK :
                                   case MKV_SIMPLE_BLOCK:
                                   {
                                     indexBlock(&blockGroup,len,_clusters[clusters].timeCode);
@@ -111,7 +111,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
                           }
                           thiscluster++;
             }
-            
+
             break; // Block Group
        }
      }
@@ -130,19 +130,19 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t cluste
   int lacing,nbLaces,entryFlags=0;
   //
   uint64_t tail=parser->tell()+len;
-  // Read Track id 
+  // Read Track id
   uint32_t tid=parser->readEBMCode();
   int track=searchTrackFromTid(tid);
-  
+
       //printf("Wanted %u got %u\n",_tracks[0].streamIndex,tid);
       if(track==-1) //dont care track
       {
-        
+
         parser->seek(tail);
         return 1; // we do only video here...
       }
       // Skip timecode
-      int16_t timecode=parser->readSignedInt(2); 
+      int16_t timecode=parser->readSignedInt(2);
       //if(!track) printf("TC: %d\n",timecode);
       uint8_t flags=parser->readu8();
       uint32_t remaining=tail-parser->tell();
@@ -153,12 +153,13 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t cluste
       {
         case 0: // No lacing
               if(!track) // Video
-              {    
+              {
                   addIndexEntry(track,parser->tell(),remaining,entryFlags,clusterTimeCodeMs+timecode);
               }
               else
               {
-                _tracks[track]._sizeInBytes+=remaining; // keep some stat, useful for audio 
+                _tracks[track]._sizeInBytes+=remaining; // keep some stat, useful for audio
+                _tracks[track].nbPackets++;
               }
               break;
         case 2 : // Constant size lacing
@@ -166,14 +167,14 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t cluste
                     nbLaces=parser->readu8()+1;
                     remaining--;
                     // Only mp3/Ac3 supported, ignore lacing FIXME : Vorbis or AAC will not work
-                    
-                    
+
+
                     int bsize=remaining/nbLaces;
                     if(bsize*nbLaces!=remaining)
                     {
                       printf("Warning not multiple bsize=%d total=%u  nbLaces=%u\n",bsize,remaining,nbLaces);
                     }
-                    if(!track) 
+                    if(!track)
                     {
                       addIndexEntry(track,parser->tell(),remaining,0,clusterTimeCodeMs+timecode);
                       printf("Warning lacing on video track\n");
@@ -181,6 +182,7 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t cluste
                     else
                     {
                        _tracks[track]._sizeInBytes+=remaining;
+                       _tracks[track].nbPackets++;
                     }
                     //printf("tid:%u track %u Remaining : %llu laces %u blksize %d er%d\n",tid,track,remaining,nbLaces,remaining/nbLaces,remaining-(remaining/nbLaces)*nbLaces);
             }
@@ -188,7 +190,7 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t cluste
 #if 1
         case 3: // Ebml lacing
           {
-                                
+
                                 int nbLaces=parser->readu8();
                                 for(int i=1;i<nbLaces;i++)
                                 {
@@ -197,13 +199,14 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t cluste
                                 ADM_assert(track); // Not video!
                                 if(parser->tell()>=tail)
                                 {
-                                  printf("[MKVINDEXER]OOps overflow for EBML(track %u tid%u) at 0x%llx\n",track,tid,parser->tell()); 
+                                  printf("[MKVINDEXER]OOps overflow for EBML(track %u tid%u) at 0x%llx\n",track,tid,parser->tell());
                                   break;
                                 }else
                                 {
                                     _tracks[track]._sizeInBytes+=tail-parser->tell();
+                                    _tracks[track].nbPackets++;
                                 }
-                                
+
                               }
             break;
 #endif
@@ -217,16 +220,17 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t cluste
                                 }
                                 if(parser->tell()>=tail)
                                 {
-                                  printf("[MKVINDEXER]OOps overflow for XIPH(track %u tid%u) at 0x%llx\n",track,tid,parser->tell()); 
+                                  printf("[MKVINDEXER]OOps overflow for XIPH(track %u tid%u) at 0x%llx\n",track,tid,parser->tell());
                                   break;
                                 }
                                 ADM_assert(track); // Not video!
                                 _tracks[track]._sizeInBytes+=(tail-parser->tell());
+                                _tracks[track].nbPackets++;
                                 //printf("This round %lld total:%lld\n",tail-parser->tell(),    _tracks[track]._sizeInBytes);
                                 break;
-          
+
         }
-        default: 
+        default:
             printf("unsupported lacing Track:%d (%d)\n",track,lacing);
             break;
       }
@@ -246,21 +250,21 @@ uint8_t mkvHeader::addIndexEntry(uint32_t track,uint64_t where, uint32_t size,ui
   // Need to grow index ?
   if(Track->_nbIndex==Track->_indexMax-1)
   {
-    // Realloc 
+    // Realloc
     mkvIndex *dx=new mkvIndex[Track->_indexMax*2];
     memcpy(dx, Track->_index,sizeof(mkvIndex)*Track->_nbIndex);
     Track->_indexMax*=2;
     delete [] Track->_index;
     Track->_index=dx;
   }
-  
+
   mkvIndex *index=Track->_index;
   int x=Track->_nbIndex;
   index[x].pos=where;
   index[x].size=size;
   index[x].flags=AVI_KEY_FRAME;
   index[x].timeCode=0;
-  
+
   float f=timecodeMS;
   uint32_t delta;
   f*=_videostream.dwRate;
@@ -270,14 +274,14 @@ uint8_t mkvHeader::addIndexEntry(uint32_t track,uint64_t where, uint32_t size,ui
   //printf("Frame :%u rawTimeCode:%u convertedtoframe:%u \n",Track->_nbIndex,timecodeMS,delta);
   if(delta+2<Track->_nbIndex)
   {
-    printf("[MKV] WARNING DELTA PTS/DTS is negative for frame %u (delta:%u, raw value %u,dwrate=%u)\n",Track->_nbIndex,delta,timecodeMS,_videostream.dwRate); 
+    printf("[MKV] WARNING DELTA PTS/DTS is negative for frame %u (delta:%u, raw value %u,dwrate=%u)\n",Track->_nbIndex,delta,timecodeMS,_videostream.dwRate);
     index[x].timeCode=0;
   }else
   {
     index[x].timeCode=delta+1-Track->_nbIndex;
   }
   Track->_nbIndex++;
-  
+
  // printf("++\n");
   return 1;
 }
@@ -310,9 +314,9 @@ uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
   const char *ss;
   uint64_t time;
   uint64_t segmentPos;
-  
+
    parser->seek(0);
-   
+
    if(!parser->simplefind(MKV_SEGMENT,&vlen,1))
    {
      printf("[MKV] Cannot find CLUSTER atom\n");
@@ -320,7 +324,7 @@ uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
    }
    ADM_ebml_file segment(parser,vlen);
    segmentPos=segment.tell();
-   
+
    while(segment.simplefind(MKV_CUES,&alen,0))
   {
    ADM_ebml_file cues(&segment,alen);
@@ -335,7 +339,7 @@ uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
       }
       if(id!=MKV_CUE_POINT)
       {
-        printf("Found %s in CUES, ignored \n",ss); 
+        printf("Found %s in CUES, ignored \n",ss);
         cues.skip(len);
         continue;
       }
@@ -350,8 +354,8 @@ uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
           continue;
        }
        time=cue.readUnsignedInt(len);
-       
-       
+
+
        cue.readElemId(&id,&len);
        if(id!=MKV_CUE_TRACK_POSITION)
        {
@@ -370,7 +374,7 @@ uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
          {
            case MKV_CUE_TRACK: tid=trackPos.readUnsignedInt(len);break;
            case MKV_CUE_CLUSTER_POSITION: cluster_position=trackPos.readUnsignedInt(len);break;
-           default: 
+           default:
                  ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type);
                  printf("[MKV] in cluster position found tag %s (0x%x)\n",ss,id);
                  trackPos.skip(len);
@@ -382,7 +386,7 @@ uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
      }
    }
    printf("[MKV] Cues updated\n");
-   return 1;  
+   return 1;
 }
 /**
         \fn indexClusters
@@ -403,7 +407,7 @@ uint8_t   mkvHeader::indexClusters(ADM_ebml_file *parser)
   _clusters=new mkvIndex[NB_DEFAULT_CLUSTERS];
   _clustersCeil=NB_DEFAULT_CLUSTERS;
   _nbClusters=0;
-  
+
   // Search segment
    fileSize=parser->getFileSize();
    if(!parser->simplefind(MKV_SEGMENT,&vlen,1))
@@ -413,9 +417,9 @@ uint8_t   mkvHeader::indexClusters(ADM_ebml_file *parser)
    }
    ADM_ebml_file segment(parser,vlen);
    DIA_working *work=new DIA_working("Matroska clusters");
-   while(segment.simplefind(MKV_CLUSTER,&alen,0)) 
+   while(segment.simplefind(MKV_CLUSTER,&alen,0))
    {
-     
+
      // UI update
      work->update(segment.tell()>>10,fileSize>>10);
      // Grow clusters index if needed
@@ -429,8 +433,8 @@ uint8_t   mkvHeader::indexClusters(ADM_ebml_file *parser)
      }
      _clusters[_nbClusters].pos=segment.tell();
      _clusters[_nbClusters].size=alen;
-     
-     // Normally the timecode is the 1st one following 
+
+     // Normally the timecode is the 1st one following
        segment.readElemId(&id,&len);
        int seekme=_nbClusters;
        if(id!=MKV_TIMECODE)
@@ -438,7 +442,7 @@ uint8_t   mkvHeader::indexClusters(ADM_ebml_file *parser)
           ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type);
           printf("[MKV] Cluster : no time code Found %s(0x%x), expected MKV_TIMECODE  (0x%x)\n",
                   ss,id,MKV_TIMECODE);
-       } 
+       }
        else
        {
            uint64_t timecode=segment.readUnsignedInt(len);
