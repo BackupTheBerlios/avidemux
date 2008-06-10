@@ -51,12 +51,10 @@ MESSAGE("")
 ########################################
 # pthreads
 ########################################
-IF (WIN32)
-	MESSAGE(STATUS "Checking for pthreads")
-	MESSAGE(STATUS "*********************")
+MESSAGE(STATUS "Checking for pthreads")
+MESSAGE(STATUS "*********************")
 
-	FIND_PACKAGE(Threads)
-	PRINT_LIBRARY_INFO("pthreads" PTHREAD_FOUND "${PTHREAD_INCLUDE_DIR}" "${PTHREAD_LIBRARIES}" FATAL_ERROR)
+FIND_PACKAGE(Threads)
+PRINT_LIBRARY_INFO("pthreads" PTHREAD_FOUND "${PTHREAD_INCLUDE_DIR}" "${PTHREAD_LIBRARIES}" FATAL_ERROR)
 
-	MESSAGE("")
-ENDIF (WIN32)
+MESSAGE("")

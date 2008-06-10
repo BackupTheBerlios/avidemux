@@ -97,6 +97,10 @@ MACRO (ADM_CHECK_FUNCTION_EXISTS _function _lib _varToSet)
 		MESSAGE(STATUS "Found ${_function} in ${_lib}")
 	ELSE (${_varToSet})
 		MESSAGE(STATUS "Could not find ${_function} in ${_lib}")
+		
+		IF (VERBOSE)
+			MESSAGE(${OUTPUT})
+		ENDIF (VERBOSE)
 	ENDIF (${_varToSet})	
 ENDMACRO (ADM_CHECK_FUNCTION_EXISTS)
 
@@ -139,13 +143,11 @@ MACRO (APPEND_FLAGS _flags)
 		SET(${_flags} "${${_flags}} ${_flag}")
 	ENDFOREACH (_flag ${ARGN})
 
-	STRING(SUBSTRING "${${_flags}}" 0 1 firstChar)
-
-	IF (${firstChar} STREQUAL " ")
+	IF (${firstChar} AND ${firstChar} STREQUAL " ")
 		STRING(LENGTH "${${_flags}}" stringLength)
 		MATH(EXPR stringLength "${stringLength} - 1")
 		STRING(SUBSTRING "${${_flags}}" 1 ${stringLength} ${_flags})
-	ENDIF (${firstChar} STREQUAL " ")
+	ENDIF (${firstChar} AND ${firstChar} STREQUAL " ")
 ENDMACRO (APPEND_FLAGS)
 
 
