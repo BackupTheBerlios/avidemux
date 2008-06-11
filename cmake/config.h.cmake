@@ -18,9 +18,6 @@
 #cmakedefine ALSA_SUPPORT
 #endif
 
-/* FontConfig detected */
-#cmakedefine HAVE_FONTCONFIG
-
 #if ${CONFIG_HEADER_TYPE} == ADM_BUILD_CLI || ${CONFIG_HEADER_TYPE} == ADM_BUILD_GTK
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #cmakedefine HAVE_GETTEXT
@@ -61,9 +58,6 @@
 
 /* FFmpeg */
 #define USE_FFMPEG
-
-/* FontConfig detected */
-#cmakedefine USE_FONTCONFIG
 
 /* FreeType2 detected */
 #cmakedefine USE_FREETYPE

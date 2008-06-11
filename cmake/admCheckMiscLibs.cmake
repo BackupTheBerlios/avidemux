@@ -1,27 +1,4 @@
 ########################################
-# FontConfig
-########################################
-#OPTION(FONTCONFIG "" ON)
-
-#MESSAGE(STATUS "Checking for FontConfig")
-#MESSAGE(STATUS "***********************")
-
-#IF (FONTCONFIG)
-	#PKG_CHECK_MODULES(FONTCONFIG fontconfig)
-	#PRINT_LIBRARY_INFO("FontConfig" FONTCONFIG_FOUND "${FONTCONFIG_CFLAGS}" "${FONTCONFIG_LDFLAGS}")
-
-	#IF (FONTCONFIG_FOUND)
-		#SET(HAVE_FONTCONFIG 1)
-		#SET(USE_FONTCONFIG 1)
-	#ENDIF (FONTCONFIG_FOUND)
-#ELSE (FONTCONFIG)
-	#MESSAGE("${MSG_DISABLE_OPTION}")
-#ENDIF (FONTCONFIG)
-
-MESSAGE("")
-
-
-########################################
 # gettext
 ########################################
 INCLUDE(admCheckGettext)

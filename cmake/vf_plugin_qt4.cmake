@@ -10,7 +10,6 @@ MACRO(INIT_VIDEOFILTER_PLUGIN_QT4  lib  _srcsQt _headersQt _srcQt_ui  )
 
 		QT4_WRAP_UI(qt4_ui ${_srcQt_ui}.ui)
 		QT4_WRAP_CPP(qt4_cpp ${_headersQt})
-		#${_srcQt_ui}.h)
 
 		ADD_LIBRARY(${lib} SHARED ${ARGN} ${_srcsQt} ${qt4_cpp} ${qt4_ui})
 		ADD_TARGET_CFLAGS(${lib} "-DADM_UI_TYPE_BUILD=4")

@@ -87,7 +87,6 @@ uint8_t DIA_videoCodec(int *codecIndex) {return 0;}
 uint8_t DIA_audioCodec( AUDIOENCODER *codec ) {return 0;}
 uint8_t DIA_dnr(uint32_t *llock,uint32_t *lthresh, uint32_t *clock,
 			uint32_t *cthresh, uint32_t *scene) {return 0;}
-int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b) {return 0;}			
 uint8_t DIA_glyphEdit(void) {return 0;}
 struct THRESHOLD_PARAM;
 struct ADMVideoThreshold;

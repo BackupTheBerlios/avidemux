@@ -1,5 +1,3 @@
-
-PROJECT("Avidemux_2.5")
 MESSAGE("#####################################")
 MESSAGE("Configure Started")
 MESSAGE("#####################################")
@@ -7,9 +5,6 @@ MESSAGE("")
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7 FATAL_ERROR)
 
-#need for shared cmake script between avidemux & plugins
-SET(AVIDEMUX_SOURCE_DIR ${CMAKE_SOURCE_DIR})
-MESSAGE(STATUS "Source dir is ${AVIDEMUX_SOURCE_DIR}")
 if (COMMAND cmake_policy)
 	cmake_policy(VERSION 2.4)
 	cmake_policy(SET CMP0003 NEW)
@@ -21,6 +16,12 @@ IF (NOT CMAKE_CXX_COMPILER_WORKS MATCHES "^${CMAKE_CXX_COMPILER_WORKS}$")
 	SET(FRESH_BUILD 1)
 ENDIF (NOT CMAKE_CXX_COMPILER_WORKS MATCHES "^${CMAKE_CXX_COMPILER_WORKS}$")
 
+# need for shared cmake script between avidemux & plugins
+SET(AVIDEMUX_SOURCE_DIR ${CMAKE_SOURCE_DIR})
+MESSAGE(STATUS "Source dir is ${AVIDEMUX_SOURCE_DIR}")
+MESSAGE("")
+
+PROJECT(Avidemux)
 
 IF (${Avidemux_SOURCE_DIR} MATCHES ${Avidemux_BINARY_DIR})
 	MESSAGE("Please do an out-of-tree build:")
