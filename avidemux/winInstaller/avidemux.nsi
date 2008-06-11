@@ -177,7 +177,7 @@ Section "Core files (required)" SecCore
     File ..\..\..\avidemux_2.4_build\libfontconfig-1.dll
     File ..\..\..\avidemux_2.4_build\libglib-2.0-0.dll
     File ..\..\..\avidemux_2.4_build\libmp3lame-0.dll
-    File ..\..\..\avidemux_2.4_build\libpng13.dll
+    File ..\..\..\avidemux_2.4_build\libpng12-0.dll
     File ..\..\..\avidemux_2.4_build\libx264.dll
     File ..\..\..\avidemux_2.4_build\libxml2.dll
     File ..\..\..\avidemux_2.4_build\ogg.dll

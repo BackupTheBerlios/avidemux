@@ -41,5 +41,7 @@ protected:
 	void clearCustomMenu(void);
 	bool eventFilter(QObject* watched, QEvent* event);
 	void mousePressEvent(QMouseEvent* event);
+	void dragEnterEvent(QDragEnterEvent *event);
+	void dropEvent(QDropEvent *event);
 };
 #endif	// Q_gui2_h

@@ -1,10 +1,14 @@
+/***************************************************************************
+                          DIA_vobsub.cpp  -  description
+                             -------------------
+    begin                : Thu Apr 21 2003
+    copyright            : (C) 2003 by mean
+    email                : fixounet@free.fr
 
-//
-// Author: mean , fixounet@free.fr, GPL (C) 2005
-//
-// Copyright: See COPYING file that comes with this distribution
-//
-//
+  This class deals with the working window
+
+ ***************************************************************************/
+
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -15,6 +19,7 @@
  ***************************************************************************/
 #include "ADM_toolkitGtk.h"
 
+#include "DIA_coreToolkit.h"
 #include "DIA_fileSel.h"
 
 #define CHECK_GET(x,y) {*y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
@@ -34,87 +39,88 @@ static GtkWidget        *dialog;
 static int              indeces[MAX_INDECES];
 static void update(char *name,int i);
 
+/* Dialog for update vobsub parameters :
+ * - File name
+ * - Shift
+ * - Selected language
+ */
 uint8_t DIA_vobsub(vobSubParam *param);
 uint8_t DIA_vobsub(vobSubParam *param)
 {
-  char *name=NULL; 
+  char *name;
   int32_t shift;     
-  int ret,ext,r;
+  int ret,ext;
         
-  ret=0;
-  ext=0;
-  
-  if(param->subname)
-    name=ADM_strdup(param->subname);
-  shift=param->subShift;
+  ret = 0;
+  ext = 0;
+  name = param->subname;
+  shift = param->subShift;
   
   while(!ext)
   {
-    dialog=create_dialog1();
+    dialog = create_dialog1();
     gtk_register_dialog(dialog);
-    //gtk_transient(dialog);
-    gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonSelect), GTK_RESPONSE_APPLY);
+    gtk_dialog_add_action_widget(GTK_DIALOG(dialog),WID(buttonSelect),GTK_RESPONSE_APPLY);
     
+    fq = new GtkWidget*[ADM_MAX_LANGUAGE];
     
-    fq=new GtkWidget*[ADM_MAX_LANGUAGE];
-  
-        // Upload if any
+    // update if any
         if(name)
         {
                 update(name,param->index);
+      gtk_label_set_text(GTK_LABEL(WID(labelVobsub)),name);
         }
         else
         {
                 gtk_label_set_text(GTK_LABEL(WID(labelVobsub)),QT_TR_NOOP("none"));     
         }
+
         gtk_write_entry(WID(entryShift),shift);
-        r=gtk_dialog_run(GTK_DIALOG(dialog));
-        shift=gtk_read_entry(WID(entryShift));
-        switch(r)
+
+    switch(gtk_dialog_run(GTK_DIALOG(dialog)))
         {
               case GTK_RESPONSE_APPLY:
-              {
                 char *file;
                         GUI_FileSelRead(QT_TR_NOOP("Select .idx file"),&file); 
                         if(file)
                         {
-                          if(name) ADM_dealloc(name);
-                          name=NULL;
-                          name=ADM_strdup(file); // Leak ?                      
-                        }                                
+          ADM_dealloc(name);
+          name = file;
               }
+        shift = gtk_read_entry(WID(entryShift));
                 break;
               case GTK_RESPONSE_OK:
-                ret=1;
-                ext=1;
-                if(name)
+        if(!name)
                 {
-                        ADM_dealloc(name);
+          GUI_Error_HIG(QT_TR_NOOP("Wrong VobSub parametering"),QT_TR_NOOP("The idx/sub file does not set."));
+        }
+        else
+        {
+          param->subname = name;
+          param->index = indeces[getRangeInMenu(WID(optionmenu1))];
+          param->subShift = gtk_read_entry(WID(entryShift));
+          ret = 1;
+          ext = 1;
                 }
-                name=ADM_strdup(gtk_label_get_text(GTK_LABEL(WID(labelVobsub))));
-                if(param->subname)      
-                        ADM_dealloc(param->subname);
-                param->subname=name;                                        
-                //
-                
-                param->index=indeces[getRangeInMenu(WID(optionmenu1))];
-                param->subShift=shift;
                 break;
               case GTK_RESPONSE_CANCEL:
+      default:
+        if(name != param->subname)
+        {
+          ADM_dealloc(name);
+        }
                 ret=0;
                 ext=1;
-                break;
-              default:
                 break;
         }
         delete [] fq;          
         gtk_unregister_dialog(dialog);
         gtk_widget_destroy(dialog);
-  
   }
      
   return ret;
 }    
+
 //*****************************************************   
 void update(char *name,int idx)
 {

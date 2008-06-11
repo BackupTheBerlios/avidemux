@@ -241,8 +241,8 @@ getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
     {
       return (decoders *) (new decoderFFFLV1 (w, h,extraLen, extraData));
     }
-  
-    
+
+
 #ifdef USE_FFMPEG
   if (fourCC::check (fcc, (uint8_t *) "H263"))
     {
@@ -297,7 +297,7 @@ getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
 
       return (decoders *) (new decoderFFWMV1 (w, h, extraLen, extraData));
     }
-  
+
   if (fourCC::check (fcc, (uint8_t *) "WMV3"))
     {
 
@@ -380,7 +380,8 @@ if (fourCC::check (fcc, (uint8_t *) "MJPG")
       return (decoders *) (new decoderFFAMV (w, h,extraLen,extraData));
     }
 
-    if (isVP6Compatible(fcc))
+
+  if (isVP6Compatible(fcc))
     {
       printf ("\n using VP6F codec\n");
       return (decoders *) (new decoderFFVP6F (w, h,extraLen,extraData));

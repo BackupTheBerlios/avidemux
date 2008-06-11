@@ -1,7 +1,7 @@
-
+//
 // C++ Implementation: ADM_lavformat
 //
-// Description: 
+// Description:
 //
 //
 // Author: mean <fixounet@free.fr>, (C) 2004
@@ -25,7 +25,7 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" 
+extern "C"
 {
 	#include "ADM_libraries/ADM_ffmpeg/ADM_lavformat/avformat.h"
 };
@@ -98,7 +98,7 @@ lavMuxer::~lavMuxer()
 	close();
 }
 //___________________________________________________________________________
-uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader) 
+uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader)
 {
         return open(filename,inbitrate,type,info,0,NULL,audioheader,0,NULL);
 }
@@ -133,22 +133,22 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 		break;
 	case MUXER_FLV:
 		fmt = guess_format("flv", NULL, NULL);
-		break;          
+		break;
 	case MUXER_MATROSKA:
 		fmt = guess_format("matroska", NULL, NULL);
-		break;          
+		break;
 
 	default:
 		fmt=NULL;
 	}
-	if (!fmt) 
+	if (!fmt)
 	{
         	printf("Lav:Cannot guess format\n");
                 ADM_assert(0);
 		return 0;
 	}
 	oc = av_alloc_format_context();
-	if (!oc) 
+	if (!oc)
 	{
        		printf("Lav:Cannot allocate context\n");
 		return 0;
@@ -157,14 +157,14 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	snprintf(oc->filename,1000,"file://%s",filename);
 	// Video
 	//________
-	
+
 	video_st = av_new_stream(oc, 0);
-	if (!video_st) 
+	if (!video_st)
 	{
 		printf("Lav: new stream failed\n");
 		return 0;
-	}	
-	
+	}
+
 	c = video_st->codec;
 	switch(_type)
 	{
@@ -177,16 +177,16 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 					 	 c->codec->name=ADM_strdup("FLV1");
 					 }else
 					 {
-					         if(isVP6Compatible(info->fcc))
+						 if(isVP6Compatible(info->fcc))
 						 			{
 							 		 c->codec_id=CODEC_ID_VP6F;
 					 				 c->codec->name=ADM_strdup("VP6F");
 						 			}
 						 else
 							 ADM_assert(0);
- 
+
 					 }
-					 
+
 					 break;
                 case MUXER_MATROSKA:
                         strcpy(oc->title,"Avidemux");
@@ -214,7 +214,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                                       printf("[lavFormat] Cannot map  this\n");
                                       return 0;
                                    }
-                                  
+
                                 }
                         }
                         if(videoExtraDataSize)
@@ -299,7 +299,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                                 c->bit_rate=9000*1000;
                         else
                                 c->bit_rate=inbitrate;
-        
+
                         break;
 		case MUXER_DVD:
 			c->codec_id = CODEC_ID_MPEG2VIDEO;
@@ -310,7 +310,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 				c->bit_rate=9000*1000;
 			else
 				c->bit_rate=inbitrate;
-	
+
 			break;
 		case MUXER_VCD:
 			c->codec_id = CODEC_ID_MPEG1VIDEO;
@@ -318,9 +318,9 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 			c->rc_buffer_size=8*1024*40;
 			c->rc_max_rate=1152*1000;
 			c->rc_min_rate=1152*1000;
-			
+
 			c->bit_rate=1152*1000;
-			
+
 
 			break;
 		case MUXER_SVCD:
@@ -338,23 +338,23 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 		default:
 			ADM_assert(0);
 	}
-	
+
 	c->codec_type = CODEC_TYPE_VIDEO;
-	c->flags=CODEC_FLAG_QSCALE;   
-	c->width = info->width;  
-	c->height = info->height; 
+	c->flags=CODEC_FLAG_QSCALE;
+	c->width = info->width;
+	c->height = info->height;
 
        AVRational fps25=(AVRational){1001,25025};
        AVRational fps24=(AVRational){1001,24000};
        AVRational fps30= (AVRational){1001,30000};
        AVRational fpsfree= (AVRational){1000,_fps1000};
 
-        
+
     	switch(_fps1000)
 	{
 		case 25000:
                 {
-			 c->time_base= fps25; 
+			 c->time_base= fps25;
 			 break;
                 }
 		case 23976:
@@ -382,24 +382,24 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                         break;
 	}
 
-			
+
 	c->gop_size=15;
 	c->max_b_frames=2;
 	c->has_b_frames=1;
 
-	
+
 	// Audio
 	//________
         if(audioheader)
         {
           audio_st = av_new_stream(oc, 1);
-          if (!audio_st) 
+          if (!audio_st)
           {
                   printf("Lav: new stream failed\n");
                   return 0;
           }
-  
-                  
+
+
           c = audio_st->codec;
           c->frame_size=1024; //For AAC mainly, sample per frame
           printf("[LavFormat] Bitrate %u\n",(audioheader->byterate*8)/1000);
@@ -410,7 +410,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                     _audioFq=c->sample_rate = audioheader->frequency/2;                 //_audioFq*=2; // SBR
              }
 #endif
-          
+
           switch(audioheader->encoding)
           {
                   case WAV_AC3: c->codec_id = CODEC_ID_AC3;break;
@@ -420,11 +420,11 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                               c->frame_size=1152;
                               c->codec_id = CODEC_ID_MP3;
                               break;
-                  case WAV_PCM: 
+                  case WAV_PCM:
                                   // One chunk is 10 ms (1/100 of fq)
                                   c->frame_size=4;
                                   c->codec_id = CODEC_ID_PCM_S16LE;break;
-                  case WAV_AAC: 
+                  case WAV_AAC:
                                   c->extradata=audioextraData;
                                   c->extradata_size= audioextraSize;
                                   c->codec_id = CODEC_ID_AAC;
@@ -444,25 +444,24 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                              break;
                            }
                           }
-                            
-                          printf("Cant mux that ! audio\n"); 
+
                           printf("Cant mux that ! audio\n");
                           c->codec_id = CODEC_ID_MP2;
                           return 0;
                           break;
           }
           c->codec_type = CODEC_TYPE_AUDIO;
-          
+
           c->bit_rate = audioheader->byterate*8;
           c->rc_buffer_size=(c->bit_rate/(2*8)); // 500 ms worth
-          
+
           c->channels = audioheader->channels;
           _audioByterate=audioheader->byterate;
-          
+
         }
         // /audio
-	
-	
+
+
 //----------------------
 	switch(_type)
 	{
@@ -483,26 +482,26 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 		case MUXER_VCD:
 			oc->packet_size=2324;
 			oc->mux_rate=2352 * 75 * 8;
-			
+
 			break;
 		case MUXER_SVCD:
-			
+
 			oc->packet_size=2324;
 			oc->mux_rate=2*2352 * 75 * 8; // ?
-			
+
 			break;
 		default:
 			ADM_assert(0);
 	}
 	oc->preload=AV_TIME_BASE/10; // 100 ms preloading
 	oc->max_delay=200*1000; // 500 ms
-	
-	if (av_set_parameters(oc, NULL) < 0) 
+
+	if (av_set_parameters(oc, NULL) < 0)
 	{
 		printf("Lav: set param failed \n");
 		return 0;
 	}
-	 if (url_fopen(&(oc->pb), filename, URL_WRONLY) < 0) 
+	 if (url_fopen(&(oc->pb), filename, URL_WRONLY) < 0)
 	 {
 	 	printf("Lav: Failed to open file :%s\n",filename);
 		return 0;
@@ -513,10 +512,10 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 
 
 	printf("lavformat mpeg muxer initialized\n");
-	
+
 	_running=1;
 
-	one=(1000*1000*1000)/_fps1000; 
+	one=(1000*1000*1000)/_fps1000;
 	_curDTS=one;
 
 	return 1;
@@ -524,14 +523,14 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 //___________________________________________________________________________
 uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
 {
-        
+
         int ret;
         AVPacket pkt;
         double f;
         int64_t timeInUs;
 
             //printf("Audio paclet : size %u, sample %u\n",len,sample);
-        
+
            if(!audio_st) return 0;
            if(!len) return 1;
             av_init_packet(&pkt);
@@ -546,24 +545,24 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
             else
             {
             	f=timeInUs;
-            	f/=1000000.; // In ms seconds 
+            	f/=1000000.; // In ms seconds
             	f*=_audioFq;
             	f=floor(f+0.4);
             }
             pkt.dts=pkt.pts=(int)(f);
 
             //printf("F:%f Q:%u D=%u\n",f,pkt.pts,timeInUs-_lastAudioDts);
-            
-            pkt.flags |= PKT_FLAG_KEY; 
+
+            pkt.flags |= PKT_FLAG_KEY;
             pkt.data= buf;
             pkt.size= len;
             pkt.stream_index=1;
             //pkt.duration=pkt.dts-_lastAudioDts; // Duration
-            aprintf("A: sample: %d frame_pts: %d fq: %d\n",(int32_t )sample,(int32_t )pkt.dts,audio_st->codec->sample_rate); 
+            aprintf("A: sample: %d frame_pts: %d fq: %d\n",(int32_t )sample,(int32_t )pkt.dts,audio_st->codec->sample_rate);
 
             ret = av_write_frame(oc, &pkt);
             _lastAudioDts=timeInUs;
-            if(ret) 
+            if(ret)
             {
                         printf("Error writing audio packet\n");
                         printf("pts %llu dts %llu\n",pkt.pts,pkt.dts);
@@ -579,20 +578,20 @@ double f;
                 f=sample;
                 f*=1000.*1000.;
                 f/=_audioFq;              // Sample / Frequency = time in seconds *10E6 to get in in us
-                
+
                 return (uint64_t)floor(f);
 
 }
 //___________________________________________________________________________
 uint8_t lavMuxer::needAudio( void )
 {
-	
+
         if(!audio_st) return 0;
 
 	double f;
 	uint64_t dts=_lastAudioDts;  // Last audio dts
 
-		
+
 		aprintf("Need audio  ?: %llu / %llu : %llu\n ",dts,_curDTS,_curDTS+one);
 		if((dts+5000>=_curDTS) && (dts<=_curDTS+one)) return 1;
 		if(dts<=_curDTS)
@@ -610,28 +609,28 @@ int ret;
 double p,d;
   	AVPacket pkt;
             av_init_packet(&pkt);
-	    
+
         p=bitstream->ptsFrame+1;      // Pts           // Time p/fps1000=out/den  out=p*den*1000/fps1000
         p=(p*1000*1000*1000);
         p=p/_fps1000;                  // in us
-	
+
         d=bitstream->dtsFrame;		// dts
 	d=(d*1000*1000*1000);
 	d=d/_fps1000;
-	
-	
-	_curDTS=(int64_t)floor(d);	
-        
+
+
+	_curDTS=(int64_t)floor(d);
+
         // Rescale
 #define RESCALE(x) x=x*video_st->codec->time_base.den*1000.;\
                    x=x/_fps1000;
-        
+
         p=bitstream->ptsFrame+1;
         RESCALE(p);
-        
+
         d=bitstream->dtsFrame;
         RESCALE(d);
-        
+
         if(_type==MUXER_FLV || _type==MUXER_MATROSKA) /* The FLV muxer expects packets dated in ms, there is something i did not get... WTF */
         {
         			p=p*1000/_fps1000;
@@ -643,30 +642,30 @@ double p,d;
        // printf("Lavformat : Pts :%u dts:%u",displayframe,frameno);
 	aprintf("Lavformat : Pts :%llu dts:%llu",pkt.pts,pkt.dts);
 	pkt.stream_index=0;
-           
+
         pkt.data= bitstream->data;
         pkt.size= bitstream->len;
 	// Look if it is a gop start or seq start
         if(_type==MUXER_MP4 || _type==MUXER_PSP || _type==MUXER_FLV || _type==MUXER_MATROSKA)
         {
-            if(bitstream->flags & AVI_KEY_FRAME) 
+            if(bitstream->flags & AVI_KEY_FRAME)
                         pkt.flags |= PKT_FLAG_KEY;
         }else
             if(!bitstream->data[0] &&  !bitstream->data[1] && bitstream->data[2]==1)
 	{
             if(bitstream->data[3]==0xb3 || bitstream->data[3]==0xb8 ) // Seq start or gop start
 		pkt.flags |= PKT_FLAG_KEY;
-		//printf("Intra\n"); 
+		//printf("Intra\n");
 	}
-           
+
 	ret =av_write_frame(oc, &pkt);
-	if(ret) 
+	if(ret)
 	{
 		printf("Error writing video packet\n");
 		return 0;
 	}
         aprintf("V: frame %lu pts%d\n",bitstream->dtsFrame,pkt.pts);
-	
+
 	return 1;
 }
 //___________________________________________________________________________
@@ -723,7 +722,7 @@ uint8_t lavformat_init(void)
 }
 extern "C"
 {
-/** 
+/**
     \fn ADM_useAlternateTagging
     \brief returns 1 if using haali compatible tagging, 0 if normal. For mp3 in mp4ff.
 */
@@ -732,7 +731,7 @@ int ADM_useAlternateTagging(void)
   uint32_t v=1;
   prefs->get(FEATURE_ALTERNATE_MP3_TAG,&v);
   return v;
-} 
+}
 }
 
 typedef struct
@@ -762,12 +761,12 @@ uint8_t ADM_4cc_to_lavcodec(const char *fcc, CodecID *outlavid)
       if(!strncmp(lavFCC[i].name,fcc,4))
       {
         *outlavid=(CodecID)lavFCC[i].id;
-        return 1; 
+        return 1;
       }
-      
+
     }
     return 0;
-  
+
 }
 //*****************
 typedef struct
@@ -797,12 +796,12 @@ uint8_t ADM_WaveTag_to_lavcodec(uint32_t tag, CodecID *outlavid)
       if(lavWaveTag[i].tag==tag)
       {
         *outlavid=(CodecID)lavWaveTag[i].id;
-        return 1; 
+        return 1;
       }
-      
+
     }
     return 0;
-  
+
 }
 
 //___________________________________________________________________________

@@ -41,9 +41,8 @@ extern void UI_purge(void);
  * 		\fn 		ADM_ocr_engine
  * 		\brief 		Common part of the OCR engine
  */
-uint8_t ADM_ocr_engine(   ADM_OCR_SOURCE & source,const char *labelSrt,admGlyph *head)
+uint8_t ADM_ocr_engine(ADM_OCR_SOURCE & source,const char *labelSrt,admGlyph *head)
 {
-// 
     uint32_t nbSub=0;
     FILE *out=NULL;
     vobSubBitmap *bitmap=NULL;
@@ -63,45 +62,42 @@ uint8_t ADM_ocr_engine(   ADM_OCR_SOURCE & source,const char *labelSrt,admGlyph 
     
     ui=ADM_ocrUiSetup();
     
+    int success = 1;
 
 _again:    
     
-    printf("Go go go\n");
-    
-    // Everything ready go go go 
-         
-   
     UI_purge();
-//  Time to go
-    
-    //gtk_widget_set_sensitive(WID(frameBitmap),1);
  
     out=fopen(labelSrt,"wb");
     if(!out)
     {
+        success = 0;
        GUI_Error_HIG(QT_TR_NOOP("Output file error"), QT_TR_NOOP("Could not open \"%s\" for writing."), labelSrt);
        goto endIt;
     }
+
     bitmapSource=ADM_buildBitmapSource(&source);
     if(!bitmapSource)
     {
-    	goto _again;
+        success = 0;
+        GUI_Error_HIG(QT_TR_NOOP("Input file error"), QT_TR_NOOP("Unknown source type"));
+        goto endIt;
     }
     if(!bitmapSource->init(&source))
     {
-    		printf("[OCR] Bitmap source failed\n");
-    		goto _again;
+        success = 0;
+        GUI_Error_HIG(QT_TR_NOOP("Input file error"), QT_TR_NOOP("Bitmap source failed"));
+        goto endIt;
     }
     
     nbSub=bitmapSource->getNbImages();
-   
     if(!nbSub)
     {
-      GUI_Error_HIG(QT_TR_NOOP("Problem loading sub"), NULL);
-        delete bitmapSource;
-        bitmapSource=NULL;
-        goto _again;
+        success = 0;
+        GUI_Error_HIG(QT_TR_NOOP("Problem loading sub"),QT_TR_NOOP("No subs"));
+        goto endIt;
      }
+
     seqNum=1;   // Sub number in srt file
     oldw=oldh=0;
     uint32_t eos;
@@ -115,7 +111,6 @@ _again:
             if(eos) break;
             ADM_assert(last>=first);
             
-            // something ?
             if(!bitmap) continue;
             if(first==last) continue;
 
@@ -133,12 +128,11 @@ _again:
             }
             oldbitmaph=bitmap->_height;
             oldbitmapw=bitmap->_width;
-           // 
+
            w=bitmap->_width;
            h=last-first+1;
            
            ADM_ocrSetRedrawSize(ui,w,h);
-           //**
            
            // Build
 againPlease:
@@ -154,14 +148,9 @@ againPlease:
               if(reply==ReplyClose) goto endIt;
               if(reply==ReplyCalibrate)
                 {
-                        //
-                        //printf("TADA!!!!\n");
                         ocrUpdateMinThreshold();
                         goto againPlease;
                 }
-             
-             //
-             
              
              fprintf(out,"%d\n",seqNum++);
              uint16_t hh,mm,ss,ms;
@@ -176,7 +165,7 @@ againPlease:
              ms2time(endTime, &hh, &mm, &ss, &ms);
              fprintf(out,"%02d:%02d:%02d,%03d\n",hh,mm,ss,ms);
              fprintf(out,"%s\n\n",decodedString);
-             //             
+
              oldw=w;
              oldh=h;
              // Update infos
@@ -196,9 +185,7 @@ endIt:
     	        delete bitmapSource;
     	    bitmapSource=NULL;
       
-    return 1;
-
+    return success;
 }
-
 
 //EOF

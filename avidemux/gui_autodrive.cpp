@@ -54,41 +54,34 @@ uint8_t A_autoDrive(Action action)
         switch(action)
         {
                 case ACT_AUTO_IPOD:
-#if  !defined(USE_XVID_4) || (!defined(USE_FAAC) && !defined(HAVE_MP3LAME))
-                  GUI_Error_HIG(QT_TR_NOOP("Codec Error"),
-                                        QT_TR_NOOP( "You need Xvid4 and either LAME or FAAC support for the iPod profile"));
+#if !defined(USE_XVID_4) || !defined(USE_FAAC)
+					GUI_Error_HIG(QT_TR_NOOP("Codec Error"),
+						QT_TR_NOOP( "Xvid4 and FAAC support is required for the iPod profile."));
 #else
-                    if(!setIPOD())
-                    {
-                        return 0;
-                    }
-                
-                    // Video codec
+					if(!setIPOD())
+						return 0;
 
-                    if(!videoCodecSelectByName("XVID4")) 
-                    {
-                      GUI_Error_HIG(QT_TR_NOOP("Codec Error"),QT_TR_NOOP( "Cannot select the MPEG-4 SP codec."));
-                        return 0;
-                    }
-                    setIpod_Xvid4Preset();
-                    // Set mode & bitrate 
-                    setVideoEncoderSettings(COMPRESS_CBR,400,0,NULL);
-                    // Audio Codec
-                    if(   (currentaudiostream->getInfo()->channels==2)&&
-                        (currentaudiostream->getInfo()->encoding==WAV_AAC ||
-                         currentaudiostream->getInfo()->encoding==WAV_MP3))
-                    {
-                        audioCodecSetcodec(AUDIOENC_COPY);
-                    }
-                    else
-                    {
-#if defined(USE_FAAC)
-                          audioCodecSetcodec(AUDIOENC_FAAC);
-#elif defined(HAVE_MP3LAME)
-                          audioCodecSetcodec(AUDIOENC_MP3);
-#endif
-                          audioFilter_SetBitrate(128);
-                      }
+					// Video codec
+
+					if(!videoCodecSelectByName("XVID4")) 
+					{
+						GUI_Error_HIG(QT_TR_NOOP("Codec Error"),QT_TR_NOOP( "Cannot select the MPEG-4 SP codec."));
+						return 0;
+					}
+					setIpod_Xvid4Preset();
+					// Set mode & bitrate
+					setVideoEncoderSettings(COMPRESS_CBR,400,0,NULL);
+					// Audio Codec
+					if((currentaudiostream->getInfo()->channels == 2)&& currentaudiostream->getInfo()->encoding == WAV_AAC)
+						audioCodecSetcodec(AUDIOENC_COPY);
+					else
+					{
+						audioCodecSetcodec(AUDIOENC_FAAC);
+						audioFilter_SetBitrate(128);
+
+						if (currentaudiostream->getInfo()->channels != 2)
+							setCurrentMixerFromString("STEREO");
+					}
 #endif
                       break;
 //******************************** IPOD *******************************

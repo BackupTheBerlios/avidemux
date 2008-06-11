@@ -133,7 +133,6 @@ uint32_t sent=0;
            int supported=0;
            if(isVP6Compatible(info.fcc)) supported=1;
            if(fourCC::check(info.fcc,(const uint8_t *)"FLV1")) supported=1;
-
            if(!supported)
            {
         	   GUI_Error_HIG(QT_TR_NOOP("Unsupported video"),QT_TR_NOOP("Only FLV1 and VP6 video are supported"));

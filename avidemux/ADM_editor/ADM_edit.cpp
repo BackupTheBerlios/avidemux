@@ -69,7 +69,7 @@ extern uint8_t indexMpeg (char *mpeg, char *file, uint8_t aid);
 extern uint8_t loadVideoCodecConf( char *name);
 extern uint8_t parseScript(char *name);
 uint8_t UI_SetCurrentFormat( ADM_OUT_FORMAT fmt );
-const char *VBR_MSG="Avidemux detected VBR MP3 audio in this file. For keeping audio/video in sync, time map is needed. Build it now?\n\nYou can do it later with \"Audio -> Build VBR Time Map\".";
+const char *VBR_MSG = QT_TR_NOOP("Avidemux detected VBR MP3 audio in this file. For keeping audio/video in sync, time map is needed. Build it now?\n\nYou can do it later with \"Audio -> Build VBR Time Map\".");
 //
 //
 

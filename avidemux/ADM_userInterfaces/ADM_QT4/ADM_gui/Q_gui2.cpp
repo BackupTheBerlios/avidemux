@@ -13,6 +13,8 @@
  ***************************************************************************/
 #include "config.h"
 
+#include <QtCore/QFileInfo>
+#include <QtCore/QUrl>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QGraphicsView>
 
@@ -43,6 +45,7 @@ extern void loadTranslator(void);
 extern void initTranslator(void);
 extern void destroyTranslator(void);
 extern ADM_RENDER_TYPE UI_getPreferredRender(void);
+extern int A_openAvi2(char *name, uint8_t mode);
 
 int SliderIsShifted=0;
 static void setupMenus(void);
@@ -426,6 +429,35 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 void MainWindow::mousePressEvent(QMouseEvent* event)
 {
 	this->setFocus(Qt::OtherFocusReason);
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+	if (event->mimeData()->hasFormat("text/uri-list"))
+		event->acceptProposedAction();
+}
+
+void MainWindow::dropEvent(QDropEvent *event)
+{
+	QList<QUrl> urlList;
+	QString fileName;
+	QFileInfo info;
+
+	if (event->mimeData()->hasUrls())
+	{
+		urlList = event->mimeData()->urls();
+
+		if (urlList.size() > 0)
+		{
+			fileName = urlList[0].toLocalFile();
+			info.setFile(fileName);
+
+			if (info.isFile())
+				A_openAvi2(fileName.toUtf8().data(), 0);
+		}
+	}
+
+	event->acceptProposedAction();
 }
 
 void MainWindow::previousIntraFrame(void)
