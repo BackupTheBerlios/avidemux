@@ -22,6 +22,7 @@ MESSAGE("***    SUMMARY    ***")
 MESSAGE("*********************")
 MESSAGE("***  Video Codec  ***")
 ADM_DISPLAY("x264      " "$ENV{ADM_HAVE_X264}")
+ADM_DISPLAY("Xvid      " "$ENV{ADM_HAVE_XVID}")
 
 MESSAGE("***  Audio Codec  ***")
 ADM_DISPLAY("amrnb     " "$ENV{ADM_HAVE_AMRNB}")

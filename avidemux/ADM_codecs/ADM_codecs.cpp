@@ -42,7 +42,6 @@ extern "C"
 #include "ADM_codecs/ADM_codecNull.h"
 #include "ADM_codecs/ADM_rgb16.h"
 #include "ADM_codecs/ADM_uyvy.h"
-#include "ADM_codecs/ADM_xvideco.h"
 
 #include "fourcc.h"
 

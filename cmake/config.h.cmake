@@ -86,12 +86,6 @@
 #cmakedefine USE_XV
 #endif
 
-/* use Xvid 1.x API */
-#cmakedefine USE_XVID_4
-
-/* use Xvid 0.9 API */
-#cmakedefine USE_XX_XVID
-
 /* Version number of package */
 #define VERSION "${VERSION}"
 

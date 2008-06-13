@@ -23,9 +23,6 @@ MESSAGE("*********************")
 ADM_DISPLAY("GTK+      " "${ADM_UI_GTK}")
 ADM_DISPLAY("Qt 4      " "${ADM_UI_QT4}")
 
-MESSAGE("***  Video Codec  ***")
-ADM_DISPLAY("Xvid      " "${USE_XVID_4}")
-
 MESSAGE("***  Audio Codec  ***")
 ADM_DISPLAY("Aften     " "${USE_AFTEN}")
 ADM_DISPLAY("LAME      " "${HAVE_LIBMP3LAME}")

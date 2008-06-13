@@ -141,7 +141,6 @@ IF (NOT QT4_FOUND)
 	SET(ADM_UI_QT4 0)
 ENDIF (NOT QT4_FOUND)
 
-INCLUDE(admCheckVideoCodecLibs)
 INCLUDE(admCheckAudioCodecLibs)
 INCLUDE(admCheckAudioDeviceLibs)
 INCLUDE(admCheckMiscLibs)
