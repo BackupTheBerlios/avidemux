@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="it">
-<defaultcodec></defaultcodec>
 <context>
     <name></name>
     <message>
@@ -846,7 +845,7 @@
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_tdeint.cpp" line="60"/>
         <source>Kernel interpolation</source>
-        <translation>Interpolazione Kernel</translation>
+        <translation>Interpolazione kernel</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_tdeint.cpp" line="61"/>
@@ -951,7 +950,7 @@
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_tdeint.cpp" line="102"/>
         <source>_Denoise</source>
-        <translation>_Rimuovi interferenza</translation>
+        <translation>_Rimuovi rumore</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_tdeint.cpp" line="103"/>
@@ -1332,7 +1331,7 @@
         <translation>_Modalità:</translation>
     </message>
     <message>
-        <location filename="../avidemux/gui_autodrive.cpp" line="196"/>
+        <location filename="../avidemux/gui_autodrive.cpp" line="189"/>
         <source>Codec Error</source>
         <translation>Errore codec</translation>
     </message>
@@ -1410,7 +1409,7 @@ Cambia il codec o usa il filtro mixer per ridurre i canali.</translation>
         <translation>PSP</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp" line="283"/>
+        <location filename="../avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp" line="277"/>
         <source>FLV</source>
         <translation>FLV</translation>
     </message>
@@ -1530,17 +1529,17 @@ Cambia il codec o usa il filtro mixer per ridurre i canali.</translation>
         <translation>Sconosciuto</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_ocr/ADM_ocrEngine.cpp" line="87"/>
+        <location filename="../avidemux/ADM_ocr/ADM_ocrEngine.cpp" line="78"/>
         <source>Output file error</source>
         <translation>Errore file di uscita</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_ocr/ADM_ocrEngine.cpp" line="87"/>
+        <location filename="../avidemux/ADM_ocr/ADM_ocrEngine.cpp" line="78"/>
         <source>Could not open &quot;%s&quot; for writing.</source>
         <translation>Impossibile aprire &quot;%s&quot; per la scrittura.</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_ocr/ADM_ocrEngine.cpp" line="105"/>
+        <location filename="../avidemux/ADM_ocr/ADM_ocrEngine.cpp" line="100"/>
         <source>Problem loading sub</source>
         <translation>Problema di caricamento sottotitoli</translation>
     </message>
@@ -1740,27 +1739,27 @@ Please move the A marker.</source>
 Spostare il segnalibro A.</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp" line="151"/>
+        <location filename="../avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp" line="145"/>
         <source>Unsupported video</source>
         <translation>Video non supportato</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp" line="151"/>
+        <location filename="../avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp" line="145"/>
         <source>Only FLV1 and VP6 video are supported</source>
         <translation>Sono supportati solo i video FLV1 e VP6</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp" line="178"/>
+        <location filename="../avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp" line="172"/>
         <source>Unsupported audio</source>
         <translation>Audio non supportato</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp" line="173"/>
+        <location filename="../avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp" line="167"/>
         <source>Audio must be mp3 for flv output.</source>
         <translation>L&apos;audio di un video flv deve essere mp3.</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp" line="178"/>
+        <location filename="../avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp" line="172"/>
         <source>Frequency must be 44100, 22050 or 11025 Hz.</source>
         <translation>La frequenza deve essere 44100, 22050 o 11025 Hz.</translation>
     </message>
@@ -2038,7 +2037,7 @@ Spostare il segnalibro A.</translation>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="120"/>
         <source>Noise Reduction</source>
-        <translation>Riduzione interferenza</translation>
+        <translation>Riduzione rumore</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/DIA_x264.cpp" line="121"/>
@@ -2166,62 +2165,62 @@ Spostare il segnalibro A.</translation>
         <translation>Filtro video parziale</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/Q_gui2.cpp" line="822"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_gui/Q_gui2.cpp" line="851"/>
         <source>%c (%02d)</source>
         <translation>%c (%02d)</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="92"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="85"/>
         <source>Select idx file:</source>
         <translation>Seleziona un file idx:</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="210"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="202"/>
         <source>Use glyphset (optional):</source>
         <translation>Usa set di glifi (opzionale):</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="211"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="203"/>
         <source>Output SRT file</source>
         <translation>File SRT in uscita</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="222"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="214"/>
         <source>Select input and ouput files</source>
         <translation>Seleziona file di ingresso e di uscita</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="246"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="238"/>
         <source>The idx/sub file does not exist.</source>
         <translation>Il file idx/sub non esiste.</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="239"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="231"/>
         <source>Please Select a valid output SRT file.</source>
         <translation>Seleziona un file SRT in uscita valido.</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="255"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="247"/>
         <source>Cannot load the glyphset file.</source>
         <translation>Impossibile caricare il set di glifi.</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="158"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="149"/>
         <source>Save Glyph</source>
         <translation>Salva glifo</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="208"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="200"/>
         <source>Input TS:</source>
         <translation>TS in ingresso:</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="209"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="201"/>
         <source>Subtitle PID:</source>
         <translation>PID sottotitoli:</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="233"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="225"/>
         <source>Please Select a valid TS file.</source>
         <translation>Seleziona un file TS valido.</translation>
     </message>
@@ -2238,7 +2237,7 @@ Spostare il segnalibro A.</translation>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_prefs.cpp" line="189"/>
         <source>_Use libavcodec MPEG-2 decoder</source>
-        <translation>_Usa decodificatore libavcodec MPEG-2</translation>
+        <translation>_Usa libavcodec come decodificatore MPEG-2</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_prefs.cpp" line="190"/>
@@ -3177,24 +3176,24 @@ Is it running ?</source>
         <translation>È necessaria una traccia audio per creare questo tipo di file</translation>
     </message>
     <message>
-        <location filename="../avidemux/gui_autodrive.cpp" line="121"/>
+        <location filename="../avidemux/gui_autodrive.cpp" line="114"/>
         <source>You don&apos;t have LAME!.
 It is needed to create FLV  video.</source>
         <translation>Non disponi di LAME!
 È necessario per creare video FLV.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gui_autodrive.cpp" line="135"/>
+        <location filename="../avidemux/gui_autodrive.cpp" line="128"/>
         <source>Cannot select FLV1  codec.</source>
         <translation>Impossibile selezionare il codec FLV1.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gui_autodrive.cpp" line="162"/>
+        <location filename="../avidemux/gui_autodrive.cpp" line="155"/>
         <source>Cannot select mpeg4 sp codec.</source>
         <translation>Impossibile selezionare il codec mpeg4 sp.</translation>
     </message>
     <message>
-        <location filename="../avidemux/gui_autodrive.cpp" line="197"/>
+        <location filename="../avidemux/gui_autodrive.cpp" line="190"/>
         <source>You don&apos;t have FAAC!.
 It is needed to create PSP compatible video.</source>
         <translation>Non disponi di FAAC.
@@ -3298,7 +3297,7 @@ It is needed to create PSP compatible video.</source>
         <translation>Prova uinteger</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="93"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="86"/>
         <source>Use GlyphSet (optional):</source>
         <translation>Usa set di glifi (opzionale):</translation>
     </message>
@@ -3308,27 +3307,27 @@ It is needed to create PSP compatible video.</source>
         <translation>Seleziona il set di glifi</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="211"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="203"/>
         <source>Save SRT file</source>
         <translation>Salva il file SRT</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="276"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="268"/>
         <source>GlyphSet filename</source>
         <translation>Nome file del set di glifi</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="276"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="268"/>
         <source>Save GlyphSet file</source>
         <translation>Salva il set di glifi</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="208"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="200"/>
         <source>Select TS file</source>
         <translation>Seleziona un file TS</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="278"/>
+        <location filename="../avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp" line="270"/>
         <source>Save GlyphSet</source>
         <translation>Salva il set di glifi</translation>
     </message>
@@ -3820,7 +3819,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="130"/>
         <source>Reduce noise, smooth image, increase compressibility.</source>
-        <translation>Riduce l&apos;interferenza, leviga le immagini, aumenta la comprimibilità.</translation>
+        <translation>Riduce il rumore, leviga le immagini, aumenta la comprimibilità.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="131"/>
@@ -3850,12 +3849,12 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="134"/>
         <source>Vlad59&apos;s Avisynth port of Jim Casaburi&apos;s denoiser.</source>
-        <translation>Port Avisynth di Vlad59 del filtro di rimozione di interferenza di Jim Casaburi.</translation>
+        <translation>Port Avisynth di Vlad59 del filtro di rimozione del rumore di Jim Casaburi.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="136"/>
         <source>Denoise</source>
-        <translation>Rimozione interferenza</translation>
+        <translation>Rimozione rumore</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="136"/>
@@ -3870,7 +3869,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="137"/>
         <source>Light denoiser.</source>
-        <translation>Rimozione interferenza leggera.</translation>
+        <translation>Rimozione rumore leggera.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="139"/>
@@ -3880,7 +3879,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="139"/>
         <source>Chroma noise reduction filter by MarcFD/Tritical.</source>
-        <translation>Filtro di riduzione interferenza croma di MarcFD/Tritical.</translation>
+        <translation>Filtro di riduzione rumore croma di MarcFD/Tritical.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="141"/>
@@ -3920,7 +3919,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="148"/>
         <source>Sharpen edges without amplifying noise. By Donald Graft.</source>
-        <translation>Rende nitidi i margini senza amplificare l&apos;interferenza. Di Donald Graft.</translation>
+        <translation>Rende nitidi i margini senza amplificare il rumore. Di Donald Graft.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="149"/>
@@ -3950,7 +3949,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="152"/>
         <source>Mean (blur) kernel.</source>
-        <translation>Media (sfocatura) kernel.</translation>
+        <translation>Kernel media (sfocatura).</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="153"/>
@@ -3960,7 +3959,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="153"/>
         <source>Median kernel 3x3. Remove high frequency noise.</source>
-        <translation>Mediana kernel 3x3. Rimuove l&apos;interferenza ad alta frequenza.</translation>
+        <translation>Kernel mediana 3x3. Rimuove il rumore ad alta frequenza.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="154"/>
@@ -3970,7 +3969,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="154"/>
         <source>Median kernel 5x5. Good for reducing chroma noise.</source>
-        <translation>Mediana kernel 5x5. Riduce interferenza croma.</translation>
+        <translation>Kernel mediana 5x5. Riduce rumore croma.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="155"/>
@@ -4105,7 +4104,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="188"/>
         <source>Apply operation like P&apos;=P*A, P-A, P+A, etc. using a convolution, rolling average, image from file, or constant</source>
-        <translation>Applica operazioni come P&apos;=P*A, P-A, P+A, ecc. usando avvolgimento, media mobile, immagine da file, o costante.</translation>
+        <translation>Applica operazioni come P&apos;=P*A, P-A, P+A, ecc. usando convoluzione, media mobile, immagine da file, o costante.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_filter/filter_declaration.cpp" line="189"/>
@@ -4168,12 +4167,7 @@ It is needed to create PSP compatible video.</source>
         <translation>Win32</translation>
     </message>
     <message>
-        <location filename="../avidemux/gui_autodrive.cpp" line="63"/>
-        <source>You need Xvid4 and either LAME or FAAC support for the iPod profile</source>
-        <translation>Hai bisogno del supporto di Xvid4 e di LAME o FAAC per il profilo Ipod</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/gui_autodrive.cpp" line="74"/>
+        <location filename="../avidemux/gui_autodrive.cpp" line="72"/>
         <source>Cannot select the MPEG-4 SP codec.</source>
         <translation>Impossibile selezionare il codec MPEG-4 SP.</translation>
     </message>
@@ -4240,7 +4234,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_audiofilter/audiofilter_buildchain.cpp" line="417"/>
         <source>Not activated.</source>
-        <translation>Non attivo.</translation>
+        <translation>Non attivato.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_encoder/ADM_encCodecDesc.h" line="13"/>
@@ -4527,6 +4521,40 @@ It is needed to create PSP compatible video.</source>
         <source>DVD (mpeg2enc)</source>
         <translation>DVD (mpeg2enc)</translation>
     </message>
+    <message>
+        <location filename="../avidemux/ADM_ocr/ADM_ocrEngine.cpp" line="92"/>
+        <source>Input file error</source>
+        <translation>Errore file di ingresso</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_ocr/ADM_ocrEngine.cpp" line="86"/>
+        <source>Unknown source type</source>
+        <translation>Tipo di sorgente sconosciuto</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_ocr/ADM_ocrEngine.cpp" line="92"/>
+        <source>Bitmap source failed</source>
+        <translation>Sorgente bitmap fallita</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_ocr/ADM_ocrEngine.cpp" line="100"/>
+        <source>No subs</source>
+        <translation>Nessun sottotitolo</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/gui_autodrive.cpp" line="63"/>
+        <source>Xvid4 and FAAC support is required for the iPod profile.</source>
+        <translation>Il supporto di Xvid4 e FAAC è richiesto per il profilo iPod.</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="82"/>
+        <source>Avidemux detected VBR MP3 audio in this file. For keeping audio/video in sync, time map is needed. Build it now?
+
+You can do it later with &quot;Audio -&gt; Build VBR Time Map&quot;.</source>
+        <translation>Avidemux ha rilevato un audio MP3 VBR in questo file. Per mantenere la sincronizzazione audio/video, è necessaria la time map. Crearla ora?
+
+Puoi farlo successivamente con \&quot;Audio -&gt; Crea time map VBR\&quot;.</translation>
+    </message>
 </context>
 <context>
     <name>ADMImage</name>
@@ -4644,7 +4672,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidDenoise.cpp" line="397"/>
         <source>Denoise</source>
-        <translation>Rimuovi interferenza</translation>
+        <translation>Rimuovi rumore</translation>
     </message>
 </context>
 <context>
@@ -4676,17 +4704,17 @@ It is needed to create PSP compatible video.</source>
 <context>
     <name>ADMVideoFlux</name>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidFlux.cpp" line="133"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidFlux.cpp" line="134"/>
         <source>_Temporal threshold:</source>
         <translation>Soglia _temporale:</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidFlux.cpp" line="134"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidFlux.cpp" line="135"/>
         <source>_Spatial threshold:</source>
         <translation>Soglia _spaziale:</translation>
     </message>
     <message>
-        <location filename="../avidemux/ADM_videoFilter/ADM_vidFlux.cpp" line="138"/>
+        <location filename="../avidemux/ADM_videoFilter/ADM_vidFlux.cpp" line="139"/>
         <source>FluxSmooth</source>
         <translation>FluxSmooth</translation>
     </message>
@@ -4807,7 +4835,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidLargeMedian.cpp" line="309"/>
         <source>Large Median 5x5</source>
-        <translation>Large Median 5x5</translation>
+        <translation>Mediana grande 5x5</translation>
     </message>
 </context>
 <context>
@@ -5150,7 +5178,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidStabilize.cpp" line="63"/>
         <source>Stabilize Threshold</source>
-        <translation>Stabilizza soglia</translation>
+        <translation>Soglia di stabilizzazione</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidStabilize.cpp" line="66"/>
@@ -5264,7 +5292,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="275"/>
         <source>A = convolve(P); Load convolution kernel from file</source>
-        <translation>A = avvolgi(P); carica nucleo di avvolgimento da file</translation>
+        <translation>A = avvolgi(P); carica nucleo di convoluzione da file</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="277"/>
@@ -5299,7 +5327,7 @@ It is needed to create PSP compatible video.</source>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="324"/>
         <source>Input _File (image or convolution kernel):</source>
-        <translation>_File di ingresso (immagine o nucleo di avvolgimento):</translation>
+        <translation>_File di ingresso (immagine o nucleo di convoluzione):</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="328"/>
@@ -5335,7 +5363,8 @@ di fotogramma da usare per la partenza facilitata):</translation>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="360"/>
         <source>Init By _Rolling (compute head start using a rolling average rather than a straight average)</source>
-        <translation>Inizializza con media mobile (elabora partenza facilitata usando una media mobile invece di una media diretta)</translation>
+        <translation>Inizializza con media mobile (elabora partenza facilitata
+usando una media mobile invece di una media diretta)</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidSwissArmyKnife.cpp" line="364"/>
@@ -5483,7 +5512,7 @@ moltiplicato per questo valore):</translation>
     <message>
         <location filename="../avidemux/ADM_audiocodec/ADM_codecwma.cpp" line="200"/>
         <source>Cannot open AMR codec.</source>
-        <translation>Impossibile aprire i codec AMR.</translation>
+        <translation>Impossibile aprire il codec AMR.</translation>
     </message>
 </context>
 <context>
@@ -5496,7 +5525,7 @@ moltiplicato per questo valore):</translation>
     <message>
         <location filename="../avidemux/ADM_audiocodec/ADM_codecwma.cpp" line="88"/>
         <source>Cannot open WMA2 codec.</source>
-        <translation>Impossibile aprire i codec WMA2.</translation>
+        <translation>Impossibile aprire il codec WMA2.</translation>
     </message>
 </context>
 <context>
@@ -5514,7 +5543,7 @@ moltiplicato per questo valore):</translation>
     <message>
         <location filename="../avidemux/ADM_editor/ADM_edFrameType.cpp" line="63"/>
         <source>DivX 5 + packed?</source>
-        <translation>DivX 5 + compresso?</translation>
+        <translation>Compresso con DivX5+?</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_editor/ADM_edFrameType.cpp" line="93"/>
@@ -5549,7 +5578,7 @@ moltiplicato per questo valore):</translation>
     <message>
         <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="408"/>
         <source>May be related to an old index file.</source>
-        <translation>Potrebbe essere relativo a un vecchio file di indice.</translation>
+        <translation>Potrebbe essere correlato a un vecchio file di indice.</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="415"/>
@@ -5574,25 +5603,6 @@ moltiplicato per questo valore):</translation>
         <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="551"/>
         <source>Build VBR time map?</source>
         <translation>Creare la time map VBR?</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="585"/>
-        <source>Use that mode</source>
-        <translation>Utilizza questa modalità</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="585"/>
-        <source>H264 detected</source>
-        <translation>H264 rilevato</translation>
-    </message>
-    <message>
-        <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="585"/>
-        <source>If the file is using bframe as reference, it can lead to crash or stutteting.
-Avidemux can use another mode which is safed but &lt;b&gt;YOU WILL LOOSE FRAME ACCURACY&lt;/b&gt;.
-Do you want to use that mode ?</source>
-        <translation>Se il file sta utilizzando un fotogramma-B come riferimento, può causare un crash.
-Avidemux può utilizzare un&apos;altra modalità più sicura ma &lt;b&gt;PERDERAI LA PRECISIONE DEI FOTOGRAMMI&lt;/b&gt;.
-Vuoi usare quella modalità?</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="712"/>
@@ -5655,6 +5665,25 @@ Vuoi usare quella modalità?</translation>
         <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="1569"/>
         <source>Indexing failed</source>
         <translation>Indicizzazione fallita</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="585"/>
+        <source>Use safe mode</source>
+        <translation>Usa modalità sicura</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="585"/>
+        <source>H.264 detected</source>
+        <translation>H.264 rilevato</translation>
+    </message>
+    <message>
+        <location filename="../avidemux/ADM_editor/ADM_edit.cpp" line="585"/>
+        <source>If the file is using B-frames as reference it can lead to a crash or stuttering.
+Avidemux can use another mode which is safe but &lt;b&gt;YOU WILL LOSE FRAME ACCURACY&lt;/b&gt;.
+Do you want to use that mode?</source>
+        <translation>Se il file sta utilizzando un fotogramma-B come riferimento, può causare un crash o una riproduzione a scatti.
+Avidemux può utilizzare un&apos;altra modalità più sicura ma &lt;b&gt;PERDERAI PRECISIONE NEI FOTOGRAMMI&lt;/b&gt;.
+Vuoi usare questa modalità?</translation>
     </message>
 </context>
 <context>
@@ -5844,7 +5873,7 @@ Vuoi usare quella modalità?</translation>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidFastConvolution.cpp" line="472"/>
         <source>Fast Convolution</source>
-        <translation>Avvolgimento veloce</translation>
+        <translation>Convoluzione veloce</translation>
     </message>
 </context>
 <context>
@@ -6262,7 +6291,7 @@ Vuoi usare quella modalità?</translation>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/asharp.ui" line="111"/>
         <source>Block Adaptative</source>
-        <translation>Blocco adattativo</translation>
+        <translation>Adattativo a blocchi</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_dialog/asharp.ui" line="118"/>
@@ -6793,7 +6822,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_filters/mainfilter.ui" line="268"/>
         <source>Noise</source>
-        <translation>Interferenza</translation>
+        <translation>Rumore</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_userInterfaces/ADM_QT4/ADM_filters/mainfilter.ui" line="276"/>
@@ -8485,7 +8514,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>lavMuxer</name>
     <message>
-        <location filename="../avidemux/ADM_libraries/ADM_lavformat/ADM_lavformat.cpp" line="376"/>
+        <location filename="../avidemux/ADM_libraries/ADM_lavformat/ADM_lavformat.cpp" line="379"/>
         <source>Incompatible frame rate</source>
         <translation>Frame rate incompatibile</translation>
     </message>
@@ -8612,12 +8641,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidBlendRemoval.cpp" line="85"/>
         <source>_Noise:</source>
-        <translation>_Interferenza:</translation>
+        <translation>_Rumore:</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidBlendRemoval.cpp" line="85"/>
         <source>If pixels are closer than noise, they are considered to be the same</source>
-        <translation>Se i pixel sono più vicini dell&apos;interferenza, sono considerati identici</translation>
+        <translation>Se i pixel sono più vicini del rumore, sono considerati identici</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidBlendRemoval.cpp" line="86"/>
@@ -8655,7 +8684,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../avidemux/ADM_video/ADM_vidFieldUnblend.cpp" line="81"/>
         <source>Do you want to print metrics on screen ?</source>
-        <translation>Vuoi mostrare le misure sullo schermo?</translation>
+        <translation>Vuoi stampare le misure sullo schermo?</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidHardIvtcRemoval.cpp" line="87"/>
@@ -8670,12 +8699,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidHardIvtcRemoval.cpp" line="90"/>
         <source>_Noise:</source>
-        <translation>_Interferenza:</translation>
+        <translation>_Rumore:</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidHardIvtcRemoval.cpp" line="90"/>
         <source>If pixels are closer than noise, they are considered to be the same</source>
-        <translation>Se i pixel sono più vicini dell&apos;interferenza, sono considerati identici</translation>
+        <translation>Se i pixel sono più vicini del rumore, sono considerati identici</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidHardIvtcRemoval.cpp" line="91"/>
@@ -8690,7 +8719,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidHardIvtcRemoval.cpp" line="92"/>
         <source>_Show metrics</source>
-        <translation>_Mostra misure</translation>
+        <translation>_Mostra metrica</translation>
     </message>
     <message>
         <location filename="../avidemux/ADM_videoFilter/ADM_vidHardIvtcRemoval.cpp" line="92"/>

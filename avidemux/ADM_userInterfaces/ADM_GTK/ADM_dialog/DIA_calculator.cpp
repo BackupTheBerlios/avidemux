@@ -43,7 +43,7 @@ static int cb_mod2(GtkObject * object, gpointer user_data);
 static uint32_t videoDuration;
 static uint32_t track1, track2;
 
-uint32_t numberOfVideoFrames;
+static uint32_t numberOfVideoFrames;
 
 static uint32_t videoSize,videoBitrate;
 

@@ -43,34 +43,48 @@ static uint16_t s16;
 static uint32_t s32;
 #define MAX_ACCEPTED_OPEN_FILE 99999
 
-//****************************************************************
-//****************************************************************
-uint8_t
-    picHeader::getFrameNoAlloc(uint32_t framenum, ADMCompressedImage *img)
+picHeader::picHeader(void)
 {
-    if(framenum>= (uint32_t)_videostream.dwLength) return 0;
-    img->flags = AVI_KEY_FRAME;
-    fseek(_fd[framenum], _offset, SEEK_SET);
-    fread(img->data, _imgSize[framenum] - _offset, 1, _fd[framenum]);
-    img->dataLength = _imgSize[framenum] - _offset;;
-    return 1;
+	_nb_file = 0;
+	_imgSize = NULL;
+	_fileMask = NULL;
+}
+
+//****************************************************************
+uint8_t picHeader::getFrameNoAlloc(uint32_t framenum, ADMCompressedImage *img)
+{
+	if (framenum >= (uint32_t)_videostream.dwLength)
+		return 0;
+
+	img->flags = AVI_KEY_FRAME;
+
+	FILE* fd = openFrameFile(framenum);
+
+	fread(img->data, _imgSize[framenum] - _offset, 1, fd);
+	img->dataLength = _imgSize[framenum] - _offset;
+
+	fclose(fd);
+
+	return 1;
 }
 //****************************************************************
 uint8_t picHeader::close(void)
 {
-    if (_fd) {
-	for (uint32_t i = 0; i < _nb_file; i++) {
-	    fclose(_fd[i]);
-	}
-	ADM_dealloc(_fd);
-	_fd = NULL;
+	_nb_file = 0;
 
-    }
-    if (_imgSize) {
-	delete[]_imgSize;
-	_imgSize = NULL;
-    }
-    return 0;
+	if (_fileMask)
+	{
+		delete [] _fileMask;
+		_fileMask = NULL;
+	}
+
+	if (_imgSize)
+	{
+		delete [] _imgSize;
+		_imgSize = NULL;
+	}
+
+	return 0;
 }
 //****************************************************************
 /*
@@ -112,7 +126,6 @@ uint8_t picHeader::read8(FILE * fd)
 //****************************************************************
 uint8_t picHeader::open(char *inname)
 {
-
     uint32_t nnum;
     uint32_t *fcc;
     uint8_t fcc_tab[4];
@@ -173,54 +186,58 @@ char realstring[250];
     if (nnum == 1) {
 	printf("\n only one file!");
         _nb_file=1;
-         sprintf(realstring, "%%s.%s",extension);
+		 _fileMask = ADM_strdup(inname);
     }
     else
     {
     nnum--;
     end++;
     _first = atoi(end);
-    printf("\n First : %lu, num digit :%lu", _first, nnum);
+	printf("\n First: %lu, Digit count: %lu\n", _first, nnum);
     *(end) = 0;
-    printf("\n Path : %s\n", name);
+	printf(" Path: %s\n", name);
 
-    
-    sprintf(realstring, "%%s%%0%lud.%s", nnum, extension);
-    printf("\n string : %s", realstring);
+	sprintf(realstring, "%s%%0%lud.%s", name, nnum, extension);
+	_fileMask = ADM_strdup(realstring);
+	printf(" File Mask: %s\n\n", _fileMask);
 
     _nb_file = 0;
 
-    for (uint32_t i = 0; i < MAX_ACCEPTED_OPEN_FILE; i++) {
-	sprintf(realname, realstring, name, i + _first);
-	printf("\n %lu : %s\n", i, realname);
-	fd = fopen(realname, "rb");
-	if (fd == NULL)
-	    break;
-	fclose(fd);
-	_nb_file++;
-    }
-    }
+	for (uint32_t i = 0; i < MAX_ACCEPTED_OPEN_FILE; i++)
+	{
+		sprintf(realname, realstring, i + _first);
+		printf(" %lu : %s\n", i, realname);
+
+		fd = fopen(realname, "rb");
+
+		if (fd == NULL)
+			break;
+
+		fclose(fd);
+		_nb_file++;
+	}
+	}
     printf("\n found %lu images\n", _nb_file);
 
-
-    _fd = (FILE **) ADM_alloc(_nb_file * sizeof(FILE *));
     _imgSize = new uint32_t[_nb_file];
     //_________________________________
-    // now open them and assign fd && imgSize
+    // now open them and assign imgSize
     //__________________________________
-    for (uint32_t i = 0; i < _nb_file; i++) {
-	sprintf(realname, realstring, name, i + _first);
-	printf("\n %lu : %s", i, realname);
-	_fd[i] = fopen(realname, "rb");
-	fseek(_fd[i], 0, SEEK_END);
-	_imgSize[i] = ftell(_fd[i]);
-	fseek(_fd[i], 0, SEEK_SET);
-	ADM_assert(_fd[i] != NULL);
-    }
+	for (uint32_t i = 0; i < _nb_file; i++)
+	{
+		fd = openFrameFile(i);
+		ADM_assert(fd != NULL);
 
-    delete[]name;
-    delete[]extension;
+		fseek(fd, 0, SEEK_END);
+		_imgSize[i] = ftell(fd);
 
+		fclose(fd);
+	}
+
+	fd = openFrameFile(0);
+
+	delete [] name;
+	delete [] extension;
 
     //
     //      Image is bmp type
@@ -230,17 +247,19 @@ char realstring[250];
 	{
 	    ADM_BITMAPINFOHEADER bmph;
 
-	    fread(&s16, 2, 1, _fd[0]);
+		fread(&s16, 2, 1, fd);
 	    if (s16 != 0x4D42) {
 		printf("\n incorrect bmp sig.\n");
+		fclose(fd);
 		return 0;
 	    }
-	    fread(&s32, 4, 1, _fd[0]);
-	    fread(&s32, 4, 1, _fd[0]);
-	    fread(&s32, 4, 1, _fd[0]);
-	    fread(&bmph, sizeof(bmph), 1, _fd[0]);
+		fread(&s32, 4, 1, fd);
+		fread(&s32, 4, 1, fd);
+		fread(&s32, 4, 1, fd);
+		fread(&bmph, sizeof(bmph), 1, fd);
 	    if (bmph.biCompression != 0) {
 		printf("\ncannot handle compressed bmp\n");
+		fclose(fd);
 		return 0;
 	    }
 	    _offset = bmph.biSize + 14;
@@ -258,36 +277,38 @@ char realstring[250];
 	    uint16_t tag = 0, count = 0, off;
 
 	    _offset = 0;
-	    fseek(_fd[0], 0, SEEK_SET);
-	    read16(_fd[0]);	// skip jpeg ffd8
+	    fseek(fd, 0, SEEK_SET);
+	    read16(fd);	// skip jpeg ffd8
 	    while (count < 10 && tag != 0xFFC0) {
 
-		tag = read16(_fd[0]);
+		tag = read16(fd);
 		if ((tag >> 8) != 0xff) {
 		    printf("invalid jpeg tag found (%x)\n", tag);
 		}
 		if (tag == 0xFFC0) {
-		    read16(_fd[0]);	// size
-		    read8(_fd[0]);	// precision
-		    h = read16(_fd[0]);
-		    w = read16(_fd[0]);
+		    read16(fd);	// size
+		    read8(fd);	// precision
+		    h = read16(fd);
+		    w = read16(fd);
                     if(w&1) w++;
                     if(h&1) h++;
 		} else {
 
-		    off = read16(_fd[0]);
+		    off = read16(fd);
 		    if (off < 2) {
 			printf("Offset too short!\n");
+			fclose(fd);
 			return 0;
 		    }
 		    aprintf("Found tag : %x , jumping %d bytes\n", tag,
 			    off);
-		    fseek(_fd[0], off - 2, SEEK_CUR);
+		    fseek(fd, off - 2, SEEK_CUR);
 		}
 		count++;
 	    }
 	    if (tag != 0xffc0) {
 		printf("Cannot fint start of frame\n");
+		fclose(fd);
 		return 0;
 	    }
 	    printf("\n %lu x %lu..\n", w, h);
@@ -298,20 +319,21 @@ char realstring[250];
 	{
 	    ADM_BITMAPINFOHEADER bmph;
 
-	    fseek(_fd[0], 10, SEEK_SET);
+	    fseek(fd, 10, SEEK_SET);
 
 #define MK32() (fcc_tab[0]+(fcc_tab[1]<<8)+(fcc_tab[2]<<16)+ \
 						(fcc_tab[3]<<24))
 
-	    fread(fcc_tab, 4, 1, _fd[0]);
+	    fread(fcc_tab, 4, 1, fd);
 	    _offset = MK32();
 	    // size, width height follow as int32 
-	    fread(&bmph, sizeof(bmph), 1, _fd[0]);
+	    fread(&bmph, sizeof(bmph), 1, fd);
 #ifdef ADM_BIG_ENDIAN
 	    Endian_BitMapInfo(&bmph);
 #endif
 	    if (bmph.biCompression != 0) {
 		printf("\ncannot handle compressed bmp\n");
+		fclose(fd);
 		return 0;
 	    }
 	    w = bmph.biWidth;
@@ -325,21 +347,22 @@ char realstring[250];
 	case PIC_PNG:
 	    {
     	     _offset = 0;
-	         fseek(_fd[0], 0, SEEK_SET);
-	         read32(_fd[0]);
-	         read32(_fd[0]);
-	         read32(_fd[0]);
-	         read32(_fd[0]);
-    	     w=read32(_fd[0]);;
-    	     h=read32(_fd[0]);;
+			 fseek(fd, 0, SEEK_SET);
+			 read32(fd);
+			 read32(fd);
+			 read32(fd);
+			 read32(fd);
+			 w=read32(fd);
+			 h=read32(fd);
     	     // It is big endian
     	     printf("Png seems to be %d x %d \n",w,h);
-    	     break;
 	    }
 	    break;
     default:
 	ADM_assert(0);
     }
+
+	fclose(fd);
 
 //_______________________________________
 //              Now build header info
@@ -405,5 +428,12 @@ uint32_t picHeader::getFlags(uint32_t frame, uint32_t * flags)
     *flags = AVI_KEY_FRAME;
     return 1;
 }
-//****************************************************************
-//EOF
+
+FILE* picHeader::openFrameFile(uint32_t frameNum)
+{
+	char filename[250];
+
+	sprintf(filename, _fileMask, frameNum + _first);
+
+	return fopen(filename, "rb");
+}

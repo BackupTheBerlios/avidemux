@@ -36,24 +36,25 @@ enum
 class picHeader         :public vidHeader
 {
 protected:
+	char *_fileMask;
+
 					uint32_t 		_nb_file;
        					uint32_t 		_first,_offset,_w,_h;
 
-            				FILE 		**_fd;
 					uint32_t		*_imgSize;
-
 					uint32_t 		_type;
 
 					uint32_t    read32(FILE *fd);
 					uint16_t    read16(FILE *fd);
 					uint8_t     read8(FILE *fd);
+					FILE* openFrameFile(uint32_t frameNum);
 
 public:
 //  static int checkFourCC(uint8_t *in, uint8_t *fourcc);
 
 virtual   void 				Dump(void) {};
 
-			picHeader( void ) {_nb_file=0;_fd=NULL;_imgSize=NULL;};
+			picHeader( void );
        		    ~picHeader(  ) { };
 // AVI io
 virtual 	uint8_t			open(char *name);
