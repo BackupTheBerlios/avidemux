@@ -771,26 +771,6 @@ void x264Options::setIntraLumaDeadzone(unsigned int intraLumaDeadzone)
 		_param.analyse.i_luma_deadzone[1] = intraLumaDeadzone;
 }
 
-bool x264Options::getComputePsnr(void)
-{
-	return _param.analyse.b_psnr;
-}
-
-void x264Options::setComputePsnr(bool computePsnr)
-{
-	_param.analyse.b_psnr = computePsnr;
-}
-
-bool x264Options::getComputeSsim(void)
-{
-	return _param.analyse.b_ssim;
-}
-
-void x264Options::setComputeSsim(bool computeSsim)
-{
-	_param.analyse.b_ssim = computeSsim;
-}
-
 unsigned int x264Options::getQuantiserMinimum(void)
 {
 	return _param.rc.i_qp_min;
@@ -1403,8 +1383,6 @@ void x264Options::addX264OptionsToXml(xmlNodePtr xmlNodeRoot)
 	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"noiseReduction", number2String(xmlBuffer, bufferSize, getNoiseReduction()));
 	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"interLumaDeadzone", number2String(xmlBuffer, bufferSize, getInterLumaDeadzone()));
 	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"intraLumaDeadzone", number2String(xmlBuffer, bufferSize, getIntraLumaDeadzone()));
-	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"computePsnr", boolean2String(xmlBuffer, bufferSize, getComputePsnr()));
-	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"computeSsim", boolean2String(xmlBuffer, bufferSize, getComputeSsim()));
 
 	xmlNodeChild = xmlNewChild(xmlNodeRoot, NULL, (xmlChar*)"rateControl", NULL);
 	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"quantiserMinimum", number2String(xmlBuffer, bufferSize, getQuantiserMinimum()));
@@ -1931,10 +1909,6 @@ void x264Options::parseAnalyseOptions(xmlNode *node)
 				setInterLumaDeadzone(atoi(content));
 			else if (strcmp((char*)xmlChild->name, "intraLumaDeadzone") == 0)
 				setIntraLumaDeadzone(atoi(content));
-			else if (strcmp((char*)xmlChild->name, "computePsnr") == 0)
-				setComputePsnr(string2Boolean(content));
-			else if (strcmp((char*)xmlChild->name, "computeSsim") == 0)
-				setComputeSsim(string2Boolean(content));
 
 			xmlFree(content);
 		}

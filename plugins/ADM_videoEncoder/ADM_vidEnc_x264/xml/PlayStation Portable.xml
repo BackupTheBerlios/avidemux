@@ -265,8 +265,6 @@
       <noiseReduction>0</noiseReduction>
       <interLumaDeadzone>21</interLumaDeadzone>
       <intraLumaDeadzone>11</intraLumaDeadzone>
-      <computePsnr>true</computePsnr>
-      <computeSsim>true</computeSsim>
     </analyse>
     <rateControl>
       <quantiserMinimum>10</quantiserMinimum>

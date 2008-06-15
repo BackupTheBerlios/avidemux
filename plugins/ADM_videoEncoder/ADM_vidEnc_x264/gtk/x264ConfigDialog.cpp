@@ -809,7 +809,7 @@ create_dialog1 (void)
   gtk_tooltips_set_tip (tooltips, spinbuttonRange, _("Define how many pixels are analysed for motion estimation. The higher the range the more accurate the analysis but the slower the encoding time."), NULL);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonRange), TRUE);
 
-  spinbuttonMaxRefFrames_adj = gtk_adjustment_new (1, 0, 16, 1, 10, 10);
+  spinbuttonMaxRefFrames_adj = gtk_adjustment_new (1, 1, 16, 1, 10, 10);
   spinbuttonMaxRefFrames = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonMaxRefFrames_adj), 1, 0);
   gtk_widget_show (spinbuttonMaxRefFrames);
   gtk_table_attach (GTK_TABLE (table11), spinbuttonMaxRefFrames, 1, 2, 1, 2,
@@ -1165,7 +1165,7 @@ create_dialog1 (void)
   gtk_tooltips_set_tip (tooltips, spinbuttonBias, _("Increase / decrease probability for how often B-frames are used. It will not violate the maximum consecutive frame limit."), NULL);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonBias), TRUE);
 
-  spinbuttonMaxBFrame_adj = gtk_adjustment_new (3, 0, 15, 1, 10, 10);
+  spinbuttonMaxBFrame_adj = gtk_adjustment_new (3, 0, 16, 1, 10, 10);
   spinbuttonMaxBFrame = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonMaxBFrame_adj), 1, 0);
   gtk_widget_show (spinbuttonMaxBFrame);
   gtk_table_attach (GTK_TABLE (table5), spinbuttonMaxBFrame, 1, 2, 0, 1,

@@ -147,7 +147,7 @@
               <xs:element name="referenceFrames">
                 <xs:simpleType>
                   <xs:restriction base="xs:integer">
-                    <xs:minInclusive value="0"/>
+                    <xs:minInclusive value="1"/>
                     <xs:maxInclusive value="16"/>
                   </xs:restriction>
                 </xs:simpleType>
@@ -181,7 +181,7 @@
                 <xs:simpleType>
                   <xs:restriction base="xs:integer">
                     <xs:minInclusive value="0"/>
-                    <xs:maxInclusive value="15"/>
+                    <xs:maxInclusive value="16"/>
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
@@ -377,8 +377,6 @@
                         </xs:restriction>
                       </xs:simpleType>
                     </xs:element>
-                    <xs:element name="computePsnr" type="xs:boolean"/>
-                    <xs:element name="computeSsim" type="xs:boolean"/>
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>

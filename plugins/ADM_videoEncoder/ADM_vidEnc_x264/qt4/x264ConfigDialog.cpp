@@ -71,7 +71,7 @@ x264ConfigDialog::x264ConfigDialog(vidEncConfigParameters *configParameters, vid
 	connect(ui.quantiserSpinBox, SIGNAL(valueChanged(int)), this, SLOT(quantiserSpinBox_valueChanged(int)));
 	connect(ui.targetRateControlSpinBox, SIGNAL(valueChanged(int)), this, SLOT(targetRateControlSpinBox_valueChanged(int)));
 
-	ui.sarAsInputLabel->setText(QString("%2:%3").arg(properties->parWidth).arg(properties->parHeight));
+	ui.sarAsInputLabel->setText(QString("%1:%2").arg(properties->parWidth).arg(properties->parHeight));
 
 	// Motion Estimation tab
 	connect(ui.meSlider, SIGNAL(valueChanged(int)), this, SLOT(meSlider_valueChanged(int)));
@@ -737,8 +737,6 @@ void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *o
 	ui.spsiComboBox->setCurrentIndex(ui.spsiComboBox->findText(strSpsId));
 	ui.repeatabilityCheckBox->setChecked(options->getDeterministic());
 	ui.accessUnitCheckBox->setChecked(options->getAccessUnitDelimiters());
-	ui.psnrCheckBox->setChecked(options->getComputePsnr());
-	ui.ssimCheckBox->setChecked(options->getComputeSsim());
 	ui.overscanComboBox->setCurrentIndex(options->getOverscan());
 	ui.videoFormatComboBox->setCurrentIndex(getValueIndexInArray(options->getVideoFormat(), videoFormat, videoFormatCount));
 	ui.colourPrimariesComboBox->setCurrentIndex(getValueIndexInArray(options->getColorPrimaries(), colourPrimaries, colourPrimariesCount));
@@ -935,8 +933,6 @@ void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *o
 	options->setSpsIdentifier(ui.spsiComboBox->currentText().toInt());
 	options->setDeterministic(ui.repeatabilityCheckBox->isChecked());
 	options->setAccessUnitDelimiters(ui.accessUnitCheckBox->isChecked());
-	options->setComputePsnr(ui.psnrCheckBox->isChecked());
-	options->setComputeSsim(ui.ssimCheckBox->isChecked());
 	options->setOverscan(ui.overscanComboBox->currentIndex());
 	options->setVideoFormat(videoFormat[ui.videoFormatComboBox->currentIndex()]);
 	options->setColorPrimaries(colourPrimaries[ui.colourPrimariesComboBox->currentIndex()]);

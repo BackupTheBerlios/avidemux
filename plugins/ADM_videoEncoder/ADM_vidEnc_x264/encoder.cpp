@@ -626,8 +626,6 @@ void x264Encoder::printParam(x264_param_t *x264Param)
 	printf("[x264] i_sps_id = %d\n", x264Param->i_sps_id);
 	printf("[x264] b_deterministic = %d\n", x264Param->b_deterministic);
 	printf("[x264] b_aud = %d\n", x264Param->b_aud);
-	printf("[x264] analyse.b_psnr = %d\n", x264Param->analyse.b_psnr);
-	printf("[x264] analyse.b_ssim = %d\n", x264Param->analyse.b_ssim);
 	printf("[x264] vui.i_overscan = %d\n", x264Param->vui.i_overscan);
 	printf("[x264] vui.i_vidformat = %d\n", x264Param->vui.i_vidformat);
 	printf("[x264] vui.i_colorprim = %d\n", x264Param->vui.i_colorprim);
