@@ -1,6 +1,6 @@
 /***************************************************************************
 /*
-    
+
     copyright            : (C) 2007 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
@@ -42,7 +42,7 @@
 
 uint32_t ADM_UsecFromFps1000(uint32_t fps1000);
 // 14496-1 / 8.2.1
-typedef enum 
+typedef enum
 {
 	Tag_InitialObjDesc	=0x02,
 	Tag_ES_Desc		=0x03,
@@ -58,7 +58,7 @@ extern char* ms2timedisplay(uint32_t ms);
 */
 uint8_t     MP4Header::lookupMainAtoms(void *ztom)
 {
-  
+
   adm_atom *tom=(adm_atom *)ztom;
   adm_atom *moov;
   ADMAtoms id;
@@ -81,19 +81,19 @@ uint8_t     MP4Header::lookupMainAtoms(void *ztom)
     {
       switch( id)
       {
-        case ADM_MP4_MVHD: parseMvhd(&son);break; 
-        case ADM_MP4_TRACK: 
+        case ADM_MP4_MVHD: parseMvhd(&son);break;
+        case ADM_MP4_TRACK:
             if(!parseTrack(&son))
             {
                 printf("Parse Track failed\n");
             } ;
             break;
-        default : 
+        default :
                 adm_printf(ADM_PRINT_DEBUG,"atom %s not handled\n",fourCC::tostringBE(son.getFCC()));
                 break;
       }
-      
-      
+
+
     }
     son.skipAtom();
   }
@@ -110,7 +110,7 @@ void MP4Header::parseMvhd(void *ztom)
   adm_atom *tom=(adm_atom *)ztom;
   tom->skipBytes(12);
   uint32_t scale,duration=1000;
-  
+
         scale=tom->read32();
         duration=tom->read32();
         _videoScale=scale;
@@ -135,7 +135,7 @@ uint8_t MP4Header::parseTrack(void *ztom)
   uint32_t container;
   uint32_t w,h;
   uint32_t trackType=TRACK_OTHER;
-  
+
   printf("Parsing Track\n");
    while(!tom->isDone())
   {
@@ -158,7 +158,7 @@ uint8_t MP4Header::parseTrack(void *ztom)
                       son.skipBytes(8);
                       son.skipBytes(4); // layers
                       son.skipBytes(40); // layers
-  
+
                       w=son.read32()>>16;
                       h=son.read32()>>16;
                       adm_printf(ADM_PRINT_DEBUG,"tkhd : %ld %ld\n",w,h);
@@ -202,7 +202,7 @@ uint8_t MP4Header::parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t
      }
      switch(id)
      {
-       case ADM_MP4_MDHD:  
+       case ADM_MP4_MDHD:
        {
                 uint32_t version=son.read(),duration;
                 son.skipBytes(3); // flags + version
@@ -220,16 +220,16 @@ uint8_t MP4Header::parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t
                 printf("MDHD,Track duration :%s, trackScale :%u\n",ms2timedisplay((1000*duration)/trackScale),trackScale);
                 break;
        }
-       case ADM_MP4_HDLR:  
+       case ADM_MP4_HDLR:
        {
             uint32_t type;
-            
+
                 son.read32();
                 son.read32();
                 type=son.read32();
                 printf("[HDLR]\n");
                 switch(type)
-                {	
+                {
                 case MKFCCR('v','i','d','e')://'vide':
                         *trackType=TRACK_VIDEO;
                         printf("hdlr video found \n ");
@@ -253,14 +253,14 @@ uint8_t MP4Header::parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t
                         printf("Url : <%s>\n",str);
                       }
                       break;
-                 
+
                 }
                 break;
-       } 
-       case ADM_MP4_MINF:  
+       }
+       case ADM_MP4_MINF:
        {
             // We are only interested in stbl
-            
+
             while(!son.isDone())
             {
               adm_atom grandson(&son);
@@ -275,7 +275,7 @@ uint8_t MP4Header::parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t
                    if(! parseStbl(&grandson,*trackType, w, h,trackScale))
                    {
                       printf("STBL failed\n");
-                      return 0; 
+                      return 0;
                    }
                    r=1;
               }
@@ -286,7 +286,7 @@ uint8_t MP4Header::parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t
         default:
             adm_printf(ADM_PRINT_DEBUG,"** atom  NOT HANDLED [%s] \n",fourCC::tostringBE(son.getFCC()));
      }
-     
+
      son.skipAtom();
   }
   return r;
@@ -302,11 +302,11 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
   ADMAtoms id;
   uint32_t container;
   MPsampleinfo  info;
-  
-  
+
+
   memset(&info,0,sizeof(info));
 
-  
+
   printf("<<Parsing Stbl>>\n");
   while(!tom->isDone())
   {
@@ -333,9 +333,9 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                   }
           }
           break;
-         
+
        }
-       case ADM_MP4_STTS: 
+       case ADM_MP4_STTS:
             {
                 printf("stts:%lu\n",son.read32()); // version & flags
                 info.nbStts=son.read32();
@@ -346,13 +346,13 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                 double dur;
                 for(int i=0;i<info.nbStts;i++)
                 {
-                        
+
                         info.SttsN[i]=son.read32();
                         info.SttsC[i]=son.read32();
-                        adm_printf(ADM_PRINT_VERY_VERBOSE,"stts: count:%u size:%u (unscaled)\n",info.SttsN[i],info.SttsC[i]);	
+                        adm_printf(ADM_PRINT_VERY_VERBOSE,"stts: count:%u size:%u (unscaled)\n",info.SttsN[i],info.SttsC[i]);
                         //dur*=1000.*1000.;; // us
                         //dur/=myScale;
-                }                
+                }
             }
             break;
        case ADM_MP4_STSC:
@@ -397,10 +397,10 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
               }
           }
           break;
-           case ADM_MP4_CTTS: // Composition time to sample             
+           case ADM_MP4_CTTS: // Composition time to sample
             {
                 uint32_t n,i,j,k,v;
-                
+
                   printf("ctts:%lu\n",son.read32()); // version & flags
                   n=son.read32();
                   if(n==1) // all the same , ignore
@@ -420,12 +420,12 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                     sum+=count[i];
                 }
                 info.Ctts=new uint32_t[sum+1]; // keep a safe margin
-                
+
                 for(i=0;i<n;i++)
                 {
                     if(i<20)
                     {
-                        adm_printf(ADM_PRINT_VERY_VERBOSE,"Ctts: nb: %u (%x) val:%u (%x)\n",count[i],count[i],values[i],values[i]);   
+                        adm_printf(ADM_PRINT_VERY_VERBOSE,"Ctts: nb: %u (%x) val:%u (%x)\n",count[i],count[i],values[i],values[i]);
                     }
                     for(k=0;k<count[i];k++)
                     {
@@ -443,7 +443,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                 ADM_assert(info.nbCtts<sum+1);
                 printf("Found %u elements\n",info.nbCtts);
             }
-            break;  
+            break;
        case ADM_MP4_STCO:
        {
           son.read32();
@@ -487,7 +487,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                    left=entrySize-8;
                    if(i || (trackType==TRACK_VIDEO && _videoFound) || (trackType==TRACK_OTHER))
                    {
-                    son.skipBytes(left); 
+                    son.skipBytes(left);
                     printf("[STSD] ignoring %s, size %u\n",fourCC::tostringBE(entryName),entrySize);
                     if(trackType==TRACK_OTHER) printf("[STSD] because track=other\n");
                     continue;
@@ -504,23 +504,23 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                 left-=4;
                                 printf("[STSD] vendor %s\n",fourCC::tostringBE(son.read32()));
                                 left-=4;
-                                
+
                                 son.skipBytes(8); // spatial qual etc..
                                 left-=8;
-                                
+
                                 printf("[STSD] width :%u\n",lw=son.read16());
                                 printf("[STSD] height :%u\n",lh=son.read16());
                                 left-=4;
-                                
+
                                 son.skipBytes(8); // Resolution
                                 left-=8;
-                                
+
                                 printf("[STSD] datasize :%u\n",son.read32());
                                 left-=4;
-                     
+
                                 printf("[STSD] FrameCount :%u\n",son.read16());
                                 left-=4;
-                                
+
                                 // Codec name
                                 uint32_t u32=son.read();
                                 if(u32>31) u32=31;
@@ -529,22 +529,22 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                 printf(">\n");
                                 son.skipBytes(32-1-u32);
                                 left-=32;
-                                // 
+                                //
                                 son.read32();
                                 left-=4; //Depth & color Id
                                 //
                                 printf("LEFT:%d\n",left);
-                                
+
                                 if(left>8)
                                 {
-//                                  decodeVideoAtom(&son); 
+//                                  decodeVideoAtom(&son);
                                 }
                                 //
 #define commonPart(x)             _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)#x);
-                      
 
-                                 _video_bih.biWidth=_mainaviheader.dwWidth=lw ; 
-                                  _video_bih.biHeight=_mainaviheader.dwHeight=lh; 
+
+                                 _video_bih.biWidth=_mainaviheader.dwWidth=lw ;
+                                  _video_bih.biHeight=_mainaviheader.dwHeight=lh;
                                   _video_bih.biCompression=_videostream.fccHandler;
 
                                 //
@@ -619,13 +619,19 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                           commonPart(H264);
                                           // There is a avcC atom just after
                                           // configuration data for h264
-nextAtom:                                          
+nextAtom:
                                           adm_atom avcc(&son);
                                           printf("Reading avcC, got %s\n",fourCC::tostringBE(avcc.getFCC()));
-                                          if(avcc.getFCC()==MKFCCR('c','o','l','r')) // Color atom
+                                          switch(avcc.getFCC())
                                           {
-                                        	  avcc.skipAtom();
-                                        	  goto nextAtom;
+                                              case MKFCCR('a','v','c','C'): break;
+                                              default:
+                                              case MKFCCR('c','o','l','r'):  // Color atom
+                                              case MKFCCR('p','a','s','p'):
+                                              case MKFCCR('c','l','a','p'):
+                                                  avcc.skipAtom();
+                                                  goto nextAtom;
+                                                  break;
                                           }
                                           int len,offset;
                                           VDEO.extraDataSize=avcc.getRemainingSize();
@@ -641,14 +647,14 @@ nextAtom:
                                             printf("avcC AVCProfileIndication :%x\n", MKD8(1));
                                             printf("avcC profile_compatibility:%x\n", MKD8(2));
                                             printf("avcC AVCLevelIndication   :%x\n", MKD8(3));
-        
+
                                             printf("avcC lengthSizeMinusOne   :%x\n", MKD8(4));
                                             printf("avcC NumSeq               :%x\n", MKD8(5));
                                             len=MKD16(6);
                                             printf("avcC sequenceParSetLen    :%x ",len );
                                             offset=8;
                                             mixDump(VDEO.extraData+offset,len);
-        
+
                                             offset=8+len;
                                             printf("\navcC numOfPictureParSets  :%x\n", MKD8(offset++));
                                             len=MKD16(offset);
@@ -664,7 +670,7 @@ nextAtom:
                                                 adm_atom avcc(&son);
                                                 printf("Reading , got %s\n",fourCC::tostringBE(avcc.getFCC()));
                                                 left=0;
-                                                
+
                                             }
                                             break;
                                 } // Entry name
@@ -673,34 +679,34 @@ nextAtom:
                      case TRACK_AUDIO:
                      {
                         uint32_t channels,bpp,encoding,fq,packSize;
-                        
+
                                 // Put some defaults
                                 ADIO.encoding=1234;
                                 ADIO.frequency=44100;
                                 ADIO.byterate=128000>>3;
                                 ADIO.channels=2;
                                 ADIO.bitspersample=16;
-                        
+
                                 printf("[STSD] AUDIO <%s>, 0x%08x, size %u\n",fourCC::tostringBE(entryName),entryName,entrySize);
                                 son.skipBytes(8);  // reserved etc..
                                 left-=8;
-                                
+
                                 int atomVersion=son.read16();  // version
                                 left-=2;
                                 printf("[STSD]Revision       :%d\n",atomVersion);
                                 son.skipBytes(2);  // revision
                                 left-=2;
-                                
+
                                 printf("[STSD]Vendor         : %s\n",fourCC::tostringBE(son.read32()));
                                 left-=4;
-                                
+
                                 ADIO.channels=channels=son.read16(); // Channel
                                 left-=2;
                                 printf("[STSD]Channels       :%d\n",ADIO.channels);
                                 ADIO.bitspersample=bpp=son.read16(); // version/revision
                                 left-=2;
                                 printf("[STSD]Bit per sample :%d\n",bpp);
-                                
+
                                 encoding=son.read16(); // version/revision
                                 left-=2;
                                 printf("[STSD]Encoding       :%d\n",encoding);
@@ -708,8 +714,8 @@ nextAtom:
                                 packSize=son.read16(); // Packet Size
                                 left-=2;
                                 printf("[STSD]Packet size    :%d\n",encoding);
-                                
-                              
+
+
                                 fq=ADIO.frequency=son.read16();
                                 printf("[STSD]Fq:%u\n",fq);
                                 if(ADIO.frequency<6000) ADIO.frequency=48000;
@@ -752,12 +758,12 @@ nextAtom:
 #define audioCodec(x) ADIO.encoding=WAV_##x;
                                 switch(entryName)
                                 {
-                                    
+
                                     case MKFCCR('t','w','o','s'):
                                             audioCodec(LPCM);
                                             ADIO.byterate=ADIO.frequency*ADIO.bitspersample*ADIO.channels/8;
                                             break;
-                                                
+
                                     case MKFCCR('u','l','a','w'):
                                             audioCodec(ULAW);
                                             ADIO.byterate=ADIO.frequency;
@@ -839,11 +845,11 @@ nextAtom:
                                                           ADIO.blockalign=ADM_swap16(item.read16());
                                                           ADIO.bitspersample=ADM_swap16(item.read16());
                                                           printWavHeader(&(ADIO));
-                                                          
+
                                                         }
                                                        break;
                                                         case MKFCCR('m','p','4','a'):
-                                                          break; 
+                                                          break;
                                                         case MKFCCR('e','s','d','s'):
                                                           {
                                                                decodeEsds(&item,TRACK_AUDIO);
@@ -855,7 +861,7 @@ nextAtom:
                                                      }
 
                                                      item.skipAtom();
-                                                   
+
                                                  }  // Wave iddone
                                                  left=0;
                                               }  // if ==wave
@@ -865,25 +871,25 @@ nextAtom:
                                                           {
                                                                decodeEsds(&wave,TRACK_AUDIO);
                                                                goto foundit; // FIXME!!!
-                                                          } 
+                                                          }
                                                 else
                                                 {
-                                                  printf("UNHANDLED ATOM : %s\n",fourCC::tostringBE(wave.getFCC())); 
+                                                  printf("UNHANDLED ATOM : %s\n",fourCC::tostringBE(wave.getFCC()));
                                                 }
                                               }
                                             } // if left > 10
-foundit: // HACK FIXME     
+foundit: // HACK FIXME
                                             left=0;
-                                    }       
+                                    }
                                             break; // mp4a
-                                  
+
                                 }
                      }
                           break;
                      default:
                           ADM_assert(0);
                    }
-                   son.skipBytes(left); 
+                   son.skipBytes(left);
                 }
        }
               break;
@@ -904,7 +910,7 @@ foundit: // HACK FIXME
               return 1;
           }
           r=indexify(&(_tracks[0]),trackScale,&info,0,&nbo);
-          
+
           _videostream.dwLength= _mainaviheader.dwTotalFrames=_tracks[0].nbIndex;
           // update fps
           float f=_videostream.dwLength;
@@ -936,7 +942,7 @@ foundit: // HACK FIXME
             updateCtts(&info);
           }
 
-          
+
            VDEO.index[0].intra=AVI_KEY_FRAME;
         }
           break;
@@ -960,7 +966,7 @@ foundit: // HACK FIXME
                 _tracks[1+nbAudioTrack].scale=trackScale;
                 nbAudioTrack++;
             }
-            
+
             break;
     case TRACK_OTHER:
         r=1;
@@ -974,7 +980,7 @@ foundit: // HACK FIXME
 */
 uint8_t MP4Header::decodeEsds(void *ztom,uint32_t trackType)
 {
-adm_atom *tom=(adm_atom *)ztom; 
+adm_atom *tom=(adm_atom *)ztom;
 int tag,l;
             // in case of mpeg4 we only take
             // the mpeg4 vol header
@@ -1006,10 +1012,10 @@ int tag,l;
                                           case 0x6d:ADIO.encoding=WAV_MP3;break;
                                           case 226:ADIO.encoding=WAV_AC3;break;
                                           break;
-                                  
+
                                       }
                                     }
-                                    tom->skipBytes(1+3+4+4);	
+                                    tom->skipBytes(1+3+4+4);
                                     break;
                             }
                             case Tag_DecSpecificInfo:
@@ -1035,7 +1041,7 @@ int tag,l;
                                     }
                             }
             }
-            
+
     tom->skipAtom();
     return 1;
 }
@@ -1046,15 +1052,15 @@ int tag,l;
 uint8_t MP4Header::updateCtts(MPsampleinfo *info )
 {
     uint32_t scope=info->nbCtts;
-            
+
             if(scope>_videostream.dwLength) scope=_videostream.dwLength;
-            
+
             // Search floor value
             uint32_t  flor=0xFFFFFFFF;
             uint32_t  cel=0;
             for(uint32_t i=0;i<scope;i++)
             {
-              if(info->Ctts[i]>4294967290) 
+              if(info->Ctts[i]>4294967290)
               {
                 if(i)
                   info->Ctts[i]=info->Ctts[0];
@@ -1078,7 +1084,7 @@ uint8_t MP4Header::updateCtts(MPsampleinfo *info )
                 aprintf(">Frame :%u delta=%d\n",i,floops);
               if(floops<0)
               {
-                printf("[3GPP] CTTS negative for frame %u : %d\n",i,floops); 
+                printf("[3GPP] CTTS negative for frame %u : %d\n",i,floops);
                 floops=0;
               }
               _tracks[0].index[i].deltaPtsDts=floops;

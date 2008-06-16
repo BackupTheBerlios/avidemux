@@ -808,6 +808,7 @@ int nw;
 	  video_body->updateVideoInfo (&info);
 	  // update display
 	  video_body->getVideoInfo (avifileinfo);
+          rebuild_status_bar();
 	 }
 	}
       break;
