@@ -28,9 +28,9 @@
 #        define FUNNY_MANGLE_ARRAY(x, y) x[y] asm(MANGLE(x))
 #    endif
 #else
-#    if defined(ADM_CPU_X86_64) && defined(PIC)
+#    if defined(ADM_CPU_X86_64)  //defined(PIC)
 #        define MANGLE(a) #a"(%%rip)"
-#        define FUNNY_MANGLE(x) x
+#        define FUNNY_MANGLE(x) x asm(#x)
 #        define FUNNY_MANGLE_ARRAY(x, y) x[y]
 #    elif defined(__APPLE__)
 #        define MANGLE(a) "_" #a
