@@ -30,17 +30,15 @@
 #include "audioeng_process.h"
 #include "audiofilter_film2pal.h"
 
-
-#define PAL_SAM  25025
-#define FILM_SAM 24000
-
 //__________
 
 AUDMAudioFilterFilm2Pal::AUDMAudioFilterFilm2Pal(AUDMAudioFilter * instream):AUDMAudioFilter (instream)
 {
     // nothing special here...
-  _target=0.0;
+  _target=0;
+  _removed=0;
   _previous->rewind();
+  _modulo=0;
   printf("[Film2Pal] Creating\n");
 };
 
@@ -58,42 +56,42 @@ uint32_t AUDMAudioFilterFilm2Pal::fill( uint32_t max, float * buffer,AUD_Status 
   
   shrink();
   fillIncomingBuffer(status);
-  float *head;
-  
-  
-  shrink();
-  fillIncomingBuffer(status);
   
   len=_tail-_head;
   if(len>max) len=max;
   
   len=len/min;
-  len*=min;
 
   rendered=0;
   start=&_incomingBuffer[_head];
-  while(len>=min)
+
+  while(len--) // in sample
   {
-    memcpy(buffer,start,min*sizeof(float));
-    buffer+=min;
-    start+=min;
-    rendered+=min;
-    len-=min;
-    _target+=(PAL_SAM-FILM_SAM);
-    _head+=min;
-    //_______________________________________
-    // Remove sample
-    // To compensate
-    //_______________________________________
-    // Fps higher=we have to accelerate sound = remove samples
-    // The compression factor is 1-((25-24)/25)	
-    while(_target>PAL_SAM && rendered>=min)
-    {	
-      rendered-=min;	
-      buffer-=min;
-      _target=_target-PAL_SAM;
-    }
-	
+        //_______________________________________
+        // FilmToPal : 24 fps to 25 fps -> shorten frame
+        // 1001 samples -> 960 samples
+        //______________________________________
+       if(_removed) // Fixme , use dither or something
+        { 
+              _removed--;
+        }
+        else
+        {
+        
+            memcpy(buffer,start,min*sizeof(float));
+            buffer+=min;
+            rendered+=min;    
+        }
+        _target++; // nb Processed
+     // Consume it
+        start+=min;
+        _head+=min;
+        _modulo++;
+        if(_target>1001)
+        {
+            _removed+=41;
+            _target-=1001;
+        }
   }
   return rendered;
 };
@@ -101,18 +99,21 @@ uint32_t AUDMAudioFilterFilm2Pal::fill( uint32_t max, float * buffer,AUD_Status 
 AUDMAudioFilterPal2Film::AUDMAudioFilterPal2Film(AUDMAudioFilter * instream):AUDMAudioFilter (instream)
 {
     // nothing special here...
-  _target=0.0;
+  _target=0;
+  _removed=0;
+  _modulo=0;
   _previous->rewind();
   printf("[Pal2Film] Creating\n");
 };
 
 AUDMAudioFilterPal2Film::~AUDMAudioFilterPal2Film()
 {
-  printf("[Film2Pal] Creating\n");
+  printf("[Film2Pal] Destroying\n");
 }
 //
 //___________________________________________
 uint32_t AUDMAudioFilterPal2Film::fill( uint32_t max, float * buffer,AUD_Status *status)
+//uint32_t AUDMAudioFilterFilm2Pal::fill( uint32_t max, float * buffer,AUD_Status *status)
 {
   uint32_t len,i,rendered;
   uint32_t min=_wavHeader.channels;
@@ -120,42 +121,56 @@ uint32_t AUDMAudioFilterPal2Film::fill( uint32_t max, float * buffer,AUD_Status 
   
   shrink();
   fillIncomingBuffer(status);
-  float *head;
   
+  ADM_assert(_tail>=_head);
   
-  shrink();
-  fillIncomingBuffer(status);
-  
-  len=_tail-_head;
+  len=_tail-_head;  // How much float available ?
   if(len>max) len=max;
   
-  len=len/min;
-  len*=min;
-
+  len=len/min; // convert to sample
+  
+  if(len==0)
+  {
+        printf("**oops**\n");
+  }
   rendered=0;
   start=&_incomingBuffer[_head];
-  while(len)
+  while(len--)
   {
         memcpy(buffer,start,min*sizeof(float));
+       // printf(" Target :%d removed :%d\n",_target,_removed);
         buffer+=min;
-        start+=min;
         rendered+=min;
-        len-=min;
-        _target+=(PAL_SAM-FILM_SAM);
-        //_______________________________________
-        // Duplicate sample
-        // To compensate
-        //_______________________________________
-        // In : One second is worth FILM_SAM samples
-        // Out:FILM_SAM+(PAL_SAM-FILM_SAM)*FILM_SAM/FILM_SAM=PAL_SAM = 25 fps
-      
-        while(_target>FILM_SAM)
+
+       
+        _target++; // _target is the number of sample we processed
+
+        _modulo++;
+
+        if(_target>960) // Time to duplicate samples
         {
-          memcpy(buffer,start-min,min*sizeof(float));
+            _removed+=41;
+            _target-=960;
+        }
+        if(rendered>=max-1)
+        {
+            start+=min;
+            _head+=min;
+            return rendered;
+        }
+        //_______________________________________
+        // Pal2Film : 25 fps to 24 fps -> Duplicate samples
+        // by 41 samples every 960 samples 960->1001
+        //______________________________________
+        if(_removed /*&& ((_modulo&15)==1)*/) // Spread the duplication
+        {
+          memcpy(buffer,start,min*sizeof(float));
           buffer+=min;
           rendered+=min;			
-          _target=_target-FILM_SAM;
-        }
+          _removed--;
+        }  
+        start+=min;
+        _head+=min;
   }
   return rendered;
 };

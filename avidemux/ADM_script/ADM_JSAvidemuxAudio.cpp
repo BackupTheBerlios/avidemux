@@ -229,7 +229,7 @@ JSBool ADM_JSAvidemuxAudio::JSSetProperty(JSContext *cx, JSObject *obj, jsval id
                                         break;
                                 priv->getObject()->m_bPAL2Film = JSVAL_TO_BOOLEAN(*vp);
                                 enterLock();
-                                audioFilterFilm2Pal(priv->getObject()->m_bPAL2Film);
+                                audioFilterPal2Film(priv->getObject()->m_bPAL2Film);
                                 leaveLock();
                                 break;
                         }

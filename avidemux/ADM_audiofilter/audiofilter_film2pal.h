@@ -21,7 +21,9 @@
 class AUDMAudioFilterFilm2Pal : public AUDMAudioFilter
 {
   protected:
-    float  _target;
+    uint32_t   _target;
+    uint32_t _removed;
+    uint32_t _modulo;
   public:
                           AUDMAudioFilterFilm2Pal(AUDMAudioFilter *previous);
     virtual                ~AUDMAudioFilterFilm2Pal();
@@ -30,7 +32,10 @@ class AUDMAudioFilterFilm2Pal : public AUDMAudioFilter
 class AUDMAudioFilterPal2Film : public AUDMAudioFilter
 {
   protected:
-    float  _target;
+    uint32_t   _target;
+    uint32_t _removed;
+    uint32_t _modulo;
+
   public:
                             AUDMAudioFilterPal2Film(AUDMAudioFilter *previous);
     virtual                ~AUDMAudioFilterPal2Film();
