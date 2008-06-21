@@ -1,7 +1,7 @@
 /***************************************************************************
                           aviaudio.cpp  -  description
                              -------------------
-    begin                : 
+    begin                :
     copyright            : (C) 2004 by mean
     email                : fixounet@free.fr
 
@@ -35,7 +35,7 @@ Split a stream into packet(s)
 #include "ADM_audio/ADM_dcainfo.h"
 
 #define MINSTOCK 5000
-#define MINUS_ONE 0xffffffff	
+#define MINUS_ONE 0xffffffff
 
 //
 uint8_t AVDMGenericAudioStream::flushPacket(void)
@@ -46,7 +46,7 @@ uint8_t AVDMGenericAudioStream::flushPacket(void)
 }
 uint8_t AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
-	uint32_t instock=0,rd=0;	
+	uint32_t instock=0,rd=0;
 
 	if (_eos)
 		return 0;
@@ -56,7 +56,7 @@ uint8_t AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len, uint32_t
 _refill:
 	shrink();
 	instock=packetTail-packetHead;
-	
+
 	while(instock<MINSTOCK)
 	{
 		rd=read(MINSTOCK,&packetBuffer[packetTail]);
@@ -102,7 +102,7 @@ _refill:
 		case WAV_AC3:
 				return getPacketAC3(dest,len,samples);
 				break;
-				
+
 		case WAV_WMA:
 				return getPacketWMA(dest,len,samples);
 				break;
@@ -123,25 +123,25 @@ uint8_t AVDMGenericAudioStream::shrink( void )
 		packetTail-=packetHead;
 		packetHead=0;
 	}
-	
+
 	return 1;
 }
 //___________________________
-uint8_t		AVDMGenericAudioStream::getPacketWMA(uint8_t *dest, uint32_t *len, 
+uint8_t		AVDMGenericAudioStream::getPacketWMA(uint8_t *dest, uint32_t *len,
 								uint32_t *samples)
 {
 	uint32_t align=_wavheader->blockalign;
 	uint32_t avail;
-	
-	
+
+
 	avail=packetTail-packetHead;
-	
+
 	if(avail>=align)
 	{
 		//printf("WMA: %lu\n",align);
 		memcpy(dest,&packetBuffer[packetHead],align);
 		packetHead+=align;
-		*samples=1024; 
+		*samples=1024;
 		#warning FIXME
 		*len=align;
 		return 1;
@@ -152,31 +152,32 @@ uint8_t		AVDMGenericAudioStream::getPacketWMA(uint8_t *dest, uint32_t *len,
 	return 0;
 
 }
-//*************
-// The packet is 1024 bytes long BUT the 4/8 bytes (mono/stereo) are used for predictor initialization
-//
-// See Mike Melanson nice doc http://www.multimedia.cx/simpleaudio.html
-//___________________________
-uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len, 
+/**
+        \fn getPacketPCM
+        \brief
+*/
+uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len,
 								uint32_t *samples)
 {
-// Take ~ 10 m packets
+// Take ~ 32 samples packet
 //
 	uint32_t count,sample;
-			sample=_wavheader->frequency/100;			
-			count=sample*_wavheader->channels;
-                        if(_wavheader->encoding!=WAV_ULAW && _wavheader->encoding!=WAV_8BITS_UNSIGNED)
+    uint32_t sampleSizeInBytes=1;
+            if(_wavheader->encoding!=WAV_ULAW && _wavheader->encoding!=WAV_8BITS_UNSIGNED)
 			{
-				count*=2;			
+				sampleSizeInBytes=2;
 			}
+			count=32*_wavheader->channels;
+            count*=sampleSizeInBytes;
+
 			if(packetTail-packetHead<count)
 			{
 				count=packetTail-packetHead;
-				count&=0xffffffC;
+				count&=~(sampleSizeInBytes*_wavheader->channels);
 			}
-			memcpy(dest,&packetBuffer[packetHead],count);			
+			memcpy(dest,&packetBuffer[packetHead],count);
 			packetHead+=count;
-			
+
 			// now revert to sample
 			sample=count/_wavheader->channels;
 			if(!sample)
@@ -185,27 +186,19 @@ uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len,
 				printf("Wav Packetizer: running empty, last packet sent\n");
 				return 0;
 			}
-                        if(_wavheader->encoding!=WAV_ULAW && _wavheader->encoding!=WAV_8BITS_UNSIGNED&&
-                                        _wavheader->encoding!=WAV_IMAADPCM  )
-			{
-				*samples=sample/2;
-			}
-			else
-			{
-				*samples=sample;
-			}
+			*samples=sample/sampleSizeInBytes;
 			*len=count;
 			return 1;
 }
-	
-uint8_t		AVDMGenericAudioStream::getPacketAC3(uint8_t *dest, uint32_t *len, 
+
+uint8_t		AVDMGenericAudioStream::getPacketAC3(uint8_t *dest, uint32_t *len,
 								uint32_t *samples)
 {
 	uint32_t instock,rd;
 	uint32_t startOffset,endOffset;
 	uint8_t  lock=0;
 	uint8_t  headerfound=0;
-				
+
 			ADM_assert(_wavheader->encoding==WAV_AC3);
 			ADM_assert(packetTail>=packetHead);
 			if(packetTail<packetHead+6)
@@ -218,13 +211,13 @@ uint8_t		AVDMGenericAudioStream::getPacketAC3(uint8_t *dest, uint32_t *len,
 			int flags,sample_rate,bit_rate;
 			int found=0;
 			uint32_t start,size=0;
-			
+
 			start=packetHead;
 
 			while(start+6<packetTail)
 			{
 				if(packetBuffer[start]!=0x0b || packetBuffer[start+1]!=0x77)
-				{	
+				{
 					if(!lock)
 					{
 						printf("AC3: searching sync ");
@@ -237,10 +230,10 @@ uint8_t		AVDMGenericAudioStream::getPacketAC3(uint8_t *dest, uint32_t *len,
 					start++;
 					continue;
 				}
-			
-			
-				size= ADM_a52_syncinfo (&packetBuffer[start], &flags, 
-						&sample_rate, &bit_rate);			
+
+
+				size= ADM_a52_syncinfo (&packetBuffer[start], &flags,
+						&sample_rate, &bit_rate);
 				if(!size)
 				{
 					printf("AC3: Cannot sync\n");
@@ -261,7 +254,7 @@ uint8_t		AVDMGenericAudioStream::getPacketAC3(uint8_t *dest, uint32_t *len,
 					printf("AC3Pkt: Need %lu have:%lu\n",size,packetTail-packetHead);
 					break;
 				}
-			
+
 			}
 			if(!found)
 			{
@@ -282,8 +275,8 @@ uint8_t		AVDMGenericAudioStream::getPacketAC3(uint8_t *dest, uint32_t *len,
 			}
 			*len=size;
 			*samples=1536;
-			
-			
+
+
 			return 1;
 }
 uint8_t		AVDMGenericAudioStream::getPacketDTS(uint8_t *dest, uint32_t *len,uint32_t *samples)
@@ -310,9 +303,9 @@ uint8_t  headerfound=0;
 
                 while(start+DTS_HEADER_SIZE<packetTail)
                 {
-                        if(packetBuffer[start]!=0x07f || packetBuffer[start+1]!=0xfe|| 
+                        if(packetBuffer[start]!=0x07f || packetBuffer[start+1]!=0xfe||
                             packetBuffer[start+2]!=0x80|| packetBuffer[start+3]!=0x01)
-                        {	
+                        {
                             if(!lock)
                             {
                                     printf("DTS: searching sync ");
@@ -374,7 +367,7 @@ uint8_t  headerfound=0;
 		to avoid as much as possible false detection
 
 */
-uint8_t		AVDMGenericAudioStream::getPacketMP3(uint8_t *dest, uint32_t *len, 
+uint8_t		AVDMGenericAudioStream::getPacketMP3(uint8_t *dest, uint32_t *len,
 								uint32_t *samples)
 {
 	uint32_t instock,rd;
@@ -382,9 +375,9 @@ uint8_t		AVDMGenericAudioStream::getPacketMP3(uint8_t *dest, uint32_t *len,
 	uint32_t layer;
 	uint32_t size;
 	MpegAudioInfo mpegInfo,mpegTemp;
-			
+
 			ADM_assert(_wavheader->encoding==WAV_MP2||_wavheader->encoding==WAV_MP3);
-_retry:                        
+_retry:
 			if(packetTail<packetHead+4)
 			{
 				printf("PKTZ: MP3Buffer empty:%lu / %lu\n",packetHead,packetTail);
@@ -393,10 +386,10 @@ _retry:
 			// Build template, only fq ATM
 			memset(&mpegTemp,0,sizeof(mpegTemp));
 			mpegTemp.samplerate=_wavheader->frequency;
-			
+
 			// It is MP3, read packet
 			// synchro start
-			
+
 			if(!getMpegFrameInfo(&(packetBuffer[packetHead]),packetTail-packetHead,
 						&mpegInfo,&mpegTemp,&startOffset))
 			{
@@ -429,16 +422,16 @@ _retry:
                                packetHead+=mpegInfo.size;
                         // /Patch
 			return 1;
-}		
+}
 //---
-uint8_t		AVDMGenericAudioStream::getPacketAAC(uint8_t *dest, uint32_t *len, 
+uint8_t		AVDMGenericAudioStream::getPacketAAC(uint8_t *dest, uint32_t *len,
 								uint32_t *samples)
 {
 	uint32_t instock,rd;
 	uint32_t startOffset,endOffset;
 	AacAudioInfo mpegInfo,mpegTemp;
-	
-				
+
+
 			ADM_assert(_wavheader->encoding==WAV_AAC);
 			if(packetTail<packetHead+8)
 			{

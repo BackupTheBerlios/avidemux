@@ -26,7 +26,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include "prefs.h"
- 
+
 
 #ifdef ALSA_SUPPORT
 #include <alsa/asoundlib.h>
@@ -51,7 +51,7 @@ snd_pcm_t *pcm_handle;
 uint8_t alsaAudioDevice::init( uint8_t channel,uint32_t fq )
 {
 	int dir=0;
-	
+
 	_channels=channel;
 	_init=0;
    /* Playback stream */
@@ -67,7 +67,7 @@ uint8_t alsaAudioDevice::init( uint8_t channel,uint32_t fq )
   static char *pcm_name;
   if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &pcm_name) != RC_OK )
                pcm_name = ADM_strdup("plughw:0,0");
-	
+
  /* Allocate the snd_pcm_hw_params_t structure on the stack. */
     snd_pcm_hw_params_alloca(&hwparams);
     snd_pcm_sw_params_alloca(&swparams);
@@ -107,9 +107,9 @@ uint8_t alsaAudioDevice::init( uint8_t channel,uint32_t fq )
     //  fprintf(stderr, "Error setting float format.\n");
 
 #ifdef ADM_BIG_ENDIAN
-    if (snd_pcm_hw_params_set_format(pcm_handle, hwparams, SND_PCM_FORMAT_S16_BE) < 0) 
+    if (snd_pcm_hw_params_set_format(pcm_handle, hwparams, SND_PCM_FORMAT_S16_BE) < 0)
 #else
-    if (snd_pcm_hw_params_set_format(pcm_handle, hwparams, SND_PCM_FORMAT_S16_LE) < 0) 
+    if (snd_pcm_hw_params_set_format(pcm_handle, hwparams, SND_PCM_FORMAT_S16_LE) < 0)
 #endif
     {
       fprintf(stderr, "Error setting format.\n");
@@ -297,8 +297,9 @@ uint8_t alsaAudioDevice::setVolume(int volume){
 		ADM_dealloc(pcm_name);
 		return 0;
 	}
-	if( (rc=snd_mixer_attach(mixer_handle,pcm_name)) < 0 ){
-		printf("ALSA: snd_mixer_attach failed: %d\n",rc);
+// MEANX: Cannot use the real name, does not work with dmix
+	if( (rc=snd_mixer_attach(mixer_handle,"hw:0")) < 0 ){
+		printf("ALSA: snd_mixer_attach failed: %d, %s\n",rc, snd_strerror (rc));
 		snd_mixer_close(mixer_handle);
 		ADM_dealloc(pcm_name);
 		return 0;

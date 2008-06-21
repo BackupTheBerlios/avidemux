@@ -14,7 +14,7 @@
  /*
  * MODIFIED Feb 2005 by GMV: ODML write support
  */
- 
+
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -73,7 +73,7 @@ aviWrite::aviWrite( void )
 	LMovie=NULL;
 	LMain=NULL;
         _file=NULL;
-		
+
 	// MOD Feb 2005 by GMV: ODML support
 	odml_indexes=NULL;
 	// END MOD Feb 2005 by GMV
@@ -120,13 +120,13 @@ uint8_t aviWrite::updateHeader (MainAVIHeader * mainheader,
   UNUSED_ARG(astream);
 
         ADM_assert(_file);
-        
+
         _file->seek(32);
 // Update main header
 #ifdef ADM_BIG_ENDIAN
 	MainAVIHeader ma;
 	memcpy(&ma,mainheader,sizeof(MainAVIHeader));
-	Endian_AviMainHeader(&ma);		
+	Endian_AviMainHeader(&ma);
   	_file->write ((uint8_t *)&ma, sizeof (ma));
 #else
   	_file->write ((uint8_t *)mainheader, sizeof (MainAVIHeader));
@@ -137,7 +137,7 @@ uint8_t aviWrite::updateHeader (MainAVIHeader * mainheader,
 
 	AVIStreamHeader as;
 	memcpy(&as,videostream,sizeof(as));
-	Endian_AviStreamHeader(&as);		
+	Endian_AviStreamHeader(&as);
   	_file->write ((uint8_t *)&as, sizeof (as));
 #else
         _file->write ((uint8_t *)videostream, sizeof (AVIStreamHeader));
@@ -159,7 +159,7 @@ uint8_t aviWrite::writeMainHeader( void )
   ADM_assert (_file);
   ADM_assert (LAll == NULL);
   _file->seek(0);
-  
+
 
   LAll = new AviList ("RIFF", _file);
   LAll->Begin ("AVI ");
@@ -171,8 +171,8 @@ uint8_t aviWrite::writeMainHeader( void )
 #ifdef ADM_BIG_ENDIAN
 	MainAVIHeader ma;
 	memcpy(&ma,&_mainheader,sizeof(ma));
-	Endian_AviMainHeader(&ma);		
-	LMain->Write((uint8_t *)&ma,sizeof(ma));	
+	Endian_AviMainHeader(&ma);
+	LMain->Write((uint8_t *)&ma,sizeof(ma));
 #else
   	LMain->Write ((uint8_t *) &_mainheader, sizeof (MainAVIHeader));
 #endif
@@ -194,7 +194,7 @@ uint8_t aviWrite::writeVideoHeader( uint8_t *extra, uint32_t extraLen )
 	uint32_t odml_video_super_idx_size;
         if(doODML!=NORMAL)
         {
-            
+
             odml_video_super_idx_size=24+odml_default_nbrof_index*16;
         }else
         {
@@ -203,11 +203,11 @@ uint8_t aviWrite::writeVideoHeader( uint8_t *extra, uint32_t extraLen )
 	// END MOD Feb 2005 by GMV
 #ifdef ADM_BIG_ENDIAN
 	// in case of Little endian, do the usual swap crap
-	
+
 	AVIStreamHeader as;
 	ADM_BITMAPINFOHEADER b;
 	memcpy(&as,&_videostream,sizeof(as));
-	Endian_AviStreamHeader(&as);		
+	Endian_AviStreamHeader(&as);
 	memcpy(&b,&_bih,sizeof(_bih));
 	Endian_BitMapInfo( &b );
   	setStreamInfo (_file, (uint8_t *) &as,
@@ -215,7 +215,7 @@ uint8_t aviWrite::writeVideoHeader( uint8_t *extra, uint32_t extraLen )
 		// MOD Feb 2005 by GMV: ODML support
 		odml_video_super_idx_size,0,
 		// END MOD Feb 2005 by GMV
-		  extra,extraLen, 	 
+		  extra,extraLen,
 		 0x1000);
 #else
   	setStreamInfo (_file, (uint8_t *) &_videostream,
@@ -223,7 +223,7 @@ uint8_t aviWrite::writeVideoHeader( uint8_t *extra, uint32_t extraLen )
 		// MOD Feb 2005 by GMV: ODML support
 		odml_video_super_idx_size,0,
 		// END MOD Feb 2005 by GMV
-		  extra,extraLen, 	 
+		  extra,extraLen,
 		 0x1000);
 
 #endif
@@ -243,7 +243,7 @@ typedef struct VBRext
 //________________________________________________
 //   Beginning of the write process
 //   We fill-in the headers
-//	3- Write audio headers 
+//	3- Write audio headers
 //   That one can be used several times so we pass stuff
 //   as parameter
 //_______________________________________________
@@ -252,7 +252,7 @@ static 	uint32_t aacBitrate[16]=
 	96000, 88200, 64000, 48000,
 	44100, 32000, 24000, 22050,
 	16000, 12000, 11025,  8000,
-	0,     0,     0,     0 
+	0,     0,     0,     0
 };
 /**
         \fn WriteAudioHeader
@@ -274,7 +274,7 @@ VBRext  mp3vbr;
 uint8_t aacHeader[12];
 uint8_t *extra=NULL;
 uint32_t extraLen=0;
-     
+
 	if(!stream) return 1;
         if(doODML!=NORMAL)
         {
@@ -293,7 +293,7 @@ uint32_t extraLen=0;
 	wmaheader[25-16]=01;
 
         memcpy(&wav,stream->getInfo (),sizeof(wav));
-      
+
 
       memset (header, 0, sizeof (AVIStreamHeader));
       header->fccType = fourCC::get ((uint8_t *) "auds");
@@ -304,83 +304,83 @@ uint32_t extraLen=0;
       header->dwQuality = 0xffffffff;
       header->dwSuggestedBufferSize = 8000;
       header->dwLength = stream->getLength ();
-      
+
 	switch(wav.encoding)
 	{
-                case WAV_IMAADPCM:
-                        wav.blockalign=1024;
-                        header->dwScale         = wav.blockalign;
-                        header->dwSampleSize    = 1;
-                        header->dwInitialFrames =1;                             
-                        header->dwSuggestedBufferSize=2048;                                
-                        break;
+        case WAV_IMAADPCM:
+                wav.blockalign=1024;
+                header->dwScale         = wav.blockalign;
+                header->dwSampleSize    = 1;
+                header->dwInitialFrames =1;
+                header->dwSuggestedBufferSize=2048;
+                break;
 		case WAV_AAC:
 		{
-		// nb sample in stream  
-		
+		// nb sample in stream
+
 			double len;
 			len=_videostream.dwLength;
-#if 1			
+#if 1
 			len/=_videostream.dwRate;
-			len*=_videostream.dwScale;			
+			len*=_videostream.dwScale;
 			len*=wav.frequency;
 			len/=1024;
-#else		
-			header->dwLength= floor(len);//_videostream.dwLength; 
-#endif			
+#else
+			header->dwLength= floor(len);//_videostream.dwLength;
+#endif
 		 // AAC is mostly VBR
 		 header->dwFlags=1;
 		 header->dwInitialFrames=0;
 		 header->dwRate=wav.frequency;
-		 
-		 	
-		 
+
+
+
 		 header->dwScale=1024; //sample/packet 1024 seems good for aac
 		 header->dwSampleSize = 0;
 		 header->dwSuggestedBufferSize=8192;
-		 header->dwInitialFrames = 0;	 
-		
-		// header->dwLength= _videostream.dwLength; 
-		 wav.blockalign=1024;	  
-		 wav.bitspersample = 0; 
-		 
+		 header->dwInitialFrames = 0;
+
+		// header->dwLength= _videostream.dwLength;
+		 wav.blockalign=1024;
+		 wav.bitspersample = 0;
+
 		//*b++ = (BYTE)((profile +1) << 3 | (SRI >> 1));
 		//*b++ = (BYTE)(((SRI & 0x1) << 7) | (aacsource->GetChannelCount() << 3));
-		
+
 		int SRI=4;	// Default 44.1 khz
 		for(int i=0;i<16;i++) if(wav.frequency==aacBitrate[i]) SRI=i;
 		aacHeader[0]=0x2;
 		aacHeader[1]=0x0;
 		aacHeader[2]=(2<<3)+(SRI>>1); // Profile LOW
 		aacHeader[3]=((SRI&1)<<7)+((wav.channels)<<3);
-		
+
 
 		extra=&(aacHeader[0]);
 		extraLen=4;
 		}
 		break;
-#if 1		
-	case WAV_DTS:
-	case WAV_AC3: // Vista compatibility
-		 		  extra=(uint8_t *)wmaheader;
-		 		  extra[0]=0;
-		 		  extra[1]=0;
-				  extraLen=2;
-				  header->dwScale = 1;  
-				  wav.blockalign=1;	
-			break;
-#endif			
-	case WAV_MP3:							
+#if 1
+        case WAV_DTS:
+        case WAV_AC3: // Vista compatibility
+                      extra=(uint8_t *)wmaheader;
+                      extra[0]=0;
+                      extra[1]=0;
+                      extraLen=2;
+                      header->dwScale = 1;
+                      wav.blockalign=1;
+                break;
+#endif
+	case WAV_MP3:
 		  // then update VBR fields
 		  mp3vbr.cbsize = R16(12);
 		  mp3vbr.wId = R16(1);
-		  mp3vbr.fdwflags = R32(2);				  
+		  mp3vbr.fdwflags = R32(2);
 	    	  mp3vbr.nframesperblock = R16(1);
 		  mp3vbr.ncodecdelay = 0;
-		  
+
 		  wav.bitspersample = 0;
 		  mp3vbr.nblocksize=R16(0x180); //384; // ??
-    
+
 		  header->dwScale = 1;
 	  	  header->dwInitialFrames = 1;
                   extra=(uint8_t *)&mp3vbr;
@@ -390,69 +390,74 @@ uint32_t extraLen=0;
 		  	//ADM_assert (audiostream->asTimeTrack ());
 		  	wav.blockalign = 1152;	// just a try
 		     	wav.bitspersample = 16;
-		  
+
 		    	header->dwRate 	= wav.frequency;	//wav->byterate;
 			header->dwScale = wav.blockalign;
 			header->dwLength= _videostream.dwLength;
-		   
+
   			header->dwSampleSize = 0;
 		  	printf ("\n VBR audio detected\n");
 		  	//
 		  	// use extended headers
-		  	//		
 		  	//
-			mp3vbr.nblocksize=1152;	
-			
-		   }	
-		   else 
+		  	//
+			mp3vbr.nblocksize=1152;
+
+		   }
+		   else
                    {
                      wav.blockalign=1;
-                     
-                     
+
+
                    }
 
-			
+
 
 			  break;
-	
-					 
+
+
 	case WAV_WMA:
 			header->dwScale 	= wav.blockalign;
 			header->dwSampleSize 	= wav.blockalign;
-			header->dwInitialFrames =1;				
-			header->dwSuggestedBufferSize=10*wav.blockalign;				
-			
+			header->dwInitialFrames =1;
+			header->dwSuggestedBufferSize=10*wav.blockalign;
 			extra=(uint8_t *)&wmaheader;
 			extraLen=12;
 			break;
-          case WAV_8BITS_UNSIGNED:
-                        wav.encoding=WAV_PCM;
-			header->dwScale 	= 1;
-                        wav.bitspersample=8;
-                        break;
-                        
-                        
+    case WAV_PCM:
+    case WAV_LPCM:
+            header->dwScale=header->dwSampleSize=wav.blockalign=2*wav.channels; // Realign
+            header->dwLength/=header->dwScale;
+            break;
+    case WAV_8BITS_UNSIGNED:
+            wav.encoding=WAV_PCM;
+			header->dwScale=header->dwSampleSize=wav.blockalign=wav.channels;
+			header->dwLength/=header->dwScale;
+            wav.bitspersample=8;
+            break;
+
+
 	default:
-			header->dwScale = 1;  
-			wav.blockalign=1;	
+			header->dwScale = 1;
+			wav.blockalign=1;
 			break;
     }
 #ifdef ADM_BIG_ENDIAN
 	// in case of Little endian, do the usual swap crap
-	
+
 	AVIStreamHeader as;
 	WAVHeader w;
 	memcpy(&as,header,sizeof(as));
-	Endian_AviStreamHeader(&as);		
+	Endian_AviStreamHeader(&as);
 	memcpy(&w,&wav,sizeof(w));
 	Endian_WavHeader( &w );
-  	setStreamInfo (_file, 
+  	setStreamInfo (_file,
 		(uint8_t *) &as,
 		  (uint8_t *)&w,sizeof(WAVHeader),
 		// MOD Feb 2005 by GMV: ODML support
 		odml_audio_super_idx_size,odml_stream_nbr,
 		// END MOD Feb 2005 by GMV
-		  extra,extraLen, 	 
+		  extra,extraLen,
 		 0x1000);
 #else
 	setStreamInfo (_file,
@@ -475,7 +480,7 @@ uint32_t extraLen=0;
 //
 //_______________________________________________________
 uint8_t aviWrite::saveBegin (char 	*name,
-		     MainAVIHeader 	*inmainheader, 
+		     MainAVIHeader 	*inmainheader,
 		     uint32_t 		nb_frame,
 		     AVIStreamHeader * invideostream,
 		     ADM_BITMAPINFOHEADER	*bih,
@@ -505,14 +510,14 @@ uint8_t aviWrite::saveBegin (char 	*name,
         curindex = 0;
         vframe = asize = 0;
         nb_audio=0;
-        
+
 // update avi header according to the information WE want
 //
         memcpy (&_mainheader, inmainheader, sizeof (MainAVIHeader));
         _mainheader.dwFlags = AVIF_HASINDEX + AVIF_ISINTERLEAVED;
 
 
-        
+
 // update main header codec with video codev
         if (inaudiostream)
         {
@@ -543,10 +548,10 @@ double f;
         f*=1000;
         f/=_videostream.dwScale;
         _mainheader.dwMicroSecPerFrame=ADM_UsecFromFps1000( (uint32_t)floor(f));
-        
+
 
         // Recompute image size
-uint32_t is;	
+uint32_t is;
         is=_bih.biWidth*_bih.biHeight;
         is*=(_bih.biBitCount+7)/8;
         _bih.biSizeImage=is;
@@ -561,15 +566,15 @@ uint32_t is;
 	}
 	// set generation mode
         uint32_t pref_odml=0;
-        
+
         if(!prefs->get(FEATURE_USE_ODML, &pref_odml))
         {
-          pref_odml=0;                
-        }            
-        
+          pref_odml=0;
+        }
+
 	doODML=NO;	// only option for users without largefile support
 	#if defined _FILE_OFFSET_BITS && _FILE_OFFSET_BITS == 64
-        if(pref_odml)        
+        if(pref_odml)
 	       doODML=HIDDEN;	// default; TODO: user should be able to choose NO for plain avi
 	#endif
 	if(doODML!=NO){
@@ -578,9 +583,9 @@ uint32_t is;
 		aprintf("\nnumber of streams: %lu\n",odml_nbrof_streams);
 		// get number of frames per index
 
-		odml_index_size=(long)ceil(1000000.0/(double)_mainheader.dwMicroSecPerFrame*600.0);	// one index per 10 Minutes; decrease if 4GB are not enough for this amount of time 
+		odml_index_size=(long)ceil(1000000.0/(double)_mainheader.dwMicroSecPerFrame*600.0);	// one index per 10 Minutes; decrease if 4GB are not enough for this amount of time
                 aprintf("\n old number of frames per index: %lu\n",odml_index_size);
-                double fps=invideostream->dwRate/invideostream->dwScale;      
+                double fps=invideostream->dwRate/invideostream->dwScale;
 
                         aprintf("Fps1000:%f\n",fps);
                         fps=600*fps; // 10 mn worth;
@@ -618,7 +623,7 @@ uint32_t is;
             odml_default_nbrof_index=16;
         }
 	// END MOD Feb 2005 by GMV
-	
+
   //___________________
   // Prepare header
   //___________________
@@ -629,9 +634,9 @@ uint32_t is;
 
 	// MOD Feb 2005 by GMV: ODML support
 	/*writeAudioHeader (	inaudiostream , &_audio1 );
-	writeAudioHeader (	inaudiostream2, &_audio2);*/ 
+	writeAudioHeader (	inaudiostream2, &_audio2);*/
 	writeAudioHeader (	inaudiostream , &_audio1,1);
-	writeAudioHeader (	inaudiostream2, &_audio2,2); 
+	writeAudioHeader (	inaudiostream2, &_audio2,2);
 	// odml header placeholder
 	odml_write_dummy_chunk(LMain, &odml_header_fpos, 16);
 	// END MOD Feb 2005 by GMV
@@ -642,7 +647,7 @@ uint32_t is;
   //
 
   ADM_assert (!LMovie);
-  
+
   LMovie = new AviList ("LIST", _file);
   LMovie->Begin ("movi");
   curindex = 0;
@@ -660,7 +665,7 @@ uint32_t is;
 uint8_t aviWrite::saveVideoFrame (uint32_t len, uint32_t flags, uint8_t * data)
 {
   vframe++;
-  // MOD Feb 2005 by GMV:  interleave ODML index dummy and index frame 
+  // MOD Feb 2005 by GMV:  interleave ODML index dummy and index frame
 	// write initial index chunks
 	if(vframe==2 && doODML!=NO){	// apparently some players require a video frame at first in the movi list, so we put the initial index dummys behind it (bye bye index before data)
 		odml_write_dummy_chunk(LMovie, &(odml_indexes[0].odml_index[0].fpos), 24+8*odml_index_size);
@@ -751,14 +756,14 @@ uint8_t aviWrite::setEnd (void)
             // END MOD Feb 2005 by GMV
             printf ("\n writing %lu index parts", curindex);
             printf ("\n received %lu video parts", vframe);
-            
+
             // Updating compared to what has been really written
             //
-            
-            // Write index  
+
+            // Write index
             LAll->Write32 ("idx1");
             LAll->Write32 (curindex * 16);
-            
+
             for (uint32_t i = 0; i < curindex; i++)
                 {
                 LAll->Write32 (myindex[i].fcc);
@@ -807,7 +812,7 @@ uint8_t aviWrite::setEnd (void)
 				printf("error writing audio (dual) indexes");
 			}
 	}
-	odml_destroy_index();		
+	odml_destroy_index();
 // END MOD Feb 2005 by GMV
 #ifdef MOVINDEX
   LAll->End ();
@@ -822,7 +827,7 @@ uint8_t aviWrite::setEnd (void)
 	else
   _mainheader.dwTotalFrames = vframe;
 // END MOD Feb 2005 by GMV
-	
+
   _videostream.dwLength = vframe;
   //astream.dwLength = asize;
 
@@ -835,7 +840,7 @@ uint8_t aviWrite::setEnd (void)
   // AUDIO SIZE ->TODO
   delete _file;
   _file=NULL;
-  
+
   qfclose (_out);
   _out = NULL;
   return 1;
@@ -847,7 +852,7 @@ uint8_t aviWrite::setEnd (void)
 //
 uint8_t aviWrite::setStreamInfo (ADMFile * fo,
 			 uint8_t * stream,
-			 uint8_t * info, uint32_t infolen, 
+			 uint8_t * info, uint32_t infolen,
 			// MOD Feb 2005 by GMV: ODML support
 			 uint32_t odml_headerlen,
 			 uint8_t odml_stream_nbr,
@@ -886,17 +891,17 @@ uint8_t aviWrite::setStreamInfo (ADMFile * fo,
     uint32_t consumed=odml_headerlen*4;
   junklen = (consumed+maxxed-1)/maxxed;
   junklen=junklen*maxxed;
-  
+
   printf("[ODML] using ODML placeholder of size %u bytes\n",junklen);
   junk = (uint8_t *) ADM_alloc (junklen);
   ADM_assert (junk);
   memset (junk,0, junklen);
   //
-  // Fill junk with out info string  
+  // Fill junk with out info string
   uint32_t len=strlen("Avidemux");
-  
+
   if(junklen>len)
-  	memcpy(junk,"Avidemux",len);	
+  	memcpy(junk,"Avidemux",len);
 
   if(doODML!=NO)
   {
@@ -926,10 +931,10 @@ uint32_t	aviWrite::getPos( void )
 uint32_t pos;
 	 // we take size of file + index
 	 // with 32 bytes per index entry
-	 // 
+	 //
 	 ADM_assert(_file);
 	 pos=_file->tell();
-	 return pos+curindex*4*4;	 	
+	 return pos+curindex*4*4;
 }
 
 // MOD Feb 2005 by GMV:  ODML functions
@@ -964,7 +969,7 @@ void aviWrite::odml_write_dummy_chunk(AviList* alist, uint64_t* fpos, uint32_t s
 		uint8_t* dummy=(uint8_t*)ADM_alloc (size);
 		memset(dummy,0,size);
 		// write dummy chunk
-		alist->WriteChunk ((uint8_t *) "JUNK", size, dummy);	
+		alist->WriteChunk ((uint8_t *) "JUNK", size, dummy);
 		// clean up
 		ADM_dealloc (dummy);
 	}
@@ -1011,7 +1016,7 @@ bool aviWrite::odml_index_frame(int stream_nbr, uint32_t data_size, bool keyFram
 			if(sidx->index_count>=sidx->odml_nbrof_index-1)	// can index counter be increased?
                                 reallocIndeces(sidx);
                         ++(sidx->index_count);	// increment index counter
-			
+
 			// handle possible riff break
 			odml_riff_break(data_size+8); // data size + fcc + size info (padding is handled in odml_riff_break)
 			// write placeholder
@@ -1020,27 +1025,27 @@ bool aviWrite::odml_index_frame(int stream_nbr, uint32_t data_size, bool keyFram
 		}
 		odml_index_t* idx=sidx->odml_index+(sidx->index_count);		// access to index
 		odml_index_data_t* idxd=idx->index+(idx->nEntriesInUse);	// access to unused index data
-		
+
 		uint64_t pos=LMovie->Tell()+8;	// preview position of data
 		idxd->fpos=pos;	// store file position of data
-		
+
 		if(keyFrame)
 			idxd->size=data_size; //store data size
 		else	// if no key frame
 			idxd->size=data_size|0x80000000; //store data size with bit 31 set
-		
+
 		++(idx->nEntriesInUse);	// advance to next free index data entry
 	}
 	return true;
 }
 void aviWrite::odml_write_sindex(int stream_nbr, const char* stream_fcc)
 {
-        
+
 	// Warning: This changes the file position
 	if(doODML==NORMAL)
                 {
                     uint32_t startAt=odml_indexes[stream_nbr].fpos;
-                    uint32_t pad=odml_indexes[stream_nbr].pad; 
+                    uint32_t pad=odml_indexes[stream_nbr].pad;
                     uint32_t endAt=startAt+pad+8;
 #ifndef MOVINDEX
 		_file->seek(startAt);
@@ -1069,7 +1074,7 @@ void aviWrite::odml_write_sindex(int stream_nbr, const char* stream_fcc)
                         odml_indexes[stream_nbr].odml_index[a].nEntriesInUse);
 		}
                 uint32_t at=LIndex->Tell();
-                
+
                 int32_t junkLen=endAt-at-8;
                 ADM_assert(junkLen>=9);
                 printf("Padding ODML index with junk of size %d, total padding %lu\n",junkLen, odml_indexes[stream_nbr].pad);
@@ -1082,9 +1087,9 @@ void aviWrite::odml_write_sindex(int stream_nbr, const char* stream_fcc)
                 delete [] zz;
                 ADM_assert(endAt==Junk->Tell());
                 delete Junk;
-                
-                
-	}	
+
+
+	}
 }
 bool aviWrite::odml_write_index(int stream_nbr, const char* stream_fcc, const char* index_fcc){	// write index
 	// Warning: This changes the file position
