@@ -109,6 +109,6 @@ CALLBACK(zoom_2_1                                   ,ACT_ZOOM_2_1);
 //CALLBACK(zoom_4_1                                   ,ACT_ZOOM_4_1);
 CALLBACK(edit_glyph1                                ,ACT_GLYPHEDIT);
 //CALLBACK(hscalVolume                                ,ACT_VOLUME);
-
+CALLBACK(plugins1                                   ,ACT_PLUGIN_INFO);
 
 

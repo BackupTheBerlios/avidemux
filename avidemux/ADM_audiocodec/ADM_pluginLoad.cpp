@@ -27,6 +27,10 @@
 #else
 #define aprintf(...) {}
 #endif
+/*  Exported functions */
+uint32_t ADM_ad_getNbFilters(void);
+bool     ADM_ad_getFilterInfo(int filter, const char **name, 
+                                uint32_t *major,uint32_t *minor,uint32_t *patch);
 
 /**
  * 
@@ -94,6 +98,34 @@ Err_ad:
 	delete plugin;
 	return 0;
 }
+/**
+    \fn ADM_ad_getNbFilters
+    \brief returns the # of loaded audio decoder
+*/
+uint32_t ADM_ad_getNbFilters(void)
+{
+    return (uint32_t )ADM_audioPlugins.size();
+}
+/**
+    \fn ADM_ad_getFilterInfo
+    \brief returns infos about a given filter
+    @param filter [in] # of the filter we are intereseted in, between 0 & ADM_ad_getNbFilters
+    @param name [out] Name of the decoder plugin
+    @param major, minor,patch [out] Version number
+    @return true
+*/
+bool ADM_ad_getFilterInfo(int filter, const char **name, uint32_t *major,uint32_t *minor,uint32_t *patch)
+{
+
+        ADM_assert(filter>=0 && filter<ADM_audioPlugins.size());
+
+    	ADM_ad_plugin *a=ADM_audioPlugins[filter];
+        a->getDecoderVersion(major, minor, patch);
+        
+        *name=a->getInfo();
+        return 1;
+}
+
 /**
  * 	\fn ADM_ad_loadPlugins
  *  \brief load all audio plugins
