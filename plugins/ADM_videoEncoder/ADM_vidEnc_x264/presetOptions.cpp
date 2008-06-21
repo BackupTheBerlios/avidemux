@@ -17,8 +17,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
 #include <libxml/parser.h>
+#include "ADM_default.h"
 #include "presetOptions.h"
 
 x264PresetOptions::x264PresetOptions(void) : x264Options()
