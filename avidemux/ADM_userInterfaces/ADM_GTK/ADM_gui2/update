@@ -1,2 +1,2 @@
-cp /home/fx/Projects/nicer/main-nicer/src/interface.c ./GUI_main2.cpp
+cp ../glade/src/interface.c ./GUI_main2.cpp
 bash patch.bash
