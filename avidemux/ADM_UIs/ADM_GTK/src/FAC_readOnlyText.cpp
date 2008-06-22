@@ -47,13 +47,14 @@ diaElemReadOnlyText::diaElemReadOnlyText(const char *readyOnly,const char *toggl
   : diaElem(ELEM_ROTEXT)
 {
   param=(void *)ADM_strdup(readyOnly);
-  paramTitle=toggleTitle;
+  paramTitle=ADM_strdup(toggleTitle);
   this->tip=tip;
 }
 
 diaElemReadOnlyText::~diaElemReadOnlyText()
 {
   ADM_dealloc(param);
+  ADM_dealloc(paramTitle);
 }
 void diaElemReadOnlyText::setMe(void *dialog, void *opaque,uint32_t line)
 {
@@ -95,13 +96,14 @@ diaElemText::diaElemText(char **text,const char *toggleTitle,const char *tip)
 {
   if(!*text) *text=ADM_strdup("");
   param=(void *)text;
-  paramTitle=toggleTitle;
+  paramTitle=ADM_strdup(toggleTitle);
+  
   this->tip=tip;
 }
 
 diaElemText::~diaElemText()
 {
-  
+  ADM_dealloc(paramTitle);
 }
 void diaElemText::setMe(void *dialog, void *opaque,uint32_t line)
 {
