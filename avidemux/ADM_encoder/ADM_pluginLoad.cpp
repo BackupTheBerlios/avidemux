@@ -60,6 +60,37 @@ ADM_vidEnc_plugin::ADM_vidEnc_plugin(const char *file) : ADM_LibWrapper()
 }
 
 std::vector<ADM_vidEnc_plugin *> ADM_videoEncoderPlugins;
+/**
+    \fn ADM_ve_getNbEncoders
+    \brief get the number of encoder plugin loaded
+    @return the number of encoder plugins
+*/
+uint32_t ADM_ve_getNbEncoders(void)
+{
+    return ADM_videoEncoderPlugins.size();
+
+}
+/**
+     \fn ADM_ve_getEncoderInfo
+     \brief Get info about an encoder plugin
+     @param filter [in] Encoder index, between 0 and ADM_ve_getNbEncoders-1 included
+     @param name [out] Name + info of the encoder
+     @param major,minor,patch [out] Version number of the encoder
+     @return true
+*/
+bool     ADM_ve_getEncoderInfo(int filter, const char **name, uint32_t *major,uint32_t *minor,uint32_t *patch)
+{
+    ADM_assert(filter>=0 && filter<ADM_videoEncoderPlugins.size());
+    ADM_vidEnc_plugin *plugin =ADM_videoEncoderPlugins[filter];
+        *name=plugin->getEncoderDescription(0);
+    int ma,mi,pa;
+        plugin->getEncoderVersion(0,&ma,&mi,&pa);
+        *major=(uint32_t)ma;
+        *minor=(uint32_t)mi;
+        *patch=(uint32_t)pa;
+        return true;
+
+}
 
 static int loadVideoEncoderPlugin(int uiType, const char *file)
 {
@@ -284,5 +315,7 @@ ADM_vidEnc_plugin* getVideoEncoderPlugin(int index)
 
 	return ADM_videoEncoderPlugins[index];
 }
+/**
 
+*/
 //EOF

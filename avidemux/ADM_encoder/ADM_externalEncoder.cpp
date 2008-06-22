@@ -18,6 +18,7 @@
 #include "ADM_externalEncoder.h"
 #include "ADM_plugin/ADM_vidEnc_plugin.h"
 
+
 externalEncoder::externalEncoder(COMPRES_PARAMS *params, bool globalHeader)
 {
 	_plugin = getVideoEncoderPlugin(params->extra_param);
