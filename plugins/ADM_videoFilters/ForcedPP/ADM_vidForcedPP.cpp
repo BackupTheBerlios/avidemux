@@ -89,10 +89,8 @@ uint8_t	ADMVideoForcedPP::getCoupledConf( CONFcouple **couples)
 }
 char *ADMVideoForcedPP::printConf( void )
 {
- 	static char buf[50];
- 	
- 	sprintf((char *)buf," Forced pp : %lu %lu",_param->postProcType,_param->postProcStrength);
-        return buf;
+ 	ADM_FILTER_DECLARE_CONF(" Forced pp : %lu %lu",_param->postProcType,_param->postProcStrength);
+        
 }
 
 ADMVideoForcedPP::~ADMVideoForcedPP()

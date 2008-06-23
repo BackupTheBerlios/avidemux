@@ -80,7 +80,7 @@ while(1)
 
 char *AVDM_Fade::printConf( void )
 {
-  static char buf[50];
+  static char buf[150];
 
         //ADM_assert(_param);
   sprintf((char *)buf," Fade : Start %u End %u",_param->startFade,_param->endFade);

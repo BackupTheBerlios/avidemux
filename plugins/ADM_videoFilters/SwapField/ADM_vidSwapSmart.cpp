@@ -42,10 +42,8 @@ VF_DEFINE_FILTER(AVDMVideoSwapSmart,nullParam,
 
 char *AVDMVideoSwapSmart::printConf( void )
 {
- 	static char buf[50];
-
- 	sprintf((char *)buf," Smart Swap fields");
-        return buf;
+ ADM_FILTER_DECLARE_CONF(" Smart Swap fields");
+        
 }
 
 //_______________________________________________________________

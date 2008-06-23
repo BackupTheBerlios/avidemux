@@ -191,11 +191,8 @@ uint8_t Msmooth::configure(AVDMGenericVideoStream *in)
 //________________________________________________________
 char *Msmooth::printConf( void )
 {
- 	static char buf[50];
-
-	ADM_assert(_param);
- 	sprintf((char *)buf," Donald Graft MSmooth");
-        return buf;
+ 	ADM_FILTER_DECLARE_CONF(" Donald Graft MSmooth");
+        
 }
 	
 //________________________________________________________

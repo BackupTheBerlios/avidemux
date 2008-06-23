@@ -42,9 +42,8 @@ uint8_t r;
 
 char *vidEqualizer::printConf( void )
 {
- 	static char buf[50];
- 	sprintf((char *)buf," Equalizer");
-        return buf;
+ 	ADM_FILTER_DECLARE_CONF(" Equalizer");
+        
 }
 
 vidEqualizer::vidEqualizer(AVDMGenericVideoStream *in,CONFcouple *couples) 

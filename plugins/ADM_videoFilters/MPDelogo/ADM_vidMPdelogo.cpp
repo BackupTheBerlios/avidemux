@@ -67,11 +67,9 @@ uint8_t ADMVideoMPdelogo::configure(AVDMGenericVideoStream * instream)
 
 char *ADMVideoMPdelogo::printConf( void )
 {
-        static char buf[50];
-
-        sprintf((char *)buf," MPlayer delogo : at (%d,%d) (%dx%d)",
+        ADM_FILTER_DECLARE_CONF(" MPlayer delogo : at (%d,%d) (%dx%d)",
                                 _param->xoff,_param->yoff,_param->lw,_param->lh);
-        return buf;
+        
 }
 //_______________________________________________________________
 ADMVideoMPdelogo::ADMVideoMPdelogo(

@@ -139,11 +139,8 @@ uint8_t Telecide::configure(AVDMGenericVideoStream *in)
 
 char *Telecide::printConf( void )
 {
- 	static char buf[50];
-
-  	ADM_assert(_param); 	
- 	sprintf((char *)buf," Decomb Telecide");
-        return buf;
+ 	ADM_FILTER_DECLARE_CONF(" Decomb Telecide");
+ 
 }
 
 

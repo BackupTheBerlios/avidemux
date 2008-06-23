@@ -45,11 +45,8 @@ uint8_t AVDM_Reverse::configure(AVDMGenericVideoStream *in)
 
 char *AVDM_Reverse::printConf( void )
 {
-  static char buf[50];
-
-        //ADM_assert(_param);
-  sprintf((char *)buf," Reverse");
-  return buf;
+ ADM_FILTER_DECLARE_CONF(" Reverse");
+  
 }
 
 

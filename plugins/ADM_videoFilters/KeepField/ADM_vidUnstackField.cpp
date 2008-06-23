@@ -41,10 +41,8 @@ VF_DEFINE_FILTER(AVDMVideoUnStackField,swapParam,
 
 char *AVDMVideoUnStackField::printConf( void )
 {
-        static char buf[50];
-
-        sprintf((char *)buf," UnStack fields");
-        return buf;
+        ADM_FILTER_DECLARE_CONF(" UnStack fields");
+        
 }
 
 //______________________Unstack Fields_________________________________________

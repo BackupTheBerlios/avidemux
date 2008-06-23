@@ -85,10 +85,8 @@ uint8_t	ADMVideoTIsophote::getCoupledConf( CONFcouple **couples)
 }
 char *ADMVideoTIsophote::printConf( void )
 {
- 	static char buf[50];
-
- 	sprintf((char *)buf," TIsoPhote by Tritical");
-        return buf;
+ 	ADM_FILTER_DECLARE_CONF(" TIsoPhote by Tritical");
+        
 }
 
 ADMVideoTIsophote::~ADMVideoTIsophote()

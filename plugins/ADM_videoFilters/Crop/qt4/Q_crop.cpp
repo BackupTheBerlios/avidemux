@@ -153,7 +153,7 @@ Ui_cropDialog *w=(Ui_cropDialog *)_cookie;
       \fn     DIA_getCropParams
       \brief  Handle crop dialog
 */
-int DIA_getCropParams(	char *name,CROP_PARAMS *param,AVDMGenericVideoStream *in)
+int DIA_getCropParams(	const char *name,CROP_PARAMS *param,AVDMGenericVideoStream *in)
 {
         uint8_t ret=0;
         

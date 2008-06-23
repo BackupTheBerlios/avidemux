@@ -52,7 +52,7 @@ VF_DEFINE_FILTER(ADMVideoSubASS,assParam,
 
 char *ADMVideoSubASS::printConf() 
 {
-      static char buf[50];
+      static char buf[150];
       sprintf((char *)buf," ASS/SSA Subtitles: ");
       
       char *filename = (char*)_params->subfile;

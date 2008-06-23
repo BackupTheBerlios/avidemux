@@ -155,11 +155,8 @@ uint8_t r=0;
 //________________________________________________________
 char *ASharp::printConf( void )
 {
-        static char buf[50];
-
-        ADM_assert(_param);
-        sprintf((char *)buf," ASharp (MarcFD)");
-        return buf;
+       ADM_FILTER_DECLARE_CONF(" ASharp (MarcFD)");
+        
 }
         
 //________________________________________________________

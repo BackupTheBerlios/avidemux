@@ -166,12 +166,10 @@ int                       flags=0;
 }
 char *ADMVideoMosaic::printConf( void )
 {
-        static char buf[50];
-
-        sprintf((char *)buf," Mosaic : %d hz, %d vz, %d shrink factor",
+        ADM_FILTER_DECLARE_CONF(" Mosaic : %d hz, %d vz, %d shrink factor",
                                 _in->getInfo()->width,
                                 _param->hz,_param->vz,_param->shrink);
-        return buf;
+        
 }
 //_______________________________________________________________
 ADMVideoMosaic::ADMVideoMosaic(

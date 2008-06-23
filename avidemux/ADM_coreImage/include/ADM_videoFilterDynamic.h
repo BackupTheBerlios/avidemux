@@ -68,4 +68,9 @@ typedef FilterDescriptor *(VF_getDescriptor)(void);
 #define QT_TR_NOOP(String) String //translate ("avidemux", String)
 #define ADM_MINIMAL_UI_INTERFACE
 
+#define ADM_CONF_STRING_SIZE 256
+#define ADM_FILTER_DECLARE_CONF(fmt,...) {static char confString[ADM_CONF_STRING_SIZE];\
+                                    snprintf(confString,ADM_CONF_STRING_SIZE-1,fmt,## __VA_ARGS__);\
+                                    return confString;} 
+
 #endif

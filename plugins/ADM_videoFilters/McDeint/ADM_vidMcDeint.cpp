@@ -82,10 +82,8 @@ static void filter(struct vf_priv_s *p, uint8_t *dst[3], uint8_t *src[3], int ds
 
 char *AVDMVideoMCDeint::printConf( void )
 {
-static char buf[50];
-
-        sprintf((char *)buf," MC deinterlacer : Mode %d, qp %d, parity %d ",_param->mode,_param->qp,_param->initial_parity);
-        return buf;
+    ADM_FILTER_DECLARE_CONF(" MC deinterlacer : Mode %d, qp %d, parity %d ",_param->mode,_param->qp,_param->initial_parity);
+        
 }
 uint8_t AVDMVideoMCDeint::configure(AVDMGenericVideoStream * instream)
 {

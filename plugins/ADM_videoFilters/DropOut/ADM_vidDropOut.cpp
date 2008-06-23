@@ -40,10 +40,8 @@ VF_DEFINE_FILTER(ADMVideoDropOut,dropParam,
 
 char  *ADMVideoDropOut::printConf(void)
 {
-	static char buf[50];
-
- 	sprintf((char *)buf," DropOut :%ld",*_param);
-        return buf;
+	ADM_FILTER_DECLARE_CONF(" DropOut :%ld",*_param);
+        
 }
 uint8_t  GUI_getIntegerValue(int *valye, int min, int max, char *title);	
 uint8_t ADMVideoDropOut::configure(AVDMGenericVideoStream *instream)

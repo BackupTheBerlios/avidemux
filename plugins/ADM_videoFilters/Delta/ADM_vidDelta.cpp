@@ -51,9 +51,8 @@ uint8_t vidDelta::configure (AVDMGenericVideoStream * in)
 /*************************************/
 char *vidDelta::printConf (void)
 {
-  static char buf[50];
-  sprintf ((char *) buf, " Delta");
-  return buf;
+ ADM_FILTER_DECLARE_CONF( " Delta");
+  
 }
 /*************************************/
 vidDelta::vidDelta (AVDMGenericVideoStream * in, CONFcouple * couples)

@@ -34,10 +34,8 @@ VF_DEFINE_FILTER(ADMVideoChromaU,nullParam,
 
 char *ADMVideoChromaU::printConf( void )
 {
- 	static char buf[50];
- 	
- 	sprintf((char *)buf," chroma u only");
-        return buf;
+ 	ADM_FILTER_DECLARE_CONF(" chroma u only");
+        
 }
 
 //_______________________________________________________________

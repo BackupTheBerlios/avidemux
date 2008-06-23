@@ -84,11 +84,9 @@ uint8_t ADMVideoResampleFPS::configure(AVDMGenericVideoStream *in)
 }
 char *ADMVideoResampleFPS::printConf( void )
 {
-  static char buf[50];
-        
-  sprintf((char *)buf," Resample to %2.2f fps (blend:%d)",(double)_param->newfps/1000.,
+ ADM_FILTER_DECLARE_CONF(" Resample to %2.2f fps (blend:%d)",(double)_param->newfps/1000.,
                 _param->use_linear);
-  return buf;
+  
 }
 
 ADMVideoResampleFPS::ADMVideoResampleFPS(  AVDMGenericVideoStream *in,uint32_t target)

@@ -173,11 +173,8 @@ uint8_t r=0;
 //________________________________________________________
 char *Msharpen::printConf( void )
 {
- 	static char buf[50];
-
-	ADM_assert(_param);
- 	sprintf((char *)buf," Donald Graft Msharpen Strength:%d Threshold:%d",_param->strength,_param->threshold);
-        return buf;
+ 	ADM_FILTER_DECLARE_CONF(" Donald Graft Msharpen Strength:%d Threshold:%d",_param->strength,_param->threshold);
+        
 }
 	
 //________________________________________________________

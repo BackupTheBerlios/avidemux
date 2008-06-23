@@ -70,11 +70,9 @@ uint8_t ADMVideoEq2::configure(AVDMGenericVideoStream *in)
 }
 char *ADMVideoEq2::printConf( void )
 {
-  static char buf[50];
-        
-  sprintf((char *)buf," Eq2 :Cont:%1.2f Brigh:%1.2f Sat:%1.2f",
+  ADM_FILTER_DECLARE_CONF(" Eq2 :Cont:%1.2f Brigh:%1.2f Sat:%1.2f",
                 _param->contrast,_param->brightness,_param->saturation);
-  return buf;
+  
 }
 
 ADMVideoEq2::ADMVideoEq2(  AVDMGenericVideoStream *in,CONFcouple *couples)

@@ -44,10 +44,8 @@ VF_DEFINE_FILTER_UI(ADMVideoSubtitle,subParam,
 
 char 								*ADMVideoSubtitle::printConf(void)
  {
-	  	static char buf[50];
-
- 				sprintf((char *)buf,"Subtitle ");
-        return buf;
+	  	ADM_FILTER_DECLARE_CONF("Subtitle ");
+        
 	}
 
 //--------------------------------------------------------

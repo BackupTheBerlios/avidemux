@@ -201,11 +201,8 @@ uint8_t Decimate::configure(AVDMGenericVideoStream *in)
 
 char *Decimate::printConf( void )
 {
- 	static char buf[50];
-
-	ADM_assert(_param);
- 	sprintf((char *)buf," Decomb Decimate cycle:%d",_param->cycle);
-        return buf;
+ 	ADM_FILTER_DECLARE_CONF(" Decomb Decimate cycle:%d",_param->cycle);
+ 
 }
 
 

@@ -40,11 +40,9 @@ VF_DEFINE_FILTER(ADMVideoMPD3D,mp3Param,
 
  char 	*ADMVideoMPD3D::printConf(void)
  {
-	  	static char buf[50];
-
- 				sprintf((char *)buf," MPlayer HQ Denoise 3D (%2.1f - %2.1f - %2.1f)'",
+	  ADM_FILTER_DECLARE_CONF(" MPlayer HQ Denoise 3D (%2.1f - %2.1f - %2.1f)'",
 						_param->param1,_param->param2,_param->param3);
-        return buf;
+        
 }
 
 uint8_t ADMVideoMPD3D::configure(AVDMGenericVideoStream *instream)

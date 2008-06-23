@@ -88,10 +88,8 @@ uint8_t r=0;
 }
 char *ADMVideoHue::printConf( void )
 {
-  static char buf[50];
-        
-  sprintf((char *)buf," Hue :%2.2f %2.2f",_param->hue,_param->saturation);
-  return buf;
+ ADM_FILTER_DECLARE_CONF(" Hue :%2.2f %2.2f",_param->hue,_param->saturation);
+  
 }
 
 ADMVideoHue::ADMVideoHue(  AVDMGenericVideoStream *in,CONFcouple *couples)

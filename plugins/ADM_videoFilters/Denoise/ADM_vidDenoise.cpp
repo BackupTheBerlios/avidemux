@@ -50,15 +50,12 @@ VF_DEFINE_FILTER(ADMVideoDenoise,denoiseParam,
 
 char *ADMVideoDenoise::printConf( void )
 {
- 	static char buf[50];
-
-  ADM_assert(_param); 	
- 	sprintf((char *)buf," Denoise : Lum :%02ld/:%02ld / Chm :%02ld/%02ld",
+ 	ADM_FILTER_DECLARE_CONF(" Denoise : Lum :%02ld/:%02ld / Chm :%02ld/%02ld",
   								_param->lumaLock,
           				_param->lumaThreshold,
               		_param->chromaLock,
                 	_param->chromaThreshold);
-        return buf;
+        
 }
 static uint8_t distMatrix[256][256];
 static uint32_t fixMul[16];

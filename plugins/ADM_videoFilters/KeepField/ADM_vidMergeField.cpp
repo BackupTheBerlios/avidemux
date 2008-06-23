@@ -42,10 +42,8 @@ VF_DEFINE_FILTER(AVDMVideoMergeField,swapParam,
 
 char *AVDMVideoMergeField::printConf( void )
 {
- 	static char buf[50];
-
- 	sprintf((char *)buf," Merge fields");
-        return buf;
+ 	ADM_FILTER_DECLARE_CONF(" Merge fields");
+        
 }
 
 //_______________________________________________________________

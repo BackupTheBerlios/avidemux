@@ -32,10 +32,8 @@ VF_DEFINE_FILTER(ADMVideoLuma,nullParam,
 //****************************************
 char *ADMVideoLuma::printConf( void )
 {
- 	static char buf[50];
- 	
- 	sprintf((char *)buf," Luma only");
-        return buf;
+ ADM_FILTER_DECLARE_CONF(" Luma only");
+        
 }
 
 ADMVideoLuma::ADMVideoLuma(  AVDMGenericVideoStream *in,CONFcouple *setup)

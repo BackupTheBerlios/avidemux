@@ -77,11 +77,9 @@ VF_DEFINE_FILTER(AVDMVideoVlad,vladParam,
 
 char *AVDMVideoVlad::printConf(void)
 {
-	static char buf[50];
- 	
-	sprintf((char *)buf," Temporal Cleaner : Y: %02lu / c: %02lu",_param->ythresholdMask,
+	ADM_FILTER_DECLARE_CONF(" Temporal Cleaner : Y: %02lu / c: %02lu",_param->ythresholdMask,
 				_param->cthresholdMask	);
-        return buf;
+        
 }
 
 

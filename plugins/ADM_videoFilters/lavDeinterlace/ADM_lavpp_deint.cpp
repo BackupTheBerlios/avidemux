@@ -128,10 +128,8 @@ uint8_t ADMVideoLavPPDeint::configure(AVDMGenericVideoStream *in)
 //*************************************************************
 char *ADMVideoLavPPDeint::printConf( void )
 {
-  static char buf[50];
-        
-  sprintf((char *)buf," Lavcodec PP deinterlacer autolev:%d deint:%d",_param->autolevel,_param->deintType);
-  return buf;
+ ADM_FILTER_DECLARE_CONF(" Lavcodec PP deinterlacer autolev:%d deint:%d",_param->autolevel,_param->deintType);
+  
 }
 //*************************************************************
 ADMVideoLavPPDeint::ADMVideoLavPPDeint(  AVDMGenericVideoStream *in,CONFcouple *couples)

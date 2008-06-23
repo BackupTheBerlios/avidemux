@@ -57,14 +57,12 @@ VF_DEFINE_FILTER_UI(AVDMVideoStreamCrop,cropParam,
 
 char *AVDMVideoStreamCrop::printConf( void )
 {
- 	static char buf[50];
- 	
- 	sprintf((char *)buf," Crop %lu x %lu --> %lu x %lu",
+ 	ADM_FILTER_DECLARE_CONF(" Crop %lu x %lu --> %lu x %lu",
  				_in->getInfo()->width,
  				_in->getInfo()->height,
  				_info.width,
  				_info.height);
-        return buf;
+ 
 }
 
 //_______________________________________________________________

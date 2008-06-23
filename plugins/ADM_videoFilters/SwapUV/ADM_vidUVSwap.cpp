@@ -32,10 +32,8 @@ VF_DEFINE_FILTER(ADMVideoUVSwap,nullParam,
 //*********************************
 char *ADMVideoUVSwap::printConf( void )
 {
- 	static char buf[50];
-
- 	sprintf((char *)buf," UV Swap");
-        return buf;
+ 	ADM_FILTER_DECLARE_CONF(" UV Swap");
+        
 }
 
 ADMVideoUVSwap::ADMVideoUVSwap(  AVDMGenericVideoStream *in,CONFcouple *setup)

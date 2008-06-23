@@ -87,10 +87,8 @@ static void filter_plane(int mode, uint8_t *dst, int dst_stride, const uint8_t *
 //***************************************************
 char *ADMVideoYadif::printConf( void )
 {
-  static char buf[50];
- 	
-  sprintf((char *)buf," Yadif : mode %u order %d",_param->mode, _param->order);
-  return buf;
+  ADM_FILTER_DECLARE_CONF(" Yadif : mode %u order %d",_param->mode, _param->order);
+  
 }
 
 ADMVideoYadif::ADMVideoYadif(AVDMGenericVideoStream *in, CONFcouple *couples)

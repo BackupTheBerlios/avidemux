@@ -99,9 +99,8 @@ uint8_t vidCNR2::configure (AVDMGenericVideoStream * in)
 /*************************************/
 char *vidCNR2::printConf (void)
 {
-  static char buf[50];
-  sprintf ((char *) buf, " CNR2 by MarcFD/Tritical");
-  return buf;
+  ADM_FILTER_DECLARE_CONF( " CNR2 by MarcFD/Tritical");
+  
 }
 /*************************************/
 vidCNR2::vidCNR2 (AVDMGenericVideoStream * in, CONFcouple * couples)

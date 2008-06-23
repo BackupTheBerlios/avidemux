@@ -60,10 +60,8 @@ static void do_rotate(ADMImage *source,ADMImage *target,uint32_t angle);
 
 char *ADMVideoRotate::printConf( void )
 {
-  static char buf[50];
- 	
-  sprintf((char *)buf," Rotate %u degrees", _param->angle);
-  return buf;
+  ADM_FILTER_DECLARE_CONF(" Rotate %u degrees", _param->angle);
+  
 }
 
 ADMVideoRotate::ADMVideoRotate(AVDMGenericVideoStream *in, CONFcouple *couples)

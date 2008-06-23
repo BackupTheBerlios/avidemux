@@ -40,9 +40,8 @@ VF_DEFINE_FILTER(AVDMVideoHzStackField,swapParam,
 
 char *AVDMVideoHzStackField::printConf( void )
 {
-        static char buf[50];
-        sprintf((char *)buf," Hz Stack fields");
-        return buf;
+        ADM_FILTER_DECLARE_CONF(" Hz Stack fields");
+        
 }
 
 //_______________________________________________________________

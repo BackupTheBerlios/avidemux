@@ -43,10 +43,8 @@ VF_DEFINE_FILTER(AVDMVideoStackField,swapParam,
 
 char *AVDMVideoStackField::printConf( void )
 {
- 	static char buf[50];
-
- 	sprintf((char *)buf," Stack fields");
-        return buf;
+ 	ADM_FILTER_DECLARE_CONF(" Stack fields");
+        
 }
 
 //_______________________________________________________________

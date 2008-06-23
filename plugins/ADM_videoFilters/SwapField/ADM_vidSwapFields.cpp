@@ -38,10 +38,8 @@ VF_DEFINE_FILTER(AVDMVideoSwapField,swapParam,
 
 char *AVDMVideoSwapField::printConf( void )
 {
- 	static char buf[50];
-
- 	sprintf((char *)buf," Swap fields");
-        return buf;
+ 	ADM_FILTER_DECLARE_CONF(" Swap fields");
+ 
 }
 //_______________________________________________________________
 AVDMVideoSwapField::AVDMVideoSwapField(

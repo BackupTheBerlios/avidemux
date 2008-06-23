@@ -96,10 +96,8 @@ uint8_t	ADMVideoKernelDeint::getCoupledConf( CONFcouple **couples)
 }
 char *ADMVideoKernelDeint::printConf( void )
 {
- 	static char buf[50];
- 	
- 	sprintf((char *)buf," D Graft Kernel Deint");
-        return buf;
+ 	ADM_FILTER_DECLARE_CONF(" D Graft Kernel Deint");
+        
 }
 
 ADMVideoKernelDeint::~ADMVideoKernelDeint()

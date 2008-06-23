@@ -11,7 +11,7 @@
 //
 
 
-typedef struct TelecideParam
+typedef struct 
 {
 	uint32_t 	order;           /* Field Order 0 BFF, 1TFF */
 	uint32_t 	back;            // Try backward field :0 Never, 1 when bad, 2 always tried MUST Have post !=0
@@ -31,4 +31,4 @@ typedef struct TelecideParam
 	uint32_t 	hints;           // ignore
 	uint32_t 	show;            // Toggle
 	uint32_t 	debug;           // Toggle
-};
+}TelecideParam;

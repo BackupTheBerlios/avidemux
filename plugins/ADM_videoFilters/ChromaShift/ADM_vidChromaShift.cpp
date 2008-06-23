@@ -39,11 +39,9 @@ VF_DEFINE_FILTER_UI(ADMVideoChromaShift,cshiftParam,
                 QT_TR_NOOP("Shift chroma U/V to fix badly synced luma/chroma."));
 char *ADMVideoChromaShift::printConf( void )
 {
- 	static char buf[50];
-
- 	snprintf((char *)buf,50," Chroma shift U:%d  V:%d",
+ 	ADM_FILTER_DECLARE_CONF(" Chroma shift U:%d  V:%d",
             _param->u,_param->v);
-        return buf;
+        
 }
 
 ADMVideoChromaShift::ADMVideoChromaShift(  AVDMGenericVideoStream *in,CONFcouple *couples)

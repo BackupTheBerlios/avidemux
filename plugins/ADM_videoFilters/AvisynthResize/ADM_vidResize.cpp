@@ -44,14 +44,12 @@ VF_DEFINE_FILTER_UI(AVDMVideoStreamResize,mpresizeParam,
 
 char *AVDMVideoStreamResize::printConf( void )
 {
- 	static char buf[50];
- 	
- 	sprintf((char *)buf," Resize %lu x %lu --> %lu x %lu",
+ 	ADM_FILTER_DECLARE_CONF(" Resize %lu x %lu --> %lu x %lu",
  				_in->getInfo()->width,
  				_in->getInfo()->height,
  				_info.width,
  				_info.height);
-        return buf;
+        
 }
 //_______________________________________________________________
 AVDMVideoStreamResize::AVDMVideoStreamResize(

@@ -51,7 +51,7 @@ static flyCrop *myCrop=NULL;
 //	Video is in YV12 Colorspace
 //
 //
-int DIA_getCropParams(char *name, CROP_PARAMS *param, AVDMGenericVideoStream *in)
+int DIA_getCropParams(const char *name, CROP_PARAMS *param, AVDMGenericVideoStream *in)
 {
 	uint32_t width, height;
 

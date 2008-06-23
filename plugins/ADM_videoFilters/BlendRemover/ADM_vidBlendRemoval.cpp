@@ -84,9 +84,8 @@ uint8_t vidBlendRemoval::configure (AVDMGenericVideoStream * in)
 /*************************************/
 char *vidBlendRemoval::printConf (void)
 {
-  static char buf[50];
-  sprintf ((char *) buf, " Blend Removal Thresh:%d Noise:%d Ident:%d",_param->threshold,_param->noise,_param->identical);
-  return buf;
+  ADM_FILTER_DECLARE_CONF( " Blend Removal Thresh:%d Noise:%d Ident:%d",_param->threshold,_param->noise,_param->identical);
+  
 }
 
 #define MAX_BLOCKS 50

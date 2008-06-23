@@ -168,9 +168,8 @@ uint8_t r;
 /*************************************/
 char *vidTDeint::printConf (void)
 {
-  static char buf[50];
-  sprintf ((char *) buf, " Tritical TDeint");
-  return buf;
+ ADM_FILTER_DECLARE_CONF( " Tritical TDeint");
+  
 }
 
 #define MAX_BLOCKS 50

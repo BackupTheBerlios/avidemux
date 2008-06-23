@@ -86,9 +86,8 @@ uint8_t ADMVideoColorYuv::configure(AVDMGenericVideoStream *in)
 
 char *ADMVideoColorYuv::printConf( void )
 {
-   static char buf[50];
-   sprintf((char *)buf," ColorYuv ");
-   return buf;
+  ADM_FILTER_DECLARE_CONF(" ColorYuv ");
+   
 }
 
 ADMVideoColorYuv::ADMVideoColorYuv(AVDMGenericVideoStream *in,CONFcouple *couples) 

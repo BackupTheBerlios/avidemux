@@ -36,14 +36,12 @@ VF_DEFINE_FILTER(AVDMVideoAddBorder,cropParam,
 
 char *AVDMVideoAddBorder::printConf( void )
 {
- 	static char buf[50];
-
- 	sprintf((char *)buf," Add Borders %lu x %lu --> %lu x %lu",
+ 	ADM_FILTER_DECLARE_CONF(" Add Borders %lu x %lu --> %lu x %lu",
  				_in->getInfo()->width,
  				_in->getInfo()->height,
  				_info.width,
  				_info.height);
-        return buf;
+        
 }
 
 AVDMVideoAddBorder::AVDMVideoAddBorder(  AVDMGenericVideoStream *in,CONFcouple *couples)
