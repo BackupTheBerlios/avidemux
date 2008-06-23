@@ -796,23 +796,46 @@ int nw;
 
     case ACT_ChangeFPS:
     	{
-      	float  fps;
-	 aviInfo info;
-	 video_body->getVideoInfo (&info);
-       	fps=info.fps1000;
-	fps/=1000.;
+         float  fps;
+         aviInfo info;
+         uint32_t useDefined=0;
+         uint32_t defaultFps[3]={25000,23976,29970};
+         uint32_t index=0;
+         video_body->getVideoInfo (&info);
+         fps=info.fps1000;
+         fps/=1000.;
 
 
-      	if (DIA_GetFloatValue (&fps, 1., 60., QT_TR_NOOP("Frame Rate"),QT_TR_NOOP("_Frames per second:")))
-	{
-	
-	  info.fps1000 = (uint32_t) (floor (fps * 1000.+0.49));
-	  video_body->updateVideoInfo (&info);
-	  // update display
-	  video_body->getVideoInfo (avifileinfo);
+
+        diaElemToggle togUsePredefined(&useDefined,QT_TR_NOOP("Use custom value"));
+        diaElemFloat  fpsFloatValue(&fps,QT_TR_NOOP("Frame Rate"),1.,200.,QT_TR_NOOP("_Frames per second"));
+
+        diaMenuEntry menuFps[]={
+              {0,QT_TR_NOOP("PAL - 25 FPS")},
+              {1,QT_TR_NOOP("FILM- 24 FPS")},
+              {2,QT_TR_NOOP("NTSC- 30 FPS")}};
+
+         diaElemMenu      stdFps(&index,QT_TR_NOOP("Standard FrameRate:"),3,menuFps);
+
+        togUsePredefined.link(0,&fpsFloatValue);
+        togUsePredefined.link(1,&stdFps);
+        diaElem *elems[3]={&togUsePredefined,&fpsFloatValue,&stdFps};
+        if(diaFactoryRun(QT_TR_NOOP("Change FrameRate"),3,elems))
+        {
+          if(!useDefined)
+          {
+            info.fps1000 = (uint32_t) (floor (fps * 1000.+0.49));
+          }else
+          {
+            info.fps1000=defaultFps[index];
+          }
+          video_body->updateVideoInfo (&info);
+          // update display
+          video_body->getVideoInfo (avifileinfo);
           rebuild_status_bar();
-	 }
-	}
+
+        }
+	   }
       break;
       // set decoder option (post processing ...)
     case ACT_DecoderOption:
