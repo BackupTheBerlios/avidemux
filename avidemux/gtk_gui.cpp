@@ -798,7 +798,7 @@ int nw;
     	{
          float  fps;
          aviInfo info;
-         uint32_t useDefined=0;
+         uint32_t useDefined=1;
          uint32_t defaultFps[3]={25000,23976,29970};
          uint32_t index=0;
          video_body->getVideoInfo (&info);
@@ -817,12 +817,12 @@ int nw;
 
          diaElemMenu      stdFps(&index,QT_TR_NOOP("Standard FrameRate:"),3,menuFps);
 
-        togUsePredefined.link(0,&fpsFloatValue);
-        togUsePredefined.link(1,&stdFps);
+        togUsePredefined.link(1,&fpsFloatValue);
+        togUsePredefined.link(0,&stdFps);
         diaElem *elems[3]={&togUsePredefined,&fpsFloatValue,&stdFps};
         if(diaFactoryRun(QT_TR_NOOP("Change FrameRate"),3,elems))
         {
-          if(!useDefined)
+          if(useDefined)
           {
             info.fps1000 = (uint32_t) (floor (fps * 1000.+0.49));
           }else
