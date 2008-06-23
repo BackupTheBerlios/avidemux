@@ -1,5 +1,6 @@
-#include <stdio.h>
+#include "default.h"
 #include <strings.h>
+
 #include <vector>
 using std::vector;
 #include <utility>
