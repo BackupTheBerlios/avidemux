@@ -179,7 +179,7 @@ WAVHeader 	*OpenDMLHeader::getAudioInfo(void )
 // Open and get the headears/index built
 // along way
 //______________________________________
-uint8_t    OpenDMLHeader::open(char *name)
+uint8_t    OpenDMLHeader::open(const char *name)
 {
 uint8_t badAvi=0;
 uint32_t rd;

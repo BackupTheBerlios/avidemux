@@ -40,7 +40,7 @@ OGMDemuxer::OGMDemuxer(void )
 
 }
 
-uint8_t OGMDemuxer::open(char *name)
+uint8_t OGMDemuxer::open(const char *name)
 {
 		_fd=fopen(name,"rb");
 		if(!_fd) return 0;

@@ -19,7 +19,7 @@ typedef struct
 
 void            TLK_getDate(ADM_date *date);
 // /dir/file.ext -> /dir/file and ext returned values are copies
-void            ADM_PathSplit(char *str, char **root, char **ext);
+void            ADM_PathSplit(const char *str, char **root, char **ext);
 // Returns path only /foo/bar.avi -> /foo INPLACE, no copy done
 void	        ADM_PathStripName(char *str);
 // Get the filename without path. /foo/bar.avi -> bar.avi INPLACE, NO COPY

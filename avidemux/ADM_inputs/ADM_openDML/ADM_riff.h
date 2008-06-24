@@ -9,7 +9,7 @@ public:
 	uint64_t curPos;
 	uint8_t  _root;
 
-	riffParser(char *name);
+	riffParser(const char *name);
 	riffParser(riffParser *o, uint32_t size);
 	~riffParser();
 	uint64_t getPos( void );

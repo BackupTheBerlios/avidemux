@@ -29,9 +29,6 @@
 
 #include "ADM_default.h"
 
-
-#define CRASH_FILE "crash.js"
-
 // Our callback to give UI formatted informations....
 static ADM_saveFunction *mysaveFunction=NULL;
 static ADM_fatalFunction *myFatalFunction=NULL;

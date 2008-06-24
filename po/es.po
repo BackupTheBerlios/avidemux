@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Avidemux 2.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-04-24 20:19+0100\n"
-"PO-Revision-Date: 2008-05-03 07:10+0100\n"
+"POT-Creation-Date: 2008-06-12 15:04+0100\n"
+"PO-Revision-Date: 2008-06-16 01:17+0100\n"
 "Last-Translator: Festor Wailon Dacoba <festor90@gmail.com>\n"
 "Language-Team:  <juliocesarmartin@msn.com>\n"
 "MIME-Version: 1.0\n"
@@ -62,8 +62,8 @@ msgid "PSP"
 msgstr "PSP"
 
 #: avidemux/ADM_editor/ADM_outputfmt.h:52
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:194
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:283
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:188
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:277
 msgid "FLV"
 msgstr "FLV"
 
@@ -89,9 +89,8 @@ msgid "H.263+ (lavc)"
 msgstr "H.263+ (lavc)"
 
 #: avidemux/ADM_encoder/ADM_encCodecDesc.h:143
-#, fuzzy
 msgid "MPEG-4 ASP (lavc)"
-msgstr "MPEG-PS (A+V)"
+msgstr "MPEG-4 ASP (lavc)"
 
 #: avidemux/ADM_encoder/ADM_encCodecDesc.h:159
 msgid "DV (lavc)"
@@ -134,9 +133,8 @@ msgid "SVCD (lavc)"
 msgstr "SVCD (lavc)"
 
 #: avidemux/ADM_encoder/ADM_encCodecDesc.h:461
-#, fuzzy
 msgid "VCD (mpeg2enc)"
-msgstr "IPOD (mpeg4)"
+msgstr "VCD (mpeg2enc)"
 
 #: avidemux/ADM_encoder/ADM_encCodecDesc.h:493
 msgid "SVCD (mpeg2enc)"
@@ -148,18 +146,16 @@ msgid "MPEG-2 requant"
 msgstr "Cuantizador MPEG"
 
 #: avidemux/ADM_encoder/ADM_encCodecDesc.h:539
-#, fuzzy
 msgid "DVD (mpeg2enc)"
-msgstr "IPOD (mpeg4)"
+msgstr "DVD (mpeg2enc)"
 
 #: avidemux/ADM_encoder/ADM_encCodecDesc.h:671
 msgid "MPEG-4 ASP (Xvid4)"
 msgstr "MPEG-4 ASP (Xvid4)"
 
 #: avidemux/ADM_encoder/ADM_encCodecDesc.h:812
-#, fuzzy
 msgid "MPEG-4 AVC (x264)"
-msgstr "MPEG-PS (A+V)"
+msgstr "MPEG-4 AVC (x264)"
 
 #: avidemux/ADM_encoder/ADM_encCodecDesc.h:829
 msgid "dummy"
@@ -171,9 +167,9 @@ msgstr ""
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:367
 #: avidemux/ADM_outputs/oplug_dummy/oplug_dummy.cpp:143
 #: avidemux/ADM_outputs/oplug_dummy/oplug_dummy.cpp:195
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:197
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:265
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:286
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:191
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:259
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:280
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:166
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:264
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:285
@@ -192,14 +188,12 @@ msgid "DivX"
 msgstr "DivX"
 
 #: avidemux/ADM_encoder/adm_encffmpeg.h:47
-#, fuzzy
 msgid "LavCodec"
-msgstr "Codec:"
+msgstr "LavCodec"
 
 #: avidemux/ADM_encoder/adm_encmjpeg.h:60
-#, fuzzy
 msgid "MJPEG"
-msgstr "MPEG"
+msgstr "MJPEG"
 
 #: avidemux/ADM_encoder/adm_encmpeg2enc.h:57
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavcodec.cpp:61
@@ -218,9 +212,8 @@ msgid "Xvid"
 msgstr "Xvid"
 
 #: avidemux/ADM_encoder/adm_encXvid4.h:62
-#, fuzzy
 msgid "Xvid4"
-msgstr "Xvid"
+msgstr "Xvid4"
 
 #: avidemux/ADM_encoder/adm_encyv12.h:69
 msgid "YV12"
@@ -332,11 +325,11 @@ msgstr "Configuración Vorbis"
 
 #: avidemux/ADM_audiofilter/audiofilter_buildchain.cpp:322
 #: avidemux/gui_autodrive.cpp:62
-#: avidemux/gui_autodrive.cpp:74
-#: avidemux/gui_autodrive.cpp:120
-#: avidemux/gui_autodrive.cpp:135
-#: avidemux/gui_autodrive.cpp:162
-#: avidemux/gui_autodrive.cpp:196
+#: avidemux/gui_autodrive.cpp:72
+#: avidemux/gui_autodrive.cpp:113
+#: avidemux/gui_autodrive.cpp:128
+#: avidemux/gui_autodrive.cpp:155
+#: avidemux/gui_autodrive.cpp:189
 msgid "Codec Error"
 msgstr "Error de codec"
 
@@ -389,6 +382,13 @@ msgstr "Reconstruyendo Imágenes"
 msgid "Aborted"
 msgstr "Abortado"
 
+#: avidemux/ADM_editor/ADM_edit.cpp:82
+msgid ""
+"Avidemux detected VBR MP3 audio in this file. For keeping audio/video in sync, time map is needed. Build it now?\n"
+"\n"
+"You can do it later with \"Audio -> Build VBR Time Map\"."
+msgstr ""
+
 #: avidemux/ADM_editor/ADM_edit.cpp:407
 msgid "File type identified but no loader support detected..."
 msgstr "Tipo de archivo identificado pero no se ha detectado soporte para cargarlo..."
@@ -421,18 +421,20 @@ msgid "Build VBR time map?"
 msgstr "¿Construir mapa de tiempo VBR?"
 
 #: avidemux/ADM_editor/ADM_edit.cpp:585
-msgid "Use that mode"
+#, fuzzy
+msgid "Use safe mode"
 msgstr "Utilizar este modo"
 
 #: avidemux/ADM_editor/ADM_edit.cpp:585
-msgid "H264 detected"
-msgstr "H264 detectado"
+msgid "H.264 detected"
+msgstr "H.264 detectado"
 
 #: avidemux/ADM_editor/ADM_edit.cpp:585
+#, fuzzy
 msgid ""
-"If the file is using bframe as reference, it can lead to crash or stutteting.\n"
-"Avidemux can use another mode which is safed but <b>YOU WILL LOOSE FRAME ACCURACY</b>.\n"
-"Do you want to use that mode ?"
+"If the file is using B-frames as reference it can lead to a crash or stuttering.\n"
+"Avidemux can use another mode which is safe but <b>YOU WILL LOSE FRAME ACCURACY</b>.\n"
+"Do you want to use that mode?"
 msgstr ""
 "Si el archivo utiliza el imagen B como referencia, puede llevar a un cuelgue o malfuncionamiento.\n"
 "Avidemux puede utilizar otro modo de forma segura pero <b>PERDERÁ LA EXACTITUD DE IMAGEN</b>.\n"
@@ -911,16 +913,15 @@ msgstr "Reducir ruido, alisar imagen, incrementar compresibilidad."
 
 #: avidemux/ADM_filter/filter_declaration.cpp:131
 #: avidemux/ADM_videoFilter/ADM_vidMPLD3D.cpp:80
-#, fuzzy
 msgid "MPlayer hqdn3d"
-msgstr "MPlayer eq2"
+msgstr "MPlayer hqdn3d"
 
 #: avidemux/ADM_filter/filter_declaration.cpp:131
 msgid "High quality version of denoise3d. Slower but more precise."
 msgstr "Versión de alta calidad de denoise3d. Más lento pero preciso."
 
 #: avidemux/ADM_filter/filter_declaration.cpp:132
-#: avidemux/ADM_videoFilter/ADM_vidFlux.cpp:138
+#: avidemux/ADM_videoFilter/ADM_vidFlux.cpp:139
 msgid "FluxSmooth"
 msgstr ""
 
@@ -1297,7 +1298,7 @@ msgstr "Desempaquetando flujo de bits"
 msgid "Indexing"
 msgstr "Indexando"
 
-#: avidemux/ADM_libraries/ADM_lavformat/ADM_lavformat.cpp:376
+#: avidemux/ADM_libraries/ADM_lavformat/ADM_lavformat.cpp:379
 msgid "Incompatible frame rate"
 msgstr "Framerate incompatible"
 
@@ -1349,14 +1350,14 @@ msgstr "No se puede codificar la imagen"
 #: avidemux/ADM_ocr/adm_glyph.cpp:221
 #: avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp:366
 #: avidemux/ADM_outputs/oplug_ogm/op_ogsave.cpp:112
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:115
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:120
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:127
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:136
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:233
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:239
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:246
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:255
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:107
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:112
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:119
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:128
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:225
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:231
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:238
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:247
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/TLK_filesel.cpp:325
 #: avidemux/gtk_gui.cpp:903
 #: avidemux/gtk_gui.cpp:1505
@@ -1410,18 +1411,36 @@ msgstr "No se pudo escribir el archivo"
 msgid "Could not read \"%s\"."
 msgstr "No se pudo leer \"%s\"."
 
-#: avidemux/ADM_ocr/ADM_ocrEngine.cpp:87
+#: avidemux/ADM_ocr/ADM_ocrEngine.cpp:78
 msgid "Output file error"
 msgstr "Error de archivo de salida"
 
-#: avidemux/ADM_ocr/ADM_ocrEngine.cpp:87
+#: avidemux/ADM_ocr/ADM_ocrEngine.cpp:78
 #, c-format
 msgid "Could not open \"%s\" for writing."
 msgstr "No se pudo abrir \"%s\" para escritura."
 
-#: avidemux/ADM_ocr/ADM_ocrEngine.cpp:105
+#: avidemux/ADM_ocr/ADM_ocrEngine.cpp:86
+#: avidemux/ADM_ocr/ADM_ocrEngine.cpp:92
+#, fuzzy
+msgid "Input file error"
+msgstr "Error de archivo de salida"
+
+#: avidemux/ADM_ocr/ADM_ocrEngine.cpp:86
+msgid "Unknown source type"
+msgstr "Tipo de fuente desconocida"
+
+#: avidemux/ADM_ocr/ADM_ocrEngine.cpp:92
+msgid "Bitmap source failed"
+msgstr ""
+
+#: avidemux/ADM_ocr/ADM_ocrEngine.cpp:100
 msgid "Problem loading sub"
 msgstr "Problema cargando sub"
+
+#: avidemux/ADM_ocr/ADM_ocrEngine.cpp:100
+msgid "No subs"
+msgstr ""
 
 #: avidemux/ADM_ocr/ADM_vob2vobsub.cpp:254
 msgid "Ifo error"
@@ -1577,8 +1596,8 @@ msgstr "Error inicializando filtros de vídeo"
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:256
 #: avidemux/ADM_outputs/oplug_dummy/oplug_dummy.cpp:141
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:195
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:269
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:189
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:263
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:164
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:268
 #: avidemux/ADM_outputs/oplug_ogm/op_ogaudio.cpp:70
@@ -1619,38 +1638,32 @@ msgid "PCM"
 msgstr "PCM"
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:487
-#, fuzzy
 msgid "MP2"
-msgstr "MP4"
+msgstr "MP2"
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:488
-#, fuzzy
 msgid "MP3"
-msgstr "MP4"
+msgstr "MP3"
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:489
-#, fuzzy
 msgid "WMA"
-msgstr "MAD"
+msgstr "WMA"
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:490
-#, fuzzy
 msgid "LPCM"
-msgstr "PCM"
+msgstr "LPCM"
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:491
 msgid "AC3"
 msgstr ""
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:492
-#, fuzzy
 msgid "Ogg Vorbis"
-msgstr "Vorbis"
+msgstr "Ogg Vorbis"
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:494
-#, fuzzy
 msgid "AAC"
-msgstr "FAAC"
+msgstr "AAC"
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:495
 msgid "QDM2"
@@ -1661,9 +1674,8 @@ msgid "AMR-NB"
 msgstr ""
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:497
-#, fuzzy
 msgid "MSADPCM"
-msgstr "MAD"
+msgstr "MSADPCM"
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:498
 msgid "ULAW"
@@ -1678,17 +1690,15 @@ msgid "8-bit PCM"
 msgstr ""
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisave.cpp:502
-#, fuzzy
 msgid "Unknown codec"
-msgstr "Desconocido"
+msgstr "Codec desconocido"
 
 #: avidemux/ADM_outputs/oplug_avi/op_avisavecopy.cpp:109
 #: avidemux/ADM_outputs/oplug_avi/op_avisavecopy_pack.cpp:134
 #: avidemux/ADM_outputs/oplug_avi/op_avisavecopy_unpack.cpp:111
 #: avidemux/ADM_outputs/oplug_mpeg/op_mpegpass.cpp:223
-#, fuzzy
 msgid "Saving"
-msgstr "Guardando audio"
+msgstr "Guardando"
 
 #: avidemux/ADM_outputs/oplug_avi/op_saveprocess.cpp:73
 msgid ""
@@ -1700,7 +1710,7 @@ msgstr ""
 
 #: avidemux/ADM_outputs/oplug_avi/op_saveprocess.cpp:93
 #: avidemux/ADM_outputs/oplug_dummy/oplug_dummy.cpp:149
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:203
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:197
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:176
 #: avidemux/ADM_outputs/oplug_ogm/op_ogsaveprocess.cpp:76
 msgid "Filter init failed"
@@ -1728,26 +1738,24 @@ msgstr "Abortando"
 
 #: avidemux/ADM_outputs/oplug_avi/op_saveprocess.cpp:246
 #: avidemux/ADM_outputs/oplug_dummy/oplug_dummy.cpp:153
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:207
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:201
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:188
 #: avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp:373
 #: avidemux/ADM_outputs/oplug_ogm/op_ogsaveprocess.cpp:143
-#, fuzzy
 msgid "Encoding"
-msgstr "Codificando:"
+msgstr "Codificando"
 
 #: avidemux/ADM_outputs/oplug_avi/op_saveprocess.cpp:250
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:467
-#, fuzzy
 msgid "2nd Pass"
-msgstr "Segunda pasada"
+msgstr "2nd pasada"
 
 #: avidemux/ADM_outputs/oplug_avi/op_savesmart.cpp:107
 msgid "Smart Copy"
 msgstr ""
 
 #: avidemux/ADM_outputs/oplug_dummy/oplug_dummy.cpp:135
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:189
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:183
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:156
 msgid "Cannot initialize the video stream"
 msgstr "No se puede iniciar la pista de vídeo"
@@ -1758,8 +1766,8 @@ msgstr ""
 
 #: avidemux/ADM_outputs/oplug_dummy/oplug_dummy.cpp:179
 #: avidemux/ADM_outputs/oplug_dummy/oplug_dummy.cpp:215
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:233
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:332
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:227
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:326
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:214
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:337
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:421
@@ -1768,13 +1776,13 @@ msgid "Error while encoding"
 msgstr "Error durante la codificación"
 
 #: avidemux/ADM_outputs/oplug_dummy/oplug_dummy.cpp:190
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:244
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:238
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:226
 msgid "KeyFrame error"
 msgstr "Error de Imagen-Clave"
 
 #: avidemux/ADM_outputs/oplug_dummy/oplug_dummy.cpp:190
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:244
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:238
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:226
 msgid ""
 "The beginning frame is not a key frame.\n"
@@ -1783,28 +1791,28 @@ msgstr ""
 "La imagen inicial no es un Imagen-Clave\n"
 "Desplace el marcador A."
 
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:151
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:145
 msgid "Unsupported video"
 msgstr "Vídeo no soportado"
 
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:151
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:145
 msgid "Only FLV1 and VP6 video are supported"
 msgstr "Sólo los vídeos FLV1 y VP6 son soportados"
 
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:173
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:178
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:167
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:172
 msgid "Unsupported audio"
 msgstr "Audio no soportado"
 
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:173
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:167
 msgid "Audio must be mp3 for flv output."
 msgstr "El formato de audio debe ser MP3 para el formato de salida FVL"
 
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:178
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:172
 msgid "Frequency must be 44100, 22050 or 11025 Hz."
 msgstr "La frecuencia debe ser 44100, 22050 o 11025 Hz."
 
-#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:254
+#: avidemux/ADM_outputs/oplug_flv/oplug_flv.cpp:248
 #: avidemux/ADM_outputs/oplug_mp4/oplug_mp4.cpp:253
 msgid "Cannot initialize the audio stream"
 msgstr "No se puede inicializar la pista de audio"
@@ -1851,27 +1859,23 @@ msgstr ""
 
 #: avidemux/ADM_outputs/oplug_mpeg/op_mpegpass.cpp:230
 #: avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp:287
-#, fuzzy
 msgid "MPEG TS"
-msgstr "MPEG"
+msgstr "MPEG TS"
 
 #: avidemux/ADM_outputs/oplug_mpeg/op_mpegpass.cpp:231
 #: avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp:288
-#, fuzzy
 msgid "MPEG VCD"
-msgstr "MPEG"
+msgstr "MPEG VCD"
 
 #: avidemux/ADM_outputs/oplug_mpeg/op_mpegpass.cpp:232
 #: avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp:289
-#, fuzzy
 msgid "MPEG SVCD"
-msgstr "MPEG"
+msgstr "MPEG SVCD"
 
 #: avidemux/ADM_outputs/oplug_mpeg/op_mpegpass.cpp:233
 #: avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp:290
-#, fuzzy
 msgid "MPEG DVD"
-msgstr "MPEG"
+msgstr "MPEG DVD"
 
 #: avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp:193
 msgid "For DVD, audio must be 48 kHz MP2, AC3 or LPCM."
@@ -1902,14 +1906,12 @@ msgid "FFmpeg MPEG-2 DVD VBR"
 msgstr ""
 
 #: avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp:278
-#, fuzzy
 msgid "MPEG Requantizer"
-msgstr "Cuantizador MPEG"
+msgstr "Recuantizador MPEG"
 
 #: avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp:286
-#, fuzzy
 msgid "MPEG ES"
-msgstr "MPEG"
+msgstr "MPEG ES"
 
 #: avidemux/ADM_outputs/oplug_mpegFF/oplug_vcdff.cpp:305
 msgid "Reuse log file ?"
@@ -1940,9 +1942,8 @@ msgid "Could not initialize audio"
 msgstr "No se pudo inicializar audio"
 
 #: avidemux/ADM_outputs/oplug_ogm/op_ogsavecopy.cpp:70
-#, fuzzy
 msgid "Saving..."
-msgstr "Guardar"
+msgstr "Guardando..."
 
 #: avidemux/ADM_outputs/oplug_ogm/op_ogsaveprocess.cpp:111
 msgid "Pass one"
@@ -2390,9 +2391,8 @@ msgid "_Interlacing:"
 msgstr "Entrelazando:"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_DVDff.cpp:88
-#, fuzzy
 msgid "libavcodec MPEG-2 Configuration"
-msgstr "Configuración MPEG-2"
+msgstr "Configuración libavcodec MPEG-2"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_flv1.cpp:44
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/FAC_bitrate.cpp:109
@@ -2413,14 +2413,31 @@ msgid "_Minutes:"
 msgstr "_Minutos:"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_gototime.cpp:29
-#, fuzzy
 msgid "_Seconds:"
-msgstr "Segunda pasada"
+msgstr "Segunda pasada:"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_gototime.cpp:32
 #, fuzzy
 msgid "Go to Time"
 msgstr "Saltar a _tiempo..."
+
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_jobs_save.cpp:6
+msgid "_Job name:"
+msgstr "Nombre de tarea"
+
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_jobs_save.cpp:7
+#, fuzzy
+msgid "Output _File:"
+msgstr "Archivo de Salida"
+
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_jobs_save.cpp:7
+#, fuzzy
+msgid "Select Video To Write"
+msgstr "Seleccione archivo AVI para escribir"
+
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_jobs_save.cpp:10
+msgid "Save Job"
+msgstr "Guardar tarea"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavcodec.cpp:52
 msgid "Full"
@@ -2544,9 +2561,8 @@ msgid "Rate Control"
 msgstr "Control de Frecuencia"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavcodec.cpp:120
-#, fuzzy
 msgid "libavcodec MPEG-4 configuration"
-msgstr "Configuración MPEG-2"
+msgstr "Configuración libavcodec MPEG-4"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_lavDecoder.cpp:26
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_postproc.cpp:41
@@ -2568,97 +2584,96 @@ msgid "_Swap U&V"
 msgstr "_Swap U&V:"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_mjpeg.cpp:39
-#, fuzzy
 msgid "MJPEG Configuration"
-msgstr "Configuración MPEG-2"
+msgstr "Configuración MJPEG"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:92
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:85
 msgid "Select idx file:"
 msgstr "Seleccionar archivo idx:"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:93
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:86
 msgid "Use GlyphSet (optional):"
 msgstr "Usar GliphSet (opcional):"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:93
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:210
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:86
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:202
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_prefs.cpp:367
 #, fuzzy
 msgid "Select GlyphSet file"
 msgstr "Seleccionar archivo de salida"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:94
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:211
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:87
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:203
 msgid "Output SRT file"
 msgstr "Archivo SRT de salida"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:94
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:211
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:87
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:203
 #, fuzzy
 msgid "Save SRT file"
 msgstr "Guardar el archivo"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:105
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:222
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:97
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:214
 msgid "Select input and ouput files"
 msgstr "Seleccionar archivos de entrada y salida"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:115
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:127
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:246
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:107
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:119
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:238
 msgid "The idx/sub file does not exist."
 msgstr "El archivo idx/sub no existe."
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:120
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:239
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:112
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:231
 msgid "Please Select a valid output SRT file."
 msgstr "Seleccione o introduzca un archivo SRT válido"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:136
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:255
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:128
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:247
 msgid "Cannot load the glyphset file."
 msgstr "No se puede cargar el archivo glyphset."
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:156
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:276
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:147
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:268
 #, fuzzy
 msgid "GlyphSet filename"
 msgstr "Nombre no válido"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:156
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:276
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:147
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:268
 #, fuzzy
 msgid "Save GlyphSet file"
 msgstr "Guardar el archivo"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:158
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:149
 msgid "Save Glyph"
 msgstr "Guardar Glyph"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:208
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:200
 #, fuzzy
 msgid "Input TS:"
 msgstr "Entrada"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:208
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:200
 #, fuzzy
 msgid "Select TS file"
 msgstr "Seleccionar archivo TTF"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:209
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:201
 msgid "Subtitle PID:"
 msgstr "Subtítulos PID:"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:210
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:202
 msgid "Use glyphset (optional):"
 msgstr "Usar glyphset (opcional):"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:233
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:225
 #, fuzzy
 msgid "Please Select a valid TS file."
 msgstr "Seleccione o introduzca un archivo SRT válido"
 
-#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:278
+#: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_ocr.cpp:270
 #, fuzzy
 msgid "Save GlyphSet"
 msgstr "Guardar Glyph"
@@ -3066,7 +3081,6 @@ msgid "_Encoding:"
 msgstr "Codificando:"
 
 #: avidemux/ADM_userInterfaces/ADM_commonUI/DIA_srt.cpp:106
-#, fuzzy
 msgid "S_elect C_olor"
 msgstr "Seleccionar color"
 
@@ -4668,57 +4682,6 @@ msgstr "Ejecutar todas las tareas"
 msgid "Run Job"
 msgstr "Ejecutar tarea"
 
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:49
-#, fuzzy
-msgid "Select Video to Write"
-msgstr "Seleccione archivo AVI para escribir"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:63
-msgid "Invalid filename"
-msgstr "Nombre no válido"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:63
-msgid "Please select or enter a valid filename."
-msgstr "Seleccione o introduzca un nombre válido"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:69
-msgid "Invalid jobname"
-msgstr "Nombre no válido"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:69
-msgid "Please select or enter a valid jobname."
-msgstr "Seleccione o introduzca un nombre válido"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:110
-msgid "Save Job"
-msgstr "Guardar tarea"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:131
-msgid "Select the output file"
-msgstr "Seleccionar archivo de salida"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:145
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/DIA_filesel.cpp:90
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/DIA_filesel.cpp:244
-msgid "_Browse..."
-msgstr "Buscar..."
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:154
-msgid "Job name displayed in the job list and used as the script filename"
-msgstr "Nombre de tarea mostrado en la lista de tareas y utilizado como nombre del script"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:163
-msgid "Filename of the audio/video output"
-msgstr "Nombre del archivo de salida"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:166
-msgid "_Job name:"
-msgstr "Nombre de tarea"
-
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_jobs_save.cpp:173
-msgid "Output _file:"
-msgstr "Archivo de Salida"
-
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_mpdelogo.cpp:379
 msgid "Mplayer Delogo"
 msgstr "Mplayer Delogo"
@@ -5115,13 +5078,23 @@ msgstr "Codec de vídeo"
 msgid "Configure"
 msgstr "Configurar"
 
-#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_vobsub.cpp:88
+#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_vobsub.cpp:89
 msgid "none"
 msgstr "ninguno"
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_vobsub.cpp:98
 msgid "Select .idx file"
 msgstr "Seleccionar archivo .idx"
+
+#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_vobsub.cpp:109
+#, fuzzy
+msgid "Wrong VobSub parametering"
+msgstr "Configuración VobSub"
+
+#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_vobsub.cpp:109
+#, fuzzy
+msgid "The idx/sub file does not set."
+msgstr "El archivo idx/sub no existe."
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_vobsub.cpp:196
 msgid "VobSub Settings"
@@ -6322,6 +6295,11 @@ msgstr "<b>Intra-Matriz</b>"
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/DIA_color.cpp:71
 msgid "Select Color"
 msgstr "Seleccionar color"
+
+#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/DIA_filesel.cpp:90
+#: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/DIA_filesel.cpp:244
+msgid "_Browse..."
+msgstr "Buscar..."
 
 #: avidemux/ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/FAC_bitrate.cpp:99
 #, fuzzy
@@ -7793,12 +7771,12 @@ msgstr "Umbral:"
 msgid "Blend Threshold"
 msgstr "Umbral de cambio de escena"
 
-#: avidemux/ADM_videoFilter/ADM_vidFlux.cpp:133
+#: avidemux/ADM_videoFilter/ADM_vidFlux.cpp:134
 #, fuzzy
 msgid "_Temporal threshold:"
 msgstr "Umbral:"
 
-#: avidemux/ADM_videoFilter/ADM_vidFlux.cpp:134
+#: avidemux/ADM_videoFilter/ADM_vidFlux.cpp:135
 #, fuzzy
 msgid "_Spatial threshold:"
 msgstr "Umbral:"
@@ -8743,14 +8721,14 @@ msgid "An audio track is necessary to create such file"
 msgstr "Es necesaria una pista de audio para crear ese tipo de archivo"
 
 #: avidemux/gui_autodrive.cpp:63
-msgid "You need Xvid4 and either LAME or FAAC support for the iPod profile"
+msgid "Xvid4 and FAAC support is required for the iPod profile."
 msgstr ""
 
-#: avidemux/gui_autodrive.cpp:74
+#: avidemux/gui_autodrive.cpp:72
 msgid "Cannot select the MPEG-4 SP codec."
 msgstr "No se puede seleccionar el codec MPEG4 SP."
 
-#: avidemux/gui_autodrive.cpp:121
+#: avidemux/gui_autodrive.cpp:114
 msgid ""
 "You don't have LAME!.\n"
 "It is needed to create FLV  video."
@@ -8758,15 +8736,15 @@ msgstr ""
 "Sin soporte para LAME.\n"
 "Es necesario para crear vídeos FLV."
 
-#: avidemux/gui_autodrive.cpp:135
+#: avidemux/gui_autodrive.cpp:128
 msgid "Cannot select FLV1  codec."
 msgstr "No se puede seleccionar el codec FLV1."
 
-#: avidemux/gui_autodrive.cpp:162
+#: avidemux/gui_autodrive.cpp:155
 msgid "Cannot select mpeg4 sp codec."
 msgstr "No se puede seleccionar el codec MPEG4 SP."
 
-#: avidemux/gui_autodrive.cpp:197
+#: avidemux/gui_autodrive.cpp:190
 msgid ""
 "You don't have FAAC!.\n"
 "It is needed to create PSP compatible video."
@@ -8853,4 +8831,21 @@ msgid ""
 msgstr ""
 "Puede necesitar copia inteligente.\n"
 " ¿Activar?"
+
+#~ msgid "Invalid filename"
+#~ msgstr "Nombre no válido"
+#~ msgid "Please select or enter a valid filename."
+#~ msgstr "Seleccione o introduzca un nombre válido"
+#~ msgid "Invalid jobname"
+#~ msgstr "Nombre no válido"
+#~ msgid "Please select or enter a valid jobname."
+#~ msgstr "Seleccione o introduzca un nombre válido"
+#~ msgid "Select the output file"
+#~ msgstr "Seleccionar archivo de salida"
+#~ msgid "Job name displayed in the job list and used as the script filename"
+#~ msgstr ""
+#~ "Nombre de tarea mostrado en la lista de tareas y utilizado como nombre "
+#~ "del script"
+#~ msgid "Filename of the audio/video output"
+#~ msgstr "Nombre del archivo de salida"
 

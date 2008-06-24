@@ -104,7 +104,7 @@ uint8_t    h263Header::close( void )
 // Open and index the (small) h263
 //
 //______________________________________
-uint8_t    h263Header::open(char *name)
+uint8_t    h263Header::open(const char *name)
 {
 	uint32_t w,h,res=255,nbImg=0;
 	uint32_t word;

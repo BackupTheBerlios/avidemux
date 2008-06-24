@@ -61,7 +61,7 @@ class oggAudio :  public AVDMGenericAudioStream
  			
 				
 		public:
-					oggAudio( char *name,OgAudioTrack *tracks,uint8_t trkidx );
+					oggAudio(const char *name,OgAudioTrack *tracks,uint8_t trkidx );
 			virtual 	~oggAudio() ;
 			virtual uint8_t goTo(uint32_t offset);
 			virtual uint32_t read(uint32_t size,uint8_t *ptr);
@@ -101,7 +101,7 @@ virtual   void 			Dump(void) ;
 					oggHeader( void ) ;
 		   virtual  		~oggHeader(  ) ;
 // AVI io
-virtual 	uint8_t			open(char *name);
+virtual 	uint8_t			open(const char *name);
 virtual 	uint8_t			close(void) ;
   //__________________________
   //				 Info

@@ -497,7 +497,7 @@ const char *ADM_GetFileName(const char *str)
     \brief Split path into absolute path+name and extention i.e. /foo/bar/zee.avi -> /foo/bar/zee,avi.             Copy are returned
 
 */
-void ADM_PathSplit(char *str, char **root, char **ext)
+void ADM_PathSplit(const char *str, char **root, char **ext)
 {
 	char *full;
 	uint32_t l;

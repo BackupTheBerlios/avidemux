@@ -36,7 +36,7 @@ class OGMDemuxer
 						OGMDemuxer(void);
 						~OGMDemuxer();
 			uint8_t		dumpHeaders(uint8_t *ptr,uint32_t *size);
-			uint8_t 		open(char *file);			
+			uint8_t 		open(const char *file);			
 			uint8_t		setPos( uint64_t pos );
 			uint8_t		readHeader(uint32_t *paySize, uint32_t *flag,uint64_t *frame,
 							uint8_t *id);

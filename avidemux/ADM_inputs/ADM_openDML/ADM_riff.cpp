@@ -78,7 +78,7 @@ riffParser::~riffParser()
 		
 	}
 }
-riffParser::riffParser(char *name)
+riffParser::riffParser(const char *name)
 {
 	ADM_assert(fd=fopen(name,"rb"));
 	startPos=0;

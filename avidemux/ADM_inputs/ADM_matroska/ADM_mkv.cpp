@@ -29,7 +29,7 @@
     __________________________________________________________
 */
 
-uint8_t mkvHeader::open(char *name)
+uint8_t mkvHeader::open(const char *name)
 {
 
   ADM_ebml_file ebml;

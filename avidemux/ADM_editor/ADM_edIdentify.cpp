@@ -43,7 +43,7 @@ DMX_TYPE dmxIdentify(const char *name);
 /**
 	Read the magic of a file i.e. its 16 first bytes
 */
-uint8_t ADM_Composer::getMagic (char *name, uint32_t * magic)
+uint8_t ADM_Composer::getMagic (const char *name, uint32_t * magic)
 {
   FILE *    tmp;
   uint8_t    ret =    1;
@@ -66,7 +66,7 @@ uint8_t ADM_Composer::getMagic (char *name, uint32_t * magic)
 
 */
 
-uint8_t ADM_Composer::identify (char *name, fileType * type)
+uint8_t ADM_Composer::identify (const char *name, fileType * type)
 {
   uint32_t magic[4];
   uint32_t id;

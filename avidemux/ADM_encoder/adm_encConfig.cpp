@@ -638,7 +638,8 @@ Encoder *getVideoEncoder(uint32_t w, uint32_t h, uint32_t globalHeaderFlag)
 	(given as sole argument)
 
 */
-uint8_t loadVideoCodecConf (char *name)
+uint8_t
+loadVideoCodecConf (const char *name)
 {
 	if (currentCodecType == CodecExternal)
 		videoCodecSetConf(strlen(name), (uint8_t*)name);
@@ -690,7 +691,8 @@ uint8_t loadVideoCodecConf (char *name)
 	return 1;
 }
 
-uint8_t loadVideoCodecConfString(char *cmd)
+uint8_t
+loadVideoCodecConfString (const char *cmd)
 {
 #define MAX_STRING 4000
 	char str[MAX_STRING * 3];

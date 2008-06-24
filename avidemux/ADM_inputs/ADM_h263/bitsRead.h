@@ -15,7 +15,7 @@ class bitsReader{
 
 public:
 			bitsReader(void);
-	uint8_t		open(char *name);
+	uint8_t		open(const char *name);
 			~bitsReader();
 	uint8_t 	forward(uint32_t nbBits);
 	uint8_t 	read(uint32_t nbBits,uint32_t *val);

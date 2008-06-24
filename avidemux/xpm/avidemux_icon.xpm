@@ -1,5 +1,5 @@
 /* XPM */
-static char * avidemux_icon_xpm[] = {
+static const char * avidemux_icon_xpm[] = {
 "64 64 824 2",
 "  	c None",
 ". 	c #000000",

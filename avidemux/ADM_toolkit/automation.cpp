@@ -47,7 +47,7 @@
 
 extern void filterListAll(void );
 
-extern uint8_t loadVideoCodecConf( char *name);
+extern uint8_t loadVideoCodecConf( const char *name);
 extern int A_saveJpg (char *name);
 extern void filterLoadXml(char *n);
 extern int A_openAvi(char *name);

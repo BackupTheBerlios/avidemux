@@ -2,7 +2,7 @@ SET(ADM_LIB ADM_toolkitGtk)
 
 SET(${ADM_LIB}_SRCS
 	ADM_tray_gtk.cpp  
-    eggtrayicon.c eggtray_win32.c gtkmarkscale.c jogshuttle.c ADM_jogshuttle.cpp  mediactrl.c
+    gtkmarkscale.c jogshuttle.c ADM_jogshuttle.cpp  mediactrl.c
 ADM_icons.cpp
 
 )

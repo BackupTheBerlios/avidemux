@@ -22,8 +22,9 @@ class ADM_tray
 {
 protected:
         void    *sys;
+		void *_parent;
 public:
-                ADM_tray(char *name);
+                ADM_tray(void *parent);
                 ~ADM_tray();
         uint8_t setPercent(int percent);
         uint8_t setStatus(int working);

@@ -28,7 +28,6 @@
 #include "ADM_h263.h"
 #include "bitsRead.h"
 
-#include "bitsRead.h"
 const int mask[9]={
 0,
 1,
@@ -125,7 +124,7 @@ bitsReader::~bitsReader()
 
 			}
 }
-uint8_t bitsReader::open(char *name)
+uint8_t bitsReader::open(const char *name)
 {
 	_fd=fopen(name,"rb");
 	if(!_fd) return 0;

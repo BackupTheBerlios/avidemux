@@ -75,7 +75,7 @@ dmxAudioStream::dmxAudioStream (void)
   _index=NULL;
 }
 uint8_t
-dmxAudioStream::open (char *name)
+dmxAudioStream::open (const char *name)
 {
   FILE *file;
   uint32_t dummy;		//,audio=0;

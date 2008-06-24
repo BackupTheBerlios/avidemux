@@ -50,7 +50,7 @@ oggAudio::~ oggAudio()
 
 }
 
-oggAudio::oggAudio( char *name,OgAudioTrack *tracks,uint8_t trkidx )
+oggAudio::oggAudio(const char *name,OgAudioTrack *tracks,uint8_t trkidx )
 {
 uint64_t f;
 	_tracks=tracks;

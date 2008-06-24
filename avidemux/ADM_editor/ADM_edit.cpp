@@ -66,7 +66,7 @@ int DIA_mpegIndexer (char **mpegFile, char **indexFile, int *aid,
 void DIA_indexerPrefill(char *name);
 extern uint8_t indexMpeg (char *mpeg, char *file, uint8_t aid);
 
-extern uint8_t loadVideoCodecConf( char *name);
+extern uint8_t loadVideoCodecConf( const char *name);
 extern uint8_t parseScript(char *name);
 uint8_t UI_SetCurrentFormat( ADM_OUT_FORMAT fmt );
 const char *VBR_MSG = QT_TR_NOOP("Avidemux detected VBR MP3 audio in this file. For keeping audio/video in sync, time map is needed. Build it now?\n\nYou can do it later with \"Audio -> Build VBR Time Map\".");
@@ -252,7 +252,7 @@ ADM_Composer::~ADM_Composer ()
         
 
 */
-uint8_t ADM_Composer::addFile (char *name, uint8_t mode,fileType forcedType)
+uint8_t ADM_Composer::addFile (const char *name, uint8_t mode,fileType forcedType)
 {
   uint8_t    ret =    0;
   aviInfo    info;
@@ -582,23 +582,26 @@ TryAgain:
 
                 }
 		printf("\n checking for B-Frames...\n");
-		if( vid->_nb_video_frames >12) // 12
+		if( vid->_nb_video_frames > 12)
 		{
 				uint8_t 		*bufferin;
 				uint32_t 		len,flags;
 				uint8_t 		bframe=0, bconsistency=1;
-				uint32_t		scanned=12;
+				uint32_t		scanned;
                                 ADMImage                *buffer=NULL;
-				//buffer=new uint8_t [info.width* info.height*2];
-				if(vid->_nb_video_frames>50) scanned=50;
+
+				if(vid->_nb_video_frames > (info.fps1000 * 5) / 1000)
+					scanned = (info.fps1000 * 5) / 1000;
 				else				scanned=vid->_nb_video_frames;
+
+				printf(" scanning %lu frames\n", scanned);
 				
 				bufferin=new uint8_t [info.width* info.height*2];
                                 if(vid->decoder->dontcopy())
                                         buffer=new ADMImage(info.width,info.height,1);
                                 else
 				        buffer=new ADMImage(info.width,info.height);
-				// we decode 5 frames..should be enough to get an opinion
+
                                 ADMCompressedImage img;
                                 img.data=bufferin;
 				for(uint32_t i=0;i<scanned;i++)  //10
@@ -1498,7 +1501,7 @@ uint8_t r=0;
 //              0 else
 //_________________________________________
 //
-uint8_t         ADM_Composer::tryIndexing(char *name,char *idxname)
+uint8_t         ADM_Composer::tryIndexing(const char *name, const char *idxname)
 {
  unsigned int autoidx = 0;
       prefs->get(FEATURE_TRYAUTOIDX,&autoidx);

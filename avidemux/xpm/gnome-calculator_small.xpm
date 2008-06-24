@@ -1,5 +1,5 @@
 /* XPM */
-static char * gnome_calculator_small_xpm[] = {
+static const char * gnome_calculator_small_xpm[] = {
 "16 16 94 2",
 "  	c None",
 ". 	c #000000",

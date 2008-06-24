@@ -86,7 +86,7 @@ uint32_t flvHeader::read32(void)
       \brief open the flv file, gather infos and build index(es).
 */
 
-uint8_t flvHeader::open(char *name)
+uint8_t flvHeader::open(const char *name)
 {
   uint32_t prevLen, type, size, pts,pos=0;
   

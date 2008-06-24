@@ -56,7 +56,7 @@ class dmxAudioStream : public AVDMGenericAudioStream
                 public:
                 uint32_t        currentTrack;
                                 dmxAudioStream( void);
-                uint8_t         open(char *name);
+                uint8_t         open(const char *name);
         virtual                 ~dmxAudioStream() ;                    
         virtual uint8_t         goTo(uint32_t offset);
         virtual uint32_t        read(uint32_t size,uint8_t *ptr);

@@ -421,7 +421,7 @@ uint32_t nuvHeader::getFlags(uint32_t frame,uint32_t *flags)
 
 
 */
-uint8_t    nuvHeader::open(char *name)
+uint8_t    nuvHeader::open(const char *name)
 {
 uint32_t a=0,v=0,t=0;
 uint32_t max=0;

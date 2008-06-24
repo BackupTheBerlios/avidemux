@@ -31,10 +31,10 @@
 
 extern VF_FILTERS filterGetTagFromName(const char *inname);
 extern uint8_t A_ListAllBlackFrames( char *file );
-extern uint8_t loadVideoCodecConfString( char *name);
+extern uint8_t loadVideoCodecConfString( const char *name);
 extern uint8_t ADM_saveRaw (const char *name);
 extern int A_saveJpg (char *name);
-extern uint8_t loadVideoCodecConf( char *name);
+extern uint8_t loadVideoCodecConf( const char *name);
 extern void filterCleanUp( void );
 
 JSPropertySpec ADM_JSAvidemuxVideo::avidemuxvideo_properties[] = 

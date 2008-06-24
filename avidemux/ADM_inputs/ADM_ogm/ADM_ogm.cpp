@@ -149,7 +149,7 @@ uint32_t  oggHeader::getFlags(uint32_t frame,uint32_t *flags)
 
 
 
-uint8_t oggHeader::open(char *name)
+uint8_t oggHeader::open(const char *name)
 {
 #ifdef ADM_BIG_ENDIAN
 	#define SWAP64(x) { uint64_t y=x;x=R32((y>>16)>>16)+((R32(y&0x0ffffffff)<<16)<<16);}

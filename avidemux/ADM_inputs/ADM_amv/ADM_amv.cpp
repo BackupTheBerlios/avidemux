@@ -83,7 +83,7 @@ uint32_t amvHeader::read32(void)
       \brief open the flv file, gather infos and build index(es).
 */
 
-uint8_t amvHeader::open(char *name)
+uint8_t amvHeader::open(const char *name)
 {
   uint32_t prevLen, type, size, pts,pos=0;
   

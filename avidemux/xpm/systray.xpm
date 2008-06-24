@@ -1,5 +1,5 @@
 /* XPM */
-static char * systray_xpm[] = {
+static const char * systray_xpm[] = {
 "22 23 288 2",
 "  	c None",
 ". 	c #DDD4DC",

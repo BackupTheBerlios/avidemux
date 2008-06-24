@@ -124,7 +124,7 @@ uint8_t picHeader::read8(FILE * fd)
     return i;
 }
 //****************************************************************
-uint8_t picHeader::open(char *inname)
+uint8_t picHeader::open(const char *inname)
 {
     uint32_t nnum;
     uint32_t *fcc;

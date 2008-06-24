@@ -141,7 +141,7 @@ uint8_t       asfHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
     __________________________________________________________
 */
 
-uint8_t asfHeader::open(char *name)
+uint8_t asfHeader::open(const char *name)
 {
   _fd=fopen(name,"rb");
   if(!_fd)

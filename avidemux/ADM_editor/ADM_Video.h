@@ -73,7 +73,7 @@ virtual   uint32_t              ptsDtsDelta(uint32_t framenum) ;
 virtual   void 			Dump(void)=0;
 virtual	  uint8_t		getExtraHeaderData(uint32_t *len, uint8_t **data);
 // AVI io
-virtual 	uint8_t		open(char *name)=0;
+virtual 	uint8_t		open(const char *name)=0;
 virtual 	uint8_t		close(void)=0;
 virtual	uint8_t			reorder( void ) { return 0;} // by default we don"t do frame re-ordering
 virtual	uint8_t			isReordered( void ) { return 0;} // by default we don"t do frame re-ordering
@@ -83,7 +83,7 @@ virtual	uint8_t			isReordered( void ) { return 0;} // by default we don"t do fra
   uint8_t			getVideoInfo(aviInfo *info);
   uint32_t			getWidth( void ) { return _mainaviheader.dwWidth;};
   uint32_t			getHeight( void ) { return _mainaviheader.dwHeight;};
-  uint8_t			setMyName( char *name);
+  uint8_t			setMyName( const char *name);
   char				*getMyName( void);
   //__________________________
   //				 Audio

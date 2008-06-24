@@ -42,7 +42,7 @@ public:
 
 
 // AVI io
-        virtual         uint8_t                 open(char *name);
+        virtual         uint8_t                 open(const char *name);
         virtual         uint8_t                 close(void);
   //__________________________
   //                             Info

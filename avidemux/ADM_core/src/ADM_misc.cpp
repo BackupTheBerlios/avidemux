@@ -236,7 +236,7 @@ FILE *file;
     This function convert the later to the former
 
 */
-extern char *ADM_slashToBackSlash(char *in)
+extern char *ADM_slashToBackSlash(const char *in)
 {
     char *out,*cout;
     int n;

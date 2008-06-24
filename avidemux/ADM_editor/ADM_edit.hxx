@@ -153,10 +153,10 @@ class ADM_Composer
 				       		uint8_t  	updateAudioTrack(uint32_t seg);			   	
 						void 		deleteAllVideos(void );
 
-						uint8_t 	getMagic(char *name,uint32_t *magic);
-						uint8_t 	identify(char *name, fileType *type);
+						uint8_t 	getMagic(const char *name,uint32_t *magic);
+						uint8_t 	identify(const char *name, fileType *type);
 						uint32_t 	searchForwardSeg(uint32_t startframe);
-                                                uint8_t         tryIndexing(char *name,char *idxname=NULL);
+                                                uint8_t         tryIndexing(const char *name, const char *idxname=NULL);
 
   public:
                                                 uint8_t hasVBRVideos(void);
@@ -170,9 +170,9 @@ class ADM_Composer
   				virtual 			~ADM_Composer();
   						void		clean( void );
   						void		dumpSeg(void);
-                                                uint8_t         saveAsScript (char *name,char *out);
-						uint8_t 	saveWorbench(char *name)      ;
-						uint8_t 	loadWorbench(char *name)      ;
+                                                uint8_t         saveAsScript (const char *name, const char *out);
+						uint8_t 	saveWorbench(const char *name);
+						uint8_t 	loadWorbench(const char *name);
 						uint8_t     resetSeg( void );
 						uint8_t	reorder( void );
 						uint8_t	isReordered( uint32_t framenum );
@@ -180,7 +180,7 @@ class ADM_Composer
   				//_______________________
   				// specific to composer
   				//_______________________
-  						uint8_t 	addFile (char *name, uint8_t mode=0,fileType forcedType=Unknown_FileType);
+  						uint8_t 	addFile (const char *name, uint8_t mode=0,fileType forcedType=Unknown_FileType);
   						uint8_t 	cleanup( void);
 			   			uint8_t 	isMultiSeg( void) { if(_nb_segment>1) return 1; else return 0;}
   						uint8_t 	removeFrames(uint32_t start,uint32_t end);

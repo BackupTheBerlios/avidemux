@@ -1,13 +1,11 @@
 /***************************************************************************
-                          adm_encdivx.cpp  -  description
-                             -------------------
+                              ADM_tray_gtk.cpp
+                              ----------------
+
     begin                : Sun Jul 14 2002
-    copyright            : (C) 2002 by mean
+    copyright            : (C) 2002 by mean/gruntster
     email                : fixounet@free.fr
 
-
-Derived from MLdonkey systray code
-http://savannah.nongnu.org/cvs/?group=mldonkey
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,76 +17,108 @@ http://savannah.nongnu.org/cvs/?group=mldonkey
  *                                                                         *
  ***************************************************************************/
 
+#include "config.h"
+
+#include <string.h>
+#include <stdio.h>
+
 #include "ADM_toolkitGtk.h"
 #include "ADM_tray.h"
-extern "C"
+
+extern void UI_deiconify(void);
+
+static GdkPixbuf **pixbuf = NULL;
+static int lastIcon;
+
+static const char *animated[] = {
+	"film1.png","film3.png","film5.png","film7.png","film9.png",
+	"film11.png","film13.png","film15.png","film17.png","film19.png",
+	"film21.png","film23.png"};
+
+void tray_icon_on_click(GtkStatusIcon *status_icon, gpointer user_data)
 {
-#include "systray.h"
+	gtk_window_deiconify(GTK_WINDOW(user_data));
+	UI_deiconify();
 }
-static int nbTray=0;
-static  GdkPixbuf   **pixbuf=NULL;
 
-extern GdkPixbuf        *create_pixbuf                  (const gchar     *filename);
-/*
-class ADM_tray
+static void tray_menu_open_avidemux(GtkStatusIcon *status_icon, gpointer user_data)
 {
-protected:
-
-public:
-        ADM_tray(char *name);
-        ~ADM_tray();
-        setPercent(int percent);
-        setStatus(int working);
-
-};*/
-static const char *animated[]={
-    "film1.png","film3.png","film5.png","film7.png","film9.png",
-    "film11.png","film13.png","film15.png","film17.png","film19.png",
-    "film21.png","film23.png"};
-ADM_tray::ADM_tray(char *name)
-{
-        ADM_assert(!nbTray);
-        nbTray++;
-
-
-  int nb=sizeof(animated)/sizeof(char *);
-  if(!pixbuf)
-  {
-      pixbuf=new GdkPixbuf*[nb];
-      for(int i=0;i<nb;i++)
-      {
-        pixbuf[i]=create_pixbuf(animated[i]);
-        if(!pixbuf[i])
-        {
-          printf("Failed to create <%s>\n",animated[i]);
-          ADM_assert(0);
-        }
-      }
-
-  }
-  sys=adm_new_systray(pixbuf,nb,name);
-
+	gtk_window_deiconify(GTK_WINDOW(user_data));
+	UI_deiconify();
 }
+
+static void tray_icon_popup_menu(GtkStatusIcon *status_icon, guint button, guint activate_time, gpointer user_data)
+{
+	GtkWidget *popupMenu = gtk_menu_new();
+	GtkWidget *item = gtk_menu_item_new_with_label(QT_TR_NOOP("Open Avidemux"));
+
+	gtk_menu_append(popupMenu, item);
+	g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(tray_menu_open_avidemux), user_data);
+
+	gtk_widget_show_all(popupMenu);
+	gtk_menu_popup(GTK_MENU(popupMenu), NULL, NULL, gtk_status_icon_position_menu, status_icon, button, activate_time);
+}
+
+ADM_tray::ADM_tray(void* parent)
+{
+	_parent = parent;
+	lastIcon = 0;
+	int nb = sizeof(animated) / sizeof(char *);
+
+	if (!pixbuf)
+	{
+		pixbuf = new GdkPixbuf*[nb];
+
+		for (int i = 0; i < nb; i++)
+		{
+			pixbuf[i] = create_pixbuf(animated[i]);
+
+			if (!pixbuf[i])
+			{
+				printf("Failed to create <%s>\n", animated[i]);
+				ADM_assert(0);
+			}
+		}
+	}
+
+	sys = gtk_status_icon_new_from_pixbuf(pixbuf[0]);
+
+	g_signal_connect(G_OBJECT(sys), "activate", G_CALLBACK(tray_icon_on_click), _parent);
+	g_signal_connect(G_OBJECT(sys), "popup-menu", G_CALLBACK(tray_icon_popup_menu), _parent);
+	gtk_status_icon_set_tooltip((GtkStatusIcon*)sys, "Avidemux");
+	gtk_status_icon_set_visible((GtkStatusIcon*)sys, TRUE);
+}
+
 ADM_tray::~ADM_tray()
 {
-        nbTray--;
-        ADM_assert(!nbTray);
-        if(sys)
-                adm_delete_systray(sys);
-        sys=NULL;
+	if (sys)
+		gtk_status_icon_set_visible((GtkStatusIcon*)sys, FALSE);
+
+	sys = NULL;
 }
+
 uint8_t ADM_tray::setPercent(int percent)
 {
-char percentS[40];
-        sprintf(percentS,"%d %%",percent);
-        if(sys)
-        {
-                adm_changeIcon_systray();
-                adm_change_tooltip(sys,percentS);
-        }
-        return 1;
+	char percentS[40];
+
+	sprintf(percentS, "Avidemux [%d%%]", percent);
+
+	if (sys)
+	{
+		int maxIcons = sizeof(animated) / sizeof(char *);
+		lastIcon++;
+
+		if (lastIcon >= maxIcons)
+			lastIcon = 0;
+
+		gtk_status_icon_set_from_pixbuf((GtkStatusIcon*)sys, pixbuf[lastIcon]);
+		gtk_status_icon_set_tooltip((GtkStatusIcon*)sys, percentS);
+	}
+
+	return 1;
 }
+
 uint8_t ADM_tray::setStatus(int working)
 {
-        return 1;
+	return 1;
 }

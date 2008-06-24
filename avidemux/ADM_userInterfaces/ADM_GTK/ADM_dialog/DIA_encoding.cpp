@@ -92,20 +92,21 @@ uint32_t useTray=0;
 
         gtk_widget_show(dialog);
 
-        if(useTray)
-        {
-              gtk_window_iconify(GTK_WINDOW(dialog));
-              UI_iconify();
-        }
+		if (useTray)
+		{
+			gtk_window_iconify(GTK_WINDOW(dialog));
+			UI_iconify();
+			tray = new ADM_tray(dialog);
+		}
+		else
+			tray = NULL;
+
         _lastTime=0;
         _lastFrame=0;
         _fps_average=0;
-        tray=NULL;
         _total=1000;
-        if(useTray)
-                tray=new ADM_tray("Encoding");
-
 }
+
 void DIA_encoding::setFps(uint32_t fps)
 {
         _roundup=(uint32_t )floor( (fps+999)/1000);

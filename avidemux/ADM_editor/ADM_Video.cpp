@@ -102,7 +102,7 @@ uint8_t vidHeader::getVideoInfo (aviInfo * info)
   return 1;
 }
 
-uint8_t vidHeader::setMyName (char *name)
+uint8_t vidHeader::setMyName (const char *name)
 {
   _name = new char[strlen (name) + 1];
   ADM_assert (_name);

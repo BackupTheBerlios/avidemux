@@ -65,7 +65,7 @@ uint8_t ADM_Composer::getMarkers(uint32_t *start, uint32_t *end)
 // Save the config, including name, segment etc...
 //______________________________________________
 
-uint8_t ADM_Composer::saveWorbench (char *name)
+uint8_t ADM_Composer::saveWorbench (const char *name)
 {
         GUI_Error_HIG(QT_TR_NOOP("Unsupported"), NULL);
         return 0;
@@ -73,7 +73,7 @@ uint8_t ADM_Composer::saveWorbench (char *name)
 /*______________________________________________
         Save the project as a script
 ______________________________________________*/
-uint8_t ADM_Composer::saveAsScript (char *name, char *outputname)
+uint8_t ADM_Composer::saveAsScript (const char *name, const char *outputname)
 {
 const char *truefalse[]={"false","true"};
 printf("\n **Saving script project **\n");
@@ -293,7 +293,7 @@ for (uint32_t i = 0; i < _nb_segment; i++)
 // Save the config, including name, segment etc...
 //______________________________________________
 
-uint8_t ADM_Composer::loadWorbench (char *name)
+uint8_t ADM_Composer::loadWorbench (const char *name)
 {
   GUI_Error_HIG(QT_TR_NOOP("Old format project file"),QT_TR_NOOP( "No more supported."));
  return 0;

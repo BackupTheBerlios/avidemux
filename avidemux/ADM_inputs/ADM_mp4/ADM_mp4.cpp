@@ -198,7 +198,7 @@ uint32_t old;
 // other stuff which are pretty useless on
 // 3gp file anyway.
 //______________________________________
-uint8_t    MP4Header::open(char *name)
+uint8_t    MP4Header::open(const char *name)
 {
         printf("** opening 3gpp files **");	
         _fd=fopen(name,"rb");

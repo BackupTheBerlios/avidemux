@@ -171,7 +171,7 @@ uint8_t dmxHeader::getFrameSize(uint32_t frame,uint32_t *size) {
 
 */
 #define MAX_LINE 4096
-uint8_t                 dmxHeader::open(char *name)
+uint8_t                 dmxHeader::open(const char *name)
 {
                 FILE *file;
         
