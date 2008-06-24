@@ -195,7 +195,7 @@ uint8_t	AVDMVideoStreamCrop::getCoupledConf( CONFcouple **couples)
 			return 1;
 
 }
-extern int DIA_getCropParams(	char *name,CROP_PARAMS *param,AVDMGenericVideoStream *in);
+extern int DIA_getCropParams(const char *name, CROP_PARAMS *param, AVDMGenericVideoStream *in);
 uint8_t AVDMVideoStreamCrop::configure( AVDMGenericVideoStream *instream)
 
 {
