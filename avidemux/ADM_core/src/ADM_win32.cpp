@@ -394,8 +394,6 @@ bool getWindowsVersion(char* version)
 	return true;
 }
 
-#define MONITOR_DEFAULTTONEAREST    0x00000002
-
 void redirectStdoutToFile(void)
 {
 	// Don't redirect stdout and stderr if SDL hasn't already hijacked it.
@@ -447,5 +445,32 @@ void redirectStdoutToFile(void)
 	setvbuf(stderr, NULL, _IONBF, BUFSIZ);
 
 	delete[] logPath;
+}
+
+// Convert string from ANSI code page to UTF-8
+int ansiStringToUtf8(const char *ansiString, int ansiStringLength, char *utf8String)
+{
+	int wideCharStringLen = MultiByteToWideChar(CP_ACP, 0, ansiString, ansiStringLength, NULL, 0);
+	wchar_t wideCharString[wideCharStringLen];
+
+	MultiByteToWideChar(CP_ACP, 0, ansiString, ansiStringLength, wideCharString, wideCharStringLen);
+
+	int multiByteStringLen = WideCharToMultiByte(CP_UTF8, 0, wideCharString, wideCharStringLen, NULL, 0, NULL, NULL);
+
+	if (utf8String)
+		WideCharToMultiByte(CP_UTF8, 0, wideCharString, wideCharStringLen, utf8String, multiByteStringLen, NULL, NULL);
+
+	return multiByteStringLen;
+}
+
+// Convert UTF-8 string to wide char
+int utf8StringToWideChar(const char *utf8String, int utf8StringLength, wchar_t *wideCharString)
+{
+	int wideCharStringLength = MultiByteToWideChar(CP_UTF8, 0, utf8String, utf8StringLength, NULL, 0);
+
+	if (wideCharString)
+		MultiByteToWideChar(CP_UTF8, 0, utf8String, utf8StringLength, wideCharString, wideCharStringLength);
+
+	return wideCharStringLength;
 }
 #endif	// __WIN32

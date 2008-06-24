@@ -57,12 +57,12 @@ static CONFcouple *buildCouple(uint32_t nb, xmlNodePtr node);
 /**
 	Xml Read/write ConfCouple from files
 */
-void filterSaveXml(char *docname)
+void filterSaveXml(const char *docname)
 {
 	filterSaveXml(docname,0);
 }
 
-void filterSaveXml(char *docname,uint8_t silent)
+void filterSaveXml(const char *docname,uint8_t silent)
 {
  xmlDocPtr xdoc;
  xmlNodePtr node;
@@ -130,12 +130,12 @@ int max;
 		xmlFreeDoc(xdoc);
 	return ;
 }
-void filterLoadXml(char *docname)
+void filterLoadXml(const char *docname)
 {
 	filterLoadXml(docname,0);
 }
 
-int filterLoadXml(char *docname,uint8_t silent)
+int filterLoadXml(const char *docname,uint8_t silent)
 {
  xmlDocPtr xdoc;
  xmlNodePtr node,subnode;

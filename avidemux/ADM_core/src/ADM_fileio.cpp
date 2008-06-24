@@ -49,7 +49,11 @@ static int baseDirDone = 0;
 #undef fopen
 #undef fclose
 
-size_t ADM_fread(void *ptr, size_t size, size_t n, FILE *sstream)
+#ifdef __MINGW32__
+extern int utf8StringToWideChar(const char *utf8String, int utf8StringLength, wchar_t *wideCharString);
+#endif
+
+size_t ADM_fread (void *ptr, size_t size, size_t n, FILE *sstream)
 {
 	return fread(ptr,size,n,sstream);
 }
@@ -62,15 +66,16 @@ size_t ADM_fwrite(void *ptr, size_t size, size_t n, FILE *sstream)
 FILE *ADM_fopen(const char *file, const char *mode)
 {
 #ifdef __MINGW32__
-	int nFileLen = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, file, -1, NULL, 0);
-	int nModeLen = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, mode, -1, NULL, 0);
-	wchar_t wFile[nFileLen + 1];
-	wchar_t wMode[nModeLen + 1];
+	int fileNameLength = utf8StringToWideChar(file, -1, NULL);
+	int modeLength = utf8StringToWideChar(mode, -1, NULL);
 
-	MultiByteToWideChar(CP_UTF8, 0, mode, -1, wMode, nModeLen + 1);
-	MultiByteToWideChar(CP_UTF8, 0, file, -1, wFile, nFileLen + 1);
+	wchar_t wcFile[fileNameLength];
+	wchar_t wcMode[modeLength];
 
-	return _wfopen(wFile, wMode);
+	utf8StringToWideChar(file, -1, wcFile);
+	utf8StringToWideChar(mode, -1, wcMode);
+
+	return _wfopen(wcFile, wcMode);
 #else
 	return fopen(file, mode);
 #endif

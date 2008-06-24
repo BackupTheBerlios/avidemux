@@ -195,14 +195,14 @@ void updateStatus(void)
 GtkTreeIter iter;
 char *str;
 ADM_date  *date;
-char str1[200],str2[200],str3[200];
+char *str1,str2[200],str3[200];
 
         gtk_list_store_clear (jobs.store);
         for (uint32_t i = 0; i < jobs.nb; i++)
         {
-                sprintf(str1,"<span weight=\"heavy\"> %s </span>\n" 
-               "<span size=\"smaller\" style=\"oblique\" > %s </span> "
-                ,ADM_GetFileName(jobs.name[i]),QT_TR_NOOP(StringStatus[jobs.status[i].status]));
+               str1 = g_markup_printf_escaped("<span weight=\"heavy\">%s</span>\n" 
+               "<span size=\"smaller\" style=\"oblique\">%s</span>"
+                , ADM_GetFileName(jobs.name[i]), StringStatus[jobs.status[i].status]);
 
                 date=&(jobs.status[i].startDate);
                 sprintf(str2,"%02d:%02d:%02d",date->hours,
@@ -218,7 +218,8 @@ char str1[200],str2[200],str3[200];
                 gtk_list_store_set (jobs.store, &iter, 0,str1,1,str2,2,str3,-1);
                 printf("Start : %s\n",str2);
                 printf("End : %s\n",str3);
-                
+
+				g_free(str1);
         }
 }
 //*************************************

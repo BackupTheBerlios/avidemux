@@ -107,10 +107,10 @@ void registerFilterEx(const char *name,const char *filtername,VF_CATEGORY catego
 		const char *descText);
 
 /* Save / load filters */
-void filterSaveXml(char *name);
-void filterSaveXml(char *name,uint8_t silent);
-void filterLoadXml(char *name);
-int  filterLoadXml(char *name,uint8_t silent);
+void filterSaveXml(const char *name);
+void filterSaveXml(const char *name,uint8_t silent);
+void filterLoadXml(const char *name);
+int  filterLoadXml(const char *name,uint8_t silent);
 void filterSaveScriptJS(FILE *f);
 
  #endif

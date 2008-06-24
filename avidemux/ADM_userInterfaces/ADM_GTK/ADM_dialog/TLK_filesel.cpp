@@ -1,21 +1,21 @@
 /***************************************************************************
-TLK_filesel.cpp  -  description
--------------------
-New version of file selector
+                          TLK_filesel.cpp  -  description
+                             -------------------
+	New version of file selector
 
-begin                : Fri Sep 20 2002
-copyright            : (C) 2002 by mean
-email                : fixounet@free.fr
-***************************************************************************/
+    begin                : Fri Sep 20 2002
+    copyright            : (C) 2002 by mean
+    email                : fixounet@free.fr
+ ***************************************************************************/
 
 /***************************************************************************
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU General Public License as published by  *
-*   the Free Software Foundation; either version 2 of the License, or     *
-*   (at your option) any later version.                                   *
-*                                                                         *
-***************************************************************************/
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #include "ADM_toolkitGtk.h"
 #include "DIA_coreToolkit.h"
@@ -34,11 +34,12 @@ email                : fixounet@free.fr
 
 #define TH_READ 1
 #define TH_WRITE 2
+
 extern char *actual_workbench_file;
+extern void FileSel_ReadWrite(SELFILE_CB *cb, int rw, const char *name, const char *actual_workbench_file);
 
 namespace ADM_GTK_fileSel 
 {
-
 static void GUI_FileSel(const char *label, SELFILE_CB cb, int rw, char **name = NULL);
 uint8_t initFileSelector(void);
 
@@ -300,113 +301,6 @@ void GUI_FileSelWrite(const char *label, char * * name)
 	GUI_FileSel(label, NULL, 1, name);
 }
 
-// CYB 2005.02.23: DND
-void fileReadWrite(SELFILE_CB cb, int rw, char *name)
-{
-	if (name)
-	{
-		if (cb)
-		{
-			FILE *fd;
-			fd = fopen(name, "rb");
-
-			if (rw == 0) // read
-			{
-				// try to open it..
-				if (!fd)
-				{
-					GUI_Error_HIG(QT_TR_NOOP("File error"), QT_TR_NOOP("Cannot open \"%s\"."), name);
-					return;
-				}
-			}
-			else // write
-			{
-				if (fd)
-				{
-					struct stat buf;
-					int fdino;
-					char msg[300];
-
-					fclose(fd);
-
-					snprintf(msg, 300, QT_TR_NOOP("%s already exists.\n\nDo you want to replace it?"), ADM_GetFileName(name));
-
-					if (!GUI_Question(msg))
-						return;
-
-					/*
-					** JSC Fri Feb 10 00:07:30 CET 2006
-					** compare existing output file inode against each current open files inode
-					** i'm ignoring st_dev, so we may get false positives
-					** i'm testing until fd=1024, should be MAXFD computed by configure
-					** keep in mind:
-					** you can overwrite .idx files, they are loaded into memory and closed soon
-					** you cannot overwrite segment data files, all files are kept open and
-					** are detected here
-					*/
-#ifndef __WIN32
-					if (stat(name,&buf) == -1)
-					{
-						fprintf(stderr, "stat(%s) failed\n", name);
-						return;
-					}
-#endif
-					fdino = buf.st_ino;
-					for (int i = 0; i < 1024; i++)
-					{
-						if (fstat(i, &buf) != -1)
-						{
-							if (buf.st_ino == fdino)
-							{
-								char str[512];
-
-								snprintf(str, 512, "File \"%s\" exists and is opened by Avidemux", name);
-								GUI_Error_HIG(str, QT_TR_NOOP("It is possible that you are trying to overwrite an input file!"));
-
-								return;
-							}
-						}
-					}
-					/*
-					** compare output file against actual EMCAscript file
-					** need to stat() to avoid symlink (/home/x.js) vs. real file (/export/home/x.js) case
-					*/
-					if (actual_workbench_file)
-					{
-						if (stat(actual_workbench_file, &buf) != -1)
-						{
-							if (buf.st_ino == fdino)
-							{
-								char str[512];
-
-								snprintf(str, 512, "File \"%s\" exists and is the actual ECMAscript file", name);
-								GUI_Error_HIG(str, QT_TR_NOOP("It is possible that you are trying to overwrite an input file!"));
-
-								return;
-							}
-						}
-					}
-				}
-
-				// check we have right access to it
-				fd = fopen(name, "wb");
-
-				if (!fd)
-				{
-					GUI_Error_HIG(QT_TR_NOOP("Cannot write the file"), QT_TR_NOOP("No write access to \"%s\"."), name);
-
-					return;
-				}
-			}
-
-			fclose(fd);
-			cb(name);
-		} // no callback -> return value
-	}
-}
-// CYB 2005.02.23: DND
-
-
 void GUI_FileSel(const char *label, SELFILE_CB cb, int rw,char **rname)
 {
 	/* Create the selector */
@@ -492,7 +386,7 @@ void GUI_FileSel(const char *label, SELFILE_CB cb, int rw,char **rname)
 	// CYB 2005.02.23
 	if (cb)
 	{
-		fileReadWrite(cb, rw, name);
+		FileSel_ReadWrite(cb, rw, name, actual_workbench_file);
 		ADM_dealloc(name);
 	}
 	else

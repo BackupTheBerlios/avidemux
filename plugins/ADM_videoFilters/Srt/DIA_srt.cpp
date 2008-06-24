@@ -28,21 +28,21 @@ static void sizePositionCallback(void *cookie);
 /*****************************************************************/
 typedef struct unicd
 {
-	char *display,*name;
+	const char *display;
+	const char *name;
 }unicd;
 
   static unicd  names[]=
 {
-	{(char *)"Ascii"	,(char *)"ISO-8859-1"},
-	{(char *)"Cyrillic"	,(char *)"WINDOWS-1251"}, // ru
-	{(char *)"Czech"	,(char *)"ISO-8859-2"},	// cz
-	{(char *)"German"	,(char *)"ISO-8859-9"}		// german ?
-	,{(char *)"Slovene"	,(char *)"CP1250"}		// UTF8
-
-        ,{(char *)"UTF16"	,(char *)"UTF16"}		// UTF8
-	,{(char *)"UTF8"	,(char *)"UTF8"}		// UTF8
-	,{(char *)"Chinese Traditionnal(Big5)"	,(char *)"CP950"}		// UTF8
-	,{(char *)"Chinese Simplified (GB2312)"	,(char *)"CP936"}		// UTF8
+	{QT_TR_NOOP("Chinese Simplified (GB2312)"), "CP936"},		// UTF8
+	{QT_TR_NOOP("Chinese Traditional (Big5)"), "CP950"}	,	// UTF8
+	{QT_TR_NOOP("Cyrillic"), "WINDOWS-1251"}, // ru
+	{QT_TR_NOOP("Czech"), "ISO-8859-2"},	// cz
+	{QT_TR_NOOP("German"), "ISO-8859-9"},		// german ?
+	{QT_TR_NOOP("Latin-1"), "ISO-8859-1"},
+	{QT_TR_NOOP("Slovene"), "CP1250"},		// UTF8
+	{QT_TR_NOOP("UTF-8"), "UTF-8"},		// UTF8
+	{QT_TR_NOOP("UTF-16"), "UTF-16"}		// UTF16
 };
 typedef struct
 {
@@ -57,7 +57,7 @@ typedef struct
 */
 uint8_t DIA_srt(AVDMGenericVideoStream *source, SUBCONF *param)
 {
-#define item(x) QT_TR_NOOP(names[x].display)
+#define item(x) names[x].display
 #define Mitem(x) {x,item(x)}
 diaMenuEntry encoding[]={
   Mitem(0),
@@ -68,6 +68,7 @@ diaMenuEntry encoding[]={
   Mitem(5),
   Mitem(6),
   Mitem(7),
+  Mitem(8)
 };
 
 #define PX(x) &(param->x)
@@ -87,7 +88,7 @@ diaMenuEntry encoding[]={
       {
           if(!strcmp(param->_charset,names[i].name)) myEncoding=i;
       }
-      diaElemMenu      encodingM(&myEncoding,QT_TR_NOOP("_Encoding:"),8,encoding);
+      diaElemMenu      encodingM(&myEncoding,QT_TR_NOOP("_Encoding:"),9,encoding);
     //  diaElemUInteger  fontSize(PX(_fontsize),QT_TR_NOOP("Font Si_Ze:"),8,120);
       diaElemButton    color(QT_TR_NOOP("S_elect C_olor"), colorCallBack,&(colors[0]));
       diaElemButton    setBase(QT_TR_NOOP("Set Size and _Position"), sizePositionCallback,&sizePos);

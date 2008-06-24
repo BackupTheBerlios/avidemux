@@ -11,7 +11,10 @@ void initGetText(void)
 	char *local = setlocale(LC_ALL, "");
 
 #ifdef __WIN32
-	bindtextdomain("avidemux", "./share/locale");
+	char *localeDir = ADM_getInstallRelativePath("share", "locale");
+
+	bindtextdomain("avidemux", localeDir);
+	delete [] localeDir;
 #elif defined(__APPLE__)
 	char *localeDir = ADM_getInstallRelativePath("..", "Resources", "locale");
 

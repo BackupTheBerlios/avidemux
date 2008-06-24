@@ -24,12 +24,12 @@
 #define MODULE_NAME MODULE_SCRIPT
 #include "ADM_osSupport/ADM_debug.h"
 
-extern int A_openAvi (char *name);
+extern int A_openAvi (const char *name);
 extern int A_Save (const char *name);
-extern int A_appendAvi (char *name);
+extern int A_appendAvi (const char *name);
 extern uint8_t ogmSave(char *name);
 extern int GUI_GoToFrame(uint32_t frame);
-extern int filterLoadXml(char *docname,uint8_t silent);
+extern int filterLoadXml(const char *docname,uint8_t silent);
 extern int A_delete(uint32_t start, uint32_t end);
 
 extern uint8_t A_ListAllBlackFrames( char *file );

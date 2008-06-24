@@ -49,9 +49,8 @@ extern void filterListAll(void );
 
 extern uint8_t loadVideoCodecConf( const char *name);
 extern int A_saveJpg (char *name);
-extern void filterLoadXml(char *n);
-extern int A_openAvi(char *name);
-extern int A_appendAvi (char *name);
+extern void filterLoadXml(const char *n);
+extern int A_appendAvi (const char *name);
 extern void A_saveAudio(char *name);
 extern int A_loadNone( void );
 extern void A_saveAudioDecodedTest(char *name);
@@ -100,12 +99,16 @@ static void set_autoindex(char *p);
 extern int A_SaveUnpackedVop(const char *name);
 extern int A_SavePackedVop(const char *name);
 extern int A_saveDVDPS(char *name);
-extern void A_saveWorkbench (char *name);
+extern void A_saveWorkbench (const char *name);
 extern uint8_t A_rebuildKeyFrame (void);
 extern uint8_t A_setContainer(const char *cont);
 uint8_t scriptAddVar(char *var,char *value);
 extern uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo);
-//
+
+#ifdef __WIN32
+	extern int ansiStringToUtf8(const char *ansiString, int ansiStringLength, char *utf8String);
+#endif
+
 static int call_bframe(void);
 static int call_x264(void);
 static int call_packedvop(void);
@@ -145,7 +148,7 @@ AUTOMATON reaction_table[]=
         {"run",			1,"load and run a script",		(one_arg_type)A_parseECMAScript},
         {"audio-normalize",	1,"activate normalization",		call_normalize},
         {"audio-resample",	1,"resample to x hz",			call_resample},
-        {"filters",		1,"load a filter preset",		filterLoadXml}   ,
+        {"filters",		1,"load a filter preset",		(one_arg_type)filterLoadXml}   ,
         {"codec-conf",		1,"load a codec configuration",		(one_arg_type )loadVideoCodecConf}   ,
         {"vcd-res",		0,"set VCD resolution",			(one_arg_type)setVCD}              ,
         {"svcd-res",		0,"set SVCD resolution",		(one_arg_type)setSVCD}              ,
@@ -160,8 +163,8 @@ AUTOMATON reaction_table[]=
         {"save-raw-audio",	1,"save audio as-is ",			A_saveAudio},
         {"save-raw-video",	1,"save raw video stream (mpeg/... ) ",	(one_arg_type)ADM_saveRaw},
         {"save-uncompressed-audio",1,"save uncompressed audio",A_saveAudioDecodedTest},
-        {"load",		1,"load video or workbench",		(one_arg_type )A_openAvi},
-        {"load-workbench",	1,"load workbench file",		(one_arg_type)A_openAvi},
+        {"load",		1,"load video or workbench", (one_arg_type)A_openAvi},
+        {"load-workbench",	1,"load workbench file", (one_arg_type)A_openAvi},
         {"append",		1,"append video",			(one_arg_type)A_appendAvi},
         {"save",		1,"save avi",				save},		
         {"save-workbench",	1,"save workbench file",		(one_arg_type)A_saveWorkbench},
@@ -238,7 +241,17 @@ static int index;
                       {
                             if(cur==1) 
                             {
-                                A_openAvi(argv[cur]);
+#ifdef __WIN32
+								int utf8StringLength = ansiStringToUtf8(argv[cur], -1, NULL);
+								char utf8FileName[utf8StringLength];
+
+								ansiStringToUtf8(argv[cur], -1, utf8FileName);
+
+								A_openAvi(utf8FileName);
+#else
+								A_openAvi(argv[cur]);
+#endif
+	
                             }
                             else
                                 printf("\n Found garbage %s\n",argv[cur]);

@@ -27,6 +27,7 @@
 #include "DIA_fileSel.h"
 #include "ADM_video/ADM_vidMisc.h"
 #include "prefs.h"
+#include "avi_vars.h"
 
 #include "ADM_userInterfaces/ADM_render/GUI_renderInternal.h"
 extern int global_argc;
@@ -45,7 +46,10 @@ extern void loadTranslator(void);
 extern void initTranslator(void);
 extern void destroyTranslator(void);
 extern ADM_RENDER_TYPE UI_getPreferredRender(void);
-extern int A_openAvi2(char *name, uint8_t mode);
+extern int A_openAvi(const char *name);
+extern int A_appendAvi(const char *name);
+extern char *actual_workbench_file;
+extern void FileSel_ReadWrite(SELFILE_CB *cb, int rw, const char *name, const char *actual_workbench_file);
 
 int SliderIsShifted=0;
 static void setupMenus(void);
@@ -291,6 +295,8 @@ MainWindow::MainWindow() : QMainWindow()
 	ui.lineEdit_2->installEventFilter(this);
 
 	this->setFocus(Qt::OtherFocusReason);
+
+	setAcceptDrops(true);
 }
 /**
 \fn     custom
@@ -447,13 +453,18 @@ void MainWindow::dropEvent(QDropEvent *event)
 	{
 		urlList = event->mimeData()->urls();
 
-		if (urlList.size() > 0)
+		for (int fileIndex = 0; fileIndex < urlList.size(); fileIndex++)
 		{
-			fileName = urlList[0].toLocalFile();
+			fileName = urlList[fileIndex].toLocalFile();
 			info.setFile(fileName);
 
 			if (info.isFile())
-				A_openAvi2(fileName.toUtf8().data(), 0);
+			{
+				if (avifileinfo)
+					FileSel_ReadWrite(reinterpret_cast <void (*)(const char *)> (A_appendAvi), 0, fileName.toUtf8().data(), actual_workbench_file);
+				else
+					FileSel_ReadWrite(reinterpret_cast <void (*)(const char *)> (A_openAvi), 0, fileName.toUtf8().data(), actual_workbench_file);
+			}
 		}
 	}
 
@@ -992,7 +1003,7 @@ uint8_t UI_getTimeShift(int *onoff,int *value)
 
 uint8_t UI_setTimeShift(int onoff,int value)
 {
-	if(onoff)
+	if (onoff && value)
 		WIDGET(checkBox_TimeShift)->setCheckState(Qt::Checked);
 	else
 		WIDGET(checkBox_TimeShift)->setCheckState(Qt::Unchecked);
