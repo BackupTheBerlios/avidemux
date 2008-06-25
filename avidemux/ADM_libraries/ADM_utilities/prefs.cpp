@@ -81,7 +81,11 @@ static opt_def opt_defs [] = {
 	{"codecs.xvid.bitrate",		UINT,	"1500000",NULL,	"17",	"5900000"},
 	{"codecs.xvid.finalsize",	UINT,	"700",	NULL,	"0",	"3999"	},
 	{"codecs.preferredcodec",		STRING,"FFmpeg4",NULL, NULL, NULL },
-	{"filters.subtitle.fontname",		FILENAME,"/usr/X11R6/lib/X11/fonts/truetype/arial.ttf",NULL, NULL, NULL },
+#ifdef __WIN32
+	{"filters.subtitle.fontname",		FILENAME,"C:\\Windows\\Fonts\\arial.ttf",NULL, NULL, NULL },
+#else
+	{"filters.subtitle.fontname",		FILENAME,"/usr/share/fonts/truetype/DejaVuSans.ttf",NULL, NULL, NULL },
+#endif
 	{"filters.subtitle.charset",		STRING,"ISO-8859-1",NULL, NULL, NULL },
 	{"filters.subtitle.fontsize",		UINT,	"24",	NULL,	"1",	"576"	},
 	{"filters.subtitle.ypercent",	INT,	"255",	NULL,	"0",	"255"	},
@@ -90,8 +94,12 @@ static opt_def opt_defs [] = {
 	{"filters.subtitle.selfadjustable",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"filters.subtitle.usebackgroundcolor",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"settings.mpegsplit",	UINT,	"790",	NULL,	"400",	"5000"	},
-	{"device.audiodevice",	STRING,"OSS",	NULL, NULL, NULL },
-	{"device.audio.alsa_device",		STRING,"plughw:0,0",NULL, NULL, NULL },
+#ifdef __WIN32
+	{"device.audiodevice",		STRING,"WIN32",NULL, NULL, NULL },
+#else
+	{"device.audiodevice",		STRING,"ALSA",	NULL, NULL, NULL },
+#endif
+	{"device.audio.alsa_device",		STRING,"dmix",	NULL, NULL, NULL },
 	{"device.videodevice",		UINT,	"0",	NULL,	"0",	"10"	},
 	{"default.postproc_type",		UINT,	"3",	NULL,	"0",	"7"	},
 	{"default.postproc_value",		UINT,	"3",	NULL,	"0",	"5"	},

@@ -74,6 +74,7 @@ void diaElemInteger::setMe(void *dialog, void *opaque,uint32_t line)
   
   int32_t val=*(int32_t *)param;
   widget = gtk_spin_button_new_with_range(min,max,1);
+  gtk_entry_set_activates_default (GTK_ENTRY(widget), TRUE);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON(widget),TRUE);
   gtk_spin_button_set_digits  (GTK_SPIN_BUTTON(widget),0);
   gtk_spin_button_set_value (GTK_SPIN_BUTTON(widget),val);
@@ -144,6 +145,7 @@ void diaElemUInteger::setMe(void *dialog, void *opaque,uint32_t line)
   
   uint32_t val=*(uint32_t *)param;
   widget = gtk_spin_button_new_with_range(min,max,1);
+  gtk_entry_set_activates_default (GTK_ENTRY(widget), TRUE);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON(widget),TRUE);
   gtk_spin_button_set_digits  (GTK_SPIN_BUTTON(widget),0);
   gtk_spin_button_set_value (GTK_SPIN_BUTTON(widget),val);

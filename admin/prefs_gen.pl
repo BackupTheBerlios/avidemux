@@ -40,17 +40,17 @@ my $fd = new IO::Handle;
 my @data;
 my $flag;
 my $num_opts = 0;
+my $prev_optname = "";
 
 open($fd,"< $in") or die;
 while(<$fd>){
 	chomp;
-	s/#.*$//;
+	s/^(#\s.*|#$)//;
 	next if( /^[ 	]*$/ );
 	#     optname       type           value  rest
-        if( /^([^,]+)\s*,\s*([A-Z]+)\s*,\s*([^,]+)(.*)$/ ){
-	   my ($N,$a,$b,$c,$d,$e) = ($1,uc($1),$2,$3,$4,$4);
+	if( /^([^,]+)\s*,\s*([A-Z]+)\s*,\s*([^,]+)(.*)$/ ){
+		my ($N,$a,$b,$c,$d,$e) = ($1,uc($1),$2,$3,$4,$4);
 		$a       =~ s/\./_/g;
-		$h_str   .= "\t$a,\n";
 		$cpp_str .= "\t{\"$N\",";
 		$cpp_str .= "\t" if( length($c)%8 != 3 );
 		$cpp_str .= "\t$b,";
@@ -81,9 +81,19 @@ while(<$fd>){
 			$cpp_str .= "},\n";
 			die "value($a) < min : $c < $d\n" if( $c < $d );
 		}
-		$num_opts++;
+
+		if ($prev_optname ne $N){
+			$h_str .= "\t$a,\n";
+			$num_opts++;
+			$prev_optname = $N;
+		}
 	}else{
-		die "parse error in \"$in\" line \"$_\".";
+		if ( /^#/ ){
+			$cpp_str .= "$_\n";
+		}
+		else {
+			die "parse error in \"$in\" line \"$_\".";
+		}
 	}
 }
 close($fd);

@@ -22,9 +22,8 @@
 
 #include <time.h>
 #include <sys/time.h>
-#include <fcntl.h>	/* O_RDONLY */
 #include <errno.h>
-    
+
 #include "ADM_lavcodec.h"
 #include "fourcc.h"
 #include "avi_vars.h"
@@ -816,6 +815,7 @@ int nw;
 
         togUsePredefined.link(1,&fpsFloatValue);
         togUsePredefined.link(0,&stdFps);
+
         diaElem *elems[3]={&togUsePredefined,&fpsFloatValue,&stdFps};
         if(diaFactoryRun(QT_TR_NOOP("Change FrameRate"),3,elems))
         {
@@ -827,12 +827,13 @@ int nw;
             info.fps1000=defaultFps[index];
           }
           video_body->updateVideoInfo (&info);
+          printf("[MainUI] New framerate :%u\n",info.fps1000);
           // update display
           video_body->getVideoInfo (avifileinfo);
           rebuild_status_bar();
 
         }
-	   }
+	}
       break;
       // set decoder option (post processing ...)
     case ACT_DecoderOption:
@@ -2411,6 +2412,7 @@ uint8_t GUI_close(void)
   if (avifileinfo)		// already opened ?
     {				// delete everything
       // if preview is on
+      admPreview::setMainDimension(0, 0);
       if(getPreviewMode()!=ADM_PREVIEW_NONE)
       {
 	admPreview::stop();
@@ -2434,6 +2436,8 @@ uint8_t GUI_close(void)
 	  secondaudiostream=NULL;
 
       filterCleanUp ();
+	  UI_setTitle(NULL);
+
       return 1;
     }
     return 0;

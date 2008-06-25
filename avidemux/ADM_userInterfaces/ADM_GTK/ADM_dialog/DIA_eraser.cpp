@@ -768,6 +768,10 @@ uint8_t DIA_eraser (AVDMGenericVideoStream * in, ADMVideoEraser * eraserp,
     }
 
     dialog = create_eraser_dialog();
+	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+								GTK_RESPONSE_OK,
+								GTK_RESPONSE_CANCEL,
+								-1);
     gtk_register_dialog (dialog);
 
     // Fix up a bunch of things that Glade can't do.  This is less efficient

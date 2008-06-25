@@ -94,9 +94,7 @@ uint8_t vidHardPDRemoval::configure (AVDMGenericVideoStream * in)
 /*************************************/
 char *vidHardPDRemoval::printConf (void)
 {
-  static char buf[50];
-  sprintf ((char *) buf, " Field Unblend Thresh:%d Noise:%d",_param->threshold,_param->noise);
-  return buf;
+	ADM_FILTER_DECLARE_CONF( " Field Unblend Thresh:%d Noise:%d",_param->threshold,_param->noise);
 }
 static void hint(ADMImage *img)
 {

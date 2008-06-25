@@ -23,6 +23,11 @@ uint8_t DIA_Paused( void )
 	while(ret==2)
 	{
 		dialog=create_dialog1();
+
+		gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+										GTK_RESPONSE_CANCEL,
+										GTK_RESPONSE_OK,
+										-1);
 		//  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(button1), GTK_RESPONSE_CANCEL);
 		//  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(button2), GTK_RESPONSE_OK);
 		//gtk_transient(dialog);

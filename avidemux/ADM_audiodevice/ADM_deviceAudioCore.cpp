@@ -30,7 +30,7 @@
 #define MODULE_NAME  MODULE_ADEVICE
 #include "ADM_osSupport/ADM_debug.h"
 
-#define BUFFER_SIZE (2*48000)
+#define BUFFER_SIZE (500*48000)
 
 static Component comp = NULL;
 static int16_t audioBuffer[BUFFER_SIZE];

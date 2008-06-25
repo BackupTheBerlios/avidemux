@@ -45,6 +45,10 @@ uint8_t DIA_contrast(AVDMGenericVideoStream *in,CONTRAST_PARAM *param)
         height=in->getInfo()->height;
 
         dialog=create_dialog1();
+		gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+									GTK_RESPONSE_OK,
+									GTK_RESPONSE_CANCEL,
+									-1);
         gtk_register_dialog(dialog);
         gtk_window_set_title (GTK_WINDOW (dialog), QT_TR_NOOP("Contrast"));
         gtk_widget_show(dialog);	

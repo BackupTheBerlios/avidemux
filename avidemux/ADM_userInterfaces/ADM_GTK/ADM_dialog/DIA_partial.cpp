@@ -40,7 +40,12 @@ uint8_t DIA_getPartial(PARTIAL_CONFIG *param,AVDMGenericVideoStream *son,AVDMGen
     GtkWidget *dialog;
     int ret=0,done=0;
     dialog=create_dialog1();
-        
+
+	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+								GTK_RESPONSE_OK,
+								GTK_RESPONSE_CANCEL,
+								-1);
+
     // Update
     SPIN_SET(spinbuttonStart,_start);
     SPIN_SET(spinbuttonSize,_end);

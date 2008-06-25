@@ -46,7 +46,6 @@ create_colorselectiondialog1 (void)
   GtkWidget *colorselectiondialog1;
   GtkWidget *ok_button1;
   GtkWidget *cancel_button1;
-  GtkWidget *help_button1;
   GtkWidget *color_selection1;
 
   colorselectiondialog1 = gtk_color_selection_dialog_new (QT_TR_NOOP("Select Color"));
@@ -58,11 +57,6 @@ create_colorselectiondialog1 (void)
 
   cancel_button1 = GTK_COLOR_SELECTION_DIALOG (colorselectiondialog1)->cancel_button;
   gtk_widget_show (cancel_button1);
-  GTK_WIDGET_SET_FLAGS (cancel_button1, GTK_CAN_DEFAULT);
-
-  help_button1 = GTK_COLOR_SELECTION_DIALOG (colorselectiondialog1)->help_button;
-  gtk_widget_show (help_button1);
-  GTK_WIDGET_SET_FLAGS (help_button1, GTK_CAN_DEFAULT);
 
   color_selection1 = GTK_COLOR_SELECTION_DIALOG (colorselectiondialog1)->colorsel;
   gtk_widget_show (color_selection1);
@@ -72,7 +66,6 @@ create_colorselectiondialog1 (void)
   GLADE_HOOKUP_OBJECT_NO_REF (colorselectiondialog1, colorselectiondialog1, "colorselectiondialog1");
   GLADE_HOOKUP_OBJECT_NO_REF (colorselectiondialog1, ok_button1, "ok_button1");
   GLADE_HOOKUP_OBJECT_NO_REF (colorselectiondialog1, cancel_button1, "cancel_button1");
-  GLADE_HOOKUP_OBJECT_NO_REF (colorselectiondialog1, help_button1, "help_button1");
   GLADE_HOOKUP_OBJECT_NO_REF (colorselectiondialog1, color_selection1, "color_selection1");
 
   return colorselectiondialog1;

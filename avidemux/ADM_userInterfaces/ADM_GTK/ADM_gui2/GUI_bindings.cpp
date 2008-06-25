@@ -686,15 +686,26 @@ int32_t UI_readJog(void)
 
 void UI_setTitle(const char *name)
 {
-        char title[1024];
+	char *title;
+	const char* defaultTitle = "Avidemux";
 
-        strncpy(title,name,200);
-        title[200] = 0;
-        strncat(title," - Avidemux", 11);
+	if (name && strlen(name) > 0)
+	{
+		title = new char[strlen(defaultTitle) + strlen(name) + 3 + 1];
 
+		strcpy(title, name);
+		strcat(title, " - ");
+		strcat(title, defaultTitle);
+	}
+	else
+	{
+		title = new char[strlen(defaultTitle) + 1];
 
-        gtk_window_set_title (GTK_WINDOW (guiRootWindow), title);
+		strcpy(title, defaultTitle);
+	}
 
+	gtk_window_set_title(GTK_WINDOW (guiRootWindow), title);
+	delete [] title;
 }
 void UI_setFrameType( uint32_t frametype,uint32_t qp)
 {

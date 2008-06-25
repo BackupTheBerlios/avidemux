@@ -6,7 +6,7 @@
 !include WinMessages.nsh
 !include revision.nsh
 
-Name "Avidemux 2.4 r${REVISION}"
+Name "Avidemux 2.4.1 r${REVISION}"
 
 SetCompressor /SOLID lzma
 SetCompressorDictSize 96
@@ -17,7 +17,7 @@ SetCompressorDictSize 96
 !define INTERNALNAME "Avidemux 2.4"
 !define REGKEY "SOFTWARE\${INTERNALNAME}"
 !define UNINST_REGKEY "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${INTERNALNAME}"
-!define VERSION 2.4.0.${REVISION}
+!define VERSION 2.4.1.${REVISION}
 !define COMPANY "Free Software Foundation"
 !define URL "http://www.avidemux.org"
 
@@ -93,7 +93,7 @@ InstallDir "$PROGRAMFILES\Avidemux 2.4"
 CRCCheck on
 XPStyle on
 ShowInstDetails nevershow
-VIProductVersion 2.4.0.${REVISION}
+VIProductVersion 2.4.1.${REVISION}
 VIAddVersionKey ProductName Avidemux
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey FileVersion ""
@@ -189,6 +189,14 @@ Section "Core files (required)" SecCore
     File ..\..\..\avidemux_2.4_build\xvidcore.dll
     SetOutPath $INSTDIR\etc\fonts
     File /r ..\..\..\avidemux_2.4_build\etc\fonts\*
+
+    # if $PROFILE\avidemux exists and $APPDATA\avidemux doesn't, then move it
+    IfFileExists "$PROFILE\avidemux" 0 end
+    IfFileExists "$APPDATA\avidemux" end
+
+    Rename "$PROFILE\avidemux" "$APPDATA\avidemux"
+
+end:
     WriteRegStr HKLM "${REGKEY}\Components" "Core files (required)" 1
 SectionEnd
 

@@ -56,9 +56,7 @@ uint8_t ADMVideoAnimated::configure(AVDMGenericVideoStream *in)
 
 char *ADMVideoAnimated::printConf( void )
 {
-   static char buf[50];
-   sprintf((char *)buf," Animated Menu ");
-   return buf;
+	ADM_FILTER_DECLARE_CONF(" Animated Menu ");
 }
 uint8_t ADMVideoAnimated::setup( void)
 {

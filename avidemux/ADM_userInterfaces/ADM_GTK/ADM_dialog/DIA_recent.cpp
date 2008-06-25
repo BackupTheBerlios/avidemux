@@ -29,6 +29,12 @@ const char **names;
 GtkTreeIter   iter;
 
 	dialog=create_dialog1();
+
+	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+									GTK_RESPONSE_OK,
+									GTK_RESPONSE_CANCEL,
+									-1);
+
 	gtk_transient(dialog);
 	tree=lookup_widget(dialog,"treeview1");
 	gtk_signal_connect (GTK_OBJECT (lookup_widget(dialog,"treeview1")),

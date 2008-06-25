@@ -39,7 +39,13 @@ extern "C"
 {
 static void SDL_callback(void *userdata, Uint8 *stream, int len);
 }
+
+#ifdef __APPLE__
+#define BUFFER_SIZE (500*48000)
+#else
 #define BUFFER_SIZE (2*48000)
+#endif
+
 //_______________________________________________
 //
 //_______________________________________________

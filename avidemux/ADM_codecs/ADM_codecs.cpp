@@ -391,14 +391,14 @@ if (fourCC::check (fcc, (uint8_t *) "MJPG")
     {
       // RGB 16 Codecs
       printf ("\n using RGB codec\n");
-      return (decoders *) (new decoderRGB16 (w, h, 0, bpp));
+      return (decoders *) (new decoderRGB16 (w, h, 1, bpp));
 
     }
  if ((fcc == 0) || fourCC::check (fcc, (uint8_t *) "DIB "))
     {
       // RGB 16 Codecs
-      printf ("\n using RGB-DIB codec\n");
-      return (decoders *) (new decoderRGB16 (w, h, 1, bpp));
+      printf ("\n using DIB codec\n");
+      return (decoders *) (new decoderRGB16 (w, h, 0, bpp));
 
     }
   if (isMpeg12Compatible (fcc))

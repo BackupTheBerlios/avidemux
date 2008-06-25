@@ -1511,6 +1511,7 @@
     <addaction name="menuRecent_Files" />
     <addaction name="actionAppend" />
     <addaction name="menuSave" />
+    <addaction name="actionClose" />
     <addaction name="separator" />
     <addaction name="actionProperties" />
     <addaction name="separator" />
@@ -2493,6 +2494,14 @@
   <action name="actionIPOD" >
    <property name="text" >
     <string>IPOD (mpeg4)</string>
+   </property>
+  </action>
+  <action name="actionClose" >
+   <property name="text" >
+    <string>&amp;Close</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+W</string>
    </property>
   </action>
  </widget>

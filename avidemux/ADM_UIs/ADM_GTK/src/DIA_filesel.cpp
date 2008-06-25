@@ -100,7 +100,7 @@ void diaElemFile::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_widget_show (hbox1);
   
   entry = gtk_entry_new ();
-  gtk_entry_set_width_chars (GTK_ENTRY (entry), 40);
+  gtk_entry_set_activates_default (GTK_ENTRY(entry), TRUE);
   gtk_widget_show (entry);
   if(param)
   {
@@ -258,6 +258,7 @@ void diaElemDirSelect::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_widget_show (hbox1);
   
   entry = gtk_entry_new ();
+  gtk_entry_set_activates_default (GTK_ENTRY(entry), TRUE);
   gtk_widget_show (entry);
   if(param)
   {

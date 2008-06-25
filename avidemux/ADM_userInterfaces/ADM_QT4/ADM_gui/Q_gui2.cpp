@@ -806,13 +806,28 @@ void UI_purge( void )
 */
 void UI_setTitle(const char *name)
 {
-    char title[300];
+	char *title;
+	const char* defaultTitle = "Avidemux";
 
-    strncpy(title,name,200);
-    strncat(title," - Avidemux", 11);
+	if (name && strlen(name) > 0)
+	{
+		title = new char[strlen(defaultTitle) + strlen(name) + 3 + 1];
+
+		strcpy(title, name);
+		strcat(title, " - ");
+		strcat(title, defaultTitle);
+	}
+	else
+	{
+		title = new char[strlen(defaultTitle) + 1];
+
+		strcpy(title, defaultTitle);
+	}
 
 	QuiMainWindows->setWindowTitle(QString::fromUtf8(title));
+	delete [] title;
 }
+
 /**
     \fn     UI_setFrameType( uint32_t frametype,uint32_t qp)
     \brief  Display frametype (I/P/B) and associated quantizer

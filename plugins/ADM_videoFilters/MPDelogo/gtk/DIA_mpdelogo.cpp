@@ -81,7 +81,13 @@ uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in)
 	uint8_t ret=0;
 
 	dialog=create_dialog1();
-        gtk_register_dialog(dialog);
+
+	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+										GTK_RESPONSE_OK,
+										GTK_RESPONSE_CANCEL,
+										-1);
+
+	gtk_register_dialog(dialog);
 	
 	x=param->xoff;
 	y=param->yoff;

@@ -29,7 +29,11 @@ uint8_t DIA_cnr2(CNR2Param *param)
 GtkWidget *dialog;
 int ret=0;
         dialog=create_dialog1();
-        
+		gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+									GTK_RESPONSE_OK,
+									GTK_RESPONSE_CANCEL,
+									-1);
+
         // Update
         ENTRY_SET(lm);ENTRY_SET(ln);
         ENTRY_SET(um);ENTRY_SET(un);

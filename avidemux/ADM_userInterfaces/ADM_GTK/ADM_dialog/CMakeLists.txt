@@ -20,14 +20,14 @@ DIA_about.cpp
  DIA_recent.cpp     
  DIA_working.cpp
  DIA_busy.cpp     
- DIA_exLame.cpp    
- DIA_pipe.cpp     
  DIA_resize.cpp
  toolkit_dialog.cpp
  TLK_filesel.cpp
 )
 SET(OBSOLETE_SRCS
-DIA_threshold.cpp
+ DIA_exLame.cpp
+ DIA_pipe.cpp
+ DIA_threshold.cpp
  DIA_SwissArmyKnife.cpp
  DIA_particle.cpp
  DIA_eraser.cpp

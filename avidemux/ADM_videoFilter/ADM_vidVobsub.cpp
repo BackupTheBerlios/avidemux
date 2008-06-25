@@ -27,7 +27,7 @@
 #include "ADM_colorspace.h"
 #include "ADM_vobsubinfo.h"
 #define VOBSUB "/capture/sub/phone.sub"
-
+#include "ADM_videoFilterDynamic.h"
 #include "ADM_vidVobSub.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
@@ -62,10 +62,8 @@ uint8_t ADMVideoVobSub::configure(AVDMGenericVideoStream *in)
 //*************************************************************
 char *ADMVideoVobSub::printConf( void )
 {
-        static char buf[50];
+    ADM_FILTER_DECLARE_CONF(" VobSub");
         
-        sprintf((char *)buf," VobSub");
-        return buf;
 }
 //*************************************************************
 ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *couples)

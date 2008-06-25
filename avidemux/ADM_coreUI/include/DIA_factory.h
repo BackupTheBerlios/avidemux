@@ -397,7 +397,7 @@ class diaElemBitrateBase : public diaElem
 {
   protected:
     COMPRES_PARAMS    copy;
-    uint32_t maxQ;
+    uint32_t maxQ, minQ;
 public:
   
 	diaElemBitrateBase(void) : diaElem(ELEM_BITRATE) {};
@@ -414,6 +414,7 @@ public:
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
   void setMaxQz(uint32_t qz);
+  void setMinQz(uint32_t qz);
   
   void updateMe(void);
 };

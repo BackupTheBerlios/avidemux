@@ -45,7 +45,7 @@ VF_DEFINE_FILTER(ADMVideoTelecide,nullParam,
 //********** Register chunk ************
 char *ADMVideoTelecide::printConf(void)
 {
- 		return (char *)"Pal Smart";;
+	ADM_FILTER_DECLARE_CONF(" Pal Smart");
 }
 
 //_______________________________________________________________

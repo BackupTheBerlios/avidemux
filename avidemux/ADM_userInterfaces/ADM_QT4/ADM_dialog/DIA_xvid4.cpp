@@ -29,6 +29,7 @@ int code;
          // Our tabs
          /* Tab 1 main */
            diaElemBitrate bitrate(incoming,NULL);
+		   bitrate.setMinQz(1);
 #define MKTOGGLE(y,x)           diaElemToggle  t_##x(PX(x),y)
         MKTOGGLE(QT_TR_NOOP("_Interlaced"),	    interlaced);
         MKTOGGLE(QT_TR_NOOP("Ca_rtoon mode"),      cartoon);

@@ -58,9 +58,7 @@ uint8_t vidUnblend::configure (AVDMGenericVideoStream * in)
 /*************************************/
 char *vidUnblend::printConf (void)
 {
-  static char buf[50];
-  sprintf ((char *) buf, " Unblend by Bach");
-  return buf;
+	ADM_FILTER_DECLARE_CONF(" Unblend by Bach");
 }
 uint8_t vidUnblend::getCoupledConf (CONFcouple ** couples)
 {

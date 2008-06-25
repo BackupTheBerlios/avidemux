@@ -102,6 +102,12 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in)
         memcpy(scaler,param->_scaler,sizeof(scaler));
 
 	dialog=create_dialog1();
+	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+										A_RESET,
+										GTK_RESPONSE_OK,
+										GTK_RESPONSE_CANCEL,
+										GTK_RESPONSE_APPLY,
+										-1);
 	gtk_register_dialog(dialog);
 	gtk_widget_set_usize(WID(drawingarea_histin), 256,128);
     gtk_widget_set_usize(WID(drawingarea_histout), 256,128);
@@ -120,10 +126,6 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in)
 		resizer = new ADMImageResizer(w, h, zoomW, zoomH, PIX_FMT_YUV420P, PIX_FMT_RGB32);
 	}
 
-	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonCancel), GTK_RESPONSE_CANCEL);
-	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(button3),      GTK_RESPONSE_OK);
-	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonApply),  GTK_RESPONSE_APPLY);
-        gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonReset),  A_RESET);
 	  upload();
 
 	gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
@@ -417,20 +419,18 @@ create_dialog1 (void)
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
   GtkWidget *vbox1;
-  GtkWidget *hbox2;
+  GtkWidget *drawingarea1;
+  GtkWidget *gui_scale;
+  GtkWidget *hbox1;
   GtkWidget *curve1;
-  GtkWidget *vseparator1;
-  GtkWidget *vbox3;
+  GtkWidget *vbox2;
   GtkWidget *drawingarea_histin;
   GtkWidget *drawingarea_histout;
-  GtkWidget *hbox1;
-  GtkWidget *buttonReset;
-  GtkWidget *buttonCancel;
-  GtkWidget *buttonApply;
-  GtkWidget *button3;
-  GtkWidget *gui_scale;
-  GtkWidget *drawingarea1;
   GtkWidget *dialog_action_area1;
+  GtkWidget *button1;
+  GtkWidget *button2;
+  GtkWidget *button3;
+  GtkWidget *button4;
 
   dialog1 = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (dialog1), QT_TR_NOOP("Equalizer"));
@@ -443,85 +443,75 @@ create_dialog1 (void)
   gtk_widget_show (vbox1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
 
-  hbox2 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox2);
-  gtk_box_pack_start (GTK_BOX (vbox1), hbox2, TRUE, TRUE, 0);
-
-  curve1 = gtk_curve_new ();
-  gtk_widget_show (curve1);
-  gtk_box_pack_start (GTK_BOX (hbox2), curve1, FALSE, FALSE, 0);
-  gtk_curve_set_range (GTK_CURVE (curve1), 0, 1, 0, 1);
-
-  vseparator1 = gtk_vseparator_new ();
-  gtk_widget_show (vseparator1);
-  gtk_box_pack_start (GTK_BOX (hbox2), vseparator1, FALSE, FALSE, 0);
-
-  vbox3 = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (vbox3);
-  gtk_box_pack_start (GTK_BOX (hbox2), vbox3, TRUE, TRUE, 0);
-
-  drawingarea_histin = gtk_drawing_area_new ();
-  gtk_widget_show (drawingarea_histin);
-  gtk_box_pack_start (GTK_BOX (vbox3), drawingarea_histin, TRUE, TRUE, 0);
-  gtk_widget_set_size_request (drawingarea_histin, 10, -1);
-
-  drawingarea_histout = gtk_drawing_area_new ();
-  gtk_widget_show (drawingarea_histout);
-  gtk_box_pack_start (GTK_BOX (vbox3), drawingarea_histout, TRUE, TRUE, 0);
-
-  hbox1 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox1);
-  gtk_box_pack_start (GTK_BOX (vbox1), hbox1, FALSE, TRUE, 0);
-
-  buttonReset = gtk_button_new_from_stock ("gtk-clear");
-  gtk_widget_show (buttonReset);
-  gtk_box_pack_start (GTK_BOX (hbox1), buttonReset, FALSE, FALSE, 0);
-
-  buttonCancel = gtk_button_new_from_stock ("gtk-cancel");
-  gtk_widget_show (buttonCancel);
-  gtk_box_pack_start (GTK_BOX (hbox1), buttonCancel, FALSE, FALSE, 0);
-
-  buttonApply = gtk_button_new_from_stock ("gtk-apply");
-  gtk_widget_show (buttonApply);
-  gtk_box_pack_start (GTK_BOX (hbox1), buttonApply, FALSE, FALSE, 0);
-
-  button3 = gtk_button_new_from_stock ("gtk-ok");
-  gtk_widget_show (button3);
-  gtk_box_pack_start (GTK_BOX (hbox1), button3, FALSE, FALSE, 0);
+  drawingarea1 = gtk_drawing_area_new ();
+  gtk_widget_show (drawingarea1);
+  gtk_box_pack_start (GTK_BOX (vbox1), drawingarea1, TRUE, TRUE, 0);
 
   gui_scale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 100, 1, 10, 10)));
   gtk_widget_show (gui_scale);
   gtk_box_pack_start (GTK_BOX (vbox1), gui_scale, TRUE, TRUE, 0);
 
-  drawingarea1 = gtk_drawing_area_new ();
-  gtk_widget_show (drawingarea1);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox1), drawingarea1, TRUE, TRUE, 0);
-  gtk_widget_set_size_request (drawingarea1, 100, 100);
+  hbox1 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox1);
+  gtk_box_pack_start (GTK_BOX (vbox1), hbox1, TRUE, TRUE, 0);
+
+  curve1 = gtk_curve_new ();
+  gtk_widget_show (curve1);
+  gtk_box_pack_start (GTK_BOX (hbox1), curve1, TRUE, TRUE, 0);
+  gtk_curve_set_range (GTK_CURVE (curve1), 0, 1, 0, 1);
+
+  vbox2 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox2);
+  gtk_box_pack_start (GTK_BOX (hbox1), vbox2, TRUE, TRUE, 0);
+
+  drawingarea_histin = gtk_drawing_area_new ();
+  gtk_widget_show (drawingarea_histin);
+  gtk_box_pack_start (GTK_BOX (vbox2), drawingarea_histin, TRUE, TRUE, 0);
+
+  drawingarea_histout = gtk_drawing_area_new ();
+  gtk_widget_show (drawingarea_histout);
+  gtk_box_pack_start (GTK_BOX (vbox2), drawingarea_histout, TRUE, TRUE, 0);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
 
+  button1 = gtk_button_new_from_stock ("gtk-clear");
+  gtk_widget_show (button1);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), button1, A_RESET);
+  GTK_WIDGET_SET_FLAGS (button1, GTK_CAN_DEFAULT);
+
+  button2 = gtk_button_new_from_stock ("gtk-cancel");
+  gtk_widget_show (button2);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), button2, GTK_RESPONSE_CANCEL);
+  GTK_WIDGET_SET_FLAGS (button2, GTK_CAN_DEFAULT);
+
+  button3 = gtk_button_new_from_stock ("gtk-apply");
+  gtk_widget_show (button3);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), button3, GTK_RESPONSE_APPLY);
+  GTK_WIDGET_SET_FLAGS (button3, GTK_CAN_DEFAULT);
+
+  button4 = gtk_button_new_from_stock ("gtk-ok");
+  gtk_widget_show (button4);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), button4, GTK_RESPONSE_OK);
+  GTK_WIDGET_SET_FLAGS (button4, GTK_CAN_DEFAULT);
+
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
   GLADE_HOOKUP_OBJECT (dialog1, vbox1, "vbox1");
-  GLADE_HOOKUP_OBJECT (dialog1, hbox2, "hbox2");
+  GLADE_HOOKUP_OBJECT (dialog1, drawingarea1, "drawingarea1");
+  GLADE_HOOKUP_OBJECT (dialog1, gui_scale, "gui_scale");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
   GLADE_HOOKUP_OBJECT (dialog1, curve1, "curve1");
-  GLADE_HOOKUP_OBJECT (dialog1, vseparator1, "vseparator1");
-  GLADE_HOOKUP_OBJECT (dialog1, vbox3, "vbox3");
+  GLADE_HOOKUP_OBJECT (dialog1, vbox2, "vbox2");
   GLADE_HOOKUP_OBJECT (dialog1, drawingarea_histin, "drawingarea_histin");
   GLADE_HOOKUP_OBJECT (dialog1, drawingarea_histout, "drawingarea_histout");
-  GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
-  GLADE_HOOKUP_OBJECT (dialog1, buttonReset, "buttonReset");
-  GLADE_HOOKUP_OBJECT (dialog1, buttonCancel, "buttonCancel");
-  GLADE_HOOKUP_OBJECT (dialog1, buttonApply, "buttonApply");
-  GLADE_HOOKUP_OBJECT (dialog1, button3, "button3");
-  GLADE_HOOKUP_OBJECT (dialog1, gui_scale, "gui_scale");
-  GLADE_HOOKUP_OBJECT (dialog1, drawingarea1, "drawingarea1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
+  GLADE_HOOKUP_OBJECT (dialog1, button1, "button1");
+  GLADE_HOOKUP_OBJECT (dialog1, button2, "button2");
+  GLADE_HOOKUP_OBJECT (dialog1, button3, "button3");
+  GLADE_HOOKUP_OBJECT (dialog1, button4, "button4");
 
-  //gtk_widget_grab_default (buttonApply);
   return dialog1;
 }
-

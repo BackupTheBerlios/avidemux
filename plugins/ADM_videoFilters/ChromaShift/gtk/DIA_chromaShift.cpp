@@ -54,6 +54,11 @@ uint8_t ret=0;
         height=in->getInfo()->height;
 
         dialog=create_ChromaShift();
+		gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+											GTK_RESPONSE_OK,
+											GTK_RESPONSE_CANCEL,
+											GTK_RESPONSE_APPLY,
+											-1);
         gtk_register_dialog(dialog);
         gtk_window_set_title (GTK_WINDOW (dialog), QT_TR_NOOP("Chroma Shift"));
         gtk_widget_show(dialog);

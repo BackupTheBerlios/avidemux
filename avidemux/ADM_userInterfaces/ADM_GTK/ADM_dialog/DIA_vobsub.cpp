@@ -59,6 +59,12 @@ uint8_t DIA_vobsub(vobSubParam *param)
   while(!ext)
   {
     dialog = create_dialog1();
+
+	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+										GTK_RESPONSE_OK,
+										GTK_RESPONSE_CANCEL,
+										-1);
+
     gtk_register_dialog(dialog);
     gtk_dialog_add_action_widget(GTK_DIALOG(dialog),WID(buttonSelect),GTK_RESPONSE_APPLY);
     

@@ -55,6 +55,10 @@ void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate )
 	if(!avifileinfo) return ;
 	
 	dialog=create_Calculator();
+	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+										GTK_RESPONSE_CANCEL,
+										GTK_RESPONSE_APPLY,
+										-1);
 	gtk_register_dialog(dialog);
         gtk_signal_connect(GTK_OBJECT(WID(optionmenu1)), "changed",
                       GTK_SIGNAL_FUNC(cb_mod),   (void *) 0);

@@ -1,5 +1,6 @@
 #define LIST_OF_OBJECTS     \
 PROCESS(actionOpen,ACT_OpenAvi) \
+PROCESS(actionClose,ACT_CLOSE) \
 PROCESS(actionAppend,ACT_AppendAvi) \
 PROCESS(actionQuit,ACT_Exit) \
 PROCESS(actionCut,ACT_Cut) \

@@ -69,6 +69,11 @@ extern "C" int showX264ConfigDialog(vidEncConfigParameters *configParameters, vi
 
 	GtkWidget *dialog = create_dialog1();
 
+	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+									GTK_RESPONSE_OK,
+									GTK_RESPONSE_CANCEL,
+									-1);
+
 	gtk_window_set_modal(GTK_WINDOW(dialog), 1);
 	gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(configParameters->parent));
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), WID(buttonResetDaults), ACTION_LOAD_DEFAULT);

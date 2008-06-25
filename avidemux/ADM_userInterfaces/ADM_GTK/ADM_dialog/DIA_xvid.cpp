@@ -41,7 +41,11 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 	gint r,b;
 
 	dialog=create_dialog1();
-//	gtk_transient(dialog);
+
+	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+										GTK_RESPONSE_OK,
+										GTK_RESPONSE_CANCEL,
+										-1);
         gtk_register_dialog(dialog);
 
 	// set the right select button

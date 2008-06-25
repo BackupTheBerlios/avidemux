@@ -64,7 +64,7 @@ VF_DEFINE_FILTER(AVDMVideoWhirl,whirlParam,
 
 char *AVDMVideoWhirl::printConf(void)
 {
-	ADM_FILTER_DECLARE_CONF(" Whril");
+	ADM_FILTER_DECLARE_CONF(" Whirl");
         
 }
 

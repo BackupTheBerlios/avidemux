@@ -103,6 +103,7 @@ void diaElemThreadCount::setMe(void *dialog, void *opaque, uint32_t line)
 	spinbutton1 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton1_adj), 1, 0);
 	gtk_widget_show (spinbutton1);
 	gtk_box_pack_start (GTK_BOX (hbox2), spinbutton1, TRUE, TRUE, 0);
+	gtk_entry_set_activates_default (GTK_ENTRY(spinbutton1), TRUE);
 
 	gtk_table_attach (GTK_TABLE (opaque), hbox1, 1, 2, line, line+1,
 					(GtkAttachOptions) (GTK_EXPAND | GTK_FILL),

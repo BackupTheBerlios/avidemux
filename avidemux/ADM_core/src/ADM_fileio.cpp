@@ -23,6 +23,7 @@
 
 #ifdef __WIN32
 #include <windows.h>
+#include <shlobj.h>
 #elif defined(__APPLE__)
 #include <Carbon/Carbon.h>
 #endif
@@ -220,19 +221,22 @@ char *ADM_getBaseDir(void)
 {
 	char *dirname = NULL;
 	DIR *dir = NULL;
-	char *home;
 
 	if (baseDirDone)
 		return ADM_basedir;
 
 	// Get the base directory
 #if defined(__WIN32)
-	if (!(home = getenv("USERPROFILE")))
+	char home[MAX_PATH];
+
+	if (SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, home) != S_OK)
 	{
-		printf("Oops: can't determine $USERPROFILE.");
-		home = NULL;
+		printf("Oops: can't determine the Application Data folder.");
+		strcpy(home, "c:\\");
 	}
 #else
+	char *home;
+
 	if (!(home = getenv("HOME")))
 	{
 		printf("Oops: can't determine $HOME.");

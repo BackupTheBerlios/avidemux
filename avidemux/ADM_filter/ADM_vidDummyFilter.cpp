@@ -59,10 +59,8 @@ uint32_t FILTER_getAPIVersion(void)
 //********************************************
 char *ADMVideoFlipV::printConf( void )
 {
- 	static char buf[50];
- 	
- 	sprintf((char *)buf," V-Flip");
-        return buf;
+ 	ADM_FILTER_DECLARE_CONF(" V-Flip");
+
 }
 
 ADMVideoFlipV::ADMVideoFlipV(  AVDMGenericVideoStream *in,CONFcouple *setup)

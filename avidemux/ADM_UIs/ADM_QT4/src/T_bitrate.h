@@ -24,9 +24,9 @@ namespace ADM_Qt4Factory
 		QLabel          *text1;
 		QLabel          *text2;
 		COMPRES_PARAMS  *compress;
-		uint32_t        maxQ;
+		uint32_t        maxQ, _minQ;
 
-		ADM_Qbitrate(QWidget *z, COMPRES_PARAMS *p, uint32_t mq, QGridLayout *layout, int line);
+		ADM_Qbitrate(QWidget *z, COMPRES_PARAMS *p, uint32_t minQ, uint32_t mq, QGridLayout *layout, int line);
 		virtual ~ADM_Qbitrate();
 		void readBack(void);
 	};

@@ -66,6 +66,11 @@ uint8_t FileSel_SelectRead(const char *title, char *target, uint32_t max, const 
 	dialog = gtk_file_chooser_dialog_new("Open File", NULL, GTK_FILE_CHOOSER_ACTION_OPEN,
 		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,	NULL);
 
+	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+										GTK_RESPONSE_ACCEPT,
+										GTK_RESPONSE_CANCEL,
+										-1);
+
 	gtk_window_set_title(GTK_WINDOW(dialog), title);
 	initFileSelector();
 	setFilter(dialog);
@@ -133,6 +138,11 @@ uint8_t FileSel_SelectWrite(const char *title, char *target, uint32_t max, const
 
 	dialog = gtk_file_chooser_dialog_new("Write to File", NULL, GTK_FILE_CHOOSER_ACTION_SAVE,
 		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+
+	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+										GTK_RESPONSE_ACCEPT,
+										GTK_RESPONSE_CANCEL,
+										-1);
 
 	gtk_window_set_title(GTK_WINDOW(dialog), title);
 	initFileSelector();
@@ -224,6 +234,11 @@ uint8_t FileSel_SelectDir(const char *title, char *target, uint32_t max, const c
 
 	dialog = gtk_file_chooser_dialog_new("Open File", NULL, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
 		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+
+	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+										GTK_RESPONSE_ACCEPT,
+										GTK_RESPONSE_CANCEL,
+										-1);
 
 	gtk_window_set_title(GTK_WINDOW(dialog), title);
 	gtk_register_dialog(dialog);
@@ -321,6 +336,10 @@ void GUI_FileSel(const char *label, SELFILE_CB cb, int rw,char **rname)
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
 
 	gtk_dialog_set_default_response (GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT);
+	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+											GTK_RESPONSE_ACCEPT,
+											GTK_RESPONSE_CANCEL,
+											-1);
 
 	initFileSelector();
 	setFilter(dialog);

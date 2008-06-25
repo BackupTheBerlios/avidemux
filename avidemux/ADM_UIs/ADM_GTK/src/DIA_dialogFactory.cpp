@@ -116,13 +116,18 @@ uint8_t gtkDiaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
   cancelbutton1 = gtk_button_new_from_stock ("gtk-cancel");
   gtk_widget_show (cancelbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), cancelbutton1, GTK_RESPONSE_CANCEL);
-  GTK_WIDGET_SET_FLAGS (cancelbutton1, GTK_CAN_DEFAULT);
   
   okbutton1 = gtk_button_new_from_stock ("gtk-ok");
   gtk_widget_show (okbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), okbutton1, GTK_RESPONSE_OK);
   GTK_WIDGET_SET_FLAGS (okbutton1, GTK_CAN_DEFAULT);
+  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_OK);
   
+  gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+										GTK_RESPONSE_OK,
+										GTK_RESPONSE_CANCEL,
+										-1);
+
   /* Finalize them */
   for(int i=0;i<nb;i++)
   {
@@ -199,13 +204,18 @@ uint8_t gtkDiaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs)
   cancelbutton1 = gtk_button_new_from_stock ("gtk-cancel");
   gtk_widget_show (cancelbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), cancelbutton1, GTK_RESPONSE_CANCEL);
-  GTK_WIDGET_SET_FLAGS (cancelbutton1, GTK_CAN_DEFAULT);
   
   okbutton1 = gtk_button_new_from_stock ("gtk-ok");
   gtk_widget_show (okbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), okbutton1, GTK_RESPONSE_OK);
   GTK_WIDGET_SET_FLAGS (okbutton1, GTK_CAN_DEFAULT);
-  
+  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_OK);
+
+  gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+										GTK_RESPONSE_OK,
+										GTK_RESPONSE_CANCEL,
+										-1);
+
   // Show it & run
   gtk_register_dialog(dialog);
   if(GTK_RESPONSE_OK==gtk_dialog_run(GTK_DIALOG(dialog)))

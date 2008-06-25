@@ -572,7 +572,7 @@ TryAgain:
 		}
                 if(isH264Compatible(info.fcc))
                 {
-                  if(getEnv(ENV_EDITOR_X264) || GUI_Confirmation_HIG(QT_TR_NOOP("Use safe mode"),QT_TR_NOOP("H.264 detected"),QT_TR_NOOP("If the file is using B-frames as reference it can lead to a crash or stuttering.\nAvidemux can use another mode which is safe but <b>YOU WILL LOSE FRAME ACCURACY</b>.\nDo you want to use that mode?")))
+                  if(getEnv(ENV_EDITOR_X264) || GUI_Confirmation_HIG(QT_TR_NOOP("Use safe mode"),QT_TR_NOOP("H.264 detected"),QT_TR_NOOP("If the file is using B-frames as reference it can lead to a crash or stuttering.\nAvidemux can use another mode which is safe but YOU WILL LOSE FRAME ACCURACY.\nDo you want to use that mode?")))
                     {
                               printf("Switching to non low delay codec\n");
                               _videos[_nb_video-1].decoder = getDecoderH264noLogic (info.fcc,  info.width, info.height, l, d);

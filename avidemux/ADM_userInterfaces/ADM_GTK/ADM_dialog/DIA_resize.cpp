@@ -76,6 +76,13 @@ uint8_t DIA_resize(uint32_t *width,uint32_t *height,uint32_t *alg,uint32_t origi
 	iw=*width;
 	ih=*height;
 	dialog=create_dialog1();
+
+	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
+									GTK_RESPONSE_OK,
+									GTK_RESPONSE_CANCEL,
+									GTK_RESPONSE_APPLY,
+									-1);
+
 	//gtk_transient(dialog);
         gtk_register_dialog(dialog);
 	erx=ery=0;
