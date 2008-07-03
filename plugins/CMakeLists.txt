@@ -127,6 +127,7 @@ INCLUDE(admCheckMiscLibs)
 # Actual work to do..
 ########################################
 ADD_SUBDIRECTORY(ADM_audiodecoder)
+ADD_SUBDIRECTORY(ADM_audioDevices)
 ADD_SUBDIRECTORY(ADM_videoEncoder)
 ADD_SUBDIRECTORY(ADM_videoFilters)
 
