@@ -15,17 +15,18 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
+
 #include "ADM_default.h"
 
-#ifdef USE_ARTS
+
 #include <artsc.h>
 
-#include "ADM_audiodevice.h"
-#include  "ADM_audiodevice/ADM_deviceoss.h"
-#include  "ADM_audiodevice/ADM_deviceArts.h"
+#include  "ADM_audiodevice.h"
+#include  "ADM_audioDeviceInternal.h"
+#include  "ADM_deviceArts.h"
 
 uint8_t artsInitialized=0;
+ADM_DECLARE_AUDIODEVICE(Arts,artsAudioDevice,1,0,0,"Arts audio device (c) mean");
 //_______________________________________________
 //
 //
@@ -49,7 +50,7 @@ uint8_t  artsAudioDevice::stop(void) {
 //
 //
 //_______________________________________________
-uint8_t artsAudioDevice::init(uint8_t channels, uint32_t fq)
+uint8_t artsAudioDevice::init(uint32_t channels, uint32_t fq)
 {
 	_channels = channels;
 

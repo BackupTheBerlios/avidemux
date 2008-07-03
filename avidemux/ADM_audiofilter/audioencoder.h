@@ -15,6 +15,7 @@
   \param maxChannels The maximum # of channels this codec supports
   \param param : An opaque structure that contains the codec specific configuration datas
 */
+#include "ADM_coreAudio.h"
 #include "audioeng_buildfilters.h"
 
 typedef struct ADM_audioEncoderDescriptor
@@ -32,10 +33,6 @@ typedef struct ADM_audioEncoderDescriptor
   Base class for all audio encoder.It does the reverse of the bridge class and offers a proper GenericAudioStreamAPI
 
 */
-#define DITHER_SIZE 4800
-#define DITHER_CHANNELS 6
-void            AUDMEncoder_initDither();
-void dither16(float *start, uint32_t nb, uint8_t channels);
 
  //_____________________________________________
 class AUDMEncoder : public AVDMGenericAudioStream

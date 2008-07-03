@@ -13,7 +13,7 @@
 #define ADM_AUDIODEVICE_H
 
 // Converts float to int16_t with dithering
-extern void dither16(float *start, uint32_t nb, uint8_t channels);
+#include "ADM_coreAudio.h"
 
  class audioDevice
  {

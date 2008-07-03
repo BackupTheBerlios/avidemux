@@ -1,7 +1,7 @@
 include(admCheckAudioDeviceLibs)
-if(ALSA_SUPPORT)
+if(USE_ALSA)
 ADD_SUBDIRECTORY(Alsa)
-endif(ALSA_SUPPORT)
+endif(USE_ALSA)
 
 if(USE_PULSE_SIMPLE)
 ADD_SUBDIRECTORY(PulseAudioSimple)
@@ -10,3 +10,20 @@ endif(USE_PULSE_SIMPLE)
 if(USE_ESD)
 ADD_SUBDIRECTORY(Esd)
 endif(USE_ESD)
+
+if(USE_SDL)
+ADD_SUBDIRECTORY(Sdl)
+endif(USE_SDL)
+
+if(USE_OSS)
+ADD_SUBDIRECTORY(Oss)
+endif(USE_OSS)
+
+if(USE_ARTS)
+ADD_SUBDIRECTORY(Arts)
+endif(USE_ARTS)
+
+if(USE_JACK)
+ADD_SUBDIRECTORY(Jack)
+endif(USE_JACK)
+#

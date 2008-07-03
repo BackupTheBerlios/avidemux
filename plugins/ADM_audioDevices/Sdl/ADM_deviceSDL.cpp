@@ -4,31 +4,20 @@
 // Description: 
 //
 //
-// Author: mean <fixounet@free.fr>, (C) 2004
+// Author: mean <fixounet@free.fr>, (C) 2004-2008
 //
 // Copyright: See COPYING file that comes with this distribution
 //
 //
 
-#include "config.h"
-#include <errno.h>
-
 
 #include "ADM_default.h"
-  
- 
-#ifdef USE_SDL
 #include "SDL.h"
 
+#include  "ADM_audiodevice.h"
+#include  "ADM_audioDeviceInternal.h"
 
-
-#include "ADM_audiodevice.h"
-#include "ADM_audiodevice/ADM_deviceoss.h"
-#include "ADM_audiodevice/ADM_deviceALSA.h"
-#include "ADM_audiodevice/ADM_deviceSDL.h"
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME  MODULE_ADEVICE
-#include "ADM_osSupport/ADM_debug.h"
+#include "ADM_deviceSDL.h"
 
 static int16_t  		*audioBuffer=NULL;
 static uint32_t 		frameCount=0;
@@ -46,6 +35,9 @@ static void SDL_callback(void *userdata, Uint8 *stream, int len);
 #define BUFFER_SIZE (2*48000)
 #endif
 
+ADM_DECLARE_AUDIODEVICE(Sdl,sdlAudioDevice,1,0,0,"Sdl audio device (c) mean");
+
+#define aprintf(...) {}
 //_______________________________________________
 //
 //_______________________________________________
@@ -142,7 +134,7 @@ void SDL_callback(void *userdata, Uint8 *stream, int len)
 //
 //
 //_______________________________________________
-uint8_t sdlAudioDevice::init(uint8_t channels, uint32_t fq) 
+uint8_t sdlAudioDevice::init(uint32_t channels, uint32_t fq) 
 {
 SDL_AudioSpec spec,result;
 _channels = channels;
@@ -266,11 +258,5 @@ uint8_t sdlAudioDevice::setVolume(int volume){
 	return 1;
 }
 
-#else
-void dummy_as_func( void);
-void dummy_as_func( void)
- {
-}
 
-#endif
 

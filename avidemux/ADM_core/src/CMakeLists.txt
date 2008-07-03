@@ -1,6 +1,8 @@
 SET(ADM_core_SRCS 
 	ADM_cpuCap.cpp  ADM_memcpy.cpp  ADM_memsupport.cpp  ADM_threads.cpp  ADM_win32.cpp
-	ADM_memory.cpp  ADM_misc.cpp  TLK_clock.cpp  ADM_crashdump.cpp  ADM_fileio.cpp ADM_dynamicLoading.cpp)
+	ADM_memory.cpp  ADM_misc.cpp  TLK_clock.cpp  ADM_crashdump.cpp  ADM_fileio.cpp ADM_dynamicLoading.cpp
+        ADM_audioUtils.cpp
+)
 
 ADD_LIBRARY(ADM_core SHARED ${ADM_core_SRCS})
 ADD_TARGET_DEFINITIONS(ADM_core ADM_DEBUG FIND_LEAKS)

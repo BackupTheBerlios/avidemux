@@ -14,16 +14,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifdef OSS_SUPPORT
+
 class ossAudioDevice : public audioDevice
 {
 protected :
                                 int oss_fd;
 public:
                                         ossAudioDevice(void) {oss_fd=0;}
-                        virtual uint8_t init(uint8_t channels, uint32_t fq);
+                        virtual uint8_t init(uint32_t channels, uint32_t fq);
                         virtual uint8_t play(uint32_t len, float *data);
                         virtual uint8_t stop(void);
 			uint8_t setVolume(int volume);
 }     ;
-#endif
+

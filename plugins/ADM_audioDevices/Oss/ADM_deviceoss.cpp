@@ -14,12 +14,12 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 
-#ifdef OSS_SUPPORT
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include "ADM_default.h"
+
+#include  "ADM_audiodevice.h"
+#include  "ADM_audioDeviceInternal.h"
+
 #include <errno.h>
 
 #include <fcntl.h>
@@ -38,17 +38,11 @@
 	#include <sys/soundcard.h>
 	const char *dsp = "/dev/dsp";
         const char *device_mixer = "/dev/mixer";
-
 #endif
- 
- 
 
-#include "ADM_default.h"
-#include "ADM_audiodevice.h"
-#include "ADM_assert.h"
-#include  "ADM_audiodevice/ADM_deviceoss.h"
-#include "DIA_coreToolkit.h"
-#include "prefs.h"
+#include  "ADM_deviceoss.h"
+
+ADM_DECLARE_AUDIODEVICE(Oss,ossAudioDevice,1,0,0,"Oss audio device (c) mean");
 
 //_______________________________________________
 //
@@ -60,14 +54,14 @@ uint8_t  ossAudioDevice::setVolume(int volume)
 	int ret;
 	uint32_t which_vol = 0;
 
-	prefs->get(FEATURE_AUDIOBAR_USES_MASTER,&which_vol);
+	//prefs->get(FEATURE_AUDIOBAR_USES_MASTER,&which_vol);
         fd=open(device_mixer,O_RDONLY);
         if(!fd)
         {
-                printf("OSS: cannot open mixer\n");
+                printf("[OSSS]: cannot open mixer\n");
                 return 0;
         }
-        printf("Oss: New %s volume %d\n",(which_vol?"master":"pcm"),volume);
+        printf("[OSSS]: New %s volume %d\n",(which_vol?"master":"pcm"),volume);
         // Assuming stereo
         volume=volume+(volume<<8);
 	if( which_vol ){
@@ -79,9 +73,9 @@ uint8_t  ossAudioDevice::setVolume(int volume)
 
 	if( ret ){
 		if( errno == EBADF ){
-			printf("set mixer failed: %u (possible access issue)\n",errno);
+			printf("[OSSS]set mixer failed: %u (possible access issue)\n",errno);
 		}else{
-			printf("set mixer failed: %u\n",errno);
+			printf("[OSSS]set mixer failed: %u\n",errno);
 		}
 	}
         return 1;
@@ -104,36 +98,38 @@ uint8_t  ossAudioDevice::stop(void) {
 //
 //
 //_______________________________________________
-uint8_t ossAudioDevice::init(uint8_t channels, uint32_t fq) 
+uint8_t ossAudioDevice::init(uint32_t channels, uint32_t fq) 
 {
 	_channels = channels;
  
-    printf("\n OSS  : %lu Hz, %lu channels", fq, channels);
+    printf("[OSSS]: %lu Hz, %lu channels\n", fq, channels);
     // open OSS device
     oss_fd = open(dsp, O_WRONLY | O_NONBLOCK);
     if (oss_fd == -1) {
+/*
 	if( errno == EACCES )
 	{
           GUI_Error_HIG(QT_TR_NOOP("Could not open OSS audio device"), QT_TR_NOOP("Check the permissions for /dev/dsp."));
 	  }
 	else
-           printf("\n Error initializing OSS: Error : %d", errno);
+*/
+           printf("[OSSS] Error initializing OSS: Error : %d\n", errno);
         return 0;
     }
     // seems ok, set up audio 
     if (ioctl (oss_fd, SNDCTL_DSP_SPEED, &fq) < 0) {
-        printf("\n Error setting up OSS(SPEED): Error : %d", errno);
+        printf("[OSSS] Error setting up OSS(SPEED): Error : %d\n", errno);
         return 0;
     }
     if (channels > 2) {
         if (ioctl (oss_fd, SNDCTL_DSP_CHANNELS, &channels) < 0) {
-	    printf("\n Error setting up OSS(CHANNELS): Error : %d", errno);
+	    printf("[OSSS] Error setting up OSS(CHANNELS): Error : %d\n", errno);
 	    return 0;
         }
     } else {
         int chan = channels - 1;
         if (ioctl (oss_fd, SNDCTL_DSP_STEREO, &chan) < 0) {
-	    printf("\n Error setting up OSS(STEREO): Error : %d", errno);
+	    printf("[OSSS] Error setting up OSS(STEREO): Error : %d\n", errno);
 	    return 0;
         }
     }
@@ -143,7 +139,7 @@ uint8_t ossAudioDevice::init(uint8_t channels, uint32_t fq)
     int fmt = AFMT_S16_LE;
 #endif    
     if (ioctl (oss_fd, SNDCTL_DSP_SETFMT, &fmt) < 0) {
-        printf("\n Error setting up OSS(FORMAT): Error : %d", errno);
+        printf("[OSSS] Error setting up OSS(FORMAT): Error : %d\n", errno);
         return 0;
     }
 
@@ -170,10 +166,4 @@ uint8_t ossAudioDevice::play(uint32_t len, float *data)
         }
 	return 1;
 }
-#else
-void dummy_oss_func( void);
-void dummy_oss_func( void)
- {
-}
-
-#endif
+//EOF

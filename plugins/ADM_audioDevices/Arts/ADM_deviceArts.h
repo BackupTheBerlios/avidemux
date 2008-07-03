@@ -15,19 +15,19 @@
  *                                                                         *
  ***************************************************************************/
 
- #ifdef USE_ARTS
-                 class artsAudioDevice : public audioDevice
+ 
+     class artsAudioDevice : public audioDevice
 	 {
 		 protected :
 		 		arts_stream_t _stream;
 		  public:
 		  			artsAudioDevice() {_stream=NULL;}
 				virtual ~artsAudioDevice() {stop();}
-		     		virtual uint8_t init(uint8_t channels, uint32_t fq);
+		     		virtual uint8_t init(uint32_t channels, uint32_t fq);
 	    			virtual uint8_t play(uint32_t len, float *data);
 		      		virtual uint8_t stop(void);
 				uint8_t setVolume(int volume);
 		 };
-#endif
+
 
 
