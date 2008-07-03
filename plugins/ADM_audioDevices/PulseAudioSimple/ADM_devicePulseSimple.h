@@ -1,8 +1,8 @@
 /***************************************************************************
-                        audioouput.h  -  description
+                          ADM_deviceEsd.h  -  description
                              -------------------
-    begin                : Thu Dec 27 2001
-    copyright            : (C) 2001 by mean
+                             Audio device for ESD sound daemon
+    copyright            : (C) 2005 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -15,24 +15,15 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef AUDIOOUPUT_H
-#define AUDIOOUPUT_H
-
-typedef int AUDIO_DEVICE;
-
-void 		AVDM_audioSave( void ); /// Save in Prefs the current audio Device
-void 		AVDM_audioInit( void );
-void		AVDM_cleanup(void);
-void 		AVDM_switch( AUDIO_DEVICE action );
-
-uint8_t 	AVDM_AudioPlay(float *ptr, uint32_t nb);
-uint32_t 	AVDM_AudioSetup(uint32_t fq, uint8_t channel);
-void 		AVDM_AudioClose(void);
-AUDIO_DEVICE 	AVDM_getCurrentDevice( void);
-uint8_t         AVDM_setVolume(int volume);
-// Get infos
-uint32_t ADM_av_getNbDevices(void);
-bool     ADM_av_getDeviceInfo(int filter, const char **name, uint32_t *major,uint32_t *minor,uint32_t *patch);
-
-#endif
+class pulseSimpleAudioDevice : public audioDevice
+	 {
+		 protected :
+                    void  *instance;
+		  public:
+		  			pulseSimpleAudioDevice(void);
+		     		virtual uint8_t init(uint32_t channels, uint32_t fq);
+	    			virtual uint8_t play(uint32_t len, float *data);
+		      		virtual uint8_t stop(void);
+				    uint8_t setVolume(int volume);
+		 }     ;
 

@@ -48,8 +48,6 @@ void DummyDeleteAudioDevice(audioDevice *z)
     dummyAudioDevice *a=(dummyAudioDevice *)z;
 }
 // --------- couple of stubs for dummy device  -------------
-uint32_t ADM_av_getNbDevices(void);
-bool     ADM_av_getDeviceInfo(int filter, const char **name, uint32_t *major,uint32_t *minor,uint32_t *patch);
 
 /**
         \fn ADM_av_getNbDevices

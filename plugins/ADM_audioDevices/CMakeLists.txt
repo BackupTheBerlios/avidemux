@@ -1,1 +1,12 @@
+include(admCheckAudioDeviceLibs)
+if(ALSA_SUPPORT)
 ADD_SUBDIRECTORY(Alsa)
+endif(ALSA_SUPPORT)
+
+if(USE_PULSE_SIMPLE)
+ADD_SUBDIRECTORY(PulseAudioSimple)
+endif(USE_PULSE_SIMPLE)
+
+if(USE_ESD)
+ADD_SUBDIRECTORY(Esd)
+endif(USE_ESD)

@@ -285,51 +285,21 @@ char     *globalGlyphName=NULL;
                               ,{3,      QT_TR_NOOP("Pro Logic II"),NULL}
          };
         diaElemMenu menuMixer(&downmix,QT_TR_NOOP("_Local playback downmixing:"), sizeof(mixerEntries)/sizeof(diaMenuEntry),mixerEntries,"");
-
-		diaMenuEntry audioEntries[] =
-		{
-#if 0
-		#ifdef ALSA_SUPPORT
-			{DEVICE_ALSA, QT_TR_NOOP("ALSA")},
-		#endif
-		#ifdef USE_ARTS
-			{DEVICE_ARTS, QT_TR_NOOP("aRts")},
-		#endif
-		#ifdef __APPLE__
-			{DEVICE_COREAUDIO, QT_TR_NOOP("Core Audio")},
-		#endif
-		#ifdef USE_ESD
-			{DEVICE_ESD, QT_TR_NOOP("ESD")},
-		#endif
-		#ifdef USE_JACK
-			{DEVICE_JACK, QT_TR_NOOP("JACK")},
-		#endif
-		#ifdef OSS_SUPPORT
-			{DEVICE_OSS, QT_TR_NOOP("OSS")},
-		#endif
-		#if	defined(USE_SDL) && !defined(__WIN32)
-			{DEVICE_SDL, QT_TR_NOOP("SDL")},
-		#endif
-		#ifdef __WIN32
-			{DEVICE_WIN32, QT_TR_NOOP("Win32")},
-		#endif
-#endif
-			{0, QT_TR_NOOP("None")}
-		};
-
-        diaElemMenu menuAudio(&newdevice,QT_TR_NOOP("_Audio output:"), sizeof(audioEntries)/sizeof(diaMenuEntry),audioEntries,"");
-                
-#if 0 //def ALSA_SUPPORT
-		diaElemText entryAlsaDevice(&alsaDevice,QT_TR_NOOP("ALSA _device:"),NULL);
-
-          int z,m;
-          m=sizeof(audioEntries)/sizeof(diaMenuEntry);
-          for(z=0;z<m;z++)
-          {
-            if(audioEntries[z].val==DEVICE_ALSA)
-                menuAudio.link(&(audioEntries[z]),1,&entryAlsaDevice);
-          }
-#endif
+//*********** AV_
+		
+//***AV
+        uint32_t nbAudioDevice=ADM_av_getNbDevices();
+        diaMenuEntryDynamic *audioDeviceItems[nbAudioDevice+1];
+        audioDeviceItems[0]=new diaMenuEntryDynamic(0,"Dummy","Dummy");
+        for(int i=0;i<nbAudioDevice;i++)
+        {
+            const char *name;
+            uint32_t major,minor,patch;
+            ADM_av_getDeviceInfo(i, &name, &major,&minor,&patch);
+            audioDeviceItems[i+1]=new diaMenuEntryDynamic(i+1,name,name);
+        }
+        diaElemMenuDynamic menuAudio(&newdevice,QT_TR_NOOP("_AudioDevice"), nbAudioDevice+1, 
+                    audioDeviceItems,NULL);
         // default Post proc
      diaElemToggle     fhzd(&hzd,QT_TR_NOOP("_Horizontal deblocking"));
      diaElemToggle     fvzd(&vzd,QT_TR_NOOP("_Vertical deblocking"));
@@ -516,6 +486,11 @@ char     *globalGlyphName=NULL;
 				initSdl(render);
 			#endif
 	}
+        for(int i=0;i<nbAudioDevice+1;i++)
+        {
+            
+            delete audioDeviceItems[i];
+        }
 
 	ADM_dealloc(filterPath);
 	ADM_dealloc(globalGlyphName);

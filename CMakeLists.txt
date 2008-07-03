@@ -142,7 +142,7 @@ IF (NOT QT4_FOUND)
 ENDIF (NOT QT4_FOUND)
 
 INCLUDE(admCheckAudioCodecLibs)
-INCLUDE(admCheckAudioDeviceLibs)
+#INCLUDE(admCheckAudioDeviceLibs)
 INCLUDE(admCheckMiscLibs)
 
 ########################################

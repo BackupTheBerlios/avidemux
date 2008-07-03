@@ -15,26 +15,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
-#if defined(USE_ESD)
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <esd.h>
-
 #include "ADM_default.h"
 #include "ADM_audiodevice.h"
-#include "ADM_assert.h"
-#include "ADM_audiodevice/ADM_deviceoss.h"
-#include "ADM_audiodevice/ADM_deviceALSA.h"
-#include  "ADM_audiodevice/ADM_deviceEsd.h"
 
 
+#include  "ADM_audiodevice.h"
+#include  "ADM_audioDeviceInternal.h"
+
+#include  "ADM_deviceEsd.h"
+#include <esd.h>
+ADM_DECLARE_AUDIODEVICE(Esd,esdAudioDevice,1,0,0,"Esd audio device (c) mean");
 //_______________________________________________
 //
 //
@@ -51,7 +41,7 @@ uint8_t  esdAudioDevice::stop(void) {
 //
 //
 //_______________________________________________
-uint8_t esdAudioDevice::init(uint8_t channels, uint32_t fq) 
+uint8_t esdAudioDevice::init(uint32_t channels, uint32_t fq) 
 {
 esd_format_t format;
 _channels = channels;
@@ -102,10 +92,4 @@ uint8_t esdAudioDevice::setVolume(int volume){
 	return 1;
 }
 
-#else
-void dummy_ess_func( void);
-void dummy_ess_func( void)
- {
-}
-
-#endif
+//EOF
