@@ -26,4 +26,8 @@ endif(USE_ARTS)
 if(USE_JACK)
 ADD_SUBDIRECTORY(Jack)
 endif(USE_JACK)
+
+if(WIN32)
+ADD_SUBDIRECTORY(Win32)
+endif(WIN32)
 #

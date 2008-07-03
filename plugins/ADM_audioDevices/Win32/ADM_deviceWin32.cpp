@@ -10,22 +10,18 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 
-#include "config.h"
+#include "ADM_default.h"
+#include "ADM_audiodevice.h"
 
-#ifdef __WIN32
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
+
+#include  "ADM_audiodevice.h"
+#include  "ADM_audioDeviceInternal.h"
+
 #include <windows.h>
 
-#include "fourcc.h" 
-#include "ADM_assert.h"
-#include "ADM_audiodevice.h"
-#include "ADM_audiodevice/ADM_deviceWin32.h"
+#include "ADM_deviceWin32.h"
 
-#define MODULE_NAME  MODULE_ADEVICE
-#include "ADM_osSupport/ADM_debugID.h"
-#include "ADM_osSupport/ADM_debug.h"
+#define aprintf(...) {}
 
 #define NB_BUCKET 8
 
@@ -36,7 +32,7 @@ static MMRESULT myError;
 static void handleMM(MMRESULT err);
 
 WAVEHDR waveHdr[NB_BUCKET];	
-
+ADM_DECLARE_AUDIODEVICE(Win32,win32AudioDevice,1,0,0,"Win32 audio device (c) mean");
 win32AudioDevice::win32AudioDevice(void) 
 {
 	printf("[Win32] Creating audio device\n");
@@ -73,7 +69,7 @@ uint8_t win32AudioDevice::stop(void)
 	return 1;
 }
 
-uint8_t win32AudioDevice::init(uint8_t channels, uint32_t fq) 
+uint8_t win32AudioDevice::init(uint32_t channels, uint32_t fq) 
 {
 	printf("[Win32] Opening Audio, channels=%u freq=%u\n",channels, fq);
 
