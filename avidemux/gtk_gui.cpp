@@ -294,20 +294,6 @@ int nw;
       ADM_aviUISetMuxer();
       return;
       break;
-#ifdef HAVE_AUDIO      
-    	case ACT_SelectDevOSS:
-				   AVDM_switch (DEVICE_OSS);
-				   return;break;
-    	case ACT_SelectDevDummy:
-				   AVDM_switch (DEVICE_DUMMY);
-				   return;break;
-    	case ACT_SelectDevArts:
-				   AVDM_switch (DEVICE_ARTS);
-				   return;break;
-	case ACT_SelectDevALSA:
-				   AVDM_switch (DEVICE_ALSA);
-				   return;break;
-#endif                                  
     case ACT_Fast:
       ADM_assert(0);
       break;

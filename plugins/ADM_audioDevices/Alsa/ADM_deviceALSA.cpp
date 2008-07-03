@@ -18,27 +18,22 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "ADM_default.h"
 #include <unistd.h>
 #include <errno.h>
 #include <sys/types.h>
-#include "prefs.h"
 
 
-#ifdef ALSA_SUPPORT
+
+
 #include <alsa/asoundlib.h>
-#include "ADM_assert.h"
+#include  "ADM_audiodevice.h"
+#include  "ADM_audioDeviceInternal.h"
+#include  "ADM_deviceALSA.h"
 
-#include "ADM_default.h"
 
-
-#include "ADM_audiodevice.h"
-#include  "ADM_audiodevice/ADM_deviceALSA.h"
-
-#include "ADM_assert.h"
+ADM_DECLARE_AUDIODEVICE(Alsa,alsaAudioDevice,1,0,0,"Alsa audio device (c) mean");
 
 /* Handle for the PCM device */
 snd_pcm_t *pcm_handle;
@@ -48,7 +43,7 @@ snd_pcm_t *pcm_handle;
 		_init=0;
     }
 
-uint8_t alsaAudioDevice::init( uint8_t channel,uint32_t fq )
+uint8_t alsaAudioDevice::init( uint32_t channel,uint32_t fq )
 {
 	int dir=0;
 
@@ -65,8 +60,8 @@ uint8_t alsaAudioDevice::init( uint8_t channel,uint32_t fq )
 
 
   static char *pcm_name;
-  if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &pcm_name) != RC_OK )
-               pcm_name = ADM_strdup("plughw:0,0");
+//  if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &pcm_name) != RC_OK )
+               pcm_name = ADM_strdup("dmix");
 
  /* Allocate the snd_pcm_hw_params_t structure on the stack. */
     snd_pcm_hw_params_alloca(&hwparams);
@@ -286,12 +281,14 @@ uint8_t alsaAudioDevice::setVolume(int volume){
   char *pcm_name;
   uint32_t which_vol;
   int rc;
-
+/*
 	if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &pcm_name) != RC_OK )
 		pcm_name = ADM_strdup("hw:0");
 	if( prefs->get(FEATURE_AUDIOBAR_USES_MASTER,&which_vol) != RC_OK )
 		which_vol = 0;
-
+*/
+    pcm_name = ADM_strdup("hw:0");
+    which_vol = 0;
 	if( (rc=snd_mixer_open(&mixer_handle,0)) < 0 ){
 		printf("ALSA: snd_mixer_open failed: %d\n",rc);
 		ADM_dealloc(pcm_name);
@@ -346,10 +343,4 @@ uint8_t alsaAudioDevice::setVolume(int volume){
 	return 0;
 }
 
-#else
-void dummy_alsa_fun( void);
-void dummy_alsa_fun( void)
- {
-}
-
-#endif
+//EOF

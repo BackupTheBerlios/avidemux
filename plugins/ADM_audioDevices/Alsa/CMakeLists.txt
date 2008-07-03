@@ -1,0 +1,10 @@
+INCLUDE(av_plugin)
+
+
+SET(ADM_av_alsa_SRCS ADM_deviceALSA.cpp)
+
+ADD_LIBRARY(ADM_av_alsa SHARED ${ADM_av_alsa_SRCS})
+#TARGET_LINK_LIBRARIES(ADM_av_alsa ADM_libalsa)
+
+INIT_AUDIO_DEVICE(ADM_av_alsa)
+INSTALL_AUDIODEVICE(ADM_av_alsa)

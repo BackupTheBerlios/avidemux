@@ -71,6 +71,7 @@ extern void ADM_memStatEnd( void );
 extern void getUIDescription(char*);
 extern uint8_t ADM_ad_loadPlugins(const char *path);
 extern uint8_t ADM_vf_loadPlugins(const char *path);
+extern uint8_t ADM_av_loadPlugins(const char *path);
 extern void loadPlugins(void);
 extern void InitFactory(void);
 extern void InitCoreToolkit(void);
@@ -226,18 +227,23 @@ int main(int argc, char *argv[])
 	//***************Plugins *********************
 	// Load system wide audio decoder plugin
 #ifdef __APPLE__
-	char *adPlugins = ADM_getInstallRelativePath("../Resources/lib","ADM_plugins","audioDecoder");
-	char *vfPlugins = ADM_getInstallRelativePath("../Resources/lib","ADM_plugins","videoFilter");
+    const char *startDir="../Resources/lib";
 #else
-	char *adPlugins = ADM_getInstallRelativePath("lib","ADM_plugins","audioDecoder");
-	char *vfPlugins = ADM_getInstallRelativePath("lib","ADM_plugins","videoFilter");
+    const char *startDir="lib";
 #endif
+	char *adPlugins = ADM_getInstallRelativePath(startDir,"ADM_plugins","audioDecoder");
+	char *vfPlugins = ADM_getInstallRelativePath(startDir,"ADM_plugins","videoFilter");
+    char *avPlugins = ADM_getInstallRelativePath(startDir,"ADM_plugins","audioDevices");    
+
 
 	ADM_ad_loadPlugins(adPlugins);
 	delete [] adPlugins;
 
 	ADM_vf_loadPlugins(vfPlugins);
 	delete [] vfPlugins;
+
+    ADM_av_loadPlugins(avPlugins);
+    delete [] avPlugins;
 
 	// load local audio decoder plugins
 	adPlugins=ADM_getHomeRelativePath("plugins","audioDecoder");

@@ -14,169 +14,199 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
-#ifdef HAVE_AUDIO
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-
-#include "avi_vars.h"
+#include <vector>
+#include "ADM_default.h"
+#include "ADM_audiodevice.h"
+#include "audio_out.h"
+#include "ADM_audioDeviceInternal.h"
 #include "prefs.h"
 
-#include "ADM_assert.h"
-#include "ADM_audiodevice.h"
-
-#include "ADM_audiodevice/ADM_deviceoss.h"
-
-#ifdef USE_ARTS
-#include <artsc.h>
-#include "ADM_audiodevice/ADM_deviceArts.h"
-#endif
-
-#ifdef ALSA_SUPPORT
-#include "ADM_audiodevice/ADM_deviceALSA.h"
-#endif
-
-#ifdef USE_SDL
-#include "ADM_audiodevice/ADM_deviceSDL.h"
-#endif
-
-#ifdef __WIN32
-#include "ADM_audiodevice/ADM_deviceWin32.h"
-#endif
-
-#ifdef USE_ESD
-#include "ADM_deviceEsd.h"
-#endif
-
-#ifdef USE_JACK
-#include "ADM_deviceJack.h"
-#endif
-
-#ifdef __APPLE__
-#include "ADM_audiodevice/ADM_deviceAudioCore.h"
-#endif
-
-#include "gui_action.hxx"
-#include "audio_out.h"
+std::vector <ADM_AudioDevices *> ListOfAudioDevices;
 
 
+static audioDevice *device=NULL;
+static AUDIO_DEVICE  currentDevice=0; //0 is always dummy
 
-
-
-audioDevice::audioDevice(void) {
-}
-
-/**
-		in=0 -> arts1
-		in=1 -> alsa
-*/
-
-audioDevice *device=NULL;
-static AUDIO_DEVICE  currentDevice=DEVICE_DUMMY;
 static AUDIO_DEVICE ADM_audioByName(const char *name);
 static const char *ADM_audioById(AUDIO_DEVICE id);
+
+
+// --------- couple of stubs for dummy device  -------------
+static uint8_t      DummyGetVersion(uint32_t *major,uint32_t *minor,uint32_t *patch)
+{
+    *major=1;
+    *minor=0;
+    *patch=0;
+    return 0;
+}
+audioDevice *DummyCreateAudioDevice(void)
+{
+    return new dummyAudioDevice;
+}
+void DummyDeleteAudioDevice(audioDevice *z)
+{
+    dummyAudioDevice *a=(dummyAudioDevice *)z;
+}
+// --------- couple of stubs for dummy device  -------------
+uint32_t ADM_av_getNbDevices(void);
+bool     ADM_av_getDeviceInfo(int filter, const char **name, uint32_t *major,uint32_t *minor,uint32_t *patch);
+
+/**
+        \fn ADM_av_getNbDevices
+        \brief Returns the number of av filter plugins except one
+*/
+uint32_t ADM_av_getNbDevices(void)
+{
+    return ListOfAudioDevices.size()-1;
+}
+/**
+    \fn     ADM_av_getDeviceInfo
+    \brief  Get Infos about the filter#th plugin
+*/
+bool     ADM_av_getDeviceInfo(int filter, const char **name, uint32_t *major,uint32_t *minor,uint32_t *patch)
+{
+    filter++;
+    ADM_assert(filter<ListOfAudioDevices.size());
+    ListOfAudioDevices[filter]->getVersion(major,minor,patch);
+    *name=ListOfAudioDevices[filter]->name;
+    return true;
+}
+/**
+    \fn tryLoadingFilterPlugin
+    \brief Try loading the file given as argument as an audio device plugin
+
+*/
+#define Fail(x) {printf("%s:"#x"\n",file);goto er;}
+static bool tryLoadingFilterPlugin(const char *file)
+{
+	ADM_AudioDevices *dll=new ADM_AudioDevices(file);
+    if(!dll->initialised) Fail(CannotLoad);
+    if(dll->apiVersion!=ADM_AUDIO_DEVICE_API_VERSION) Fail(WrongApiVersion);
+
+    ListOfAudioDevices.push_back(dll); // Needed for cleanup. FIXME TODO Delete it.
+    printf("[Filters] Registered filter %s as  %s\n",file,dll->descriptor);
+    return true;
+	// Fail!
+er:
+	delete dll;
+	return false;
+
+}
+/**
+ * 	\fn ADM_av_loadPlugins
+ *  \brief load all audio device plugins
+ */
+uint8_t ADM_av_loadPlugins(const char *path)
+{
+#define MAX_EXTERNAL_FILTER 100
+// FIXME Factorize
+#ifdef __WIN32
+#define SHARED_LIB_EXT "dll"
+#elif defined(__APPLE__)
+#define SHARED_LIB_EXT "dylib"
+#else
+#define SHARED_LIB_EXT "so"
+#endif
+
+	char *files[MAX_EXTERNAL_FILTER];
+	uint32_t nbFile;
+
+
+    // PushBack our dummy one : TODO FIXME
+    ADM_AudioDevices *dummyDevice=new ADM_AudioDevices("Dummy","Dummy audio device", 
+                                DummyGetVersion,
+                                DummyCreateAudioDevice,
+                                DummyDeleteAudioDevice);
+    
+    ListOfAudioDevices.push_back(dummyDevice); 
+	memset(files,0,sizeof(char *)*MAX_EXTERNAL_FILTER);
+	printf("[ADM_av_plugin] Scanning directory %s\n",path);
+
+	if(!buildDirectoryContent(&nbFile, path, files, MAX_EXTERNAL_FILTER, SHARED_LIB_EXT))
+	{
+		printf("[ADM_av_plugin] Cannot parse plugin\n");
+		return 0;
+	}
+
+	for(int i=0;i<nbFile;i++)
+		tryLoadingFilterPlugin(files[i]);
+
+	printf("[ADM_av_plugin] Scanning done\n");
+
+	return 1;
+}
+/**
+    \fn AVDM_audioSave
+    \brief Save in Prefs the current audio Device
+
+*/
 
 void AVDM_audioSave( void )
 {
 const char *string;
 		string=ADM_audioById(currentDevice);
 		prefs->set(DEVICE_AUDIODEVICE, string);
-	
-
 }
+/**
+    \fn ADM_audioByName
+    \brief Returns the Id of the given string 
+
+*/
 AUDIO_DEVICE ADM_audioByName(const char *name)
 {
 	if(!name) return (AUDIO_DEVICE)0;
-	for(uint32_t i=0;i<sizeof(audioDeviceList)/sizeof(DEVICELIST);i++)
+	for(uint32_t i=0;i<ListOfAudioDevices.size();i++)
 	{
-		if(!strcmp(name,audioDeviceList[i].name))
+		if(!strcasecmp(name,ListOfAudioDevices[i]->name))
 		{
-			return audioDeviceList[i].id;
+			return i;
 		}	
 	}
 	printf("Device not found :%s\n",name);
 	return (AUDIO_DEVICE)0;
 
 }
+/**
+    \fn ADM_audioById
+    \brief Returns the name of a device from its Id
+*/
 const char *ADM_audioById(AUDIO_DEVICE id)
 {
-	
-	for(uint32_t i=0;i<sizeof(audioDeviceList)/sizeof(DEVICELIST);i++)
-	{
-		if(audioDeviceList[i].id==id)
-		{
-			return audioDeviceList[i].name;
-		}	
-	}
-	printf("Device not found :%d\n",id);
-	return (const char *)"Unknown!";
-
+	ADM_assert(id<ListOfAudioDevices.size());
+    return ListOfAudioDevices[id]->name;
 }
-
+/**
+    \fn AVDM_getCurrentDevice
+    \brief
+*/
 AUDIO_DEVICE AVDM_getCurrentDevice( void)
 {
 	return currentDevice;
 }
-
+/**
+    \fn AVDM_audioInit
+    \brief
+*/
 void AVDM_audioInit(void )
 {
 uint8_t init=0;
 char *name=NULL;
-AUDIO_DEVICE id;
+AUDIO_DEVICE id=0;
 
 		if(prefs->get(DEVICE_AUDIODEVICE, &name))
 		{
 		id=ADM_audioByName(name);
 		ADM_dealloc(name);
 		name=NULL;	
-		if(!id) id=DEVICE_DUMMY;
-		switch(id)
-		{
-
-			case DEVICE_ARTS:									
-			case DEVICE_ALSA:
-			case DEVICE_COREAUDIO:
-			case DEVICE_SDL:
-			case DEVICE_WIN32:
-			case DEVICE_ESD:
-			case DEVICE_JACK:
-			
-						printf("Using real audio device\n");
-						AVDM_switch(id);
-						init=1;	
-						break;				
-			case DEVICE_DUMMY:
-			default:
-						printf("Using dummy audio device\n");
-						init=1;
-						AVDM_switch(id);
-						break;
+        }
 		
-		}
-		}
-		// Fallback
-		if(init==0)
-		{
-		#ifdef OSS_SUPPORT
-			AVDM_switch(DEVICE_OSS);			
-			printf("\n Using OSS\n");
-		#else
-			#ifdef __WIN32
-			AVDM_switch(DEVICE_WIN32);
-			#else
-                #ifdef USE_ESD
-			        AVDM_switch(DEVICE_ESD);
-                #else
-			        AVDM_switch(DEVICE_DUMMY);
-			        printf("\n Using dummy\n");
-                #endif
-			#endif
-		#endif
-		}
+		
+        AVDM_switch(id);
 }
-
+/**
+        \fn AVDM_cleanup
+        \brief Current device is no longer used, delete
+*/
 void AVDM_cleanup(void)
 {
 	if(device)
@@ -194,93 +224,37 @@ void AVDM_switch(AUDIO_DEVICE action)
 		delete device;
 		device=NULL;
 	}
-
-	 currentDevice=DEVICE_DUMMY;
-	switch(action)
-	{
-#ifdef __APPLE__
-		  case  DEVICE_COREAUDIO :
-								device=new 	 coreAudioDevice;
-								currentDevice=DEVICE_COREAUDIO;;
-								printf("Using Darwin coreaudio i/f\n");
-								break;
-
-#endif
-#if defined(OSS_SUPPORT)
-		  case  DEVICE_OSS :
-								device=new 	 ossAudioDevice;
-								currentDevice=DEVICE_OSS;;
-								break;
-#endif
-#if defined(USE_ESD)
-		  case  DEVICE_ESD :
-								device=new 	 esdAudioDevice;
-								currentDevice=DEVICE_ESD;;
-								break;
-#endif
-#if defined(USE_JACK)
-		  case  DEVICE_JACK:
-								device=new 	 jackAudioDevice;
-								currentDevice=DEVICE_JACK;
-								break;
-#endif
-#ifdef USE_ARTS
-		case DEVICE_ARTS:
-								device=new 	 artsAudioDevice;
-							 	currentDevice=DEVICE_ARTS;
-								break;
-
-#endif
-#ifdef ALSA_SUPPORT
-		case DEVICE_ALSA:
-								device=new 	 alsaAudioDevice;
-							 	currentDevice=DEVICE_ALSA;
-								break;
-
-#endif
-#ifdef USE_SDL
-		case DEVICE_SDL:
-								device=new sdlAudioDevice;
-								currentDevice=DEVICE_SDL;
-								break;
-#endif
-
-#ifdef __WIN32
-		case DEVICE_WIN32:
-								device=new win32AudioDevice;
-								currentDevice=DEVICE_WIN32;
-								break;
-#endif
-
-
-		 case  DEVICE_DUMMY:
-					default:
-								device=new 	 dummyAudioDevice;
-								currentDevice=DEVICE_DUMMY;
-								break;
-
-	}
+    ADM_assert(action<ListOfAudioDevices.size());
+    device=ListOfAudioDevices[action]->createAudioDevice();
+    currentDevice=action;
 
 }
+/**
+    \fn AVDM_AudioClose
+    \brief Stop playback
 
-//_______________________________________________
-//
-//
-//_______________________________________________
+*/
 void AVDM_AudioClose(void)
 {
 	device->stop();
 }
 
-//_______________________________________________
-//
-//
-//_______________________________________________
+/**
+    \fn AVDM_AudioSetup
+    \brief Initialize a device
+
+*/
 uint32_t AVDM_AudioSetup(uint32_t fq, uint8_t channel)
 {
 	
 	return device->init(channel,fq);
 }
+/**
+    \fn AVDM_setVolume
+    \brief Set the volume (0..100)
+
+*/
+
 uint8_t         AVDM_setVolume(int volume)
 {
         printf("New volume :%d\n",volume);
@@ -288,18 +262,24 @@ uint8_t         AVDM_setVolume(int volume)
         return 1;
 
 }
-//_______________________________________________
-//
-//
-//_______________________________________________
+/**
+    \fn AVDM_AudioPlay
+    \brief Send float data to be played immediately by the device
+
+*/
 uint8_t AVDM_AudioPlay(float *ptr, uint32_t nb)
 {
 	return device->play(nb,ptr);
 }
-#else
-void dummy_func_make_gcc_happy( void );
-void dummy_func_make_gcc_happy( void )
-{
-}
+//**
+dummyAudioDevice::dummyAudioDevice(void) {};
+dummyAudioDevice::~dummyAudioDevice(void) {};
+uint8_t dummyAudioDevice::init(uint32_t channels, uint32_t fq)
+                                {printf("Null audio device\n"); UNUSED_ARG(fq); UNUSED_ARG(channels); return 1;}
+uint8_t dummyAudioDevice::play(uint32_t len, float *data)
+                                {UNUSED_ARG(len); UNUSED_ARG(data); return 1;}
+uint8_t dummyAudioDevice::stop(void)
+                                { return 1;}
 
-#endif
+
+//**

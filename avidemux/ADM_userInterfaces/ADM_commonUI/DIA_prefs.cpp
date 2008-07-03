@@ -288,6 +288,7 @@ char     *globalGlyphName=NULL;
 
 		diaMenuEntry audioEntries[] =
 		{
+#if 0
 		#ifdef ALSA_SUPPORT
 			{DEVICE_ALSA, QT_TR_NOOP("ALSA")},
 		#endif
@@ -312,12 +313,13 @@ char     *globalGlyphName=NULL;
 		#ifdef __WIN32
 			{DEVICE_WIN32, QT_TR_NOOP("Win32")},
 		#endif
-			{DEVICE_DUMMY, QT_TR_NOOP("None")}
+#endif
+			{0, QT_TR_NOOP("None")}
 		};
 
         diaElemMenu menuAudio(&newdevice,QT_TR_NOOP("_Audio output:"), sizeof(audioEntries)/sizeof(diaMenuEntry),audioEntries,"");
                 
-#ifdef ALSA_SUPPORT
+#if 0 //def ALSA_SUPPORT
 		diaElemText entryAlsaDevice(&alsaDevice,QT_TR_NOOP("ALSA _device:"),NULL);
 
           int z,m;
@@ -372,16 +374,20 @@ char     *globalGlyphName=NULL;
         diaElemTabs tabOutput(QT_TR_NOOP("Output"),4,(diaElem **)diaOutput);
         
         /* Audio */
-#if defined(ALSA_SUPPORT)
+
+#if 0 //defined(ALSA_SUPPORT)
         diaElem *diaAudio[]={&menuMixer,&menuVolume,&menuAudio,&entryAlsaDevice};
         diaElemTabs tabAudio(QT_TR_NOOP("Audio"),4,(diaElem **)diaAudio);
-#elif defined(OSS_SUPPORT)
+//#elif defined(OSS_SUPPORT)
         diaElem *diaAudio[]={&menuMixer,&menuVolume,&menuAudio};
         diaElemTabs tabAudio(QT_TR_NOOP("Audio"),3,(diaElem **)diaAudio);
-#else
+#endif
+
+#if 1
         diaElem *diaAudio[]={&menuMixer,&menuAudio};
         diaElemTabs tabAudio(QT_TR_NOOP("Audio"),2,(diaElem **)diaAudio);
 #endif
+
         
         /* Video */
         diaElem *diaVideo[]={&menuVideoMode,&framePP};

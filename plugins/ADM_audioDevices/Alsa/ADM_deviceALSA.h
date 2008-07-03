@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifdef ALSA_SUPPORT
+
 	 class alsaAudioDevice : public audioDevice
 	 {
 		 protected :
@@ -24,12 +24,12 @@
 				//	2->fully initialized
 				uint32_t _init;
 		  public:
-					alsaAudioDevice(void);
-		     		virtual uint8_t init(uint8_t channel,uint32_t fq);
+                                    alsaAudioDevice(void);
+		     		virtual uint8_t init(uint32_t channel,uint32_t fq);
 	    			virtual uint8_t play(uint32_t len, float *data);
 		      		virtual uint8_t stop(void) ;
-				uint8_t setVolume(int volume);
+                    virtual uint8_t setVolume(int volume);
 		 }     ;
-#endif
+//EOF
 
 
