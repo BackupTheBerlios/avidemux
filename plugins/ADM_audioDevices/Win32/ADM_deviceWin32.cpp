@@ -185,4 +185,3 @@ void handleMM(MMRESULT err)
 	ERMM(WAVERR_BADFORMAT);
 	ERMM(WAVERR_SYNC);
 }
-#endif

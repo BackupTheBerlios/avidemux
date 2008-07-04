@@ -4,6 +4,6 @@ INCLUDE(av_plugin)
 SET(ADM_av_win32_SRCS ADM_deviceWin32.cpp)
 
 ADD_LIBRARY(ADM_av_win32 SHARED ${ADM_av_win32_SRCS})
-
+TARGET_LINK_LIBRARIES("-lwinmm -lADM_core")
 INIT_AUDIO_DEVICE(ADM_av_win32)
 INSTALL_AUDIODEVICE(ADM_av_win32)
