@@ -74,7 +74,7 @@ latency=0;
     int fmt = AFMT_S16_LE;
 #endif    
 */
-    float f=(float)esd_get_latency(esdDevice);
+    float f=0; // FIXE Cause a freeze with esdcompat =(float)esd_get_latency(esdDevice);
     f=f/44.1;
     latency=(uint32_t)f;
     return 1;
