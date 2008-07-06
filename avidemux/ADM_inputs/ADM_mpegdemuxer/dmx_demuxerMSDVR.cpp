@@ -359,12 +359,14 @@ uint8_t dmx_demuxerMSDVR::refill(void)
                   {
                     seen[bit->stream]+=bit->len;
                   }
+		  if (bit->data) delete[] bit->data;
                   delete bit;
                 }else
                 {
                   _pesBufferStart=bit->packet;
                   memcpy(&(_pesBuffer[_pesBufferLen]),bit->data,bit->len);
                   _pesBufferLen+=bit->len;
+                  if (bit->data) delete[] bit->data;
                   delete bit;
                 }
               }
