@@ -413,7 +413,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 
           switch(audioheader->encoding)
           {
-                  case WAV_AC3: c->codec_id = CODEC_ID_AC3;break;
+                  case WAV_AC3: c->codec_id = CODEC_ID_AC3;c->frame_size=6*256;break;
                   case WAV_MP2: c->codec_id = CODEC_ID_MP2;break;
                   case WAV_MP3:
   #warning FIXME : Probe deeper
@@ -528,29 +528,30 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
         AVPacket pkt;
         double f;
         int64_t timeInUs;
-
+        static int sz=0;
             //printf("Audio paclet : size %u, sample %u\n",len,sample);
 
            if(!audio_st) return 0;
            if(!len) return 1;
             av_init_packet(&pkt);
-
             timeInUs=(int64_t)sample2time_us(sample);
+            aprintf("Sample :%u time :%u size :%u this round:%u\n",sample,timeInUs,sz,len);
+            sz+=len;
             /* Rescale to ?? */
             if(_type==MUXER_FLV || _type==MUXER_MATROSKA) /* The FLV muxer expects packets dated in ms, there is something i did not get... WTF */
             {
-            			f=timeInUs/1000;
+            			f=timeInUs/1000; // ms
             			f=floor(f+0.4);
             }
             else
             {
             	f=timeInUs;
-            	f/=1000000.; // In ms seconds
-            	f*=_audioFq;
+            	f/=1000000.; // In sec
+            	f*=_audioFq; // In samples
             	f=floor(f+0.4);
             }
             pkt.dts=pkt.pts=(int)(f);
-
+            aprintf("Adm audio dts=:%u\n",pkt.dts);
             //printf("F:%f Q:%u D=%u\n",f,pkt.pts,timeInUs-_lastAudioDts);
 
             pkt.flags |= PKT_FLAG_KEY;
@@ -564,8 +565,8 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
             _lastAudioDts=timeInUs;
             if(ret)
             {
-                        printf("Error writing audio packet\n");
-                        printf("pts %llu dts %llu\n",pkt.pts,pkt.dts);
+                        printf("[LavFormat]Error writing audio packet\n");
+                        printf("[LavFormat]pts %llu dts %llu\n",pkt.pts,pkt.dts);
                         return 0;
             }
             return 1;
@@ -620,21 +621,30 @@ double p,d;
 
 
 	_curDTS=(int64_t)floor(d);
-
+    aprintf("Adm video unscaled dts=:%u\n",(uint32_t)d);
         // Rescale
-#define RESCALE(x) x=x*video_st->codec->time_base.den*1000.;\
+#define RESCALE(x) x=x*1000.;\
                    x=x/_fps1000;
 
         p=bitstream->ptsFrame+1;
         RESCALE(p);
-
-        d=bitstream->dtsFrame;
+// MP4/ TS
+        d=bitstream->dtsFrame;  // p & d are now in seconds
         RESCALE(d);
-
-        if(_type==MUXER_FLV || _type==MUXER_MATROSKA) /* The FLV muxer expects packets dated in ms, there is something i did not get... WTF */
+        switch(_type)  // video_st->codec->time_base.den
         {
-        			p=p*1000/_fps1000;
-        			d=d*1000/_fps1000;
+        case MUXER_FLV :
+        case MUXER_MATROSKA:
+                    {
+                        p=p*1000;
+                        d=d*1000; // in milliseconds
+                        break;
+                    }
+        
+        default:
+                    p=p*video_st->codec->time_base.den;
+                    d=d*video_st->codec->time_base.den;
+                    break;
         }
     	pkt.dts=(int64_t)floor(d);
     	pkt.pts=(int64_t)floor(p);
@@ -657,11 +667,11 @@ double p,d;
 		pkt.flags |= PKT_FLAG_KEY;
 		//printf("Intra\n");
 	}
-
+    //printf("Adm video dts=:%u\n",pkt.dts);
 	ret =av_write_frame(oc, &pkt);
 	if(ret)
 	{
-		printf("Error writing video packet\n");
+		printf("[LavFormat]Error writing video packet\n");
 		return 0;
 	}
         aprintf("V: frame %lu pts%d\n",bitstream->dtsFrame,pkt.pts);
