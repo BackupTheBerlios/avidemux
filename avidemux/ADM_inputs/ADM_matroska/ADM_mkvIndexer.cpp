@@ -160,6 +160,7 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t cluste
               {
                 _tracks[track]._sizeInBytes+=remaining; // keep some stat, useful for audio
                 _tracks[track].nbPackets++;
+                _tracks[track].nbFrames++;
               }
               break;
         case 2 : // Constant size lacing
@@ -183,6 +184,7 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t cluste
                     {
                        _tracks[track]._sizeInBytes+=remaining;
                        _tracks[track].nbPackets++;
+                       _tracks[track].nbFrames+=nbLaces;
                     }
                     //printf("tid:%u track %u Remaining : %llu laces %u blksize %d er%d\n",tid,track,remaining,nbLaces,remaining/nbLaces,remaining-(remaining/nbLaces)*nbLaces);
             }
@@ -205,6 +207,7 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t cluste
                                 {
                                     _tracks[track]._sizeInBytes+=tail-parser->tell();
                                     _tracks[track].nbPackets++;
+                                    _tracks[track].nbFrames+=nbLaces+1;
                                 }
 
                               }
@@ -226,6 +229,7 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t cluste
                                 ADM_assert(track); // Not video!
                                 _tracks[track]._sizeInBytes+=(tail-parser->tell());
                                 _tracks[track].nbPackets++;
+                                _tracks[track].nbFrames+=nbLaces+1;
                                 //printf("This round %lld total:%lld\n",tail-parser->tell(),    _tracks[track]._sizeInBytes);
                                 break;
 

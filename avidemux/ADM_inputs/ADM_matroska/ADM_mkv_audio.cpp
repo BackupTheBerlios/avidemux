@@ -83,6 +83,7 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
   ADM_MKV_TYPE type;
   const char *ss;
   vprintf("Enter: Currently at :%llx\n",_clusterParser->tell());
+  *samples=_frameDurationInSample;
     // Have we still lace to go ?
     if(_currentLace<_maxLace)
     {
@@ -90,22 +91,7 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
       *packlen= _Laces[_currentLace];
       vprintf("Continuing lacing : %u bytes, lacing %u/%u\n",*packlen,_currentLace,_maxLace);
 
-      if(_currentLace==_maxLace-1)
-      {
-          float f;
-          f=_frameDurationInSample;
-          f/=_maxLace;
-          uint32_t total=(uint32_t)floor(f);
-          total*=(_maxLace-1);
-          *samples=_frameDurationInSample-total;
-          ADM_assert(_frameDurationInSample>=total);
-      }else
-      {
-          float f;
-          f=_frameDurationInSample;
-          f/=_maxLace;
-          *samples=(uint32_t )floor(f);
-      }
+     
       *timecode=_curTimeCode;
       _currentLace++;
       return 1;
@@ -175,7 +161,7 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
                               vprintf("No lacing :%d bytes\n",remaining);
                               _clusterParser->readBin(dest,remaining);
                               *packlen=remaining;
-                              *samples=_frameDurationInSample;
+                              
                               _currentLace=_maxLace=0;
 
                               return 1;
@@ -315,6 +301,7 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
   _wavheader=new WAVHeader;
   memcpy(_wavheader,&(_track->wavHeader),sizeof(WAVHeader));
   printf("[MKVAUDIO] found %lu packets\n",track->nbPackets);
+  printf("[MKVAUDIO] found %lu frames\n",track->nbFrames);
   printf("[MKVAUDIO] Default duration %u us\n",_track->_defaultFrameDuration);
   printf("[MKVAUDIO] found %lu bytes, %u samples per frame\n",_length,_frameDurationInSample);
   _currentLace=_maxLace=0;

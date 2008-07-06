@@ -40,7 +40,8 @@ typedef struct
 
   /* Used for audio */
   WAVHeader wavHeader;
-  uint32_t  nbPackets;
+  uint32_t  nbPackets; // number of blocks (used for audio)
+  uint32_t  nbFrames;  // number of distinct frames
   uint32_t  length;
   /* Used for both */
   uint8_t    *extraData;
