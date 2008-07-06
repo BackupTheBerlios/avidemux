@@ -302,7 +302,7 @@ void FillAudio(void)
 void ComputePreload(void)
 //_______________________________________
 {
-    uint32_t latency, one_sec;
+    uint32_t state,latency, one_sec;
     uint32_t small_;
     uint32_t channels;
 
@@ -342,11 +342,12 @@ void ComputePreload(void)
     wavbuf =  (float *)  ADM_alloc((3 *  channels * wavinfo->frequency*wavinfo->channels));
     ADM_assert(wavbuf);
     // Call it twice to be sure it is properly setup
-     latency = AVDM_AudioSetup(playback->getInfo()->frequency,  channels );
+     state = AVDM_AudioSetup(playback->getInfo()->frequency,  channels );
      AVDM_AudioClose();
-     latency = AVDM_AudioSetup(playback->getInfo()->frequency,  channels );
-
-      if (!latency)
+     state = AVDM_AudioSetup(playback->getInfo()->frequency,  channels );
+     latency=AVDM_GetLayencyMs();
+     printf("[Playback] Latency : %d ms\n",latency);
+      if (!state)
       {
           GUI_Error_HIG(QT_TR_NOOP("Trouble initializing audio device"), NULL);
           return;
@@ -356,7 +357,7 @@ void ComputePreload(void)
     // we preload 1/4 a second
      currentaudiostream->beginDecompress();
      one_sec = (wavinfo->frequency *  channels)  >> 2;
-    
+     one_sec+=(latency*wavinfo->frequency *  channels*2)/1000;
      AUD_Status status;
     uint32_t fill=0;
     while(fill<one_sec)
@@ -369,6 +370,8 @@ void ComputePreload(void)
     }
     dauds += fill/channels;  // In sample
     AVDM_AudioPlay(wavbuf, fill);
+    // Let audio latency sets in...
+    ADM_usleep(latency*1000);
     audio_available = 1;
 }
 

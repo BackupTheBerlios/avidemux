@@ -25,6 +25,14 @@
 #include  "ADM_deviceEsd.h"
 #include <esd.h>
 ADM_DECLARE_AUDIODEVICE(Esd,esdAudioDevice,1,0,0,"Esd audio device (c) mean");
+/**
+        \fn getLatencyMs
+        \brief Returns device latency in ms
+*/
+uint32_t esdAudioDevice::getLatencyMs(void)
+{
+    return latency;
+}
 //_______________________________________________
 //
 //
@@ -45,19 +53,20 @@ uint8_t esdAudioDevice::init(uint32_t channels, uint32_t fq)
 {
 esd_format_t format;
 _channels = channels;
+latency=0;
 
     format=ESD_STREAM | ESD_PLAY | ESD_BITS16;
     if(channels==1) format|=ESD_MONO;
         else format|=ESD_STEREO;
 
-    printf("\n ESD  : %lu Hz, %lu channels", fq, channels);
+    printf("[ESD]  : %lu Hz, %lu channels\n", fq, channels);
     esdDevice=esd_play_stream(format,fq,NULL,"avidemux");
     if(esdDevice<=0) 
     {
-        printf("Esd open failed\n");
+        printf("[ESD] open failed\n");
         return 0;
     }
-    printf("Esd open succeedeed\n");
+    printf("[ESD] open succeedeed\n");
     /*
 #ifdef ADM_BIG_ENDIAN    
     int fmt = AFMT_S16_BE;
@@ -65,6 +74,9 @@ _channels = channels;
     int fmt = AFMT_S16_LE;
 #endif    
 */
+    float f=(float)esd_get_latency(esdDevice);
+    f=f/44.1;
+    latency=(uint32_t)f;
     return 1;
 }
 

@@ -19,11 +19,13 @@ class esdAudioDevice : public audioDevice
 	 {
 		 protected :
                     int esdDevice;
+                    uint32_t latency;
 		  public:
 		  			esdAudioDevice(void) {esdDevice=-1;}
 		     		virtual uint8_t init(uint32_t channels, uint32_t fq);
 	    			virtual uint8_t play(uint32_t len, float *data);
 		      		virtual uint8_t stop(void);
                             uint8_t setVolume(int volume);
+                            uint32_t getLatencyMs(void);
 		 }     ;
 

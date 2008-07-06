@@ -269,6 +269,15 @@ uint8_t AVDM_AudioPlay(float *ptr, uint32_t nb)
 {
 	return device->play(nb,ptr);
 }
+/**
+    \fn AVDM_GetLayencyMs
+    \brief Return playback latency in ms
+
+*/
+uint32_t AVDM_GetLayencyMs(void)
+{
+	return device->getLatencyMs();
+}
 //**
 dummyAudioDevice::dummyAudioDevice(void) {};
 dummyAudioDevice::~dummyAudioDevice(void) {};

@@ -28,6 +28,7 @@ void 		AVDM_switch( AUDIO_DEVICE action );
 uint8_t 	AVDM_AudioPlay(float *ptr, uint32_t nb);
 uint32_t 	AVDM_AudioSetup(uint32_t fq, uint8_t channel);
 void 		AVDM_AudioClose(void);
+uint32_t    AVDM_GetLayencyMs(void);
 AUDIO_DEVICE 	AVDM_getCurrentDevice( void);
 uint8_t         AVDM_setVolume(int volume);
 // Get infos

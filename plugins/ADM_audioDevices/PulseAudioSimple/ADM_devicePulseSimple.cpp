@@ -25,7 +25,9 @@
 #include  "pulse/simple.h"
 
 ADM_DECLARE_AUDIODEVICE(PulseAudioS,pulseSimpleAudioDevice,1,0,0,"PulseAudioSimple audio device (c) mean");
+#define INSTANCE  ((pa_simple *)instance)
 
+// By default we use float
 //#define ADM_PULSE_INT16
 /**
     \fn pulseSimpleAudioDevice
@@ -36,8 +38,21 @@ pulseSimpleAudioDevice::pulseSimpleAudioDevice()
 {
     instance=NULL;
 }
+/**
+    \fn pulseSimpleAudioDevice
+    \brief Returns delay in ms
+*/
+uint32_t pulseSimpleAudioDevice::getLatencyMs(void)
+{
+    if(!instance) return 0;
+    int er;
+    pa_usec_t l=0;
+    l=pa_simple_get_latency(INSTANCE, &er);
+    printf("[Pulse] Latency :%lu\n",l);
+    l/=1000;
+    return (uint32_t )l;
+}
 
-#define INSTANCE  ((pa_simple *)instance)
 /**
     \fn stop
     \brief stop & release device
@@ -91,6 +106,10 @@ int er;
         printf("[PulseSimple] open failed\n");
         return 0;
     }
+ pa_usec_t l=0;
+    l=pa_simple_get_latency(INSTANCE, &er);
+    printf("[Pulse] Latency :%lu\n",l);
+
     printf("[PulseSimple] open ok\n");
     return 1;
 
@@ -104,6 +123,7 @@ int er;
 uint8_t pulseSimpleAudioDevice::play(uint32_t len, float *data)
 {
 int er;
+    if(!instance) return 0;
 #ifdef ADM_PULSE_INT16
 	dither16(data, len, _channels);
     pa_simple_write(INSTANCE,data,len*2,&er);
