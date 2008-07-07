@@ -44,7 +44,7 @@
 #include "ADM_audio/ADM_aacinfo.h"
 #define MAX_LINE 4096
 #define PROBE_SIZE (4096*4)
-
+#define DMX_MIN_AUDIO_DETECTED PROBE_SIZE //we must have at least that bytes to consider the audio as valid
 //___________________________________________________
 //___________________________________________________
 //___________________________________________________
@@ -308,7 +308,23 @@ printf("Filling audio header\n");
   _pos = 0;
   printf ("\n DMX audio initialized (%lu bytes)\n", _length);
   printf ("With %lu sync point\n", nbIndex);
-  changeAudioTrack(mainAudio);
+  int found=-1;
+  // Only take the audio track if it has enough bytes
+  // else we can have a track present in the PMT that is not actually present
+  for(int i=0;i<nbTrack;i++)
+  {
+        int test=(mainAudio+i)%nbTrack;
+        if(_index[nbIndex-1].count[test]>DMX_MIN_AUDIO_DETECTED)
+        {
+            found=test;
+            break;
+        }
+        else printf("[DmxAudio] Skipping track %d, not enough audio\n",test);
+  }
+    if(found!=-1)
+        mainAudio=found;
+    changeAudioTrack(found);
+  
   return 1;
 }
 // __________________________________________________________
@@ -409,7 +425,7 @@ WAVHeader *hdr;
         if(PROBE_SIZE!=(blocksize=demuxer->read(buffer,PROBE_SIZE)))
         {
            printf("DmxAudio: Reading for track %d failed (%u/%u)\n",i,blocksize,PROBE_SIZE);
-           return 0;
+           continue;
         }
         myPes=_tracks[i].myPes;
         // Try mp2/3

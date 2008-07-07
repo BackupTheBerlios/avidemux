@@ -437,8 +437,16 @@ void redirectStdoutToFile(void)
 	strcat(logPath, "/");
 	strcat(logPath, logFile);
 
-	stream = freopen(logPath, "w", stdout);
-	*stderr = *stream;
+	fclose(stdout);
+	fclose(stderr);
+
+	stream = fopen(logPath, "w");
+
+	if (stream)
+	{
+		*stdout = *stream;
+		*stderr = *stream;
+	}
 
 	// Line buffering
 	setvbuf(stdout, NULL, _IONBF, BUFSIZ); 
@@ -447,20 +455,15 @@ void redirectStdoutToFile(void)
 	delete[] logPath;
 }
 
-// Convert string from ANSI code page to UTF-8
-int ansiStringToUtf8(const char *ansiString, int ansiStringLength, char *utf8String)
+// Convert string from ANSI code page to wide char
+int ansiStringToWideChar(const char *ansiString, int ansiStringLength, wchar_t *wideCharString)
 {
 	int wideCharStringLen = MultiByteToWideChar(CP_ACP, 0, ansiString, ansiStringLength, NULL, 0);
-	wchar_t wideCharString[wideCharStringLen];
 
-	MultiByteToWideChar(CP_ACP, 0, ansiString, ansiStringLength, wideCharString, wideCharStringLen);
+	if (wideCharString)
+		MultiByteToWideChar(CP_ACP, 0, ansiString, ansiStringLength, wideCharString, wideCharStringLen);
 
-	int multiByteStringLen = WideCharToMultiByte(CP_UTF8, 0, wideCharString, wideCharStringLen, NULL, 0, NULL, NULL);
-
-	if (utf8String)
-		WideCharToMultiByte(CP_UTF8, 0, wideCharString, wideCharStringLen, utf8String, multiByteStringLen, NULL, NULL);
-
-	return multiByteStringLen;
+	return wideCharStringLen;
 }
 
 // Convert UTF-8 string to wide char
@@ -472,5 +475,32 @@ int utf8StringToWideChar(const char *utf8String, int utf8StringLength, wchar_t *
 		MultiByteToWideChar(CP_UTF8, 0, utf8String, utf8StringLength, wideCharString, wideCharStringLength);
 
 	return wideCharStringLength;
+}
+
+// Convert Wide Char string to UTF-8
+int wideCharStringToUtf8(const wchar_t *wideCharString, int wideCharStringLength, char *utf8String)
+{
+	int utf8StringLen = WideCharToMultiByte(CP_UTF8, 0, wideCharString, wideCharStringLength, NULL, 0, NULL, NULL);
+
+	if (utf8String)
+		WideCharToMultiByte(CP_UTF8, 0, wideCharString, wideCharStringLength, utf8String, utf8StringLen, NULL, NULL);
+
+	return utf8StringLen;
+}
+
+// Convert string from ANSI code page to UTF-8
+int ansiStringToUtf8(const char *ansiString, int ansiStringLength, char *utf8String)
+{
+	int wideCharStringLen = ansiStringToWideChar(ansiString, ansiStringLength, NULL);
+	wchar_t wideCharString[wideCharStringLen];
+
+	ansiStringToWideChar(ansiString, ansiStringLength, wideCharString);
+
+	int multiByteStringLen = wideCharStringToUtf8(wideCharString, wideCharStringLen, NULL);
+
+	if (utf8String)
+		wideCharStringToUtf8(wideCharString, wideCharStringLen, utf8String);
+
+	return multiByteStringLen;
 }
 #endif	// __WIN32

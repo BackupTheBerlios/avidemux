@@ -583,6 +583,7 @@ ffmpegEncoderVBR::init (uint32_t val, uint32_t fps1000)
   _context->stats_in = (char *) ADM_alloc (statSize + 1);
   _context->stats_in[statSize] = 0;
   fread (_context->stats_in, statSize, 1, _statfile);
+  fclose(_statfile);
 
   _context->bit_rate = val;	// bitrate
 

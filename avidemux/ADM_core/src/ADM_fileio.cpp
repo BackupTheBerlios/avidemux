@@ -22,8 +22,9 @@
 #include <unistd.h>
 
 #ifdef __WIN32
-#include <windows.h>
+#include <direct.h>
 #include <shlobj.h>
+#include <fcntl.h>
 #elif defined(__APPLE__)
 #include <Carbon/Carbon.h>
 #endif
@@ -50,8 +51,9 @@ static int baseDirDone = 0;
 #undef fopen
 #undef fclose
 
-#ifdef __MINGW32__
+#ifdef __WIN32
 extern int utf8StringToWideChar(const char *utf8String, int utf8StringLength, wchar_t *wideCharString);
+extern int wideCharStringToUtf8(const wchar_t *wideCharString, int wideCharStringLength, char *utf8String);
 #endif
 
 size_t ADM_fread (void *ptr, size_t size, size_t n, FILE *sstream)
@@ -67,20 +69,115 @@ size_t ADM_fwrite(void *ptr, size_t size, size_t n, FILE *sstream)
 FILE *ADM_fopen(const char *file, const char *mode)
 {
 #ifdef __MINGW32__
+	// Override fopen to handle Unicode filenames and to ensure exclusive access when initially writing to a file.
 	int fileNameLength = utf8StringToWideChar(file, -1, NULL);
-	int modeLength = utf8StringToWideChar(mode, -1, NULL);
-
 	wchar_t wcFile[fileNameLength];
-	wchar_t wcMode[modeLength];
+	int creation = 0, access = 0;
+	HANDLE hFile;
 
 	utf8StringToWideChar(file, -1, wcFile);
-	utf8StringToWideChar(mode, -1, wcMode);
 
-	return _wfopen(wcFile, wcMode);
+	if (strchr(mode, 'w'))
+	{
+		creation = CREATE_ALWAYS;
+		access = GENERIC_WRITE;
+
+		if (strchr(mode, '+'))
+			access |= GENERIC_READ;
+	}
+	else if (strchr(mode, 'r'))
+	{
+		creation = OPEN_EXISTING;
+		access = GENERIC_READ;
+
+		if (strchr(mode, '+'))
+			access = GENERIC_WRITE;
+	}
+	else if (strchr(mode, 'a'))
+	{
+		creation = OPEN_ALWAYS;
+		access = GENERIC_WRITE;
+
+		if (strchr(mode, '+'))
+			access |= GENERIC_READ;
+	}
+
+	if (creation & GENERIC_WRITE)
+	{
+		hFile = CreateFileW(wcFile, access, 0, NULL, creation, 0, NULL);
+
+		if (hFile == INVALID_HANDLE_VALUE)
+			return NULL;
+		else
+			CloseHandle(hFile);
+	}
+
+	hFile = CreateFileW(wcFile, access, FILE_SHARE_READ, NULL, creation, 0, NULL);
+
+	if (hFile == INVALID_HANDLE_VALUE)
+		return NULL;
+	else
+		return _fdopen(_open_osfhandle((intptr_t)hFile, 0), mode);
 #else
 	return fopen(file, mode);
 #endif
 }
+
+#if __WIN32
+extern "C"
+{
+	// libavformat uses open (in the file_open function) so we need to override that too.
+	// Following the same rules as ADM_fopen.
+	int ADM_open(const char *path, int oflag, ...)
+	{
+		int fileNameLength = utf8StringToWideChar(path, -1, NULL);
+		wchar_t wcFile[fileNameLength];
+		int creation = 0, access = 0;
+		HANDLE hFile;
+
+		utf8StringToWideChar(path, -1, wcFile);
+
+		if (oflag & O_WRONLY || oflag & O_RDWR)
+		{
+			access = GENERIC_WRITE;
+
+			if (oflag & O_RDWR)
+				access |= GENERIC_READ;
+
+			if (oflag & O_CREAT)
+			{
+				if (oflag & O_EXCL)
+					creation = CREATE_NEW;
+				else if (oflag & O_TRUNC)
+					creation = CREATE_ALWAYS;
+				else
+					creation = OPEN_ALWAYS;
+			}
+			else if (oflag & O_TRUNC)
+				creation = TRUNCATE_EXISTING;
+		}
+		else if (oflag & O_RDONLY)
+			creation = OPEN_EXISTING;
+
+		if (creation & GENERIC_WRITE)
+		{
+			hFile = CreateFileW(wcFile, access, 0, NULL, creation, 0, NULL);
+
+			if (hFile == INVALID_HANDLE_VALUE)
+				return -1;
+			else
+				CloseHandle(hFile);
+		}
+
+		hFile = CreateFileW(wcFile, access, FILE_SHARE_READ, NULL, creation, 0, NULL);
+
+		if (hFile == INVALID_HANDLE_VALUE)
+			return -1;
+		else
+			return _open_osfhandle((intptr_t)hFile, oflag);
+	}
+}
+#endif
 
 int ADM_fclose(FILE *file)
 {
@@ -219,33 +316,45 @@ char *ADM_getPluginPath(void)
 ******************************************************/
 char *ADM_getBaseDir(void)
 {
-	char *dirname = NULL;
-	DIR *dir = NULL;
+	char *home;
 
 	if (baseDirDone)
 		return ADM_basedir;
 
 	// Get the base directory
-#if defined(__WIN32)
-	char home[MAX_PATH];
+#ifdef __WIN32
+	wchar_t wcHome[MAX_PATH];
 
-	if (SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, home) != S_OK)
+	if (SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, 0, wcHome) == S_OK)
+	{
+		int len = wideCharStringToUtf8(wcHome, -1, NULL);
+		home = new char[len];
+
+		wideCharStringToUtf8(wcHome, -1, home);
+	}
+	else
 	{
 		printf("Oops: can't determine the Application Data folder.");
-		strcpy(home, "c:\\");
+		home = ADM_strdup("c:\\");
 	}
 #else
-	char *home;
+	const char* homeEnv = getenv("HOME");
 
-	if (!(home = getenv("HOME")))
+	if (homeEnv)
+	{
+		home = new char[strlen(homeEnv) + 1];
+		strcpy(home, homeEnv);
+	}
+	else
 	{
 		printf("Oops: can't determine $HOME.");
+
 		return NULL;
 	}
 #endif
 
 	// Try to open the .avidemux directory
-	dirname = new char[strlen(home) + strlen(ADM_DIR_NAME) + 2];
+	char *dirname = new char[strlen(home) + strlen(ADM_DIR_NAME) + 2];
 	strcpy(dirname, home);
 	strcat(dirname, ADM_DIR_NAME);
 
@@ -267,6 +376,14 @@ char *ADM_getBaseDir(void)
 	return ADM_basedir;
 }
 
+#ifdef __WIN32
+#define DIR _WDIR
+#define dirent _wdirent
+#define opendir _wopendir
+#define readdir _wreaddir
+#define closedir _wclosedir
+#endif
+
 /*----------------------------------------
       Create a directory
       If it already exists, do nothing
@@ -275,8 +392,17 @@ uint8_t ADM_mkdir(const char *dirname)
 {
 	DIR *dir = NULL;
 
+#ifdef __WIN32
+	int dirNameLength = utf8StringToWideChar(dirname, -1, NULL);
+	wchar_t dirname2[dirNameLength];
+
+	utf8StringToWideChar(dirname, -1, dirname2);
+#else
+	const char* dirname2 = dirname;
+#endif
+
 	// Check it already exists ?
-	dir = opendir(dirname);
+	dir = opendir(dirname2);
 
 	if (dir)
 	{ 
@@ -284,24 +410,24 @@ uint8_t ADM_mkdir(const char *dirname)
 		closedir(dir);
 		return 1;
 	}
-
-#ifdef __MINGW32__
-	if (mkdir(dirname))
+#ifdef __WIN32
+	if (_wmkdir(dirname2))
 	{
-		printf("Oops: mkdir failed on %s\n", dirname);   
+		printf("Oops: mkdir failed on %s\n", dirname);
 		return 0;
 	}
 #else
-	char *sys = new char[strlen(dirname) + strlen("mkdir ") + 2];
+	char *sys = new char[strlen(dirname2) + strlen("mkdir ") + 2];
 
 	strcpy(sys, "mkdir ");
-	strcat(sys, dirname);
+	strcat(sys, dirname2);
 	printf("Creating dir :%s\n", sys);
 	system(sys);
 
 	delete [] sys;
 #endif
-	if ((dir = opendir(dirname)) == NULL)
+
+	if ((dir = opendir(dirname2)) == NULL)
 		return 0;
 
 	closedir(dir);
@@ -322,30 +448,48 @@ uint8_t buildDirectoryContent(uint32_t *outnb, const char *base, char *jobName[]
 
 	ADM_assert(extlen);
 
-	dir = opendir(base);
+#ifdef __WIN32
+	int dirNameLength = utf8StringToWideChar(base, -1, NULL);
+	wchar_t base2[dirNameLength];
+
+	utf8StringToWideChar(base, -1, base2);
+#else
+	const char *base2 = base;
+#endif
+
+	dir = opendir(base2);
 	if (!dir)
 		return 0;
 
-	while((direntry = readdir(dir)))
+	while (direntry = readdir(dir))
 	{
-		len = strlen(direntry->d_name);
+#ifdef __WIN32
+		int dirLength = wideCharStringToUtf8(direntry->d_name, -1, NULL);
+		char d_name[dirLength];
+
+		wideCharStringToUtf8(direntry->d_name, -1, d_name);
+#else
+		const char *d_name = direntry->d_name;
+#endif
+
+		len = strlen(d_name);
 
 		if (len < (extlen + 1))
 			continue;
 
 		int xbase = len - extlen;
 
-		if (memcmp(direntry->d_name + xbase, ext, extlen))
+		if (memcmp(d_name + xbase, ext, extlen))
 			//if (direntry->d_name[len-1]!='s' || direntry->d_name[len-2]!='j' || direntry->d_name[len-3]!='.')
 		{
-			printf("ignored: %s\n", direntry->d_name);
+			printf("ignored: %s\n", d_name);
 			continue;
 		}
 
-		jobName[dirmax] = (char *)ADM_alloc(strlen(base) + strlen(direntry->d_name) + 2);
+		jobName[dirmax] = (char *)ADM_alloc(strlen(base) + strlen(d_name) + 2);
 		strcpy(jobName[dirmax], base);
 		strcat(jobName[dirmax], "/");
-		strcat(jobName[dirmax], direntry->d_name);
+		strcat(jobName[dirmax], d_name);
 		dirmax++;
 
 		if (dirmax >= maxElems)

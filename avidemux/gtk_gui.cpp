@@ -61,6 +61,11 @@
 #include "ADM_libraries/ADM_libmpeg2enc/ADM_mpeg2enc.h"
 #include "ADM_video/ADM_vidMisc.h"
 #include "ADM_preview.h"
+static AudioSource currentAudioSource = AudioAvi;
+static AudioSource secondAudioSource = AudioNone;
+static char *currentAudioName = NULL;
+static char *secondAudioName = NULL;
+
 void A_handleSecondTrack (int tracktype);
 int A_delete(uint32_t start, uint32_t end);
 void A_saveImg (const char *name);
@@ -448,10 +453,8 @@ int nw;
         case ACT_JumpToFrame: 
                 // read value	
                 nf=UI_readCurFrame();
-                if(nf>0 && nf< avifileinfo->nb_frames)
-                {
-                        GUI_GoToFrame(nf);
-                }
+				if(nf< avifileinfo->nb_frames)
+					GUI_GoToFrame(nf);
                 UI_JumpDone();
                 break;
 	case ACT_JumpToTime:
@@ -685,16 +688,10 @@ int nw;
       fn=curframe;
       if (DIA_GetIntegerValue ((int *)&fn,0,avifileinfo->nb_frames,QT_TR_NOOP("Go to Frame"),QT_TR_NOOP("_Go to frame:")))
 	{
-	  if (fn)
-	    {			// 0 probably means garbage
-	      if (fn < avifileinfo->nb_frames)
-		{
-		  curframe = fn;
-		  GUI_GoToFrame (curframe);
-		}
-	      else
-                GUI_Error_HIG (QT_TR_NOOP("Out of bounds"), NULL);
-	    }
+		if (fn < avifileinfo->nb_frames)
+			GUI_GoToFrame (curframe);
+		else
+			GUI_Error_HIG (QT_TR_NOOP("Out of bounds"), NULL);
 	}
       break;
 //----------------------test-----------------------
@@ -943,9 +940,6 @@ int A_openAvi2 (const char *name, uint8_t mode)
 		return 0;
 	}
 	
-	currentaudiostream = NULL;
-	avifileinfo = NULL;
-
 	if( fourCC::check(id,(uint8_t *)"//AD") ){
           GUI_Error_HIG(QT_TR_NOOP("Cannot open project using the video loader."),
                         QT_TR_NOOP(  "Try 'File' -> 'Load/Run Project...'"));
@@ -1010,23 +1004,15 @@ int A_openAvi2 (const char *name, uint8_t mode)
 
 void  updateLoaded ()
 {
-  if (avifileinfo)
-    {
-      delete avifileinfo;
-      avifileinfo = NULL;
-    }
   avifileinfo = new aviInfo;
   if (!video_body->getVideoInfo (avifileinfo))
     {
 //      err1:
       printf ("\n get info failed...cancelling load...\n");
       delete avifileinfo;
-      avifileinfo = (aviInfo *) NULL;
-      currentaudiostream = aviaudiostream = NULL;
-
+      avifileinfo = NULL;
 
       return;
-
     }
 
   curframe = 0;
@@ -1038,7 +1024,6 @@ void  updateLoaded ()
     {
       printf ("\n *** NO AUDIO ***\n");
       wavinfo = (WAVHeader *) NULL;
-      currentaudiostream = aviaudiostream = (AVDMGenericAudioStream *) NULL;
     }
   else
     {
@@ -1384,16 +1369,7 @@ int A_loadNone( void )
 {
  	A_changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
 }
-//_____________________________________________________________
-//
-//              Load wave
-//              
-//
-//_____________________________________________________________
-AudioSource currentAudioSource=AudioAvi;
-AudioSource secondAudioSource=AudioNone;
-char *currentAudioName=NULL;
-char *secondAudioName=NULL;
+
 //_____________________________________________________________
 //
 //              Load MP3 and identify wavfmt infos to fill avi header
@@ -1456,12 +1432,18 @@ AudioSource getCurrentAudioSource(char **name)
 //________________________________________________________
 uint8_t A_changeAudioStream (AVDMGenericAudioStream * newaudio, AudioSource nwsource,char *myname)
 {
-  if (currentaudiostream)
-    {
-      currentAudioSource=AudioNone;
-      if(currentAudioName) ADM_dealloc(currentAudioName);
-      currentAudioName=NULL;
-    }
+	if (currentaudiostream)
+	{
+		if (currentaudiostream != aviaudiostream)
+			delete currentaudiostream;
+
+		if(currentAudioName)
+			ADM_dealloc(currentAudioName);
+
+		currentAudioName = NULL;
+		currentAudioSource = AudioNone;
+	}
+
   currentaudiostream = newaudio;
 
   if (currentaudiostream)
@@ -2406,8 +2388,8 @@ uint8_t GUI_close(void)
       }
       delete avifileinfo;
       //delete wavinfo;
-      wavinfo = (WAVHeader *) NULL;
-      avifileinfo = (aviInfo *) NULL;
+      wavinfo = NULL;
+      avifileinfo = NULL;
       video_body->cleanup ();
       curframe = 0;
       A_changeAudioStream (NULL, AudioNone,NULL);

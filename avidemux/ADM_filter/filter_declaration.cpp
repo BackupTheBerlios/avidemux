@@ -55,6 +55,7 @@ printf(  "******************************\n");
 #endif
 // Misc filter, internal only
 	REGISTERX(VF_MISC,"partial",QT_TR_NOOP("Partial"),"",VF_PARTIAL,0,partial_create,partial_script);
+	REGISTERX(VF_MISC,"framenum",QT_TR_NOOP("Add Framenumber"),QT_TR_NOOP("Print frame number directly in image"),VF_FRAMENUM,1,number_create,number_script);
  printf("\n");
 }
 

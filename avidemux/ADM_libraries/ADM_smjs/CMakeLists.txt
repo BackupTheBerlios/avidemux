@@ -18,6 +18,7 @@ ADD_TARGET_CFLAGS(${ADM_LIB} "-Dmalloc=ADM_alloc")
 ADD_TARGET_CFLAGS(${ADM_LIB} "-Drealloc=ADM_realloc")
 ADD_TARGET_CFLAGS(${ADM_LIB} "-Dfree=ADM_dezalloc")
 ADD_TARGET_CFLAGS(${ADM_LIB} "-Dcalloc=ADM_calloc -I/usr/include/nspr")
+ADD_TARGET_CFLAGS(${ADM_LIB} "-Dfopen=ADM_fopen")
 
 TARGET_LINK_LIBRARIES(${ADM_LIB} ADM_core)
 

@@ -235,7 +235,11 @@ uint8_t flvHeader::open(const char *name)
     videoTrack->_index[0].flags=AVI_KEY_FRAME;
     
     // audio track
-    _audioStream=new flvAudio(name,audioTrack,&wavHeader);
+	if(_isaudiopresent)
+		_audioStream = new flvAudio(name, audioTrack, &wavHeader);
+	else
+		_audioStream = NULL;
+
   printf("[FLV]FLV successfully read\n");
   
   return 1;

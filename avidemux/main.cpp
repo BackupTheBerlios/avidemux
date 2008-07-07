@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
 
 	// Start counting memory
 	ADM_memStatInit();
-
+    ADM_InitMemcpy();
 	printf("\nInitialising prefs\n");
 	initPrefs();
 	prefs->load();
@@ -211,9 +211,7 @@ int main(int argc, char *argv[])
     InitFactory();
     InitCoreToolkit();
     initFileSelector();
-    //****************
 
-    ADM_InitMemcpy();
 
 	// Load .avidemuxrc
     quotaInit();

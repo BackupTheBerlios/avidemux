@@ -99,7 +99,7 @@ void UI_iconify( void )
 void UI_deiconify( void )
 {}
 
-uint32_t UI_readCurFrame( void )
+int UI_readCurFrame( void )
 {
     return 0;
 }

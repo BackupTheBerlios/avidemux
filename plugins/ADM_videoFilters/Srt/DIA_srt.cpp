@@ -34,13 +34,17 @@ typedef struct unicd
 
   static unicd  names[]=
 {
+	{QT_TR_NOOP("Arabic"), "ISO-8859-6"}, 
+	{QT_TR_NOOP("Baltic"), "ISO-8859-4"}, // 
 	{QT_TR_NOOP("Chinese Simplified (GB2312)"), "CP936"},		// UTF8
 	{QT_TR_NOOP("Chinese Traditional (Big5)"), "CP950"}	,	// UTF8
-	{QT_TR_NOOP("Cyrillic"), "WINDOWS-1251"}, // ru
-	{QT_TR_NOOP("Czech"), "ISO-8859-2"},	// cz
-	{QT_TR_NOOP("German"), "ISO-8859-9"},		// german ?
-	{QT_TR_NOOP("Latin-1"), "ISO-8859-1"},
+	{QT_TR_NOOP("Cyrillic"), "ISO-8859-5"}, // ru
+	{QT_TR_NOOP("Latin-1 (Western European)"), "ISO-8859-1"}, // german
+	{QT_TR_NOOP("Latin-2 (Central European)"), "ISO-8859-2"},       // cz
+	{QT_TR_NOOP("Greek"), "ISO-8859-7"}, // greek
+	{QT_TR_NOOP("Hebrew"), "ISO-8859-8"},           // Hebrew
 	{QT_TR_NOOP("Slovene"), "CP1250"},		// UTF8
+	{QT_TR_NOOP("Turkish"), "ISO-8859-9"},          // Turkish
 	{QT_TR_NOOP("UTF-8"), "UTF-8"},		// UTF8
 	{QT_TR_NOOP("UTF-16"), "UTF-16"}		// UTF16
 };
@@ -68,8 +72,13 @@ diaMenuEntry encoding[]={
   Mitem(5),
   Mitem(6),
   Mitem(7),
-  Mitem(8)
-};
+  Mitem(8),
+  Mitem(9),
+  Mitem(10),
+  Mitem(11),
+  Mitem(12),
+  Mitem(13)
+};       
 
 #define PX(x) &(param->x)
   diaElemFile subtitle(0,(char **)PX(_subname),QT_TR_NOOP("_Subtitle file:"), NULL, QT_TR_NOOP("Select Subtitle file"));
@@ -88,7 +97,7 @@ diaMenuEntry encoding[]={
       {
           if(!strcmp(param->_charset,names[i].name)) myEncoding=i;
       }
-      diaElemMenu      encodingM(&myEncoding,QT_TR_NOOP("_Encoding:"),9,encoding);
+      diaElemMenu      encodingM(&myEncoding,QT_TR_NOOP("_Encoding:"),13,encoding);
     //  diaElemUInteger  fontSize(PX(_fontsize),QT_TR_NOOP("Font Si_Ze:"),8,120);
       diaElemButton    color(QT_TR_NOOP("S_elect C_olor"), colorCallBack,&(colors[0]));
       diaElemButton    setBase(QT_TR_NOOP("Set Size and _Position"), sizePositionCallback,&sizePos);

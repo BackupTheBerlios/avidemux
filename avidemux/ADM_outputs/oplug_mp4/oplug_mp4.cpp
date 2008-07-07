@@ -110,7 +110,7 @@ uint8_t r=0;
 uint32_t skipping=1;
 pthread_t     audioThread;
 audioQueueMT context;
-PacketQueue   *pq;//("MP4 audioQ",50,2*1024*1024);
+PacketQueue   *pq = NULL;//("MP4 audioQ",50,2*1024*1024);
 uint32_t    totalAudioSize=0;
 uint32_t sent=0;
 const char *containerTitle;
@@ -262,6 +262,22 @@ preFilling:
           if(audio)
           {
                 audioinfo=audio->getInfo();
+
+				if (muxerType == MUXER_MP4)
+				{
+					switch (audioinfo->encoding)
+					{
+						case WAV_MP2:
+						case WAV_MP3:
+						case WAV_AAC:
+						case WAV_AAC_HE:
+							break;
+						default:
+							if (!GUI_YesNo(QT_TR_NOOP("Invalid audio stream detected"), QT_TR_NOOP("The audio stream may be invalid for this container.\n\nContinue anyway?")))
+								goto stopit;
+					}
+				}
+
                 audio->extraData(&extraDataSize,&extraData);
                 if(audioProcessMode())
                         encoding_gui->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));
@@ -365,7 +381,7 @@ preFilling:
 stopit:
     printf("2nd pass, sent %u frames\n",sent);
     // Flush slave Q
-    if(audio)
+    if(pq)
     {
         context.audioAbort=1;
         pq->Abort();

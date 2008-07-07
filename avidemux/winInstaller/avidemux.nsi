@@ -6,7 +6,7 @@
 !include WinMessages.nsh
 !include revision.nsh
 
-Name "Avidemux 2.4.1 r${REVISION}"
+Name "Avidemux 2.4.2 r${REVISION}"
 
 SetCompressor /SOLID lzma
 SetCompressorDictSize 96
@@ -17,7 +17,7 @@ SetCompressorDictSize 96
 !define INTERNALNAME "Avidemux 2.4"
 !define REGKEY "SOFTWARE\${INTERNALNAME}"
 !define UNINST_REGKEY "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${INTERNALNAME}"
-!define VERSION 2.4.1.${REVISION}
+!define VERSION 2.4.2.${REVISION}
 !define COMPANY "Free Software Foundation"
 !define URL "http://www.avidemux.org"
 
@@ -93,7 +93,7 @@ InstallDir "$PROGRAMFILES\Avidemux 2.4"
 CRCCheck on
 XPStyle on
 ShowInstDetails nevershow
-VIProductVersion 2.4.1.${REVISION}
+VIProductVersion 2.4.2.${REVISION}
 VIAddVersionKey ProductName Avidemux
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey FileVersion ""
@@ -260,9 +260,10 @@ SectionGroup "Additional languages" SecGrpLang
         !insertmacro InstallGtkLanguage Czech cs
     SectionEnd
 
-    Section "French (GTK+ only)" SecLangFrench
+    Section "French" SecLangFrench
         SectionIn 2
         !insertmacro InstallGtkLanguage French fr
+        !insertmacro InstallQt4Language French fr
     SectionEnd
 
     Section "German (GTK+ only)" SecLangGerman
@@ -508,7 +509,7 @@ Section /o "un.Core files (required)" UnSecCore
     Delete /REBOOTOK $INSTDIR\ogg.dll
     Delete /REBOOTOK $INSTDIR\libxml2.dll
     Delete /REBOOTOK $INSTDIR\libx264.dll
-    Delete /REBOOTOK $INSTDIR\libpng13.dll
+    Delete /REBOOTOK $INSTDIR\libpng12-0.dll
     Delete /REBOOTOK $INSTDIR\libmp3lame-0.dll
     Delete /REBOOTOK $INSTDIR\libglib-2.0-0.dll
     Delete /REBOOTOK $INSTDIR\libfontconfig-1.dll

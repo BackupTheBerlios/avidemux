@@ -528,7 +528,7 @@ void MainWindow::buildCustomMenu(void)
 
 		for(int i=0; i < ADM_nbCustom; i++)
 		{
-			customActions[i] = new QAction(ADM_GetFileName(customNames[i]), NULL);
+			customActions[i] = new QAction(QString::fromUtf8(ADM_GetFileName(customNames[i])), NULL);
 			ui.menuCustom->addAction(customActions[i]);
 			connect(customActions[i], SIGNAL(triggered()), this, SLOT(custom()));
 		}
@@ -760,11 +760,11 @@ void UI_setScale( double val )
 	_upd_in_progres--;
 }
 
-uint32_t UI_readCurFrame(void)
+int UI_readCurFrame(void)
 {
 	bool ok;
 	
-	return WIDGET(lineEdit)->text().toUInt(&ok);
+	return WIDGET(lineEdit)->text().toInt(&ok);
 }
 
 int UI_readCurTime(uint16_t &hh, uint16_t &mm, uint16_t &ss, uint16_t &ms)
