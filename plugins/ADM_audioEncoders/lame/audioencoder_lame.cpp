@@ -28,7 +28,11 @@ static LAME_encoderParam myLameParam = {
   2,				//uint32_t        quality;
   0,				//uint32_t        disableReservoir; // usefull for strict CBR (FLV)
 };
+extern "C"
+{
 static uint8_t configure (void);
+static uint8_t setOption(const char *paramName, uint32_t value);
+};
 /********************* Declare Plugin *****************************************************/
 ADM_DECLARE_AUDIO_ENCODER_PREAMBLE(AUDMEncoder_Lame);
 
@@ -50,7 +54,7 @@ static ADM_audioEncoder encoderDesc = {
   getBitrate,           // Defined by macro automatically
   setBitrate,            // Defined by macro automatically 
 
-  NULL,         //** put your own function here**
+  setOption,         //** put your own function here**
 
   NULL
 };
@@ -322,5 +326,17 @@ uint8_t configure (void)
     }
   return 0;
 }
-
+/**
+     \fn setOption
+     \brief Allow giving codec specific options as string+value
+*/
+uint8_t setOption(const char *paramName, uint32_t value)
+{
+    if(!strcasecmp(paramName,"MP3DisableReservoir"))
+    {
+        myLameParam.disableReservoir=value;
+        return 1;
+    }
+    return 0;
+}
 // EOF
