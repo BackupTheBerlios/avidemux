@@ -15,16 +15,12 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <math.h>
 
 #include "ADM_default.h"
 
 #include "ADM_audiofilter/audiofilter_limiter_param.h"
 #include "ADM_audiofilter/audiofilter_normalize_param.h"
-#include "audioprocess.hxx"
 
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 
@@ -33,7 +29,6 @@
 
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
 
-#include "audioeng_process.h"
 
 #include "audiofilter_bridge.h"
 #include "audiofilter_mixer.h"

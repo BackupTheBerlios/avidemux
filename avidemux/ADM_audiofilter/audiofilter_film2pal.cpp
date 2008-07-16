@@ -15,19 +15,11 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <math.h>
 
-#include "ADM_assert.h"
+#include "ADM_default.h"
 
-#include "avifmt.h"
-#include "avifmt2.h"
-
-
-//#include "ADM_dialog/DIA_working.h"
-#include "audioeng_process.h"
+#include "ADM_audioFilter.h"
 #include "audiofilter_film2pal.h"
 
 //__________

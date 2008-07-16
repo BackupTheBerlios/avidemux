@@ -20,8 +20,6 @@
 
 #include "ADM_default.h"
 
-#include "audioprocess.hxx"
-#include "audioeng_process.h"
 #include "audioencoder.h"
 //
 #include "audioencoder_vorbis_param.h"

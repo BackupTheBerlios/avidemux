@@ -16,13 +16,7 @@
 #include "ADM_default.h"
 #include <math.h>
 
-#include "avifmt.h"
-#include "avifmt2.h"
-// Needed for incoming ..
-#include "audioprocess.hxx"
-
-#include "audioeng_process.h"
-
+#include "ADM_audioFilter.h"
 #include "audiofilter_bridge.h"
 
 #include "ADM_osSupport/ADM_debugID.h"

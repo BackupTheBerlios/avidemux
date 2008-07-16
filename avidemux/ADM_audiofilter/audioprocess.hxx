@@ -19,7 +19,7 @@
 #define __AudioProcess__
 
 #include "ADM_audio/aviaudio.hxx"
-#define MINUS_ONE 0xffffffff
+
 #define PROCESS_BUFFER_SIZE 48000*4*4 // should be enougth
 #define MINIMUM_BUFFER   8192*4
 /*! Base class for chained action. This class is derivated from AVDMGenericAudioStream and has two

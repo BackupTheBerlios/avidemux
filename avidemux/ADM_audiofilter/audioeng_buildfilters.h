@@ -17,9 +17,7 @@
 #ifndef ADM_AUDIO_BUILDFILTER_H
 #define  ADM_AUDIO_BUILDFILTER_H
 
-#include "ADM_audiofilter/audioeng_process.h"
-#include "ADM_audiofilter/audioprocess.hxx"
-#include "ADM_audiofilter/audioeng_process.h"
+#include "audioencoder.h"
 
 
 

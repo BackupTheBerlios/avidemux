@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 #ifndef AUDM_BRIDGE_H
-
+#include "audioencoder.h"
 class AUDMAudioFilter_Bridge : public AUDMAudioFilter
 {
   protected:

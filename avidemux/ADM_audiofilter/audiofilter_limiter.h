@@ -16,7 +16,7 @@
 #ifndef AUDIO_F_LIMITER_H
 #define AUDIO_F_LIMITER_H
 
-#include "audioeng_process.h"
+#include "ADM_audioFilter.h"
 #include "audiofilter_limiter_param.h"
 class AUDMAudioFilterLimiter : public AUDMAudioFilter
 {

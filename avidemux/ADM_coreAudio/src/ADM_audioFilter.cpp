@@ -14,16 +14,11 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <math.h>
 
 #include "ADM_default.h"
 
-#include "audioprocess.hxx"
-
-#include "audioeng_process.h"
+#include "ADM_audioFilter.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_AUDIO_FILTER

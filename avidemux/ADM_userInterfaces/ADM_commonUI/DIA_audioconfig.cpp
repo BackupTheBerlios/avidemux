@@ -18,8 +18,6 @@
 #include "ADM_default.h"
 
 #include "DIA_factory.h"
-#include "../../ADM_audiofilter/audioprocess.hxx"
-#include "../../ADM_audiofilter/audioeng_process.h"
 #include "ADM_coreAudio/include/audioencoder.h"
 
 /**

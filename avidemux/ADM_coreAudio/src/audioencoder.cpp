@@ -15,8 +15,7 @@
 
 #include "ADM_default.h"
 #include "ADM_coreAudio.h"
-#include "ADM_audiofilter/audioprocess.hxx"
-#include "ADM_audiofilter/audioeng_process.h"
+#include "ADM_audioFilter.h"
 #include "audioencoder.h"
 
 AUDMEncoder::AUDMEncoder(AUDMAudioFilter *in) // :AVDMGenericAudioStream  ()

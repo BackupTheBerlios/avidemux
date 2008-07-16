@@ -1,7 +1,7 @@
 #ifndef AUDIO_F_NORMALIZE_H
 #define AUDIO_F_NORMALIZE_H
 
-#include "audioeng_process.h"
+#include "ADM_audioFilter.h"
 class AUDMAudioFilterNormalize : public AUDMAudioFilter
 {
   protected:

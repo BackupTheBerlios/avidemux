@@ -6,6 +6,7 @@
 #define ADM_audioCore_H
 
 
+#define MINUS_ONE 0xffffffff
 
 #define DITHER_SIZE 4800
 #define DITHER_CHANNELS 6

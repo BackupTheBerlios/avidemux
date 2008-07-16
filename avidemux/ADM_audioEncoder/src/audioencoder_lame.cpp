@@ -17,8 +17,6 @@
 #include <lame/lame.h>
 
 #include "ADM_default.h"
-#include "audioprocess.hxx"
-#include "audioeng_process.h"
 #include "audioencoder.h"
 #include "audioencoder_lame_param.h"
 #include "audioencoder_lame.h"

@@ -1,6 +1,7 @@
 SET(ADMaudioCore_SRCS
 ADM_audioUtils.cpp
 audioencoder.cpp
+ADM_audioFilter.cpp
 )	
 ADD_LIBRARY(ADM_coreAudio SHARED ${ADMaudioCore_SRCS})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/avidemux/ADM_coreAudio/include)

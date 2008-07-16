@@ -33,7 +33,7 @@ typedef struct ADM_audioEncoderDescriptor
 
 */
 #include "ADM_audio/aviaudio.hxx" // FIXME!!!!
-#include "ADM_audiofilter/audioeng_process.h" // FIXME!!!
+#include "ADM_audioFilter.h" // FIXME!!!
  //_____________________________________________
 class AUDMEncoder //: public AVDMGenericAudioStream
 {
