@@ -511,6 +511,7 @@ uint8_t  bindGUI( void )
                 for(uint32_t i=0;i<nbAud;i++)
                 {
                         name=audioEncoderGetDisplayName(i); //audioFilterGetIndexedName(i);
+                        printf("Found %d %s audio encoder\n",i,name);		       
                         gtk_combo_box_append_text      (combo_box,QT_TR_NOOP(name));	
                 }
         gtk_combo_box_set_active(combo_box,0);

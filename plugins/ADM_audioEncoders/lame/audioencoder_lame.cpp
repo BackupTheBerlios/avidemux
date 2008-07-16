@@ -38,6 +38,7 @@ static uint8_t configure(void);
 
 static LAME_encoderParam myLameParam=
 {
+  128,
   ADM_LAME_PRESET_CBR, // preset;
   ADM_STEREO, //ADM_mode        mode;
   2, //uint32_t        quality;
@@ -49,7 +50,6 @@ static ADM_audioEncoder lameDesc={
     create,                        // AUDMEncoder *(*create)(AUDMAudioFilter *head);  
     destroy,                       // void         (*destroy)(AUDMEncoder *codec);
     configure,                     // int          (*configure)(void);    
-    128,           // bitrate in kbps
     "LAME",
     "MP3 (Lame)",
     "Lame encoding plugin (c) 2008 Mean",
@@ -59,6 +59,12 @@ static ADM_audioEncoder lameDesc={
     200,              // const Higher means the codec is prefered and should appear first in the list
     getConfigurationData, // Get the encoder private conf
     setConfigurationData,
+
+    NULL,  // GetBitrate
+    NULL,  // SetBitrate
+
+    NULL, // Set Option
+
     NULL              // Hide stuff in here
 };
 

@@ -19,9 +19,12 @@ static const ADM_PRESET_DEFINITION      presetDefinition[]=
   {ADM_LAME_PRESET_ABR,"ABR"},
   {ADM_LAME_PRESET_EXTREME,"Extreme"}
 };    
+/**
 
+*/
 typedef struct 
 {
+  uint32_t        bitrate; // in kbps
   ADM_LAME_PRESET preset;
   ADM_mode        mode;
   uint32_t        quality;

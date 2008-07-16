@@ -321,12 +321,16 @@ void audioCodecConfigure( void )
 uint32_t audioGetBitrate(void)
 {
     ADM_assert(currentEncoder<ListOfAudioEncoder.size());
-    return ListOfAudioEncoder[currentEncoder]->bitrate;
+    if(ListOfAudioEncoder[currentEncoder]->getBitrate)
+        return ListOfAudioEncoder[currentEncoder]->getBitrate();
+    return 0;
 } 
 void audioFilter_SetBitrate( int i)
 {
     ADM_assert(currentEncoder<ListOfAudioEncoder.size());
-    ListOfAudioEncoder[currentEncoder]->bitrate=i;
+    if(ListOfAudioEncoder[currentEncoder]->setBitrate)
+        ListOfAudioEncoder[currentEncoder]->setBitrate(i);
+    
 }
 /**
     \fn audioEncoderGetNumberOfEncoders
@@ -341,7 +345,7 @@ uint32_t audioEncoderGetNumberOfEncoders(void)
 const char  *audioEncoderGetDisplayName(uint32_t i)
 {
      ADM_assert(currentEncoder<ListOfAudioEncoder.size());
-     return ListOfAudioEncoder[currentEncoder]->menuName;
+     return ListOfAudioEncoder[i]->menuName;
 }
 /**
         \fn audioEncoderCreate
