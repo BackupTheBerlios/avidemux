@@ -83,6 +83,9 @@ static int update_ui=0;
 void GUI_gtk_grow_off(int onff);
 static void GUI_initCustom(void);
 const char * GUI_getCustomScript(uint32_t nb);
+uint32_t audioEncoderGetNumberOfEncoders(void);
+const char  *audioEncoderGetDisplayName(uint32_t i);
+
 #ifdef HAVE_AUDIO
 extern uint8_t AVDM_setVolume(int volume);
 #endif
@@ -122,9 +125,6 @@ extern void FileSel_ReadWrite(SELFILE_CB *cb, int rw, const char *name, const ch
 // To build vcodec
 extern int encoderGetEncoderCount(void);
 extern const char* encoderGetIndexedName(uint32_t i);
-// To build a codec
-uint32_t audioFilterGetNbEncoder(void);
-const char* audioFilterGetIndexedName(uint32_t i);
 //
 static uint8_t  bindGUI( void );
 static gboolean destroyCallback(GtkWidget * widget,	  GdkEvent * event, gpointer user_data);
@@ -504,14 +504,13 @@ uint8_t  bindGUI( void )
         // And A codec
         // Finally add video codec...
         uint32_t nbAud;
-
-                nbAud=audioFilterGetNbEncoder();
+                nbAud=audioEncoderGetNumberOfEncoders();
                 combo_box=GTK_COMBO_BOX(lookup_widget(guiRootWindow,AUDIO_WIDGET));
                 gtk_combo_box_remove_text(combo_box,0);
                 printf("Found %d audio encoder\n",nbAud);		       
                 for(uint32_t i=0;i<nbAud;i++)
                 {
-                        name=audioFilterGetIndexedName(i);
+                        name=audioEncoderGetDisplayName(i); //audioFilterGetIndexedName(i);
                         gtk_combo_box_append_text      (combo_box,QT_TR_NOOP(name));	
                 }
         gtk_combo_box_set_active(combo_box,0);

@@ -38,8 +38,8 @@ extern int automation(void );
 extern void HandleAction(Action a);
 extern int encoderGetEncoderCount (void);
 extern const char *encoderGetIndexedName (uint32_t i);
-extern uint32_t audioFilterGetNbEncoder(void);
-extern const char* audioFilterGetIndexedName(uint32_t i);
+uint32_t audioEncoderGetNumberOfEncoders(void);
+const char  *audioEncoderGetDisplayName(uint32_t i);
 extern void checkCrashFile(void);
 extern void UI_QT4VideoWidget(QFrame *frame);
 extern void loadTranslator(void);
@@ -723,13 +723,14 @@ void setupMenus(void)
 
 	uint32_t nbAud;
 
-	nbAud=audioFilterGetNbEncoder();
+    nbAud=audioEncoderGetNumberOfEncoders();
 	printf("Found %d audio encoder(s)\n",nbAud);		       
 	for(uint32_t i=1;i<nbAud;i++)
 	{
-		name=audioFilterGetIndexedName(i);
+		name=audioEncoderGetDisplayName(i);
 		WIDGET(comboBoxAudio)->addItem(name);
 	}
+
 	/*   Fill in output format window */
 	uint32_t nbFormat;
 

@@ -18,7 +18,7 @@
 #define  ADM_AUDIO_BUILDFILTER_H
 
 #include "audioencoder.h"
-
+#include "ADM_audio/aviaudio.hxx"
 
 
  AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *stream, uint32_t startTime);

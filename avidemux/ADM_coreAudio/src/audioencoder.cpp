@@ -17,7 +17,7 @@
 #include "ADM_coreAudio.h"
 #include "ADM_audioFilter.h"
 #include "audioencoder.h"
-
+#include "ADM_audioCodecEnum.h"
 AUDMEncoder::AUDMEncoder(AUDMAudioFilter *in) // :AVDMGenericAudioStream  ()
 {
   _wavheader = new WAVHeader;

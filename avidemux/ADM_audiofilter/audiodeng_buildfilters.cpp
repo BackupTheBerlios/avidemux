@@ -42,7 +42,7 @@
 #include "ADM_osSupport/ADM_debug.h"
 
 extern void UI_setAProcessToggleStatus( uint8_t status );
-extern uint8_t DIA_audioCodec( AUDIOENCODER *codec );
+extern uint8_t DIA_audioCodec( int *codec );
 extern void UI_setAudioCodec( int i);
 uint32_t audioFilterGetNbEncoder(void);
 const char* audioFilterGetIndexedName(uint32_t i);

@@ -6,8 +6,10 @@
 
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-#include "ADM_audiocodec/ADM_audiocodeclist.h"
+//#include "ADM_audiocodec/ADM_audiocodeclist.h"
 
+extern uint32_t audioEncoderGetNumberOfEncoders(void);
+extern const char  *audioEncoderGetDisplayName(uint32_t i);
 
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
@@ -19,14 +21,14 @@
   
 static GtkWidget	*create_dialogAudioCodec (void);
 
- static AUDIOENCODER findCodec( void );
+ static int findCodec( void );
  static GtkWidget *dialog;
  static void okCallback(GtkButton * button, gpointer user_data);
  
   
  void okCallback(GtkButton * button, gpointer user_data)
 {
-	AUDIOENCODER cur;
+	int cur;
 
 
 		UNUSED_ARG(button);
@@ -38,11 +40,11 @@ static GtkWidget	*create_dialogAudioCodec (void);
 
 }
 
-uint8_t DIA_audioCodec( AUDIOENCODER *codec )
+uint8_t DIA_audioCodec( int *codec )
 {
 
 	uint8_t ret=0;
-	AUDIOENCODER old=*codec;
+	int old=*codec;
 	
 	dialog=create_dialogAudioCodec();
 	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
@@ -51,14 +53,12 @@ uint8_t DIA_audioCodec( AUDIOENCODER *codec )
 										-1);
 	gtk_register_dialog(dialog);
 
-#if FIXME_ZAZA	
+
 	// now set the input one
-	for(uint32_t i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
-		if(*codec==myCodecList[i].codec)
-			{
-				// set 
-				gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(dialog,"optionmenu_CodecList")), i);
-			}
+    uint32_t nb=audioEncoderGetNumberOfEncoders();
+	
+   gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(dialog,"optionmenu_CodecList")), *codec);
+	
 	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
 	{
 		
@@ -70,24 +70,19 @@ uint8_t DIA_audioCodec( AUDIOENCODER *codec )
 	{
 		*codec=old;
 	}
-#endif
-        gtk_unregister_dialog(dialog);
+
+    gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	
 	return ret;
 } 
 
-AUDIOENCODER findCodec( void )
+int findCodec( void )
 {
-#ifdef FIXME_ZAZA
-uint8_t j;
-			j=getRangeInMenu(lookup_widget(dialog,"optionmenu_CodecList"));
-		
-			if(j>=sizeof(myCodecList)/sizeof(CODECLIST)) ADM_assert(0);
-			return myCodecList[j].codec;
- #endif
-			
 
+int  j;
+			j=getRangeInMenu(lookup_widget(dialog,"optionmenu_CodecList"));
+            return j;
 }
 //-------------------------
 
@@ -116,7 +111,8 @@ GtkWidget	*create_dialogAudioCodec (void)
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
-  GtkWidget *acodec[10];
+uint32_t nbA=audioEncoderGetNumberOfEncoders();
+  GtkWidget *acodec[nbA];
   int acodecNb=0;
 
   dialogAudioCodec = gtk_dialog_new ();
@@ -136,14 +132,15 @@ GtkWidget	*create_dialogAudioCodec (void)
   menu1 = gtk_menu_new ();
 
  /***************/
-#if FIXME_ZAZA
-        for(int i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
+
+
+        for(int i=0;i<nbA;i++)
         {
-                acodec[i]=gtk_menu_item_new_with_mnemonic(myCodecList[i].menuName);
+                acodec[i]=gtk_menu_item_new_with_mnemonic(audioEncoderGetDisplayName(i));
                 gtk_widget_show(acodec[i]);
                 gtk_container_add(GTK_CONTAINER(menu1),acodec[i]);
         }  
-#endif
+
  /***************/ 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu_CodecList), menu1);
 
@@ -171,14 +168,10 @@ GtkWidget	*create_dialogAudioCodec (void)
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, vbox1, "vbox1");
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, optionmenu_CodecList, "optionmenu_CodecList");
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, menu1, "menu1");
-/****/
-#if FIXME_ZAZA
-   for(int i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
+  for(int i=0;i<nbA;i++)
         {
-                GLADE_HOOKUP_OBJECT (dialogAudioCodec, acodec[i],myCodecList[i].name );
-        }
-#endif
-/****/
+             GLADE_HOOKUP_OBJECT (dialogAudioCodec, acodec[i],audioEncoderGetDisplayName(i));
+        }  
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, buttonConfigure, "buttonConfigure");
   GLADE_HOOKUP_OBJECT_NO_REF (dialogAudioCodec, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, cancelbutton1, "cancelbutton1");
