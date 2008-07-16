@@ -5,7 +5,7 @@
 #ifndef ADM_ad_plugin_h
 #define ADM_ad_plugin_h
 #include "ADM_default.h"
-#include "../ADM_audio/ADM_audiodef.h"
+#include "ADM_coreAudio/include/ADM_coreAudio.h"
 #include "ADM_audiocodec.h"
 #include "../ADM_audio/aviaudio.hxx"
 

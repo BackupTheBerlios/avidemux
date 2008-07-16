@@ -32,7 +32,7 @@
 //
 
 #include "faac.h"
-#include "ADM_audiofilter/audioencoder_faac.h"
+#include "audioencoder_faac.h"
 
 AUDMEncoder_Faac::AUDMEncoder_Faac(AUDMAudioFilter * instream)  :AUDMEncoder    (instream)
 {

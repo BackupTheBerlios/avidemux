@@ -22,7 +22,8 @@
 
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
-#include "ADM_audiofilter/audioencoder.h"
+#include "ADM_audioEncoder/include/audioencoder_enum.h"
+
 
 #ifdef USE_XX_XVID 
 #include "xvid.h"

@@ -23,8 +23,8 @@
 #include "audioeng_process.h"
 #include "audioencoder.h"
 //
-#include "ADM_audiofilter/audioencoder_twolame.h"
-#include "ADM_audiofilter/audioencoder_twolame_param.h"
+#include "audioencoder_twolame.h"
+#include "audioencoder_twolame_param.h"
 
 extern "C"
 {

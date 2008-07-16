@@ -23,7 +23,7 @@
 #include "audioeng_process.h"
 #include "audioencoder.h"
 //
-#include "ADM_audiofilter/audioencoder_pcm.h"
+#include "audioencoder_pcm.h"
 
 
 #include "ADM_osSupport/ADM_debugID.h"

@@ -22,7 +22,7 @@
 class AviList;
 
 
-#include "../ADM_audio/ADM_audiodef.h"
+#include "ADM_coreAudio/include/ADM_coreAudio.h"
 typedef struct
 {
 	uint16_t	encoding;	

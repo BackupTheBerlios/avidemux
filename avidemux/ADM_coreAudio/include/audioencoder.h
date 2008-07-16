@@ -16,8 +16,7 @@
   \param param : An opaque structure that contains the codec specific configuration datas
 */
 #include "ADM_coreAudio.h"
-#include "audioeng_buildfilters.h"
-
+#include "ADM_audioEncoder/include/audioencoder_enum.h"
 typedef struct ADM_audioEncoderDescriptor
 {
   AUDIOENCODER encoder;
@@ -33,7 +32,8 @@ typedef struct ADM_audioEncoderDescriptor
   Base class for all audio encoder.It does the reverse of the bridge class and offers a proper GenericAudioStreamAPI
 
 */
-
+#include "ADM_audio/aviaudio.hxx" // FIXME!!!!
+#include "ADM_audiofilter/audioeng_process.h" // FIXME!!!
  //_____________________________________________
 class AUDMEncoder : public AVDMGenericAudioStream
 {

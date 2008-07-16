@@ -21,8 +21,8 @@
 #include "audioeng_process.h"
 #include "audioencoder.h"
 
-#include "ADM_audiofilter/audioencoder_lame_param.h"
-#include "ADM_audiofilter/audioencoder_lame.h"
+#include "audioencoder_lame_param.h"
+#include "audioencoder_lame.h"
 
 
 

@@ -38,8 +38,8 @@ extern "C"
 	#include "aften/aften.h"
 #endif
 };
-#include "ADM_audiofilter/audioencoder_aften_param.h"
-#include "ADM_audiofilter/audioencoder_aften.h"
+#include "audioencoder_aften_param.h"
+#include "audioencoder_aften.h"
 
 #define _HANDLE ((AftenContext *)_handle)
 AUDMEncoder_Aften::AUDMEncoder_Aften(AUDMAudioFilter * instream)  :AUDMEncoder    (instream)

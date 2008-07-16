@@ -29,7 +29,7 @@
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 
 
-#include "ADM_audiofilter/audioencoder.h"
+#include "audioencoder.h"
 
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
 

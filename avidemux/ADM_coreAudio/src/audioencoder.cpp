@@ -12,18 +12,11 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
-#include "ADM_assert.h"
 
 #include "ADM_default.h"
-
-#include "audioprocess.hxx"
-#include "audioeng_process.h"
+#include "ADM_coreAudio.h"
+#include "ADM_audiofilter/audioprocess.hxx"
+#include "ADM_audiofilter/audioeng_process.h"
 #include "audioencoder.h"
 
 AUDMEncoder::AUDMEncoder(AUDMAudioFilter *in)  :AVDMGenericAudioStream  ()

@@ -27,7 +27,7 @@
 #include "audioeng_process.h"
 #include "audioencoder.h"
 //
-#include "ADM_audiofilter/audioencoder_lavcodec.h"
+#include "audioencoder_lavcodec.h"
 
 #include "ADM_lavcodec.h"
 

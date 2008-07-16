@@ -37,22 +37,8 @@ void audioCodecSelect( void );
 void audioFilter_MP3DisableReservoir(int onoff);
 uint32_t audioFilter_getOuputCodec(void);
 uint32_t audioFilter_getOuputFrequency(uint32_t inputFrequency);
-typedef enum 
-{
-	AUDIOENC_NONE,
-	AUDIOENC_MP3,
-	AUDIOENC_MP2,
-	AUDIOENC_AC3,
-	AUDIOENC_2LAME,
-	AUDIOENC_FAAC,
-	AUDIOENC_VORBIS,
-        AUDIOENC_COPY,
-        AUDIOENC_LPCM,
-#ifdef USE_AFTEN        
-        AUDIOENC_AFTEN,
-#endif        
-	AUDIOENC_DUMMY
-}AUDIOENCODER;
+
+#include "ADM_audioEncoder/include/audioencoder_enum.h"
 
 typedef enum 
 {

@@ -12,7 +12,7 @@
 void            AUDMEncoder_initDither();
 void dither16(float *start, uint32_t nb, uint8_t channels);
 
-
+#include "ADM_audiodef.h"
 
 #endif
 //EOF

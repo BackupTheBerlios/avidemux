@@ -24,8 +24,8 @@
 #include "audioeng_process.h"
 #include "audioencoder.h"
 //
-#include "ADM_audiofilter/audioencoder_vorbis_param.h"
-#include "ADM_audiofilter/audioencoder_vorbis.h"
+#include "audioencoder_vorbis_param.h"
+#include "audioencoder_vorbis.h"
 
 
 #include "vorbis/vorbisenc.h"

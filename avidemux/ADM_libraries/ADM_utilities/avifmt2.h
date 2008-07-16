@@ -44,7 +44,7 @@ typedef struct _avistdindex_chunk
 #define AVI_KEY_FRAME   0x10
 #define AVI_B_FRAME	0x4000	 // hopefully it is not used..
 
-#include "../../ADM_audio/ADM_audiodef.h"
+#include "ADM_coreAudio/include/ADM_coreAudio.h"
 
 void Endian_AviMainHeader(MainAVIHeader *m);
 void Endian_BitMapInfo( ADM_BITMAPINFOHEADER *b);

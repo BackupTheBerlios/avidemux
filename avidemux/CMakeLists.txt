@@ -56,6 +56,7 @@ INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}/config")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_core/include")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_coreUI/include")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_coreImage/include")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_coreAudio/include")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_utilities")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_ffmpeg/ADM_lavutil")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_ffmpeg/ADM_lavcodec")
@@ -151,6 +152,7 @@ ADD_SOURCE_CFLAGS(main.cpp "-DADM_SUBVERSION=${ADM_SUBVERSION}")
 ########################################
 SET(ADM_SUBDIR 
 	ADM_audiofilter
+	ADM_audioEncoder
 	ADM_editor
 	ADM_audiocodec
 	ADM_audio
@@ -220,7 +222,6 @@ FOREACH(_current ${ADM_TAILS})
 	ADD_SUBDIRECTORY(${_current})
 	ADD_ADMLIB_ALL_TARGETS(${_current})
 ENDFOREACH(_current ${ADM_TAILS})
-
 ###########################################
 # Construct ADM_libraries
 ###########################################
@@ -316,6 +317,11 @@ ADD_SUBDIRECTORY(ADM_coreUI)
 ADD_LIB_ALL_TARGETS(ADM_coreUI)
 ADD_SUBDIRECTORY(ADM_coreImage)
 ADD_LIB_ALL_TARGETS(ADM_coreImage)
+ADD_SUBDIRECTORY(ADM_coreAudio)
+ADD_LIB_ALL_TARGETS(ADM_coreAudio)
+
+# To be removed
+ADD_SUBDIRECTORY(ADM_audioEncoder)
 
 ###########################################
 # External libs
@@ -375,23 +381,6 @@ IF (USE_SDL)
 		TARGET_LINK_LIBRARIES(avidemux2_qt4 ${SDL_LIBRARY})
 	ENDIF (ADM_UI_QT4)
 ENDIF (USE_SDL)
-if(0)
-# aRts
-IF (USE_ARTS)
-	IF (ADM_UI_GTK)
-		ADD_TARGET_LDFLAGS(avidemux2_gtk ${ARTS_LDFLAGS})
-	ENDIF (ADM_UI_GTK)
-
-	IF (ADM_UI_QT4)
-		ADD_TARGET_LDFLAGS(avidemux2_qt4 ${ARTS_LDFLAGS})
-	ENDIF (ADM_UI_QT4)
-ENDIF (USE_ARTS)
-
-# JACK
-IF (USE_JACK)
-	ADD_LIB_ALL_TARGETS("${JACK_LIBRARY_DIR}")
-ENDIF (USE_JACK)
-endif(0)
 # LAME
 IF (HAVE_LIBMP3LAME)
 	ADD_LIB_ALL_TARGETS("${LAME_LIBRARY_DIR}")

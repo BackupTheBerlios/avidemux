@@ -21,38 +21,38 @@
 
 #include "ADM_audio/audiomode.hxx"
 #include "ADM_audiofilter/audiofilter_limiter_param.h"
-#include "ADM_audiofilter/audioencoder_lame_param.h"
-#include "ADM_audiofilter/audioencoder_twolame_param.h"
-#include "ADM_audiofilter/audioencoder_faac_param.h"
-#include "ADM_audiofilter/audioencoder_vorbis_param.h"
-#include "ADM_audiofilter/audioencoder_aften_param.h"
-#include "ADM_audiofilter/audiofilter_normalize_param.h"
+#include "audioencoder_lame_param.h"
+#include "audioencoder_twolame_param.h"
+#include "audioencoder_faac_param.h"
+#include "audioencoder_vorbis_param.h"
+#include "audioencoder_aften_param.h"
+#include "audiofilter_normalize_param.h"
 
 #include "audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_audiofilter/audio_raw.h"
 
 /* ************* Encoder *********** */
-#include "ADM_audiofilter/audioencoder.h"
+#include "audioencoder.h"
 #ifdef USE_FAAC
-#include "ADM_audiofilter/audioencoder_faac.h"
+#include "audioencoder_faac.h"
 #endif
 #ifdef HAVE_LIBMP3LAME
-#include "ADM_audiofilter/audioencoder_lame.h"
+#include "audioencoder_lame.h"
 #endif
 #ifdef USE_VORBIS
-#include "ADM_audiofilter/audioencoder_vorbis.h"
+#include "audioencoder_vorbis.h"
 #endif
 #ifdef USE_AFTEN
-#include "ADM_audiofilter/audioencoder_aften.h"
+#include "audioencoder_aften.h"
 #endif
 
-#include "ADM_audiofilter/audioencoder_twolame.h"
-#include "ADM_audiofilter/audioencoder_lavcodec.h"
+#include "audioencoder_twolame.h"
+#include "audioencoder_lavcodec.h"
 
 
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
-#include "ADM_audiofilter/audioencoder_pcm.h"
+#include "audioencoder_pcm.h"
 
 #include "prefs.h"
 
