@@ -15,20 +15,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-#ifdef USE_AFTEN
-#include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <math.h>
-
-
 #include "ADM_default.h"
-
-#include "audioprocess.hxx"
-#include "audioeng_process.h"
+#include "DIA_factory.h"
+#include "DIA_coreToolkit.h"
 #include "audioencoder.h"
+#include "audioencoderInternal.h"
+
 //
 extern "C"
 {
@@ -42,6 +35,47 @@ extern "C"
 #include "audioencoder_aften.h"
 
 #define _HANDLE ((AftenContext *)_handle)
+
+static AFTEN_encoderParam aftenParam= {
+  128
+  
+};
+static uint8_t configure (void);
+/********************* Declare Plugin *****************************************************/
+ADM_DECLARE_AUDIO_ENCODER_PREAMBLE(AUDMEncoder_Aften);
+
+static ADM_audioEncoder encoderDesc = { 
+  ADM_AUDIO_ENCODER_API_VERSION,
+  create,			// Defined by macro automatically
+  destroy,			// Defined by macro automatically
+  configure,		//** put your own function here**
+  "Aften",            
+  "AC3 (Aften)",      
+  "Aften AC3 encoder plugin Mean/Gruntster 2008",             
+  6,                    // Max channels
+  1,0,0,                // Version
+  WAV_AC3,
+  200,                  // Priority
+  getConfigurationData,  // Defined by macro automatically
+  setConfigurationData,  // Defined by macro automatically
+
+  getBitrate,           // Defined by macro automatically
+  setBitrate,            // Defined by macro automatically 
+
+  NULL,         //** put your own function here**
+
+  NULL
+};
+ADM_DECLARE_AUDIO_ENCODER_CONFIG(aftenParam);
+
+/******************* / Declare plugin*******************************************************/
+
+
+/**
+    \fn AUDMEncoder_Aften
+
+*/
+
 AUDMEncoder_Aften::AUDMEncoder_Aften(AUDMAudioFilter * instream)  :AUDMEncoder    (instream)
 {
   uint32_t channels;
@@ -58,6 +92,10 @@ AUDMEncoder_Aften::AUDMEncoder_Aften(AUDMAudioFilter * instream)  :AUDMEncoder  
 #endif
 };
 
+/**
+    \fn ~AUDMEncoder_Aften
+
+*/
 
 AUDMEncoder_Aften::~AUDMEncoder_Aften()
 {
@@ -71,15 +109,11 @@ AUDMEncoder_Aften::~AUDMEncoder_Aften()
 };
 
 
-//________________________________________________
-//   Init lame encoder
-// frequence    : Impose frequency , 0 means reuse the incoming fq
-// mode                         : ADM_STEREO etc...
-// bitrate              : Bitrate in kbps (96,192...)
-// return 0 : init failed
-//                              1 : init succeeded
-//_______________________________________________
-uint8_t AUDMEncoder_Aften::init(ADM_audioEncoderDescriptor *config)
+/**
+    \fn initialize
+
+*/
+uint8_t AUDMEncoder_Aften::initialize(void)
 {
 
 
@@ -91,12 +125,12 @@ int mask;
 unsigned int mask;
 #endif
 
-    _wavheader->byterate=(config->bitrate*1000)/8;
+    _wavheader->byterate=(aftenParam.bitrate*1000)/8;
     _HANDLE->sample_format=A52_SAMPLE_FMT_FLT;
     _HANDLE->channels=_wavheader->channels;
     _HANDLE->samplerate=_wavheader->frequency;
     
-    _HANDLE->params.bitrate=config->bitrate;
+    _HANDLE->params.bitrate=aftenParam.bitrate;
     switch(_wavheader->channels)
     {
         case 1: mask = 0x04;  break;
@@ -127,7 +161,9 @@ unsigned int mask;
 }
 
 
-//______________________________________________
+/**
+        \fn getPacket
+*/
 uint8_t	AUDMEncoder_Aften::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
   uint32_t count=0;
@@ -162,5 +198,32 @@ _again:
         return 1;
 }
 
-#endif		
+/**
+    \fn configure
+*/
+uint8_t configure (void)
+{
+ int ret=0;
+
+    diaMenuEntry bitrateM[]={
+                              BITRATE(56),
+                              BITRATE(64),
+                              BITRATE(80),
+                              BITRATE(96),
+                              BITRATE(112),
+                              BITRATE(128),
+                              BITRATE(160),
+                              BITRATE(192),
+                              BITRATE(224),
+                              BITRATE(384)
+                          };
+    diaElemMenu bitrate(&(aftenParam.bitrate),   QT_TR_NOOP("_Bitrate:"), SZT(bitrateM),bitrateM);
+  
+    
+
+    diaElem *elems[]={&bitrate};
+    
+    return ( diaFactoryRun(QT_TR_NOOP("Aften Configuration"),1,elems));
+    
+}
 // EOF

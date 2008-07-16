@@ -11,6 +11,7 @@ typedef enum
 
 typedef struct 
 {
+  uint32_t           bitrate;
   ADM_VORBIS_MODE    mode;   // 0 cbr 1 vbr 2 quality
   float              quality;
 }VORBIS_encoderParam;

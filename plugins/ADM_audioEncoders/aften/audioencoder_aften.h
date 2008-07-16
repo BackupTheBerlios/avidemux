@@ -14,7 +14,7 @@
  ***************************************************************************/
 #ifndef AUDMaudioAften
 #define AUDMaudioAften
-#ifdef USE_AFTEN
+
  //_____________________________________________
 class AUDMEncoder_Aften : public AUDMEncoder
 {
@@ -22,10 +22,10 @@ protected:
          void           *_handle;
          
 public:
-                        uint8_t init(ADM_audioEncoderDescriptor *config);
+                uint8_t initialize(void);
                 virtual ~AUDMEncoder_Aften();
                         AUDMEncoder_Aften(AUDMAudioFilter *instream);	
-                virtual uint8_t	getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
+        virtual uint8_t	getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
 };
 #endif
-#endif
+
