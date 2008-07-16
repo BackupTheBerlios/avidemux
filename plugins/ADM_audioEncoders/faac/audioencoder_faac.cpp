@@ -18,12 +18,49 @@
 #include <math.h>
 
 #include "ADM_default.h"
+#include "DIA_factory.h"
+#include "DIA_coreToolkit.h"
 
 #include "audioencoder.h"
-//
+#include "audioencoderInternal.h"
 
 #include "faac.h"
 #include "audioencoder_faac.h"
+#include "audioencoder_faac_param.h"
+
+static uint8_t configure(void);
+
+static FAAC_encoderParam faacParm={
+    128
+};
+/********************* Declare Plugin *****************************************************/
+ADM_DECLARE_AUDIO_ENCODER_PREAMBLE(AUDMEncoder_Faac);
+
+static ADM_audioEncoder encoderDesc = { 
+  ADM_AUDIO_ENCODER_API_VERSION,
+  create,			// Defined by macro automatically
+  destroy,			// Defined by macro automatically
+  configure,		//** put your own function here**
+  "Faac",            
+  "AAC (Faac)",      
+  "Faac AAC encoder plugin Mean 2008",             
+  6,                    // Max channels
+  1,0,0,                // Version
+  WAV_AAC,
+  200,                  // Priority
+  getConfigurationData,  // Defined by macro automatically
+  setConfigurationData,  // Defined by macro automatically
+
+  getBitrate,           // Defined by macro automatically
+  setBitrate,            // Defined by macro automatically 
+
+  NULL,         //** put your own function here**
+
+  NULL
+};
+ADM_DECLARE_AUDIO_ENCODER_CONFIG( faacParm);
+
+/******************* / Declare plugin*******************************************************/
 
 AUDMEncoder_Faac::AUDMEncoder_Faac(AUDMAudioFilter * instream)  :AUDMEncoder    (instream)
 {
@@ -58,16 +95,11 @@ AUDMEncoder_Faac::~AUDMEncoder_Faac()
 };
 
 
-//________________________________________________
-//   Init lame encoder
-// frequence    : Impose frequency , 0 means reuse the incoming fq
-// mode                         : ADM_STEREO etc...
-// bitrate              : Bitrate in kbps (96,192...)
-// return 0 : init failed
-//                              1 : init succeeded
-//_______________________________________________
-#if 0
-uint8_t AUDMEncoder_Faac::init(ADM_audioEncoderDescriptor *config)
+/**
+    \fn initialize
+
+*/
+uint8_t AUDMEncoder_Faac::initialize(void)
 {
 unsigned long int samples_input, max_bytes_output;
 faacEncConfigurationPtr cfg;
@@ -81,7 +113,7 @@ int ret=0;
     if(!_handle)
     {
           printf("Cannot open faac with fq=%lu chan=%lu br=%lu\n",
-          _wavheader->frequency,_wavheader->channels,config->bitrate);
+          _wavheader->frequency,_wavheader->channels,faacParm.bitrate);
           return 0;
     }
     printf(" [FAAC] : Sample input:%d, max byte output%d \n",samples_input,max_bytes_output);
@@ -93,14 +125,14 @@ int ret=0;
     cfg->bandWidth= (_wavheader->frequency*3)/4; // Should be relevant
     cfg->useTns = 0;
     cfg->allowMidside = 0;
-    cfg->bitRate = (config->bitrate*1000)/_wavheader->channels; // It is per channel
+    cfg->bitRate = (faacParm.bitrate*1000)/_wavheader->channels; // It is per channel
     cfg->outputFormat = 0; // 0 Raw 1 ADTS
     cfg->inputFormat = FAAC_INPUT_FLOAT;
     cfg->useLfe=0;	
     if (!(ret=faacEncSetConfiguration(_handle, cfg))) 
     {
         printf("[FAAC] Cannot set conf for faac with fq=%lu chan=%lu br=%lu (err:%d)\n",
-				_wavheader->frequency,_wavheader->channels,config->bitrate,ret);
+				_wavheader->frequency,_wavheader->channels,faacParm.bitrate,ret);
 	return 0;
     }
      unsigned char *data=NULL;
@@ -115,7 +147,7 @@ int ret=0;
      memcpy(_extraData,data,size);
 
     // update
-     _wavheader->byterate=(config->bitrate*1000)/8;
+     _wavheader->byterate=(faacParm.bitrate*1000)/8;
 //    _wavheader->dwScale=1024;
 //    _wavheader->dwSampleSize=0;
     _wavheader->blockalign=4096;
@@ -136,7 +168,7 @@ int ret=0;
     
     return 1;
 }
-#endif
+
 //_____________________________________________
 //  Need to multiply the float by 32767, can't use
 //  generic fill buffer
@@ -184,7 +216,7 @@ uint8_t AUDMEncoder_Faac::refillBuffer(int minimum)
     }
   }
 }
-
+#define SIZE_INTERNAL 64*1024 
 #define FA_BUFFER_SIZE (SIZE_INTERNAL/4)
 //______________________________________________
 uint8_t	AUDMEncoder_Faac::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
@@ -211,5 +243,35 @@ _again:
         tmphead+=_chunk;
         return 1;
 }
-#endif		
+#define SZT(x) sizeof(x)/sizeof(diaMenuEntry )
+#define BITRATE(x) {x,QT_TR_NOOP(#x)}
+
+/**
+    \fn configure
+*/
+uint8_t configure (void)
+{
+ int ret=0;
+
+    diaMenuEntry bitrateM[]={
+                              BITRATE(56),
+                              BITRATE(64),
+                              BITRATE(80),
+                              BITRATE(96),
+                              BITRATE(112),
+                              BITRATE(128),
+                              BITRATE(160),
+                              BITRATE(192),
+                              BITRATE(224),
+                              BITRATE(384)
+                          };
+    diaElemMenu bitrate(&(faacParm.bitrate),   QT_TR_NOOP("_Bitrate:"), SZT(bitrateM),bitrateM);
+  
+    
+
+    diaElem *elems[]={&bitrate};
+    
+    return ( diaFactoryRun(QT_TR_NOOP("Aften Configuration"),1,elems));
+    
+}	
 // EOF

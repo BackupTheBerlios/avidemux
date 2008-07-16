@@ -3,6 +3,6 @@
 #define FAAC_PARAM_H
 typedef struct 
 {
-  uint32_t dummy;
+  uint32_t bitrate;
 }FAAC_encoderParam;
 #endif
