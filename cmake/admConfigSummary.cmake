@@ -31,9 +31,9 @@ ADM_DISPLAY("Qt 4      " "${ADM_UI_QT4}")
 #ADM_DISPLAY("OSS       " "${OSS_SUPPORT}" "${OSS_CAPABLE}")
 #ADM_DISPLAY("SRC       " "${USE_SRC}" "${JACK_CAPABLE}")
 
-IF (WIN32)
-	ADM_DISPLAY("Win32     " 1)
-ENDIF (WIN32)
+#IF (WIN32)
+#	ADM_DISPLAY("Win32     " 1)
+#ENDIF (WIN32)
 
 MESSAGE("*** Miscellaneous ***")
 ADM_DISPLAY("gettext   " "${HAVE_GETTEXT}")
