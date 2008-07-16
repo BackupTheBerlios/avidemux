@@ -20,245 +20,242 @@
 #include "audioencoderInternal.h"
 #include "audioencoder_lame_param.h"
 #include "audioencoder_lame.h"
-static uint8_t      getConfigurationData(uint32_t *l, uint8_t **d);
-static uint8_t      setConfigurationData(uint32_t l, uint8_t *d);
 
-
-static AUDMEncoder *create(AUDMAudioFilter *head)
-{
-    return new AUDMEncoder_Lame(head);
-}
-static void destroy(AUDMEncoder *in)
-{
-    AUDMEncoder_Lame *z=(AUDMEncoder_Lame *)in;
-    delete z;
-}
-static uint8_t configure(void);
-
-
-static LAME_encoderParam myLameParam=
-{
+static LAME_encoderParam myLameParam = {
   128,
-  ADM_LAME_PRESET_CBR, // preset;
-  ADM_STEREO, //ADM_mode        mode;
-  2, //uint32_t        quality;
-  0, //uint32_t        disableReservoir; // usefull for strict CBR (FLV)
+  ADM_LAME_PRESET_CBR,		// preset;
+  ADM_STEREO,			//ADM_mode        mode;
+  2,				//uint32_t        quality;
+  0,				//uint32_t        disableReservoir; // usefull for strict CBR (FLV)
 };
+static uint8_t configure (void);
+/********************* Declare Plugin *****************************************************/
+ADM_DECLARE_AUDIO_ENCODER_PREAMBLE(AUDMEncoder_Lame);
 
-static ADM_audioEncoder lameDesc={
-    ADM_AUDIO_ENCODER_API_VERSION, //uint32_t     apiVersion;            // const
-    create,                        // AUDMEncoder *(*create)(AUDMAudioFilter *head);  
-    destroy,                       // void         (*destroy)(AUDMEncoder *codec);
-    configure,                     // int          (*configure)(void);    
-    "LAME",
-    "MP3 (Lame)",
-    "Lame encoding plugin (c) 2008 Mean",
-    2,     // Max Channel
-    1,0,0, //Major minor patch
-    WAV_MP3,                // const Avi fourcc
-    200,              // const Higher means the codec is prefered and should appear first in the list
-    getConfigurationData, // Get the encoder private conf
-    setConfigurationData,
+static ADM_audioEncoder encoderDesc = { 
+  ADM_AUDIO_ENCODER_API_VERSION,
+  create,			// Defined by macro automatically
+  destroy,			// Defined by macro automatically
+  configure,		//** put your own function here**
+  "Lame",            
+  "MP3 (lame)",      
+  "Lame MP3 encoder plugin Mean 2008",             
+  2,                    // Max channels
+  1,0,0,                // Version
+  WAV_MP3,
+  200,                  // Priority
+  getConfigurationData,  // Defined by macro automatically
+  setConfigurationData,  // Defined by macro automatically
 
-    NULL,  // GetBitrate
-    NULL,  // SetBitrate
+  getBitrate,           // Defined by macro automatically
+  setBitrate,            // Defined by macro automatically 
 
-    NULL, // Set Option
+  NULL,         //** put your own function here**
 
-    NULL              // Hide stuff in here
+  NULL
 };
+ADM_DECLARE_AUDIO_ENCODER_CONFIG(myLameParam);
 
-uint8_t      getConfigurationData(uint32_t *l, uint8_t **d) // Get the encoder private conf
-{
-    *l=sizeof(lameDesc);
-    *d=(uint8_t *)&lameDesc;
-    return 1;
-}
-uint8_t      setConfigurationData(uint32_t l, uint8_t *d) // Get the encoder private conf
-{
-    if(sizeof(lameDesc) != l) 
-    {
-        GUI_Error_HIG("Audio Encoder","The configuration size does not match the codec size");
-        return 0;
-    }
-    memcpy(&lameDesc,d,l);
-    return 1;
-}
-
-
-extern "C" ADM_audioEncoder *getInfo(void)
-{
-    return &lameDesc;
-}
-
+/******************* / Declare plugin*******************************************************/
 #define MYFLAGS (lame_global_flags *)lameFlags
-
-AUDMEncoder_Lame::AUDMEncoder_Lame(AUDMAudioFilter * instream)  :AUDMEncoder    (instream)
+/**
+    \fn AUDMEncoder_Lame Constructor
+    \brief
+*/
+AUDMEncoder_Lame::AUDMEncoder_Lame (AUDMAudioFilter * instream):AUDMEncoder
+  (instream)
 {
-  printf("[Lame] Creating lame\n");
-  lameFlags=NULL;
-  _wavheader->encoding=WAV_MP3;
+  printf ("[Lame] Creating lame\n");
+  lameFlags = NULL;
+  _wavheader->encoding = WAV_MP3;
 };
 
-AUDMEncoder_Lame::~AUDMEncoder_Lame()
+/**
+    \fn AUDMEncoder_Lame 
+    \brief Destructor
+*/
+
+AUDMEncoder_Lame::~AUDMEncoder_Lame ()
 {
-#if 0
-  printf("[Lame] Deleting lame\n");
-  if(lameFlags)
-  {
-    lame_close(MYFLAGS);
-  }
-  lameFlags=NULL;
-  cleanup();
-#endif
+
+  printf ("[Lame] Deleting lame\n");
+  if (lameFlags)
+    {
+      lame_close (MYFLAGS);
+    }
+  lameFlags = NULL;
+  cleanup ();
+
 };
 
 
-//________________________________________________
-//   Init lame encoder
-// frequence    : Impose frequency , 0 means reuse the incoming fq
-// mode                         : ADM_STEREO etc...
-// bitrate              : Bitrate in kbps (96,192...)
-// return 0 : init failed
-//                              1 : init succeeded
-//_______________________________________________
+/**
+    \fn initialize
+    \brief initialize lame encoder
+    @return 1 on success, 0 on error
+*/
 
-uint8_t AUDMEncoder_Lame::initialize(void)
+uint8_t
+AUDMEncoder_Lame::initialize (void)
 {
-#if 0
+
   int ret;
   MPEG_mode_e mmode;
   uint32_t frequence;
-  LAME_encoderParam *lameConf=(LAME_encoderParam *)config->param;
-      ADM_assert(config->paramSize==sizeof(LAME_encoderParam));
+  LAME_encoderParam *lameConf = (LAME_encoderParam *) & myLameParam;
 
-      lameFlags = lame_init();
-      if (lameFlags == NULL)
-          return 0;
-      
-      if(_incoming->getInfo()->channels>2)
-      {
-        printf("Too many channels\n");
-        return 0; 
-      }
 
-	// recompute output length
-	
-      
-      ret = lame_set_in_samplerate(MYFLAGS, _wavheader->frequency);
-      ret = lame_set_num_channels(MYFLAGS, _wavheader->channels);
+  lameFlags = lame_init ();
+  if (lameFlags == NULL)
+    return 0;
 
-    
-      frequence = _wavheader->frequency;
-    printf("\n output frequency : %lu\n", frequence);
-    ret = lame_set_out_samplerate(MYFLAGS, frequence);
-
-    ret = lame_set_quality(MYFLAGS, 2);
-    
-    if (_wavheader->channels == 2)
-      {
-        switch (lameConf->mode)
-	    {
-	    case ADM_STEREO:
-		mmode = STEREO;
-		break;
-	    case ADM_JSTEREO:
-		mmode = JOINT_STEREO;
-		break;
-	    default:
-		printf("\n **** unknown mode ***\n");
-		mmode = STEREO;
-		break;
-
-	    }
-    } else
+  if (_incoming->getInfo ()->channels > 2)
     {
-		mmode = MONO;
-     	printf("\n mono audio mp3");
-  	}
-
-        ret = lame_set_brate(MYFLAGS, config->bitrate);
-        ret = lame_set_mode(MYFLAGS, mmode);	// 0 stereo 1 jstero
-        ret = lame_set_quality(MYFLAGS, lameConf->quality);	// 0 stereo 1 jstero
-        ret = lame_set_disable_reservoir(MYFLAGS,lameConf->disableReservoir);
-        printf("[Lame]Using quality of %d\n",lame_get_quality(MYFLAGS));
-        ret = lame_init_params(MYFLAGS);
-    if (ret == -1)
-	return 0;
-    // update bitrate in header
-    _wavheader->byterate = (config->bitrate >> 3) * 1000;
-#define BLOCK_SIZE 1152
-    // configure CBR/ABR/...
-    _preset=lameConf->preset;
-    switch(_preset)
-    {
-    	default:
-    	case ADM_LAME_PRESET_CBR: 
-          break;
-	case ADM_LAME_PRESET_ABR:
-	  
-          lame_set_preset( MYFLAGS, config->bitrate);
-	  _wavheader->blockalign=BLOCK_SIZE;
-	 break;
-	case ADM_LAME_PRESET_EXTREME: 
-	  _wavheader->blockalign=BLOCK_SIZE;
-          lame_set_preset( MYFLAGS, EXTREME);	
-	break;
-    
-    
+      printf ("[Lame]Too many channels\n");
+      return 0;
     }
 
-    lame_print_config(MYFLAGS);
-    lame_print_internals(MYFLAGS);
-    _chunk=BLOCK_SIZE*_wavheader->channels;
-#endif
-    return 1;
+  // recompute output length
+
+
+  ret = lame_set_in_samplerate (MYFLAGS, _wavheader->frequency);
+  ret = lame_set_num_channels (MYFLAGS, _wavheader->channels);
+
+
+  frequence = _wavheader->frequency;
+  printf ("[Lame] output frequency : %lu\n", frequence);
+  ret = lame_set_out_samplerate (MYFLAGS, frequence);
+
+  ret = lame_set_quality (MYFLAGS, 2);
+
+  if (_wavheader->channels == 2)
+    {
+      switch (lameConf->mode)
+	{
+	case ADM_STEREO:
+	  mmode = STEREO;
+	  break;
+	case ADM_JSTEREO:
+	  mmode = JOINT_STEREO;
+	  break;
+	default:
+	  printf ("[Lame] **** unknown mode ***\n");
+	  mmode = STEREO;
+	  break;
+
+	}
+    }
+  else
+    {
+      mmode = MONO;
+      printf ("[Lame] mono audio mp3");
+    }
+
+  ret = lame_set_brate (MYFLAGS, lameConf->bitrate);
+  ret = lame_set_mode (MYFLAGS, mmode);	// 0 stereo 1 jstero
+  ret = lame_set_quality (MYFLAGS, lameConf->quality);	// 0 stereo 1 jstero
+  ret = lame_set_disable_reservoir (MYFLAGS, lameConf->disableReservoir);
+  printf ("[Lame]Using quality of %d\n", lame_get_quality (MYFLAGS));
+  ret = lame_init_params (MYFLAGS);
+  if (ret == -1)
+    return 0;
+  // update bitrate in header
+  _wavheader->byterate = (lameConf->bitrate >> 3) * 1000;
+#define BLOCK_SIZE 1152
+  // configure CBR/ABR/...
+
+  switch (lameConf->preset)
+    {
+    default:
+    case ADM_LAME_PRESET_CBR:
+      break;
+    case ADM_LAME_PRESET_ABR:
+
+      lame_set_preset (MYFLAGS, lameConf->bitrate);
+      _wavheader->blockalign = BLOCK_SIZE;
+      break;
+    case ADM_LAME_PRESET_EXTREME:
+      _wavheader->blockalign = BLOCK_SIZE;
+      lame_set_preset (MYFLAGS, EXTREME);
+      break;
+
+
+    }
+
+  lame_print_config (MYFLAGS);
+  lame_print_internals (MYFLAGS);
+  _chunk = BLOCK_SIZE * _wavheader->channels;
+
+  return 1;
 }
-uint8_t	AUDMEncoder_Lame::isVBR(void )
+/**
+    \fn isVBR
+    @return 1 if the stream is vbr, 0 is cbr
+
+*/
+uint8_t AUDMEncoder_Lame::isVBR (void)
 {
-	if(_preset==ADM_LAME_PRESET_CBR) return 0;
-	return 1;
+  if (myLameParam.preset == ADM_LAME_PRESET_CBR)
+    return 0;
+  return 1;
 
 }
+/**
+    \fn getPacket
+    \brief Get an encoded mp3 packet
+    @param dest [in] Where to write datas
+    @param len  [out] Length of encoded datas in bytes
+    @param samples [out] Number of samples 
+    @return 1 on success, 0 on error
 
-uint8_t	AUDMEncoder_Lame::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
+*/
+uint8_t AUDMEncoder_Lame::getPacket (uint8_t * dest, uint32_t * len,
+			     uint32_t * samples)
 {
-#if 0
+
   int32_t nbout;
-  
-        *samples = BLOCK_SIZE; //FIXME
-        *len = 0;
 
-        if(!refillBuffer(_chunk ))
-        {
-          return 0; 
-        }
-        
-        if(tmptail-tmphead<_chunk)
-        {
-          return 0; 
-        }
-        dither16(&(tmpbuffer[tmphead]),_chunk,_wavheader->channels);
-        ADM_assert(tmptail>=tmphead);
-        if (_wavheader->channels == 1)
-        {
-          nbout = lame_encode_buffer(MYFLAGS, (int16_t *)&(tmpbuffer[tmphead]),(int16_t *)&(tmpbuffer[tmphead]), _chunk, dest, 16 * 1024);
-          
-        }
-        else
-        {
-          nbout = lame_encode_buffer_interleaved(MYFLAGS, (int16_t *)&(tmpbuffer[tmphead]), _chunk/2, dest, 16 * 1024);
-        }
-        tmphead+=_chunk;
-        if (nbout < 0) {
-          printf("\n Error !!! : %ld\n", nbout);
-          return 0;
-        }
-        *len=nbout;
-        if(!*len) *samples=0;
-        //printf("Audio packet : size %u, sample %u\n",*len,*samples);
-#endif
-        return 1;
+  *samples = BLOCK_SIZE;	//FIXME
+  *len = 0;
+
+  if (!refillBuffer (_chunk))
+    {
+      return 0;
+    }
+
+  if (tmptail - tmphead < _chunk)
+    {
+      return 0;
+    }
+  dither16 (&(tmpbuffer[tmphead]), _chunk, _wavheader->channels);
+  ADM_assert (tmptail >= tmphead);
+  if (_wavheader->channels == 1)
+    {
+      nbout =
+	lame_encode_buffer (MYFLAGS, (int16_t *) & (tmpbuffer[tmphead]),
+			    (int16_t *) & (tmpbuffer[tmphead]), _chunk, dest,
+			    16 * 1024);
+
+    }
+  else
+    {
+      nbout =
+	lame_encode_buffer_interleaved (MYFLAGS,
+					(int16_t *) & (tmpbuffer[tmphead]),
+					_chunk / 2, dest, 16 * 1024);
+    }
+  tmphead += _chunk;
+  if (nbout < 0)
+    {
+      printf ("\n Error !!! : %ld\n", nbout);
+      return 0;
+    }
+  *len = nbout;
+  if (!*len)
+    *samples = 0;
+  //printf("Audio packet : size %u, sample %u\n",*len,*samples);
+
+  return 1;
 }
 /**
       \fn configure
@@ -268,61 +265,62 @@ uint8_t	AUDMEncoder_Lame::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samp
 */
 #define QT_TR_NOOP(x) x
 
- uint8_t configure(void)
-  {
-    int ret=0;
-    char string[400];
-    uint32_t mmode,ppreset;
+uint8_t configure (void)
+{
+  int ret = 0;
+  char string[400];
+  uint32_t mmode, ppreset;
 #define SZT(x) sizeof(x)/sizeof(diaMenuEntry )
 #define PX(x) &(lameParam->x)
-    
-    LAME_encoderParam *lameParam=&myLameParam;
-    mmode=lameParam->mode;
-    ppreset=lameParam->preset;
-    diaMenuEntry channelMode[]={
-                             {ADM_STEREO,      QT_TR_NOOP("Stereo"),NULL},
-                             {ADM_JSTEREO,   QT_TR_NOOP("Joint stereo"),NULL},
-                             {ADM_MONO,      QT_TR_NOOP("Mono"),NULL}};
-          
-    diaElemMenu menuMode(&mmode,   QT_TR_NOOP("C_hannel mode:"), SZT(channelMode),channelMode);
-    
-    diaMenuEntry encodingMode[]={
-                             {ADM_LAME_PRESET_CBR,      QT_TR_NOOP("CBR"),NULL},
-                             {ADM_LAME_PRESET_ABR,   QT_TR_NOOP("ABR"),NULL},
+
+  LAME_encoderParam *lameParam = &myLameParam;
+  mmode = lameParam->mode;
+  ppreset = lameParam->preset;
+  diaMenuEntry channelMode[] = {
+    {ADM_STEREO, QT_TR_NOOP ("Stereo"), NULL},
+    {ADM_JSTEREO, QT_TR_NOOP ("Joint stereo"), NULL},
+    {ADM_MONO, QT_TR_NOOP ("Mono"), NULL}
+  };
+
+  diaElemMenu menuMode (&mmode, QT_TR_NOOP ("C_hannel mode:"),
+			SZT (channelMode), channelMode);
+
+  diaMenuEntry encodingMode[] = {
+    {ADM_LAME_PRESET_CBR, QT_TR_NOOP ("CBR"), NULL},
+    {ADM_LAME_PRESET_ABR, QT_TR_NOOP ("ABR"), NULL},
 #if 0
-                             {ADM_LAME_PRESET_EXTREME,      QT_TR_NOOP("Extreme"),NULL}
+    {ADM_LAME_PRESET_EXTREME, QT_TR_NOOP ("Extreme"), NULL}
 #endif
-    }; 
-    diaElemMenu Mode(&ppreset,   QT_TR_NOOP("Bit_rate mode:"), SZT(encodingMode),encodingMode);
+  };
+  diaElemMenu Mode (&ppreset, QT_TR_NOOP ("Bit_rate mode:"),
+		    SZT (encodingMode), encodingMode);
 #define BITRATE(x) {x,QT_TR_NOOP(#x)}
-    diaMenuEntry bitrateM[]={
-                              BITRATE(56),
-                              BITRATE(64),
-                              BITRATE(80),
-                              BITRATE(96),
-                              BITRATE(112),
-                              BITRATE(128),
-                              BITRATE(160),
-                              BITRATE(192),
-                              BITRATE(224)
-                          };
-    uint32_t fixme;
-    diaElemMenu bitrate(&fixme,   QT_TR_NOOP("_Bitrate:"), SZT(bitrateM),bitrateM);
-    
-    
-    
-    
-    diaElemUInteger quality(PX(quality),QT_TR_NOOP("_Quality:"),0,9);
-    diaElemToggle reservoir(PX(disableReservoir),QT_TR_NOOP("_Disable reservoir:"));
-  
-    diaElem *elems[]={&menuMode,&Mode,&quality,&bitrate,&reservoir};
-    
-  if( diaFactoryRun(QT_TR_NOOP("LAME Configuration"),5,elems))
-  {
-    return 1;
-  }
+  diaMenuEntry bitrateM[] = {
+    BITRATE (56),
+    BITRATE (64),
+    BITRATE (80),
+    BITRATE (96),
+    BITRATE (112),
+    BITRATE (128),
+    BITRATE (160),
+    BITRATE (192),
+    BITRATE (224)
+  };
+
+//***  
+  diaElemMenu bitrate (PX(bitrate), QT_TR_NOOP ("_Bitrate:"), SZT (bitrateM),
+		       bitrateM);
+  diaElemUInteger quality (PX (quality), QT_TR_NOOP ("_Quality:"), 0, 9);
+  diaElemToggle reservoir (PX (disableReservoir),
+			   QT_TR_NOOP ("_Disable reservoir:"));
+
+  diaElem *elems[] = { &menuMode, &Mode, &quality, &bitrate, &reservoir };
+
+  if (diaFactoryRun (QT_TR_NOOP ("LAME Configuration"), 5, elems))
+    {
+      return 1;
+    }
   return 0;
-}  
+}
 
 // EOF
-

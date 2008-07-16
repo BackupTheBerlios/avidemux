@@ -21,7 +21,7 @@ class AUDMEncoder_Lame : public AUDMEncoder
   protected:
    
     void              *lameFlags;
-    ADM_LAME_PRESET   _preset;
+    
          
   public:
 //            uint8_t     init(ADM_audioEncoderDescriptor *config);

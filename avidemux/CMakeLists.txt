@@ -230,7 +230,6 @@ ADD_SUBDIRECTORY(ADM_libraries)
 ADD_ADMLIB_ALL_TARGETS(
 	ADM_mplex
 	ADM_libmpeg2enc
-	ADM_libtwolame
 	ADM_lvemux
 	ADM_utilities
 	ADM_xvidratectl

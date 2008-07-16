@@ -9,6 +9,8 @@ ADM_DISPLAY("Vorbis    " "${USE_VORBIS}")
 MESSAGE("***  /Audio Codec  ***")
 
 
+ADD_SUBDIRECTORY(twolame)
+
 if(USE_LAME)
 ADD_SUBDIRECTORY(lame)
 endif(USE_LAME)

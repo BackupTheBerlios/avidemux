@@ -37,6 +37,50 @@ typedef struct
 }ADM_audioEncoder;
 
 // Macros to declare audio encoder
+/**************************************************************************/
+#define ADM_DECLARE_AUDIO_ENCODER_PREAMBLE(Class) \
+static uint8_t getConfigurationData (uint32_t * l, uint8_t ** d); \
+static uint8_t setConfigurationData (uint32_t l, uint8_t * d);\
+static uint32_t     getBitrate(void); \
+static void         setBitrate(uint32_t br); \
+\
+static AUDMEncoder * create (AUDMAudioFilter * head) \
+{ \
+  return new Class (head); \
+} \
+static void destroy (AUDMEncoder * in) \
+{\
+  Class *z = (Class *) in; \
+  delete z; \
+} 
+//******************************************************
+#define ADM_DECLARE_AUDIO_ENCODER_CONFIG(configData) \
+uint8_t getConfigurationData (uint32_t * l, uint8_t ** d)\
+{\
+  *l = sizeof (configData); \
+  *d = (uint8_t *) & configData; \
+  return 1; \
+} \
+uint8_t setConfigurationData (uint32_t l, uint8_t * d)\
+{\
+  if (sizeof (configData) != l) \
+    {\
+      GUI_Error_HIG ("Audio Encoder",\
+		     "The configuration size does not match the codec size"); \
+      return 0; \
+    }\
+  memcpy (&configData, d, l); \
+  return 1;\
+}\
+\
+\
+extern "C" ADM_audioEncoder *getInfo (void) \
+{ \
+  return &encoderDesc; \
+}  \
+uint32_t     getBitrate(void) {return configData.bitrate;};\
+void         setBitrate(uint32_t br) {configData.bitrate=br;}
+
 
 #endif
 //EOF
