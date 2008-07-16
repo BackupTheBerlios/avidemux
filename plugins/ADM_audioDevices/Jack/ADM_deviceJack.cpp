@@ -5,9 +5,7 @@
 //
 //
 
-#include "config.h"
 
-#if defined(USE_JACK)
 #include <unistd.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -15,9 +13,7 @@
 #include "ADM_default.h"
 #include "ADM_audiodevice.h"
 #include "ADM_assert.h"
-#include "ADM_audiodevice/ADM_deviceoss.h"
-#include "ADM_audiodevice/ADM_deviceALSA.h"
-#include "ADM_audiodevice/ADM_deviceJack.h"
+#include "ADM_deviceJack.h"
 
 
 #define BUFSIZE 16385
@@ -231,6 +227,7 @@ uint8_t jackAudioDevice::play(uint32_t len, float *data)
 }
 
 uint8_t jackAudioDevice::setVolume(int volume){
+#if 0
 #ifdef OSS_SUPPORT
 	ossAudioDevice dev;
 	dev.setVolume(volume);
@@ -240,12 +237,7 @@ uint8_t jackAudioDevice::setVolume(int volume){
 	dev.setVolume(volume);
 #endif
 #endif
+#endif
 	return 1;
 }
 
-#else
-void dummy_jack_func( void);
-void dummy_jack_func( void)
-{
-}
-#endif

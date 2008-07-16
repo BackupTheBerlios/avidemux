@@ -5,7 +5,6 @@
 //
 //
 
-#ifdef USE_JACK
 
 
 #include <jack/jack.h>
@@ -40,4 +39,3 @@ protected:
 	SRC_DATA src_data;
 	#endif
 };
-#endif
