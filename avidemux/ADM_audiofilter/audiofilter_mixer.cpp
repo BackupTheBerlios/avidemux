@@ -14,7 +14,7 @@
 
 #include "ADM_default.h"
 
-#include "audioeng_process.h"
+#include "ADM_audioFilter.h"
 #include "audiofilter_mixer.h"
 #include "audiofilter_dolby.h"
 #include <math.h>

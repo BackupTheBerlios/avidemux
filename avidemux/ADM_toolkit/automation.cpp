@@ -385,31 +385,22 @@ void call_setAudio (char *p)
 }
 void call_audiocodec(char *p)
 {
-#define FIXME_ZAZA
-#if 0
 	if(!strcasecmp(p,"MP2"))
-		audioCodecSetcodec( AUDIOENC_MP2 );
+		audio_selectCodecByTag(WAV_MP2);
 	else if(!strcasecmp(p,"AC3"))
-		audioCodecSetcodec( AUDIOENC_AC3 );
-#ifdef HAVE_LIBMP3LAME		
+		audio_selectCodecByTag( WAV_AC3 );
 	else if(!strcasecmp(p,"MP3"))
-		 audioCodecSetcodec( AUDIOENC_MP3 );
-#endif
-	else if(!strcasecmp(p,"NONE"))
-		audioCodecSetcodec( AUDIOENC_NONE );
-	else if(!strcasecmp(p,"TWOLAME"))
-		audioCodecSetcodec( AUDIOENC_2LAME );		
-#ifdef USE_VORBIS		
+		 audio_selectCodecByTag( WAV_MP3 );
+	else if(!strcasecmp(p,"PCM"))
+		audio_selectCodecByTag( WAV_PCM );
 	else if(!strcasecmp(p,"VORBIS"))
-		audioCodecSetcodec( AUDIOENC_VORBIS );		
-#endif		
+		audioCodecSetcodec( WAV_OGG );		
 	else if(!strcasecmp(p,"COPY"))
-		audioCodecSetcodec( AUDIOENC_COPY );		
+		audioCodecChanged( AUDIOENC_COPY );		
 	else{
-		audioCodecSetcodec( AUDIOENC_NONE );
+		audio_selectCodecByTag( WAV_PCM );
 		fprintf(stderr,"audio codec \"%s\" unknown.\n",p);
 	}
-#endif
 }
 void call_probePat(char *p)
 {

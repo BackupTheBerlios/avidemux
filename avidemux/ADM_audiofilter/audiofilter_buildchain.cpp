@@ -22,14 +22,6 @@
 #include "audioencoder.h"
 
 #include "ADM_audiofilter/audiofilter_limiter_param.h"
-#define FIXME_ZAZA
-#if 0
-#include "audioencoder_lame_param.h"
-#include "audioencoder_twolame_param.h"
-#include "audioencoder_faac_param.h"
-#include "audioencoder_vorbis_param.h"
-#include "audioencoder_aften_param.h"
-#endif
 #include "audiofilter_normalize_param.h"
 #include "audio_encoderWrapper.h"
 
@@ -38,26 +30,9 @@
 #include "ADM_audiofilter/audio_raw.h"
 
 /* ************* Encoder *********** */
-#if 0 // FIXME_ZAZA
-#ifdef USE_FAAC
-#include "audioencoder_faac.h"
-#endif
-#ifdef HAVE_LIBMP3LAME
-#include "audioencoder_lame.h"
-#endif
-#ifdef USE_VORBIS
-#include "audioencoder_vorbis.h"
-#endif
-#ifdef USE_AFTEN
-#include "audioencoder_aften.h"
-#endif
-
-#include "audioencoder_twolame.h"
-#include "audioencoder_lavcodec.h"
-#endif
 
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
-#include "audioencoder_pcm.h"
+
 
 #include "prefs.h"
 

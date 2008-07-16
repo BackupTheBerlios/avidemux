@@ -1,7 +1,6 @@
 SET(ADM_LIB ADM_commonUI)
 
 SET(${ADM_LIB}_SRCS
-DIA_audioconfig.cpp   
 DIA_DVDff.cpp           
 DIA_mjpeg.cpp     
 DIA_resizeWiz.cpp  

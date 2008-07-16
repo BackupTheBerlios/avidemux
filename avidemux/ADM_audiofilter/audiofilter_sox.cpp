@@ -21,7 +21,7 @@
 
 #include "ADM_default.h"
 
-#include "audioeng_process.h"
+#include "ADM_audioFilter.h"
 #include "audiofilter_sox.h"
 
 AUDMAudioFilterSox::AUDMAudioFilterSox(AUDMAudioFilter *instream,uint32_t  tgt):AUDMAudioFilter (instream)

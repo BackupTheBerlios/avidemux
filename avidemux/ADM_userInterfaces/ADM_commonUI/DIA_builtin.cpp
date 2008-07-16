@@ -130,26 +130,8 @@ uint8_t DIA_builtin(void)
 	videoFrame.swallow(&tXvid4);
 	videoFrame.swallow(&tX264);
 
-	diaElemFrame audioFrame(QT_TR_NOOP("Audio Codecs"));	
-	diaElemNotch tAften(aften, QT_TR_NOOP("Aften"));	
-	diaElemNotch tLibamrnb(libamrnb, QT_TR_NOOP("amrnb"));
-    diaElemNotch tFaac(faac, QT_TR_NOOP("FAAC"));
-    diaElemNotch tFaad(faad, QT_TR_NOOP("FAAD2"));
-	diaElemNotch tLame(lame, QT_TR_NOOP("LAME"));
-	diaElemNotch tA52dec(a52dec, QT_TR_NOOP("liba52"));
-	diaElemNotch tLibdca(libdca, QT_TR_NOOP("libdca"));
-	diaElemNotch tMad(mad, QT_TR_NOOP("MAD"));
-	diaElemNotch tVorbis(vorbis, QT_TR_NOOP("Vorbis"));
 
-	audioFrame.swallow(&tAften);
-	audioFrame.swallow(&tLibamrnb);	
-	audioFrame.swallow(&tFaac);
-	audioFrame.swallow(&tFaad);
-	audioFrame.swallow(&tLame);
-	audioFrame.swallow(&tA52dec);
-	audioFrame.swallow(&tLibdca);
-	audioFrame.swallow(&tMad);
-	audioFrame.swallow(&tVorbis);
+
 
 	diaElemNotch tArts(arts, QT_TR_NOOP("aRts"));
 	diaElemNotch tEsd(esd, QT_TR_NOOP("ESD"));
@@ -167,11 +149,11 @@ uint8_t DIA_builtin(void)
 	diaElemNotch tX86_64(x86_64, QT_TR_NOOP("x86-64"));
 
 
-	diaElem *codecElems[] = {&videoFrame, &audioFrame};
+	diaElem *codecElems[] = {&videoFrame};
 	diaElem *libsElems[] = {&tArts, &tEsd, &tFontConfig, &tFreetype, &tGettext, &tAlsa, &tOss, &tSdl, &tXvideo};
 	diaElem *CPUElems[] = {&tAltivec, &tPowerPc, &tX86, &tX86_64};
 
-	diaElemTabs tabCodec(QT_TR_NOOP("Codecs"), 2, codecElems);
+	diaElemTabs tabCodec(QT_TR_NOOP("Codecs"), 1, codecElems);
 	diaElemTabs tabLibs(QT_TR_NOOP("Libraries"), 9, libsElems);
 	diaElemTabs tabCPU(QT_TR_NOOP("CPU"), 4, CPUElems);
 

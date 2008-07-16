@@ -110,6 +110,10 @@ uint8_t                 audioLamePreset(const char *name);
 uint8_t getAudioExtraConf(uint32_t *bitrate,uint32_t *extraDataSize, uint8_t **extradata);
 uint8_t setAudioExtraConf(uint32_t bitrate,uint32_t extraDataSize, uint8_t *extradata);
 //
+uint8_t audio_selectCodecByTag(uint32_t tag);
+void audioCodecChanged(int newcodec);
+uint8_t audioSetOption(const char *option, uint32_t value);
+//
 AUDMEncoder *audioEncoderCreate(AUDMAudioFilter *filter);
 #endif
 

@@ -99,16 +99,20 @@ uint8_t A_autoDrive(Action action)
         						}
         				else
         				{
-#ifdef FIXME_ZAZA //HAVE_LIBMP3LAME
-        					audioCodecSetcodec(AUDIOENC_MP3);
-        					audioFilter_SetBitrate(128);
-                                                audioFilter_MP3DisableReservoir(1);
-        					// set fq
-        					
-#else
+                            if(audio_selectCodecByTag(WAV_MP3))
+                            {
+                                    audioFilter_SetBitrate(128);
+                                    if(!audioSetOption("MP3DisableReservoir",1))
+                                    {
+        					 GUI_Error_HIG(QT_TR_NOOP("Codec Error"),
+        					        QT_TR_NOOP( "The MP3 codec does not allow disabling reservoir.\nInstall lame plugin"));
+
+                                    }
+        					}else
+        					{
         					 GUI_Error_HIG(QT_TR_NOOP("Codec Error"),
         					        QT_TR_NOOP( "You don't have LAME!.\nIt is needed to create FLV  video."));
-#endif
+                             }
         					 if(fq==44100 || fq==22050 || fq==11025)
         					         						{}
         					 else
@@ -180,12 +184,11 @@ uint8_t A_autoDrive(Action action)
                     }
                     else
                     {
-#if FIXME_ZAZA //def USE_FAAC
-                          audioCodecSetcodec(AUDIOENC_FAAC);
-#else
-                          GUI_Error_HIG(QT_TR_NOOP("Codec Error"),
+
+
+                          if(!audio_selectCodecByTag(WAV_AAC))
+                            GUI_Error_HIG(QT_TR_NOOP("Codec Error"),
                                         QT_TR_NOOP( "You don't have FAAC!.\nIt is needed to create PSP compatible video."));
-#endif
                                     // ? Needed ?
                           if(currentaudiostream->getInfo()->frequency!=fq)
                           {
@@ -210,7 +213,7 @@ uint8_t A_autoDrive(Action action)
                                 }
                                 else
                                 {
-                                 // FIXME_ZAZA       audioCodecSetcodec(AUDIOENC_2LAME);
+                                        audio_selectCodecByTag(WAV_MP2);
                                         if(currentaudiostream->getInfo()->frequency!=44100)
                                         {
                                                 audioFilterResample(44100);
@@ -240,7 +243,7 @@ uint8_t A_autoDrive(Action action)
                                 }
                                 else
                                 {
-                                       // FIXME_ZAZA audioCodecSetcodec(AUDIOENC_2LAME);
+                                        audio_selectCodecByTag(WAV_MP2);
                                         if(currentaudiostream->getInfo()->frequency!=44100)
                                         {
                                                 audioFilterResample(44100);
@@ -269,7 +272,7 @@ uint8_t A_autoDrive(Action action)
                                         || (currentaudiostream->getInfo()->encoding!=WAV_MP2 &&
                                          currentaudiostream->getInfo()->encoding!=WAV_AC3))
                                 {
-                                       // FIXME_ZAZA audioCodecSetcodec(AUDIOENC_2LAME);
+                                        audio_selectCodecByTag(WAV_MP2);
                                         audioFilterResample(48000);
                                         audioFilter_SetBitrate(160);
                                         if(currentaudiostream->getInfo()->channels!=2)

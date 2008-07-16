@@ -390,5 +390,42 @@ uint8_t setAudioExtraConf(uint32_t bitrate,uint32_t extraDataSize, uint8_t *extr
         return encoder->setConfigurationData(extraDataSize,extradata);
     else return 1;
 }     
+/**
+        \fn audio_selectCodecByTag
+        \brief Select the "best" encoder outputing tag codec
+*/
+uint8_t audio_selectCodecByTag(uint32_t tag)
+{
+    int selected=-1,priority=-1;
+    for(int i=1;i<ListOfAudioEncoder.size();i++)
+    {
+        ADM_audioEncoder *c=ListOfAudioEncoder[i];
+        if(c->wavTag==tag)
+        {
+            if((int)c->priority>priority)
+            {
+                selected=i;
+                priority=c->priority;
+            }
+        }
+    }
+    if(selected!=-1)
+    {
+        currentEncoder=selected;
+        printf("[AudioEncoder] Selected %s for tag %d (%s)\n",ListOfAudioEncoder[currentEncoder],tag,"");
+        return 1;
+    }
+    return 0;
+}
+/**
+         \fn audioSetOption
+         \brief Allow per codec switch
+*/
+uint8_t audioSetOption(const char *option, uint32_t value)
+{
+    ADM_audioEncoder *c=ListOfAudioEncoder[currentEncoder];
+    if(!c->setOption) return 0;
+    return c->setOption(option,value);
 
+}
 //**
