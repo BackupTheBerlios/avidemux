@@ -19,7 +19,8 @@
 #include "ADM_default.h"
 #include "DIA_coreToolkit.h"
 
-#include "ADM_audio/audiomode.hxx"
+#include "audioencoder.h"
+
 #include "ADM_audiofilter/audiofilter_limiter_param.h"
 #include "audioencoder_lame_param.h"
 #include "audioencoder_twolame_param.h"
@@ -27,13 +28,13 @@
 #include "audioencoder_vorbis_param.h"
 #include "audioencoder_aften_param.h"
 #include "audiofilter_normalize_param.h"
+#include "audio_encoderWrapper.h"
 
 #include "audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_audiofilter/audio_raw.h"
 
 /* ************* Encoder *********** */
-#include "audioencoder.h"
 #ifdef USE_FAAC
 #include "audioencoder_faac.h"
 #endif
@@ -405,10 +406,10 @@ AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
     tmpfilter=NULL;
     GUI_Error_HIG(QT_TR_NOOP("Encoder initialization failed"), QT_TR_NOOP("Not activated."));
   }
-  output=tmpfilter;
-
+  ADM_audioEncoderWrapper *wrapper=new ADM_audioEncoderWrapper(tmpfilter);
+  output=wrapper;
   currentaudiostream->beginDecompress();
-
+  ADM_assert(output);
   return output;
 }
 

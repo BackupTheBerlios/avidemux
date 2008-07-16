@@ -35,9 +35,10 @@ typedef struct ADM_audioEncoderDescriptor
 #include "ADM_audio/aviaudio.hxx" // FIXME!!!!
 #include "ADM_audiofilter/audioeng_process.h" // FIXME!!!
  //_____________________________________________
-class AUDMEncoder : public AVDMGenericAudioStream
+class AUDMEncoder //: public AVDMGenericAudioStream
 {
   protected:
+    
     //
     uint32_t grab(uint8_t *outbuffer);
     uint32_t grab(float *outbuffer) {ADM_assert(0);return 1;}
@@ -60,6 +61,8 @@ class AUDMEncoder : public AVDMGenericAudioStream
     CHANNEL_TYPE outputChannelMapping[MAX_CHANNELS];
   public:
     //
+    WAVHeader       *_wavheader;
+    //
     uint32_t read(uint32_t len,uint8_t *buffer);
     uint32_t read(uint32_t len,float *buffer) {ADM_assert(0);return 1;}
     //
@@ -71,5 +74,12 @@ class AUDMEncoder : public AVDMGenericAudioStream
     virtual uint8_t extraData(uint32_t *l,uint8_t **d) {*l=_extraSize;*d=_extraData;return 1;}
             uint8_t  goTo(uint32_t timeMS) {ADM_assert(0);return 1;}
 };
+// Used by some old code (lame/twolame) OBSOLETE   / DO NOT USE
+typedef enum  
+{
+   	ADM_STEREO=1,
+   	ADM_JSTEREO,
+   	ADM_MONO
+} ADM_mode;
 
 #endif

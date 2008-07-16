@@ -20,7 +20,6 @@
 #include "audioprocess.hxx"
 #include "audioeng_process.h"
 #include "audioencoder.h"
-
 #include "audioencoder_lame_param.h"
 #include "audioencoder_lame.h"
 

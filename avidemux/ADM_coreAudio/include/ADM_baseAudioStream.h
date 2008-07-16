@@ -17,6 +17,7 @@
 #ifndef __WAV_Audio
 #define __WAV_Audio
 
+#include "audiomode.hxx"
 
 class AviList;
 
