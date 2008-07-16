@@ -52,6 +52,7 @@ AUDMEncoder_Lame::~AUDMEncoder_Lame()
 // return 0 : init failed
 //                              1 : init succeeded
 //_______________________________________________
+
 uint8_t AUDMEncoder_Lame::init(ADM_audioEncoderDescriptor *config)
 {
   int ret;

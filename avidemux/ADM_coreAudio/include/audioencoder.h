@@ -16,7 +16,31 @@
   \param param : An opaque structure that contains the codec specific configuration datas
 */
 #include "ADM_coreAudio.h"
-#include "ADM_audioEncoder/include/audioencoder_enum.h"
+
+#define ADM_AUDIO_ENCODER_API_VERSION 1
+
+#define AUDIOENC_COPY 0
+
+class AUDMEncoder;
+typedef struct
+{
+    AUDMEncoder *(*create)(WAVHeader *head);  
+    void         (*destroy)(AUDMEncoder *codec);
+    int          (*configure)(void);    
+    uint32_t     bitrate;           // Can be changed
+    const char   *codecName;        // Internal name (tag)
+    const char   *menuName;         // Displayed name (in menu)
+    const char   *description;
+    uint32_t     maxChannels;       // Const
+    uint32_t     major,minor,patch;     // Const
+    uint32_t     apiVersion;            // const
+    uint32_t     wavTag;                // const Avi fourcc
+    uint32_t     priority;              // const Higher means the codec is prefered and should appear first in the list
+    void         *opaque;
+}ADM_audioEncoder;
+
+typedef int AUDIOENCODER;
+/*
 typedef struct ADM_audioEncoderDescriptor
 {
   AUDIOENCODER encoder;
@@ -27,7 +51,7 @@ typedef struct ADM_audioEncoderDescriptor
   uint32_t  paramSize;
   void     *param;
 } ADM_audioEncoderDescriptor;
-
+*/
 /*!
   Base class for all audio encoder.It does the reverse of the bridge class and offers a proper GenericAudioStreamAPI
 
@@ -68,7 +92,8 @@ class AUDMEncoder //: public AVDMGenericAudioStream
     //
     virtual ~AUDMEncoder();
     AUDMEncoder(AUDMAudioFilter *in);	
-    virtual uint8_t init(ADM_audioEncoderDescriptor *config)=0;
+
+    virtual uint8_t initialize(void)=0;
     virtual uint8_t getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)=0;
     virtual uint8_t packetPerFrame( void) {return 1;}
     virtual uint8_t extraData(uint32_t *l,uint8_t **d) {*l=_extraSize;*d=_extraData;return 1;}

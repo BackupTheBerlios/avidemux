@@ -51,7 +51,7 @@ uint8_t DIA_audioCodec( AUDIOENCODER *codec )
 										-1);
 	gtk_register_dialog(dialog);
 
-	
+#if FIXME_ZAZA	
 	// now set the input one
 	for(uint32_t i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
 		if(*codec==myCodecList[i].codec)
@@ -70,6 +70,7 @@ uint8_t DIA_audioCodec( AUDIOENCODER *codec )
 	{
 		*codec=old;
 	}
+#endif
         gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	
@@ -78,11 +79,13 @@ uint8_t DIA_audioCodec( AUDIOENCODER *codec )
 
 AUDIOENCODER findCodec( void )
 {
+#ifdef FIXME_ZAZA
 uint8_t j;
 			j=getRangeInMenu(lookup_widget(dialog,"optionmenu_CodecList"));
 		
 			if(j>=sizeof(myCodecList)/sizeof(CODECLIST)) ADM_assert(0);
 			return myCodecList[j].codec;
+ #endif
 			
 
 }
@@ -133,12 +136,14 @@ GtkWidget	*create_dialogAudioCodec (void)
   menu1 = gtk_menu_new ();
 
  /***************/
+#if FIXME_ZAZA
         for(int i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
         {
                 acodec[i]=gtk_menu_item_new_with_mnemonic(myCodecList[i].menuName);
                 gtk_widget_show(acodec[i]);
                 gtk_container_add(GTK_CONTAINER(menu1),acodec[i]);
         }  
+#endif
  /***************/ 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu_CodecList), menu1);
 
@@ -167,11 +172,12 @@ GtkWidget	*create_dialogAudioCodec (void)
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, optionmenu_CodecList, "optionmenu_CodecList");
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, menu1, "menu1");
 /****/
+#if FIXME_ZAZA
    for(int i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
         {
                 GLADE_HOOKUP_OBJECT (dialogAudioCodec, acodec[i],myCodecList[i].name );
         }
-
+#endif
 /****/
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, buttonConfigure, "buttonConfigure");
   GLADE_HOOKUP_OBJECT_NO_REF (dialogAudioCodec, dialog_action_area1, "dialog_action_area1");

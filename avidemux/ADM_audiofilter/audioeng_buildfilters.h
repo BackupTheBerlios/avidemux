@@ -35,6 +35,7 @@ void audioCodecSelect( void );
 void audioFilter_MP3DisableReservoir(int onoff);
 uint32_t audioFilter_getOuputCodec(void);
 uint32_t audioFilter_getOuputFrequency(uint32_t inputFrequency);
+uint32_t audioFilter_getMaxChannels(void);
 
 #include "ADM_audioEncoder/include/audioencoder_enum.h"
 
@@ -109,5 +110,6 @@ uint8_t                 audioLamePreset(const char *name);
 uint8_t getAudioExtraConf(uint32_t *bitrate,uint32_t *extraDataSize, uint8_t **extradata);
 uint8_t setAudioExtraConf(uint32_t bitrate,uint32_t extraDataSize, uint8_t *extradata);
 //
+AUDMEncoder *audioEncoderCreate(AUDMAudioFilter *filter);
 #endif
 

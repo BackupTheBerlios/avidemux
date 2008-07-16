@@ -515,7 +515,7 @@ uint8_t  bindGUI( void )
                         gtk_combo_box_append_text      (combo_box,QT_TR_NOOP(name));	
                 }
         gtk_combo_box_set_active(combo_box,0);
-	on_audio_change();
+// FIXME_ZAZA	on_audio_change();
         /*   Fill in output format window */
         uint32_t nbFormat;
 

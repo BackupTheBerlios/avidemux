@@ -89,7 +89,7 @@ static Mixer_String Mixer_strings[]=
 
 extern void UI_PrintCurrentACodec( const char *s);
 
-AUDIOENCODER  activeAudioEncoder=  AUDIOENC_COPY;
+
 /*----------------------------------*/
 GAINparam audioGain;
 int  audioFreq=48000;
@@ -190,22 +190,7 @@ FILMCONV audioGetFpsConv(void)
 //
 
 
-void audioCodecChanged(int newcodec)
-{
-      ADM_assert(newcodec<sizeof(myCodecList) /sizeof(CODECLIST));
-      activeAudioEncoder=myCodecList[newcodec].codec;
 
-}
-
-uint32_t audioFilterGetNbEncoder(void)
-{
-	return sizeof(myCodecList) /sizeof(CODECLIST);
-}
-const char* audioFilterGetIndexedName(uint32_t i)
-{
- 	ADM_assert(i<sizeof(myCodecList) /sizeof(CODECLIST));
-	return myCodecList[i].menuName;
-}
 
 void audioFilterNormalizeMode(uint8_t onoff)
 {
@@ -288,36 +273,7 @@ void audioFilter_configureFilters( void )
 
 */
 
-uint8_t audioCodecSetByName( const char *name)
-{
-		for(uint32_t i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
-		{
-			if(!strcasecmp(name,myCodecList[i].name))
-			{
-
-				audioCodecSetcodec(myCodecList[i].codec);
-				return 1;
-			}
-
-		}
-		printf("\n Mmmm Select audio codec by name failed...(%s).\n",name);
-		return 0;
-}
-AudioSource audioCodecGetFromName( const char *name)
-{
-                for(uint32_t i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
-                {
-                        if(!strcasecmp(name,Sources[i].name))
-                        {
-
-                                return Sources[i].type;
-                        }
-
-                }
-                printf("\n Mmmm Select audio codec by name failed...(%s).\n",name);
-                return AudioNone;
-}
-	#define Read(x) { \
+#define Read(x) { \
 		tmp=name; \
 		if((tmp=strstr(name,#x))) \
 			{ \
@@ -329,21 +285,7 @@ AudioSource audioCodecGetFromName( const char *name)
 			{ printf("*** %s not found !***\n",#x);} \
 		}
 #define Add(x) {sprintf(tmp,"%s=%d ",#x,x);strcat(conf,tmp);}
-
-
-const char *audioCodecGetName( void )
-{
-	for(uint32_t i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
-	{
-		if(activeAudioEncoder==myCodecList[i].codec)
-		{
-			return myCodecList[i].name;
-		}
-
-	}
-	printf("\n Mmmm get audio  codec  name failed..\n");
-	return NULL;
-}
+	
 uint8_t audioFilterSetByName( const char *name)
 {
 	const char *tmp;
@@ -378,39 +320,8 @@ const char *audioFilterGetName( void )
 	return conf;
 
 }
-void audioPrintCurrentCodec(void)
-{
+ 
 
-	for(uint32_t i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
-	{
-		if(activeAudioEncoder==myCodecList[i].codec)
-		{
-			UI_setAudioCodec(i);
-			return;
-		}
-	
-	}
-	ADM_assert(0);
-}
- void audioCodecSetcodec(AUDIOENCODER codec)
-{
-
-	activeAudioEncoder=codec;
-	audioPrintCurrentCodec();
-
-}
-void audioCodecSelect( void )
-{
-	DIA_audioCodec( &activeAudioEncoder );
-	audioPrintCurrentCodec();
-
-
-}
-uint32_t audioProcessMode(void)
-{
-        if(activeAudioEncoder==AUDIOENC_COPY) return 0;
-        return 1;
-}
 /*
 	Refresh   activeAudioEncoder value
 	depending on what's selected
@@ -426,33 +337,35 @@ void audioSetResample(uint32_t fq)
 	audioFreq=fq;
 }
 /**
- * 	\fn getAudioOuputTag
- *  \brief Return the encoding of the currently selected codec
- *  Must be called only in process mode, else it is meaningless.
- */
-uint32_t audioFilter_getOuputCodec(void)
-{
-	
-	for(uint32_t i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
-		{
-			if(activeAudioEncoder==myCodecList[i].codec)
-			{
-				return myCodecList[i].wavTag;
-			}
-		
-		}
-	ADM_assert(0);
-	return WAV_PCM;
-}
-/**
  * 	\fn getAudioOuputFrequency
  *  \brief Return the encoding of the currently selected codec
  */
+uint32_t audioProcessMode(void);
 uint32_t audioFilter_getOuputFrequency(uint32_t inputFrequency)
 {
-	if(activeAudioEncoder==AUDIOENC_COPY) return inputFrequency;
+	if(!audioProcessMode()) return inputFrequency;
 	if(audioResampleMode == RESAMPLING_NONE) return inputFrequency;
 	return audioFreq;
 }
+/**
+    \fn audioCodecGetName
+    \brief Returns the current codec tagname
+*/
+
+AudioSource audioCodecGetFromName( const char *name)
+{
+                for(uint32_t i=0;i<sizeof(Sources)/sizeof(externalSource);i++)
+                {
+                        if(!strcasecmp(name,Sources[i].name))
+                        {
+
+                                return Sources[i].type;
+                        }
+
+                }
+                printf("\n Mmmm Select audio codec by name failed...(%s).\n",name);
+                return AudioNone;
+}
+
 //EOF
 

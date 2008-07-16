@@ -111,7 +111,7 @@ static DRCparam drcSetup=
   -12.0 ,//double   mThresholdDB;
 };
 
-static ADM_audioEncoderDescriptor *getAudioDescriptor( AUDIOENCODER encoder);
+
 
 //
 // Build audio filters
@@ -300,111 +300,26 @@ AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
 
 //_______________________________________________________
   uint8_t init;
-  ADM_audioEncoderDescriptor *descriptor=getAudioDescriptor( activeAudioEncoder);
   
   if(!lastFilter)
   {
     printf(" buildInternalAudioFilter failed\n");
     return 0;
   }
-  if(lastFilter->getInfo()->channels > descriptor->maxChannels)
+  if(lastFilter->getInfo()->channels > audioFilter_getMaxChannels())
   {
     GUI_Error_HIG(QT_TR_NOOP("Codec Error"),QT_TR_NOOP("The number of channels is greater than what the selected audio codec can do.\n"
         "Either change codec or use the mixer filter to have less channels."));
     deleteAudioFilter(NULL);
     return 0; 
   }
-  switch(activeAudioEncoder)
+
+  tmpfilter=audioEncoderCreate(lastFilter);
+  if(!tmpfilter || !tmpfilter->initialize())
   {
-
-                  case AUDIOENC_LPCM:
-                  case AUDIOENC_NONE:
-                  {
-                    AUDMEncoder_PCM *pcm;
-                    uint32_t fourcc,revert=0;
-                    
-                    if(activeAudioEncoder==AUDIOENC_LPCM) fourcc=WAV_LPCM;
-                    else          fourcc=WAV_PCM;
-                    
-#ifdef ADM_BIG_ENDIAN                    
-                    if(fourcc==WAV_PCM)
-#else
-                    if(fourcc==WAV_LPCM)
-#endif
-                        revert=1;
-                    pcm = new AUDMEncoder_PCM(revert,fourcc,lastFilter);
-                    tmpfilter=pcm;
-                  }
-                  break;
-#ifdef USE_VORBIS
-             case AUDIOENC_VORBIS:
-                {
-                  AUDMEncoder_Vorbis *vorbis;
-                  vorbis = new AUDMEncoder_Vorbis(lastFilter);
-                  tmpfilter=vorbis;
-                  break;
-                }
-#endif		
-#ifdef USE_AFTEN
-              case AUDIOENC_AFTEN:
-                {
-                  AUDMEncoder_Aften *aften;
-                  aften = new AUDMEncoder_Aften(lastFilter);
-                  tmpfilter=aften;
-                }
-                break;
-#endif
-#ifdef USE_FAAC
-    case AUDIOENC_FAAC:
-                  {
-                      AUDMEncoder_Faac *faac;
-                          faac = new AUDMEncoder_Faac(lastFilter);
-                          tmpfilter=faac;
-                  }
-                  break;
-#endif		
-
-#ifdef HAVE_LIBMP3LAME
-    case AUDIOENC_MP3:
-              {
-                AUDMEncoder_Lame *plame = NULL;
-
-                            plame = new AUDMEncoder_Lame(lastFilter);
-                            tmpfilter=plame;
-                }
-              break;
-#endif
-    case AUDIOENC_AC3:
-    case AUDIOENC_MP2:
-                    {
-                      AUDMEncoder_Lavcodec *lavcodec = NULL;
-                      uint32_t fourc;
-                      
-                      if(activeAudioEncoder==AUDIOENC_AC3) fourc=WAV_AC3;
-                      else fourc=WAV_MP2;
-                    
-                      lavcodec = new AUDMEncoder_Lavcodec(fourc,lastFilter);
-                      tmpfilter=lavcodec;
-                    }
-              break;
-    case  AUDIOENC_2LAME:
-              {
-                  AUDMEncoder_Twolame *toolame_enc = NULL;
-                          toolame_enc = new AUDMEncoder_Twolame(lastFilter);
-                          tmpfilter=toolame_enc;
-              }
-    	  break;
-
-    default:
-      ADM_assert(0);
-  }
-//_______________________________________________________
-
-  if(!tmpfilter->init(descriptor))
-  {
-    delete tmpfilter;
+    if(tmpfilter) delete tmpfilter;
     tmpfilter=NULL;
-    GUI_Error_HIG(QT_TR_NOOP("Encoder initialization failed"), QT_TR_NOOP("Not activated."));
+    GUI_Error_HIG(QT_TR_NOOP("[BuildChain] Encoder initialization failed"), QT_TR_NOOP("Not activated."));
   }
   ADM_audioEncoderWrapper *wrapper=new ADM_audioEncoderWrapper(tmpfilter);
   output=wrapper;
@@ -440,41 +355,33 @@ void deleteAudioFilter(AVDMGenericAudioStream *in)
 */
 void audioFilter_MP3DisableReservoir(int onoff)
 {
+#if 0
       if(activeAudioEncoder!=AUDIOENC_MP3) return;
       ADM_audioEncoderDescriptor *desc=getAudioDescriptor( activeAudioEncoder);
       ADM_assert(desc);
       LAME_encoderParam *param=(LAME_encoderParam *)desc->param;
       ADM_assert(param);
       param->disableReservoir=onoff;
-  
+#endif
 }
 
 /**********************************************/
-ADM_audioEncoderDescriptor *getAudioDescriptor( AUDIOENCODER encoder)
-{
-  for(int i=0;i<NB_AUDIO_DESCRIPTOR;i++)
-  {
-    if(allDescriptors[i]->encoder==encoder)
-    {
-      return    allDescriptors[i];
-    }
-  }
-  ADM_assert(0);
-  return NULL;
-}
 
 uint8_t getAudioExtraConf(uint32_t *bitrate,uint32_t *extraDataSize, uint8_t **extradata)
 {
-  ADM_audioEncoderDescriptor *descriptor=getAudioDescriptor(activeAudioEncoder);
-  
+#define FIXME_ZAZA
+#if 0  
   *bitrate=descriptor->bitrate;
   *extraDataSize=descriptor->paramSize;
   *extradata=(uint8_t *)descriptor->param;
+#endif
   return 1;
   
 }
 uint8_t setAudioExtraConf(uint32_t bitrate,uint32_t extraDataSize, uint8_t *extradata)
 {
+#define FIXME_ZAZA
+#if 0
   ADM_audioEncoderDescriptor *descriptor=getAudioDescriptor(activeAudioEncoder);
   if(extraDataSize!=descriptor->paramSize)
   {
@@ -484,27 +391,11 @@ uint8_t setAudioExtraConf(uint32_t bitrate,uint32_t extraDataSize, uint8_t *extr
   printf("Valid descriptor found for audio codec\n");
   descriptor->bitrate=bitrate;
   memcpy(descriptor->param,extradata,extraDataSize);
+#endif
   return 1;
   
 }
 
-void audioCodecConfigure( void )
-{
-  ADM_audioEncoderDescriptor *descriptor=getAudioDescriptor(activeAudioEncoder);
-  if(descriptor->configure)
-  {
-    descriptor->configure(descriptor); 
-  }
-}
-uint32_t audioGetBitrate(void)
-{
-  ADM_audioEncoderDescriptor *descriptor=getAudioDescriptor(activeAudioEncoder);
-  return descriptor->bitrate;
-} 
-void audioFilter_SetBitrate( int i)
-{
-  ADM_audioEncoderDescriptor *descriptor=getAudioDescriptor(activeAudioEncoder);
-  descriptor->bitrate=i;
-}
+
 
 

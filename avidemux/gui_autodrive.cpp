@@ -99,7 +99,7 @@ uint8_t A_autoDrive(Action action)
         						}
         				else
         				{
-#ifdef HAVE_LIBMP3LAME
+#ifdef FIXME_ZAZA //HAVE_LIBMP3LAME
         					audioCodecSetcodec(AUDIOENC_MP3);
         					audioFilter_SetBitrate(128);
                                                 audioFilter_MP3DisableReservoir(1);
@@ -180,7 +180,7 @@ uint8_t A_autoDrive(Action action)
                     }
                     else
                     {
-#ifdef USE_FAAC
+#if FIXME_ZAZA //def USE_FAAC
                           audioCodecSetcodec(AUDIOENC_FAAC);
 #else
                           GUI_Error_HIG(QT_TR_NOOP("Codec Error"),
@@ -210,7 +210,7 @@ uint8_t A_autoDrive(Action action)
                                 }
                                 else
                                 {
-                                        audioCodecSetcodec(AUDIOENC_2LAME);
+                                 // FIXME_ZAZA       audioCodecSetcodec(AUDIOENC_2LAME);
                                         if(currentaudiostream->getInfo()->frequency!=44100)
                                         {
                                                 audioFilterResample(44100);
@@ -240,7 +240,7 @@ uint8_t A_autoDrive(Action action)
                                 }
                                 else
                                 {
-                                        audioCodecSetcodec(AUDIOENC_2LAME);
+                                       // FIXME_ZAZA audioCodecSetcodec(AUDIOENC_2LAME);
                                         if(currentaudiostream->getInfo()->frequency!=44100)
                                         {
                                                 audioFilterResample(44100);
@@ -269,7 +269,7 @@ uint8_t A_autoDrive(Action action)
                                         || (currentaudiostream->getInfo()->encoding!=WAV_MP2 &&
                                          currentaudiostream->getInfo()->encoding!=WAV_AC3))
                                 {
-                                        audioCodecSetcodec(AUDIOENC_2LAME);
+                                       // FIXME_ZAZA audioCodecSetcodec(AUDIOENC_2LAME);
                                         audioFilterResample(48000);
                                         audioFilter_SetBitrate(160);
                                         if(currentaudiostream->getInfo()->channels!=2)

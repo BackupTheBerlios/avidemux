@@ -152,7 +152,7 @@ ADD_SOURCE_CFLAGS(main.cpp "-DADM_SUBVERSION=${ADM_SUBVERSION}")
 ########################################
 SET(ADM_SUBDIR 
 	ADM_audiofilter
-	ADM_audioEncoder
+	#ADM_audioEncoder
 	ADM_editor
 	ADM_audiocodec
 	ADM_audio
@@ -321,7 +321,7 @@ ADD_SUBDIRECTORY(ADM_coreAudio)
 ADD_LIB_ALL_TARGETS(ADM_coreAudio)
 
 # To be removed
-ADD_SUBDIRECTORY(ADM_audioEncoder)
+#ADD_SUBDIRECTORY(ADM_audioEncoder)
 
 ###########################################
 # External libs

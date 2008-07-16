@@ -34,7 +34,7 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 
 
 uint8_t DIA_videoCodec(int *codecIndex) {return 0;}
-uint8_t DIA_audioCodec( AUDIOENCODER *codec ) {return 0;}
+//uint8_t DIA_audioCodec( AUDIOENCODER *codec ) {return 0;}
 uint8_t DIA_quota(char *) {return 0;}
 uint8_t DIA_RecentFiles( char **name ){return 0;}
 uint8_t initGUI( void ) {return 1;}

@@ -23,7 +23,7 @@ class AUDMEncoder_Lavcodec : public AUDMEncoder
     uint32_t          _fourcc;
          
   public:
-            uint8_t     init(ADM_audioEncoderDescriptor *config);
+//            uint8_t     init(ADM_audioEncoderDescriptor *config);
    virtual             ~AUDMEncoder_Lavcodec();
                         AUDMEncoder_Lavcodec(uint32_t fourcc,AUDMAudioFilter *instream);	
    virtual uint8_t	getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);

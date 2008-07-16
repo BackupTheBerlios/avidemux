@@ -72,6 +72,7 @@ extern void getUIDescription(char*);
 extern uint8_t ADM_ad_loadPlugins(const char *path);
 extern uint8_t ADM_vf_loadPlugins(const char *path);
 extern uint8_t ADM_av_loadPlugins(const char *path);
+extern uint8_t ADM_ae_loadPlugins(const char *path);
 extern void loadPlugins(void);
 extern void InitFactory(void);
 extern void InitCoreToolkit(void);
@@ -232,6 +233,7 @@ int main(int argc, char *argv[])
 	char *adPlugins = ADM_getInstallRelativePath(startDir,"ADM_plugins","audioDecoder");
 	char *vfPlugins = ADM_getInstallRelativePath(startDir,"ADM_plugins","videoFilter");
     char *avPlugins = ADM_getInstallRelativePath(startDir,"ADM_plugins","audioDevices");    
+    char *aePlugins = ADM_getInstallRelativePath(startDir,"ADM_plugins","audioEncoders");    
 
 
 	ADM_ad_loadPlugins(adPlugins);
@@ -242,6 +244,9 @@ int main(int argc, char *argv[])
 
     ADM_av_loadPlugins(avPlugins);
     delete [] avPlugins;
+
+    ADM_ae_loadPlugins(aePlugins);
+    delete [] aePlugins;
 
 	// load local audio decoder plugins
 	adPlugins=ADM_getHomeRelativePath("plugins","audioDecoder");

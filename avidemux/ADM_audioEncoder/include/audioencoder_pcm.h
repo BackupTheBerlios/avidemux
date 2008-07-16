@@ -24,7 +24,7 @@ class AUDMEncoder_PCM : public AUDMEncoder
     uint32_t            revert;
          
   public:
-            uint8_t     init(ADM_audioEncoderDescriptor *config);
+//            uint8_t     init(ADM_audioEncoderDescriptor *config);
             virtual     ~AUDMEncoder_PCM();
                         /*! \param reverted : Should the endianness be reverted compared to system  
                             \param fourCC   : FourCC to use (WAV_PCM/WAV_LPCM)

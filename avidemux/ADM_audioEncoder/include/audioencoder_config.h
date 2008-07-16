@@ -1,6 +1,7 @@
 #ifndef AUDIOENCODER_CONFIG_H
 #define AUDIOENCODER_CONFIG_H
 
+#if 0
 #include "audioencoder_faac_param.h"
 #include "audioencoder_lame_param.h"
 #include "audioencoder_twolame_param.h"
@@ -178,3 +179,4 @@ ADM_audioEncoderDescriptor *allDescriptors[]=
 #endif
 //EOF
 
+#endif

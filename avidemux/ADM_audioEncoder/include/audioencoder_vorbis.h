@@ -25,7 +25,7 @@ class AUDMEncoder_Vorbis : public AUDMEncoder
 
          
   public:
-            uint8_t     init(ADM_audioEncoderDescriptor *config);
+//            uint8_t     init(ADM_audioEncoderDescriptor *config);
             virtual     ~AUDMEncoder_Vorbis();
                         AUDMEncoder_Vorbis(AUDMAudioFilter *instream);	
             

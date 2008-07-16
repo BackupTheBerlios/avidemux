@@ -385,6 +385,8 @@ void call_setAudio (char *p)
 }
 void call_audiocodec(char *p)
 {
+#define FIXME_ZAZA
+#if 0
 	if(!strcasecmp(p,"MP2"))
 		audioCodecSetcodec( AUDIOENC_MP2 );
 	else if(!strcasecmp(p,"AC3"))
@@ -407,6 +409,7 @@ void call_audiocodec(char *p)
 		audioCodecSetcodec( AUDIOENC_NONE );
 		fprintf(stderr,"audio codec \"%s\" unknown.\n",p);
 	}
+#endif
 }
 void call_probePat(char *p)
 {

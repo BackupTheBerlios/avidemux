@@ -20,7 +20,7 @@
 #include "audio_out.h"
 #include "ADM_audioDeviceInternal.h"
 #include "prefs.h"
-
+#include "ADM_dynamicLoading.h"
 std::vector <ADM_AudioDevices *> ListOfAudioDevices;
 
 

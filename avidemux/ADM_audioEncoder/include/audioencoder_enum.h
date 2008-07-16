@@ -5,7 +5,7 @@
 
 #ifndef audioencoder_enum_h
 #define audioencoder_enum_h
-
+#if 0
 typedef enum 
 {
 	AUDIOENC_NONE,
@@ -20,5 +20,5 @@ typedef enum
     AUDIOENC_AFTEN,
     AUDIOENC_DUMMY
 }AUDIOENCODER;
-
+#endif
 #endif

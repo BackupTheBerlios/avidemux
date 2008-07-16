@@ -1,6 +1,7 @@
 
 #ifndef CODECA_LIST
 #define CODECA_LIST
+#if 0
 typedef struct {
         const char *name;
         const char *menuName;
@@ -29,4 +30,5 @@ typedef struct {
                 {"none", "WAV PCM",AUDIOENC_NONE,WAV_PCM},
                 {"lpcm", "WAV LPCM",AUDIOENC_LPCM,WAV_LPCM}
 };
+#endif
 #endif

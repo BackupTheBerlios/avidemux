@@ -26,8 +26,10 @@
       @return 1 on success, 0 on failure
 
 */
+#if FIXME_ZAZA
 int DIA_defaultSettings(ADM_audioEncoderDescriptor *descriptor)
   {
+
     int ret=0;
     char string[400];
     uint32_t mmode,ppreset;
@@ -51,6 +53,8 @@ int DIA_defaultSettings(ADM_audioEncoderDescriptor *descriptor)
     
   return ( diaFactoryRun(QT_TR_NOOP("Audio Configuration"),1,elems));
 
+    return 0;
 } 
+#endif
 //EOF 
 

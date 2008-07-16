@@ -73,6 +73,7 @@ AUDMEncoder_Faac::~AUDMEncoder_Faac()
 // return 0 : init failed
 //                              1 : init succeeded
 //_______________________________________________
+#if 0
 uint8_t AUDMEncoder_Faac::init(ADM_audioEncoderDescriptor *config)
 {
 unsigned long int samples_input, max_bytes_output;
@@ -142,7 +143,7 @@ int ret=0;
     
     return 1;
 }
-
+#endif
 //_____________________________________________
 //  Need to multiply the float by 32767, can't use
 //  generic fill buffer

@@ -24,7 +24,7 @@ class AUDMEncoder_Lame : public AUDMEncoder
     ADM_LAME_PRESET   _preset;
          
   public:
-            uint8_t     init(ADM_audioEncoderDescriptor *config);
+//            uint8_t     init(ADM_audioEncoderDescriptor *config);
     virtual             ~AUDMEncoder_Lame();
                         AUDMEncoder_Lame(AUDMAudioFilter *instream);	
             uint8_t	isVBR(void );
