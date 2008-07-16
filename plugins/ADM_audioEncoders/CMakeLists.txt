@@ -10,8 +10,20 @@ MESSAGE("***  /Audio Codec  ***")
 
 
 ADD_SUBDIRECTORY(twolame)
+ADD_SUBDIRECTORY(pcm)
 
 if(USE_LAME)
 ADD_SUBDIRECTORY(lame)
 endif(USE_LAME)
 
+if(USE_AFTEN)
+# not tested ADD_SUBDIRECTORY(aften)
+endif(USE_AFTEN)
+
+if(USE_VORBIS)
+ADD_SUBDIRECTORY(vorbis)
+endif(USE_VORBIS)
+
+if(USE_FAAC)
+#ADD_SUBDIRECTORY(faac)
+endif(USE_FAAC)

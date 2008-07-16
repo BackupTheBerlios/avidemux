@@ -20,26 +20,55 @@
 #include "ADM_default.h"
 
 #include "audioencoder.h"
-//
+#include "audioencoderInternal.h"
 #include "audioencoder_pcm.h"
 
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_AUDIO_FILTER
-#include "ADM_osSupport/ADM_debug.h"
 
+
+/********************* Declare Plugin *****************************************************/
+ADM_DECLARE_AUDIO_ENCODER_PREAMBLE(AUDMEncoder_PCM);
+
+static ADM_audioEncoder encoderDesc = { 
+  ADM_AUDIO_ENCODER_API_VERSION,
+  create,			// Defined by macro automatically
+  destroy,			// Defined by macro automatically
+  NULL,		//** put your own function here**
+  "PCM",            
+  "PCM",      
+  "PCM encoder plugin Mean 2008",             
+  6,                    // Max channels
+  1,0,0,                // Version
+  WAV_PCM,
+  200,                  // Priority
+  NULL,  // Defined by macro automatically
+  NULL,  // Defined by macro automatically
+
+  NULL,           // Defined by macro automatically
+  NULL,            // Defined by macro automatically 
+
+  NULL,         //** put your own function here**
+
+  NULL
+};
+//ADM_DECLARE_AUDIO_ENCODER_CONFIG(NULL);
+extern "C" ADM_audioEncoder *getInfo (void) 
+{ 
+  return &encoderDesc; 
+}  
+
+/******************* / Declare plugin*******************************************************/
 
 
 
 // Ctor: Duplicate
 //__________
 
-AUDMEncoder_PCM::AUDMEncoder_PCM(uint32_t reverted,uint32_t fourCC,AUDMAudioFilter * instream)  :AUDMEncoder    (instream)
+AUDMEncoder_PCM::AUDMEncoder_PCM(AUDMAudioFilter * instream)  :AUDMEncoder    (instream)
 {
   printf("[PCM] Creating PCM\n");
-  ADM_assert(fourCC==WAV_PCM || fourCC==WAV_LPCM);
-  _wavheader->encoding=fourCC;
-  revert=reverted;
+  _wavheader->encoding=WAV_PCM;
+  
 };
 
 
@@ -49,15 +78,10 @@ AUDMEncoder_PCM::~AUDMEncoder_PCM()
   cleanup();
 };
 
-//________________________________________________
-//   Init lame encoder
-// frequence    : Impose frequency , 0 means reuse the incoming fq
-// mode                         : ADM_STEREO etc...
-// bitrate              : Bitrate in kbps (96,192...)
-// return 0 : init failed
-//                              1 : init succeeded
-//_______________________________________________
-uint8_t AUDMEncoder_PCM::init(ADM_audioEncoderDescriptor *config)
+/**
+    \fn initialize
+*/
+uint8_t AUDMEncoder_PCM::initialize(void)
 {
   
   _wavheader->byterate=_wavheader->channels*_wavheader->frequency*2;
@@ -69,6 +93,9 @@ uint8_t AUDMEncoder_PCM::init(ADM_audioEncoderDescriptor *config)
   printf("[PCM]PCM successfully initialized\n");
   return 1;       
 }
+/**
+    \fn getPacket
+*/
 
 uint8_t	AUDMEncoder_PCM::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
@@ -88,7 +115,7 @@ uint8_t	AUDMEncoder_PCM::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sampl
   }
         // Do in place replace
   dither16(&(tmpbuffer[tmphead]),_chunk,_wavheader->channels);
-  if(!revert)
+  if(1) //!revert)
     memcpy(dest,&(tmpbuffer[tmphead]),_chunk*2);
   else
   {
@@ -107,6 +134,5 @@ uint8_t	AUDMEncoder_PCM::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sampl
   *samples=_chunk/_wavheader->channels;
   return 1;
 }
-
 
 // EOF
