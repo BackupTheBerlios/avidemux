@@ -20,14 +20,7 @@
  *  
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <assert.h>
-
-#include "config.h"
-
+#include "ADM_default.h"
 #include "twolame.h"
 #include "common.h"
 #include "bitbuffer.h"

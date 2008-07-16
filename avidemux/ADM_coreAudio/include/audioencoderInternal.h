@@ -81,6 +81,8 @@ extern "C" ADM_audioEncoder *getInfo (void) \
 uint32_t     getBitrate(void) {return configData.bitrate;};\
 void         setBitrate(uint32_t br) {configData.bitrate=br;}
 
-
+#ifndef QT_TR_NOOP
+#define QT_TR_NOOP(x) x
+#endif
 #endif
 //EOF

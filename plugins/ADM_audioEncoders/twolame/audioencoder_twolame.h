@@ -21,10 +21,10 @@ class AUDMEncoder_Twolame : public AUDMEncoder
     void           *_twolameOptions;
          
   public:
-//            uint8_t     init(ADM_audioEncoderDescriptor *config);
+            uint8_t     initialize(void);
     virtual             ~AUDMEncoder_Twolame();
                         AUDMEncoder_Twolame(AUDMAudioFilter *instream);	
-    virtual uint8_t	getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
+    virtual uint8_t	    getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
 };
 
 #endif

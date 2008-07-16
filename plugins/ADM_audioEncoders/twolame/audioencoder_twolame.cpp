@@ -12,31 +12,58 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <math.h>
 
 #include "ADM_default.h"
+#include "DIA_factory.h"
+#include "DIA_coreToolkit.h"
 
 #include "audioencoder.h"
-//
+#include "audioencoderInternal.h"
 #include "audioencoder_twolame.h"
 #include "audioencoder_twolame_param.h"
 
 extern "C"
 {
-#include "ADM_libraries/ADM_libtwolame/twolame.h"
+#include "twolame.h"
 }
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_AUDIO_FILTER
-#include "ADM_osSupport/ADM_debug.h"
-
 
 #define OPTIONS (twolame_options_struct *)_twolameOptions
 
-// Ctor: Duplicate
-//__________
+static TWOLAME_encoderParam twolameParam=
+{
+    128,
+    ADM_STEREO
+};
+static uint8_t configure (void);
+/********************* Declare Plugin *****************************************************/
+ADM_DECLARE_AUDIO_ENCODER_PREAMBLE(AUDMEncoder_Twolame);
+
+static ADM_audioEncoder encoderDesc = { 
+  ADM_AUDIO_ENCODER_API_VERSION,
+  create,			// Defined by macro automatically
+  destroy,			// Defined by macro automatically
+  configure,		//** put your own function here**
+  "TwoLame",            
+  "MP2 (Twolame)",      
+  "TwoLame MP2 encoder plugin Mean 2008",             
+  2,                    // Max channels
+  1,0,0,                // Version
+  WAV_MP2,
+  200,                  // Priority
+  getConfigurationData,  // Defined by macro automatically
+  setConfigurationData,  // Defined by macro automatically
+
+  getBitrate,           // Defined by macro automatically
+  setBitrate,            // Defined by macro automatically 
+
+  NULL,         //** put your own function here**
+
+  NULL
+};
+ADM_DECLARE_AUDIO_ENCODER_CONFIG(twolameParam);
+
+/******************* / Declare plugin*******************************************************/
 
 AUDMEncoder_Twolame::AUDMEncoder_Twolame(AUDMAudioFilter * instream)  :AUDMEncoder    (instream)
 {
@@ -56,22 +83,17 @@ AUDMEncoder_Twolame::~AUDMEncoder_Twolame()
   _twolameOptions=NULL;
   cleanup();
 };
+/**
+    \fn initialize
 
-//________________________________________________
-//   Init lame encoder
-// frequence    : Impose frequency , 0 means reuse the incoming fq
-// mode                         : ADM_STEREO etc...
-// bitrate              : Bitrate in kbps (96,192...)
-// return 0 : init failed
-//                              1 : init succeeded
-//_______________________________________________
-uint8_t AUDMEncoder_Twolame::init(ADM_audioEncoderDescriptor *config)
+*/
+uint8_t AUDMEncoder_Twolame::initialize(void)
 {
   int ret;
   TWOLAME_MPEG_mode mmode;    	
   uint32_t frequence;
-  TWOLAME_encoderParam *lameConf=(TWOLAME_encoderParam *)config->param;
-  ADM_assert(config->paramSize==sizeof(TWOLAME_encoderParam));
+  TWOLAME_encoderParam *lameConf=&twolameParam;
+  
 
   _twolameOptions = twolame_init();
   if (_twolameOptions == NULL)
@@ -82,14 +104,14 @@ uint8_t AUDMEncoder_Twolame::init(ADM_audioEncoderDescriptor *config)
     printf("[TwoLame]Too many channels\n");
     return 0; 
   }
-  _wavheader->byterate=(config->bitrate*1000)>>3;         
+  _wavheader->byterate=(lameConf->bitrate*1000)>>3;         
       
  
   _chunk = 1152*_wavheader->channels;
 
  
   printf("[TwoLame]Incoming :fq : %lu, channel : %lu bitrate: %lu \n",
-        _wavheader->frequency,_wavheader->channels,config->bitrate);
+        _wavheader->frequency,_wavheader->channels,lameConf->bitrate);
 		
  
   twolame_set_in_samplerate(OPTIONS, _wavheader->frequency);
@@ -118,7 +140,7 @@ uint8_t AUDMEncoder_Twolame::init(ADM_audioEncoderDescriptor *config)
   twolame_set_mode(OPTIONS,mmode);
   twolame_set_error_protection(OPTIONS,TRUE);	
     	//toolame_setPadding (options,TRUE);
-  twolame_set_bitrate (OPTIONS,config->bitrate);
+  twolame_set_bitrate (OPTIONS,lameConf->bitrate);
   twolame_set_verbosity(OPTIONS, 2);
   if(twolame_init_params(OPTIONS))
   {
@@ -131,7 +153,9 @@ uint8_t AUDMEncoder_Twolame::init(ADM_audioEncoderDescriptor *config)
   printf("[TwoLame]Libtoolame successfully initialized\n");
   return 1;       
 }
-
+/**
+        \fn getPacket
+*/
 uint8_t	AUDMEncoder_Twolame::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
   int nbout;
@@ -169,6 +193,48 @@ uint8_t	AUDMEncoder_Twolame::getPacket(uint8_t *dest, uint32_t *len, uint32_t *s
   *len=nbout;
   return 1;
 }
+#define SZT(x) sizeof(x)/sizeof(diaMenuEntry )
+#define BITRATE(x) {x,QT_TR_NOOP(#x)}
 
+/**
+    \fn configure
+*/
+uint8_t configure (void)
+{
+ int ret=0;
+  
+  uint32_t m=(uint32_t)twolameParam.mode;  
+    
+    diaMenuEntry channelMode[] = 
+    {
+        {ADM_STEREO, QT_TR_NOOP ("Stereo"), NULL},
+        {ADM_JSTEREO, QT_TR_NOOP ("Joint stereo"), NULL},
+        {ADM_MONO, QT_TR_NOOP ("Mono"), NULL}
+    };
+    diaMenuEntry bitrateM[]={
+                              BITRATE(56),
+                              BITRATE(64),
+                              BITRATE(80),
+                              BITRATE(96),
+                              BITRATE(112),
+                              BITRATE(128),
+                              BITRATE(160),
+                              BITRATE(192),
+                              BITRATE(224),
+                              BITRATE(384)
+                          };
+    diaElemMenu bitrate(&(twolameParam.bitrate),   QT_TR_NOOP("_Bitrate:"), SZT(bitrateM),bitrateM);
+  
+    diaElemMenu menuMode (&m, QT_TR_NOOP ("C_hannel mode:"),SZT (channelMode), channelMode);
 
+    diaElem *elems[]={&bitrate,&menuMode};
+    
+    if( diaFactoryRun(QT_TR_NOOP("TwoLame Configuration"),2,elems))
+    {
+        twolameParam.mode=(ADM_mode)m;
+        return 1;
+    }
+
+    return 0;
+}
 // EOF

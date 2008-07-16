@@ -9,6 +9,7 @@
 
 typedef struct 
 {
+  uint32_t        bitrate;
   ADM_mode        mode;
 }TWOLAME_encoderParam;
 
