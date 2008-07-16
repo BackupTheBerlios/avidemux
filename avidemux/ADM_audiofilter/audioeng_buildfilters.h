@@ -113,6 +113,8 @@ uint8_t setAudioExtraConf(uint32_t bitrate,uint32_t extraDataSize, uint8_t *extr
 uint8_t audio_selectCodecByTag(uint32_t tag);
 void audioCodecChanged(int newcodec);
 uint8_t audioSetOption(const char *option, uint32_t value);
+uint8_t audio_setCopyCodec(void);
+uint8_t audioCodecSetByIndex(int i);
 //
 AUDMEncoder *audioEncoderCreate(AUDMAudioFilter *filter);
 #endif

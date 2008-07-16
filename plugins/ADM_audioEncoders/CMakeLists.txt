@@ -11,6 +11,7 @@ MESSAGE("***  /Audio Codec  ***")
 
 ADD_SUBDIRECTORY(twolame)
 ADD_SUBDIRECTORY(pcm)
+ADD_SUBDIRECTORY(lavcodec)
 
 if(USE_LAME)
 ADD_SUBDIRECTORY(lame)

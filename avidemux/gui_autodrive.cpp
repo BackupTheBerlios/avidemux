@@ -54,10 +54,6 @@ uint8_t A_autoDrive(Action action)
         switch(action)
         {
                 case ACT_AUTO_IPOD:
-#if !defined(USE_XVID_4) || !defined(USE_FAAC)
-					GUI_Error_HIG(QT_TR_NOOP("Codec Error"),
-						QT_TR_NOOP( "Xvid4 and FAAC support is required for the iPod profile."));
-#else
 					if(!setIPOD())
 						return 0;
 
@@ -68,21 +64,27 @@ uint8_t A_autoDrive(Action action)
 						GUI_Error_HIG(QT_TR_NOOP("Codec Error"),QT_TR_NOOP( "Cannot select the MPEG-4 SP codec."));
 						return 0;
 					}
-					setIpod_Xvid4Preset();
+                    GUI_Info_HIG(ADM_LOG_INFO,"CODE DISABLED","XVID4 PROFILE FOR IPOD");
+					//setIpod_Xvid4Preset();
 					// Set mode & bitrate
 					setVideoEncoderSettings(COMPRESS_CBR,400,0,NULL);
 					// Audio Codec
 					if((currentaudiostream->getInfo()->channels == 2)&& currentaudiostream->getInfo()->encoding == WAV_AAC)
-						audioCodecSetcodec(AUDIOENC_COPY);
+						audio_setCopyCodec();
 					else
 					{
-						audioCodecSetcodec(AUDIOENC_FAAC);
-						audioFilter_SetBitrate(128);
+						if(audio_selectCodecByTag(WAV_AAC))
+                        {
+                            GUI_Error_HIG(QT_TR_NOOP("Codec Error"),QT_TR_NOOP( "No AAC audio encoder plugin found."));
+                        }else
+                        {
+                            audioFilter_SetBitrate(128);
 
-						if (currentaudiostream->getInfo()->channels != 2)
-							setCurrentMixerFromString("STEREO");
+                            if (currentaudiostream->getInfo()->channels != 2)
+                                setCurrentMixerFromString("STEREO");
+                        }
 					}
-#endif
+
                       break;
 //******************************** IPOD *******************************
                           
@@ -95,7 +97,7 @@ uint8_t A_autoDrive(Action action)
         				fq=currentaudiostream->getInfo()->frequency;
         				if(currentaudiostream->getInfo()->encoding==WAV_MP3 && (fq==44100 || fq==22050 || fq==11025))
         						{
-        	                		audioCodecSetcodec(AUDIOENC_COPY);
+        	                		audio_setCopyCodec();
         						}
         				else
         				{
@@ -180,7 +182,7 @@ uint8_t A_autoDrive(Action action)
                         (currentaudiostream->getInfo()->channels==2)&&
                         (currentaudiostream->getInfo()->encoding==WAV_AAC))
                     {
-                        audioCodecSetcodec(AUDIOENC_COPY);
+                        audio_setCopyCodec();
                     }
                     else
                     {
@@ -209,7 +211,7 @@ uint8_t A_autoDrive(Action action)
                                                 (currentaudiostream->getInfo()->encoding==WAV_MP2)&&
                                                         (currentaudiostream->getInfo()->byterate==28000))
                                 {
-                                        audioCodecSetcodec(AUDIOENC_COPY);
+                                        audio_setCopyCodec();
                                 }
                                 else
                                 {
@@ -239,7 +241,7 @@ uint8_t A_autoDrive(Action action)
                                         (currentaudiostream->getInfo()->channels==2)&&
                                                 (currentaudiostream->getInfo()->encoding==WAV_MP2))
                                 {
-                                        audioCodecSetcodec(AUDIOENC_COPY);
+                                        audio_setCopyCodec();
                                 }
                                 else
                                 {
@@ -285,7 +287,7 @@ uint8_t A_autoDrive(Action action)
                                 }
                                 else
                                 {
-                                        audioCodecSetcodec(AUDIOENC_COPY);
+                                        audio_setCopyCodec();
                                 }
                                 break;
 

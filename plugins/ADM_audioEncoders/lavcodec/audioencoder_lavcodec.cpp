@@ -16,37 +16,76 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
 #include "ADM_default.h"
-
+#include "DIA_factory.h"
+#include "DIA_coreToolkit.h"
+#include <lame/lame.h>
 #include "audioencoder.h"
+#include "audioencoderInternal.h"
 //
 #include "audioencoder_lavcodec.h"
 
 #include "ADM_lavcodec.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_AUDIO_FILTER
-#include "ADM_osSupport/ADM_debug.h"
+typedef struct 
+{
+    uint32_t bitrate;
+}LavAudioEncoder_PARAM;
+static LavAudioEncoder_PARAM lavConfig={128};
+static uint8_t configure (void);
+/********************* Declare Plugin *****************************************************/
+ADM_DECLARE_AUDIO_ENCODER_PREAMBLE(AUDMEncoder_Lavcodec);
 
+static ADM_audioEncoder encoderDesc = { 
+  ADM_AUDIO_ENCODER_API_VERSION,
+  create,			// Defined by macro automatically
+  destroy,			// Defined by macro automatically
+  configure,		//** put your own function here**
+#ifdef ADM_LAV_MP2      
+  "LavMP2",            
+  "MP2 (lav)",      
+  "MP2 LavCodec encoder plugin Mean 2008",             
+  2,                    // Max channels
+  1,0,0,                // Version
+  WAV_MP2,
+#else
+ "LavAC3",            
+  "AC3 (lav)",      
+  "AC3 LavEncoder encoder plugin Mean 2008",             
+  6,                    // Max channels
+  1,0,0,                // Version
+  WAV_AC3,
+#endif
+  100,                  // Priority
+  getConfigurationData,  // Defined by macro automatically
+  setConfigurationData,  // Defined by macro automatically
 
+  getBitrate,           // Defined by macro automatically
+  setBitrate,            // Defined by macro automatically 
+
+  NULL,         //** put your own function here**
+
+  NULL
+};
+ADM_DECLARE_AUDIO_ENCODER_CONFIG(lavConfig);
+
+/******************* / Declare plugin*******************************************************/
 #define CONTEXT ((AVCodecContext  	*)_context)
 
 
 // Ctor: Duplicate
 //__________
 
-AUDMEncoder_Lavcodec::AUDMEncoder_Lavcodec(uint32_t fourcc,AUDMAudioFilter * instream)  :AUDMEncoder    (instream)
+AUDMEncoder_Lavcodec::AUDMEncoder_Lavcodec(AUDMAudioFilter * instream)  :AUDMEncoder    (instream)
 {
-  _fourcc=fourcc;
-  if(_fourcc!=WAV_MP2 && _fourcc!=WAV_AC3) ADM_assert(0);
+  
   _context=NULL;
-  _wavheader->encoding=_fourcc;
-  printf("[Lavcodec] Creating Lavcodec\n");
+#ifdef ADM_LAV_MP2     
+  _wavheader->encoding=WAV_MP2;
+#else
+    _wavheader->encoding=WAV_AC3;
+#endif
+  printf("[Lavcodec] Creating Lavcodec audio encoder\n");
 };
 
 
@@ -65,38 +104,43 @@ AUDMEncoder_Lavcodec::~AUDMEncoder_Lavcodec()
 //________________________________________________
 //   Init lame encoder
 //_______________________________________________
-uint8_t AUDMEncoder_Lavcodec::init(ADM_audioEncoderDescriptor *config)
+uint8_t AUDMEncoder_Lavcodec::initialize(void)
 {
   int ret;
   _context=( void *)avcodec_alloc_context();
-  _wavheader->byterate=(config->bitrate*1000)>>3;
+  _wavheader->byterate=(lavConfig.bitrate*1000)>>3;
 
-      
-  if(_fourcc==WAV_MP2 && _incoming->getInfo()->channels>2)
+#ifdef ADM_LAV_MP2      
+  if( _incoming->getInfo()->channels>2)
   {
     printf("[Lavcodec]Too many channels\n");
     return 0; 
   }
-  _wavheader->byterate=(config->bitrate*1000)>>3;         
+#endif
+  _wavheader->byterate=(lavConfig.bitrate*1000)>>3;         
       
-  if(_fourcc==WAV_MP2)
+#ifdef ADM_LAV_MP2 
     _chunk = 1152*_wavheader->channels;
-  else
+#else
     _chunk = 1536*_wavheader->channels; // AC3
-
+#endif
   printf("[Lavcodec]Incoming : fq : %lu, channel : %lu bitrate: %lu \n",
-         _wavheader->frequency,_wavheader->channels,config->bitrate);
+         _wavheader->frequency,_wavheader->channels,lavConfig.bitrate);
   
   
   CONTEXT->channels     =  _wavheader->channels;
   CONTEXT->sample_rate  =  _wavheader->frequency;
-  CONTEXT->bit_rate     = (config->bitrate*1000); // bits -> kbits
+  CONTEXT->bit_rate     = (lavConfig.bitrate*1000); // bits -> kbits
 
   AVCodec *codec;
   CodecID codecID;
-  
-  if(_fourcc==WAV_MP2) codecID=CODEC_ID_MP2;
-        else codecID=CODEC_ID_AC3;
+#ifdef ADM_LAV_MP2  
+  printf("[LavAudio] Mp2 encoder\n"); 
+  codecID=CODEC_ID_MP2;
+#else
+  printf("[LavAudio] Ac3 encoder\n"); 
+  codecID=CODEC_ID_AC3;
+#endif
   codec = avcodec_find_encoder(codecID);
   ADM_assert(codec);
   
@@ -143,5 +187,37 @@ uint8_t	AUDMEncoder_Lavcodec::getPacket(uint8_t *dest, uint32_t *len, uint32_t *
   *len=nbout;
   return 1;
 }
+#define SZT(x) sizeof(x)/sizeof(diaMenuEntry )
+#define BITRATE(x) {x,QT_TR_NOOP(#x)}
+
+/**
+    \fn configure
+*/
+uint8_t configure (void)
+{
+ int ret=0;
+
+    diaMenuEntry bitrateM[]={
+                              BITRATE(56),
+                              BITRATE(64),
+                              BITRATE(80),
+                              BITRATE(96),
+                              BITRATE(112),
+                              BITRATE(128),
+                              BITRATE(160),
+                              BITRATE(192),
+                              BITRATE(224),
+                              BITRATE(384)
+                          };
+    diaElemMenu bitrate(&(lavConfig.bitrate),   QT_TR_NOOP("_Bitrate:"), SZT(bitrateM),bitrateM);
+  
+    
+
+    diaElem *elems[]={&bitrate};
+    
+    return ( diaFactoryRun(QT_TR_NOOP("Aften Configuration"),1,elems));
+    
+}	
+// EOF
 
 // EOF

@@ -214,7 +214,6 @@ void audioCodecChanged(int newcodec)
     \fn     
     \brief
 */
-void audioCodecSetcodec(AUDIOENCODER codec);
 uint8_t audioCodecSetByName( const char *name)
 {
 		for(uint32_t i=0;i<ListOfAudioEncoder.size();i++)
@@ -222,7 +221,7 @@ uint8_t audioCodecSetByName( const char *name)
 			if(!strcasecmp(name,ListOfAudioEncoder[i]->codecName))
 			{
 
-				audioCodecSetcodec(i);
+				currentEncoder=i;
 				return 1;
 			}
 
@@ -230,8 +229,17 @@ uint8_t audioCodecSetByName( const char *name)
 		printf("\n Mmmm Select audio codec by name failed...(%s).\n",name);
 		return 0;
 }
+/**
+    \fn audioCodecSetByIndex
+    \brief To be used by UI code only!
+*/
+uint8_t audioCodecSetByIndex(int i)
+{
+    ADM_assert(i<ListOfAudioEncoder.size());
+    currentEncoder=i;
+    return 1;
 
-
+}
 /**
     \fn audioCodecGetName
     \brief Returns the current codec tagname
@@ -255,13 +263,14 @@ void audioPrintCurrentCodec(void)
       \fn audioCodecSetcodec
       \brief Set & update current audio encoder
 */
+/*
 void audioCodecSetcodec(AUDIOENCODER codec)
 {
 
 	currentEncoder=codec;
 	audioPrintCurrentCodec();
 
-}
+}*/
 /**
     \fn audioCodecSelect
     \brief
@@ -412,6 +421,7 @@ uint8_t audio_selectCodecByTag(uint32_t tag)
     if(selected!=-1)
     {
         currentEncoder=selected;
+        UI_setAudioCodec( (int)currentEncoder);
         printf("[AudioEncoder] Selected %s for tag %d (%s)\n",ListOfAudioEncoder[currentEncoder],tag,"");
         return 1;
     }
@@ -428,4 +438,15 @@ uint8_t audioSetOption(const char *option, uint32_t value)
     return c->setOption(option,value);
 
 }
+/**
+         \fn audio_setCopyCodec
+         \brief Set audio codec to copy
+*/
+uint8_t audio_setCopyCodec(void)
+{
+    currentEncoder=0;
+    return 1;
+
+}
+
 //**

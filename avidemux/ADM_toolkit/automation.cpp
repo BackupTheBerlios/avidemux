@@ -394,7 +394,7 @@ void call_audiocodec(char *p)
 	else if(!strcasecmp(p,"PCM"))
 		audio_selectCodecByTag( WAV_PCM );
 	else if(!strcasecmp(p,"VORBIS"))
-		audioCodecSetcodec( WAV_OGG );		
+		audio_selectCodecByTag( WAV_OGG );		
 	else if(!strcasecmp(p,"COPY"))
 		audioCodecChanged( AUDIOENC_COPY );		
 	else{

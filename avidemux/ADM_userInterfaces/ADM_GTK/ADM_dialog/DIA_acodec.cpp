@@ -10,7 +10,7 @@
 
 extern uint32_t audioEncoderGetNumberOfEncoders(void);
 extern const char  *audioEncoderGetDisplayName(uint32_t i);
-
+extern uint8_t audioCodecSetByIndex(int i);
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \
@@ -35,7 +35,7 @@ static GtkWidget	*create_dialogAudioCodec (void);
 		UNUSED_ARG(user_data);
 
 		cur=findCodec();
-		audioCodecSetcodec(cur);
+		audioCodecSetByIndex(cur);
 		audioCodecConfigure();
 
 }
