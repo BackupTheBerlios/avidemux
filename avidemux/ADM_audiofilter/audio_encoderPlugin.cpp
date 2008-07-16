@@ -79,18 +79,18 @@ public:
 };
 
 /**
-        \fn ADM_ae_getNbEncoders
+        \fn ADM_ae_getPluginNbEncoders
         \brief Returns the number of av filter plugins except one
 */
-uint32_t ADM_ae_getNbEncoders(void)
+uint32_t ADM_ae_getPluginNbEncoders(void)
 {
     return ListOfAudioEncoder.size()-1;
 }
 /**
-    \fn     ADM_ae_getEncoderInfo
+    \fn     ADM_ae_getAPluginEncoderInfo
     \brief  Get Infos about the encoder #th plugin (plugin display)
 */
-bool     ADM_ae_getEncoderInfo(int filter, const char **name, uint32_t *major,uint32_t *minor,uint32_t *patch)
+bool     ADM_ae_getAPluginEncoderInfo(int filter, const char **name, uint32_t *major,uint32_t *minor,uint32_t *patch)
 {
     filter++;
     ADM_assert(filter<ListOfAudioEncoder.size());
