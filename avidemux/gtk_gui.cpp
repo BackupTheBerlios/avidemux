@@ -238,7 +238,7 @@ int nw;
 		return;
    case ACT_AudioCodecChanged:
                 nw=UI_getCurrentACodec();
-   		audioCodecChanged(nw);
+                audioCodecSetByIndex(nw);
     		
 		return;
     case ACT_PLUGIN_INFO:

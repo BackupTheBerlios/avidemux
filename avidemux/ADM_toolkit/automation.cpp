@@ -396,7 +396,7 @@ void call_audiocodec(char *p)
 	else if(!strcasecmp(p,"VORBIS"))
 		audio_selectCodecByTag( WAV_OGG );		
 	else if(!strcasecmp(p,"COPY"))
-		audioCodecChanged( AUDIOENC_COPY );		
+		audio_setCopyCodec();		
 	else{
 		audio_selectCodecByTag( WAV_PCM );
 		fprintf(stderr,"audio codec \"%s\" unknown.\n",p);

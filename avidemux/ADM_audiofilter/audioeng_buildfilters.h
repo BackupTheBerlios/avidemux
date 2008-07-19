@@ -20,6 +20,7 @@
 #include "audioencoder.h"
 #include "ADM_audio/aviaudio.hxx"
 
+#include "ADM_audiofilter/audioEncoderApi.h"
 
  AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *stream, uint32_t startTime);
  AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
@@ -37,7 +38,7 @@ uint32_t audioFilter_getOuputCodec(void);
 uint32_t audioFilter_getOuputFrequency(uint32_t inputFrequency);
 uint32_t audioFilter_getMaxChannels(void);
 
-#include "ADM_audioEncoder/include/audioencoder_enum.h"
+//#include "ADM_audioEncoder/include/audioencoder_enum.h"
 
 typedef enum 
 {
@@ -65,18 +66,11 @@ typedef enum
 
 }AudioSource;
 
-void audioCodecSetcodec(AUDIOENCODER codec);
+//void audioCodecSetcodec(AUDIOENCODER codec);
 uint8_t audioReset(void);
 /*  for job/workspace stuff  */
-uint8_t audioCodecSetByName( const char *name);
-AudioSource audioCodecGetFromName( const char *name);
-const char *audioCodecGetName( void );
-
 const char *audioFilterGetName( void );
 uint8_t audioFilterSetByName( const char *name);
-
-const char *audioCodecGetConf( void );
-uint8_t audioCodecSetConf(char *conf );
 
 AVDMGenericAudioStream *mpt_getAudioStream(void);
 
@@ -105,17 +99,8 @@ const char              *audioSourceFromEnum(AudioSource src);
 AudioSource             audioSourceFromString(const char *name);
 const char              *getCurrentMixerString(void);
 uint8_t                 setCurrentMixerFromString(const char *string);
-uint8_t                 audioLamePreset(const char *name);
+
 //*****
-uint8_t getAudioExtraConf(uint32_t *bitrate,uint32_t *extraDataSize, uint8_t **extradata);
-uint8_t setAudioExtraConf(uint32_t bitrate,uint32_t extraDataSize, uint8_t *extradata);
 //
-uint8_t audio_selectCodecByTag(uint32_t tag);
-void audioCodecChanged(int newcodec);
-uint8_t audioSetOption(const char *option, uint32_t value);
-uint8_t audio_setCopyCodec(void);
-uint8_t audioCodecSetByIndex(int i);
-//
-AUDMEncoder *audioEncoderCreate(AUDMAudioFilter *filter);
 #endif
 

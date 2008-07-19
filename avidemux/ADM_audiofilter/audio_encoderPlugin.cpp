@@ -25,7 +25,10 @@ static AUDIOENCODER  currentEncoder=0; //0 is always dummy
 static AUDIOENCODER ADM_encoderByName(const char *name);
 static const char *ADM_audioEncoderById(AUDIOENCODER id);
 
-
+/**
+    \class ADM_AudioEncoderLoader
+    \brief Helper class to load plugins
+*/
 class ADM_AudioEncoderLoader :public ADM_LibWrapper
 {
 
@@ -198,17 +201,6 @@ AUDIOENCODER AVDM_getCurrentAudioEncoder( void)
 {
 	return currentEncoder;
 }
-//*******************************************************************
-/**
-    \fn     
-    \brief
-*/
-void audioCodecChanged(int newcodec)
-{
-      ADM_assert(newcodec<ListOfAudioEncoder.size());
-      currentEncoder=newcodec;
-
-}
 
 /**
     \fn     
@@ -259,18 +251,6 @@ void audioPrintCurrentCodec(void)
 {
 			UI_setAudioCodec(currentEncoder);
 }
-/**
-      \fn audioCodecSetcodec
-      \brief Set & update current audio encoder
-*/
-/*
-void audioCodecSetcodec(AUDIOENCODER codec)
-{
-
-	currentEncoder=codec;
-	audioPrintCurrentCodec();
-
-}*/
 /**
     \fn audioCodecSelect
     \brief

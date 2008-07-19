@@ -46,7 +46,7 @@
 #include "audiofilter_film2pal.h"
 
 /* ************ Conf *********** */
-#include "audioencoder_config.h"
+//#include "audioencoder_config.h"
 
 
 #include "ADM_osSupport/ADM_debugID.h"

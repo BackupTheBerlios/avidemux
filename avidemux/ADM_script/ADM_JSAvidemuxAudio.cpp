@@ -456,7 +456,7 @@ JSBool ADM_JSAvidemuxAudio::secondAudioTrack(JSContext *cx, JSObject *obj, uintN
         ADM_LowerCase(name);
         // First search the codec by its name
         AudioSource source;
-        if(AudioInvalid==(source=audioCodecGetFromName(name)))
+        if(AudioInvalid==(source=audioSourceFromString(name)))
                 return JS_FALSE;
         // Now get the name
         name = JS_GetStringBytes(JSVAL_TO_STRING(argv[1]));
