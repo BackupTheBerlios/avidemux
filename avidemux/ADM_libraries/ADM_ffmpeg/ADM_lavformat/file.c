@@ -30,6 +30,7 @@
 #ifdef __WIN32
 extern int ADM_open(const char *path, int oflag, ...);
 #define open ADM_open
+#define lseek(f,p,w) _lseeki64((f), (p), (w))
 #endif
 // GRUNTSTER end
 

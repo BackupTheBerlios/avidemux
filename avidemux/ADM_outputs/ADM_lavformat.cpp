@@ -528,14 +528,14 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
         AVPacket pkt;
         double f;
         int64_t timeInUs;
-        static int sz=0;
+        static uint64_t sz = 0;
             //printf("Audio paclet : size %u, sample %u\n",len,sample);
 
            if(!audio_st) return 0;
            if(!len) return 1;
             av_init_packet(&pkt);
             timeInUs=(int64_t)sample2time_us(sample);
-            aprintf("Sample :%u time :%u size :%u this round:%u\n",sample,timeInUs,sz,len);
+            aprintf("Sample: %u, time: %"LLU", size: %"LLU", this round: %u\n",sample, timeInUs, sz, len);
             sz+=len;
             /* Rescale to ?? */
             if(_type==MUXER_FLV || _type==MUXER_MATROSKA) /* The FLV muxer expects packets dated in ms, there is something i did not get... WTF */
@@ -550,8 +550,8 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
             	f*=_audioFq; // In samples
             	f=floor(f+0.4);
             }
-            pkt.dts=pkt.pts=(int)(f);
-            aprintf("Adm audio dts=:%u\n",pkt.dts);
+            pkt.dts=pkt.pts=f;
+            aprintf("Adm audio dts: %"LLU"\n",pkt.dts);
             //printf("F:%f Q:%u D=%u\n",f,pkt.pts,timeInUs-_lastAudioDts);
 
             pkt.flags |= PKT_FLAG_KEY;
@@ -559,7 +559,7 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
             pkt.size= len;
             pkt.stream_index=1;
             //pkt.duration=pkt.dts-_lastAudioDts; // Duration
-            aprintf("A: sample: %d frame_pts: %d fq: %d\n",(int32_t )sample,(int32_t )pkt.dts,audio_st->codec->sample_rate);
+            aprintf("A: sample: %d, frame_pts: %"LLU", fq: %d\n", sample, pkt.dts, audio_st->codec->sample_rate);
 
             ret = av_write_frame(oc, &pkt);
             _lastAudioDts=timeInUs;
