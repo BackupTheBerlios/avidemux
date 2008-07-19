@@ -101,7 +101,7 @@ uint64_t target=mstime;
 //_______________________________________________________
 uint8_t MP4Audio::goTo(uint32_t newoffset)
 {
-   ADM_assert(0);
+   goToTime(0);
     return 1;
 }
 //______________________________________
