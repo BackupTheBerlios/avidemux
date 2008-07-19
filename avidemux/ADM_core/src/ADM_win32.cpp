@@ -400,13 +400,9 @@ void redirectStdoutToFile(void)
 	// This allows us to optionally compile all EXEs as console applications
 	// so the output can be printed to the terminal for debugging purposes.
 
-	// Close SDL generated logs
-	fclose(stdout);
-	fclose(stderr);
-
-	// Briefly redirect to console
-	freopen("CON", "w", stdout);
-	freopen("CON", "w", stderr);
+ 	// Close SDL generated logs and briefly redirect to NUL
+ 	freopen("NUL", "w", stdout);
+ 	freopen("NUL", "w", stderr);
 
 	// Remove SDL logs to avoid confusion
 	char path[MAX_PATH];
@@ -431,19 +427,18 @@ void redirectStdoutToFile(void)
 	const char* logFile = "admlog.txt";
 	char* baseDir = ADM_getBaseDir();
 	char *logPath = new char[strlen(baseDir) + 2 + strlen(logFile)];
-	FILE* stream;
 
 	strcpy(logPath, baseDir);
 	strcat(logPath, "/");
 	strcat(logPath, logFile);
 
-	fclose(stdout);
-	fclose(stderr);
-
-	stream = fopen(logPath, "w");
+	FILE *stream = fopen(logPath, "w");
 
 	if (stream)
 	{
+		fclose(stdout);
+		fclose(stderr);
+
 		*stdout = *stream;
 		*stderr = *stream;
 	}
