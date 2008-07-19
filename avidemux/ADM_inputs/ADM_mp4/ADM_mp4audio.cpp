@@ -47,7 +47,22 @@ MP4Audio::MP4Audio(const char *name,MP4Track *track)
 
 	_extraLen=track->extraDataSize;
 	_extraData=track->extraData;
-	
+
+	// Check if MP3 track is actually MP2
+	if (track->_rdWav.encoding == WAV_MP3 && _nb_chunks && _index[0].size >= 4)
+	{
+		uint8_t sample[4];
+
+		fseeko(_fd, _index[0].offset, SEEK_SET);
+		fread(&sample, 1, 4, _fd);
+
+		uint32_t fcc = sample[0] << 24 | sample[1] << 16 | sample[2] << 8 | sample[3];
+		int layer = 4 - ((fcc >> 17) & 0x3);
+
+		if (layer == 2)
+			track->_rdWav.encoding = WAV_MP2;
+	}
+
 	_wavheader=new WAVHeader;
         memcpy(_wavheader,&(track->_rdWav),sizeof(WAVHeader));
 	
