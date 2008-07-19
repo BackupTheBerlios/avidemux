@@ -948,7 +948,7 @@ foundit: // HACK FIXME
           float f=_videostream.dwLength;
           if(_movieDuration) f=1000000.*f/_movieDuration;
               else  f=25000;
-          _videostream.dwRate=(uint32_t)floor(f);
+          _videostream.dwRate=(uint32_t)floor(f+0.49);
            _mainaviheader.dwMicroSecPerFrame=ADM_UsecFromFps1000(_videostream.dwRate);
           // if we have a sync atom ???
           if(info.nbSync)
