@@ -126,6 +126,8 @@ uint8_t  MP4Header::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
     fseeko(_fd,offset,SEEK_SET);
     fread(img->data, VDEO.index[framenum].size, 1, _fd);
     img->dataLength=VDEO.index[framenum].size;
+	img->flags = VDEO.index[framenum].intra;
+
     return 1;
 }
 MP4Header::~MP4Header()
