@@ -1040,7 +1040,7 @@ int tag,l;
                                       switch(objectTypeIndication)
                                       {
                                           case 0x69:ADIO.encoding=WAV_MP3;break;
-                                          case 0x6b:ADIO.encoding=WAV_MP3;break;
+                                          case 0x6b:ADIO.encoding=WAV_MP2;break;
                                           case 0x6d:ADIO.encoding=WAV_MP3;break;
                                           case 226:ADIO.encoding=WAV_AC3;break;
                                           break;
