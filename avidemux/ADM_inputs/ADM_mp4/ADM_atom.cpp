@@ -19,12 +19,9 @@
  ***************************************************************************/
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#include "ADM_assert.h"
 #include "ADM_default.h"
 #include "ADM_editor/ADM_Video.h"
 
@@ -37,7 +34,7 @@
 adm_atom::adm_atom(adm_atom *atom)
 {
 	_fd=atom->_fd;
-	_atomStart=ftell(_fd);
+	_atomStart=ftello(_fd);
 	_atomSize=read32();
 	_atomFCC=read32();
 	// Gross hack for some (buggy ?) movie
@@ -46,10 +43,14 @@ adm_atom::adm_atom(adm_atom *atom)
 		printf("3GP:Workaround: detected wrong sized atom!\nTrying to continue\n");
 		_atomStart+=4;
 		_atomSize-=4;
-		fseek(_fd,_atomStart,SEEK_SET);
+		fseeko(_fd,_atomStart,SEEK_SET);
 		_atomSize=read32();
 		_atomFCC=read32();
 	}
+
+	if (fourCC::check(_atomFCC, (uint8_t *)"tadm") && _atomSize == 1)	// mdat
+		_atomSize=read64();
+
 #ifdef ATOM_DEBUG
 	dumpAtom();
 #endif
@@ -64,14 +65,14 @@ adm_atom::adm_atom(adm_atom *atom,int duplicate)
 }
 adm_atom::adm_atom(FILE *fd )
 {
-uint32_t orgpos;
+int64_t orgpos;
 	_fd=fd;
         orgpos=ftello(fd);
-	fseek(_fd,0,SEEK_END);
+	fseeko(_fd,0,SEEK_END);
 	_atomFCC=fourCC::get((uint8_t *)"MOVI");
-	_atomSize=ftell(_fd);//-orgpos;
+	_atomSize=ftello(_fd);//-orgpos;
 
-	fseek(_fd,orgpos,SEEK_SET);
+	fseeko(_fd,orgpos,SEEK_SET);
 	_atomStart=0;
 #ifdef ATOM_DEBUG
 	dumpAtom();
@@ -85,9 +86,9 @@ uint32_t orgpos;
 }
 uint8_t adm_atom::skipBytes( uint32_t nb )
 {
-uint32_t pos;
-	fseek(_fd,nb,SEEK_CUR);
-	pos=ftell(_fd);
+int64_t pos;
+	fseeko(_fd,nb,SEEK_CUR);
+	pos=ftello(_fd);
 	if(pos>_atomStart+_atomSize+1) ADM_assert(0);	
 	return 1;
 }
@@ -124,15 +125,19 @@ uint32_t adm_atom::read32( void )
 
 }
 
+uint64_t adm_atom::read64( void )
+{
+	uint64_t a1 = read32();
+
+	return (a1 << 32) + read32();
+}
+
 uint32_t adm_atom::getFCC( void )
 {
 	return _atomFCC;
 }
-uint32_t adm_atom::getSize( void )
-{
-	return _atomSize-8;
-}
-uint32_t adm_atom::getRemainingSize( void )
+
+int64_t adm_atom::getRemainingSize( void )
 {
         int64_t pos=ftello(_fd);
         
@@ -141,9 +146,9 @@ uint32_t adm_atom::getRemainingSize( void )
 
 uint8_t adm_atom::readPayload( uint8_t *whereto, uint32_t rd)
 {
-	uint32_t pos;
+	int64_t pos;
 
-	pos=ftell(_fd);
+	pos=ftello(_fd);
 	if(pos+rd>_atomSize+_atomStart)
 	{
 		printf("\n Going out of atom's bound!! (%ld  / %ld )\n",pos+rd,_atomSize+_atomStart);
@@ -172,7 +177,7 @@ uint8_t adm_atom::dumpAtom( void )
 
 uint8_t adm_atom::skipAtom( void )
 {
-	fseek(_fd,_atomStart+_atomSize,SEEK_SET);
+	fseeko(_fd,_atomStart+_atomSize,SEEK_SET);
 #ifdef _3G_LOGO
         printf("Branching to %x ending atom ",_atomStart+_atomSize);
         fourCC::printBE(_atomFCC);
@@ -184,7 +189,7 @@ uint8_t adm_atom::skipAtom( void )
 }
 uint8_t adm_atom::isDone( void )
 {
-	uint32_t pos=ftell(_fd);
+	int64_t pos=ftello(_fd);
 
 	if(pos>=(_atomStart+_atomSize)) return 1;
 	return 0;

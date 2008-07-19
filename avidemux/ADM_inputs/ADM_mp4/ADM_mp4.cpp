@@ -54,12 +54,9 @@ version 2 media descriptor :
  ***************************************************************************/
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#include "ADM_assert.h"
 #include "ADM_default.h"
 #include "ADM_editor/ADM_Video.h"
 
@@ -123,7 +120,7 @@ uint8_t  MP4Header::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
     {
       return 0; 
     }
-    uint32_t offset=VDEO.index[framenum].offset; //+_mdatOffset;
+    uint64_t offset=VDEO.index[framenum].offset; //+_mdatOffset;
 
 
     fseeko(_fd,offset,SEEK_SET);
@@ -226,14 +223,14 @@ uint8_t    MP4Header::open(const char *name)
         fseeko(_fd,0,SEEK_SET);
         if(check[0]=='m' && check[1]=='d' &&check[2]=='a' && check[3]=='t')
         {
-                        uint32_t of;
+                        uint64_t of;
                                         printf("Data first, header later...\n");
                                         of=atom->read32();
                                         if(of==1)
                                         {
-                                          atom->read32();
-                                          atom->read32();
-                                          of=atom->read32();
+                                          atom->read32();	// size
+                                          atom->read32();	// fcc
+                                          of=atom->read64();
                                         }
                                         fseeko(_fd,of,SEEK_SET);        
                                         printf("Header starts at %x\n",of);
@@ -330,7 +327,7 @@ uint8_t    MP4Header::open(const char *name)
             _audioTracks[audio]=new MP4Audio(name,&(_tracks[1+audio]));   
             
         }
-        fseek(_fd,0,SEEK_SET);
+        fseeko(_fd,0,SEEK_SET);
         printf("3gp/mov file successfully read..\n");
         return 1;
 }

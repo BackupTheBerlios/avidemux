@@ -38,7 +38,7 @@ class MPsampleinfo
       uint32_t nbSync;
       uint32_t nbCtts;
       
-      uint32_t *Co;
+	  uint64_t *Co;
       uint32_t *Sz;
       uint32_t *Sc;
       uint32_t *Sn;
@@ -86,15 +86,12 @@ class MP4Audio : public AVDMGenericAudioStream
 protected:
 
            	uint32_t 					_nb_chunks;
-		uint64_t					_abs_position;
-		uint32_t					_rel_position;
-
               	uint32_t 					_current_index;
 	    	MP4Index 					*_index;
 		FILE						*_fd;
 		uint32_t					_extraLen;
 		uint8_t						*_extraData;
-		uint32_t                                         _audioDuration;
+		uint64_t                                         _audioDuration;
 		
 		
 public:
@@ -129,7 +126,7 @@ protected:
           uint8_t                       decodeEsds(void *ztom,uint32_t trackType);
           uint8_t                       updateCtts(MPsampleinfo *info );
           uint32_t                      _videoScale;
-          uint32_t                      _movieDuration; // in ms
+          int64_t						_movieDuration; // in ms
           uint32_t                      _videoFound;
           uint8_t	                indexify(
                                                 MP4Track *track,   
@@ -141,7 +138,7 @@ protected:
         uint8_t                       _reordered;		
         FILE                          *_fd;
         MP4Track                      _tracks[_3GP_MAX_TRACKS];
-        uint32_t                      _audioDuration;
+        int64_t                      _audioDuration;
         uint32_t                      _currentAudioTrack;
         uint8_t                       parseAtomTree(adm_atom *atom);
         MP4Audio                      *_audioTracks[_3GP_MAX_TRACKS-1];

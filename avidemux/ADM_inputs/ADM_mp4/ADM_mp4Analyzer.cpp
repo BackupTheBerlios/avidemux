@@ -15,12 +15,8 @@
  ***************************************************************************/
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <math.h>
 
-#include "ADM_assert.h"
 #include "ADM_default.h"
 #include "ADM_editor/ADM_Video.h"
 
@@ -107,23 +103,36 @@ uint8_t     MP4Header::lookupMainAtoms(void *ztom)
 */
 void MP4Header::parseMvhd(void *ztom)
 {
-  adm_atom *tom=(adm_atom *)ztom;
-  tom->skipBytes(12);
-  uint32_t scale,duration=1000;
+	adm_atom *tom = (adm_atom*)ztom;
+	int version = tom->read();
 
-        scale=tom->read32();
-        duration=tom->read32();
-        _videoScale=scale;
-        printf("Warning : scale is not in ms %lu !\n",_videoScale);
-        if(_videoScale)
-        {
-                        duration=1000*duration; // In ms
-                        duration/=_videoScale;
-        }else
-          _videoScale=1000;
-        printf("Movie duration :%s\n",ms2timedisplay(duration));
-        _movieDuration=duration;
+	tom->skipBytes(3);	// flags
+
+	if (version == 1)
+		tom->skipBytes(16);
+	else
+		tom->skipBytes(8);
+
+	int scale = tom->read32();
+	uint64_t duration = (version == 1) ? tom->read64() : tom->read32();
+
+	_videoScale = scale;
+
+	printf("Warning: scale is not in ms %lu!\n", _videoScale);
+
+	if (_videoScale)
+	{
+		duration = 1000 * duration; // In ms
+		duration /= _videoScale;
+	}
+	else
+		_videoScale = 1000;
+
+	printf("Movie duration: %s\n", ms2timedisplay(duration));
+
+	_movieDuration = duration;
 }
+
 /**
       \fn parseMvhd
       \brief Parse mvhd header
@@ -151,20 +160,31 @@ uint8_t MP4Header::parseTrack(void *ztom)
      {
        case ADM_MP4_TKHD:
               {
-                      son.skipBytes(12);
-                      adm_printf(ADM_PRINT_DEBUG,"Track Id: %lu\n",son.read32());
-                      son.skipBytes(4);
-                      adm_printf(ADM_PRINT_DEBUG,"Duration: %lu (ms)\n",(son.read32()*1000)/_videoScale);
-                      son.skipBytes(8);
-                      son.skipBytes(4); // layers
-                      son.skipBytes(40); // layers
+				  int version = son.read();
 
-                      w=son.read32()>>16;
-                      h=son.read32()>>16;
-                      adm_printf(ADM_PRINT_DEBUG,"tkhd : %ld %ld\n",w,h);
+				  son.skipBytes(3);
 
+				  if (version == 1)
+					  tom->skipBytes(16);
+				  else
+					  tom->skipBytes(8);
+
+				  adm_printf(ADM_PRINT_DEBUG,"Track Id: %lu\n", son.read32());
+				  son.skipBytes(4);
+
+				  uint64_t duration = (version == 1) ? son.read64() : son.read32();
+
+				  adm_printf(ADM_PRINT_DEBUG, "Duration: %lu (ms)\n", (duration * 1000) / _videoScale);
+				  son.skipBytes(8);
+				  son.skipBytes(8);
+				  son.skipBytes(36);
+
+				  w = son.read32() >> 16;
+				  h = son.read32() >> 16;
+
+				  adm_printf(ADM_PRINT_DEBUG,"tkhd: %ld %ld\n", w, h);
+				  break;
               }
-              break;
         case ADM_MP4_MDIA:
         {
             parseMdia(&son,&trackType,w,h);
@@ -187,7 +207,7 @@ uint8_t MP4Header::parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t
   ADMAtoms id;
   uint32_t container;
   uint32_t trackScale=_videoScale;
-  uint32_t trackDuration;
+  uint64_t trackDuration;
   *trackType=TRACK_OTHER;
   uint8_t r=0;
   printf("<<Parsing Mdia>>\n");
@@ -204,21 +224,31 @@ uint8_t MP4Header::parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t
      {
        case ADM_MP4_MDHD:
        {
-                uint32_t version=son.read(),duration;
-                son.skipBytes(3); // flags + version
-                son.skipBytes(4); // creation time
-                son.skipBytes(4); // mod time
-                if(version==1) son.skipBytes(8);
-                trackScale=son.read32(); //
-                adm_printf(ADM_PRINT_DEBUG,"MDHD,Trackscale in mdhd:%u\n",trackScale);
-                if(!trackScale) trackScale=600; // default
-                duration=son.read32();
-                adm_printf(ADM_PRINT_DEBUG,"MDHD,duration in mdhd:%u (unscaled)\n",duration);
-                duration=(uint32_t)((duration*1000.)/trackScale);
-                adm_printf(ADM_PRINT_DEBUG,"MDHD,duration in mdhd:%u (scaled ms)\n",duration);
-                trackDuration=duration;
-                printf("MDHD,Track duration :%s, trackScale :%u\n",ms2timedisplay((1000*duration)/trackScale),trackScale);
-                break;
+		   int version = son.read();
+
+		   son.skipBytes(3); // flags
+
+		   if (version == 1)
+			   son.skipBytes(16);
+		   else
+			   son.skipBytes(8);
+
+		   trackScale = son.read32();
+
+		   adm_printf(ADM_PRINT_DEBUG, "MDHD, Trackscale in mdhd: %u\n", trackScale);
+
+		   if (!trackScale)
+			   trackScale = 600; // default
+
+		   uint64_t duration = (version == 1) ? son.read64() : son.read32();
+
+		   adm_printf(ADM_PRINT_DEBUG, "MDHD, duration in mdhd: %u (unscaled)\n", duration);
+		   duration = (duration * 1000.) / trackScale;
+		   adm_printf(ADM_PRINT_DEBUG, "MDHD, duration in mdhd: %u (scaled ms)\n", duration);
+		   trackDuration = duration;
+		   printf("MDHD, Track duration: %s, trackScale: %u\n", ms2timedisplay((1000 * duration) / trackScale), trackScale);
+
+		   break;
        }
        case ADM_MP4_HDLR:
        {
@@ -343,7 +373,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                 printf("Using myscale %lu\n",trackScale);
                 info.SttsN=new uint32_t[info.nbStts];
                 info.SttsC=new uint32_t[info.nbStts];
-                double dur;
+                //double dur;
                 for(int i=0;i<info.nbStts;i++)
                 {
 
@@ -446,32 +476,34 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
             break;
        case ADM_MP4_STCO:
        {
-          son.read32();
-          info.nbCo=son.read32();
-          printf("\t\tnbCo:%u\n",info.nbCo);
-          info.Co=new uint32_t[info.nbCo];
-          for(int j=0;j< info.nbCo;j++)
-          {
-                  info.Co[j]=son.read32();
-                  adm_printf(ADM_PRINT_VERY_VERBOSE,"Chunk offset : %u / %u  : %u\n",  j,info.nbCo,info.Co[j]);
-          }
+		   son.skipBytes(4);
 
+		   info.nbCo = son.read32();
+		   printf("\t\tnbCo: %u\n", info.nbCo);
+
+		   info.Co = new uint64_t[info.nbCo];
+
+		   for(int j = 0; j < info.nbCo; j++)
+		   {
+			   info.Co[j] = son.read32();
+			   adm_printf(ADM_PRINT_VERY_VERBOSE, "Chunk offset: %u / %u : %"LLU"\n", j, info.nbCo - 1, info.Co[j]);
+		   }
        }
        break;
        case ADM_MP4_STCO64:
        {
-         printf("Incomplete support for 64 bits quicktime!!\n");
-          son.read32();
-          info.nbCo=son.read32();
-          printf("\t\tnbCo:%u\n",info.nbCo);
-          info.Co=new uint32_t[info.nbCo];
-          for(int j=0;j< info.nbCo;j++)
-          {
-                  son.read32(); // Ignore MSB
-                  info.Co[j]=son.read32();
-                  adm_printf(ADM_PRINT_VERY_VERBOSE,"Chunk offset : %u / %u  : %lu\n",  j,info.nbCo,info.Co[j]);
-          }
+		   son.skipBytes(4);
 
+		   info.nbCo = son.read32();
+		   printf("\t\tnbCo: %u\n", info.nbCo);
+
+		   info.Co = new uint64_t[info.nbCo];
+
+		   for(int j = 0; j< info.nbCo; j++)
+		   {
+			   info.Co[j] = son.read64();
+			   adm_printf(ADM_PRINT_VERY_VERBOSE, "Chunk offset: %u / %u : %"LLU"\n", j, info.nbCo - 1, info.Co[j]);
+		   }
        }
        break;
        case ADM_MP4_STSD:
@@ -797,7 +829,7 @@ nextAtom:
                                             break;
                                     case MKFCCR('Q','D','M','2'):
                                         {
-                                            uint32_t sz;
+                                            int64_t sz;
                                               audioCodec(QDM2);
                                               sz=son.getRemainingSize();
                                               _tracks[1+nbAudioTrack].extraDataSize=sz;
@@ -924,7 +956,7 @@ foundit: // HACK FIXME
             // Mark keyframes
             for(int i=0;i<info.nbSync;i++)
             {
-              int sync=info.Sync[i];
+              uint32_t sync=info.Sync[i];
               if(sync) sync--;
               _tracks[0].index[sync].intra=AVI_KEY_FRAME;
             }

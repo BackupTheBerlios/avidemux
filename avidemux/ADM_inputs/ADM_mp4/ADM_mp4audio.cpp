@@ -23,8 +23,6 @@
  ***************************************************************************/
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
@@ -44,8 +42,6 @@ MP4Audio::MP4Audio(const char *name,MP4Track *track)
 	_fd=fopen(name,"rb");
         ADM_assert(_fd);
 	_current_index=0;
-	_abs_position=0;
-	_rel_position=0;
 	_pos=0;
 	_index=track->index;
 
@@ -61,9 +57,8 @@ MP4Audio::MP4Audio(const char *name,MP4Track *track)
 	// compute length
 	_length=0;
 	for(uint32_t i=0;i<_nb_chunks;i++)
-		{
-			_length+=track->index[i].size;
-		}
+		_length+=track->index[i].size;
+
 	printf("\n [MP4 audio] : %lu bytes (%lu chunks)\n",_length,_nb_chunks);
 
 	printf("Byterate     :%d\n",_wavheader->byterate);
@@ -123,13 +118,8 @@ double delta;
 	  fseeko(_fd,_index[_current_index].offset,SEEK_SET);
 	  r=fread(dest,1,_index[_current_index].size,_fd);
           if(!r)
-          {
             printf("[MP4 Audio] Cannot read \n"); 
-          }
-          else
-          {
-            
-          }
+
 	  if(_current_index==_nb_chunks-1)
 	  {
 	  	
@@ -145,10 +135,12 @@ double delta;
                         delta*=_wavheader->frequency;
                         delta/=1000.; // mss -> second
                         *samples=(uint32_t)floor(delta);
-                }else *samples=1024;
+                }
+				else
+					*samples=1024;
+
                 printf("[MP4Audio]: Last sample %d current chunk %d nb chunk %d\n",
                                 *samples,_current_index,_nb_chunks);
-                
 	  }
 	  else
 	  {
@@ -159,7 +151,6 @@ double delta;
 		delta*=_wavheader->frequency;
 		delta/=1000.*1000.; // us -> second
 		*samples=(uint32_t)floor(delta);
-	     
 	  }
 #if 0
           printf("[MP4Audio]Read %u bytes\n", r);
