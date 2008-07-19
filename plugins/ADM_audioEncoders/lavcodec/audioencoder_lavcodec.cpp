@@ -23,9 +23,26 @@
 #include "audioencoder.h"
 #include "audioencoderInternal.h"
 //
-#include "audioencoder_lavcodec.h"
+
 
 #include "ADM_lavcodec.h"
+
+
+
+#define Join(x,y) x##_##y
+#if defined(ADM_LAV_MP2) && !defined(ADM_LAV_AC3)
+  #define makeName(x) Join(x,MP2)
+  #define AUDMEncoder_Lavcodec AUDMEncoder_Lavcodec_MP2
+#else
+ #if !defined(ADM_LAV_MP2) && defined(ADM_LAV_AC3)
+  #define makeName(x) Join(x,AC3)
+  #define AUDMEncoder_Lavcodec AUDMEncoder_Lavcodec_AC3
+ #else
+   #error
+ #endif
+#endif
+
+#include "audioencoder_lavcodec.h"
 
 typedef struct 
 {
@@ -47,15 +64,17 @@ static ADM_audioEncoder encoderDesc = {
   "MP2 LavCodec encoder plugin Mean 2008",             
   2,                    // Max channels
   1,0,0,                // Version
-  WAV_MP2,
 #else
+  
+
  "LavAC3",            
   "AC3 (lav)",      
   "AC3 LavEncoder encoder plugin Mean 2008",             
   6,                    // Max channels
   1,0,0,                // Version
-  WAV_AC3,
 #endif
+  makeName(WAV),
+
   100,                  // Priority
   getConfigurationData,  // Defined by macro automatically
   setConfigurationData,  // Defined by macro automatically
@@ -80,12 +99,11 @@ AUDMEncoder_Lavcodec::AUDMEncoder_Lavcodec(AUDMAudioFilter * instream)  :AUDMEnc
 {
   
   _context=NULL;
-#ifdef ADM_LAV_MP2     
-  _wavheader->encoding=WAV_MP2;
-#else
-    _wavheader->encoding=WAV_AC3;
-#endif
-  printf("[Lavcodec] Creating Lavcodec audio encoder\n");
+   printf("[Lavcodec] Creating Lavcodec audio encoder (0x%x)\n",makeName(WAV));
+
+  _wavheader->encoding=makeName(WAV);
+  
+  
 };
 
 
@@ -134,13 +152,9 @@ uint8_t AUDMEncoder_Lavcodec::initialize(void)
 
   AVCodec *codec;
   CodecID codecID;
-#ifdef ADM_LAV_MP2  
-  printf("[LavAudio] Mp2 encoder\n"); 
-  codecID=CODEC_ID_MP2;
-#else
-  printf("[LavAudio] Ac3 encoder\n"); 
-  codecID=CODEC_ID_AC3;
-#endif
+
+  
+  codecID=makeName(CODEC_ID);
   codec = avcodec_find_encoder(codecID);
   ADM_assert(codec);
   
@@ -152,7 +166,7 @@ uint8_t AUDMEncoder_Lavcodec::initialize(void)
   }
 
 
-  printf("[Lavcodec]Lavcodec successfully initialized\n");
+  printf("[Lavcodec]Lavcodec successfully initialized,wavTag : 0x%x\n",makeName(WAV));
   return 1;       
 }
 //*********************************

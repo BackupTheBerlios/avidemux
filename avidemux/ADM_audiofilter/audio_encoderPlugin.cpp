@@ -55,8 +55,8 @@ public:
                         initialised=0;
                     }else
                     {
-                        printf("[AudioEncoder] Loaded %s version %02d.%02d.%02d\n",e->codecName,
-                                e->major,e->minor,e->patch);
+                        printf("[AudioEncoder] Loaded %s version %02d.%02d.%02d wavTag :0x%x\n",e->codecName,
+                                e->major,e->minor,e->patch,e->wavTag);
                         encoderBlock=new ADM_audioEncoder;
                         *encoderBlock=*e;
                         encoderBlock->opaque=(void *)this;
@@ -229,6 +229,7 @@ uint8_t audioCodecSetByIndex(int i)
 {
     ADM_assert(i<ListOfAudioEncoder.size());
     currentEncoder=i;
+    printf("[AudioEncoder] Selected %s for index %d, tag 0x%x \n",ListOfAudioEncoder[currentEncoder]->codecName,i,ListOfAudioEncoder[currentEncoder]->wavTag);
     return 1;
 
 }
@@ -343,7 +344,8 @@ const char  *audioEncoderGetDisplayName(uint32_t i)
 AUDMEncoder *audioEncoderCreate(AUDMAudioFilter *filter)
 {
       ADM_assert(currentEncoder<ListOfAudioEncoder.size());
-     return ListOfAudioEncoder[currentEncoder]->create(filter);
+      static ADM_audioEncoder *enc=ListOfAudioEncoder[currentEncoder];
+     return enc->create(filter);
 }
 /**
         \fn getAudioExtraConf
@@ -402,7 +404,7 @@ uint8_t audio_selectCodecByTag(uint32_t tag)
     {
         currentEncoder=selected;
         UI_setAudioCodec( (int)currentEncoder);
-        printf("[AudioEncoder] Selected %s for tag %d (%s)\n",ListOfAudioEncoder[currentEncoder],tag,"");
+        printf("[AudioEncoder] Selected %s for tag %d (%s)\n",ListOfAudioEncoder[currentEncoder]->codecName,tag,"");
         return 1;
     }
     return 0;
