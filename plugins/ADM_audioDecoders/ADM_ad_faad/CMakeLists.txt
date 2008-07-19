@@ -1,7 +1,7 @@
 INCLUDE(admCheckFaad)
 checkFaad()
 
-IF (HAVE_FAAD)
+IF (USE_FAAD)
 	INCLUDE(ad_plugin)
 	
 	SET(ADM_ad_faad_SRCS ADM_ad_faad.cpp)
@@ -14,4 +14,4 @@ IF (HAVE_FAAD)
 
 	INIT_AUDIO_PLUGIN(ADM_ad_faad)
 	INSTALL_AUDIODECODER(ADM_ad_faad)
-ENDIF (HAVE_FAAD)
+ENDIF (USE_FAAD)
