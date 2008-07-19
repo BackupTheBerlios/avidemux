@@ -21,13 +21,6 @@
 
 #define MAKELONG(low,high)     ((int32_t)(((uint16_t)(low)) | (((uint32_t)((uint16_t)(high))) << 16)))
 
-typedef struct __attribute__((__packed__))
-{
-    int16_t	left;
-    int16_t	top;
-    int16_t	right;
-    int16_t	bottom;
-} RECT, *PRECT, *LPRECT;
 #endif // __WINE_WINDEF_H
 
 #ifdef _MSC_VER
@@ -209,20 +202,25 @@ typedef struct __attribute__((__packed__))
 
 typedef struct  __attribute__((__packed__))
 {
-    uint32_t	fccType;
-    uint32_t	fccHandler;
-    int32_t	dwFlags;	/* Contains AVITF_* flags */
-    int16_t	wPriority;	/* dwPriority - splited for audio */
-    int16_t	wLanguage;
-    int32_t	dwInitialFrames;
-    int32_t	dwScale;
-    int32_t	dwRate;		/* dwRate / dwScale == samples/second */
-    int32_t	dwStart;
-    int32_t	dwLength;	/* In units above... */
-    int32_t	dwSuggestedBufferSize;
-    int32_t	dwQuality;
-    int32_t	dwSampleSize;
-    RECT	rcFrame;
+	uint32_t	fccType;
+	uint32_t	fccHandler;
+	int32_t	dwFlags;	/* Contains AVITF_* flags */
+	int16_t	wPriority;	/* dwPriority - splited for audio */
+	int16_t	wLanguage;
+	int32_t	dwInitialFrames;
+	int32_t	dwScale;
+	int32_t	dwRate;		/* dwRate / dwScale == samples/second */
+	int32_t	dwStart;
+	int32_t	dwLength;	/* In units above... */
+	int32_t	dwSuggestedBufferSize;
+	int32_t	dwQuality;
+	int32_t	dwSampleSize;
+	struct {
+		int16_t left;
+		int16_t top;
+		int16_t right;
+		int16_t bottom;
+	} rcFrame;
 } AVIStreamHeader;
 
 /* Flags for index */
