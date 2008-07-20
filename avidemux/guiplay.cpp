@@ -339,7 +339,7 @@ void ComputePreload(void)
     one_audio_frame /= 1000; // In elemtary info (float)
     printf("1 audio frame = %lu bytes\n", one_audio_frame);
     // 3 sec buffer..               
-    wavbuf =  (float *)  ADM_alloc((3 *  channels * wavinfo->frequency*wavinfo->channels));
+    wavbuf =  (float *)  ADM_alloc((3 *  2*channels * wavinfo->frequency*wavinfo->channels));
     ADM_assert(wavbuf);
     // Call it twice to be sure it is properly setup
      state = AVDM_AudioSetup(playback->getInfo()->frequency,  channels );

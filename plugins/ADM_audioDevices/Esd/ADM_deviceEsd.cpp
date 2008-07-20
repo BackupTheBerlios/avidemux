@@ -24,6 +24,7 @@
 
 #include  "ADM_deviceEsd.h"
 #include <esd.h>
+#include <sys/time.h>
 ADM_DECLARE_AUDIODEVICE(Esd,esdAudioDevice,1,0,0,"Esd audio device (c) mean");
 /**
         \fn getLatencyMs
@@ -74,9 +75,29 @@ latency=0;
     int fmt = AFMT_S16_LE;
 #endif    
 */
-    float f=0; // FIXE Cause a freeze with esdcompat =(float)esd_get_latency(esdDevice);
-    f=f/44.1;
-    latency=(uint32_t)f;
+// Compute latency  esd_get_latency is causing a freeze
+// from VLC...
+#if 0
+        struct timeval start, stop;
+        esd_server_info_t * p_info;
+
+        gettimeofday( &start, NULL );
+        p_info = esd_get_server_info( esdDevice);
+        gettimeofday( &stop, NULL );
+
+        uint64_t serv_lat= (uint64_t)( stop.tv_sec - start.tv_sec )
+                           * 1000;
+        serv_lat += stop.tv_usec - start.tv_usec;
+    
+
+  
+  
+    latency=(uint32_t)(serv_lat);
+#else
+    latency=0; // harcoded value.... does not work with pulse+esd compat
+#endif
+    printf("[ESD] Latency %u ms\n",latency);
+    //printf("[ESD] get_esd_latency %u \n",esd_get_latency(esdDevice));
     return 1;
 }
 
