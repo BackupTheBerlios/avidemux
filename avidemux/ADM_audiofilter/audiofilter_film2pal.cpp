@@ -63,8 +63,8 @@ uint32_t AUDMAudioFilterFilmChange::fill( uint32_t max, float * buffer,AUD_Statu
   fillIncomingBuffer(status);
   
   len=_tail-_head;
-  if(max>64)
-    max-=64; // Prevent overflow
+  int nbBlock=max/1001;
+  max=nbBlock*960; // Prevent overflow when slowing down
 
   if(len>max) len=max;
   
