@@ -48,7 +48,7 @@ int er=0;
     fromFrequency=from;
     toFrequency=to;
     nbChannels=channel;
-    context=(void *)src_new (SRC_SINC_MEDIUM_QUALITY, channel, &er) ;
+    context=(void *)src_new (SRC_SINC_FASTEST*0+1*SRC_SINC_MEDIUM_QUALITY, channel, &er) ;
     if(!context) 
     {
         printf("[SRC] Error :%d\n",er);

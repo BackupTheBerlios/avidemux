@@ -32,6 +32,7 @@ AUDMAudioFilter::AUDMAudioFilter(AUDMAudioFilter *previous)
   if(_previous)
   {
       memcpy(&_wavHeader,_previous->getInfo(),sizeof(_wavHeader));
+      _wavHeader.bitspersample=16; // We deal with PCM here...
       _length=previous->getLength();
   }
   _head=_tail=0; 

@@ -17,29 +17,29 @@
 #define AUDIO_F_FILM2PAL_H
 
 #include "ADM_audioFilter.h"
-#include "audiofilter_limiter_param.h"
-class AUDMAudioFilterFilm2Pal : public AUDMAudioFilter
+#include "audiofilter_SRC.h"
+#define BLK_SIZE 512
+
+class AUDMAudioFilterFilmChange : public AUDMAudioFilter
 {
   protected:
-    uint32_t   _target;
-    uint32_t _removed;
-    uint32_t _modulo;
+    ADM_resample          resampler;
   public:
-                          AUDMAudioFilterFilm2Pal(AUDMAudioFilter *previous);
-    virtual                ~AUDMAudioFilterFilm2Pal();
+                          AUDMAudioFilterFilmChange(AUDMAudioFilter *previous,uint32_t from, uint32_t to);
+    virtual                ~AUDMAudioFilterFilmChange();
     virtual    uint32_t   fill(uint32_t max,float *output,AUD_Status *status);
 };
-class AUDMAudioFilterPal2Film : public AUDMAudioFilter
+class AUDMAudioFilterPal2Film : public AUDMAudioFilterFilmChange
 {
   protected:
-    uint32_t   _target;
-    uint32_t _removed;
-    uint32_t _modulo;
-
   public:
                             AUDMAudioFilterPal2Film(AUDMAudioFilter *previous);
-    virtual                ~AUDMAudioFilterPal2Film();
-    virtual    uint32_t   fill(uint32_t max,float *output,AUD_Status *status);
+};
+class AUDMAudioFilterFilm2Pal : public AUDMAudioFilterFilmChange
+{
+  protected:
+  public:
+                            AUDMAudioFilterFilm2Pal(AUDMAudioFilter *previous);
 };
 
 #endif

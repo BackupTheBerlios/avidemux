@@ -14,7 +14,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
 #include <math.h>
 
 #include "ADM_default.h"
@@ -22,149 +22,74 @@
 #include "ADM_audioFilter.h"
 #include "audiofilter_film2pal.h"
 
+AUDMAudioFilterFilm2Pal::AUDMAudioFilterFilm2Pal(AUDMAudioFilter *previous) : 
+            AUDMAudioFilterFilmChange(previous,1001,960)
+{
+    printf("[Film2Pal] Created\n");
+}
+AUDMAudioFilterPal2Film::AUDMAudioFilterPal2Film(AUDMAudioFilter *previous) : 
+            AUDMAudioFilterFilmChange(previous,960,1001)
+{
+    printf("[Pal2Film] Created\n");
+}
+#define CONTECT ((SRC_STATE *)context))
 //__________
 
-AUDMAudioFilterFilm2Pal::AUDMAudioFilterFilm2Pal(AUDMAudioFilter * instream):AUDMAudioFilter (instream)
+AUDMAudioFilterFilmChange::AUDMAudioFilterFilmChange(AUDMAudioFilter * instream,uint32_t from, uint32_t to):AUDMAudioFilter (instream)
 {
-    // nothing special here...
-  _target=0;
-  _removed=0;
-  _previous->rewind();
-  _modulo=0;
-  printf("[Film2Pal] Creating\n");
+    // The parameter are in sample, we deal with fq
+    if(true!=resampler.init(from,to,_wavHeader.channels))
+    {
+        printf("[AudioFilter Resample] Init failed! \n");
+        ADM_assert(0);
+    }
+    printf("[FilmChange] Creating\n");
 };
 
-AUDMAudioFilterFilm2Pal::~AUDMAudioFilterFilm2Pal()
+AUDMAudioFilterFilmChange::~AUDMAudioFilterFilmChange()
 {
-  printf("[Film2Pal] Destroying\n");
+  
+  printf("[FilmChange] Destroying\n");
 }
 //
 //___________________________________________
-uint32_t AUDMAudioFilterFilm2Pal::fill( uint32_t max, float * buffer,AUD_Status *status)
+uint32_t AUDMAudioFilterFilmChange::fill( uint32_t max, float * buffer,AUD_Status *status)
 {
   uint32_t len,i,rendered;
-  uint32_t min=_wavHeader.channels;
+  uint32_t chan=_wavHeader.channels;
   float *start;
   
   shrink();
   fillIncomingBuffer(status);
   
   len=_tail-_head;
+  if(max>64)
+    max-=64; // Prevent overflow
+
   if(len>max) len=max;
   
-  len=len/min;
+  len=len/chan; // in sample
 
-  rendered=0;
-  start=&_incomingBuffer[_head];
-
-  while(len--) // in sample
-  {
-        //_______________________________________
-        // FilmToPal : 24 fps to 25 fps -> shorten frame
-        // 1001 samples -> 960 samples
-        //______________________________________
-       if(_removed) // Fixme , use dither or something
-        { 
-              _removed--;
-        }
-        else
+        uint32_t maxSample=max/chan; // in sample
+        uint32_t nbOut=0;
+        uint32_t nbIn=len;
+        uint32_t nbInTaken=0;
+        float *from,*to;
+        from=_incomingBuffer+_head;
+        to=buffer;
+        if(true!=resampler.process(from,to, 
+                    nbIn,
+                    maxSample,
+                    &nbInTaken, 
+                    &nbOut))
         {
-        
-            memcpy(buffer,start,min*sizeof(float));
-            buffer+=min;
-            rendered+=min;    
+            printf("[FilmChange] EOF ??\n");
+            *status=AUD_END_OF_STREAM;
+            return 0;
         }
-        _target++; // nb Processed
-     // Consume it
-        start+=min;
-        _head+=min;
-        _modulo++;
-        if(_target>1001)
-        {
-            _removed+=41;
-            _target-=1001;
-        }
-  }
-  return rendered;
-};
-//****************************************************
-AUDMAudioFilterPal2Film::AUDMAudioFilterPal2Film(AUDMAudioFilter * instream):AUDMAudioFilter (instream)
-{
-    // nothing special here...
-  _target=0;
-  _removed=0;
-  _modulo=0;
-  _previous->rewind();
-  printf("[Pal2Film] Creating\n");
+      _head=_head+(nbInTaken*chan);
+      return nbOut*chan;
 };
 
-AUDMAudioFilterPal2Film::~AUDMAudioFilterPal2Film()
-{
-  printf("[Film2Pal] Destroying\n");
-}
-//
-//___________________________________________
-uint32_t AUDMAudioFilterPal2Film::fill( uint32_t max, float * buffer,AUD_Status *status)
-//uint32_t AUDMAudioFilterFilm2Pal::fill( uint32_t max, float * buffer,AUD_Status *status)
-{
-  uint32_t len,i,rendered;
-  uint32_t min=_wavHeader.channels;
-  float *start;
-  
-  shrink();
-  fillIncomingBuffer(status);
-  
-  ADM_assert(_tail>=_head);
-  
-  len=_tail-_head;  // How much float available ?
-  if(len>max) len=max;
-  
-  len=len/min; // convert to sample
-  
-  if(len==0)
-  {
-        printf("**oops**\n");
-  }
-  rendered=0;
-  start=&_incomingBuffer[_head];
-  while(len--)
-  {
-        memcpy(buffer,start,min*sizeof(float));
-       // printf(" Target :%d removed :%d\n",_target,_removed);
-        buffer+=min;
-        rendered+=min;
-
-       
-        _target++; // _target is the number of sample we processed
-
-        _modulo++;
-
-        if(_target>960) // Time to duplicate samples
-        {
-            _removed+=41;
-            _target-=960;
-        }
-        if(rendered>=max-1)
-        {
-            start+=min;
-            _head+=min;
-            return rendered;
-        }
-        //_______________________________________
-        // Pal2Film : 25 fps to 24 fps -> Duplicate samples
-        // by 41 samples every 960 samples 960->1001
-        //______________________________________
-        if(_removed /*&& ((_modulo&15)==1)*/) // Spread the duplication
-        {
-          memcpy(buffer,start,min*sizeof(float));
-          buffer+=min;
-          rendered+=min;			
-          _removed--;
-        }  
-        start+=min;
-        _head+=min;
-  }
-  return rendered;
-};
 //EOF
 
