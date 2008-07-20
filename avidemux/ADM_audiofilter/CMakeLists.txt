@@ -7,9 +7,8 @@ SET(ADMaudiofilter_SRCS
         audiofilter_mixer.cpp
 	audiofilter_normalize.cpp
         audiofilter_dolby.cpp          
-        audiofilter_sox.cpp
+        audiofilter_SRC.cpp
         audio_raw.cpp
-        audiolib_sox.cpp
 	audioeng_buff.cpp          
         audio_encoderWrapper.cpp
         audio_encoderPlugin.cpp

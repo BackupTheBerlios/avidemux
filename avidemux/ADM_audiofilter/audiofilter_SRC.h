@@ -12,20 +12,19 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef AUDM_AUDIO_SOX_H
-#define AUDM_AUDIO_SOX_H
-
-#include "audiolib_sox.h"
-class AUDMAudioFilterSox : public AUDMAudioFilter
+#ifndef AUDM_AUDIO_SRC_H
+#define AUDM_AUDIO_SRC_H
+#include "ADM_audioResample.h"
+class AUDMAudioFilterSrc : public AUDMAudioFilter
 {
   protected:
-      uint32_t targetFrequency;
-      uint32_t engaged;
-      ResampleStruct	*_resamples;
+      uint32_t          targetFrequency;
+      uint32_t          engaged;
+      ADM_resample      resampler; 
   public:
 
-    ~AUDMAudioFilterSox();
-    AUDMAudioFilterSox(AUDMAudioFilter *instream,uint32_t  tgt);
+    ~AUDMAudioFilterSrc();
+    AUDMAudioFilterSrc(AUDMAudioFilter *instream,uint32_t  tgt);
     uint32_t   fill(uint32_t max,float *output,AUD_Status *status);
 };
 #endif

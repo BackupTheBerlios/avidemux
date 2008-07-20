@@ -21,13 +21,15 @@
 ** use license for this code is available, please see:
 **		http://www.mega-nerd.com/SRC/procedure.html
 */
-
+#if 0 // MEANX
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
 
 #include	"config.h"
-
+#else
+#include "ADM_default.h"
+#endif
 #include	"samplerate.h"
 #include	"float_cast.h"
 #include	"common.h"

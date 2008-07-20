@@ -42,7 +42,7 @@
 #include "audiofilter_mixer.h"
 #include "audiofilter_normalize.h"
 #include "audiofilter_limiter.h"
-#include "audiofilter_sox.h"
+#include "audiofilter_SRC.h"
 #include "audiofilter_film2pal.h"
 
 /* ************ Conf *********** */
@@ -140,8 +140,8 @@ AUDMAudioFilter *buildInternalAudioFilter(AVDMGenericAudioStream *currentaudiost
             case RESAMPLING_NONE: break;
             case RESAMPLING_CUSTOM:
             {
-                      AUDMAudioFilterSox  *resample=NULL;
-                      resample = new AUDMAudioFilterSox(lastFilter, audioFreq);
+                      AUDMAudioFilterSrc  *resample=NULL;
+                      resample = new AUDMAudioFilterSrc(lastFilter, audioFreq);
                       lastFilter = resample;
                       filtersFloat[filtercount++] = lastFilter;	
             }
