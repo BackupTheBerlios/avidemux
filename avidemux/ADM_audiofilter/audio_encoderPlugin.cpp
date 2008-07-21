@@ -162,6 +162,15 @@ uint8_t ADM_ae_loadPlugins(const char *path)
 
 	return 1;
 }
+/**
+    \fn audioPrintCurrentCodec
+    \brief updates the UI with the current selected audio encoder
+*/
+void UI_setAudioCodec( int i);
+void audioPrintCurrentCodec(void)
+{
+			UI_setAudioCodec(currentEncoder);
+}
 
 /**
     \fn ADM_encoderByName
@@ -201,10 +210,20 @@ AUDIOENCODER AVDM_getCurrentAudioEncoder( void)
 {
 	return currentEncoder;
 }
-
 /**
-    \fn     
-    \brief
+    \fn audioCodecSelect
+    \brief Update UI
+*/
+uint8_t DIA_audioCodec( int *codec );
+void audioCodecSelect( void )
+{
+ 
+	DIA_audioCodec( &currentEncoder );
+	audioPrintCurrentCodec();
+}
+/**
+    \fn     audioCodecSetByName
+    \brief  only called by JS, we have to update UI as well
 */
 uint8_t audioCodecSetByName( const char *name)
 {
@@ -214,6 +233,7 @@ uint8_t audioCodecSetByName( const char *name)
 			{
 
 				currentEncoder=i;
+                audioPrintCurrentCodec(); // Update UI
 				return 1;
 			}
 
@@ -243,28 +263,7 @@ const char *audioCodecGetName( void )
       return ListOfAudioEncoder[currentEncoder]->codecName;
 
 }
-/**
-    \fn audioPrintCurrentCodec
-    \brief updates the UI with the current selected audio encoder
-*/
-void UI_setAudioCodec( int i);
-void audioPrintCurrentCodec(void)
-{
-			UI_setAudioCodec(currentEncoder);
-}
-/**
-    \fn audioCodecSelect
-    \brief
-*/
-uint8_t DIA_audioCodec( int *codec );
-void audioCodecSelect( void )
-{
- 
-	DIA_audioCodec( &currentEncoder );
-	audioPrintCurrentCodec();
 
-
-}
 /**
     \fn audioProcessMode
     \brief
@@ -361,6 +360,7 @@ uint8_t getAudioExtraConf(uint32_t *bitrate,uint32_t *extraDataSize, uint8_t **e
     }
      ADM_assert(currentEncoder<ListOfAudioEncoder.size());
      ADM_audioEncoder *encoder= ListOfAudioEncoder[currentEncoder];
+     *bitrate=encoder->getBitrate();
      if(encoder->getConfigurationData)
         return encoder->getConfigurationData(extraDataSize,extradata);
      else return 1;
@@ -377,6 +377,7 @@ uint8_t setAudioExtraConf(uint32_t bitrate,uint32_t extraDataSize, uint8_t *extr
     }
      ADM_assert(currentEncoder<ListOfAudioEncoder.size());
      ADM_audioEncoder *encoder= ListOfAudioEncoder[currentEncoder];
+     encoder->setBitrate(bitrate);
      if(encoder->setConfigurationData)
         return encoder->setConfigurationData(extraDataSize,extradata);
     else return 1;
