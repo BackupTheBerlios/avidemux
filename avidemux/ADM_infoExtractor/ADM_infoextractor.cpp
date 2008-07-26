@@ -354,8 +354,9 @@ uint8_t extractSPSInfo(uint8_t *data, uint32_t len,uint32_t *wwidth,uint32_t *hh
             get_ue_golomb(&s);  //bit_depth_luma_minus8
             get_ue_golomb(&s);  //bit_depth_chroma_minus8
             get_bits1(&s);
-            get_bits1(&s); //incomplete FIXME
-           }    // /??
+			if (get_bits1(&s))
+				get_bits(&s, 8);
+           }
            
 
            dum=get_ue_golomb(&s); // log2_max_frame_num_minus4

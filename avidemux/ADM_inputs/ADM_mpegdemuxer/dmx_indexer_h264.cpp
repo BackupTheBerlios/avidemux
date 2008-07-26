@@ -143,7 +143,7 @@ uint8_t pic_started=0;
               {
                     // Our firt frame is here
                     // Important to initialize the mpeg decoder !
-                    
+                    _run->imageAR = 1;	// 1:1 to suppress warning
                     _run->imageFPS=25000; 
                     //
                     
