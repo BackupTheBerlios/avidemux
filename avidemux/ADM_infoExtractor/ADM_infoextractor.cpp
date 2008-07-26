@@ -324,12 +324,65 @@ static uint32_t unescapeH264(uint32_t len,uint8_t *in, uint8_t *out)
     return outlen;
     
 }
+
+static uint8_t extractVUIInfo(GetBitContext *s, uint32_t *fps1000)
+{
+	*fps1000 = 0;
+
+	if (get_bits1(s))
+	{
+		unsigned int aspect_ratio_information = get_bits(s, 8);
+
+		if (aspect_ratio_information == 255)
+		{
+			get_bits(s, 16);
+			get_bits(s, 16);
+		}
+	}
+
+	if (get_bits1(s))	// overscan
+		get_bits1(s);
+
+	if (get_bits1(s))	// vsp_color
+	{
+		get_bits(s, 4);
+
+		if (get_bits1(s))
+		{
+			get_bits(s, 8);
+			get_bits(s, 8);
+			get_bits(s, 8);
+		}
+	}
+
+	if (get_bits1(s))	// chroma
+	{
+		get_ue_golomb(s);
+		get_ue_golomb(s);
+	}
+
+	if (get_bits1(s))	// timing
+	{
+		uint32_t timeinc_unit = get_bits_long(s, 32);
+		uint32_t timeinc_resolution = get_bits_long(s, 32);
+		uint32_t fixed_fps = get_bits1(s);
+
+		if (timeinc_unit > 0 && timeinc_resolution > 0)
+			*fps1000 = (uint32_t)(((float)timeinc_resolution / (float)timeinc_unit) * 1000);
+
+		if (fixed_fps)
+			*fps1000 /= 2;
+	}
+
+	return 1;
+}
+
 /**
     \fn extractSPSInfo
     \brief Extract info from H264 SPS
     See 7.3.2.1 of 14496-10
 */
-uint8_t extractSPSInfo(uint8_t *data, uint32_t len,uint32_t *wwidth,uint32_t *hheight)
+uint8_t extractSPSInfo(uint8_t *data, uint32_t len,uint32_t *wwidth,uint32_t *hheight, uint32_t *fps1000)
 {
    GetBitContext s;
    
@@ -401,6 +454,22 @@ uint8_t extractSPSInfo(uint8_t *data, uint32_t len,uint32_t *wwidth,uint32_t *hh
 		   *wwidth = w * 16;
 		   *hheight= h * 16;
            
+		   if (!frame_mbs_only)
+			   get_bits1(&s);
+
+		   get_bits1(&s);
+
+		   if(get_bits1(&s))
+		   {
+			   get_ue_golomb(&s);
+			   get_ue_golomb(&s);
+			   get_ue_golomb(&s);
+			   get_ue_golomb(&s);
+		   }
+
+		   if(get_bits1(&s))
+			   extractVUIInfo(&s, fps1000);
+
            return 1;
 }
 /**
