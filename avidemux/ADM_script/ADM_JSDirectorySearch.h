@@ -28,6 +28,7 @@ public:
 	static JSBool Init(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 	static JSBool GetFileSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 	static JSBool GetFileDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+	static JSBool GetFilePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 	static JSBool GetFileName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 	static JSBool Close(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 

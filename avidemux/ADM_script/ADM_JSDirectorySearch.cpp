@@ -29,6 +29,7 @@ JSFunctionSpec ADM_JSDirectorySearch::directorysearch_methods[] =
 	{ "Close", Close, 0, 0, 0 },	// Close the search
 	{ "GetFileName", GetFileName, 0, 0, 0 },	// return the current file name
 	{ "GetFileDirectory", GetFileDirectory, 0, 0, 0 },	// returns the directory of the file
+	{ "GetFilePath", GetFilePath, 0, 0, 0 },	// returns the full path of the file
 	{ "NextFile", NextFile, 0, 0, 0 },	// Advance search to the next file
 	{ "GetFileSize", GetFileSize, 0, 0, 0 },	// Returns the size of the file in bytes
 	{ "GetExtension", GetExtension, 0, 0, 0 },	// Returns the extension of the current file
@@ -213,6 +214,17 @@ JSBool ADM_JSDirectorySearch::GetFileDirectory(JSContext *cx, JSObject *obj, uin
 	*rval = STRING_TO_JSVAL(JS_NewStringCopyZ(cx,p->getObject()->GetFileDirectory().c_str()));
 	return JS_TRUE;
 }// end GetFileDirectory
+
+JSBool ADM_JSDirectorySearch::GetFilePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{// begin GetFilePath
+	ADM_JSDirectorySearch *p = (ADM_JSDirectorySearch *)JS_GetPrivate(cx, obj);
+	// default return value
+	*rval = BOOLEAN_TO_JSVAL(false);
+	if(argc != 0)
+		return JS_FALSE;
+	*rval = STRING_TO_JSVAL(JS_NewStringCopyZ(cx,p->getObject()->GetFilePath().c_str()));
+	return JS_TRUE;
+}// end GetFilePath
 
 JSBool ADM_JSDirectorySearch::GetFileName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {// begin GetFileName
