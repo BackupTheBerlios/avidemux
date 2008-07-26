@@ -340,18 +340,18 @@ JSBool systemExecute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 		return JS_FALSE;
 
 	JS_GetArrayLength(cx,pArgs,&nArgsLength);
-	char **args = new char *[JSVAL_TO_INT(nArgsLength)+2];
+	char **args = new char *[nArgsLength + 2];
 	args[0] = pExecutable;
-	args[JSVAL_TO_INT(nArgsLength)+1] = NULL;
+	args[nArgsLength + 1] = NULL;
 
-	for(jsuint i = 1;i <= nArgsLength;i++)
+	for(int i = 0; i < nArgsLength; i++)
 	{
 		if(JS_GetElement(cx, pArgs, i, &jsValue) == JS_FALSE)
 		{// begin failure to get item
 			JS_ReportError(cx, "exec() JS_GetElement failed to get an array item.");
 			return JS_FALSE;
 		}// end failure to get item
-		args[JSVAL_TO_INT(i)] = JS_GetStringBytes(JSVAL_TO_STRING(jsValue));
+		args[i + 1] = JS_GetStringBytes(JSVAL_TO_STRING(jsValue));
 	}
 
 #ifndef ADM_WIN32
