@@ -333,7 +333,7 @@ uint8_t extractSPSInfo(uint8_t *data, uint32_t len,uint32_t *wwidth,uint32_t *hh
 {
    GetBitContext s;
    
-   uint32_t profile,constraint,level,pic_order_cnt_type,w,h,z;
+   uint32_t profile,constraint,level,pic_order_cnt_type,w,h, mbh, frame_mbs_only;
    uint8_t buf[len];
    uint32_t outlen;
    uint32_t id,dum;
@@ -389,15 +389,17 @@ uint8_t extractSPSInfo(uint8_t *data, uint32_t len,uint32_t *wwidth,uint32_t *hh
            dum=get_ue_golomb(&s);     //num_ref_frames
            printf("[H264] # of ref frames : %u\n",dum);
            get_bits1(&s);         // gaps_in_frame_num_value_allowed_flag
-           w=get_ue_golomb(&s);   //pic_width_in_mbs_minus1
-           h=get_ue_golomb(&s);   //pic_height_in_mbs_minus1
-           z=get_ue_golomb(&s); 
+		   w = get_ue_golomb(&s) + 1;   //pic_width_in_mbs_minus1
+
+		   mbh = get_ue_golomb(&s) + 1;
+		   frame_mbs_only = get_bits1(&s);
+		   h = (2 - frame_mbs_only) * mbh;   //pic_height_in_mbs_minus1
+
            printf("[H264] Width in mb -1  :%d\n",w); 
            printf("[H264] Height in mb -1 :%d\n", h);
-           printf("[H264] z               :%d\n", z);  
-            *wwidth=(w+1)*16;
-            *hheight=(h+1)*16*2; /* Fixme : frame_mbs_only_flag in slice header!! */
 
+		   *wwidth = w * 16;
+		   *hheight= h * 16;
            
            return 1;
 }
