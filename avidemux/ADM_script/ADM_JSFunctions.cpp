@@ -423,14 +423,6 @@ JSBool systemExecute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 		*rval = INT_TO_JSVAL(-1);	// failure
 	return JS_TRUE;
 }// end systemExecute
-#ifdef ADM_WIN32
-
-JSBool systemInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
-{
-		return JS_FALSE;
-}
-#else
-
 JSBool systemInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {// begin systemInclude
 	// default return value
@@ -445,7 +437,11 @@ JSBool systemInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 	// make sure we haven't included this already to avoid a recursive
 	// dependency loop
 	char *pTempStr = new char[PATH_MAX+1];
+ #ifdef __MINGW32__
+ 	if(_fullpath(pTempStr,pIncludeFile,PATH_MAX) == NULL)
+ #else
 	if(realpath(pIncludeFile,pTempStr) == NULL)
+#endif
 	{// begin can't resolve path
 		JS_ReportError(cx, "include() can't resolve the path of \"%s\".", pIncludeFile);
 		return JS_FALSE;
@@ -483,7 +479,6 @@ JSBool systemInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 	}// end error including
 	return JS_TRUE;
 }// end systemInclude
-#endif
 
 /********************** Extract Path from a filename **************/
 JSBool pathOnly(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
