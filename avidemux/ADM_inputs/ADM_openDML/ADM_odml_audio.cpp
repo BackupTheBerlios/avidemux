@@ -48,7 +48,7 @@ AVDMAviAudioStream::~AVDMAviAudioStream()
 AVDMAviAudioStream::AVDMAviAudioStream(		odmlIndex *idx,
 						uint32_t nbchunk,
 						const char *name,
-				       		WAVHeader * wav, 
+				        WAVHeader * wav, 
 						uint32_t preload,
 						uint32_t extraLen,
 						uint8_t  *extraData

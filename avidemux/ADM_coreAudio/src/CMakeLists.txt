@@ -4,6 +4,7 @@ ADM_audioUtils.cpp
 audioencoder.cpp
 ADM_audioFilter.cpp
 ADM_audioResample.cpp
+ADM_audioStream.cpp
 ADM_libsamplerate/samplerate.c
 ADM_libsamplerate/src_linear.c
 ADM_libsamplerate/src_sinc.c
