@@ -19,7 +19,7 @@
 
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_inputs/ADM_openDML/ADM_riff.h"
-
+#include "ADM_audioStream.h"
 class AVDMGenericAudioStream;
 
 typedef struct odmlIndex
@@ -44,7 +44,7 @@ public:
                  ~odmlAudioTrack();
 //********************************
                  odmlIndex               *index;
-                 AVDMGenericAudioStream  *track;
+                 
                  WAVHeader               *wavHeader;
                  uint32_t                nbChunks;
                  uint32_t                extraDataLen;
@@ -54,6 +54,7 @@ public:
                 AVIStreamHeader          *avistream;
 };
 
+
 class OpenDMLHeader         :public vidHeader
 {
 protected:
@@ -62,15 +63,12 @@ protected:
 	  FILE 				*_fd;
 	  odmlIndex 			*_idx;
 
-	  odmlAudioTrack               *_audioTracks;
-
+	  odmlAudioTrack                  *_audioTracks;
+      ADM_audioStream                   **_audioStreams;
          uint32_t                       _nbAudioTracks;
          uint32_t                       _currentAudioTrack;
 
           odmlIndex                     *_audioIdx;
-          AVDMGenericAudioStream        *_audioTrack;
-          WAVHeader                     *_wavHeader;
-
 	  
 	  void 				walk(riffParser *p) ;
 	  uint32_t			_nbTrack;
@@ -89,7 +87,7 @@ protected:
 	  
 	  
           char                         *myName;
-	  uint32_t 			countAudioTrack( void );
+	  uint32_t 			    countAudioTrack( void );
 	  uint32_t  			searchAudioTrack(uint32_t which);
 	  // _____________________________________________
 	  //		indexer, vanilla, odml and others
@@ -98,7 +96,7 @@ protected:
 	  uint8_t 			indexRegular(uint32_t vidTrack);
 
 	  uint8_t 			indexReindex(uint32_t vidTrack,uint32_t audTrack,
-	  					uint32_t audioTrackNumber);	
+                                        uint32_t audioTrackNumber);	
 					// scan one track for openDML						
 	  uint8_t			scanIndex(uint32_t track,odmlIndex **index,uint32_t *nbElem);
 	  uint32_t			read32( void )
@@ -134,7 +132,7 @@ virtual 	uint8_t			close(void) ;
   //__________________________
 
 virtual 	WAVHeader 	*getAudioInfo(void ); 
-virtual 	uint8_t		getAudioStream(AVDMGenericAudioStream **audio);
+virtual 	uint8_t		        getAudioStream(ADM_audioStream **audio);
 virtual         uint8_t         getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos);
 virtual         uint8_t         changeAudioStream(uint32_t newstream);
                 uint32_t        getCurrentAudioStreamNumber(void) { return _currentAudioTrack;}

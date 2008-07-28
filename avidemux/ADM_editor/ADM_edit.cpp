@@ -159,7 +159,7 @@ uint8_t ADM_Composer::getAudioExtra (uint32_t * l, uint8_t ** d)
     return 0;
   if (!_videos[0]._audiostream)
     return 0;
-  return _videos[0]._audiostream->extraData (l, d);
+  return _videos[0]._audiostream->getExtraData (l, d);
 
 
 }
@@ -188,12 +188,6 @@ ADM_Composer::deleteAllVideos (void)
   for (uint32_t vid = 0; vid < _nb_video; vid++)
     {
 
-      // purge audio stream
-      if (_videos[vid]._audiostream)
-	{
-	  if (_videos[vid]._audiostream->isDestroyable ())
-	    delete _videos[vid]._audiostream;
-	}
       // if there is a video decoder...
       if (_videos[vid].decoder)
 	delete _videos[vid].decoder;
@@ -277,6 +271,7 @@ UNUSED_ARG(mode);
 						_videos[_nb_video]._aviheader=new y; \
 						 ret = _videos[_nb_video]._aviheader->open(name); \
 						break;
+#if 0 // BAZOOKA
   switch (type)
     {
       case VCodec_FileType:
@@ -398,7 +393,10 @@ thisIsMpeg:
                       QT_TR_NOOP("May be related to an old index file."));
       return 0;
     }
-
+#else // BAZOOKA
+        _videos[_nb_video]._aviheader=new OpenDMLHeader; 
+		ret = _videos[_nb_video]._aviheader->open(name); 			
+#endif // BAZOOKA
    // check opening was successful
    if (ret == 0) {
      char str[512+1];
@@ -489,7 +487,7 @@ thisIsMpeg:
 float duration;
       _videos[_nb_video]._aviheader->getAudioStream (&_videos[_nb_video].
 						     _audiostream);
-      _videos[_nb_video]._audio_size =_videos[_nb_video]._audiostream->getLength ();
+
      
       
 	
@@ -540,7 +538,7 @@ float duration;
           prefs->get(FEATURE_AUTO_BUILDMAP,&autovbr);
           if(autovbr || GUI_Confirmation_HIG(QT_TR_NOOP("Build Time Map"),QT_TR_NOOP( "Build VBR time map?"), VBR_MSG))
                 {
-                _videos[_nb_video]._isAudioVbr=_videos[_nb_video]._audiostream->buildAudioTimeLine ();
+               // _videos[_nb_video]._isAudioVbr=_videos[_nb_video]._audiostream->buildAudioTimeLine ();
                 }
         }
 
@@ -1045,7 +1043,7 @@ aviInfo    info;
         }
         _videos[reference]._aviheader->getVideoInfo (&info);
         _videos[reference]._aviheader->getAudioStream (&_videos[reference]._audiostream);
-        _videos[reference]._audio_size =_videos[reference]._audiostream->getLength ();
+
         duration=_videos[reference]._nb_video_frames;
         duration/=info.fps1000;
         duration*=1000;                 // duration in seconds
@@ -1382,7 +1380,7 @@ uint8_t ADM_Composer::updateAudioTrack (uint32_t seg)
       return 1;
 
     }
-  pos_start = _videos[reference]._audiostream->getPos ();
+//  pos_start = _videos[reference]._audiostream->getPos ();
 
   // Now try to go to the end...
   // if it fails, try previous frame stamp
@@ -1395,7 +1393,7 @@ uint8_t ADM_Composer::updateAudioTrack (uint32_t seg)
       tf--;
     }
 
-  pos_end = _videos[reference]._audiostream->getPos ();
+//  pos_end = _videos[reference]._audiostream->getPos ();
 
   _segments[seg]._audio_size = pos_end - pos_start;
   _segments[seg]._audio_start = pos_start;
@@ -1468,7 +1466,7 @@ uint8_t need_update=0;
     	{
     		if(! _videos[i]._isAudioVbr)
 		{
-			if((    		_videos[i]._isAudioVbr=_videos[i]._audiostream->buildAudioTimeLine ()))
+//			if((    		_videos[i]._isAudioVbr=_videos[i]._audiostream->buildAudioTimeLine ()))
 			{
 				need_update=1;
 			}
@@ -1496,6 +1494,7 @@ uint8_t r=0;
 		return r;
 
 }
+#if BAZOOKA
 //_________________________________________
 //    Try indexing the file, return 1 if file successfully indexed 
 //              0 else
@@ -1562,6 +1561,7 @@ uint8_t         ADM_Composer::tryIndexing(const char *name, const char *idxname)
                 if(!r) GUI_Error_HIG(QT_TR_NOOP("Indexing failed"), NULL); 
                 return r;
 }
+#endif
 /**
       If a parameter has changed, rebuild the duration of the streams
       It can happen, for example in case of SBR audio such as AAC

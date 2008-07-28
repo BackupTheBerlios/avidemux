@@ -26,6 +26,7 @@
 
 #include "../ADM_audio/aviaudio.hxx"
 #include "ADM_compressedImage.h"
+#include "ADM_audioStream.h"
 typedef struct 
 {
     uint32_t encoding;  // Same as in wavheader
@@ -90,7 +91,7 @@ virtual	uint8_t			isReordered( void ) { return 0;} // by default we don"t do fra
   //__________________________
 
 virtual 	WAVHeader              *getAudioInfo(void ) =0 ;
-virtual 	uint8_t                 getAudioStream(AVDMGenericAudioStream **audio)=0;
+virtual 	uint8_t                 getAudioStream(ADM_audioStream  **audio)=0;
 virtual         uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **info);
 virtual         uint8_t                 changeAudioStream(uint32_t newstream);
 virtual         uint32_t                getCurrentAudioStreamNumber(void) { return 0;}

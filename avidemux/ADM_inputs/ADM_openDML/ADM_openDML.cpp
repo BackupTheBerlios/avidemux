@@ -130,6 +130,16 @@ uint8_t    OpenDMLHeader::close( void )
           ADM_dealloc(myName);
           myName=NULL; 
         }
+    // Destroy audioStreams
+    if(_audioStreams)
+    {
+        for(int i=0;i<_nbAudioTracks;i++)
+        {
+            delete _audioStreams[i];
+        }
+        delete [] _audioStreams;
+        _audioStreams=NULL;
+    }
  	return 1;
 }
 //
@@ -153,12 +163,12 @@ OpenDMLHeader::OpenDMLHeader(void)
         _currentAudioTrack=0;
         myName=NULL;
 }
-uint8_t	OpenDMLHeader::getAudioStream(AVDMGenericAudioStream **audio)
+uint8_t	OpenDMLHeader::getAudioStream(ADM_audioStream **audio)
 {  	
         if(_nbAudioTracks)
         {
 
-                *audio=_audioTracks[_currentAudioTrack].track;
+                *audio=_audioStreams[_currentAudioTrack];
                 ADM_assert(*audio);
                 return 1;
         }
@@ -169,7 +179,7 @@ WAVHeader 	*OpenDMLHeader::getAudioInfo(void )
 { 	
 	
 	if(_nbAudioTracks)
-		return _audioTracks[_currentAudioTrack].wavHeader; 
+		return _audioStreams[_currentAudioTrack]->getInfo();
 	else
 		return NULL;
 	
@@ -337,6 +347,7 @@ uint32_t rd;
                           odmlAudioTrack *track;
 
                           _audioTracks=new odmlAudioTrack[_nbAudioTracks]; 
+                          _audioStreams=new ADM_audioStream *[_nbAudioTracks]; 
                           while(audio<_nbAudioTracks)
                           {
                                         ADM_assert(run<_nbTrack);
@@ -366,7 +377,7 @@ uint32_t rd;
                                         }
                                         // now read extra stuff
                                         fseeko(_fd,_Tracks[run].strf.offset,SEEK_SET);		
-                                        extra=_Tracks[run].strf.size-sizeof(_wavHeader);
+                                        extra=_Tracks[run].strf.size-sizeof(WAVHeader);
                                         if(extra<0)
                                         {	
                                                 printf("WavHeader is not big enough (%lu/%lu)!\n",
@@ -449,12 +460,11 @@ uint32_t rd;
                         for(int i=0;i<_nbAudioTracks;i++)
                         {
                                 track=&(_audioTracks[i]);
-                                _audioTracks[i].track= new AVDMAviAudioStream(track->index,
-                                                track->nbChunks,
-                                                myName,
-                                                track->wavHeader,
-                                                0,
-                                                track->extraDataLen,track->extraData);
+                                ADM_aviAudioAccess *access=new ADM_aviAudioAccess(track->index,
+                                            track->nbChunks,
+                                            myName,
+                                            track->extraDataLen,track->extraData);
+                                _audioStreams[i]= ADM_audioCreateStream((track->wavHeader), access);
                         }
                 }
                 if(!_video_bih.biCompression && fourCC::check(_videostream.fccHandler,(uint8_t*)"DIB "))
@@ -735,7 +745,6 @@ void OpenDMLHeader::walk(riffParser *p)
 odmlAudioTrack::odmlAudioTrack(void)
 {
         index=NULL;
-        track=NULL;
         extraData=NULL;
 
         wavHeader=new WAVHeader;
@@ -749,7 +758,6 @@ odmlAudioTrack::odmlAudioTrack(void)
 odmlAudioTrack::~odmlAudioTrack()
 {
         if(index) delete [] index;
-        if(track) delete  track;
         if(wavHeader) delete wavHeader;
         if(extraData) delete [] extraData;
         if(avistream) delete avistream;

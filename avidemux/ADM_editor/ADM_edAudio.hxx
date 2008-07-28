@@ -28,7 +28,8 @@ public:
 	virtual uint8_t		isVBR(void )   { return _vbr;}
 	virtual uint8_t 	goToTime(uint32_t mstime);
 	virtual	uint8_t		getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
-	virtual	uint8_t		flushPacket(void);
+	
 	virtual uint8_t		extraData(uint32_t *l,uint8_t **d);
 	virtual CHANNEL_TYPE *getChannelMapping(void);
 };
+

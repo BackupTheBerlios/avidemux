@@ -40,13 +40,6 @@
 
 extern char* ms2timedisplay(uint32_t ms);
 
-uint8_t		 ADM_Composer::audioFlushPacket(void)
-{
-	for(uint32_t i=0;i<_nb_video;i++)
-		_videos[i]._audiostream->flushPacket();
-	return 1;
-
-}
 #if 0
 CHANNEL_TYPE *ADM_Composer::getChannelMapping(void)
 {
@@ -71,7 +64,7 @@ _VIDEOS *currentVideo;
                         *samples=0;
                         return 0;
                 }
-		r=currentVideo->_audiostream->getPacket(dest,len,samples);
+		r=currentVideo->_audiostream->getPacket(dest,len,64*1024,samples); //FIXME BAZOOKA
 		if(r)
 		{
 			// ok we update the current sample count and go on
@@ -101,7 +94,7 @@ _VIDEOS *currentVideo;
                 {
                         printf("Drop too high, filling...\n");
                         currentVideo->_audiostream->goToTime(0);
-                        r=currentVideo->_audiostream->getPacket(dest,len,samples);
+                        r=currentVideo->_audiostream->getPacket(dest,len,64*1024,samples); //FIXME BAZOOKA
                         if(r)
                         {
                                 printf("Filled with data from beginning (%u bytes %u samples)\n",*len,*samples);
@@ -156,52 +149,6 @@ _VIDEOS *currentVideo;
         }
         return ret;
 }
-//__________________________________________________
-//
-//  Go to the concerned segment and concerned offset
-//
-// Should never be called normally...
-//
-//__________________________________________________
-
-uint8_t ADM_Composer::audioGoTo (uint32_t offset)
-{
-  uint32_t
-    seg,
-    ref;			//, sz;
-  AVDMGenericAudioStream *
-    as;
-
-    aprintf("************Editor: audio go to : seg %lu offset %lu \n",_audioseg,_audiooffset);
-  seg = 0;
-  while (1)
-    {
-      ref = _segments[seg]._reference;
-      as = _videos[ref]._audiostream;
-      if (!as)
-	return 0;
-
-      if (_segments[seg]._audio_size < offset)
-	{
-	  offset -= _segments[seg]._audio_size;
-	  seg++;
-	  if (seg >= _nb_segment)
-	    return 0;
-	  continue;
-	}
-      // we are in the right seg....
-      else
-	{
-	  _audioseg = seg;
-	  _audiooffset = offset + _segments[seg]._audio_start;
-	  as->goToSync (_audiooffset);
-	  return 1;
-	}
-
-    }
-
-  return 0;
-}
 
 //__________________________________________________
 //
@@ -220,31 +167,17 @@ uint32_t size,sam;
  }
  return size;
 }
-/*
-		Convert frame from a seg to an offset
-		(normally not used)
-*/
-uint8_t  ADM_Composer::audioFnToOff (uint32_t seg, uint32_t fn, uint32_t * noff)
-{
- aprintf("Editor: audioFnToOff go to : seg %lu fn %lu \n",seg,fn);
-  ADM_assert (seg < _nb_segment);
-  ADM_assert (_videos[AUDIOSEG]._audiostream);
 
-#define AS _videos[AUDIOSEG]._audiostream
-
-  *noff = AS->convTime2Offset (getTime (fn));
-  return 1;
-}
 
 //  --------------------------------------------
 uint8_t ADM_Composer::audioGoToTime (uint32_t mstime, uint32_t * off)
 {
 
   uint32_t	    cumul_offset =    0;
-  uint32_t    frames =    0,    fi =    0;
-  aviInfo    info;
-  uint64_t   sample;
-  double    fn;
+  uint32_t      frames =    0,    fi =    0;
+  aviInfo       info;
+  uint64_t      sample;
+  double        fn;
 
   getVideoInfo (&info);
  // audioFlushPacket();
@@ -289,8 +222,8 @@ uint8_t ADM_Composer::audioGoToTime (uint32_t mstime, uint32_t * off)
   aprintf (" Editor audio seg          : %lu\n", seg);
 
   _audioseg = seg;
+/* BAZOOKA
   _videos[AUDIOSEG]._audiostream->goToTime (jump);
-  _videos[AUDIOSEG]._audiostream->flushPacket();
   _audiooffset = _videos[AUDIOSEG]._audiostream->getPos ();
   *off = cumul_offset + _videos[AUDIOSEG]._audiostream->getPos ()
     - _segments[seg]._audio_start;
@@ -304,7 +237,7 @@ uint8_t ADM_Composer::audioGoToTime (uint32_t mstime, uint32_t * off)
 	duration*=_videos[AUDIOSEG]._audiostream->getInfo()->frequency;
    _audioSample=(uint64_t)floor(duration);
    aprintf("Editor audio : we are at %llu in seg which has %llu sample\n",_audioSample,_segments[_audioseg]._audio_duration);
-
+*/
   return 1;
 }
 /*
@@ -333,7 +266,7 @@ uint8_t ADM_Composer::audioGoToFn (uint32_t seg, uint32_t fn, uint32_t * noff)
 
   time = _videos[SEG]._aviheader->getTime (fn);
   AS->goToTime (time);
-  *noff = AS->getPos ();
+  *noff=0;
   return AS->goToTime (time);
 }
 

@@ -86,7 +86,7 @@ static void call_videocodec(char *p) ;
 static void call_videoconf(char *p) ;
 static int searchReactionTable(char *string);
 static void call_setPP(char *v,char *s);
-static void call_v2v(char *a,char *b,char *c);
+//static void call_v2v(char *a,char *b,char *c);
 static void call_probePat(char *p);
 extern void updateLoaded(void );
 static void save(char*name);
@@ -190,7 +190,7 @@ AUTOMATON reaction_table[]=
         {"reuse-2pass-log",	0	,"reuse 2pass logfile if it exists",	set_reuse_2pass_log},
         {"set-pp",		2	,"set post processing default value, value(1=hdeblok|2=vdeblock|4=dering) and strength (0-5)",
                                               (one_arg_type )	call_setPP},
-        {"vobsub",              3       ,"Create vobsub file (vobfile vosubfile ifofile)",  (one_arg_type ) call_v2v},
+//        {"vobsub",              3       ,"Create vobsub file (vobfile vosubfile ifofile)",  (one_arg_type ) call_v2v},
 
         {"autosplit",		1	,"split every N MBytes",call_autosplit},
         {"info",		0	,"show information about loaded video and audio streams", show_info},
@@ -404,7 +404,7 @@ void call_audiocodec(char *p)
 }
 void call_probePat(char *p)
 {
-  runProbe(p); 
+// BAZOOKA  runProbe(p); 
 }
 void call_videocodec(char *p)
 {
@@ -682,8 +682,10 @@ char *script_getVar(char *in, int *r)
 void set_reuse_2pass_log(char *p){
    prefs->set(FEATURE_REUSE_2PASS_LOG,1);
 }
+#if BAZOOKA
 void call_v2v(char *a,char *b,char *c)
 {
          ADM_vob2vobsub(a,b,c); //char *nameVob, char *nameVobSub, char *nameIfo);
 }
+#endif
 //EOF

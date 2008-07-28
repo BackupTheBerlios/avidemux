@@ -13,23 +13,53 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifndef ADM_audioStream.h
-#define ADM_audioStream.h
+#ifndef ADM_audioStream_H
+#define ADM_audioStream_H
 
-#include "ADM_baseAudioStrem.h"
+#include "ADM_baseAudioStream.h"
 /**
         \fn      ADM_audioAccess
-        \brief   Access layer to the file. That one is re-instancied by each demuxer 
+        \brief   Access layer to the file. That one is re-instancied by each demuxer.
+                 Some methods are also present in audioStream to allow override or
+                        computation when access does not provide it.
 */
 #define ADM_AUDIO_NO_DTS ((uint64_t)-1)
 class ADM_audioAccess
 {
 protected:
+                        /// must be allocated/freed if needed by derived class
+                        uint8_t *extraData;
+                        uint32_t extraDataLen;
+
 public:
-                virtual uint32_t  getLength(void)=0;
-                virtual uint8_t   setPos(uint64_t pos)=0;
-                virtual uint64_t  getPos()=0;
-                virtual uint8_t   getPacket(uint8_t *buffer, uint32_t *size, uint32_t maxSize,uint64_t *dts)=0;
+                                  ADM_audioAccess() {extraData=NULL;extraDataLen=0;}
+                virtual           ~ADM_audioAccess() {}
+                                    /// Return true if the demuxer can seek in time
+                virtual bool      canSeekTime(void) {return false;};
+                                    /// Return true if the demuxer can seek by offser
+                virtual bool      canSeekOffset(void) {return false;};
+                                    /// Return true if we can have the audio duration
+                virtual bool      canGetDuration(void) {return false;};
+                                    /// Returns audio duration in us
+                virtual uint64_t  getDurationInUs(void) {return 0;}
+                                    /// Returns length in bytes of the audio stream
+                virtual uint32_t  getLength(void){return 0;}
+                                    /// Set position in bytes
+                virtual bool      setPos(uint64_t pos){ADM_assert(0); return 0;};
+                                    /// Get position in bytes
+                virtual uint64_t  getPos(){ADM_assert(0); return 0;};
+                                    /// Go to a given time
+                virtual bool      goToTime(uint64_t timeUs){ADM_assert(0); return false;}
+                                    /// Grab extra data
+                virtual bool      getExtraData(uint32_t *l, uint8_t **d)
+                                    {
+                                            *l=extraDataLen;    
+                                            *d=extraData;
+                                            return true;
+                                    };
+
+                
+                virtual bool    getPacket(uint8_t *buffer, uint32_t *size, uint32_t maxSize,uint64_t *dts)=0;
 };
 /**
         \fn ADM_audioStream
@@ -40,18 +70,17 @@ class ADM_audioStream
 {
         protected:
                        WAVHeader                wavHeader;
+/// Access will be allocated externally, but will be destroy by ADM_audioStream when it is destroyed
                        ADM_audioAccess          *access; 
                        uint32_t                 lengthInBytes;
                        uint64_t                 position;
-                       ADM_Audiocodec 	        *audioCodec;
-                       uint32_t                 extraDataSize;
-                       uint8_t                  *extraData;
-
+                       uint64_t                 lastDts;
+                       uint64_t                 durationInUs;
         public:
-                       ADM_audioStream(WAVHeader *header,ADM_audioAccess *access,uint8_t *extraData,uint32_t extraDataSize);  
+/// Default constructor
+                       ADM_audioStream(WAVHeader *header,ADM_audioAccess *access);  
+/// Returns wavheader
                        WAVHeader                *getInfo(void) {return &wavHeader;}
-///  Get  Channel mapping
-virtual CHANNEL_TYPE   *getChannelMapping(void) {if(_codec) return _codec->channelMapping; else return NULL;}
 ///  Get a packet
 virtual uint8_t         getPacket(uint8_t *buffer,uint32_t *size, uint32_t sizeMax,uint32_t *nbSample);
 /// Go to a given time, in microseconds
@@ -59,10 +88,13 @@ virtual uint8_t         goToTime(uint64_t nbUs);
 /// Returns current time in us. Not used.
 //virtual uint8_t         getTime(uint64_t *nbUs);
 /// Returns extra configuration data
-        uint8_t         getExtraData(uint32_t *l, uint8_t **d);
+        bool            getExtraData(uint32_t *l, uint8_t **d);
+/// Returns or compute duration. If the access cannot provide it, it will be computed here
+        uint64_t        getDurationInUs(void) {return durationInUs;}
 };
 /**
-                Create the appropriate audio stream
+   \fn ADM_audioCreateStream
+    \brief Create the appropriate audio stream. It will be a derivated class of audioStream if possible (MP3/AC3)
 */
 ADM_audioStream  *ADM_audioCreateStream(WAVHeader *wavheader, ADM_audioAccess *access);
 #endif

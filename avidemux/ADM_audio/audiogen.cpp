@@ -115,7 +115,7 @@ uint8_t AVDMGenericAudioStream::goToSync(uint32_t offset)
     uint32_t tryz;
     
     ADM_assert(_wavheader);
-    flushPacket();
+
     // can't deal with something not mp3...
   //  printf("syncing asked : %lu",offset);
     switch(  _wavheader->encoding )
@@ -410,7 +410,7 @@ uint8_t AVDMGenericAudioStream::goToTime(uint32_t timeoffset)
     packetHead=packetHead=0;
     offset = convTime2Offset(timeoffset);
       aprintf("\n Time Offset : %lu", timeoffset);
-      flushPacket();
+
    if( _audioMap)
    	{
       		// dichotomic search

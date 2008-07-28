@@ -161,7 +161,7 @@ SET(ADM_SUBDIR
 	ADM_videoFilter
 	ADM_video
 	ADM_audiodevice
-	ADM_ocr
+	#ADM_ocr
 )
 FOREACH(_current ${ADM_SUBDIR})
 	ADD_SUBDIRECTORY(${_current})
@@ -192,18 +192,19 @@ ADD_SUBDIRECTORY(ADM_inputs)
 ADD_SUBDIRECTORY(ADM_UIs)
 
 SET(ADM_INPUTS
-	ADM_asf
-	ADM_avsproxy
-	ADM_h263
-	ADM_inpics
-	ADM_matroska
-	ADM_mp4
-	ADM_mpegdemuxer
-	ADM_nuv
-	ADM_ogm
+	#ADM_asf
+	#ADM_avsproxy
+	#ADM_h263
+	#ADM_inpics
+	#ADM_matroska
+	#ADM_mp4
+	#ADM_mpegdemuxer
+	#ADM_nuv
+	#ADM_ogm
 	ADM_openDML
-	ADM_flv
-	ADM_amv)
+	#ADM_flv
+	#ADM_amv
+)
 
 ADD_ADMLIB_ALL_TARGETS(${ADM_INPUTS})
 
@@ -265,7 +266,7 @@ ADD_SUBDIRECTORY(ADM_userInterfaces)
 TARGET_LINK_LIBRARIES(avidemux2_cli
 	ADM_UI_None_cli
 	ADM_commonUI_cli
-	ADM_ocr_cli
+	#ADM_ocr_cli
 	ADM_dialogNone_cli
 	ADM_dialogFiltersNone_cli
 	ADM_dialogGuiNone_cli
@@ -277,8 +278,8 @@ IF (ADM_UI_GTK)
 	TARGET_LINK_LIBRARIES(avidemux2_gtk
 		ADM_UI_GTK_gtk
 		ADM_commonUI_gtk
-		ADM_ocr_gtk
-		ADM_ocrGtk_gtk
+		#ADM_ocr_gtk
+		#ADM_ocrGtk_gtk
 		ADM_dialogGtk_gtk
 		ADM_filtersGtk_gtk
 		ADM_gui2Gtk_gtk
@@ -293,8 +294,8 @@ IF (ADM_UI_QT4)
 	TARGET_LINK_LIBRARIES(avidemux2_qt4
 		ADM_UI_QT4_qt4
 		ADM_commonUI_qt4
-		ADM_ocr_qt4
-		ADM_ocrQt4_qt4
+		#ADM_ocr_qt4
+		#ADM_ocrQt4_qt4
 		ADM_dialogQt4_qt4
 		ADM_guiQt4_qt4
 		ADM_filtersQt4_qt4

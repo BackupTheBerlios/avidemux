@@ -17,9 +17,8 @@
 #ifndef __WAV_Audio
 #define __WAV_Audio
 
-#include "audiomode.hxx"
-
-class AviList;
+//#include "audiomode.hxx"
+//class AviList;
 
 
 #include "ADM_coreAudio/include/ADM_coreAudio.h"
@@ -69,8 +68,8 @@ typedef struct
 #define WAV_AMV_ADPCM    9900
 #define WAV_NELLYMOSER   9901
 #define WAV_UNKNOWN     9999
-#include "../ADM_audiocodec/ADM_audiocodec.h"
-#include "../ADM_osSupport/ADM_fileio.h"
+#include "ADM_audiocodec/ADM_audiocodec.h"
+#include "ADM_osSupport/ADM_fileio.h"
 
 
 
@@ -91,10 +90,12 @@ class AVDMGenericAudioStream
 					uint8_t		_destroyable;
 					char   		_name[20];
 					uint8_t	_eos;
+#if 0
          					// This is for writing..
 			              	uint32_t	_dlen;
 					AviList		*_LAll;
                                         ADMFile         *_file;
+#endif
        					// This is for VBR MP3
        					ST_point	*_audioMap;
             				uint32_t	_nbMap;

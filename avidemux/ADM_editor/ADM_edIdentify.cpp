@@ -258,6 +258,7 @@ uint8_t ADM_Composer::identify (const char *name, fileType * type)
 
     }    
     /* Try harder to identify stuff */
+#if BAZOOKA
     switch(dmxIdentify(name))
     {
       case  DMX_MPG_ES :
@@ -270,6 +271,7 @@ uint8_t ADM_Composer::identify (const char *name, fileType * type)
       case  DMX_MPG_MSDVR  :*type = ASF_FileType; return 1;
       
     }
+#endif
   printf ("\n unrecognized file detected...\n");
   fourCC::print(magic[0]); printf("\n");
   fourCC::print(magic[1]);

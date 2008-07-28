@@ -1,43 +1,46 @@
 #ifndef ADM_ODML_AUDIO_H
 #define ADM_ODML_AUDIO_H
-
+#include "ADM_audioStream.h"
 class odmlIndex;
-
-class AVDMAviAudioStream : public AVDMGenericAudioStream
+/**
+    \class ADM_aviAudioAccess
+    \brief provided audio access
+*/
+class ADM_aviAudioAccess : public ADM_audioAccess
 {
-  protected:
-    		
-    uint32_t 		_nb_chunks;
-    uint64_t		_abs_position;
-    uint32_t		_rel_position;
-    uint32_t 		_current_index;		
-    odmlIndex 		*_index;
-    uint32_t		_extraLen;
-    uint8_t			*_extraData;
-    FILE			*_fd;
-		
-  public:
-    virtual ~AVDMAviAudioStream();
-    AVDMAviAudioStream(		odmlIndex *idx,
-                                uint32_t nbchunk,
-                                const char  *name,
-                                WAVHeader * wav, 
-                                uint32_t preload,
-                                uint32_t extraLen,
-                                uint8_t  *extraData);
-    virtual uint32_t 		read(uint32_t len,uint8_t *buffer);
-    virtual uint8_t  		goTo(uint32_t newoffset);
-    virtual	uint8_t			extraData(uint32_t *l,uint8_t **d)
-    {
-      *l=_extraLen;
-      *d=_extraData;
-      return 1;
-    }
-    virtual	uint8_t				getPacket(uint8_t *dest, uint32_t *len, 
-        uint32_t *samples);
+protected:
+               
+                uint32_t length;
+                uint32_t pos;
+                FILE     *fd;
+                uint32_t currentIndex;
+                odmlIndex *index;
+                uint32_t   nbIndex;
+public: 
+                ADM_aviAudioAccess(odmlIndex *idx,
+						uint32_t nbchunk,
+						const char *name,
+						uint32_t extraLen,
+						uint8_t  *extraData);
 
+                virtual ~ADM_aviAudioAccess();
+
+                
+                virtual bool      canSeekTime(void) {return false;};
+                virtual bool      canSeekOffset(void) {return true;};
+                virtual bool      canGetDuration(void) {return false;};
+                virtual uint64_t  getDurationInUs(void) {return 0;};
+                virtual uint32_t  getLength(void) {return length;}
+                virtual bool      goToTime(uint64_t timeUs) {ADM_assert(0);}
+                
+                virtual uint64_t  getPos(void);
+                
+                
+
+                virtual bool   getPacket(uint8_t *buffer, uint32_t *size, uint32_t maxSize,uint64_t *dts);
+                virtual bool   setPos(uint64_t pos);
 };
 
 
-
 #endif
+//EOF

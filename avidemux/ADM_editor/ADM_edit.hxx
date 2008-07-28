@@ -35,6 +35,7 @@
  #include "../ADM_editor/ADM_edCache.h"
  #include "ADM_pp.h"
  #include "ADM_colorspace.h"
+#include "ADM_audioStream.h"
  
 #define MAX_SEG  	100 // Should be enougth
 #define MAX_VIDEO   100
@@ -85,7 +86,7 @@ typedef struct
 
 	uint32_t  							_audio_size;
 	uint64_t							_audio_duration; //! IN SAMPLE
-	AVDMGenericAudioStream 						*_audiostream;
+	ADM_audioStream      				*_audiostream;
 	uint8_t								_isAudioVbr;
 	WAVHeader							*_wavheader;
 

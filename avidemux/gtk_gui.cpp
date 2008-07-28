@@ -151,7 +151,7 @@ extern uint8_t UI_getPhysicalScreenSize(void* window, uint32_t *w,uint32_t *h);
 extern uint8_t GUI_jobs(void);
 extern bool parseECMAScript(const char *name);
 void A_parseECMAScript(const char *name);
-static int A_vob2vobsub(void);
+//static int A_vob2vobsub(void);
 uint8_t DIA_builtin(void);
 renderZoom currentZoom=ZOOM_1_1;
 uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name);
@@ -190,18 +190,21 @@ int nw;
   }
   switch (action)
     {
-        case ACT_GLYPHEDIT: 
-                                DIA_glyphEdit();
-                                return;
         case ACT_AVS_PROXY:
                                 GUI_avsProxy();
                                 return;
         case ACT_BUILT_IN:
                                 DIA_builtin();
                                 return;
+#if BAZOOKA
+        case ACT_GLYPHEDIT: 
+                                DIA_glyphEdit();
+                                return;
+
         case ACT_V2V:
                                 A_vob2vobsub();
                                 return;
+#endif
         case ACT_HANDLE_JOB:
                                 GUI_jobs();
                                 return;
@@ -220,12 +223,15 @@ int nw;
                 return;
         case ACT_ViewMain: UI_toogleMain();return;
         case ACT_ViewSide: UI_toogleSide();return;
+#ifdef BAZOOKA
         case ACT_DVB_Ocr:
         		DIA_ocrDvb();
         		return;
+
       case ACT_Ocr:
                 DIA_ocrGen(); //
                 return;
+#endif
       case ACT_AudioConfigure:
     		audioCodecSelect();
 		return;
@@ -2272,6 +2278,7 @@ int A_SaveWrapper(char *name)
 }
 uint8_t  DIA_v2v(char **vobname, char **ifoname,char **vobsubname);
 uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo);
+#if BAZOOKA
 int A_vob2vobsub(void)
 {
         char *vob=NULL;
@@ -2288,6 +2295,7 @@ int A_vob2vobsub(void)
         return r;
 
 }
+#endif
 ///
 ///	Return the frame # corresponding to the position of the scale/slider
 ///	Rougth estimation in fact

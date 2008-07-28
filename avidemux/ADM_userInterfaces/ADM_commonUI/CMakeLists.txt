@@ -15,7 +15,7 @@ DIA_SVCD.cpp
 DIA_builtin.cpp       
 DIA_lavDecoder.cpp  
 DIA_requant.cpp   
-DIA_ocr.cpp             
+#DIA_ocr.cpp             
 DIA_tsSub.cpp        
 DIA_jobs_save.cpp
 DIA_flv1.cpp            

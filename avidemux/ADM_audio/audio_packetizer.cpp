@@ -38,6 +38,7 @@ Split a stream into packet(s)
 #define MINUS_ONE 0xffffffff
 
 //
+
 uint8_t AVDMGenericAudioStream::flushPacket(void)
 {
 	packetTail=packetHead=0;
