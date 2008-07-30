@@ -562,8 +562,11 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                 son.skipBytes(32-1-u32);
                                 left-=32;
                                 //
-                                son.read32();
-                                left-=4; //Depth & color Id
+                                if(left>=4)
+                                {
+                                    son.read32();
+                                    left-=4; //Depth & color Id
+                                }else left=0;
                                 //
                                 printf("LEFT:%d\n",left);
 
