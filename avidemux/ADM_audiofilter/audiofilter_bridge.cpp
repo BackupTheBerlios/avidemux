@@ -24,7 +24,7 @@
 #include "ADM_osSupport/ADM_debug.h"
 
 
-AUDMAudioFilter_Bridge::AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,AVDMGenericAudioStream *incoming,
+AUDMAudioFilter_Bridge::AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,ADM_audioStream *incoming,
                           uint32_t startInMs,int32_t shiftMs) : AUDMAudioFilter(NULL)
 {
   _incoming=incoming;
@@ -36,8 +36,7 @@ AUDMAudioFilter_Bridge::AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,AVDMGen
   rewind();
   /*  */
   WAVHeader *hdr=incoming->getInfo();
-  double duration;
-  duration=incoming->getLength();
+  /*
   if(hdr->byterate)
   {
       duration/=hdr->byterate;
@@ -45,7 +44,7 @@ AUDMAudioFilter_Bridge::AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,AVDMGen
       _length=(uint32_t)floor(duration);
   }else
     _length=0xFFFF0000;
-  
+  */
   /*  */
   printf("[Bridge] Starting with time %u, shift %d\n",startInMs,-shiftMs);
   // If shiftMS is > 0, it means we have to go in the future, just increse _startTime
@@ -141,7 +140,7 @@ uint8_t AUDMAudioFilter_Bridge::fillIncomingBuffer(AUD_Status *status)
         if(asked>sam) asked=sam;
         
       }
-      asked = _incoming->readDecompress(asked, &(_incomingBuffer[_tail]));
+//      asked = _incoming->readDecompress(asked, &(_incomingBuffer[_tail]));
 
       if (!asked )
       {
@@ -172,8 +171,8 @@ uint8_t AUDMAudioFilter_Bridge::fillIncomingBuffer(AUD_Status *status)
 CHANNEL_TYPE *AUDMAudioFilter_Bridge::getChannelMapping(void) 
 {
 	ADM_assert(_incoming);
-	CHANNEL_TYPE *chan=_incoming->getChannelMapping();
-	ADM_assert(chan);
-	return chan;
+//	CHANNEL_TYPE *chan=_incoming->getChannelMapping();
+//	ADM_assert(chan);
+	return NULL;
 }
 //EOF

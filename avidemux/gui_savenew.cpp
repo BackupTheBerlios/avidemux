@@ -161,6 +161,10 @@ int ret=0;
 					printf(" AVI family\n");
 					switch(UI_GetCurrentFormat())
 					{
+                        case ADM_AVI:
+								ret=A_SaveAudioNVideo(name);
+								break;
+#if 0
 						case ADM_DUMMY:
 					                            			ret=oplug_dummy(name);
 					                            			break;
@@ -173,11 +177,9 @@ int ret=0;
                         
                                                     ret=oplug_mp4(name,UI_GetCurrentFormat());
                                                     break;
-						case ADM_AVI:
-								ret=A_SaveAudioNVideo(name);
-								break;
+						
 						case ADM_OGM:
-								ret=ogmSave(name);
+//								ret=ogmSave(name);
 								break;
 						case ADM_ES:
 								ret=ADM_saveRaw(name);
@@ -192,6 +194,7 @@ int ret=0;
 						case ADM_AVI_UNP:
 								ret=A_SaveUnpackedVop(name);
 								break;
+#endif
 						default:
                                                   GUI_Error_HIG(QT_TR_NOOP("Incompatible output format"), NULL);
 					}
@@ -206,7 +209,7 @@ int ret=0;
                                                 {
                                                   case ADM_PS:
                                                   case ADM_TS:
-						          ret=mpeg_passthrough(name,UI_GetCurrentFormat());
+						     //     ret=mpeg_passthrough(name,UI_GetCurrentFormat());
                                                           break;
                                                   default:
                                                     GUI_Error_HIG(QT_TR_NOOP("Incompatible output format"), NULL);
@@ -219,7 +222,7 @@ int ret=0;
                         case ADM_TS:
                         case ADM_PS:
                         case ADM_ES:
-                                ret=oplug_mpegff(name,UI_GetCurrentFormat());;
+                             //   ret=oplug_mpegff(name,UI_GetCurrentFormat());;
                                 break;
                         default:
                           GUI_Error_HIG(QT_TR_NOOP("Incompatible output format"), NULL);
@@ -250,9 +253,9 @@ uint8_t ret=0;
 			
 		if(!name) return 0;
 
-     		nw=new   GenericAviSaveCopyDualAudio(secondaudiostream);
-		ret=nw->saveAvi(name);
-       		delete nw;
+//     		nw=new   GenericAviSaveCopyDualAudio(secondaudiostream);
+	//	ret=nw->saveAvi(name);
+      // 		delete nw;
                 return ret;
 
 }

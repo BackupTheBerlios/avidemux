@@ -239,7 +239,7 @@ for (uint32_t i = 0; i < _nb_segment; i++)
     if(currentaudiostream)
     {
         uint32_t encoding=currentaudiostream->getInfo()->encoding;
-        if(currentaudiostream->isVBR() && (encoding==WAV_MP3 || encoding==WAV_MP2))
+        if((encoding==WAV_MP3 || encoding==WAV_MP2))
         {
             qfprintf(fd,"app.audio.scanVBR();\n");
         }

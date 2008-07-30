@@ -159,7 +159,7 @@ AUTOMATON reaction_table[]=
         {"end",			1,"set end frame",			setEnd},
         {"save-unpacked-vop",	1,"save avi, unpacking vop",(one_arg_type)A_SaveUnpackedVop},
         {"save-packed-vop",	1,"save avi, packing vop",(one_arg_type)A_SavePackedVop},				
-        {"save-ogm",		1,"save as ogm file ",			(one_arg_type)ogmSave},
+//        {"save-ogm",		1,"save as ogm file ",			(one_arg_type)ogmSave},
         {"save-raw-audio",	1,"save audio as-is ",			A_saveAudio},
         {"save-raw-video",	1,"save raw video stream (mpeg/... ) ",	(one_arg_type)ADM_saveRaw},
         {"save-uncompressed-audio",1,"save uncompressed audio",A_saveAudioDecodedTest},
@@ -533,12 +533,13 @@ void show_info(char *p){
       }
       printf("   BitRate: %u Bps / %u kbps\n", wavinfo->byterate, wavinfo->byterate*8/1000);
       printf("   Frequency: %u Hz\n", wavinfo->frequency);
-      { double du = video_body->getAudioLength();
+      { 
+double du = 0;// BAZOOKA video_body->getAudioLength();
         uint16_t hh, mm, ss, ms;
          du*=1000;
          du/=wavinfo->byterate;
          ms2time((uint32_t)floor(du), &hh, &mm, &ss, &ms);
-         printf("   Duration: %02d:%02d:%02d.%03d (%lu MBytes)\n", hh, mm, ss, ms, video_body->getAudioLength()>>20);
+//         printf("   Duration: %02d:%02d:%02d.%03d (%lu MBytes)\n", hh, mm, ss, ms, video_body->getAudioLength()>>20);
       }
    }else{
       printf("   Codec: NONE\n");

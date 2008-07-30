@@ -486,8 +486,8 @@ uint8_t aviWrite::saveBegin (char 	*name,
 		     ADM_BITMAPINFOHEADER	*bih,
 		     uint8_t 		*videoextra,
 		     uint32_t  		videoextraLen,
-		     AVDMGenericAudioStream * inaudiostream,
-		     AVDMGenericAudioStream * inaudiostream2)
+		     ADM_audioStream * inaudiostream,
+		     ADM_audioStream * inaudiostream2)
 {
 
 	asize=asize2=0;
@@ -635,8 +635,8 @@ uint32_t is;
 	// MOD Feb 2005 by GMV: ODML support
 	/*writeAudioHeader (	inaudiostream , &_audio1 );
 	writeAudioHeader (	inaudiostream2, &_audio2);*/
-	writeAudioHeader (	inaudiostream , &_audio1,1);
-	writeAudioHeader (	inaudiostream2, &_audio2,2);
+//	writeAudioHeader (	inaudiostream , &_audio1,1);
+//	writeAudioHeader (	inaudiostream2, &_audio2,2);
 	// odml header placeholder
 	odml_write_dummy_chunk(LMain, &odml_header_fpos, 16);
 	// END MOD Feb 2005 by GMV

@@ -151,7 +151,7 @@ uint8_t GenericAviSave::cleanupAudio (void)
   }
   if(audio_filter)
   {
-    deleteAudioFilter (audio_filter);
+//    deleteAudioFilter (audio_filter);
     audio_filter=NULL;
   }
   return 1;
@@ -250,7 +250,7 @@ GenericAviSave::setupAudio (void)
 
   if (audioProcessMode())	// else Raw copy mode
     {
-      audio_filter = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart));
+//      audio_filter = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart));
       if(!audio_filter) return 0;
       encoding_gui->setAudioCodec(getStrFromAudioCodec(audio_filter->getInfo()->encoding));
     }
@@ -259,14 +259,14 @@ GenericAviSave::setupAudio (void)
       // else prepare the incoming raw stream
       // audio copy mode here
       encoding_gui->setAudioCodec(QT_TR_NOOP("Copy"));
-      audio_filter=buildAudioFilter( currentaudiostream,video_body->getTime (frameStart));
+//      audio_filter=buildAudioFilter( currentaudiostream,video_body->getTime (frameStart));
       if(!audio_filter) return 0;
     }
     /* Setup audioQ */
     pthread_t     audioThread;
     _pq=new PacketQueue("AVI audioQ",5000,2*1024*1024);
     memset(&_context,0,sizeof(_context));
-    _context.audioEncoder=audio_filter;
+   // _context.audioEncoder=audio_filter;
     _context.audioTargetSample=0xFFFF0000; ; //FIXME
     _context.packetQueue=_pq;
     // start audio thread
@@ -293,23 +293,7 @@ GenericAviSave::writeAudioChunk (uint32_t frame)
         uint32_t sample,packetLen,packets=0;
 
 
-        if(audio_filter->packetPerFrame()
-                || audio_filter->isVBR() )
-        {
-                while(_audioCurrent<_audioTarget)
-                {
-                  if(!_pq->Pop(abuffer,&packetLen,&sample))
-                  {
-                    return 0;
-                  }
-                  _audioCurrent+=sample;
-                  _audioTotal+=packetLen;
-                  writter->saveAudioFrame (packetLen,abuffer);
-                  encoding_gui->setAudioSize(_audioTotal);
-                }
-                return 1;
-        }
-
+       
         sample=0;
         // _audioTarget is the # of sample we want
         while(_audioCurrent<_audioTarget)

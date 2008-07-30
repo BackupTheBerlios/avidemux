@@ -747,7 +747,7 @@ void ADM_lavInit(void)
 {
     avcodec_init();
     avcodec_register_all();
-    lavformat_init();
+//BAZOOKA    lavformat_init();
     av_log_set_callback(adm_lavLogCallback);
 #ifdef ADM_DEBUG
   //  av_log_set_level(AV_LOG_DEBUG);

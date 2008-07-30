@@ -56,11 +56,11 @@ typedef enum
 		Script_FileType=12,
 		NewMpeg_FileType=13,
 		ECMAScript_FileType=14,
-                AvsProxy_FileType=15,
-                Matroska_FileType=16,
-                ASF_FileType=17,
-                FLV_FileType=18,
-                AMV_FileType=19,
+        AvsProxy_FileType=15,
+        Matroska_FileType=16,
+        ASF_FileType=17,
+        FLV_FileType=18,
+        AMV_FileType=19,
 		DUMMY_FILETYPE=99
 }fileType;
 
@@ -69,8 +69,8 @@ typedef enum
 	ENV_EDITOR_NONE=   0x0000,
 	ENV_EDITOR_BFRAME= 0x0001,
 	ENV_EDITOR_PVOP=   0x0002,
-        ENV_EDITOR_X264=   0x0004,
-        ENV_EDITOR_SMART=  0x0005,
+    ENV_EDITOR_X264=   0x0004,
+    ENV_EDITOR_SMART=  0x0005,
 	ENV_EDITOR_LAST=   0x8000
 }_ENV_EDITOR_FLAGS;
 //
@@ -89,10 +89,11 @@ typedef struct
 	ADM_audioStream      				*_audiostream;
 	uint8_t								_isAudioVbr;
 	WAVHeader							*_wavheader;
+    ADM_Audiocodec                      *_audioCodec;
 
 	uint32_t							_nb_video_frames;	
 	uint8_t								_reorderReady;
-        uint8_t                                                         _unpackReady;
+    uint8_t                             _unpackReady;
 	EditorCache							*_videoCache;
 }_VIDEOS;
 
@@ -108,13 +109,15 @@ typedef struct
 	uint32_t							_seg_video_duration;
  	uint32_t  							_audio_start;
 }_SEGMENT;
-
-class ADM_Composer
+/**
+        
+*/
+class ADM_Composer : public ADM_audioStream
 {
   private:
-                                        uint8_t dupe(ADMImage *src,ADMImage *dst,_VIDEOS *vid); 
-                                                                                // Duplicate img, do colorspace
-                                                                                // if needed
+                    uint8_t dupe(ADMImage *src,ADMImage *dst,_VIDEOS *vid); 
+                                                            // Duplicate img, do colorspace
+                                                            // if needed
   					uint32_t	_internalFlags;
   					ADM_PP 		_pp;
 					ADMImage	*_imageBuffer;
@@ -160,24 +163,24 @@ class ADM_Composer
                                                 uint8_t         tryIndexing(const char *name, const char *idxname=NULL);
 
   public:
-                                                uint8_t hasVBRVideos(void);
-                                                uint8_t addSegment(uint32_t source,uint32_t start, uint32_t nb);
-                                                uint8_t deleteAllSegments(void);
+                            uint8_t hasVBRVideos(void);
+                            uint8_t addSegment(uint32_t source,uint32_t start, uint32_t nb);
+                            uint8_t deleteAllSegments(void);
   						uint8_t 	getExtraHeaderData(uint32_t *len, uint8_t **data);
-                                                uint32_t getPARWidth(void);
-                                                uint32_t getPARHeight(void);
-                                                uint8_t  rebuildDuration(void);
+                            uint32_t getPARWidth(void);
+                            uint32_t getPARHeight(void);
+                            uint8_t  rebuildDuration(void);
   								ADM_Composer();
   				virtual 			~ADM_Composer();
   						void		clean( void );
   						void		dumpSeg(void);
-                                                uint8_t         saveAsScript (const char *name, const char *out);
+                        uint8_t     saveAsScript (const char *name, const char *out);
 						uint8_t 	saveWorbench(const char *name);
 						uint8_t 	loadWorbench(const char *name);
 						uint8_t     resetSeg( void );
-						uint8_t	reorder( void );
-						uint8_t	isReordered( uint32_t framenum );
-						uint8_t	isIndexable( void);
+						uint8_t	    reorder( void );
+						uint8_t	    isReordered( uint32_t framenum );
+						uint8_t	    isIndexable( void);
   				//_______________________
   				// specific to composer
   				//_______________________
@@ -217,23 +220,36 @@ class ADM_Composer
 					//*******************************************	
 						uint32_t 	getSpecificMpeg4Info( void );
 					//______________________________
-					//    Info etc... to be removed later
+					//   audioStream
 					//______________________________
+  
+        
+virtual uint8_t         getPacket(uint8_t *buffer,uint32_t *size, uint32_t sizeMax,uint32_t *nbSample);
+virtual uint8_t         goToTime(uint64_t nbUs);
+        bool            getExtraData(uint32_t *l, uint8_t **d);
+        uint64_t        getDurationInUs(void) {return durationInUs;}
+        uint8_t			getAudioStream(ADM_audioStream **audio);
+virtual WAVHeader       *getInfo(void);
+
+					//______________________________
+					//   /audioStream
+					//______________________________
+                    uint8_t         getAudioStreamsInfo(uint32_t frame,uint32_t *nbStreams, audioInfo **infos);
+                    uint8_t         changeAudioStream(uint32_t frame,uint32_t newstream);
+                    uint32_t        getCurrentAudioStreamNumber(uint32_t frame);
+                    // /other audio stuff
 
 			     		uint8_t 			setDecodeParam( uint32_t frame );
 	 				AVIStreamHeader 	*getVideoStreamHeader(void ) ;
 	 				MainAVIHeader 		*getMainHeader(void );
 	 				ADM_BITMAPINFOHEADER 	*getBIH(void ) ;
+
 	  				uint8_t			getVideoInfo(aviInfo *info);
-					WAVHeader 		*getAudioInfo(void )  ;
-					uint32_t 			getAudioLength(void);
-					uint8_t			getAudioStream(AVDMGenericAudioStream **audio);
-					uint8_t			getAudioExtra(uint32_t *l,uint8_t **d);
-					uint8_t			audioGoTo(uint32_t offset);
-					uint8_t			audioFlushPacket(void);
-					uint32_t			audioRead(uint32_t len,uint8_t *buffer);
-					uint8_t 			audioGoToFn(uint32_t seg,uint32_t fn,uint32_t *noff);
-					uint8_t 			audioFnToOff(uint32_t seg,uint32_t fn,uint32_t *noff);
+
+
+					
+					
+					
                   //
                   //	Coder/decoder
                   //
@@ -254,7 +270,7 @@ class ADM_Composer
                   // kludg
                   			void 			propagateBuildMap( void );
 
-			virtual 	uint8_t			audioGoToTime(uint32_t mstime,uint32_t *off);
+			
 					uint8_t 		getMarkers(uint32_t *start, uint32_t *end);
 								 // get markers from file
 					uint8_t 		setPostProc( uint32_t type, uint32_t strength, 
@@ -262,14 +278,10 @@ class ADM_Composer
 					uint8_t 		getPostProc( uint32_t *type, uint32_t *strength, 
 										uint32_t *swapuv);
 										
-					uint8_t 		getAudioPacket(uint8_t *dest, uint32_t *len, uint32_t
-									*samples);
+				
 					uint8_t			setEnv(_ENV_EDITOR_FLAGS newflag);
 					uint8_t			getEnv(_ENV_EDITOR_FLAGS newflag);
 					decoders 		*rawGetDecoder(uint32_t frame);
-                                        uint8_t                 getAudioStreamsInfo(uint32_t frame,uint32_t *nbStreams, audioInfo **infos);
-                                        uint8_t                 changeAudioStream(uint32_t frame,uint32_t newstream);
-                                        uint32_t                getCurrentAudioStreamNumber(uint32_t frame);
 
 };
 #endif

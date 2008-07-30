@@ -21,12 +21,13 @@
 #include "ADM_audio/aviaudio.hxx"
 
 #include "ADM_audiofilter/audioEncoderApi.h"
+#include "ADM_audioStream.h"
 
- AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *stream, uint32_t startTime);
- AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
+ ADM_audioStream *buildAudioFilter(ADM_audioStream *stream, uint32_t startTime);
+ AUDMAudioFilter *buildPlaybackFilter(ADM_audioStream *currentaudiostream,
 				uint32_t starttime, uint32_t duration);
 
- void deleteAudioFilter(AVDMGenericAudioStream *in);
+ void deleteAudioFilter(ADM_audioStream *in);
 void audioFilter_configureFilters( void );
 
 
@@ -93,7 +94,7 @@ FILMCONV audioGetFpsConv(void);
 uint32_t audioGetDrc(void);
 RESAMPLING  audioGetResampling(void);
 /*-----*/
-uint8_t                 A_changeAudioStream(AVDMGenericAudioStream *newaudio,AudioSource so,char *name);
+uint8_t                 A_changeAudioStream(ADM_audioStream *newaudio,AudioSource so,char *name);
 AudioSource             getCurrentAudioSource(char **name);
 const char              *audioSourceFromEnum(AudioSource src);
 AudioSource             audioSourceFromString(const char *name);

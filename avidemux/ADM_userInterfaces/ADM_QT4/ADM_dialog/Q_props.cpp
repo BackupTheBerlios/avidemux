@@ -95,7 +95,7 @@ propWindow::propWindow() : QDialog()
                 // Duration in seconds too
                 if(currentaudiostream && wavinfo->byterate>1)
                 {
-                        uint32_t l=currentaudiostream->getLength();
+                        uint32_t l; //=currentaudiostream->getLength();
                         double du;
                         du=l;
                         du*=1000;
@@ -109,7 +109,7 @@ propWindow::propWindow() : QDialog()
 						FILLQT_TR_NOOP(labelFileSize);
                 }
 
-                SET_YES(labelVBR,currentaudiostream->isVBR());
+//                SET_YES(labelVBR,currentaudiostream->isVBR());
         } else
           {
 			  ui.groupBoxAudio->setEnabled(false);

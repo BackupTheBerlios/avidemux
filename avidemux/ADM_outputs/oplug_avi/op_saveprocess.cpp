@@ -193,6 +193,7 @@ _mainaviheader.dwMicroSecPerFrame=0;
     uint32_t dataLen=0;
 
     _encode->hasExtraHeaderData( &dataLen,&data);
+#if 0
   	if (!writter->saveBegin (name,
 			   &_mainaviheader,
 			   frameEnd - frameStart + 1,
@@ -204,6 +205,7 @@ _mainaviheader.dwMicroSecPerFrame=0;
     	{
       		return 0;
     	}
+#endif
   aprintf("Setup video done\n");
   bitstream.data=vbuffer;
   bitstream.bufferSize=MAXIMUM_SIZE * MAXIMUM_SIZE * 3;

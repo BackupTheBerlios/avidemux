@@ -13,6 +13,7 @@
  ***************************************************************************/
 #ifndef AUDIO_RSHIFT_H
 #define AUDIO_RSHIFT_H
+#include "ADM_audioStream.h"
 /**
   This class implements a timeshift directly on the bistream bits
   If the shift is <0, it amounts to duplicate the head of the bistream
@@ -31,7 +32,7 @@ class AVDMProcessAudio_RawShift : public AVDMBufferedAudioStream
     virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer) ;
             uint8_t  getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
     
-    AVDMProcessAudio_RawShift(AVDMGenericAudioStream * instream, uint32_t starttime, int32_t msoff);
+    AVDMProcessAudio_RawShift(ADM_audioStream * instream, uint32_t starttime, int32_t msoff);
     virtual ~AVDMProcessAudio_RawShift();
     uint8_t isVBR(void);
     uint8_t packetPerFrame(void);
@@ -42,7 +43,7 @@ class AVDMProcessAudio_RawShift : public AVDMBufferedAudioStream
     virtual uint8_t  extraData(uint32_t *l,uint8_t **d)
     {
       ADM_assert(_instream);
-      return _instream->extraData(l,d);
+      return _instream->getExtraData(l,d);
     }
 };
 #endif

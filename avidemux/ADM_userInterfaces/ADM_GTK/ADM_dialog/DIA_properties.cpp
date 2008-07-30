@@ -104,7 +104,7 @@ void DIA_properties( void )
                 // Duration in seconds too
                 if(currentaudiostream && wavinfo->byterate>1)
                 {
-                        uint32_t l=currentaudiostream->getLength();
+                        uint32_t l=0; //currentaudiostream->getLength();
                         double du;
                         du=l;
                         du*=1000;
@@ -116,7 +116,7 @@ void DIA_properties( void )
 						sprintf(text, QT_TR_NOOP("%.2f MB"), l / 1048576.F);
 						FILL_ENTRY(labelFileSize);
                 }                
-                SET_YES(labelVbr, currentaudiostream->isVBR());
+        //        SET_YES(labelVbr, currentaudiostream->isVBR());
         } else
           {
 			  DISABLE_WIDGET(frame2);

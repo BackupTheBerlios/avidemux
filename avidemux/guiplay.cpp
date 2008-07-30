@@ -218,8 +218,8 @@ abort_play:
       {
 	  if (wavbuf)
 	      ADM_dealloc(wavbuf);
-          deleteAudioFilter(NULL);
-	  currentaudiostream->endDecompress();
+//          deleteAudioFilter(NULL);
+//	  currentaudiostream->endDecompress();
 	  AVDM_AudioClose();
 
       }
@@ -312,15 +312,7 @@ void ComputePreload(void)
       {
 	  return;
       }
-    // PCM or readable format ?
-    if (currentaudiostream->isCompressed())
-      {
-	  if (!currentaudiostream->isDecompressable())
-	    {
-		audio_available = 0;
-		return;
-	    }
-      }
+   
 
 
     double db;
@@ -355,7 +347,7 @@ void ComputePreload(void)
     // compute preload                      
     //_________________
     // we preload 1/4 a second
-     currentaudiostream->beginDecompress();
+
      one_sec = (wavinfo->frequency *  channels)  >> 2;
      one_sec+=(latency*wavinfo->frequency *  channels*2)/1000;
      AUD_Status status;

@@ -99,13 +99,13 @@ static DRCparam drcSetup=
 //_______________________________________
 
 
-AUDMAudioFilter *buildInternalAudioFilter(AVDMGenericAudioStream *currentaudiostream,uint32_t starttime)
+AUDMAudioFilter *buildInternalAudioFilter(ADM_audioStream *currentaudiostream,uint32_t starttime)
 {
 
   AUDMAudioFilter *firstFilter = NULL;
   AUDMAudioFilter *lastFilter = NULL;
   
-  deleteAudioFilter(NULL);
+//  deleteAudioFilter(NULL);
   int32_t timeShiftMs=audioDelay*audioShift;
   
   
@@ -188,7 +188,7 @@ AUDMAudioFilter *buildInternalAudioFilter(AVDMGenericAudioStream *currentaudiost
 
 
 
-    currentaudiostream->beginDecompress();
+
     return lastFilter;
 }
 /*
@@ -196,7 +196,7 @@ AUDMAudioFilter *buildInternalAudioFilter(AVDMGenericAudioStream *currentaudiost
 
 *******************************************************************************************************************
 */
-AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream, uint32_t starttime, uint32_t duration)
+AUDMAudioFilter *buildPlaybackFilter(ADM_audioStream *currentaudiostream, uint32_t starttime, uint32_t duration)
 {
   AUDMAudioFilter *lastFilter=NULL;
   int32_t sstart;
@@ -206,7 +206,7 @@ AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
   sstart=(int32_t)starttime;
   int32_t timeShiftMs=audioDelay*audioShift;
         
-  deleteAudioFilter(NULL);
+//  deleteAudioFilter(NULL);
   
   lastFilter = new AUDMAudioFilter_Bridge(NULL,currentaudiostream,sstart,timeShiftMs);
         filtercount = 0;
@@ -254,17 +254,17 @@ AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
 *******************************************************************************************************************
 */
 
-AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,  uint32_t starttime)
+ADM_audioStream *buildAudioFilter(ADM_audioStream *currentaudiostream,  uint32_t starttime)
 {
   AUDMAudioFilter         *lastFilter=NULL;
-  AVDMGenericAudioStream  *output=NULL;
+  ADM_audioStream         *output=NULL;
   AUDMEncoder             *tmpfilter=NULL;
 	// if audio is set to copy, we just return the first filter
   if(!audioProcessMode())
   {
     int32_t timeShiftMs=audioDelay*audioShift;
-    deleteAudioFilter(NULL);
-    output = new AVDMProcessAudio_RawShift(currentaudiostream, starttime, timeShiftMs);
+//    deleteAudioFilter(NULL);
+//    output = new AVDMProcessAudio_RawShift(currentaudiostream, starttime, timeShiftMs);
     return output;
 
   }
@@ -289,7 +289,7 @@ AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
   {
     GUI_Error_HIG(QT_TR_NOOP("Codec Error"),QT_TR_NOOP("The number of channels is greater than what the selected audio codec can do.\n"
         "Either change codec or use the mixer filter to have less channels."));
-    deleteAudioFilter(NULL);
+//    deleteAudioFilter(NULL);
     return 0; 
   }
 
@@ -301,8 +301,8 @@ AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
     GUI_Error_HIG(QT_TR_NOOP("[BuildChain] Encoder initialization failed"), QT_TR_NOOP("Not activated."));
   }
   ADM_audioEncoderWrapper *wrapper=new ADM_audioEncoderWrapper(tmpfilter);
-  output=wrapper;
-  currentaudiostream->beginDecompress();
+//  output=wrapper;
+
   ADM_assert(output);
   return output;
 }

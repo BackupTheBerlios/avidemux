@@ -19,7 +19,7 @@
 #define __AudioProcess__
 
 #include "ADM_audio/aviaudio.hxx"
-
+#include "ADM_audioStream.h"
 #define PROCESS_BUFFER_SIZE 48000*4*4 // should be enougth
 #define MINIMUM_BUFFER   8192*4
 /*! Base class for chained action. This class is derivated from AVDMGenericAudioStream and has two
@@ -32,7 +32,7 @@ class AVDMBufferedAudioStream : public  AVDMGenericAudioStream
 {
   
         protected:
-                AVDMGenericAudioStream *_instream;
+                ADM_audioStream *_instream;
 
                 /*! _chunk is the size of an elementary packed, depends on the codec used */
                 uint32_t _chunk;
@@ -42,7 +42,7 @@ class AVDMBufferedAudioStream : public  AVDMGenericAudioStream
                 uint32_t _headBuff,_tailBuff;
 
         public:
-                        AVDMBufferedAudioStream(AVDMGenericAudioStream *instream);
+                        AVDMBufferedAudioStream(ADM_audioStream *instream);
                 virtual ~AVDMBufferedAudioStream();
 
 

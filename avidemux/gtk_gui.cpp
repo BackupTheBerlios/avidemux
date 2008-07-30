@@ -436,7 +436,7 @@ int nw;
     			break;
 			
     case ACT_SaveOGM:
-                        GUI_FileSelWrite (QT_TR_NOOP("Select OGM File to Write"), (SELFILE_CB *)ogmSave);
+//                        GUI_FileSelWrite (QT_TR_NOOP("Select OGM File to Write"), (SELFILE_CB *)ogmSave);
     			break;
 				
     case ACT_SaveWork:
@@ -658,7 +658,7 @@ int nw;
       break;
     case ACT_AudioSourceNone:
       //currentaudiostream=(AVDMGenericAudioStream *)NULL;
-       A_changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
+//       A_changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
       break;
 
   
@@ -774,7 +774,7 @@ int nw;
       if (currentaudiostream)
 	{
 
-	  currentaudiostream->buildAudioTimeLine ();
+//	  currentaudiostream->buildAudioTimeLine ();
 
 	}
       break;
@@ -1025,7 +1025,7 @@ void  updateLoaded ()
   getFirstVideoFilter(); // reinit first filter
 
   // now get audio information if exists
-  wavinfo = video_body->getAudioInfo ();	//wavinfo); // will be null if no audio
+  wavinfo = video_body->getInfo ();	//wavinfo); // will be null if no audio
   if (!wavinfo)
     {
       printf ("\n *** NO AUDIO ***\n");
@@ -1035,13 +1035,14 @@ void  updateLoaded ()
     {
 	  video_body->getAudioStream (&aviaudiostream);
       A_changeAudioStream (aviaudiostream, AudioAvi,NULL);
+#if 0
       if (aviaudiostream)
 	if (!aviaudiostream->isDecompressable ())
 	  {
             GUI_Error_HIG (QT_TR_NOOP("No audio decoder found for this file"),
                            QT_TR_NOOP( "Save (A+V) will generate bad AVI. Save audio will work."));
 	  }
-
+#endif
     }
 
   // Init renderer
@@ -1131,7 +1132,7 @@ void ReSync (void)
   if (currentaudiostream == aviaudiostream)
     {
       isaviaud = 1;
-      A_changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
+//      A_changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
 
     }
   else
@@ -1168,12 +1169,7 @@ A_saveAudio (char *name)
 
   if (!currentaudiostream)
     return;
-  if (!currentaudiostream->isCompressed ())
-    {
-      GUI_Error_HIG
-          (QT_TR_NOOP("Cannot save the audio in copy mode"), QT_TR_NOOP("Select WAV PCM as the audio codec, otherwise the audio file would be raw PCM."));
-      return;
-    }
+
 
   
   out = fopen (name, "wb");
@@ -1206,7 +1202,7 @@ A_saveAudio (char *name)
    buffer=new uint8_t[ONE_STRIKE*2];
    while (1)
     {
-    	if(!currentaudiostream->getPacket(buffer+hold,&len,&sample)) break;
+    	if(!currentaudiostream->getPacket(buffer+hold,&len,64*1024,&sample)) break;
 	hold+=len;
 	written+=len;
 	cur_sample+=sample;
@@ -1367,13 +1363,13 @@ A_loadAC3 (char *name)
       return 0;
     }
   //currentaudiostream=wav;
-  A_changeAudioStream (ac3, AudioAC3,name);
+//  A_changeAudioStream (ac3, AudioAC3,name);
   wavinfo = currentaudiostream->getInfo ();
   return 1;
 }
 int A_loadNone( void )
 {
- 	A_changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
+// 	A_changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
 }
 
 //_____________________________________________________________
@@ -1395,7 +1391,7 @@ int A_loadMP3(char *name)
           return 0;
       }
     //currentaudiostream=mp3;
-    A_changeAudioStream(mp3, AudioMP3,name);
+//    A_changeAudioStream(mp3, AudioMP3,name);
     wavinfo = currentaudiostream->getInfo();
     return 1;
 }
@@ -1424,7 +1420,7 @@ A_loadWave (char *name)
       return 0;
     }
   //currentaudiostream=wav;
-  A_changeAudioStream (wav, AudioWav,name);
+//  A_changeAudioStream (wav, AudioWav,name);
   wavinfo = currentaudiostream->getInfo ();
   return 1;
 }
@@ -1436,7 +1432,7 @@ AudioSource getCurrentAudioSource(char **name)
 //________________________________________________________
 // Change audio stream and delete the old one if needed
 //________________________________________________________
-uint8_t A_changeAudioStream (AVDMGenericAudioStream * newaudio, AudioSource nwsource,char *myname)
+uint8_t A_changeAudioStream (ADM_audioStream * newaudio, AudioSource nwsource,char *myname)
 {
 	if (currentaudiostream)
 	{
@@ -1485,13 +1481,7 @@ A_saveAudioDecodedTest (char *name)
 
   if (!currentaudiostream)
     return;
-  if (currentaudiostream->isCompressed ())
-    if (!currentaudiostream->isDecompressable ())
-      {
-        GUI_Error_HIG (QT_TR_NOOP("Cannot decompress audio frame"), NULL);
-	return;
-      }
-
+ 
 
   if (!(out = fopen (name, "wb")))
     {
@@ -1510,7 +1500,7 @@ A_saveAudioDecodedTest (char *name)
 
 // re-ignite first filter...
 
-  currentaudiostream->beginDecompress ();
+
 
 
   // Write Wav header
@@ -1525,7 +1515,7 @@ A_saveAudioDecodedTest (char *name)
 
 
 
-        saveFilter =  buildAudioFilter (currentaudiostream,video_body->getTime (frameStart));
+//        saveFilter =  buildAudioFilter (currentaudiostream,video_body->getTime (frameStart));
 
 		if (saveFilter == NULL)
 		{
@@ -1590,8 +1580,8 @@ A_saveAudioDecodedTest (char *name)
   fclose (out);
   ADM_dealloc (outbuffer);
   delete work;
-  deleteAudioFilter (saveFilter);
-  currentaudiostream->endDecompress ();
+//  deleteAudioFilter (saveFilter);
+//  currentaudiostream->endDecompress ();
   printf ("AudioSave: actually written %u\n", written);
   printf ("Audiosave: target sample:%llu, got :%llu\n",sampleTarget,sampleCurrent);
 
@@ -1874,13 +1864,7 @@ int A_audioSave(char *name)
 	return 0;
 	if (audioProcessMode())
 	{
-		if (currentaudiostream->isCompressed ())
-			if (!currentaudiostream->isDecompressable ())
-		  	{
-		    		GUI_Error_HIG
-                                    (QT_TR_NOOP("Cannot decompress the audio stream"),QT_TR_NOOP( "Switch audio codec to Copy."));
-		   		return 0;
-		  	}
+		
 		// if we get here, either not compressed
 		// or decompressable
 		A_saveAudioDecodedTest(name);
@@ -1893,7 +1877,7 @@ int A_audioSave(char *name)
 }
 uint8_t A_pass(char *name)
 {
-        mpeg_passthrough(name,ADM_PS);
+//        mpeg_passthrough(name,ADM_PS);
         return 1;
 }
 int A_delete(uint32_t start, uint32_t end)
@@ -2056,7 +2040,7 @@ void A_audioTrack( void )
                               A_loadWave(newtrackname);
                             break;
                     case AudioNone:
-                              A_changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
+//                              A_changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
                             break;
                     case AudioAvi:
                             //printf("New :%d old:%d\n",newtrack,oldtrack);
@@ -2149,11 +2133,12 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                         }
                         else
                         {
-                                secondaudiostream = tmp;     
+/*                                secondaudiostream = tmp;     
                                 secondAudioSource=AudioMP3;
                                 secondAudioName=ADM_strdup(name);
                                 printf ("\n MP3 loaded\n");
                                 GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Second track loaded"), NULL);
+*/
                                 return 1;
                         }
                         }
@@ -2171,11 +2156,13 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                         }
                         else
                         {
+/*
                                 secondaudiostream = tmp;     
                                 secondAudioSource=AudioAC3;
                                 secondAudioName=ADM_strdup(name);
                                 printf ("\n AC3 loaded\n");
                                 GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Second track loaded"), NULL);
+*/
                                 return 1;
                         }
                         }
@@ -2193,11 +2180,13 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                         }
                         else
                         {
+/*
                                 secondaudiostream = tmp;     
                                 secondAudioSource=AudioAC3;
                                 secondAudioName=ADM_strdup(name);
                                 printf ("\n AC3 loaded\n");
                                 GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Second track loaded"), NULL);
+*/
                                 return 1;
                         }}
                         break;

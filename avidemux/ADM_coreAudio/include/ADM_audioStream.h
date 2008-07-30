@@ -80,7 +80,7 @@ class ADM_audioStream
 /// Default constructor
                        ADM_audioStream(WAVHeader *header,ADM_audioAccess *access);  
 /// Returns wavheader
-                       WAVHeader                *getInfo(void) {return &wavHeader;}
+virtual                 WAVHeader                *getInfo(void) {return &wavHeader;}
 ///  Get a packet
 virtual uint8_t         getPacket(uint8_t *buffer,uint32_t *size, uint32_t sizeMax,uint32_t *nbSample);
 /// Go to a given time, in microseconds

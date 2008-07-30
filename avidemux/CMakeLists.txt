@@ -175,13 +175,14 @@ ADD_SUBDIRECTORY(ADM_outputs)
 
 SET(ADM_OUTPUTS	
 	oplug_avi
-	oplug_mp4
-	oplug_mpeg
-	oplug_mpegFF
-	oplug_ogm
-	oplug_flv
-	oplug_dummy
-	ADM_outputs)
+	#oplug_mp4
+	#oplug_mpeg
+	#oplug_mpegFF
+	#oplug_ogm
+	#oplug_flv
+	#oplug_dummy
+	#ADM_outputs)
+)
 
 ADD_ADMLIB_ALL_TARGETS(${ADM_OUTPUTS})
 

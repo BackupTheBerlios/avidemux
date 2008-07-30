@@ -29,7 +29,7 @@
 
 #include "audioprocess.hxx"
 //
-AVDMBufferedAudioStream::AVDMBufferedAudioStream(AVDMGenericAudioStream * instream):AVDMGenericAudioStream()
+AVDMBufferedAudioStream::AVDMBufferedAudioStream(ADM_audioStream * instream):AVDMGenericAudioStream()
 {
         _instream=instream;
         _chunk = 4096;

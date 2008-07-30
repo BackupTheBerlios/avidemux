@@ -47,7 +47,7 @@ GenericAviSaveCopyDualAudio::GenericAviSaveCopyDualAudio (AVDMGenericAudioStream
 {
    printf("**********************************\n");
    printf("second audio track set\n");
-    audio_filter2= track;
+//    audio_filter2= track;
     _audioCurrent2=0;
 }
 
@@ -133,8 +133,8 @@ GenericAviSaveCopyDualAudio::writeAudioChunk (uint32_t frame)
   t=t*1000*audio_filter->getInfo()->frequency;
   _audioTarget=(uint32_t )floor(t);
   
-  if(!doOneTrack(0,audio_filter,_audioTarget,&_audioCurrent)) return 0;
-  if(!doOneTrack(1,audio_filter2,_audioTarget,&_audioCurrent2)) return 0;
+//  if(!doOneTrack(0,audio_filter,_audioTarget,&_audioCurrent)) return 0;
+//  if(!doOneTrack(1,audio_filter2,_audioTarget,&_audioCurrent2)) return 0;
   return 1;
 }
 //____________

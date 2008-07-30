@@ -27,11 +27,11 @@
 
 #include "ADM_default.h"
 
-
+#include "ADM_audioStream.h"
 #include "audioprocess.hxx"
 #include "audio_raw.h"
 
-AVDMProcessAudio_RawShift::AVDMProcessAudio_RawShift(AVDMGenericAudioStream * instream,
+AVDMProcessAudio_RawShift::AVDMProcessAudio_RawShift(ADM_audioStream * instream,
       uint32_t starttime, int32_t msoff): AVDMBufferedAudioStream    (instream)
 {
     _wavheader = new WAVHeader;
@@ -66,7 +66,7 @@ AVDMProcessAudio_RawShift::AVDMProcessAudio_RawShift(AVDMGenericAudioStream * in
                         _hold=(msoff*_wavheader->frequency)/1000; // in sample
                 }
         }
-    _length = instream->getLength();
+//    _length = instream->getLength();
     printf("[Raw shift] : Start:%u ms, offset in sample  %d\n",_starttime,_hold);
 };
 
@@ -84,10 +84,12 @@ uint8_t	 AVDMProcessAudio_RawShift::getPacket(uint8_t *dest, uint32_t *len, uint
         uint8_t r;
                 
                 if(!_hold)
-                        return _instream->getPacket(dest,len,samples);
+                        return _instream->getPacket(dest,len,64*1024,samples); // BAZOOKA
 
                 // filter is still on
-                r=_instream->getPacket(dest,len,samples);
+                r=_instream->getPacket(dest,len,64*1024,samples); // BAZOOKA
+
+
                 if(!r)
                 {
                         printf("[RawShift]: Readerror\n");
@@ -107,14 +109,6 @@ uint8_t	 AVDMProcessAudio_RawShift::getPacket(uint8_t *dest, uint32_t *len, uint
                 }
               return r;
 
-}
-uint8_t AVDMProcessAudio_RawShift::isVBR(void)
-{
-  return  _instream->isVBR();
-}
-uint8_t AVDMProcessAudio_RawShift::packetPerFrame(void)
-{
-  return  _instream->packetPerFrame();
 }
 
 uint32_t AVDMProcessAudio_RawShift::read(uint32_t len, uint8_t * buffer)

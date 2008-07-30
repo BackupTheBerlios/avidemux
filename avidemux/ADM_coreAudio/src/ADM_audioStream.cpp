@@ -13,7 +13,10 @@
 */
 ADM_audioStream::ADM_audioStream(WAVHeader *header,ADM_audioAccess *access)
 {
-    wavHeader=*header;
+    if(header)
+        wavHeader=*header;
+    else    
+        memset(&wavHeader,0,sizeof(wavHeader));
     this->access=access;
     lastDts=ADM_AUDIO_NO_DTS;
 }

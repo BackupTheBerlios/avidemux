@@ -2,7 +2,7 @@
                           ADM_edit.cpp  -  description
                              -------------------
     begin                : Thu Feb 28 2002
-    copyright            : (C) 2002 by mean
+    copyright            : (C) 2002/2008 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -75,7 +75,7 @@ const char *VBR_MSG = QT_TR_NOOP("Avidemux detected VBR MP3 audio in this file. 
 
 #define TEST_MPEG2DEC
 
-ADM_Composer::ADM_Composer (void)
+ADM_Composer::ADM_Composer (void) : ADM_audioStream(NULL,NULL)
 {
 uint32_t type,value;
 
@@ -145,24 +145,6 @@ uint8_t ADM_Composer::getExtraHeaderData (uint32_t * len, uint8_t ** data)
 
 }
 
-/**
-	Return extra Header info present in avi chunk that are needed to initialize
-	the audio codec
-	It is assumed that there is only one file or can share the same init data
-	Example : WMA
-*/
-uint8_t ADM_Composer::getAudioExtra (uint32_t * l, uint8_t ** d)
-{
-  *l = 0;
-  *d = NULL;
-  if (!_nb_segment)
-    return 0;
-  if (!_videos[0]._audiostream)
-    return 0;
-  return _videos[0]._audiostream->getExtraData (l, d);
-
-
-}
 
 /**
 	Purge all segments
@@ -179,7 +161,8 @@ uint8_t ADM_Composer::deleteAllSegments (void)
 }
 
 /**
-	Purge all videos
+	\fn Purge all videos
+    \brief delete datas associated with all video
 */
 void
 ADM_Composer::deleteAllVideos (void)
@@ -190,15 +173,20 @@ ADM_Composer::deleteAllVideos (void)
 
       // if there is a video decoder...
       if (_videos[vid].decoder)
-	delete _videos[vid].decoder;
+            delete _videos[vid].decoder;
       if(_videos[vid].color)
-        delete _videos[vid].color;
+            delete _videos[vid].color;
       // prevent from crashing
       _videos[vid]._aviheader->close ();
       delete _videos[vid]._aviheader;
       if(_videos[vid]._videoCache)
       	delete  _videos[vid]._videoCache;
       _videos[vid]._videoCache=NULL;
+     // Delete audio codec too
+     // audioStream will be deleted by the demuxer
+      if(_videos[vid]._audioCodec)
+        delete _videos[vid]._audioCodec;
+      _videos[vid]._audioCodec=NULL;
     }
 
   memset (_videos, 0, sizeof (_videos));
@@ -221,7 +209,6 @@ ADM_Composer::~ADM_Composer ()
 		delete[] _segments;
 		_segments=NULL;
 	}
-
 	if(_scratch)
 	{
 		delete _scratch;
@@ -474,30 +461,31 @@ thisIsMpeg:
   _videos[_nb_video]._nb_video_frames = info.nb_frames;
 
 
-  // and update audio info
+  // Update audio infos
+  // an spawn the appropriate decoder
   //_________________________
   _wavinfo = _videos[_nb_video]._aviheader->getAudioInfo ();	//wavinfo); // will be null if no audio
   if (!_wavinfo)
     {
       printf ("\n *** NO AUDIO ***\n");
       _videos[_nb_video]._audiostream = NULL;
+      _videos[_nb_video]._audioCodec=NULL;
     }
   else
     {
-float duration;
-      _videos[_nb_video]._aviheader->getAudioStream (&_videos[_nb_video].
-						     _audiostream);
+      float duration;
+      uint32_t extraLen;
+      uint8_t  *extraData;
+      _videos[_nb_video]._aviheader->getAudioStream (&_videos[_nb_video]. _audiostream);
 
-     
-      
-	
-	duration=_videos[_nb_video]._nb_video_frames;
-	duration/=info.fps1000;
-	duration*=1000;			// duration in seconds
-	duration*=_wavinfo->frequency;  	// In sample
-	_videos[_nb_video]._audio_duration=(uint64_t)floor(duration);
-        printf("[Editor] Duration in seconds: %"LLU", in samples: %"LLU"\n",_videos[_nb_video]._audio_duration/_wavinfo->frequency,_videos[_nb_video]._audio_duration);
-
+      ADM_audioStream *stream=_videos[_nb_video]. _audiostream;
+      stream->getExtraData(&extraLen,&extraData);
+      duration=stream->getDurationInUs();
+      duration*=stream->getInfo()->frequency;
+      duration/=1000*1000.; // Us -> seconds
+  	  _videos[_nb_video]._audio_duration=(uint64_t)floor(duration);
+      _videos[_nb_video]._audioCodec=getAudioCodec(_wavinfo->encoding,_wavinfo,extraLen,extraData);
+      printf("[Editor] Duration in seconds: %"LLU", in samples: %"LLU"\n",_videos[_nb_video]._audio_duration/_wavinfo->frequency,_videos[_nb_video]._audio_duration);
     }
 
   printf ("\n Decoder FCC: ");
@@ -512,8 +500,7 @@ float duration;
   uint32_t    	l;
   uint8_t 	*d;
   _videos[_nb_video]._aviheader->getExtraHeaderData (&l, &d);
-  _videos[_nb_video].decoder = getDecoder (info.fcc,
-					   info.width, info.height, l, d,info.bpp);
+  _videos[_nb_video].decoder = getDecoder (info.fcc,  info.width, info.height, l, d,info.bpp);
 
   _videos[_nb_video]._videoCache   =   new EditorCache(10,info.width,info.height) ;
   //
@@ -1373,6 +1360,7 @@ uint8_t ADM_Composer::updateAudioTrack (uint32_t seg)
 
   // If we cannot go to sync point start --> no need to continue
   // It can happen if audio track is shorter than video
+#if 0 // BAZOOKA
   if (!audioGoToFn (seg, _segments[seg]._start_frame, &off))
     {
       _segments[seg]._audio_size = 0;
@@ -1392,7 +1380,7 @@ uint8_t ADM_Composer::updateAudioTrack (uint32_t seg)
       printf (" trying to sync on frame %lu\n", tf);
       tf--;
     }
-
+#endif
 //  pos_end = _videos[reference]._audiostream->getPos ();
 
   _segments[seg]._audio_size = pos_end - pos_start;

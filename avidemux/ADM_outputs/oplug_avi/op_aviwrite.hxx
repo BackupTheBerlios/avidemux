@@ -21,6 +21,7 @@
 
  #ifndef __op_avi__
  #define __op_avi__
+#include "ADM_audioStream.h"
  class  aviWrite
  {
  protected:
@@ -116,8 +117,8 @@ public:
 			ADM_BITMAPINFOHEADER	*bitmap,	
 			uint8_t 		*videoextra,
 			uint32_t		videoextraLen,
-			AVDMGenericAudioStream 	*audiostream,
-							AVDMGenericAudioStream 	*audiostream2=NULL);
+			ADM_audioStream 	*audiostream,
+            ADM_audioStream 	*audiostream2=NULL);
 
       uint8_t setEnd(void);
 

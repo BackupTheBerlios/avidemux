@@ -39,16 +39,13 @@
 #define SEG 		_segments[seg]._reference
 
 extern char* ms2timedisplay(uint32_t ms);
+/**
+    \fn getPacket
+    \brief Get audio packet
 
-#if 0
-CHANNEL_TYPE *ADM_Composer::getChannelMapping(void)
-{
-	_VIDEOS *currentVideo;
-		currentVideo=&_videos[AUDIOSEG];
-		return currentVideo->_audiostream->getChannelMapping();
-}
-#endif
-uint8_t ADM_Composer::getAudioPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
+*/
+
+uint8_t ADM_Composer::getPacket(uint8_t *dest, uint32_t *len,uint32_t sizeMax, uint32_t *samples)
 {
 uint8_t r;	
 uint32_t ref; 
@@ -64,7 +61,7 @@ _VIDEOS *currentVideo;
                         *samples=0;
                         return 0;
                 }
-		r=currentVideo->_audiostream->getPacket(dest,len,64*1024,samples); //FIXME BAZOOKA
+		r=currentVideo->_audiostream->getPacket(dest,len,sizeMax,samples); 
 		if(r)
 		{
 			// ok we update the current sample count and go on
@@ -94,7 +91,7 @@ _VIDEOS *currentVideo;
                 {
                         printf("Drop too high, filling...\n");
                         currentVideo->_audiostream->goToTime(0);
-                        r=currentVideo->_audiostream->getPacket(dest,len,64*1024,samples); //FIXME BAZOOKA
+                        r=currentVideo->_audiostream->getPacket(dest,len,sizeMax,samples); 
                         if(r)
                         {
                                 printf("Filled with data from beginning (%u bytes %u samples)\n",*len,*samples);
@@ -138,9 +135,9 @@ _VIDEOS *currentVideo;
         }
 	starttime= _videos[AUDIOSEG]._aviheader->getTime (_segments[_audioseg]._start_frame);
 	_videos[AUDIOSEG]._audiostream->goToTime(starttime);	
-	; // Fresh start samuel
+	 // Fresh start samuel
 	printf("EditorPacket : switching to segment %lu\n",_audioseg);
-	ret= getAudioPacket(dest, len, samples);
+	ret= getPacket(dest, len,sizeMax, samples);
         if(adjust<0)
         {
                 adjust=-adjust;
@@ -149,28 +146,12 @@ _VIDEOS *currentVideo;
         }
         return ret;
 }
-
-//__________________________________________________
-//
-//
-
-/*
-		Read sequentially audio
+/**
+    \fn goToTime
+    \brief Audio Seek
 
 */
-uint32_t ADM_Composer::audioRead (uint32_t len, uint8_t * buffer)
-{
-uint32_t size,sam;
- if(!getAudioPacket(buffer,&size, &sam))
- {
- 	return 0; 
- }
- return size;
-}
-
-
-//  --------------------------------------------
-uint8_t ADM_Composer::audioGoToTime (uint32_t mstime, uint32_t * off)
+uint8_t ADM_Composer::goToTime (uint64_t mstime)
 {
 
   uint32_t	    cumul_offset =    0;
@@ -240,6 +221,7 @@ uint8_t ADM_Composer::audioGoToTime (uint32_t mstime, uint32_t * off)
 */
   return 1;
 }
+#if 0
 /*
 		Go to Frame num, from segment seg
 		Used to compute the duration of audio track
@@ -289,12 +271,12 @@ uint32_t ADM_Composer::getAudioLength (void)
   _audio_size = len;
   return len;
 }
+#endif
+/**
+    \fn getAudioStream
 
-//
-//  Build the internal audio stream from segs
-//
-
-uint8_t ADM_Composer::getAudioStream (AVDMGenericAudioStream ** audio)
+*/
+uint8_t ADM_Composer::getAudioStream (ADM_audioStream ** audio)
 {
   if (*audio)
     {
@@ -307,17 +289,18 @@ uint8_t ADM_Composer::getAudioStream (AVDMGenericAudioStream ** audio)
       return 0;
 
     }
-  *audio = new AVDMEditAudioStream (this);
+  *audio = this;
   return 1;
 };
 
-//
-//
-WAVHeader *ADM_Composer::getAudioInfo (void)
+/**
+    \fn getInfo
+    \brief returns synthetic audio info
+*/
+WAVHeader       *ADM_Composer::getInfo(void)
 {
-  if (_videos[0]._audiostream)
-    {
-      return _videos[0]._audiostream->getInfo ();
-    }
-  return NULL;
+    if(!_videos[0]._audiostream) return NULL;
+    return _videos[0]._audiostream->getInfo();
 }
+//EOF
+

@@ -32,19 +32,19 @@ EXTERN uint8_t 	playing
 ;
 
 
-EXTERN AVDMGenericAudioStream *aviaudiostream
+EXTERN ADM_audioStream *aviaudiostream
 #ifdef __DECLARE__
-=(AVDMGenericAudioStream *)NULL
+=(ADM_audioStream *)NULL
 #endif
 ;
-EXTERN AVDMGenericAudioStream *currentaudiostream
+EXTERN ADM_audioStream *currentaudiostream
 #ifdef __DECLARE__
-=(AVDMGenericAudioStream *)NULL
+=(ADM_audioStream *)NULL
 #endif
 ;
-EXTERN AVDMGenericAudioStream *secondaudiostream
+EXTERN ADM_audioStream *secondaudiostream
 #ifdef __DECLARE__
-=(AVDMGenericAudioStream *)NULL
+=(ADM_audioStream *)NULL
 #endif
 ;
 

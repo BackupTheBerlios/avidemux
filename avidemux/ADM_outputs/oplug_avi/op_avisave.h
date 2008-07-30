@@ -33,7 +33,7 @@
 		uint32_t		_audioCurrent;
 		uint64_t		_audioTotal;
 		
-     		DIA_encoding		*encoding_gui;
+     		DIA_encoding		    *encoding_gui;
       	 	AVDMGenericVideoStream  *_incoming;
      		DIA_working		*dialog_work;
      		uint8_t 		has_audio_track;
@@ -44,8 +44,8 @@
                 char			_name[500];
 		uint32_t		_videoProcess;
                 uint8_t			_part;
-                AVDMGenericAudioStream	*audio_filter;
-                AVDMGenericAudioStream	*audio_filter2;
+                ADM_audioStream	*audio_filter;
+                ADM_audioStream	*audio_filter2;
 
                 uint8_t 		computeAudioCBR (void)   ;
                 aviWrite		*writter;
