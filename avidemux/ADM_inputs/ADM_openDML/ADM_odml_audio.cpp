@@ -92,9 +92,9 @@ uint64_t  ADM_aviAudioAccess::getPos(void)
 {
     // go to the index just after the wanted one
     uint64_t total=0;
-    for(int i=0;i<nbIndex;i++)
+    for(int i=0;i<nbIndex-1;i++)
     {
-        if(pos>=total)
+        if(pos>=total && pos<=total+index[i].size)
         {
             fseeko(fd,index[i].offset,SEEK_SET);
             currentIndex=i;
@@ -115,7 +115,12 @@ bool   ADM_aviAudioAccess::getPacket(uint8_t *buffer, uint32_t *size, uint32_t m
         fseeko(fd,index[currentIndex].offset,SEEK_SET);
         if(index[currentIndex].size>maxSize) ADM_assert(0);
         fread(buffer,1,index[currentIndex].size,fd);
-        *dts=ADM_AUDIO_NO_DTS;
+        if(!currentIndex) 
+            *dts=0;
+        else
+            *dts=ADM_AUDIO_NO_DTS;
+        *size=index[currentIndex].size;
+        currentIndex++;
         return 1;
 }
 //EOF

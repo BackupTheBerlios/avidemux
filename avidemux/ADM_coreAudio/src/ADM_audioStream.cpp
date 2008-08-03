@@ -5,7 +5,7 @@
 */
 #include "ADM_default.h"
 #include "ADM_audioStream.h"
-
+#include "ADM_audioStreamMP3.h"
 
 /**
     \fn ADM_audioStream
@@ -24,7 +24,7 @@ ADM_audioStream::ADM_audioStream(WAVHeader *header,ADM_audioAccess *access)
     \fn goToTime
     \brief goToTime
 */
-uint8_t         ADM_audioStream::goToTime(uint64_t nbUs)
+bool  ADM_audioStream::goToTime(uint64_t nbUs)
 {
     if(access->canSeekTime()==true)
     {
@@ -38,11 +38,18 @@ uint8_t         ADM_audioStream::goToTime(uint64_t nbUs)
     ADM_assert(true==access->canSeekOffset());
     // Convert time to offset in bytes
     float f=nbUs*wavHeader.byterate;
-    f/=f/1000;
-    f/=f/1000; // in bytes
+    f/=1000;
+    f/=1000; // in bytes
     if(access->setPos( (uint32_t)(f+0.5)))
     {
-        lastDts=nbUs;
+        // The seek might not be accurate, recompute the Dts
+        // it is better to undershoot in most case
+        uint64_t pos=access->getPos();
+        // compute dts from pos & byterate
+        float r=pos;
+            r*=1000*1000;
+            r/=wavHeader.byterate;
+            lastDts=(uint64_t)r;
         return 1;
     }
     return false;
@@ -50,7 +57,7 @@ uint8_t         ADM_audioStream::goToTime(uint64_t nbUs)
 /**
         \fn getPacket
 */
-uint8_t ADM_audioStream::getPacket(uint8_t *buffer,uint32_t *size, uint32_t sizeMax,uint32_t *nbSample)
+uint8_t ADM_audioStream::getPacket(uint8_t *buffer,uint32_t *size, uint32_t sizeMax,uint32_t *nbSample,uint64_t *odts)
 {
 uint64_t dts=0;
     if(!access->getPacket(buffer,size,sizeMax,&dts)) return 0;
@@ -68,7 +75,7 @@ uint64_t dts=0;
     f/=1000;
     lastDts=dts;
     *nbSample=(uint32_t)(f+0.5);
-
+    *odts=dts;
 }
 /**
         \fn getExtraData
@@ -79,13 +86,30 @@ bool         ADM_audioStream::getExtraData(uint32_t *l, uint8_t **d)
     return access->getExtraData(l,d);
 }
 /**
+        \fn advanceDts
+*/
+bool    ADM_audioStream::advanceDts(uint32_t samples)
+{
+        float f=samples*1000;
+            f/=wavHeader.frequency;
+            f*=1000;
+            lastDts+=f;
+        return true;
+}
+/**
                 Create the appropriate audio stream
 */
 ADM_audioStream  *ADM_audioCreateStream(WAVHeader *wavheader, ADM_audioAccess *access)
 {
 uint8_t *data;
 uint32_t size;
-    return new ADM_audioStream(wavheader,access);
+    switch(wavheader->encoding)
+    {
+        case WAV_MP3:
+            return new ADM_audioStreamMP3(wavheader,access);
+        default:
+            return new ADM_audioStream(wavheader,access);
+    }
 
 }
 // EOF

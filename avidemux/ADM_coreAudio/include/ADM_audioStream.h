@@ -34,6 +34,8 @@ protected:
 public:
                                   ADM_audioAccess() {extraData=NULL;extraDataLen=0;}
                 virtual           ~ADM_audioAccess() {}
+                                    /// Hint, the stream is pure CBR (AC3,MP2,MP3)
+                virtual bool      isCBR(void) { return true;}
                                     /// Return true if the demuxer can seek in time
                 virtual bool      canSeekTime(void) {return false;};
                                     /// Return true if the demuxer can seek by offser
@@ -76,15 +78,17 @@ class ADM_audioStream
                        uint64_t                 position;
                        uint64_t                 lastDts;
                        uint64_t                 durationInUs;
+    /// increment DTS by samples
+                       bool                     advanceDts(uint32_t samples);
         public:
 /// Default constructor
                        ADM_audioStream(WAVHeader *header,ADM_audioAccess *access);  
 /// Returns wavheader
 virtual                 WAVHeader                *getInfo(void) {return &wavHeader;}
 ///  Get a packet
-virtual uint8_t         getPacket(uint8_t *buffer,uint32_t *size, uint32_t sizeMax,uint32_t *nbSample);
+virtual uint8_t         getPacket(uint8_t *buffer,uint32_t *size, uint32_t sizeMax,uint32_t *nbSample,uint64_t *dts);
 /// Go to a given time, in microseconds
-virtual uint8_t         goToTime(uint64_t nbUs);
+virtual bool            goToTime(uint64_t nbUs);
 /// Returns current time in us. Not used.
 //virtual uint8_t         getTime(uint64_t *nbUs);
 /// Returns extra configuration data

@@ -343,7 +343,7 @@ uint32_t tim;
 			sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
 			gtk_label_set_text(GTK_LABEL(WID(label_elapsed)),string);
 
-			gtk_label_set_text(GTK_LABEL(WID(label_eta)), ms2timedisplay((uint32_t) floor(0.5 + deltaTime * framesLeft / deltaFrame)));
+		//	gtk_label_set_text(GTK_LABEL(WID(label_eta)), ms2timedisplay((uint32_t) floor(0.5 + deltaTime * framesLeft / deltaFrame)));
  
            // Check if we should move on to the next sample period
           if (tim >= _nextSampleStartTime + ETA_SAMPLE_PERIOD ) {

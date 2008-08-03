@@ -321,7 +321,7 @@ void ComputePreload(void)
     db = curframe * 1000.;	// ms
     db *= 1000.;		// fps is 1000 time too big
     db /= avifileinfo->fps1000;
-    printf(".. Offset ...%ld ms\n", (uint32_t) floor(db + 0.49));
+    printf(".. Offset ...%ld ms\n", (uint64_t) floor(db + 0.49));
     //      currentaudiostream->goToTime( (uint32_t)floor(db+0.49));        
 
     playback = buildPlaybackFilter(currentaudiostream,(uint32_t) (db + 0.49), 0xffffffff);

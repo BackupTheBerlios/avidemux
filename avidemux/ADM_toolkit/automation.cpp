@@ -132,13 +132,13 @@ typedef	void (*two_arg_type)(char *arg,char *otherarg);
 typedef	void (*three_arg_type)(char *arg,char *otherarg,char *yetother);
 //_________________________________________________________________________
 
-typedef struct AUTOMATON
+typedef struct 
 {
           const char    *string;
           uint8_t       have_arg;
           const char    *help_string;
           one_arg_type callback;
-};
+}AUTOMATON;
 //_________________________________________________________________________
 
 AUTOMATON reaction_table[]=

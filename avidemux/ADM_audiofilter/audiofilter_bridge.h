@@ -18,17 +18,17 @@
 #include "audioencoder.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audioStream.h"
-
+#include "../ADM_editor/ADM_edit.hxx"
 class AUDMAudioFilter_Bridge : public AUDMAudioFilter
 {
   protected:
-    ADM_audioStream *_incoming;
+    ADM_Composer  *_incoming;
     uint32_t _startTime; /*< Starting time in ms */
     int32_t  _shift;  /*< Shift in Ms */
     int32_t  _hold;   /*< Nb Sample to repeat */
     virtual uint8_t fillIncomingBuffer(AUD_Status *status);
   public:
-    AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,ADM_audioStream *incoming, uint32_t startInMs,int32_t shiftMS);
+    AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,ADM_Composer *incoming, uint32_t startInMs,int32_t shiftMS);
     virtual                ~AUDMAudioFilter_Bridge();
     virtual    uint32_t   fill(uint32_t max,float *output,AUD_Status *status);      // Fill buffer: incoming -> us
                                                                                            // Output MAXIMUM max float value

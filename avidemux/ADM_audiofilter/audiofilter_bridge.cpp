@@ -24,7 +24,7 @@
 #include "ADM_osSupport/ADM_debug.h"
 
 
-AUDMAudioFilter_Bridge::AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,ADM_audioStream *incoming,
+AUDMAudioFilter_Bridge::AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,ADM_Composer *incoming,
                           uint32_t startInMs,int32_t shiftMs) : AUDMAudioFilter(NULL)
 {
   _incoming=incoming;
@@ -36,16 +36,7 @@ AUDMAudioFilter_Bridge::AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,ADM_aud
   rewind();
   /*  */
   WAVHeader *hdr=incoming->getInfo();
-  /*
-  if(hdr->byterate)
-  {
-      duration/=hdr->byterate;
-      duration*=hdr->frequency*hdr->channels;
-      _length=(uint32_t)floor(duration);
-  }else
-    _length=0xFFFF0000;
-  */
-  /*  */
+
   printf("[Bridge] Starting with time %u, shift %d\n",startInMs,-shiftMs);
   // If shiftMS is > 0, it means we have to go in the future, just increse _startTime
   if(shiftMs>0)
@@ -81,19 +72,18 @@ AUDMAudioFilter_Bridge::~AUDMAudioFilter_Bridge()
 {
   printf("[Bridge] Destroying bridge\n");
 }
+/**
+    \fn rewind
+*/
 uint8_t AUDMAudioFilter_Bridge::rewind(void)
 {
+uint64_t ttime=_startTime;
+  ttime*=1000; // ms->us
   printf("[Bridge] Going to time %d\n",_startTime);
-
-  return _incoming->goToTime(_startTime);
+  return _incoming->goToTime(ttime);
 }
 uint32_t   AUDMAudioFilter_Bridge::fill(uint32_t max,float *output,AUD_Status *status)
 {
-#if 0
-  *status=AUD_OK;
-  return  _incoming->readDecompress(max, output);
-   
-#else
   uint32_t asked,asked2,total=0;
   //
   ADM_assert(_tail>=_head);
@@ -115,12 +105,13 @@ uint32_t   AUDMAudioFilter_Bridge::fill(uint32_t max,float *output,AUD_Status *s
   }
 
   return available;
-#endif
+
 }
 
 uint8_t AUDMAudioFilter_Bridge::fillIncomingBuffer(AUD_Status *status)
 {
   uint32_t asked;
+  uint64_t dts;
   *status=AUD_OK;
   // Hysteresis
   if((_tail-_head)<(AUD_PROCESS_BUFFER_SIZE>>2)) // Less than 1/4 full
@@ -140,8 +131,8 @@ uint8_t AUDMAudioFilter_Bridge::fillIncomingBuffer(AUD_Status *status)
         if(asked>sam) asked=sam;
         
       }
-//      asked = _incoming->readDecompress(asked, &(_incomingBuffer[_tail]));
 
+      _incoming->getPCMPacket(&(_incomingBuffer[_tail]), asked, &asked,&dts);
       if (!asked )
       {
         *status=AUD_END_OF_STREAM;

@@ -82,12 +82,13 @@ AVDMProcessAudio_RawShift::~AVDMProcessAudio_RawShift()
 uint8_t	 AVDMProcessAudio_RawShift::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
         uint8_t r;
+        uint64_t dts;
                 
                 if(!_hold)
-                        return _instream->getPacket(dest,len,64*1024,samples); // BAZOOKA
+                        return _instream->getPacket(dest,len,64*1024,samples,&dts); // BAZOOKA
 
                 // filter is still on
-                r=_instream->getPacket(dest,len,64*1024,samples); // BAZOOKA
+                r=_instream->getPacket(dest,len,64*1024,samples,&dts); // BAZOOKA
 
 
                 if(!r)

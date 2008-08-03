@@ -60,10 +60,10 @@ static double aspectRatio[2][3]={
                                                                 {1.,1.066667,1.43} // PAL  1:1 4:3 16:9
                                                         };
 
-typedef struct targetFmt
+typedef struct 
 {
         int x1,x2,y1,y2;
-};
+}targetFmt;
 
 
 static targetFmt VCD={352, 352, 288, 240};

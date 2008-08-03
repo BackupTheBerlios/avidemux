@@ -354,7 +354,7 @@ uint32_t tim;
 			snprintf(string,79,"%02d:%02d:%02d",hh,mm,ss);
 			WIDGET(labelElapsed)->setText(string);
 
-            WIDGET(labelETA)->setText(ms2timedisplay((uint32_t) floor(0.5 + deltaTime * framesLeft / deltaFrame)));
+//            WIDGET(labelETA)->setText(ms2timedisplay((uint32_t) floor(0.5 + deltaTime * framesLeft / deltaFrame)));
   
            // Check if we should move on to the next sample period
           if (tim >= _nextSampleStartTime + ETA_SAMPLE_PERIOD ) {

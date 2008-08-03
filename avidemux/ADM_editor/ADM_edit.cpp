@@ -78,7 +78,8 @@ const char *VBR_MSG = QT_TR_NOOP("Avidemux detected VBR MP3 audio in this file. 
 ADM_Composer::ADM_Composer (void) : ADM_audioStream(NULL,NULL)
 {
 uint32_t type,value;
-
+   audioBufferStart=0;
+   audioBufferEnd=0;
   _nb_segment = 0;
   _nb_video = 0;
   _total_frames = 0;

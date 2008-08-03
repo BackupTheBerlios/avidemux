@@ -40,186 +40,56 @@
 
 extern char* ms2timedisplay(uint32_t ms);
 /**
-    \fn getPacket
-    \brief Get audio packet
+    \fn     getPCMPacket
+    \brief  Get audio packet
 
 */
 
-uint8_t ADM_Composer::getPacket(uint8_t *dest, uint32_t *len,uint32_t sizeMax, uint32_t *samples)
+uint8_t ADM_Composer::getPCMPacket(float  *dest, uint32_t sizeMax, uint32_t *samples,uint64_t *odts)
 {
-uint8_t r;	
-uint32_t ref; 
-_VIDEOS *currentVideo;
-	currentVideo=&_videos[AUDIOSEG];
-	
-	if(_audioSample<_segments[_audioseg]._audio_duration)
-	{
-                if( !currentVideo->_audiostream)
-                {
-                        printf("No soundtrack");        
-                        *len=0;
-                        *samples=0;
-                        return 0;
-                }
-		r=currentVideo->_audiostream->getPacket(dest,len,sizeMax,samples); 
-		if(r)
-		{
-			// ok we update the current sample count and go on
-			_audioSample+=*samples;
-			return r;		
-		}
-		// could not get the cound, rewind and retry
-		printf("EditorPacket:Read failed; retrying (were at seg %u"   ,_audioseg);
-                printf("sample %u\n",_audioSample); // FIXME use proper stuff
-                printf("/ %d)\n",_segments[_audioseg]._audio_duration);
-		if(_audioseg == (_nb_segment - 1))
-		{		
-			printf("EditorPacket : End of *last* stream\n");
-			return 0;
-		}
-                // If we get here, it means we have less audio that it should   
-                // In the current segment. Generally we repeat the segment
-                // Except if the missing data is less than 20 ms, we will compensate later
-                float drift;
-
-                drift=(float)_segments[_audioseg]._audio_duration;
-                drift-=(float)_audioSample;
-                drift/=(float)currentVideo->_audiostream->getInfo()->frequency;
-                drift*=1000.;
-                printf("Seg :%u, Drop %3.3f ms\n",_audioseg,drift);
-                if(drift>10.)
-                {
-                        printf("Drop too high, filling...\n");
-                        currentVideo->_audiostream->goToTime(0);
-                        r=currentVideo->_audiostream->getPacket(dest,len,sizeMax,samples); 
-                        if(r)
-                        {
-                                printf("Filled with data from beginning (%u bytes %u samples)\n",*len,*samples);
-                                // read it again sam
-                                _audioSample+=*samples;
-                        }
-                        return r;
-                }
-	}
-	// We have to switch seg
-	// We may have overshot a bit, but...
-	
-	// this is the end ?
-	if(_audioseg == (_nb_segment - 1))
-	{
-		
-		printf("EditorPacket : End of stream Segment :%u/%u \n",_audioseg,_nb_segment);
-                printf("This sample : %u (%s) ",_audioSample,ms2timedisplay(1000*_audioSample/currentVideo->_audiostream->getInfo()->frequency));
-                printf("total :%u (%s)\n" ,_segments[_audioseg]._audio_duration,ms2timedisplay(1000*_segments[_audioseg]._audio_duration/currentVideo->_audiostream->getInfo()->frequency));
-		return 0;
-	}
-	// switch segment
-	// We adjust the audiosample to avoid adding cumulative shift
-        uint8_t ret;
-        int64_t adjust=_audioSample-=_segments[_audioseg]._audio_duration;
-
-        if(adjust>0) _audioSample=adjust;
-	       else  _audioSample=0;
-	_audioseg++;
-	// Next audio seg has audio ?
-        
-	// Compute new start time
-	uint32_t starttime;
-	if(!_videos[AUDIOSEG]._audiostream)
-        {
-                printf("No soundtrack\n");
-                *len=0;
-                *samples=0;
-               // _audioseg--; // Stay in a valid one to avoid crash later
-                return 0;
-        }
-	starttime= _videos[AUDIOSEG]._aviheader->getTime (_segments[_audioseg]._start_frame);
-	_videos[AUDIOSEG]._audiostream->goToTime(starttime);	
-	 // Fresh start samuel
-	printf("EditorPacket : switching to segment %lu\n",_audioseg);
-	ret= getPacket(dest, len,sizeMax, samples);
-        if(adjust<0)
-        {
-                adjust=-adjust;
-                if(adjust>_audioSample) _audioSample=0;
-                else _audioSample-=adjust;
-        }
-        return ret;
+uint32_t nbSamples;
+uint64_t dts;
+uint32_t inSize,nbOut;
+    if(!_videos[0]._audiostream) return 0;
+    // Read a packet from stream 0
+    if(!_videos[0]._audiostream->getPacket(audioBuffer,&inSize,ADM_EDITOR_AUDIO_BUFFER_SIZE,&nbSamples,&dts))
+    {
+            adm_printf(ADM_PRINT_ERROR,"[Composer::getPCMPacket] Read failed\n");
+            return 0;
+    }
+    // Call codec...
+    if(!_videos[0]._audioCodec->run(audioBuffer, inSize, dest, &nbOut))
+    {
+            adm_printf(ADM_PRINT_ERROR,"[Composer::getPCMPacket] codec failed failed\n");
+            return 0;
+    }
+    // Update infos
+    *samples=nbOut;
+    *odts=dts;
+    return 1;
+}
+/**
+        \fn getPacket
+        \brief
+*/
+uint8_t ADM_Composer::getPacket(uint8_t  *dest, uint32_t *len,uint32_t sizeMax, uint32_t *samples,uint64_t *odts)
+{
+    if(!_videos[0]._audiostream) return 0;
+    // Read a packet from stream 0
+     return _videos[0]._audiostream->getPacket(dest,len,sizeMax,samples,odts);
+    
 }
 /**
     \fn goToTime
-    \brief Audio Seek
+    \brief Audio Seek in ms
 
 */
-uint8_t ADM_Composer::goToTime (uint64_t mstime)
+bool ADM_Composer::goToTime (uint64_t ustime)
 {
-
-  uint32_t	    cumul_offset =    0;
-  uint32_t      frames =    0,    fi =    0;
-  aviInfo       info;
-  uint64_t      sample;
-  double        fn;
-
-  getVideoInfo (&info);
- // audioFlushPacket();
-  
-  fn = mstime;
-  fn = fn * info.fps1000;
-  fn /= 1000000.;
-
-  fi = (uint32_t) floor (fn);
-
-  aprintf (" Editor audio GOTOtime : %lu ms\n", mstime);
-  aprintf (" Editor audio frame eq: %lu \n", fi);
-
-  // now we have virtual frame number, convert to seg & real frame
-  uint32_t    seg,    relframe;
-
-  if (!convFrame2Seg (fi, &seg, &relframe))
-    return 0;
-
-  aprintf (" Editor audio seg : %lu frame %ld\n", seg, relframe);
-  // compute position from previous seg
-  if (seg)
-    {
-      for (uint32_t i = 0; i < seg; i++)
-	{
-	  cumul_offset += _segments[i]._audio_size;
-	  frames += _segments[i]._nb_frames;
-	}
-    }
-  // compute start frame time
-  uint32_t    time_start,    time_masked,    jump;
-
-  time_masked = getTime (frames);
-  time_start = getTime (_segments[seg]._start_frame);
-
-  jump = mstime - time_masked;
-  jump = jump + time_start;
-
-  aprintf (" Editor audio time start   : %lu\n", time_start);
-  aprintf (" Editor audio time masked  : %lu\n", time_masked);
-  aprintf (" Editor audio time jump    : %lu\n", jump);
-  aprintf (" Editor audio seg          : %lu\n", seg);
-
-  _audioseg = seg;
-/* BAZOOKA
-  _videos[AUDIOSEG]._audiostream->goToTime (jump);
-  _audiooffset = _videos[AUDIOSEG]._audiostream->getPos ();
-  *off = cumul_offset + _videos[AUDIOSEG]._audiostream->getPos ()
-    - _segments[seg]._audio_start;
-    
-  // Get current duration
-  // To compute how much is left in current segment
-  
-  float duration;
-  	duration=mstime-time_masked; // Time left in current seg	
-	duration/=1000;		    // how much we are in the current seg in second
-	duration*=_videos[AUDIOSEG]._audiostream->getInfo()->frequency;
-   _audioSample=(uint64_t)floor(duration);
-   aprintf("Editor audio : we are at %llu in seg which has %llu sample\n",_audioSample,_segments[_audioseg]._audio_duration);
-*/
-  return 1;
+    printf("[Editor] go to time %02.2f secs\n",((float)ustime)/1000000.);
+    if(!_videos[0]._audiostream) return false;
+    return _videos[0]._audiostream->goToTime(ustime);
+ 
 }
 #if 0
 /*

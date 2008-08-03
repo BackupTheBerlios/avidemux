@@ -132,7 +132,7 @@ uint8_t DIA_working::update(uint32_t percent)
 	sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
 	gtk_label_set_text(GTK_LABEL(WID(labelElapsed)),string);
 
-	gtk_label_set_text(GTK_LABEL(lookup_widget(dialog,"labelRemaining")), ms2timedisplay((uint32_t) floor(((elapsed * 100.) / percent) - elapsed)));
+//	gtk_label_set_text(GTK_LABEL(lookup_widget(dialog,"labelRemaining")), ms2timedisplay((uint32_t) floor(((elapsed * 100.) / percent) - elapsed)));
 	gtk_progress_set_percentage(GTK_PROGRESS(lookup_widget(dialog,"progressbar1")),(gfloat)(percent / 100.));
 
 	sprintf(string, QT_TR_NOOP("%d%%"), percent);

@@ -1161,6 +1161,7 @@ A_saveAudio (char *name)
 // debug audio seek
   uint32_t len2;
   uint32_t written, max;
+  uint64_t dts;
   DIA_working *work;
   FILE *out;
 
@@ -1202,7 +1203,7 @@ A_saveAudio (char *name)
    buffer=new uint8_t[ONE_STRIKE*2];
    while (1)
     {
-    	if(!currentaudiostream->getPacket(buffer+hold,&len,64*1024,&sample)) break;
+    	if(!currentaudiostream->getPacket(buffer+hold,&len,64*1024,&sample,&dts)) break;
 	hold+=len;
 	written+=len;
 	cur_sample+=sample;

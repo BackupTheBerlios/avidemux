@@ -62,11 +62,11 @@ static const externalSource Sources[]=
         {AudioAC3,"AC3"},
         {AudioNone,"NONE"}
 };
-typedef struct Mixer_String
+typedef struct 
 {
   const char         *name;
   CHANNEL_CONF conf;
-};
+}Mixer_String;
 
 #define DOME(x) {#x,CHANNEL_##x}
 static Mixer_String Mixer_strings[]=

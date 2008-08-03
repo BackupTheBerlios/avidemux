@@ -35,10 +35,13 @@
  #include "../ADM_editor/ADM_edCache.h"
  #include "ADM_pp.h"
  #include "ADM_colorspace.h"
-#include "ADM_audioStream.h"
+
+ #include "ADM_audioStream.h"
  
 #define MAX_SEG  	100 // Should be enougth
 #define MAX_VIDEO   100
+
+#define ADM_EDITOR_AUDIO_BUFFER_SIZE (128*1024)
 typedef enum
 {
 		Unknown_FileType=0,
@@ -86,6 +89,9 @@ typedef struct
 
 	uint32_t  							_audio_size;
 	uint64_t							_audio_duration; //! IN SAMPLE
+
+
+
 	ADM_audioStream      				*_audiostream;
 	uint8_t								_isAudioVbr;
 	WAVHeader							*_wavheader;
@@ -115,6 +121,11 @@ typedef struct
 class ADM_Composer : public ADM_audioStream
 {
   private:
+
+    uint8_t                             audioBuffer[ADM_EDITOR_AUDIO_BUFFER_SIZE];
+    uint32_t                            audioBufferStart;
+    uint32_t                            audioBufferEnd;
+
                     uint8_t dupe(ADMImage *src,ADMImage *dst,_VIDEOS *vid); 
                                                             // Duplicate img, do colorspace
                                                             // if needed
@@ -224,8 +235,9 @@ class ADM_Composer : public ADM_audioStream
 					//______________________________
   
         
-virtual uint8_t         getPacket(uint8_t *buffer,uint32_t *size, uint32_t sizeMax,uint32_t *nbSample);
-virtual uint8_t         goToTime(uint64_t nbUs);
+virtual uint8_t         getPacket(uint8_t *buffer,uint32_t *size, uint32_t sizeMax,uint32_t *nbSample,uint64_t *dts);
+        uint8_t         getPCMPacket(float  *dest, uint32_t sizeMax, uint32_t *samples,uint64_t *odts);
+virtual bool            goToTime(uint64_t nbUs);
         bool            getExtraData(uint32_t *l, uint8_t **d);
         uint64_t        getDurationInUs(void) {return durationInUs;}
         uint8_t			getAudioStream(ADM_audioStream **audio);

@@ -79,7 +79,7 @@ uint8_t DIA_working::update(uint32_t percent)
 		sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
 
         workWindow *wind=(workWindow *)_priv; ADM_assert(wind);
-        wind->ui.labelTimeLeft->setText(ms2timedisplay((uint32_t) floor(((elapsed * 100.) / percent) - elapsed)));
+//        wind->ui.labelTimeLeft->setText(ms2timedisplay((uint32_t) floor(((elapsed * 100.) / percent) - elapsed)));
 		wind->ui.labelElapsed->setText(string);
         wind->ui.progressBar->setValue(percent);
        

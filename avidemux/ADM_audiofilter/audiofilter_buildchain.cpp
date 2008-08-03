@@ -28,6 +28,8 @@
 #include "audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_audiofilter/audio_raw.h"
+#include "ADM_editor/ADM_edit.hxx"
+extern ADM_Composer *video_body;
 
 /* ************* Encoder *********** */
 
@@ -109,7 +111,7 @@ AUDMAudioFilter *buildInternalAudioFilter(ADM_audioStream *currentaudiostream,ui
   int32_t timeShiftMs=audioDelay*audioShift;
   
   
-  firstFilter = new AUDMAudioFilter_Bridge(NULL,currentaudiostream, starttime,timeShiftMs);
+  firstFilter = new AUDMAudioFilter_Bridge(NULL,video_body, starttime,timeShiftMs);
   filtercount = 0;
   lastFilter = firstFilter;
   filtersFloat[filtercount++] = firstFilter;
@@ -191,30 +193,29 @@ AUDMAudioFilter *buildInternalAudioFilter(ADM_audioStream *currentaudiostream,ui
 
     return lastFilter;
 }
-/*
-*******************************************************************************************************************
+/**
 
-*******************************************************************************************************************
+    \fn buildPlaybackFilter
+    \brief Warning : starttime is in ms, not us!
 */
 AUDMAudioFilter *buildPlaybackFilter(ADM_audioStream *currentaudiostream, uint32_t starttime, uint32_t duration)
 {
   AUDMAudioFilter *lastFilter=NULL;
   int32_t sstart;
   uint32_t channels;
-
         // Do we need to go back
   sstart=(int32_t)starttime;
   int32_t timeShiftMs=audioDelay*audioShift;
         
 //  deleteAudioFilter(NULL);
   
-  lastFilter = new AUDMAudioFilter_Bridge(NULL,currentaudiostream,sstart,timeShiftMs);
+  lastFilter = new AUDMAudioFilter_Bridge(NULL,video_body,sstart,timeShiftMs);
         filtercount = 0;
         filtersFloat[filtercount++] = lastFilter;
         
         
         // Downmix for local playback ?
-        
+#if 0        
         uint32_t downmix;
         
         if(prefs->get(DOWNMIXING_PROLOGIC,&downmix)!=RC_OK)
@@ -246,6 +247,7 @@ AUDMAudioFilter *buildPlaybackFilter(ADM_audioStream *currentaudiostream, uint32
           lastFilter = mixer;
           filtersFloat[filtercount++] = lastFilter;
         }	
+#endif
         return lastFilter;
 }
 /*
