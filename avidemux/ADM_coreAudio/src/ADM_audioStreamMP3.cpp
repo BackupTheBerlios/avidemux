@@ -2,6 +2,8 @@
     \file ADM_audioStream
     \brief Base class
 
+(C) Mean 2008
+GPL-v2
 */
 #include "ADM_default.h"
 #include "ADM_audioStreamMP3.h"
@@ -14,7 +16,7 @@
 ADM_audioStreamMP3::ADM_audioStreamMP3(WAVHeader *header,ADM_audioAccess *access) : ADM_audioStreamBuffered(header,access)
 {
     // If hinted..., compute the duration ourselves
-    if(access->isCBR()==true)
+    if(access->isCBR()==true && access->canSeekOffset()==true)
     {
         // We can compute the duration from the length
         float size=access->getLength();
@@ -22,13 +24,17 @@ ADM_audioStreamMP3::ADM_audioStreamMP3(WAVHeader *header,ADM_audioAccess *access
               size*=1000;
               size*=1000; // s->us
               durationInUs=(uint64_t)size;
+              return;
     }
     // and built vbr map if needed
+    // The 2 conditions below means there is no gap i.e. avi style stream
+    // else not needed
     if(access->isCBR()==false && access->canSeekTime()==false)
     {
         ADM_assert(access->canSeekOffset()==true);
         buildTimeMap();
     }
+
 }
 
 /**
@@ -72,7 +78,7 @@ MpegAudioInfo info;
 uint32_t offset;
     while(1)
     {
-        // Do we have sync ?
+        // Do we have enough ? Refill if needed ?
         if(needBytes(ADM_LOOK_AHEAD)==false) return 0;
         // Peek
         peek(ADM_LOOK_AHEAD,data);
@@ -96,6 +102,8 @@ uint32_t offset;
 }
 /**
     \fn buildTimeMap
+    \brief Build a timeMap i.e. the table making the relation between offset and time
+           it is only used for VBR with offset access, time access does not it it 
 
 */
 bool ADM_audioStreamMP3::buildTimeMap(void)
