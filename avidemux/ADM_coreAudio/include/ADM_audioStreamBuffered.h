@@ -30,6 +30,7 @@ class ADM_audioStreamBuffered : public ADM_audioStream
                        uint8_t  buffer[2*ADM_AUDIOSTREAM_BUFFER_SIZE];
                        uint32_t limit;
                        uint32_t start;
+                       void     rewind(void) {limit=start=0;lastDts=0;}
             
         public:
 

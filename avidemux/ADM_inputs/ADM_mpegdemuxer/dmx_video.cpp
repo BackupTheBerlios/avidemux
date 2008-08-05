@@ -55,7 +55,7 @@ dmxHeader::dmxHeader  (void)
         _nbGop=0;
 
         _index=NULL;
-        _audioStream=NULL;
+        _audioAccess=NULL;
         _fieldEncoded=0;
         demuxer=NULL;
 }
@@ -66,7 +66,7 @@ dmxHeader::~dmxHeader  ()
 {
        
         close();
-        _audioStream=NULL; // Will be destroyed by audio!
+        _audioAccess=NULL; // Will be destroyed by audio!
 }
 uint8_t            dmxHeader::getRaw(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)
 {
@@ -127,7 +127,7 @@ uint8_t                 dmxHeader::close(void)
 
 WAVHeader *dmxHeader::getAudioInfo(void )
 {
-        if(_audioStream) return _audioStream->getInfo();
+        //if(_audioStream) return _audioStream->getInfo();
                  return NULL;
 
 }
@@ -136,11 +136,13 @@ WAVHeader *dmxHeader::getAudioInfo(void )
 
 uint8_t                 dmxHeader::getAudioStream(AVDMGenericAudioStream **audio)
 {
+#if 0
         if(_audioStream)
         {
                 *audio=_audioStream;
                 return 1;
         }
+#endif
                 *audio=NULL;
                 return 0;
 
@@ -296,7 +298,7 @@ char *start;
                                   MPEG_TRACK track;
                                   track.pid=vTsId;
                                   track.pes=vPid;
-                                  demuxer=new dmx_demuxerMSDVR(1,&track,0);
+                          //        demuxer=new dmx_demuxerMSDVR(1,&track,0);
                                   break;
                                 }
                         case 'T' :
@@ -537,6 +539,7 @@ char *start;
                         {
                                 // We have potentially some audio
                                 // Try to get it
+#if 0
                                 dmxAudioStream *tmp;
                                 tmp=new dmxAudioStream;
                                 if(!tmp->open(name)) delete tmp;
@@ -544,7 +547,7 @@ char *start;
                                 {
                                         _audioStream=tmp;
                                 }
-
+#endif
                         }
                         
      printf("Mpeg index file successfully read\n");         
@@ -675,16 +678,19 @@ dmxIndex *idx;
 /*********************************/
  uint8_t  dmxHeader::changeAudioStream(uint32_t newstream)
 {
-  ADM_assert(_audioStream);
-  return _audioStream->changeAudioTrack(newstream);
+//  ADM_assert(_audioStream);
+//  return _audioStream->changeAudioTrack(newstream);
+    return false;
 }
 uint32_t  dmxHeader::getCurrentAudioStreamNumber(void)
 {
-  if(!_audioStream) return 0;
-  return _audioStream->currentTrack;
+//  if(!_audioStream) return 0;
+ // return _audioStream->currentTrack;
+    return 0;
 }
 uint8_t  dmxHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
 {
+#if 0
     if(!_audioStream)
     {
         *nbStreams=0;
@@ -692,6 +698,16 @@ uint8_t  dmxHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
         return 1;
     }
     return _audioStream->getAudioStreamsInfo(nbStreams,infos);
+#endif
+    return 0;
 }
+/**
+    \fn getAudioStream
+*/
+uint8_t   dmxHeader::getAudioStream(ADM_audioStream  **audio)
+{
+    *audio=NULL;
+    return 1;
 
+}
 // EOF

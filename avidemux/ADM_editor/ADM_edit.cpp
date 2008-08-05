@@ -305,7 +305,7 @@ UNUSED_ARG(mode);
 	}
       OPEN_AS (BMP_FileType, picHeader);
       OPEN_AS (Matroska_FileType, mkvHeader);
-      OPEN_AS (FLV_FileType, flvHeader);
+      
       OPEN_AS (AvsProxy_FileType, avsHeader);
       OPEN_AS (_3GPP_FileType, MP4Header);
       OPEN_AS (Ogg_FileType, oggHeader);
@@ -382,8 +382,14 @@ thisIsMpeg:
       return 0;
     }
 #else // BAZOOKA
-        _videos[_nb_video]._aviheader=new OpenDMLHeader; 
-		ret = _videos[_nb_video]._aviheader->open(name); 			
+switch (type)
+    {
+        OPEN_AS(AVI_FileType,OpenDMLHeader); 
+        OPEN_AS(FLV_FileType,flvHeader);
+        OPEN_AS (NewMpeg_FileType,dmxHeader);
+         
+
+    }
 #endif // BAZOOKA
    // check opening was successful
    if (ret == 0) {

@@ -1,5 +1,5 @@
 /***************************************************************************
-                          ADM_audioStream.h  -  description
+                          ADM_audioStreamAC3.h  -  description
                              -------------------
     copyright            : (C) 2008 by mean
     email                : fixounet@free.fr
@@ -13,34 +13,25 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifndef ADM_audioStreamMP3_H
-#define ADM_audioStreamMP3_H
+#ifndef ADM_audioStreamAC3_H
+#define ADM_audioStreamAC3_H
 
 #include "ADM_audioStreamBuffered.h"
-#include <vector>
-using namespace std;
 
-typedef struct
-{
-    uint64_t offset;
-    uint64_t timeStamp;
-}MP3_seekPoint;
 
 /**
-        \fn ADM_audioStreamMP3
-        \brief Class to handle MP3/MP3 streams
+        \fn ADM_audioStreamAC3
+        \brief Class to handle AC3/AC3 streams
 
 */
-class ADM_audioStreamMP3 : public ADM_audioStreamBuffered
+class ADM_audioStreamAC3 : public ADM_audioStreamBuffered
 {
         protected:
-                      vector <MP3_seekPoint *> seekPoints;
-        bool            buildTimeMap(void);
         public:
 /// Default constructor
-                       ADM_audioStreamMP3(WAVHeader *header,ADM_audioAccess *access);  
+                       ADM_audioStreamAC3(WAVHeader *header,ADM_audioAccess *access);  
 /// Destructor
-virtual                 ~ADM_audioStreamMP3();
+virtual                 ~ADM_audioStreamAC3();
 ///  Get a packet
 virtual uint8_t         getPacket(uint8_t *buffer,uint32_t *size, uint32_t sizeMax,
                                 uint32_t *nbSample,uint64_t *dts);

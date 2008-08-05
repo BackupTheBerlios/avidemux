@@ -13,21 +13,19 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-#include <math.h>
+
 #include "ADM_default.h"
 #include "ADM_editor/ADM_Video.h"
-#include "ADM_assert.h"
-
 #include "fourcc.h"
 #include "DIA_coreToolkit.h"
 
 #include "ADM_flv.h"
 
+#include <math.h>
+
 // Borrowed from lavformt/flv.h
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavformat/flv.h"
 // Borrowed from lavformt/flv.h    
-
 uint32_t ADM_UsecFromFps1000(uint32_t fps1000);
 extern uint8_t extractH263FLVInfo(uint8_t *buffer,uint32_t len,uint32_t *w,uint32_t *h);
 /**
@@ -217,15 +215,15 @@ uint8_t flvHeader::open(const char *name)
    _videostream.dwLength= _mainaviheader.dwTotalFrames=videoTrack->_nbIndex; 
    // Compute average fps
         float f=_videostream.dwLength;
-        uint32_t duration=videoTrack->_index[videoTrack->_nbIndex-1].timeCode;
+        uint64_t duration=videoTrack->_index[videoTrack->_nbIndex-1].timeCodeUs;
           
         if(duration) 
-              f=1000.*1000.*f/duration;
+              f=1000.*1000.*1000.*f/duration;
          else  f=25000;
         _videostream.dwRate=(uint32_t)floor(f);
         _videostream.dwScale=1000;
         _mainaviheader.dwMicroSecPerFrame=ADM_UsecFromFps1000(_videostream.dwRate);
-   printf("[FLV] Duration %u ms\n",videoTrack->_index[videoTrack->_nbIndex-1].timeCode);
+   printf("[FLV] Duration %u ms\n",videoTrack->_index[videoTrack->_nbIndex-1].timeCodeUs/1000);
            
    //
     _videostream.fccType=fourCC::get((uint8_t *)"vids");
@@ -235,10 +233,16 @@ uint8_t flvHeader::open(const char *name)
     videoTrack->_index[0].flags=AVI_KEY_FRAME;
     
     // audio track
-	if(_isaudiopresent)
-		_audioStream = new flvAudio(name, audioTrack, &wavHeader);
-	else
-		_audioStream = NULL;
+    if(_isaudiopresent)
+    {
+        ADM_flvAccess *access=new ADM_flvAccess(name,audioTrack);
+        _audioStream=ADM_audioCreateStream(&wavHeader,access);
+    }
+    else
+    {
+        _audioStream = NULL;
+       access=NULL;
+    }
 
   printf("[FLV]FLV successfully read\n");
   
@@ -341,7 +345,7 @@ uint8_t flvHeader::insertVideo(uint32_t pos,uint32_t size,uint32_t frameType,uin
     flvIndex *x=&(videoTrack->_index[videoTrack->_nbIndex]);
     x->size=size;
     x->pos=pos;
-    x->timeCode=pts;
+    x->timeCodeUs=pts*1000LL;
     if(frameType==1) 
     {
         x->flags=AVI_KEY_FRAME;
@@ -363,7 +367,7 @@ uint8_t flvHeader::insertAudio(uint32_t pos,uint32_t size,uint32_t pts)
     flvIndex *x=&(audioTrack->_index[audioTrack->_nbIndex]);
     x->size=size;
     x->pos=pos;
-    x->timeCode=pts;
+    x->timeCodeUs=pts*1000LL;
     x->flags=0;
     audioTrack->_nbIndex++;
     return 1;
@@ -383,7 +387,7 @@ WAVHeader *flvHeader::getAudioInfo(void )
     __________________________________________________________
 */
 
-uint8_t flvHeader::getAudioStream(AVDMGenericAudioStream **audio)
+uint8_t flvHeader::getAudioStream(ADM_audioStream **audio)
 {
   if(_isaudiopresent)
   {
@@ -412,12 +416,13 @@ uint8_t flvHeader::close(void)
   if(audioTrack) delete audioTrack;
   if(_fd) fclose(_fd);
   if(_audioStream) delete _audioStream;
-  
+  if(access) delete access;
   _fd=NULL;
   _filename=NULL;
   videoTrack=NULL;
   audioTrack=NULL;
   _audioStream=NULL;
+  access=NULL;
 }
 /*
     __________________________________________________________
@@ -425,11 +430,13 @@ uint8_t flvHeader::close(void)
 
  flvHeader::flvHeader( void ) : vidHeader()
 { 
+    
     _fd=NULL;
     _filename=NULL;
     videoTrack=NULL;
     audioTrack=NULL;
     _audioStream=NULL;
+    access=NULL;
     memset(&wavHeader,0,sizeof(wavHeader));
     
 }
@@ -499,13 +506,7 @@ uint8_t  flvHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
                 *data=NULL; //_tracks[0].extraData;
                 return 1;            
 }
-/*
-    __________________________________________________________
-*/
-uint8_t  flvHeader::changeAudioStream(uint32_t newstream)
-{
-    return 0;
-}
+
 /**
       \fn getFrameSize
       \brief return the size of frame frame
@@ -520,14 +521,7 @@ uint8_t flvHeader::getFrameSize (uint32_t frame, uint32_t * size)
   *size = videoTrack->_index[frame].size;
   return 1;
 }
-
-/*
-    __________________________________________________________
-*/
-uint32_t  flvHeader::getCurrentAudioStreamNumber(void)
-{
-  return 0;
-}
+#if 0
 /**
     \fn getAudioStreamsInfo
     \brief returns infos about audio streams (code,...)
@@ -552,4 +546,5 @@ uint8_t  flvHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
     *infos=nfo;
     return 1;
 }
+#endif
 //EOF

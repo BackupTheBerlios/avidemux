@@ -393,7 +393,7 @@ uint8_t AVDMGenericAudioStream::isDecompressable(void)
     if (_wavheader)
       {
 			ADM_assert(_codec);
- 			return _codec->isDecompressable();
+ 			return !_codec->isDummy();
       }
     return 0;
 }

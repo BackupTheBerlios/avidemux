@@ -2,12 +2,17 @@
                           ADMedAVIAUD.cpp  -  description
                              -------------------
 
-    Deals with the audio stream coming from the segment and try to
-    present a uniq stream to ADM_edAudio
-
-    begin                : Sat Mar 16 2002
-    copyright            : (C) 2002 by mean
+    Handle switching from pieces of movie
+    Also fix the gap/overlap in audio to offer a strictly continuous audio stream
+    
+    copyright            : (C) 2008 by mean
     email                : fixounet@free.fr
+
+Todo:
+-----
+        x Fix handling of overlay/gap, it is wrong.
+
+
  ***************************************************************************/
 
 /***************************************************************************
@@ -47,25 +52,79 @@ extern char* ms2timedisplay(uint32_t ms);
 
 uint8_t ADM_Composer::getPCMPacket(float  *dest, uint32_t sizeMax, uint32_t *samples,uint64_t *odts)
 {
-uint32_t nbSamples;
+uint32_t nbSamples,fillerSample=0;   // FIXME : Store & fix the DTS error correctly!!!!
 uint64_t dts;
 uint32_t inSize,nbOut;
+bool drop=false;
+    *samples=0;
     if(!_videos[0]._audiostream) return 0;
+   // if(_videos[0]._audioCodec->isDummy()==true) return 0;
+    // fixme
+    memcpy(&wavHeader,_videos[0]._audiostream->getInfo(),sizeof(wavHeader));
+
     // Read a packet from stream 0
+again:
+    drop=false;
     if(!_videos[0]._audiostream->getPacket(audioBuffer,&inSize,ADM_EDITOR_AUDIO_BUFFER_SIZE,&nbSamples,&dts))
     {
             adm_printf(ADM_PRINT_ERROR,"[Composer::getPCMPacket] Read failed\n");
             return 0;
     }
+    // Check if the Dts matches
+    if(lastDts!=ADM_AUDIO_NO_DTS && dts!=ADM_AUDIO_NO_DTS)
+    {
+        if(abs(lastDts-dts)>5000)
+        {
+        printf("[Composer::getPCMPacket] drift %d, computed :%d got %d\n",(int)(lastDts-dts),lastDts,dts);
+        if(dts<lastDts)
+        {
+            printf("[Composer::getPCMPacket] Dropping packet\n");
+            drop=true;
+        }else 
+        {
+            // Else add filler 
+            // Compute filler size
+            float f=dts-lastDts; // in us
+            f*=wavHeader.frequency;
+            f/=1000000.;
+            // in samples!
+            uint32_t fillerSample=(uint32_t )(f+0.49);
+            uint32_t mx=sizeMax/wavHeader.channels;
+            
+            if(mx<fillerSample) fillerSample=mx;
+            // arbitrary cap, max 4kSample in one go
+            // about 100 ms
+            if(fillerSample>4*1024) 
+            {
+                uint32_t start=fillerSample*sizeof(float)*wavHeader.channels;
+                memset(dest,0,start);
+                advanceDts(fillerSample);
+            }
+            printf("[Composer::getPCMPacket] Adding %u padding samples\n",fillerSample);
+       }
+      }
+    }else
+    // If lastDts is not initialized....
+    if(lastDts==ADM_AUDIO_NO_DTS) lastDts=dts;
     // Call codec...
-    if(!_videos[0]._audioCodec->run(audioBuffer, inSize, dest, &nbOut))
+    if(!_videos[0]._audioCodec->run(audioBuffer+fillerSample*wavHeader.channels, inSize, dest, &nbOut))
     {
             adm_printf(ADM_PRINT_ERROR,"[Composer::getPCMPacket] codec failed failed\n");
             return 0;
     }
+    
+    //
+    //
+    uint32_t decodedSample=nbOut;
+    decodedSample/=wavHeader.channels;
+
+    advanceDts(decodedSample);
+    // This packet has been dropped, try the next one
+    if(drop==true) goto again;
     // Update infos
-    *samples=nbOut;
-    *odts=dts;
+    *samples=(decodedSample+fillerSample);
+    *odts=lastDts;
+    ADM_assert(sizeMax>=(fillerSample+decodedSample)*wavHeader.channels);
     return 1;
 }
 /**

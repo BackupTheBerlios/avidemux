@@ -22,14 +22,14 @@
 
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_audio/aviaudio.hxx"
-
+#include "ADM_audioStream.h"
 
 typedef struct 
 {
-    uint64_t pos;
-    uint32_t size;
+    uint64_t pos;       // Absolute position in bytes
+    uint32_t size;      // Size in bytes
     uint32_t flags;
-    uint32_t timeCode;  // Time code in ms from start
+    uint64_t timeCodeUs;  // Time code in us from start
 }flvIndex;
 //**********************************************
 class flvTrak 
@@ -49,29 +49,36 @@ public:
   uint32_t  _sizeInBytes; // Approximate size in bytes of that stream
   uint32_t  _defaultFrameDuration; // in us!
 };
-
-class flvAudio : public AVDMGenericAudioStream
+/**
+    \fn ADM_flvAccess
+*/
+class ADM_flvAccess : public ADM_audioAccess
 {
-  protected:
-    FILE                        *_fd;
-    flvTrak                     *_track;
-    uint32_t                    _curTimeCode;
-    uint8_t                      goToBlock(uint32_t x);
-    uint32_t                    _curBlock;
-    uint8_t                     getPacket(uint8_t *dest, uint32_t *packlen, uint32_t *samples,uint32_t *timecode);
-  public:
-                                flvAudio(const char *name,flvTrak *track,WAVHeader *hdr);
-                                
-                                
-    virtual                     ~flvAudio();
-    virtual uint32_t            read(uint32_t len,uint8_t *buffer);
-    virtual uint8_t             goTo(uint32_t newoffset);
-            uint8_t	        goToTime(uint32_t mstime);
-    virtual uint8_t             getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
-    
-    virtual uint8_t             extraData(uint32_t *l,uint8_t **d);
-            
+protected:
+                      
+                FILE             *_fd;
+                flvTrak          *_track;
+                uint32_t         currentBlock;
+                bool             goToBlock(uint32_t block);
+                
+public:
+                                  ADM_flvAccess(const char *name,flvTrak *trak); 
+                virtual           ~ADM_flvAccess();
+                                    /// Hint, the stream is pure CBR (AC3,MP2,MP3)
+                virtual bool      isCBR(void) { return true;}
+                                    /// Return true if the demuxer can seek in time
+                virtual bool      canSeekTime(void) {return true;};
+                                    /// Return true if the demuxer can seek by offser
+                virtual bool      canSeekOffset(void) {return false;};
+                                    /// Return true if we can have the audio duration
+                virtual bool      canGetDuration(void) {return true;};
+                                    /// Returns audio duration in us
+                virtual uint64_t  getDurationInUs(void) ;
+                                    /// Go to a given time
+                virtual bool      goToTime(uint64_t timeUs);
+                virtual bool      getPacket(uint8_t *buffer, uint32_t *size, uint32_t maxSize,uint64_t *dts);
 };
+
 
 //*****************************************************
 class flvHeader         :public vidHeader
@@ -83,10 +90,8 @@ class flvHeader         :public vidHeader
     flvTrak                 *videoTrack;
     flvTrak                 *audioTrack;
     WAVHeader               wavHeader;
-    uint8_t                 changeAudioStream(uint32_t newstream);
-    uint32_t                getCurrentAudioStreamNumber(void);
-    uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos);
-    flvAudio                *_audioStream;
+    ADM_audioStream         *_audioStream;
+    ADM_flvAccess           *access;
     /* */
     
     uint8_t     read(uint32_t len, uint8_t *where);
@@ -121,8 +126,8 @@ class flvHeader         :public vidHeader
   //__________________________
 
     virtual   WAVHeader *getAudioInfo(void ) ;
-    virtual uint8_t getAudioStream(AVDMGenericAudioStream **audio);
-
+    
+    virtual uint8_t getAudioStream(ADM_audioStream  **audio);
 
 // Frames
   //__________________________

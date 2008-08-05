@@ -3,7 +3,7 @@
                           Audio mpeg demuxer
                              -------------------
     
-    copyright            : (C) 2005 by mean
+    copyright            : (C) 2008 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -47,9 +47,11 @@
 #define DMX_MIN_AUDIO_DETECTED PROBE_SIZE //we must have at least that bytes to consider the audio as valid
 //___________________________________________________
 //___________________________________________________
+
+
 //___________________________________________________
 //___________________________________________________
-dmxAudioStream::~dmxAudioStream ()
+ADM_audioAccessMpeg::~ADM_audioAccessMpeg ()
 {
   if (_index)
     delete[] _index;
@@ -61,22 +63,20 @@ dmxAudioStream::~dmxAudioStream ()
       delete [] _tracks;
 
   _index = NULL;
-  _wavheader = NULL;
   demuxer = NULL;
 
 }
-dmxAudioStream::dmxAudioStream (void)
+/**
+    \fn    ADM_audioAccessMpeg
+    \brief Constructor
+*/
+ADM_audioAccessMpeg::ADM_audioAccessMpeg (const char *name)
 {
-  _wavheader = NULL;
   demuxer = NULL;
   nbTrack = 0;
   _tracks=NULL;
   currentTrack=0;
   _index=NULL;
-}
-uint8_t
-dmxAudioStream::open (const char *name)
-{
   FILE *file;
   uint32_t dummy;		//,audio=0;
   char string[MAX_LINE];	//,str[1024];;
@@ -91,7 +91,7 @@ dmxAudioStream::open (const char *name)
   
   
  file=fopen(name,"rt");
- if(!file) return 0;
+ if(!file) ADM_assert(0);
 
   printf ("\n  opening dmx file for audio track : %s\n", name);
   fgets (string, MAX_LINE, file);	// File header
@@ -156,7 +156,7 @@ char *start;
   {
 _abrt:
          fclose (file);
-        return 0;
+        ADM_assert(0);
   }
   _tracks=new dmxAudioTrack[nbAudioStream];
   memset(_tracks,0,sizeof(dmxAudioTrack)*nbAudioStream);
@@ -216,7 +216,7 @@ MPEG_TRACK track;
                 printf("DMX audio : cannot open %s\n");
                 
                 fclose(file);                
-                return 0;
+                ADM_assert(0);
         }
   // Now build the index
   nbIndex = nbGop;
@@ -281,11 +281,11 @@ _nxt:
   if (!read)
     {
       printf ("No audio at all!\n");              
-      return 0;
+      ADM_assert(0);
     }
 printf("Filling audio header\n");
   // now fill in the header
-  _length = _index[nbIndex - 1].count[mainAudio];
+
   for(int i=0;i<nbTrack;i++)
   {
     WAVHeader *hdr;
@@ -295,18 +295,14 @@ printf("Filling audio header\n");
     // put some default value
     hdr->bitspersample = 16;
     hdr->blockalign = 4;
-  
-    _destroyable = 1;
-    strcpy (_name, "dmx audio");
     //demuxer->setPos (0, 0);
   }
   printf("Audio index loaded, probing...\n");
-  if(!probeAudio()) return 0;
+  if(!probeAudio()) ADM_assert(0);
         
   demuxer->changePid(_tracks[currentTrack].myPid,_tracks[currentTrack].myPes);
   demuxer->setPos (0, 0);
-  _pos = 0;
-  printf ("\n DMX audio initialized (%lu bytes)\n", _length);
+
   printf ("With %lu sync point\n", nbIndex);
   int found=-1;
   // Only take the audio track if it has enough bytes
@@ -324,88 +320,31 @@ printf("Filling audio header\n");
     if(found!=-1)
         mainAudio=found;
     changeAudioTrack(found);
-  
-  return 1;
 }
-// __________________________________________________________
-// __________________________________________________________
 
-uint8_t
-dmxAudioStream::goTo (uint32_t offset)
+/**
+    \fn goToTime
+    \brief Go to time
+*/
+bool ADM_audioAccessMpeg::goToTime (uint64_t goTo)
 {
-uint8_t dummy[1024];
-uint32_t left,right;
-int fnd=0;
-        
-        // Search into the index to take the neareast one
-        if(offset>=_length) return 0;
-
-        if(offset<_index[0].count[currentTrack])
-        {
-                demuxer->setPos(0,0);
-                _pos=0;
-                fnd=1;
-        }
-        else
-        {
-                for(uint32_t i=0;i<nbIndex-1;i++)
-                {
-                        if(_index[i].count[currentTrack]<=offset && _index[i+1].count[currentTrack]>offset)
-                        {
-                                demuxer->setPos(_index[i].start,0);
-                                _pos=_index[i].count[currentTrack];
-                                fnd=1;
-                                break;
-                
-                        }
-
-                }
-        }
-        if(!fnd)
-        {
-         printf("DMX audio : failed!\n");
-         return 0;
-        }
-                        left=offset-_pos;
-                        while(left)
-                        {
-                             if(left>1000) right=1000;
-                                        else right=left;
-                             right=demuxer->read(dummy,right);
-                             if(!right) return 0;
-                             ADM_assert(right<=left);
-                             left-=right;
-                             _pos+=right;
-                        }
-  return 1;
+    return true;
 }
 
-// __________________________________________________________
-// __________________________________________________________
-
-uint32_t
-dmxAudioStream::read (uint32_t size, uint8_t * ptr)
+/**
+    \fn     getPacket
+    \brief 
+*/
+bool    ADM_audioAccessMpeg::getPacket(uint8_t *buffer, uint32_t *size, uint32_t maxSize,uint64_t *dts)
 {
-uint32_t read;          
-                
-                        if(_pos+size>=_length) 
-                        {       
-                            printf("DMX_audio Going out of bound (position : %u asked %u end%u)\n",_pos,size,_length);
-                            size=_length-_pos;
-                            if(_pos==_length) return 0;
-                        }
-                        if(!(size=demuxer->read(ptr,size)))
-                        {
-                            printf("DMX_audio Read failed (got:%u)\n",size);
-                            _pos+=size;
-                            return 0;
-                        }
-                        _pos+=size;     
-                        return size;
+uint32_t mDts,mPts;
+    if(!demuxer->readPes(buffer, size, &mDts,&mPts)) return false;
+    *dts=(uint64_t)mDts;
+    return true;
 }
-// __________________________________________________________
-// __________________________________________________________
 
+
+#if 0
 uint8_t dmxAudioStream::probeAudio (void)
 {
 uint32_t read,offset,offset2,fq,br,chan,myPes,blocksize;          
@@ -547,6 +486,6 @@ uint8_t                 dmxAudioStream::getAudioStreamsInfo(uint32_t *nbStreams,
     }
     return 1;
 }
-
+#endif
 
  //

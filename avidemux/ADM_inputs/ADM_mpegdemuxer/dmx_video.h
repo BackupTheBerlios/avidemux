@@ -31,7 +31,7 @@ protected:
         uint32_t                _lastFrame;
         uint8_t                 renumber(void);
         uint8_t                 mergeFields(void);
-        dmxAudioStream          *_audioStream;
+        ADM_audioAccessMpeg     *_audioAccess;
         uint8_t                 _fieldEncoded;
 public:
 
@@ -83,6 +83,7 @@ public:
                         uint8_t                 changeAudioStream(uint32_t newstream);
                         uint32_t                getCurrentAudioStreamNumber(void) ;
                         uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos);
+virtual 	            uint8_t                 getAudioStream(ADM_audioStream  **audio);
 
 };
 #endif

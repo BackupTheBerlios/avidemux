@@ -1,6 +1,6 @@
 /**
     \file ADM_audioStreamBuffered
-    \brief Byte oriented class
+    \brief Byte oriented audioStream class
 
 */
 #include "ADM_default.h"
@@ -19,6 +19,7 @@ ADM_audioStreamBuffered::ADM_audioStreamBuffered(WAVHeader *header,ADM_audioAcce
 */
 bool ADM_audioStreamBuffered::refill(void)
 {
+        // Shrink buffer...
         if(limit>ADM_AUDIOSTREAM_BUFFER_SIZE && start> 10*1024)
         {
             memmove(buffer, buffer+start,limit-start);
@@ -29,13 +30,18 @@ bool ADM_audioStreamBuffered::refill(void)
         uint32_t size;
         if(true!=access->getPacket(buffer+limit, &size, 2*ADM_AUDIOSTREAM_BUFFER_SIZE-limit,&newDts))
                 return false;
+        // We introduce a small error as there might be some bytes left in the buffer
+        // By construction, the error should be minimal
         if(newDts!=ADM_AUDIO_NO_DTS)
+        {
             if( abs(newDts-lastDts)>5000) 
             {
                 printf("[AudioStream] Warning skew in dts %d\n",newDts-lastDts);
                 lastDts=newDts;
             }
-        if(!start) lastDts=newDts; // Fixme allow a bit of error, not accumulating
+            // If we have a DTS and the buffer is empty, set the dts inconditionnaly
+            if(!start) lastDts=newDts; // Fixme allow a bit of error, not accumulating
+        }
         limit+=size;
         ADM_assert(limit<ADM_AUDIOSTREAM_BUFFER_SIZE*2);
         return true;
