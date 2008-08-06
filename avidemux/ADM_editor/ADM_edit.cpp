@@ -492,6 +492,7 @@ switch (type)
       duration/=1000*1000.; // Us -> seconds
   	  _videos[_nb_video]._audio_duration=(uint64_t)floor(duration);
       _videos[_nb_video]._audioCodec=getAudioCodec(_wavinfo->encoding,_wavinfo,extraLen,extraData);
+      memcpy(&wavHeader,_videos[0]._audiostream->getInfo(),sizeof(wavHeader));
       printf("[Editor] Duration in seconds: %"LLU", in samples: %"LLU"\n",_videos[_nb_video]._audio_duration/_wavinfo->frequency,_videos[_nb_video]._audio_duration);
     }
 

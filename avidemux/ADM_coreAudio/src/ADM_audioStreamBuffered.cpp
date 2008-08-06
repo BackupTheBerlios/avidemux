@@ -119,7 +119,7 @@ bool      ADM_audioStreamBuffered::needBytes(uint32_t nbBytes)
     if((limit-start)>=nbBytes) return true;
     refill();
     if((limit-start)>=nbBytes) return true;
-    return true;
+    return false;
 
 }
 /**

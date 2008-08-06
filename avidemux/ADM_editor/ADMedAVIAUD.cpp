@@ -43,6 +43,8 @@ Todo:
 #define AUDIOSEG 	_segments[_audioseg]._reference
 #define SEG 		_segments[seg]._reference
 
+#define ADM_ALLOWED_DRIFT_US 30000 // Allow 30 ms jitter on audio
+
 extern char* ms2timedisplay(uint32_t ms);
 /**
     \fn     getPCMPacket
@@ -60,20 +62,22 @@ bool drop=false;
     if(!_videos[0]._audiostream) return 0;
    // if(_videos[0]._audioCodec->isDummy()==true) return 0;
     // fixme
-    memcpy(&wavHeader,_videos[0]._audiostream->getInfo(),sizeof(wavHeader));
+    
 
     // Read a packet from stream 0
 again:
     drop=false;
+    fillerSample=0;
     if(!_videos[0]._audiostream->getPacket(audioBuffer,&inSize,ADM_EDITOR_AUDIO_BUFFER_SIZE,&nbSamples,&dts))
     {
             adm_printf(ADM_PRINT_ERROR,"[Composer::getPCMPacket] Read failed\n");
             return 0;
     }
+    printf("[PCMPacket]  Got %d samples\n",nbSamples);
     // Check if the Dts matches
     if(lastDts!=ADM_AUDIO_NO_DTS && dts!=ADM_AUDIO_NO_DTS)
     {
-        if(abs(lastDts-dts)>5000)
+        if(abs(lastDts-dts)>ADM_ALLOWED_DRIFT_US)
         {
         printf("[Composer::getPCMPacket] drift %d, computed :%d got %d\n",(int)(lastDts-dts),lastDts,dts);
         if(dts<lastDts)
@@ -117,7 +121,9 @@ again:
     //
     uint32_t decodedSample=nbOut;
     decodedSample/=wavHeader.channels;
-
+    if(!decodedSample && !fillerSample) goto again;
+    if(nbSamples!=decodedSample)
+        printf("[Composer::getPCMPacket] Demuxer was wrong %d vs %d samples!\n",nbSamples,decodedSample);
     advanceDts(decodedSample);
     // This packet has been dropped, try the next one
     if(drop==true) goto again;
@@ -147,8 +153,12 @@ bool ADM_Composer::goToTime (uint64_t ustime)
 {
     printf("[Editor] go to time %02.2f secs\n",((float)ustime)/1000000.);
     if(!_videos[0]._audiostream) return false;
-    return _videos[0]._audiostream->goToTime(ustime);
- 
+    if(true==_videos[0]._audiostream->goToTime(ustime))
+    {
+        lastDts=ustime;
+        return true;
+    }
+    return false;
 }
 #if 0
 /*
