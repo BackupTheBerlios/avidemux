@@ -45,6 +45,12 @@ Todo:
 
 #define ADM_ALLOWED_DRIFT_US 30000 // Allow 30 ms jitter on audio
 
+#if 1
+#define vprintf(...) {}
+#else
+#define vprintf printf
+#endif
+
 extern char* ms2timedisplay(uint32_t ms);
 /**
     \fn     getPCMPacket
@@ -73,13 +79,13 @@ again:
             adm_printf(ADM_PRINT_ERROR,"[Composer::getPCMPacket] Read failed\n");
             return 0;
     }
-    printf("[PCMPacket]  Got %d samples\n",nbSamples);
+    vprintf("[PCMPacket]  Got %d samples, time code %08lu  lastDts=%08lu delta =%08ld\n",nbSamples,dts,lastDts,dts-lastDts);
     // Check if the Dts matches
     if(lastDts!=ADM_AUDIO_NO_DTS && dts!=ADM_AUDIO_NO_DTS)
     {
         if(abs(lastDts-dts)>ADM_ALLOWED_DRIFT_US)
         {
-        printf("[Composer::getPCMPacket] drift %d, computed :%d got %d\n",(int)(lastDts-dts),lastDts,dts);
+        printf("[Composer::getPCMPacket] drift %d, computed :%lu got %lu\n",(int)(lastDts-dts),lastDts,dts);
         if(dts<lastDts)
         {
             printf("[Composer::getPCMPacket] Dropping packet\n");
@@ -100,18 +106,23 @@ again:
             // about 100 ms
             if(fillerSample>4*1024) 
             {
-                uint32_t start=fillerSample*sizeof(float)*wavHeader.channels;
-                memset(dest,0,start);
-                advanceDts(fillerSample);
+                fillerSample=4*1024;
             }
-            printf("[Composer::getPCMPacket] Adding %u padding samples\n",fillerSample);
+            uint32_t start=fillerSample*sizeof(float)*wavHeader.channels;
+            memset(dest,0,start);
+
+            advanceDtsBySample(fillerSample);
+            dest+=fillerSample*wavHeader.channels;
+            printf("[Composer::getPCMPacket] Adding %u padding samples, dts is now %lu\n",fillerSample,lastDts);
        }
       }
     }else
-    // If lastDts is not initialized....
-    if(lastDts==ADM_AUDIO_NO_DTS) lastDts=dts;
+    {
+        // If lastDts is not initialized....
+        if(lastDts==ADM_AUDIO_NO_DTS) lastDts=dts;
+    }
     // Call codec...
-    if(!_videos[0]._audioCodec->run(audioBuffer+fillerSample*wavHeader.channels, inSize, dest, &nbOut))
+    if(!_videos[0]._audioCodec->run(audioBuffer, inSize, dest, &nbOut))
     {
             adm_printf(ADM_PRINT_ERROR,"[Composer::getPCMPacket] codec failed failed\n");
             return 0;
@@ -124,12 +135,15 @@ again:
     if(!decodedSample && !fillerSample) goto again;
     if(nbSamples!=decodedSample)
         printf("[Composer::getPCMPacket] Demuxer was wrong %d vs %d samples!\n",nbSamples,decodedSample);
-    advanceDts(decodedSample);
+    
+    
     // This packet has been dropped, try the next one
     if(drop==true) goto again;
     // Update infos
     *samples=(decodedSample+fillerSample);
     *odts=lastDts;
+    advanceDtsBySample(decodedSample);
+    vprintf("[Composer::getPCMPacket] Adding %u decodedSample, dts is not %lu\n",fillerSample,lastDts);
     ADM_assert(sizeMax>=(fillerSample+decodedSample)*wavHeader.channels);
     return 1;
 }
@@ -155,7 +169,7 @@ bool ADM_Composer::goToTime (uint64_t ustime)
     if(!_videos[0]._audiostream) return false;
     if(true==_videos[0]._audiostream->goToTime(ustime))
     {
-        lastDts=ustime;
+        setDts(ustime);
         return true;
     }
     return false;

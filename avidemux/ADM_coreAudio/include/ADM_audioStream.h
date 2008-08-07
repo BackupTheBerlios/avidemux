@@ -78,8 +78,12 @@ class ADM_audioStream
                        uint64_t                 position;
                        uint64_t                 lastDts;
                        uint64_t                 durationInUs;
+                       uint64_t                 lastDtsBase;
+                       uint64_t                 sampleElapsed;
+    ///
+                        void                    setDts(uint64_t newDts);
     /// increment DTS by samples
-                       bool                     advanceDts(uint32_t samples);
+                       bool                     advanceDtsBySample(uint32_t samples);
         public:
 /// Default constructor
                        ADM_audioStream(WAVHeader *header,ADM_audioAccess *access);  

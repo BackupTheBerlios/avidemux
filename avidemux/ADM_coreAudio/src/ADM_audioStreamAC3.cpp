@@ -39,7 +39,7 @@ bool         ADM_audioStreamAC3::goToTime(uint64_t nbUs)
     {
         if( access->goToTime(nbUs)==true)
         {
-           lastDts=nbUs;
+           setDts(nbUs);
            limit=start=0;
            refill();
            return 1;
@@ -91,7 +91,7 @@ int flags,sample_rate,bit_rate;
         read(size,buffer);
         *nbSample=256*6;
         *dts=lastDts;
-        advanceDts(*nbSample);
+        advanceDtsBySample(*nbSample);
         return 1;
             
     }

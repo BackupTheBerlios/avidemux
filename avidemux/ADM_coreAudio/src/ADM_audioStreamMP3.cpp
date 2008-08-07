@@ -60,7 +60,7 @@ bool         ADM_audioStreamMP3::goToTime(uint64_t nbUs)
     {
         if( access->goToTime(nbUs)==true)
         {
-           lastDts=nbUs;
+           setDts(nbUs);
            limit=start=0;
            refill();
            return 1;
@@ -79,7 +79,7 @@ bool         ADM_audioStreamMP3::goToTime(uint64_t nbUs)
         {
             start=limit=0;
             access->setPos(seekPoints[i]->offset);
-            lastDts=seekPoints[i]->timeStamp;
+            setDts(seekPoints[i]->timeStamp);
             return true;
         }
     }
@@ -108,8 +108,7 @@ uint32_t offset;
                 read(*size,buffer);
                 *nbSample=info.samples;
                 *dts=lastDts;
-                advanceDts(*nbSample);
-
+                advanceDtsBySample(*nbSample);
                 return 1;
             }
             
@@ -171,7 +170,7 @@ uint64_t newDts,pos;
             if(limit-start>=info.size)
             {
                 start+=info.size;
-                advanceDts(info.samples);
+                advanceDtsBySample(info.samples);
                 continue;
             }
             break;

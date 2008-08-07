@@ -5,6 +5,9 @@
 */
 #include "ADM_default.h"
 #include "ADM_audioStreamBuffered.h"
+
+#define ADM_MAX_SKEW 30000
+
 /**
     \fn ADM_audioStreamBuffered
     \brief constructor
@@ -22,6 +25,7 @@ bool ADM_audioStreamBuffered::refill(void)
         // Shrink buffer...
         if(limit>ADM_AUDIOSTREAM_BUFFER_SIZE && start> 10*1024)
         {
+            //printf("[Shrink]\n");
             memmove(buffer, buffer+start,limit-start);
             limit-=start;
             start=0;
@@ -34,13 +38,13 @@ bool ADM_audioStreamBuffered::refill(void)
         // By construction, the error should be minimal
         if(newDts!=ADM_AUDIO_NO_DTS)
         {
-            if( abs(newDts-lastDts)>5000) 
+            if( abs(newDts-lastDts)>ADM_MAX_SKEW) 
             {
                 printf("[AudioStream] Warning skew in dts %d\n",newDts-lastDts);
-                lastDts=newDts;
+                setDts(newDts);
             }
             // If we have a DTS and the buffer is empty, set the dts inconditionnaly
-            if(!start) lastDts=newDts; // Fixme allow a bit of error, not accumulating
+            if(!start) setDts(newDts); // Fixme allow a bit of error, not accumulating
         }
         limit+=size;
         ADM_assert(limit<ADM_AUDIOSTREAM_BUFFER_SIZE*2);
@@ -82,8 +86,8 @@ uint32_t r;
 */
 bool      ADM_audioStreamBuffered::read(uint32_t n,uint8_t *d)
 {
-        if(start+n>=limit) refill();
-        if(start+n>=limit) return false;
+        if(start+n>limit) refill();
+        if(start+n>limit) return false;
         memcpy(d,buffer+start,n);
         start+=n;
         return true;

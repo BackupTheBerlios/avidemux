@@ -82,6 +82,9 @@ uint64_t ttime=_startTime;
   printf("[Bridge] Going to time %d\n",_startTime);
   return _incoming->goToTime(ttime);
 }
+/**
+    \fn fill
+*/
 uint32_t   AUDMAudioFilter_Bridge::fill(uint32_t max,float *output,AUD_Status *status)
 {
   uint32_t asked,asked2,total=0;
@@ -131,8 +134,9 @@ uint8_t AUDMAudioFilter_Bridge::fillIncomingBuffer(AUD_Status *status)
         if(asked>sam) asked=sam;
         
       }
-
+      asked/=_wavHeader.channels; // float->samples
       _incoming->getPCMPacket(&(_incomingBuffer[_tail]), asked, &asked,&dts);
+      asked*=_wavHeader.channels; // sample->float
       if (!asked )
       {
         *status=AUD_END_OF_STREAM;

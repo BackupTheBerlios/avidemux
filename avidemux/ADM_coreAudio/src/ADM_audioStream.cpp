@@ -19,6 +19,7 @@ ADM_audioStream::ADM_audioStream(WAVHeader *header,ADM_audioAccess *access)
         memset(&wavHeader,0,sizeof(wavHeader));
     this->access=access;
     lastDts=ADM_AUDIO_NO_DTS;
+    lastDtsBase=0;
 }
 /**
     \fn goToTime
@@ -30,7 +31,7 @@ bool  ADM_audioStream::goToTime(uint64_t nbUs)
     {
         if( access->goToTime(nbUs)==true)
         {
-           lastDts=nbUs;
+           setDts(nbUs);
            return 1;
         }
         return 1;
@@ -49,7 +50,7 @@ bool  ADM_audioStream::goToTime(uint64_t nbUs)
         float r=pos;
             r*=1000*1000;
             r/=wavHeader.byterate;
-            lastDts=(uint64_t)r;
+            setDts(r);
         return 1;
     }
     return false;
@@ -73,7 +74,7 @@ uint64_t dts=0;
     f*=wavHeader.frequency;
     f/=1000;
     f/=1000;
-    lastDts=dts;
+    setDts(dts);
     *nbSample=(uint32_t)(f+0.5);
     *odts=dts;
 }
@@ -86,14 +87,27 @@ bool         ADM_audioStream::getExtraData(uint32_t *l, uint8_t **d)
     return access->getExtraData(l,d);
 }
 /**
-        \fn advanceDts
+    \fn setDts
+    \brief set a new Dts
 */
-bool    ADM_audioStream::advanceDts(uint32_t samples)
+void  ADM_audioStream::setDts(uint64_t newDts)
 {
-        float f=samples*1000;
+
+    lastDts=newDts;
+    sampleElapsed=0;
+    lastDtsBase=newDts;
+}
+
+/**
+        \fn advanceDtsBySample
+*/
+bool    ADM_audioStream::advanceDtsBySample(uint32_t samples)
+{
+        sampleElapsed+=samples;
+        float f=sampleElapsed*1000;
             f/=wavHeader.frequency;
             f*=1000;
-            lastDts+=f;
+            lastDts=lastDtsBase+(uint64_t)(f+0.5);
         return true;
 }
 /**
