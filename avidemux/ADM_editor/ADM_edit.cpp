@@ -60,6 +60,9 @@
 #include "ADM_inputs/ADM_mpegdemuxer/dmx_indexer.h"
 #include "ADM_outputfmt.h"
 //#include "ADM_gui2/GUI_ui.h"
+
+vidHeader *ADM_demuxerSpawn(uint32_t magic,const char *name);
+
 int DIA_mpegIndexer (char **mpegFile, char **indexFile, int *aid,
 		     int already = 0);
 void DIA_indexerPrefill(char *name);
@@ -238,160 +241,32 @@ uint8_t ADM_Composer::addFile (const char *name, uint8_t mode,fileType forcedTyp
   uint8_t    ret =    0;
   aviInfo    info;
   WAVHeader *    _wavinfo;
-//  aviHeader *    tmp;
-  fileType    type =    forcedType;
+  
 
 UNUSED_ARG(mode);
 	_haveMarkers=0; // by default no markers are present
   ADM_assert (_nb_segment < max_seg);
   ADM_assert (_nb_video < MAX_VIDEO);
 
-  // Autodetect file type ?
-  if(Unknown_FileType==type)
-  {
-      if (!identify (name, &type))
-        return 0;
-  }
+    FILE *f=fopen(name,"r");
+    uint8_t buffer[4];
+    if(!f) return 0;
+    fread(buffer,4,1,f);
+    fclose(f);
+    uint32_t magic=(buffer[3]<<24)+(buffer[2]<<16)+(buffer[1]<<8)+(buffer[0]);
 
 
-#define OPEN_AS(x,y) case x:\
-						_videos[_nb_video]._aviheader=new y; \
-						 ret = _videos[_nb_video]._aviheader->open(name); \
-						break;
-#if 0 // BAZOOKA
-  switch (type)
+  // First find the demuxer....
+   	_videos[_nb_video]._aviheader=ADM_demuxerSpawn(magic,name);
+    if(!_videos[_nb_video]._aviheader)
     {
-      case VCodec_FileType:
-      		loadVideoCodecConf(name);      		
-		return ADM_IGN; // we do it but it wil fail, no problem with that
-      		break;
-      OPEN_AS (Mp4_FileType, mp4Header);
-      OPEN_AS (H263_FileType, h263Header);
-      
-      case ASF_FileType:
-              _videos[_nb_video]._aviheader=new asfHeader; 
-              ret = _videos[_nb_video]._aviheader->open(name); 
-              if(!ret)
-              {
-                delete _videos[_nb_video]._aviheader;
-                printf("Trying mpeg\n"); 
-                goto thisIsMpeg; 
-              }
-              break;
-      OPEN_AS (NewMpeg_FileType,dmxHeader);
-      // For AVI we first try top open it as openDML
-      case AVI_FileType:
-      			_videos[_nb_video]._aviheader=new OpenDMLHeader; 
-			 ret = _videos[_nb_video]._aviheader->open(name); 			
-			break;
-      
-    case Nuppel_FileType:
-	{ // look if the idx exists
-	  char *tmpname = (char*)ADM_alloc(strlen(name)+strlen(".idx")+1);
-		ADM_assert(tmpname);
-		sprintf(tmpname,"%s.idx",name);
-		if(addFile(tmpname))
-		{
-			return 1; // Memleak ?
-		}
-		ADM_dealloc(tmpname);
-		// open .nuv file
-		_videos[_nb_video]._aviheader=new nuvHeader;
-		ret = _videos[_nb_video]._aviheader->open(name);
-		// we store the native .nuv file in the edl
-		// the next load of the edl will open .idx instead
-		break;
-	}
-      OPEN_AS (BMP_FileType, picHeader);
-      OPEN_AS (Matroska_FileType, mkvHeader);
-      
-      OPEN_AS (AvsProxy_FileType, avsHeader);
-      OPEN_AS (_3GPP_FileType, MP4Header);
-      OPEN_AS (Ogg_FileType, oggHeader);
-      OPEN_AS (AMV_FileType, amvHeader);
-
-    case Mpeg_FileType:
-thisIsMpeg:
-    	// look if the idx exists
-	char tmpname[256];
-	ADM_assert(strlen(name)+5<256);
-	strcpy(tmpname,name);
-	strcat(tmpname,".idx");
-        if(ADM_fileExist(tmpname))
-        {
-	       return addFile(tmpname);
-        }
-	/* check for "Read-only file system" */
-	{
-                int fd = open(tmpname,O_CREAT|O_EXCL|O_WRONLY,S_IRUSR|S_IWUSR);
-                if( fd >= 0 )
-                {
-                    close(fd);
-                    unlink(tmpname);
-                    printf("Filesystem is writable\n");
-		}else if( errno == EROFS ){
-		  char *tmpdir = getenv("TMPDIR");
-#ifdef __WIN32
-                        printf("Filesystem is not writable, looking for somewhere else\n");
-			if( !tmpdir )
-				tmpdir = "c:";
-			snprintf(tmpname,256,"%s%s.idx",tmpdir,strrchr(name,'\\'));
-#else
-			if( !tmpdir )
-				tmpdir = "/tmp";
-			snprintf(tmpname,256,"%s%s.idx",tmpdir,strrchr(name,'/'));
-#endif
-			tmpname[255] = 0;
-                        printf("Storing index in %s\n",tmpname);
-                    if(ADM_fileExist(tmpname))
-                    {
-                        printf("Index present, loading it\n");
-                        return addFile(tmpname);
-                    }
-                }
-        }
-        if(tryIndexing(name,tmpname))
-        {
-                return addFile (tmpname);
-        }
-        return 0;
-      break;
-	case WorkBench_FileType:
-
-  		return loadWorbench(name);
-#if 0
-        case Script_FileType:
-                return parseScript(name);
-#endif
-	case ECMAScript_FileType:
-                printf("****** This is an ecmascript, run it with avidemux2 --run yourscript *******\n");
-                printf("****** This is an ecmascript, run it with avidemux2 --run yourscript *******\n");
-                printf("****** This is an ecmascript, run it with avidemux2 --run yourscript *******\n");
-                return 0;
-		
-                
-    default:
-      if (type == Unknown_FileType)
-	{
-	  printf ("\n not identified ...\n");
-	}
-      else
-        GUI_Error_HIG(QT_TR_NOOP("File type identified but no loader support detected..."),
-                      QT_TR_NOOP("May be related to an old index file."));
+     char str[512+1];
+     snprintf(str,512,QT_TR_NOOP("Cannot find a demuxer for %s"), name);
+      str[512] = '\0';
+      GUI_Error_HIG(str,NULL);
       return 0;
     }
-#else // BAZOOKA
-switch (type)
-    {
-#if 0
-        OPEN_AS(AVI_FileType,OpenDMLHeader); 
-        OPEN_AS(FLV_FileType,flvHeader);
-        OPEN_AS (NewMpeg_FileType,dmxHeader);
-        OPEN_AS (Matroska_FileType, mkvHeader); 
-#endif
-
-    }
-#endif // BAZOOKA
+    ret = _videos[_nb_video]._aviheader->open(name);
    // check opening was successful
    if (ret == 0) {
      char str[512+1];
@@ -689,7 +564,7 @@ TryAgain:
 							{
 								
 								// can only unpack avi
-								if(!count && type==AVI_FileType)
+								if(!count && 0) //type==AVI_FileType)
 								{
                                                                   uint32_t autounpack=0;
                                                                   prefs->get(FEATURE_AUTO_UNPACK,&autounpack);

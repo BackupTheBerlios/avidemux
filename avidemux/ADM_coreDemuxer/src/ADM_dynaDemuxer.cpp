@@ -18,6 +18,7 @@
 #include "ADM_demuxerInternal.h"
 
 void ADM_demuxersCleanup(void);
+vidHeader *ADM_demuxerSpawn(uint32_t magic,const char *name);
 
 std::vector <ADM_demuxer *> ListOfDemuxers;
 
@@ -103,5 +104,31 @@ void ADM_demuxersCleanup(void)
                         ListOfDemuxers[i]=NULL;
                 }
 }
+/**
+    \fn ADM_demuxerSpawn
+    \brief Locate the correct demuxer and instantiate it
+
+*/
+vidHeader *ADM_demuxerSpawn(uint32_t magic,const char *name)
+{
+int found=-1;
+uint32_t score=0;
+uint32_t mark;
+    for(int i=0;i<ListOfDemuxers.size();i++)
+    {
+        mark=ListOfDemuxers[i]->probe(magic,name);
+        if(mark>score)
+        {
+            score=mark;
+            found=i;
+        }
+    }
+    if(score && found!=-1)
+    {
+        return ListOfDemuxers[found]->createdemuxer();
+    }
+    return NULL;
+}
+
 // EOF
 
