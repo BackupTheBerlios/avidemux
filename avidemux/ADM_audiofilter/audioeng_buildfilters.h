@@ -73,7 +73,7 @@ uint8_t audioReset(void);
 const char *audioFilterGetName( void );
 uint8_t audioFilterSetByName( const char *name);
 
-AVDMGenericAudioStream *mpt_getAudioStream(void);
+//AVDMGenericAudioStream *mpt_getAudioStream(void);
 
 /* -- Set filter --*/
 void audioFilterNormalizeMode(uint8_t onoff);

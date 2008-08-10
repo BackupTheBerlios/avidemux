@@ -23,7 +23,7 @@
 #include "avifmt2.h"
 #include "fourcc.h"
 
-#include "ADM_toolkit/bitmap.h"
+#include "ADM_bitmap.h"
 #include "avidemutils.h"
 char *ADM_escape(const ADM_filename *incoming);
 uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,uint32_t *offset);

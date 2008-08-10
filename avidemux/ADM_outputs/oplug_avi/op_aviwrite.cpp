@@ -258,7 +258,7 @@ static 	uint32_t aacBitrate[16]=
         \fn WriteAudioHeader
 
 */
-uint8_t aviWrite::writeAudioHeader (	AVDMGenericAudioStream * stream, AVIStreamHeader *header
+uint8_t aviWrite::writeAudioHeader (	void * stream, AVIStreamHeader *header
 // MOD Feb 2005 by GMV: ODML support
 ,uint8_t	odml_stream_nbr
 // END MOD Feb 2005 by GMV
@@ -292,7 +292,7 @@ uint32_t extraLen=0;
 	wmaheader[24-16]=0x74;
 	wmaheader[25-16]=01;
 
-        memcpy(&wav,stream->getInfo (),sizeof(wav));
+        //memcpy(&wav,stream->getInfo (),sizeof(wav));
 
 
       memset (header, 0, sizeof (AVIStreamHeader));
@@ -303,7 +303,7 @@ uint32_t extraLen=0;
       header->dwSampleSize = 1;
       header->dwQuality = 0xffffffff;
       header->dwSuggestedBufferSize = 8000;
-      header->dwLength = stream->getLength ();
+      //header->dwLength = stream->getLength ();
 
 	switch(wav.encoding)
 	{
@@ -385,6 +385,7 @@ uint32_t extraLen=0;
 	  	  header->dwInitialFrames = 1;
                   extra=(uint8_t *)&mp3vbr;
 		  extraLen=sizeof(mp3vbr);
+#if 0
 		  if (stream->isVBR()) //wav->blockalign ==1152)	// VBR audio
 			{			// We do like nandub do
 		  	//ADM_assert (audiostream->asTimeTrack ());
@@ -410,7 +411,7 @@ uint32_t extraLen=0;
 
 
                    }
-
+#endif
 
 
 			  break;

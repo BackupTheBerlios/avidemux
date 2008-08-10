@@ -38,7 +38,7 @@ Split a stream into packet(s)
 #define MINUS_ONE 0xffffffff
 
 //
-
+#if 0
 uint8_t AVDMGenericAudioStream::flushPacket(void)
 {
 	packetTail=packetHead=0;
@@ -460,4 +460,5 @@ uint8_t		AVDMGenericAudioStream::getPacketAAC(uint8_t *dest, uint32_t *len,
 
 			return 1;
 }
+#endif
 //

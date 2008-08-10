@@ -16,7 +16,7 @@
 
 #include "ADM_default.h"
 #include "ADM_image.h"
-#include "ADM_toolkit/bitmap.h"
+#include "ADM_bitmap.h"
 #include "avifmt.h"
 #include "avifmt2.h"
 #include "ADM_bitstream.h"

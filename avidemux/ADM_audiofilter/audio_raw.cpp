@@ -30,7 +30,7 @@
 #include "ADM_audioStream.h"
 #include "audioprocess.hxx"
 #include "audio_raw.h"
-
+#if 0
 AVDMProcessAudio_RawShift::AVDMProcessAudio_RawShift(ADM_audioStream * instream,
       uint32_t starttime, int32_t msoff): AVDMBufferedAudioStream    (instream)
 {
@@ -142,4 +142,4 @@ uint8_t AVDMProcessAudio_RawShift::goTo(uint32_t newoffset)
         return 1;
 };
 // EOF
-
+#endif

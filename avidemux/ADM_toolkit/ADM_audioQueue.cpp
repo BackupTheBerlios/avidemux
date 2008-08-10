@@ -24,6 +24,7 @@
 */
 int defaultAudioQueueSlave( audioQueueMT *context )
 {
+#if 0
 #define QBUFFER 4096*8
   uint32_t total_sample=0;
   uint32_t samples,audioLen;
@@ -78,5 +79,6 @@ int defaultAudioQueueSlave( audioQueueMT *context )
   printf("[AudioQueueThread] Exiting\n");
   printf("[AudioThread] Target %u, got %u, %f %%\n",context->audioTargetSample,total_sample,
          (float)total_sample/(float)context->audioTargetSample);
+#endif
   return 1;
 }

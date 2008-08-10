@@ -21,22 +21,4 @@
  #define  ADMSOURCEX
 
 
-class AVDMFileStream : public AVDMGenericAudioStream
-{
-protected:
-				FILE *fd;	
-				uint32_t _offset;
-				uint32_t _totallen;
-				uint32_t _audiolen;
-				uint32_t	read32(void);
-				void			abort(void);	
-public:
-								
-        		AVDMFileStream(void);
-	  			~AVDMFileStream();
-				//~AVDMWavAudioStream() { abort();};
-				virtual uint8_t open(char *name)=0;
-        		virtual uint32_t read(uint32_t len,uint8_t *buffer);
-        		virtual uint8_t  goTo(uint32_t newoffset);     		
-};
 #endif

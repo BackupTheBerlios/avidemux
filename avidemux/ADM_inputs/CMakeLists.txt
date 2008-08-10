@@ -1,7 +1,7 @@
-subdirs (PREORDER ADM_openDML)
-subdirs (PREORDER ADM_flv)
-subdirs (PREORDER ADM_mpegdemuxer)
-subdirs (PREORDER ADM_matroska)
+#subdirs (PREORDER ADM_openDML)
+#subdirs (PREORDER ADM_flv)
+#subdirs (PREORDER ADM_mpegdemuxer)
+#subdirs (PREORDER ADM_matroska)
 
 #*************** Disabled****************
 #subdirs (PREORDER ADM_asf)

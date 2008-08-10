@@ -31,7 +31,7 @@
 #include "DIA_fileSel.h"
 #include "prototype.h"
 #include "DIA_coreToolkit.h"
-#include "ADM_toolkit/bitmap.h"
+#include "ADM_bitmap.h"
 
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audio/audioex.h"
@@ -1350,23 +1350,7 @@ void A_saveImg (const char *name)
 int
 A_loadAC3 (char *name)
 {
-  if (!avifileinfo)
-    return 0;
-
-
-  AVDMAC3AudioStream *ac3 = new AVDMAC3AudioStream ();
-
-  if (ac3->open (name) == 0)
-    {
-      GUI_Error_HIG (QT_TR_NOOP("Failed to open the file"), QT_TR_NOOP("Not a WAV file?"));
-      printf (QT_TR_NOOP("WAV open file failed..."));
-      delete ac3;
-      return 0;
-    }
-  //currentaudiostream=wav;
-//  A_changeAudioStream (ac3, AudioAC3,name);
-  wavinfo = currentaudiostream->getInfo ();
-  return 1;
+ 
 }
 int A_loadNone( void )
 {
@@ -1381,21 +1365,7 @@ int A_loadNone( void )
 //_____________________________________________________________
 int A_loadMP3(char *name)
 {
-    if (!avifileinfo)
-        return 0;
-    AVDMMP3AudioStream *mp3 = new AVDMMP3AudioStream();
-
-    if (mp3->open(name) == 0)
-      {
-          printf("MP3 open file failed...");
-          delete mp3;
-          return 0;
-      }
-    //currentaudiostream=mp3;
-//    A_changeAudioStream(mp3, AudioMP3,name);
-    wavinfo = currentaudiostream->getInfo();
-    return 1;
-}
+  }  
 //_____________________________________________________________
 //
 //              Load wave
@@ -1403,27 +1373,9 @@ int A_loadMP3(char *name)
 //
 //_____________________________________________________________
 
-int
-A_loadWave (char *name)
+int A_loadWave (char *name)
 {
-  if (!avifileinfo)
-  {
-        printf("No video loaded\n");
-        return 0;
-   }
-  AVDMWavAudioStream *wav = new AVDMWavAudioStream ();
-
-  if (wav->open (name) == 0)
-    {
-      GUI_Error_HIG (QT_TR_NOOP("Failed to open the file"), QT_TR_NOOP("Not a WAV file?"));
-      printf ("WAV open file failed...");
-      delete wav;
-      return 0;
-    }
-  //currentaudiostream=wav;
-//  A_changeAudioStream (wav, AudioWav,name);
-  wavinfo = currentaudiostream->getInfo ();
-  return 1;
+  
 }
 AudioSource getCurrentAudioSource(char **name)
 {
@@ -1466,7 +1418,7 @@ uint8_t A_changeAudioStream (ADM_audioStream * newaudio, AudioSource nwsource,ch
 void
 A_saveAudioDecodedTest (char *name)
 {
-
+#if 0
 // debug audio seek
   uint32_t len, gauge = 0;
   uint32_t written = 0;
@@ -1586,7 +1538,7 @@ A_saveAudioDecodedTest (char *name)
   printf ("AudioSave: actually written %u\n", written);
   printf ("Audiosave: target sample:%llu, got :%llu\n",sampleTarget,sampleCurrent);
 
-
+#endif
 }
 
 
@@ -2118,6 +2070,7 @@ void A_externalAudioTrack( void )
 
 uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
 {
+#if 0
         switch(nw)
         {
                 case AudioNone:break;
@@ -2195,6 +2148,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                 ADM_assert(0);
         }
         return 0;
+#endif
 }
              
 

@@ -183,7 +183,7 @@ uint8_t DIA_pluginsInfo(void)
                 while(*end==0x0a || *end==0x0d) *end--=0;
             }
             dmText[i]=new diaElemReadOnlyText(infoString,versionString);
-            frameDM.swallow(aeText[i]);
+            frameDM.swallow(dmText[i]);
     }
     diaElem *diaDM[]={&frameDM};
     diaElemTabs tabDM(QT_TR_NOOP("Demuxers"),1,diaDM);

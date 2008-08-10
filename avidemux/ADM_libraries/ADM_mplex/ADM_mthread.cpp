@@ -33,6 +33,7 @@ admMutex accessMutex("accessMutex_MT_muxer");
 //*******************************************************
 int defaultAudioSlave( muxerMT *context )
 {
+#if 0
 DIA_encoding *work=(DIA_encoding *)context->opaque;
   uint32_t total_sample=0;
   uint32_t total_size=0;
@@ -80,6 +81,7 @@ DIA_encoding *work=(DIA_encoding *)context->opaque;
   printf("[AudioThread] Target %u, got %u, %f %%\n",context->audioTargetSample,total_sample,
          (float)total_sample/(float)context->audioTargetSample);
   return 1;
+#endif
 }
 //*******************************************************
 int defaultVideoSlave( muxerMT *context )

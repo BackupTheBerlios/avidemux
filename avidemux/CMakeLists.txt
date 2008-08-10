@@ -198,13 +198,13 @@ SET(ADM_INPUTS
 	#ADM_avsproxy
 	#ADM_h263
 	#ADM_inpics
-	ADM_matroska
+	#ADM_matroska
 	#ADM_mp4
-	ADM_mpegdemuxer
+	#ADM_mpegdemuxer
 	#ADM_nuv
 	#ADM_ogm
-	ADM_openDML
-	ADM_flv
+	#ADM_openDML
+	#ADM_flv
 	#ADM_amv
 )
 

@@ -47,7 +47,7 @@
 	uint8_t saveFrame(uint32_t len,uint32_t flags,uint8_t *data,uint8_t *fcc);
 		uint8_t writeMainHeader( void );
 		uint8_t writeVideoHeader( uint8_t *extra, uint32_t extraLen );
-	uint8_t writeAudioHeader (AVDMGenericAudioStream * stream, AVIStreamHeader *header
+        uint8_t writeAudioHeader (void * stream, AVIStreamHeader *header
 		// MOD Feb 2005 by GMV: ODML super index
 		,uint8_t		odml_stream_nbr
 		// END MOD Feb 2005 by GMV

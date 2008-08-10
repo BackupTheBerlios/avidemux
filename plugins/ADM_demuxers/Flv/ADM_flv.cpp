@@ -15,7 +15,6 @@
  ***************************************************************************/
 
 #include "ADM_default.h"
-#include "ADM_Video.h"
 #include "fourcc.h"
 #include "DIA_coreToolkit.h"
 
@@ -24,7 +23,7 @@
 #include <math.h>
 
 // Borrowed from lavformt/flv.h
-#include "ADM_libraries/ADM_ffmpeg/ADM_lavformat/flv.h"
+#include "ADM_lavformat/flv.h"
 // Borrowed from lavformt/flv.h    
 uint32_t ADM_UsecFromFps1000(uint32_t fps1000);
 extern uint8_t extractH263FLVInfo(uint8_t *buffer,uint32_t len,uint32_t *w,uint32_t *h);

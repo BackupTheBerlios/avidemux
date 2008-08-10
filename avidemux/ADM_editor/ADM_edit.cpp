@@ -26,6 +26,9 @@
 
 #include "fourcc.h"
 #include "ADM_editor/ADM_edit.hxx"
+
+#if 0
+
 #include "ADM_inputs/ADM_inpics/ADM_pics.h"
 #include "ADM_inputs/ADM_nuv/ADM_nuv.h"
 #include "ADM_inputs/ADM_h263/ADM_h263.h"
@@ -33,18 +36,21 @@
 #include "ADM_inputs/ADM_mp4/ADM_mp4.h"
 #include "ADM_inputs/ADM_openDML/ADM_openDML.h"
 #include "ADM_inputs/ADM_avsproxy/ADM_avsproxy.h"
+#include "ADM_inputs/ADM_matroska/ADM_mkv.h"
+//#include "ADM_inputs/ADM_flv/ADM_flv.h"
+#include "ADM_inputs/ADM_amv/ADM_amv.h"
+#include "ADM_inputs/ADM_asf/ADM_asf.h"
+#include "ADM_inputs/ADM_ogm/ADM_ogm.h"
+#endif
+
 #include "DIA_coreToolkit.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_videoFilter.h"
 //#include "ADM_dialog/DIA_working.h"
-#include "ADM_inputs/ADM_ogm/ADM_ogm.h"
+
 #include "ADM_inputs/ADM_mpegdemuxer/dmx_video.h"
 #include "ADM_inputs/ADM_mpegdemuxer/dmx_identify.h"
 #include "ADM_inputs/ADM_mpegdemuxer/dmx_probe.h"
-#include "ADM_inputs/ADM_matroska/ADM_mkv.h"
-#include "ADM_inputs/ADM_flv/ADM_flv.h"
-#include "ADM_inputs/ADM_amv/ADM_amv.h"
-#include "ADM_inputs/ADM_asf/ADM_asf.h"
 #include "prefs.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
@@ -377,10 +383,12 @@ thisIsMpeg:
 #else // BAZOOKA
 switch (type)
     {
+#if 0
         OPEN_AS(AVI_FileType,OpenDMLHeader); 
         OPEN_AS(FLV_FileType,flvHeader);
         OPEN_AS (NewMpeg_FileType,dmxHeader);
         OPEN_AS (Matroska_FileType, mkvHeader); 
+#endif
 
     }
 #endif // BAZOOKA
@@ -689,8 +697,10 @@ TryAgain:
                                                                                 QT_TR_NOOP("Packed Bitstream detected"),
                                                                         QT_TR_NOOP("Do you want me to unpack it ?")))
 									{
+#if 0	
 									OpenDMLHeader *dml=NULL;
-									count++;	
+									count++;
+
 									dml=(OpenDMLHeader *)vid->_aviheader;
 									// Can we repack it ?
 									if(dml->unpackPacked())
@@ -708,6 +718,7 @@ TryAgain:
 										goto TryAgain;
 									}
                                                                         GUI_Error_HIG(QT_TR_NOOP("Could not unpack the video"),QT_TR_NOOP( "Using backup decoder - not frame accurate."));
+#endif
 									}
 								}
 #if  1 //def USE_DIVX

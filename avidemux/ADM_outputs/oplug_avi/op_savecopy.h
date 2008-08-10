@@ -41,12 +41,12 @@
                         char				*_trackname;
                         uint32_t			_audioCurrent2;
 
-                        uint8_t    doOneTrack (uint32_t index,AVDMGenericAudioStream *stream,uint32_t target,uint32_t *current);
+                        uint8_t    doOneTrack (uint32_t index,void *stream,uint32_t target,uint32_t *current);
                                     virtual uint8_t setupAudio( void);
                                   virtual uint8_t writeAudioChunk(uint32_t frame );
 
      public:
-                                     GenericAviSaveCopyDualAudio(AVDMGenericAudioStream	*track);
+                                     GenericAviSaveCopyDualAudio(void	*track);
 
    };
 /*            Pack /unpack */

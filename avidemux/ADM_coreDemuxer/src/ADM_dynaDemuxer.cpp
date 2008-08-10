@@ -38,7 +38,7 @@ bool     ADM_dm_getDemuxerInfo(int filter, const char **name, uint32_t *major,ui
 {
     ADM_assert(filter<ListOfDemuxers.size());
     ListOfDemuxers[filter]->getVersion(major,minor,patch);
-    *name=ListOfDemuxers[filter]->name;
+    *name=ListOfDemuxers[filter]->descriptor;
     return true;
 }
 /**

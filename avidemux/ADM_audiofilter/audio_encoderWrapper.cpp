@@ -16,10 +16,10 @@
     \brief Constructor to wrap an encoder inside ADMgenericblah blah
 
 */
-ADM_audioEncoderWrapper::ADM_audioEncoderWrapper( AUDMEncoder *coder) : AVDMGenericAudioStream()
+ADM_audioEncoderWrapper::ADM_audioEncoderWrapper( AUDMEncoder *coder) : ADM_audioStream(NULL,NULL)
 {
-    _wavheader=new WAVHeader;
-    memcpy(_wavheader,coder->_wavheader,sizeof(WAVHeader));
+   
+    memcpy(&wavHeader,coder->_wavheader,sizeof(WAVHeader));
     _encoder=coder;
 }
 /**
@@ -31,9 +31,9 @@ ADM_audioEncoderWrapper::ADM_audioEncoderWrapper( AUDMEncoder *coder) : AVDMGene
 ADM_audioEncoderWrapper::~ADM_audioEncoderWrapper()
 {
     if(_encoder) delete _encoder;
-    if(_wavheader) delete _wavheader;
+    
     _encoder=NULL;
-    _wavheader=NULL;
+    
 }
 /**
     \fn getPacket
@@ -46,6 +46,7 @@ uint8_t		ADM_audioEncoderWrapper::getPacket(uint8_t *dest, uint32_t *len, uint32
     ADM_assert(_encoder);
     return _encoder->getPacket(dest,len,samples);
 }
+
 /**
     \fn packetPerFrame
     \brief Trampoline
@@ -53,9 +54,11 @@ uint8_t		ADM_audioEncoderWrapper::getPacket(uint8_t *dest, uint32_t *len, uint32
 */
 uint8_t     ADM_audioEncoderWrapper::packetPerFrame( void)
 {
-    ADM_assert(_encoder);
-    return _encoder->packetPerFrame();
+//    ADM_assert(_encoder);
+//    return _encoder->packetPerFrame();
+    return 1;
 }
+
 /**
     \fn read
     \brief Trampoline

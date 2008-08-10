@@ -29,6 +29,7 @@
 
 #include "audioprocess.hxx"
 //
+#if 0
 AVDMBufferedAudioStream::AVDMBufferedAudioStream(ADM_audioStream * instream):AVDMGenericAudioStream()
 {
         _instream=instream;
@@ -147,5 +148,5 @@ uint8_t AVDMBufferedAudioStream::goToTime(uint32_t newoffset) {
         _headBuff=_tailBuff=0;
         return 1;
 }
-
+#endif
 // EOF

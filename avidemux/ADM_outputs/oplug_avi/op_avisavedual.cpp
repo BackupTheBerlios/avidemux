@@ -42,7 +42,7 @@
 #include "ADM_audio/audioex.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 
-GenericAviSaveCopyDualAudio::GenericAviSaveCopyDualAudio (AVDMGenericAudioStream	*track)
+GenericAviSaveCopyDualAudio::GenericAviSaveCopyDualAudio (void	*track)
 			: GenericAviSaveCopy()
 {
    printf("**********************************\n");
@@ -66,13 +66,14 @@ uint8_t GenericAviSaveCopyDualAudio::setupAudio (void)
   return 1;
 }
 //---------------------------------------------------------------------------
-uint8_t    GenericAviSaveCopyDualAudio::doOneTrack (uint32_t index,AVDMGenericAudioStream *stream,uint32_t target,uint32_t *current)
+uint8_t    GenericAviSaveCopyDualAudio::doOneTrack (uint32_t index,void *stream,uint32_t target,uint32_t *current)
 {
   uint32_t    len;
   uint32_t sample,packetLen,packets=0;
   
   _audioInBuffer=0;
   // VBR mode, one packet per frame
+#if 0
   if(stream->packetPerFrame()     || stream->isVBR() )
   {
     while(*current<target)
@@ -115,6 +116,7 @@ uint8_t    GenericAviSaveCopyDualAudio::doOneTrack (uint32_t index,AVDMGenericAu
 //      encoding_gui->feedAudioFrame(_audioInBuffer);	  
     }
   }
+#endif
   return 1;
 }
 // **************************************************************

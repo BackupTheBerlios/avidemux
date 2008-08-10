@@ -40,7 +40,7 @@
 
 extern uint16_t MP1L2Bitrate[2][16];
 extern uint16_t MP2L1Bitrate[2][16];
-
+#if 0
 AVDMGenericAudioStream::AVDMGenericAudioStream(void)
 {
 
@@ -531,6 +531,7 @@ uint8_t AVDMGenericAudioStream::endWrite(FILE * out, uint32_t len)
     return 1;
 
 }
+#endif
 /**
  * 	\fn ADM_audioCompareChannelMapping
  *  \brief return true if the two channel mapping are identical, false else.

@@ -77,7 +77,7 @@ public:
                 MP4Track(void);
                 ~MP4Track();
 };
-
+#if 0
 //
 //	Audio track
 //
@@ -108,7 +108,7 @@ public:
 	virtual uint8_t			extraData(uint32_t *l,uint8_t **d);
 
 };
-
+#endif
 #define _3GP_MAX_TRACKS 8
 #define VDEO _tracks[0]
 #define ADIO _tracks[nbAudioTrack+1]._rdWav
@@ -141,7 +141,7 @@ protected:
         int64_t                      _audioDuration;
         uint32_t                      _currentAudioTrack;
         uint8_t                       parseAtomTree(adm_atom *atom);
-        MP4Audio                      *_audioTracks[_3GP_MAX_TRACKS-1];
+//        MP4Audio                      *_audioTracks[_3GP_MAX_TRACKS-1];
         uint32_t                      nbAudioTrack;
          /*********************************/
 	uint32_t                         readPackedLen(adm_atom *tom );
@@ -165,7 +165,7 @@ virtual   uint8_t                       getExtraHeaderData(uint32_t *len, uint8_
   //__________________________
 
 virtual 	WAVHeader 	*getAudioInfo(void ); 
-virtual 	uint8_t		getAudioStream(AVDMGenericAudioStream **audio);
+//virtual 	uint8_t		getAudioStream(AVDMGenericAudioStream **audio);
 
 // Frames
   //__________________________

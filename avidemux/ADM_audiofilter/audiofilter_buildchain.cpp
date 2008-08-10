@@ -58,8 +58,6 @@ extern ADM_Composer *video_body;
 #define MAX_AUDIO_FILTER 10
 
 
-extern AVDMGenericAudioStream *currentaudiostream;
-
 static AUDMAudioFilter *filtersFloat[MAX_AUDIO_FILTER];
 static uint32_t filtercount = 0;
 
@@ -126,6 +124,7 @@ AUDMAudioFilter *buildInternalAudioFilter(ADM_audioStream *currentaudiostream,ui
             lastFilter = mixer;
             filtersFloat[filtercount++] = lastFilter;
           } 
+#if 0
     if (audioDRC)
           {
             AUDMAudioFilterLimiter *pdrc = NULL;
@@ -186,6 +185,7 @@ AUDMAudioFilter *buildInternalAudioFilter(ADM_audioStream *currentaudiostream,ui
         filtersFloat[filtercount++] = lastFilter;
       
       }
+#endif
 //_______________________________________________________
 
 
@@ -315,6 +315,7 @@ ADM_audioStream *buildAudioFilter(ADM_audioStream *currentaudiostream,  uint32_t
      delete audio filters
 *******************************************************************************************************************
 */
+#if 0
 void deleteAudioFilter(AVDMGenericAudioStream *in)
 {
   for (uint32_t i = 0; i < filtercount; i++)
@@ -329,6 +330,7 @@ void deleteAudioFilter(AVDMGenericAudioStream *in)
     currentaudiostream->endDecompress();
 
 }
+#endif
 /**
     \fn     audioFilter_MP3DisableReservoir
     \brief  Set/unset the disable reservoir bit, usefull for strict mp3 frame boundaries(FLV)

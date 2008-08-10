@@ -37,7 +37,7 @@
  #include "ADM_colorspace.h"
 
  #include "ADM_audioStream.h"
- 
+ #include "ADM_audiocodec/ADM_audiocodec.h"
 #define MAX_SEG  	100 // Should be enougth
 #define MAX_VIDEO   100
 

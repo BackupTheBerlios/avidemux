@@ -16,7 +16,7 @@ extern admMutex accessMutex;
 typedef struct 
 {
   PacketQueue               *packetQueue;
-  AVDMGenericAudioStream    *audioEncoder;
+  void                      *audioEncoder;
   uint32_t                  audioTargetSample;
   volatile uint32_t         audioDone;
   uint32_t                  feedAudio;

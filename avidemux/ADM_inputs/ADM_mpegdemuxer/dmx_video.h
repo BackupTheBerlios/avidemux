@@ -53,7 +53,7 @@ public:
   //__________________________
 
         virtual         WAVHeader       *getAudioInfo(void )  ;
-        virtual         uint8_t          getAudioStream(AVDMGenericAudioStream **audio);
+//        virtual         uint8_t          getAudioStream(AVDMGenericAudioStream **audio);
 
 // Frames
   //__________________________

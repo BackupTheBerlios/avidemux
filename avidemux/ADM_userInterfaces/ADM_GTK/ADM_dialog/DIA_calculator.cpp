@@ -94,7 +94,7 @@ void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate )
 //******************************************
 void prepare( void )
 {
-
+#if 0
 	float duration=0;
 	aviInfo info;
 	char string[200];
@@ -144,7 +144,7 @@ void prepare( void )
 	printf("Track1 bitrate :%lu\n",track1);
 	printf("Track2 bitrate :%lu\n",track2);
 
-	
+#endif
 	
 }
 /************************************/

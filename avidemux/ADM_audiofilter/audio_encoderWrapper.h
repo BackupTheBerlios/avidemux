@@ -5,8 +5,8 @@
 */
 #ifndef audio_encoderWrapper_H
 #define audio_encoderWrapper_H
-#include "ADM_audio/aviaudio.hxx"
-class ADM_audioEncoderWrapper :  public AVDMGenericAudioStream
+#include "ADM_audioStream.h"
+class ADM_audioEncoderWrapper :  public ADM_audioStream
 {
 protected:
         AUDMEncoder *_encoder;

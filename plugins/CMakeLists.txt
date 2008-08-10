@@ -131,6 +131,7 @@ ADD_SUBDIRECTORY(ADM_audioDevices)
 ADD_SUBDIRECTORY(ADM_videoEncoder)
 ADD_SUBDIRECTORY(ADM_videoFilters)
 ADD_SUBDIRECTORY(ADM_audioEncoders)
+ADD_SUBDIRECTORY(ADM_demuxers)
 
 ########################################
 # Config Summary

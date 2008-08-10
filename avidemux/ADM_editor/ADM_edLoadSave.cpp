@@ -28,9 +28,12 @@
 #include "ADM_assert.h"
 #include "ADM_editor/ADM_edit.hxx"
 
+#if 0
 #include "ADM_inputs/ADM_inpics/ADM_pics.h"
 #include "ADM_inputs/ADM_nuv/ADM_nuv.h"
 #include "ADM_inputs/ADM_h263/ADM_h263.h"
+#endif
+
 
 #include "DIA_coreToolkit.h"
 #include "ADM_editor/ADM_edit.hxx"

@@ -21,7 +21,7 @@
 #define ADM_FLV_H
 
 #include "ADM_Video.h"
-#include "ADM_audio/aviaudio.hxx"
+//#include "ADM_audio/aviaudio.hxx"
 #include "ADM_audioStream.h"
 
 typedef struct 

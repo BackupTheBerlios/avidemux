@@ -23,7 +23,7 @@
 #include "ADM_codecs/ADM_ffmp43.h"
 #include "ADM_codecs/ADM_png.h"
 
-#include "ADM_toolkit/bitmap.h"
+#include "ADM_bitmap.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "DIA_coreToolkit.h"
 //**********************************
