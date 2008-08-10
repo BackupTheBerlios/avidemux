@@ -11,21 +11,12 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <string.h>
 
 #include <math.h>
 
 #include "ADM_default.h"
 #include "ADM_editor/ADM_Video.h"
-#include "ADM_assert.h"
-
-#include "fourcc.h"
-
+//#include "fourcc.h"
 
 #include "ADM_mkv.h"
 
@@ -80,7 +71,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
                   break;
                 case MKV_SIMPLE_BLOCK:
                     {
-                      indexBlock(parser,len,_clusters[clusters].timeCode);
+                      indexBlock(parser,len,_clusters[clusters].Dts);
                     }
                     break;
                 case MKV_BLOCK_GROUP:
@@ -104,7 +95,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
                                   case MKV_BLOCK :
                                   case MKV_SIMPLE_BLOCK:
                                   {
-                                    indexBlock(&blockGroup,len,_clusters[clusters].timeCode);
+                                    indexBlock(&blockGroup,len,_clusters[clusters].Dts);
                                   }
                                   break;
                                 }
@@ -137,107 +128,18 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t cluste
       //printf("Wanted %u got %u\n",_tracks[0].streamIndex,tid);
       if(track==-1) //dont care track
       {
-
         parser->seek(tail);
         return 1; // we do only video here...
       }
       // Skip timecode
+      uint64_t blockBegin=parser->tell();
       int16_t timecode=parser->readSignedInt(2);
       //if(!track) printf("TC: %d\n",timecode);
       uint8_t flags=parser->readu8();
-      uint32_t remaining=tail-parser->tell();
+      
       lacing=((flags>>1)&3);
-        // entryFlags ???
-      //if(track) printf("This round %lld total:%lld\n",tail-parser->tell(),    _tracks[track]._sizeInBytes);
-      switch(lacing)
-      {
-        case 0: // No lacing
-              if(!track) // Video
-              {
-                  addIndexEntry(track,parser->tell(),remaining,entryFlags,clusterTimeCodeMs+timecode);
-              }
-              else
-              {
-                _tracks[track]._sizeInBytes+=remaining; // keep some stat, useful for audio
-                _tracks[track].nbPackets++;
-                _tracks[track].nbFrames++;
-              }
-              break;
-        case 2 : // Constant size lacing
-            {
-                    nbLaces=parser->readu8()+1;
-                    remaining--;
-                    // Only mp3/Ac3 supported, ignore lacing FIXME : Vorbis or AAC will not work
-
-
-                    int bsize=remaining/nbLaces;
-                    if(bsize*nbLaces!=remaining)
-                    {
-                      printf("Warning not multiple bsize=%d total=%u  nbLaces=%u\n",bsize,remaining,nbLaces);
-                    }
-                    if(!track)
-                    {
-                      addIndexEntry(track,parser->tell(),remaining,0,clusterTimeCodeMs+timecode);
-                      printf("Warning lacing on video track\n");
-                    }
-                    else
-                    {
-                       _tracks[track]._sizeInBytes+=remaining;
-                       _tracks[track].nbPackets++;
-                       _tracks[track].nbFrames+=nbLaces;
-                    }
-                    //printf("tid:%u track %u Remaining : %llu laces %u blksize %d er%d\n",tid,track,remaining,nbLaces,remaining/nbLaces,remaining-(remaining/nbLaces)*nbLaces);
-            }
-            break;
-#if 1
-        case 3: // Ebml lacing
-          {
-
-                                int nbLaces=parser->readu8();
-                                for(int i=1;i<nbLaces;i++)
-                                {
-                                  parser->readEBMCode_Signed();
-                                }
-                                ADM_assert(track); // Not video!
-                                if(parser->tell()>=tail)
-                                {
-                                  printf("[MKVINDEXER]OOps overflow for EBML(track %u tid%u) at 0x%llx\n",track,tid,parser->tell());
-                                  break;
-                                }else
-                                {
-                                    _tracks[track]._sizeInBytes+=tail-parser->tell();
-                                    _tracks[track].nbPackets++;
-                                    _tracks[track].nbFrames+=nbLaces+1;
-                                }
-
-                              }
-            break;
-#endif
-        case 1: //Xiph lacing
-        {
-                                // Skip header to get the data size...
-                                int nbLaces=parser->readu8();
-                                for(int i=0;i<nbLaces;i++)
-                                {
-                                  while( parser->readu8()==0xFF);
-                                }
-                                if(parser->tell()>=tail)
-                                {
-                                  printf("[MKVINDEXER]OOps overflow for XIPH(track %u tid%u) at 0x%llx\n",track,tid,parser->tell());
-                                  break;
-                                }
-                                ADM_assert(track); // Not video!
-                                _tracks[track]._sizeInBytes+=(tail-parser->tell());
-                                _tracks[track].nbPackets++;
-                                _tracks[track].nbFrames+=nbLaces+1;
-                                //printf("This round %lld total:%lld\n",tail-parser->tell(),    _tracks[track]._sizeInBytes);
-                                break;
-
-        }
-        default:
-            printf("unsupported lacing Track:%d (%d)\n",track,lacing);
-            break;
-      }
+      
+      addIndexEntry(track,blockBegin,tail-blockBegin,entryFlags,clusterTimeCodeMs+timecode);
       parser->seek(tail);
       return 1;
 }
@@ -267,26 +169,9 @@ uint8_t mkvHeader::addIndexEntry(uint32_t track,uint64_t where, uint32_t size,ui
   index[x].pos=where;
   index[x].size=size;
   index[x].flags=AVI_KEY_FRAME;
-  index[x].timeCode=0;
-
-  float f=timecodeMS;
-  uint32_t delta;
-  f*=_videostream.dwRate;
-  f/=1000. ;; // in frame
-  f/=1000. ;; // in seconds
-  delta=(uint32_t)floor(f+0.49);
-  //printf("Frame :%u rawTimeCode:%u convertedtoframe:%u \n",Track->_nbIndex,timecodeMS,delta);
-  if(delta+2<Track->_nbIndex)
-  {
-    printf("[MKV] WARNING DELTA PTS/DTS is negative for frame %u (delta:%u, raw value %u,dwrate=%u)\n",Track->_nbIndex,delta,timecodeMS,_videostream.dwRate);
-    index[x].timeCode=0;
-  }else
-  {
-    index[x].timeCode=delta+1-Track->_nbIndex;
-  }
+  index[x].Dts=timecodeMS*1000;
+  index[x].Pts=timecodeMS*1000;
   Track->_nbIndex++;
-
- // printf("++\n");
   return 1;
 }
 
@@ -450,7 +335,7 @@ uint8_t   mkvHeader::indexClusters(ADM_ebml_file *parser)
        else
        {
            uint64_t timecode=segment.readUnsignedInt(len);
-           _clusters[_nbClusters].timeCode=timecode;
+           _clusters[_nbClusters].Dts=timecode;
            _nbClusters++;
        }
        segment.seek( _clusters[seekme].pos+ _clusters[seekme].size);

@@ -242,7 +242,7 @@ virtual bool            goToTime(uint64_t nbUs);
         uint64_t        getDurationInUs(void) {return durationInUs;}
         uint8_t			getAudioStream(ADM_audioStream **audio);
 virtual WAVHeader       *getInfo(void);
-
+virtual CHANNEL_TYPE    *getChannelMapping(void );
 					//______________________________
 					//   /audioStream
 					//______________________________

@@ -113,7 +113,7 @@ uint32_t   AUDMAudioFilter_Bridge::fill(uint32_t max,float *output,AUD_Status *s
 
 uint8_t AUDMAudioFilter_Bridge::fillIncomingBuffer(AUD_Status *status)
 {
-  uint32_t asked;
+  uint32_t asked,got;
   uint64_t dts;
   *status=AUD_OK;
   // Hysteresis
@@ -135,18 +135,18 @@ uint8_t AUDMAudioFilter_Bridge::fillIncomingBuffer(AUD_Status *status)
         
       }
       asked/=_wavHeader.channels; // float->samples
-      _incoming->getPCMPacket(&(_incomingBuffer[_tail]), asked, &asked,&dts);
-      asked*=_wavHeader.channels; // sample->float
-      if (!asked )
+      _incoming->getPCMPacket(&(_incomingBuffer[_tail]), asked, &got,&dts);
+      got*=_wavHeader.channels; // sample->float
+      if (!got )
       {
         *status=AUD_END_OF_STREAM;
         printf("[Bridge] End of stream\n");
         break;
       }
-      _tail+=asked;
+      _tail+=got;
       if(_hold>0)
       {
-        _hold-=asked;
+        _hold-=got;
         if(_hold<=0)
         {
           printf("[Bridge] Looping\n");
@@ -166,8 +166,6 @@ uint8_t AUDMAudioFilter_Bridge::fillIncomingBuffer(AUD_Status *status)
 CHANNEL_TYPE *AUDMAudioFilter_Bridge::getChannelMapping(void) 
 {
 	ADM_assert(_incoming);
-//	CHANNEL_TYPE *chan=_incoming->getChannelMapping();
-//	ADM_assert(chan);
-	return NULL;
+	return _incoming->getChannelMapping();
 }
 //EOF

@@ -51,7 +51,6 @@ Todo:
 #define vprintf printf
 #endif
 
-extern char* ms2timedisplay(uint32_t ms);
 /**
     \fn     getPCMPacket
     \brief  Get audio packet
@@ -138,7 +137,7 @@ again:
     
     
     // This packet has been dropped, try the next one
-    if(drop==true) goto again;
+    if(drop==true && !fillerSample) goto again;
     // Update infos
     *samples=(decodedSample+fillerSample);
     *odts=lastDts;
@@ -174,57 +173,7 @@ bool ADM_Composer::goToTime (uint64_t ustime)
     }
     return false;
 }
-#if 0
-/*
-		Go to Frame num, from segment seg
-		Used to compute the duration of audio track
 
-*/
-uint8_t ADM_Composer::audioGoToFn (uint32_t seg, uint32_t fn, uint32_t * noff)
-{
-  uint32_t    time;
-
- aprintf("Editor: audioGoToFn go to : seg %lu fn %lu \n",seg,fn);
-
-// since we got the frame we can find the segment
-
-
-  if (seg >= _nb_segment)
-        {
-                printf("[audioGotoFn] asked : %d max :%d\n",seg,_nb_segment);
-                ADM_assert(seg<_nb_segment);
-        }
-  ADM_assert (_videos[SEG]._audiostream);
-  _audioseg=seg;
-#undef AS
-#define AS _videos[SEG]._audiostream
-
-  time = _videos[SEG]._aviheader->getTime (fn);
-  AS->goToTime (time);
-  *noff=0;
-  return AS->goToTime (time);
-}
-
-//
-//  Return audio length of all segments.
-//
-//
-uint32_t ADM_Composer::getAudioLength (void)
-{
-  uint32_t
-    seg,
-    len =
-    0;				//, sz;
-  //
-  for (seg = 0; seg < _nb_segment; seg++)
-    {
-      // for each seg compute size
-      len += _segments[seg]._audio_size;
-    }
-  _audio_size = len;
-  return len;
-}
-#endif
 /**
     \fn getAudioStream
 
@@ -254,6 +203,15 @@ WAVHeader       *ADM_Composer::getInfo(void)
 {
     if(!_videos[0]._audiostream) return NULL;
     return _videos[0]._audiostream->getInfo();
+}
+/**
+    \fn getChannelMapping
+    \brief returns channel mapping
+*/
+ CHANNEL_TYPE    *ADM_Composer::getChannelMapping(void )
+{
+    return (_videos[0]._audioCodec->channelMapping);
+
 }
 //EOF
 

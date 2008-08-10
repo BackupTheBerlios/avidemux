@@ -215,7 +215,7 @@ AUDMAudioFilter *buildPlaybackFilter(ADM_audioStream *currentaudiostream, uint32
         
         
         // Downmix for local playback ?
-#if 0        
+  
         uint32_t downmix;
         
         if(prefs->get(DOWNMIXING_PROLOGIC,&downmix)!=RC_OK)
@@ -247,7 +247,7 @@ AUDMAudioFilter *buildPlaybackFilter(ADM_audioStream *currentaudiostream, uint32
           lastFilter = mixer;
           filtersFloat[filtercount++] = lastFilter;
         }	
-#endif
+
         return lastFilter;
 }
 /*

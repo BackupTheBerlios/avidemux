@@ -14,12 +14,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+#include "ADM_default.h"
+#include "math.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
 #include <fcntl.h>
 #include <errno.h>
 
@@ -27,7 +24,6 @@
 #include <sys/stat.h>
 #endif
 
-#include "ADM_assert.h"
 #include "fourcc.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_inputs/ADM_inpics/ADM_pics.h"
@@ -55,9 +51,6 @@
 #define MODULE_NAME MODULE_EDITOR
 #include "ADM_osSupport/ADM_debug.h"
 
-#ifdef USE_DIVX
-	#include "ADM_codecs/ADM_divx4.h"
-#endif
 #include "ADM_inputs/ADM_mpegdemuxer/dmx_indexer.h"
 #include "ADM_outputfmt.h"
 //#include "ADM_gui2/GUI_ui.h"
@@ -387,7 +380,7 @@ switch (type)
         OPEN_AS(AVI_FileType,OpenDMLHeader); 
         OPEN_AS(FLV_FileType,flvHeader);
         OPEN_AS (NewMpeg_FileType,dmxHeader);
-         
+        OPEN_AS (Matroska_FileType, mkvHeader); 
 
     }
 #endif // BAZOOKA
@@ -480,17 +473,15 @@ switch (type)
     }
   else
     {
-      float duration;
+      
       uint32_t extraLen;
       uint8_t  *extraData;
       _videos[_nb_video]._aviheader->getAudioStream (&_videos[_nb_video]. _audiostream);
 
       ADM_audioStream *stream=_videos[_nb_video]. _audiostream;
       stream->getExtraData(&extraLen,&extraData);
-      duration=stream->getDurationInUs();
-      duration*=stream->getInfo()->frequency;
-      duration/=1000*1000.; // Us -> seconds
-  	  _videos[_nb_video]._audio_duration=(uint64_t)floor(duration);
+      durationInUs=stream->getDurationInUs();
+      _videos[_nb_video]._audio_duration=durationInUs;
       _videos[_nb_video]._audioCodec=getAudioCodec(_wavinfo->encoding,_wavinfo,extraLen,extraData);
       memcpy(&wavHeader,_videos[0]._audiostream->getInfo(),sizeof(wavHeader));
       printf("[Editor] Duration in seconds: %"LLU", in samples: %"LLU"\n",_videos[_nb_video]._audio_duration/_wavinfo->frequency,_videos[_nb_video]._audio_duration);

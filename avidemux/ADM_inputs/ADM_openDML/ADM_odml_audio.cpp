@@ -21,10 +21,6 @@ It is an fopen/fwrite lookalike interface to chunks
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 

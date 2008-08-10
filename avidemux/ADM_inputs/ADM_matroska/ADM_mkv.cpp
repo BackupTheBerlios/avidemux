@@ -11,13 +11,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
 #include <math.h>
 
 #include "ADM_default.h"
 #include "ADM_editor/ADM_Video.h"
-#include "ADM_assert.h"
 
 #include "fourcc.h"
 
@@ -238,11 +235,12 @@ WAVHeader *mkvHeader::getAudioInfo(void )
     __________________________________________________________
 */
 
-uint8_t mkvHeader::getAudioStream(AVDMGenericAudioStream **audio)
+uint8_t mkvHeader::getAudioStream(ADM_audioStream **audio)
 {
   if(_nbAudioTrack)
   {
-      *audio=new mkvAudio(_filename,&(_tracks[_currentAudioTrack+1]),_clusters,_nbClusters);
+      mkvAccess *access=new mkvAccess(_filename,&(_tracks[_currentAudioTrack+1]));
+      *audio=ADM_audioCreateStream(&(_tracks[1+_currentAudioTrack].wavHeader), access);;
       return 1;
   }
   *audio=NULL;
@@ -349,8 +347,9 @@ uint32_t mkvHeader::getFlags(uint32_t frame,uint32_t *flags)
   if(!frame) *flags=AVI_KEY_FRAME;
   return 1;
 }
-/*
-    __________________________________________________________
+/**
+  \fn getFrameNoAlloc
+   \brief Read a video frames, return size & flags
 */
 
 uint8_t  mkvHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
@@ -361,8 +360,11 @@ uint8_t  mkvHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
   mkvIndex *dx=&(_tracks[0]._index[framenum]);
 
   _parser->seek(dx->pos);
-  _parser->readBin(img->data,dx->size);
-  img->dataLength=dx->size;
+  _parser->readSignedInt(2); // Timecode
+  _parser->readu8();  // flags
+
+  _parser->readBin(img->data,dx->size-3);
+  img->dataLength=dx->size-3;
 
   img->flags=dx->flags;
 
@@ -371,10 +373,10 @@ uint8_t  mkvHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
 
   return 1;
 }
-/*
-    __________________________________________________________
+/**
+    \fn getExtraHeaderData
+    \brief Returns extra data infos
 */
-
 uint8_t  mkvHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
 {
                 *len=_tracks[0].extraDataLen;
@@ -514,6 +516,6 @@ Bytes n+1..: The Vorbis identification header, followed by the Vorbis comment he
 uint32_t              mkvHeader::ptsDtsDelta(uint32_t framenum)
 {
     ADM_assert(framenum<_tracks[0]._nbIndex);
-    return _tracks[0]._index[framenum].timeCode;
+    return (uint32_t)(_tracks[0]._index[framenum].Pts-_tracks[0]._index[framenum].Dts);
 }
 //EOF

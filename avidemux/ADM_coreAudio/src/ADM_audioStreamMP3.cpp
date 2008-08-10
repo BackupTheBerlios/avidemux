@@ -33,7 +33,10 @@ ADM_audioStreamMP3::ADM_audioStreamMP3(WAVHeader *header,ADM_audioAccess *access
     {
         ADM_assert(access->canSeekOffset()==true);
         buildTimeMap();
+        return;
     }
+    // Time based
+    durationInUs=access->getDurationInUs();
 
 }
 

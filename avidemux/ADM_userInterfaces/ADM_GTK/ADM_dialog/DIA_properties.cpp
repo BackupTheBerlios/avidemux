@@ -104,22 +104,21 @@ void DIA_properties( void )
                 // Duration in seconds too
                 if(currentaudiostream && wavinfo->byterate>1)
                 {
-                        uint32_t l=0; //currentaudiostream->getLength();
+                        uint64_t l=currentaudiostream->getDurationInUs();
                         double du;
                         du=l;
-                        du*=1000;
-                        du/=wavinfo->byterate;
+                        du/=1000.; // us->ms
                         ms2time((uint32_t)floor(du), &hh, &mm, &ss, &ms);
                         sprintf(text, QT_TR_NOOP("%02d:%02d:%02d.%03d"), hh, mm, ss, ms);
-						FILL_ENTRY(label_audioduration);
+                        FILL_ENTRY(label_audioduration);
 
-						sprintf(text, QT_TR_NOOP("%.2f MB"), l / 1048576.F);
-						FILL_ENTRY(labelFileSize);
+                        sprintf(text, QT_TR_NOOP("%.2f MB"), l / 1048576.F);
+                        FILL_ENTRY(labelFileSize);
                 }                
         //        SET_YES(labelVbr, currentaudiostream->isVBR());
         } else
           {
-			  DISABLE_WIDGET(frame2);
+                DISABLE_WIDGET(frame2);
           }
   
         gtk_dialog_run(GTK_DIALOG(dialog));	

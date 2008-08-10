@@ -28,6 +28,7 @@
 // Borrowed from lavformt/flv.h    
 uint32_t ADM_UsecFromFps1000(uint32_t fps1000);
 extern uint8_t extractH263FLVInfo(uint8_t *buffer,uint32_t len,uint32_t *w,uint32_t *h);
+
 /**
     \fn Skip
     \brief Skip some bytes from the file
@@ -78,6 +79,88 @@ uint32_t flvHeader::read32(void)
     fread(r,4,1,_fd);
     return (r[0]<<24)+(r[1]<<16)+(r[2]<<8)+r[3]; 
 }
+/**
+    \fn     readFlvString
+    \brief  read pascal like string
+*/
+char *flvHeader::readFlvString(void)
+{
+static char stringz[255];
+    int size=read16();
+    read(size,(uint8_t *)stringz);
+    stringz[size]=0;
+    return stringz;
+}
+extern "C" {
+double av_int2dbl(int64_t v);
+}
+
+/**
+    \fn setProperties
+    \brief get a couple key/value and use it if needed...
+*/
+void flvHeader::setProperties(const char *name,float value)
+{
+    if(!strcmp(name,"framerate"))
+    {
+        _videostream.dwRate=(uint32_t)(value*1000);
+        return;
+    }
+}
+/**
+    \fn parseMetaData
+    \brief
+*/
+uint8_t flvHeader::parseMetaData(uint32_t remaining)
+{
+    uint32_t endPos=ftello(_fd)+remaining;
+    {
+        // Check the first one is onMetaData...
+        uint8_t type=read8();
+            
+        if(type!=AMF_DATA_TYPE_STRING) // String!
+            goto endit;
+        char *z=readFlvString();
+        printf("[FlashString] %s\n",z);
+        if(z && strncmp(z,"onMetaData",10)) goto endit;
+        // Normally the next one is mixed array
+        Skip(4);
+        Skip(1);
+        while(ftello(_fd)<endPos-4)
+        {
+            
+            char *s=readFlvString();
+            printf("[FlvType] :%d String : %s",type,s);
+            type=read8();
+            switch(type)
+            {
+                case AMF_DATA_TYPE_DATE: Skip(8+2);break;
+                case AMF_DATA_TYPE_NUMBER: 
+                                        {
+                                            float val;
+                                            uint64_t hi,lo;
+                                            hi=read32();lo=read32();
+                                            hi=(hi<<32)+lo;
+                                            val=(float)av_int2dbl(hi);
+                                            printf("->%f\n",val);
+                                            setProperties(s,val);
+                                        }
+                                        ;break;
+                case AMF_DATA_TYPE_STRING: {int r=read16();Skip(r);}break;
+                case AMF_DATA_TYPE_BOOL: read8();break;
+                case AMF_DATA_TYPE_OBJECT: goto endit; // unsupported for the moment
+                default : printf("\n");ADM_assert(0);
+            }
+            printf("\n");
+
+        }
+
+        // Process them...
+    }
+endit:
+    fseeko(_fd,endPos,SEEK_SET);
+    return 1;
+}
 
 /**
       \fn open
@@ -92,6 +175,7 @@ uint8_t flvHeader::open(const char *name)
   _isaudiopresent=0;
   audioTrack=NULL;
   videoTrack=NULL;
+  _videostream.dwRate=0;
   _filename=ADM_strdup(name);
   _fd=fopen(name,"rb");
   if(!_fd)
@@ -180,6 +264,10 @@ uint8_t flvHeader::open(const char *name)
             insertAudio(pos+of,remaining,pts);
           }
           break;
+      case FLV_TAG_TYPE_META:
+                parseMetaData(remaining);
+                remaining=0;
+                break;
       case FLV_TAG_TYPE_VIDEO:
           {
             int of=1+4+3+3+1+4;
@@ -214,15 +302,17 @@ uint8_t flvHeader::open(const char *name)
   printf("[FLV] Found %u frames\n",videoTrack->_nbIndex);
    _videostream.dwLength= _mainaviheader.dwTotalFrames=videoTrack->_nbIndex; 
    // Compute average fps
-        float f=_videostream.dwLength;
-        uint64_t duration=videoTrack->_index[videoTrack->_nbIndex-1].timeCodeUs;
-          
-        if(duration) 
-              f=1000.*1000.*1000.*f/duration;
-         else  f=25000;
+    float f=_videostream.dwLength;
+    uint64_t duration=videoTrack->_index[videoTrack->_nbIndex-1].timeCodeUs;
+      
+    if(duration) 
+          f=1000.*1000.*1000.*f/duration;
+     else  f=25000;
+    // If it was available from the metadata, use the one from metadata
+    if(! _videostream.dwRate)
         _videostream.dwRate=(uint32_t)floor(f);
-        _videostream.dwScale=1000;
-        _mainaviheader.dwMicroSecPerFrame=ADM_UsecFromFps1000(_videostream.dwRate);
+    _videostream.dwScale=1000;
+    _mainaviheader.dwMicroSecPerFrame=ADM_UsecFromFps1000(_videostream.dwRate);
    printf("[FLV] Duration %u ms\n",videoTrack->_index[videoTrack->_nbIndex-1].timeCodeUs/1000);
            
    //

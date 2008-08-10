@@ -6,6 +6,7 @@
 #include "ADM_default.h"
 #include "ADM_audioStream.h"
 #include "ADM_audioStreamMP3.h"
+#include "ADM_audioStreamAC3.h"
 
 /**
     \fn ADM_audioStream
@@ -20,6 +21,11 @@ ADM_audioStream::ADM_audioStream(WAVHeader *header,ADM_audioAccess *access)
     this->access=access;
     lastDts=ADM_AUDIO_NO_DTS;
     lastDtsBase=0;
+    if(access)
+        if(access->canGetDuration()==true)
+                durationInUs=access->getDurationInUs();
+        else    
+                durationInUs=0;
 }
 /**
     \fn goToTime
@@ -119,6 +125,8 @@ uint8_t *data;
 uint32_t size;
     switch(wavheader->encoding)
     {
+        case WAV_AC3:
+            return new ADM_audioStreamAC3(wavheader,access);
         case WAV_MP3:
             return new ADM_audioStreamMP3(wavheader,access);
         default:

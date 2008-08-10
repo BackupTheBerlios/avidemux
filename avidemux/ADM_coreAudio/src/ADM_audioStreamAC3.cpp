@@ -13,12 +13,15 @@
 */
 ADM_audioStreamAC3::ADM_audioStreamAC3(WAVHeader *header,ADM_audioAccess *access) : ADM_audioStreamBuffered(header,access)
 {
+    if(access->canGetDuration()==false)
+    {
         // We can compute the duration from the length
         float size=access->getLength();
               size/=header->byterate; // Result is in second
               size*=1000;
               size*=1000; // s->us
               durationInUs=(uint64_t)size;
+    }
 }
 
 /**
@@ -53,7 +56,7 @@ bool         ADM_audioStreamAC3::goToTime(uint64_t nbUs)
 /**
         \fn getPacket
 */
-uint8_t ADM_audioStreamAC3::getPacket(uint8_t *buffer,uint32_t *osize, uint32_t sizeMax,uint32_t *nbSample,uint64_t *dts)
+uint8_t ADM_audioStreamAC3::getPacket(uint8_t *obuffer,uint32_t *osize, uint32_t sizeMax,uint32_t *nbSample,uint64_t *dts)
 {
 #define ADM_LOOK_AHEAD 6 // Need 6 bytes...
 uint8_t data[ADM_LOOK_AHEAD];
@@ -88,7 +91,7 @@ int flags,sample_rate,bit_rate;
             return false;
         }
         *osize=size;
-        read(size,buffer);
+        read(size,obuffer);
         *nbSample=256*6;
         *dts=lastDts;
         advanceDtsBySample(*nbSample);

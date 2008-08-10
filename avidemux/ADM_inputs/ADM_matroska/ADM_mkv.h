@@ -1,8 +1,10 @@
 /***************************************************************************
-                          ADM_pics.h  -  description
+                          ADM_mkv.h  -  description
                              -------------------
-    begin                : Mon Jun 3 2002
-    copyright            : (C) 2002 by mean
+
+    Matroska demuxer
+    
+    copyright            : (C) 2008 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -24,25 +26,35 @@
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_inputs/ADM_matroska/ADM_ebml.h"
 
-
+/**
+    \struct mkvIndex
+    \brief defines a frame, audio or video
+*/
 typedef struct
 {
     uint64_t pos;
     uint32_t size;
     uint32_t flags;
-    uint32_t timeCode;  // In fact it is delta between DTS and PTS for audio...
+    uint64_t Dts;   // Dts in us-seconds
+    uint64_t Pts;   // Pts in us
 }mkvIndex;
-//**********************************************
+
+
+/**
+    \struct mkvTrak
+    \brief Hold information about a give track, the track #0  is always video.
+*/
 typedef struct
 {
   /* Index in mkv */
   uint32_t  streamIndex;
-
+  uint64_t  duration;  // Duration in us (timecode of the last frame)
   /* Used for audio */
   WAVHeader wavHeader;
   uint32_t  nbPackets; // number of blocks (used for audio)
   uint32_t  nbFrames;  // number of distinct frames
-  uint32_t  length;
+  uint32_t  length;    // Number of bytes seen
+  
   /* Used for both */
   uint8_t    *extraData;
   uint32_t   extraDataLen;
@@ -54,41 +66,49 @@ typedef struct
 }mkvTrak;
 
 #define MKV_MAX_LACES 20 // ?
-//**********************************************
-class mkvAudio : public AVDMGenericAudioStream
+/**
+    \class mkvAccess
+    \brief Matroska audio demuxer
+*/
+class mkvAccess : public ADM_audioAccess
 {
-  protected:
+protected:
     mkvTrak                     *_track;
     ADM_ebml_file               *_parser;
-    ADM_ebml_file               *_clusterParser;
-    mkvIndex                    *_clusters;
-    uint32_t                    _nbClusters;
-    uint32_t                    _currentCluster;
 
-    uint32_t                    _frameDurationInSample; // Nb Samples per frame
+    uint32_t                    _currentBlock;
     uint32_t                    _currentLace;
     uint32_t                    _maxLace;
     uint32_t                    _Laces[MKV_MAX_LACES];
 
-    uint8_t                     goToCluster(uint32_t x);
-    uint8_t                     getPacket(uint8_t *dest, uint32_t *packlen, uint32_t *samples,uint32_t *timecode);
-    uint32_t                    _curTimeCode;
-  public:
-                                mkvAudio(const char *name,mkvTrak *track,mkvIndex *clust,uint32_t nbClusters);
-
-
-    virtual                     ~mkvAudio();
-    virtual uint32_t            read(uint32_t len,uint8_t *buffer);
-    virtual uint8_t             goTo(uint32_t newoffset);
-            uint8_t	        goToTime(uint32_t mstime);
-    virtual uint8_t             getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
-  //  virtual uint8_t             goToTime(uint32_t mstime);
-    virtual uint8_t             extraData(uint32_t *l,uint8_t **d);
+    uint8_t                     goToBlock(uint32_t x);
+ 
+public:
+                                  mkvAccess(const char *name,mkvTrak *track);
+                virtual           ~mkvAccess();
+                                    /// Hint, the stream is pure CBR (AC3,MP2,MP3)
+                virtual bool      isCBR(void) { return false;}
+                                    /// Return true if the demuxer can seek in time
+                virtual bool      canSeekTime(void) {return true;};
+                                    /// Return true if the demuxer can seek by offser
+                virtual bool      canSeekOffset(void) {return false;};
+                                    /// Return true if we can have the audio duration
+                virtual bool      canGetDuration(void) {return true;};
+                                    ///
+                virtual uint64_t  getDurationInUs(void);
+                                    /// Go to a given time
+                virtual bool      goToTime(uint64_t timeUs);
+                                    /// Grab extra data                
+                virtual bool      getPacket(uint8_t *buffer, uint32_t *size, uint32_t maxSize,uint64_t *dts);
 };
 
 
-#define ADM_MKV_MAX_TRACKS 20
 
+#define ADM_MKV_MAX_TRACKS 20
+/**
+    \class mkvHeader
+    \brief Matroska demuxer
+*/
 class mkvHeader         :public vidHeader
 {
   protected:
@@ -97,9 +117,9 @@ class mkvHeader         :public vidHeader
     char                    *_filename;
     mkvTrak                 _tracks[ADM_MKV_MAX_TRACKS+1];
 
-    mkvIndex                    *_clusters;
-    uint32_t                    _nbClusters;
-    uint32_t                    _clustersCeil;
+    mkvIndex                *_clusters;
+    uint32_t                _nbClusters;
+    uint32_t                _clustersCeil;
 
     uint32_t                _nbAudioTrack;
     uint32_t                _currentAudioTrack;
@@ -145,9 +165,9 @@ class mkvHeader         :public vidHeader
   //  Audio
   //__________________________
 
-    virtual   WAVHeader *getAudioInfo(void ) ;
-    virtual uint8_t getAudioStream(AVDMGenericAudioStream **audio);
-
+virtual 	WAVHeader              *getAudioInfo(void );
+virtual 	uint8_t                 getAudioStream(ADM_audioStream  **audio);
+//virtual     uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **info);
 
 // Frames
   //__________________________
