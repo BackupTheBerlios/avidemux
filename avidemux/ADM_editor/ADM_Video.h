@@ -55,20 +55,20 @@ class vidHeader
 {
 protected:
           MainAVIHeader 	_mainaviheader;
-          uint8_t		_isvideopresent;
+          uint8_t		    _isvideopresent;
           AVIStreamHeader 	_videostream;
           ADM_BITMAPINFOHEADER  _video_bih;
-          uint8_t		_isaudiopresent;
+          uint8_t		    _isaudiopresent;
           AVIStreamHeader 	_audiostream;
-          void			*_audiostreaminfo;
-          char			*_name;
-          uint32_t		_videoExtraLen;
-          uint8_t		*_videoExtraData;
+          void			   *_audiostreaminfo;
+          char			   *_name;
+          uint32_t		    _videoExtraLen;
+          uint8_t		   *_videoExtraData;
                     
 public:
 //  static int checkFourCC(uint8_t *in, uint8_t *fourcc);
-         vidHeader();
-virtual   ~vidHeader() ;
+                                vidHeader();
+virtual                         ~vidHeader() ;
 virtual   uint8_t               hasPtsDts(void) {return 0;}; // Return 1 if the container gives PTS & DTS info
 virtual   uint32_t              ptsDtsDelta(uint32_t framenum) ;
 virtual   void 			Dump(void)=0;
