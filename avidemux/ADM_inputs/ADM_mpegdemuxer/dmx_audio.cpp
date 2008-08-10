@@ -38,10 +38,10 @@
 #include "ADM_osSupport/ADM_debug.h"
 
 #include "dmx_audio.h"
-#include "ADM_audio/ADM_mp3info.h"
-#include "ADM_audio/ADM_a52info.h"
-#include "ADM_audio/ADM_dcainfo.h"
-#include "ADM_audio/ADM_aacinfo.h"
+#include "ADM_mp3info.h"
+#include "ADM_a52info.h"
+#include "ADM_dcainfo.h"
+#include "ADM_aacinfo.h"
 #define MAX_LINE 4096
 #define PROBE_SIZE (4096*4)
 #define DMX_MIN_AUDIO_DETECTED PROBE_SIZE //we must have at least that bytes to consider the audio as valid

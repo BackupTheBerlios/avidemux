@@ -10,11 +10,10 @@
 //
 //
 
-#include "config.h"
-#include <stdio.h>
+
 #include "ADM_default.h"
-#include "ADM_assert.h"
-#include "ADM_audio/ADM_a52info.h"
+
+#include "ADM_a52info.h"
 
 #define A52_CHANNEL 0
 #define A52_MONO 1

@@ -28,7 +28,7 @@
 #include "aviaudio.hxx"
 #include "ADM_audio/audioex.h"
 
-#include "ADM_audio/ADM_a52info.h"
+#include "ADM_a52info.h"
 
 uint8_t AVDMAC3AudioStream::open(char *name)
 {

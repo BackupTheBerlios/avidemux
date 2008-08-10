@@ -7,7 +7,7 @@ GPL-v2
 */
 #include "ADM_default.h"
 #include "ADM_audioStreamMP3.h"
-#include "../../ADM_audio/ADM_mp3info.h"
+#include "ADM_mp3info.h"
 
 /**
     \fn ADM_audioStreamMP3

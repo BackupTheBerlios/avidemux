@@ -32,9 +32,9 @@
 #include "dmx_identify.h"
 #include "dmx_probe.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_busy.h"
-#include "ADM_audio/ADM_mp3info.h"
-#include "ADM_audio/ADM_a52info.h"
-#include "ADM_audio/ADM_dcainfo.h"
+#include "ADM_mp3info.h"
+#include "ADM_a52info.h"
+#include "ADM_dcainfo.h"
 
 
 

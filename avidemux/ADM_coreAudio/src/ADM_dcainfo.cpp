@@ -10,10 +10,9 @@
 //
 //
 
-#include "config.h"
-#include <stdio.h>
 #include "ADM_default.h"
-#include "ADM_audio/ADM_dcainfo.h"
+#include "ADM_dcainfo.h"
+#if 0
 extern "C"
 {
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavutil/common.h"
@@ -112,3 +111,4 @@ uint32_t size,len1,len2,flags,sr,framesize=0,index,nbBlocks;
             printf("[DTS] Cannot find sync\n");
 	      return 0;
 }
+#endif

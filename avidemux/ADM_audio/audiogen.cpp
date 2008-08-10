@@ -32,7 +32,7 @@
 #include "fourcc.h"
 #include "aviaudio.hxx"
 #include "ADM_outputs/oplug_avi/avilist.h"
-#include "ADM_audio/ADM_a52info.h"
+#include "ADM_a52info.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_AUDIO

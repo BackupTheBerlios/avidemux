@@ -18,18 +18,14 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
+
 #include <math.h>
 
 
 #include "ADM_default.h"
-#include "aviaudio.hxx"
-#include "ADM_audio/ADM_mp3info.h"
+
+#include "ADM_mp3info.h"
 
 static  uint32_t MP3Fq[4] = { 44100, 48000, 32000, 0 };       
 static uint32_t MP2Fq[4] = { 22050, 24000, 16000, 0 };       

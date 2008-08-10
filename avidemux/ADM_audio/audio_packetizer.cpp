@@ -29,10 +29,10 @@ Split a stream into packet(s)
 #include "fourcc.h"
 #include "aviaudio.hxx"
 
-#include "ADM_audio/ADM_a52info.h"
-#include "ADM_audio/ADM_mp3info.h"
-#include "ADM_audio/ADM_aacinfo.h"
-#include "ADM_audio/ADM_dcainfo.h"
+#include "ADM_a52info.h"
+#include "ADM_mp3info.h"
+#include "ADM_aacinfo.h"
+#include "ADM_dcainfo.h"
 
 #define MINSTOCK 5000
 #define MINUS_ONE 0xffffffff
@@ -320,7 +320,7 @@ uint8_t  headerfound=0;
                         continue;
                         }
 //int ADM_DCAGetInfo(uint8_t *buf, uint32_t len, uint32_t *fq, uint32_t *br, uint32_t *chan,uint32_t *syncoff,uint32_t *flags);
-                        size= ADM_DCAGetInfo (&packetBuffer[start],packetTail-start,  &sample_rate,&bit_rate, &chan,&syncoff,&flags,&nbs);
+                    //    size= ADM_DCAGetInfo (&packetBuffer[start],packetTail-start,  &sample_rate,&bit_rate, &chan,&syncoff,&flags,&nbs);
                         if(!size)
                         {
                                 printf("DTS: Cannot sync\n");

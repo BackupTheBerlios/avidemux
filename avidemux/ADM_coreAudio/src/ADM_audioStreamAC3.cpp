@@ -5,7 +5,7 @@
 */
 #include "ADM_default.h"
 #include "ADM_audioStreamAC3.h"
-#include "../../ADM_audio/ADM_a52info.h"
+#include "ADM_a52info.h"
 
 /**
     \fn ADM_audioStreamAC3

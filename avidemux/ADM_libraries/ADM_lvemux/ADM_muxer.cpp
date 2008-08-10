@@ -25,7 +25,7 @@
 
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_muxer.h"
-#include "ADM_audio/ADM_a52info.h"
+#include "ADM_a52info.h"
 
 extern "C" {
 	#include "mux_out.h"

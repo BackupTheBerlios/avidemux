@@ -16,7 +16,7 @@
 #include "ADM_editor/ADM_Video.h"
 
 #include "ADM_mkv.h"
-#include "ADM_audio/ADM_a52info.h"
+#include "ADM_a52info.h"
 
 #define vprintf(...) {}
 

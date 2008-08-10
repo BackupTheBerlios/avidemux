@@ -32,7 +32,7 @@
 #include "fourcc.h"
 #include "aviaudio.hxx"
 
-#include "ADM_audio/ADM_mp3info.h" 
+#include "ADM_mp3info.h" 
 
    
 uint8_t mpegAudioIdentify(uint8_t *ptr, uint32_t maxLookUp, WAVHeader *header, uint8_t *tokens)

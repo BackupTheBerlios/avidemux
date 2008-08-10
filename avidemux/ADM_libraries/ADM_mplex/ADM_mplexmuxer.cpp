@@ -34,7 +34,7 @@
 
 
 #include "ADM_audiofilter/audioprocess.hxx"
-#include "ADM_audio/ADM_a52info.h"
+#include "ADM_a52info.h"
 #include "avifmt.h"
 #include "avifmt2.h"
 #include "ADM_editor/ADM_Video.h"

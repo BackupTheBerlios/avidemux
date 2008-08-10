@@ -30,7 +30,7 @@
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
 
-#include "ADM_audio/ADM_mp3info.h"
+#include "ADM_mp3info.h"
 
 #define ATOM 100 //1152>>1
 #define BIG_BUFFER (128*1024)
