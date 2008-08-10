@@ -17,6 +17,14 @@
 #ifndef ADM_DYNAMICLOADING_H
 #define ADM_DYNAMICLOADING_H
 
+#ifdef __WIN32
+#define SHARED_LIB_EXT "dll"
+#elif defined(__APPLE__)
+#define SHARED_LIB_EXT "dylib"
+#else
+#define SHARED_LIB_EXT "so"
+#endif
+
 class ADM_LibWrapper
 {
 	protected:

@@ -13,9 +13,10 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
+//#include "config.h"
 #include "ADM_default.h"
 #include "DIA_factory.h"
+
 /* Functions we need to get infos */
 uint32_t ADM_ad_getNbFilters(void);
 bool     ADM_ad_getFilterInfo(int filter, const char **name, uint32_t *major,uint32_t *minor,uint32_t *patch);
@@ -25,6 +26,10 @@ uint32_t ADM_ve_getNbEncoders(void);
 bool     ADM_ve_getEncoderInfo(int filter, const char **name, uint32_t *major,uint32_t *minor,uint32_t *patch);
 uint32_t ADM_ae_getPluginNbEncoders(void);
 bool     ADM_ae_getAPluginEncoderInfo(int filter, const char **name, uint32_t *major,uint32_t *minor,uint32_t *patch);
+uint32_t ADM_dm_getNbDemuxers(void);
+bool     ADM_dm_getDemuxerInfo(int filter, const char **name, uint32_t *major,uint32_t *minor,uint32_t *patch);
+
+#define QT_TR_NOOP(x) x
 
 /* /Functions */
 /**
@@ -38,6 +43,7 @@ uint8_t DIA_pluginsInfo(void)
     uint32_t veNbPlugin=ADM_ve_getNbEncoders();
     uint32_t avNbPlugin=ADM_av_getNbDevices();
     uint32_t aeNbPlugin=ADM_ae_getPluginNbEncoders();
+    uint32_t dmNbPlugin=ADM_dm_getNbDemuxers();
     // Audio Plugins
 
     printf("[Audio Plugins] Found %u plugins\n",aNbPlugin);
@@ -155,10 +161,40 @@ uint8_t DIA_pluginsInfo(void)
 
     // /Audio Encoder
 
+ // Demuxer Encoder
+    printf("[Demuxers Plugins] Found %u plugins\n",dmNbPlugin);
+    diaElemReadOnlyText *dmText[dmNbPlugin];
+    diaElemFrame frameDM(QT_TR_NOOP("Demuxer Plugins"));
+    
+ for(int i=0;i<dmNbPlugin;i++)
+    {
+        const char *name;
+        uint32_t major,minor,patch;
+        char versionString[256];
+        char infoString[256];
+        char *end;
+            ADM_dm_getDemuxerInfo(i, &name,&major,&minor,&patch);
+            snprintf(versionString,255,"%02d.%02d.%02d",major,minor,patch);
+            strncpy(infoString,name,255);
+            if(strlen(infoString))
+            {
+                end=strlen(infoString)+infoString-1;
+                // Remove trailing line feed
+                while(*end==0x0a || *end==0x0d) *end--=0;
+            }
+            dmText[i]=new diaElemReadOnlyText(infoString,versionString);
+            frameDM.swallow(aeText[i]);
+    }
+    diaElem *diaDM[]={&frameDM};
+    diaElemTabs tabDM(QT_TR_NOOP("Demuxers"),1,diaDM);
+
+    // /Demuxer Encoder
 
 
-    diaElemTabs *tabs[]={&tabAudio,&tabVE,&tabAV,&tabAE};
-    diaFactoryRunTabs(QT_TR_NOOP("Plugins Info"),4,tabs);
+
+
+    diaElemTabs *tabs[]={&tabAudio,&tabVE,&tabAV,&tabAE,&tabDM};
+    diaFactoryRunTabs(QT_TR_NOOP("Plugins Info"),5,tabs);
 
     for(int i=0;i<aNbPlugin;i++)
         delete aText[i];
@@ -168,6 +204,7 @@ uint8_t DIA_pluginsInfo(void)
         delete avText[i];
     for(int i=0;i<aeNbPlugin;i++)
         delete aeText[i];
-
+    for(int i=0;i<dmNbPlugin;i++)
+        delete dmText[i];
     return 1;
 }

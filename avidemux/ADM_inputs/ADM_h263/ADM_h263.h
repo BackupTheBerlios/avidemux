@@ -22,7 +22,7 @@
 #include "avifmt.h"
 #include "avifmt2.h"
 
-#include "ADM_editor/ADM_Video.h"
+#include "ADM_Video.h"
 #include "ADM_audio/aviaudio.hxx"
 
 

@@ -17,7 +17,7 @@
 #include "avifmt.h"
 #include "avifmt2.h"
 
-#include "ADM_editor/ADM_Video.h"
+#include "ADM_Video.h"
 #include "ADM_inputs/ADM_openDML/ADM_riff.h"
 #include "ADM_audioStream.h"
 class AVDMGenericAudioStream;

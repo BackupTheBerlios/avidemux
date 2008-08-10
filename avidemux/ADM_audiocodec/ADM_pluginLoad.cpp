@@ -134,14 +134,6 @@ uint8_t ADM_ad_loadPlugins(const char *path)
 {
 #define MAX_EXTERNAL_FILTER 50
 
-#ifdef __WIN32
-#define SHARED_LIB_EXT "dll"
-#elif defined(__APPLE__)
-#define SHARED_LIB_EXT "dylib"
-#else
-#define SHARED_LIB_EXT "so"
-#endif
-
 	char *files[MAX_EXTERNAL_FILTER];
 	uint32_t nbFile;
 

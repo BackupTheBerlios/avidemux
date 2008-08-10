@@ -29,7 +29,7 @@
  ***************************************************************************/
  #ifndef __ADM_composer__
  #define __ADM_composer__
- #include "../ADM_editor/ADM_Video.h"
+ #include "ADM_Video.h"
  #include "../ADM_codecs/ADM_codec.h"
  #include "ADM_image.h"
  #include "../ADM_editor/ADM_edCache.h"

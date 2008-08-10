@@ -19,7 +19,7 @@
 #endif
 
 #include "ADM_default.h"
-#include "ADM_editor/ADM_Video.h"
+#include "ADM_Video.h"
 
 #include "fourcc.h"
 #include "ADM_openDML.h"

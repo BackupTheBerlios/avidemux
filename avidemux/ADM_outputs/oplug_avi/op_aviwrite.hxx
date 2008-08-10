@@ -22,6 +22,7 @@
  #ifndef __op_avi__
  #define __op_avi__
 #include "ADM_audioStream.h"
+#include "avilist.h"
  class  aviWrite
  {
  protected:

@@ -37,7 +37,7 @@
 #include "ADM_a52info.h"
 #include "avifmt.h"
 #include "avifmt2.h"
-#include "ADM_editor/ADM_Video.h"
+#include "ADM_Video.h"
 #include "ADM_outputs/ADM_lavformat.h"
 
 #include "ADM_osSupport/ADM_debugID.h"

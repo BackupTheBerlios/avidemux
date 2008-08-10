@@ -20,7 +20,7 @@
 #ifndef ADM_AMV_H
 #define ADM_AMV_H
 
-#include "ADM_editor/ADM_Video.h"
+#include "ADM_Video.h"
 #include "ADM_audio/aviaudio.hxx"
 
 

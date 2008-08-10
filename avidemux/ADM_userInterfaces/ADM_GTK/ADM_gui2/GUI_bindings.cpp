@@ -28,7 +28,7 @@
 #include "../ADM_commonUI/GUI_ui.h"
 
 #include "DIA_fileSel.h"
-#include "ADM_editor/ADM_Video.h"
+#include "ADM_Video.h"
 
 #include "prefs.h"
 #include "../ADM_toolkit_gtk/gtkmarkscale.h"

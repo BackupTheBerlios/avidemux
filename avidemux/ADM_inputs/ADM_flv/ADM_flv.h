@@ -20,7 +20,7 @@
 #ifndef ADM_FLV_H
 #define ADM_FLV_H
 
-#include "ADM_editor/ADM_Video.h"
+#include "ADM_Video.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audioStream.h"
 

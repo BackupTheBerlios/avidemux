@@ -13,7 +13,7 @@
  ***************************************************************************/
 #include "ADM_default.h"
 #include "math.h"
-#include "ADM_editor/ADM_Video.h"
+#include "ADM_Video.h"
 
 #include "ADM_mkv.h"
 #include "ADM_a52info.h"

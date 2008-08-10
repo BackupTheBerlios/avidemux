@@ -20,7 +20,7 @@
 #include <string.h>
 #include "ADM_assert.h"
 #include "config.h"
-#include "ADM_editor/ADM_Video.h"
+#include "ADM_Video.h"
 vidHeader::~vidHeader ()
 {
   if (_name)
