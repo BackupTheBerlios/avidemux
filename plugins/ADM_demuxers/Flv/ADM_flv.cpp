@@ -338,6 +338,15 @@ uint8_t flvHeader::open(const char *name)
   return 1;
 }
 /**
+        \fn getVideoDuration
+        \brief Returns duration of video in us
+*/
+uint64_t flvHeader::getVideoDuration(void)
+{
+     uint64_t dur=videoTrack->_index[videoTrack->_nbIndex-1].timeCodeUs; 
+}
+
+/**
       \fn setVideoHeader
       \brief Set codec and stuff
 */
@@ -494,8 +503,9 @@ void flvHeader::Dump(void)
 {
  
 }
-/*
-    __________________________________________________________
+/**
+    \fn close
+    \brief cleanup
 */
 
 uint8_t flvHeader::close(void)
@@ -513,8 +523,9 @@ uint8_t flvHeader::close(void)
   _audioStream=NULL;
   access=NULL;
 }
-/*
-    __________________________________________________________
+/**
+    \fn flvHeader
+    \brief constructor
 */
 
  flvHeader::flvHeader( void ) : vidHeader()
@@ -529,8 +540,9 @@ uint8_t flvHeader::close(void)
     memset(&wavHeader,0,sizeof(wavHeader));
     
 }
-/*
-    __________________________________________________________
+/**
+    \fn flvHeader
+    \brief destructor
 */
 
  flvHeader::~flvHeader(  )
@@ -538,12 +550,10 @@ uint8_t flvHeader::close(void)
   close();
 }
 
-/*
-    __________________________________________________________
-*/
 
-/*
-    __________________________________________________________
+/**
+    \fn setFlag
+    \brief Returns timestamp in us of frame "frame" (PTS)
 */
 
   uint8_t  flvHeader::setFlag(uint32_t frame,uint32_t flags)
@@ -556,8 +566,9 @@ uint8_t flvHeader::close(void)
     videoTrack->_index[frame].flags=flags;
     return 1;
 }
-/*
-    __________________________________________________________
+/**
+    \fn getFlags
+    \brief Returns timestamp in us of frame "frame" (PTS)
 */
 
 uint32_t flvHeader::getFlags(uint32_t frame,uint32_t *flags)
@@ -571,11 +582,22 @@ uint32_t flvHeader::getFlags(uint32_t frame,uint32_t *flags)
     *flags=videoTrack->_index[frame].flags;
     return  1;
 }
-/*
-    __________________________________________________________
+
+/**
+    \fn getTime
+    \brief Returns timestamp in us of frame "frame" (PTS)
+*/
+uint64_t flvHeader::getTime(uint32_t frame)
+{
+     if(frame>=videoTrack->_nbIndex) return 0;
+     flvIndex *idx=&(videoTrack->_index[frame]);
+     return idx->timeCodeUs;
+}
+/**
+        \fn getFrame
 */
 
-uint8_t  flvHeader::getFrameNoAlloc(uint32_t frame,ADMCompressedImage *img)
+uint8_t  flvHeader::getFrame(uint32_t frame,ADMCompressedImage *img)
 {
      if(frame>=videoTrack->_nbIndex) return 0;
      flvIndex *idx=&(videoTrack->_index[frame]);
@@ -583,12 +605,13 @@ uint8_t  flvHeader::getFrameNoAlloc(uint32_t frame,ADMCompressedImage *img)
      fread(img->data,idx->size,1,_fd);
      img->dataLength=idx->size;
      img->flags=idx->flags;
+     img->demuxerDts=idx->timeCodeUs;
+     img->demuxerPts=ADM_COMPRESSED_NO_PTS;
      return 1;
 }
-/*
-    __________________________________________________________
+/**
+        \fn getExtraHeaderData
 */
-
 uint8_t  flvHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
 {
                 *len=0; //_tracks[0].extraDataLen;
@@ -610,7 +633,7 @@ uint8_t flvHeader::getFrameSize (uint32_t frame, uint32_t * size)
   *size = videoTrack->_index[frame].size;
   return 1;
 }
-#if 0
+
 /**
     \fn getAudioStreamsInfo
     \brief returns infos about audio streams (code,...)
@@ -635,5 +658,5 @@ uint8_t  flvHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
     *infos=nfo;
     return 1;
 }
-#endif
+
 //EOF

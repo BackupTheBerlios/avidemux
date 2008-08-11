@@ -123,7 +123,7 @@ GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
   uint8_t    ret1;
  ADMCompressedImage img;
  ADMBitstream bitstream;
- 
+ uint8_t seq;
       img.data=vbuffer;
       bitstream.bufferSize=_incoming->getInfo ()->width *   _incoming->getInfo ()->height * 3;
       bitstream.data=vbuffer;
@@ -131,7 +131,7 @@ GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
       
        if(!video_body->isReordered(frameStart+frame))
       {
-          ret1 = video_body->getFrameNoAlloc (frameStart + frame,&img);// vbuffer, &len,      &_videoFlag);
+          ret1 = video_body->getFrame (frameStart + frame,&img,&seq);// vbuffer, &len,      &_videoFlag);
           _videoFlag=img.flags;
       }
       else

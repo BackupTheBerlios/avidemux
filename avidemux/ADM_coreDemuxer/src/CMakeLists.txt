@@ -1,6 +1,8 @@
 
 SET(ADMcoreDemuxer_SRCS
 ADM_dynaDemuxer.cpp
+ADM_demuxer.cpp
+fourcc.cpp
 )	
 #*************************************************
 ADD_LIBRARY(ADM_coreDemuxer SHARED ${ADMcoreDemuxer_SRCS})

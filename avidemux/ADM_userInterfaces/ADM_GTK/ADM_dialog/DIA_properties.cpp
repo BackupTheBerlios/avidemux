@@ -56,14 +56,11 @@ void DIA_properties( void )
         sprintf(text, "%s", fourCC::tostring(avifileinfo->fcc));
         FILL_ENTRY(label_videofourcc);
 
-        if (avifileinfo->nb_frames)
-          {
-                frame2time(avifileinfo->nb_frames, avifileinfo->fps1000,
-                          &hh, &mm, &ss, &ms);
-                sprintf(text, QT_TR_NOOP("%02d:%02d:%02d.%03d"), hh, mm, ss, ms);
-                FILL_ENTRY(label_duration);	
-  
-          }
+        uint64_t duration=video_body->getVideoDuration();
+        duration/=1000;
+        ms2time((uint32_t)duration,&hh,&mm,&ss,&ms);
+        sprintf(text, QT_TR_NOOP("%02d:%02d:%02d.%03d"), hh, mm, ss, ms);
+        FILL_ENTRY(label_duration);	
         // Fill in vop, gmc & qpel
         SET_YES(labelPacked,vop);
         SET_YES(labelGMC,gmc);

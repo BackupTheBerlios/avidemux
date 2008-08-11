@@ -15,11 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 #include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-#include "config.h"
+#include "ADM_default.h"
 #include "ADM_Video.h"
 vidHeader::~vidHeader ()
 {
@@ -53,23 +49,6 @@ vidHeader::vidHeader (void)
   _name = NULL;
   _videoExtraData = NULL;
   _videoExtraLen = 0;
-}
-uint32_t             vidHeader::ptsDtsDelta(uint32_t framenum)
-{
-  ADM_assert(0);
-  return 0; 
-}
-uint32_t vidHeader::getTime (uint32_t frame)
-{
-
-  double
-    one;
-  one = 1. / _videostream.dwRate;
-  one *= 1000;
-  one *= _videostream.dwScale;
-  one *= frame;
-
-  return (uint32_t) floor (one);
 }
 
 //_______________________________________
@@ -124,12 +103,7 @@ uint8_t vidHeader::getFrameSize (uint32_t frame, uint32_t * size)
   return 0;
 }
 
-uint8_t vidHeader::getRawStart (uint8_t * ptr, uint32_t * len)
-{
-  UNUSED_ARG (ptr);
-  *len = 0;
-  return 1;
-}
+
 uint8_t                 vidHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
 {
 WAVHeader *wav;

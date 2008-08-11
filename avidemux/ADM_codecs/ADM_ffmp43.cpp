@@ -63,7 +63,10 @@ extern "C"
   int av_is_voppacked (AVCodecContext * avctx, int *vop_packed, int *gmc,
 		       int *qpel);
 };
-
+/**
+    \fn clonePic
+    \brief Convert AvFrame to ADMImage
+*/
 uint8_t decoderFF::clonePic (AVFrame * src, ADMImage * out)
 {
   uint32_t    u,v;
@@ -103,10 +106,13 @@ uint8_t decoderFF::clonePic (AVFrame * src, ADMImage * out)
       out->_qSize = out->_qStride = 0;
       out->quant = NULL;
     }
-  out->demuxerFrameno=(uint32_t) (uint64_t)(src->opaque);
+    out->Pts=(uint32_t) (uint64_t)(src->opaque);
 }
-void
-decoderFF::decoderMultiThread (void)
+/**
+        \fn decoderMultiThread
+        \brief Enabled multitheaded decoder if possible
+*/
+void decoderFF::decoderMultiThread (void)
 {
   uint32_t threads = 0;
 
@@ -239,7 +245,10 @@ decoderFF::~decoderFF ()
   printf ("[lavc] Destroyed\n");
 }
 
-//-------------------------------
+/**
+    \fn frameType
+    \return frametype of the last decoded frame
+*/
 uint32_t decoderFF::frameType (void)
 {
   uint32_t
@@ -299,7 +308,10 @@ uint8_t decoderFF::decodeFull (void)
   printf ("\n[lavc] full decoding\n");
   return 1;
 }
-
+/**
+    \fn uncompress
+    \brief Actually decode an image
+*/
 uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
 {
   int got_picture = 0;
@@ -312,7 +324,6 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
     {
       _context->debug_mv |= FF_SHOW;
       _context->debug |= 0;	//FF_DEBUG_VIS_MB_TYPE;
-      //_context->debug       |=FF_DEBUG_VIS_MB_TYPE+FF_DEBUG_VIS_QP;
     }
   else
     {
@@ -320,7 +331,7 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
       _context->debug &= ~(FF_DEBUG_VIS_MB_TYPE + FF_DEBUG_VIS_QP);
     }
 
-    
+   
     
   if (in->dataLength == 0 && !_allowNull)	// Null frame, silently skipped
     {
@@ -331,14 +342,19 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
 	if (_context->coded_frame && _context->coded_frame->data)
 	  {
 	    clonePic (_context->coded_frame, out);
+        out->Pts=ADM_COMPRESSED_NO_PTS;
 	  }
 	else
 	  out->_noPicture = 1;
       }
       return 1;
     }
-  
-  _frame.opaque=(void *)in->demuxerFrameNo;
+   // Put a safe value....
+    if(in->demuxerPts==ADM_COMPRESSED_NO_PTS)
+        out->Pts=in->demuxerDts;
+    else
+        out->Pts=in->demuxerPts;
+  _frame.opaque=(void *)out->Pts;
   
   ret = avcodec_decode_video (_context, &_frame, &got_picture, in->data, in->dataLength);
   out->_qStride = 0;		//Default = no quant
@@ -392,7 +408,7 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
       out->flags = frameType ();
       return 1;
     }
-
+  // We have an image....
   switch (_context->pix_fmt)
     {
     case PIX_FMT_YUV411P:
@@ -428,11 +444,8 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
       return 0;
     }
     clonePic (&_frame, out);
-    #if 0
-    printf("[lavc] Frame bitstream order: %u, display order %u Incoming: %u outgoing: %u\n",_frame.coded_picture_number,_frame.display_picture_number,
-         in->demuxerFrameNo,out->demuxerFrameno);
-    printf("[lavc] in flags: %x out flags: %x\n",in->flags, out->flags);
- #endif 
+    printf("[AvCodec] Pts : %llu Out Pts:%llu \n",_frame.pts,out->Pts);
+
   return 1;
 }
 

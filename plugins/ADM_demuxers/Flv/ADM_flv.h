@@ -80,7 +80,11 @@ public:
 };
 
 
-//*****************************************************
+/**
+    \Class flvHeader
+    \brief Flash demuxer
+
+*/
 class flvHeader         :public vidHeader
 {
   protected:
@@ -128,10 +132,9 @@ class flvHeader         :public vidHeader
   //  Audio
   //__________________________
 
-    virtual   WAVHeader *getAudioInfo(void ) ;
-    
-    virtual uint8_t getAudioStream(ADM_audioStream  **audio);
-
+    virtual WAVHeader  *getAudioInfo(void ) ;
+    virtual uint8_t     getAudioStream(ADM_audioStream  **audio);
+    virtual uint8_t     getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **info);
 // Frames
   //__________________________
   //  video
@@ -139,9 +142,10 @@ class flvHeader         :public vidHeader
 
     virtual uint8_t  setFlag(uint32_t frame,uint32_t flags);
     virtual uint32_t getFlags(uint32_t frame,uint32_t *flags);
-    virtual uint8_t  getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img);
-
+    virtual uint8_t  getFrame(uint32_t framenum,ADMCompressedImage *img);
+    virtual uint64_t getTime(uint32_t frame);
             uint8_t  getExtraHeaderData(uint32_t *len, uint8_t **data);
+    virtual uint64_t getVideoDuration(void);
 
 };
 #endif

@@ -131,6 +131,7 @@ uint8_t
 EncoderCopy::encode (uint32_t frame, ADMBitstream *out)
 {
   uint8_t ret = 0;
+  uint8_t seq;
   out->dtsFrame = frame;
   
   if (frame >= _total)
@@ -141,15 +142,18 @@ EncoderCopy::encode (uint32_t frame, ADMBitstream *out)
   // No B frames, take as is
  ADMCompressedImage img;
  img.data=out->data;
+ 
   if (!video_body->isReordered (frameStart + frame))
     {
-      ret =video_body->getFrameNoAlloc (_frameStart + frame, &img);
+      ret =video_body->getFrame (_frameStart + frame, &img,&seq);
       out->len=img.dataLength;
       out->flags=img.flags;
+#if 0
       if(video_body->hasPtsDts(frameStart+frame))
       {
         out->ptsFrame = frame+video_body->ptsDtsDelta(frameStart+frame);
       }else
+#endif
         out->ptsFrame = frame;
       return ret;
     }
@@ -160,13 +164,13 @@ EncoderCopy::encode (uint32_t frame, ADMBitstream *out)
     {				// search if we have to send a I/P frame in adance
       aprintf ("\tIt is a B frame\n");
       uint32_t forward;
-
+      uint8_t seq;
       forward = searchForward (_frameStart + frame);
       // if we did not sent it, do it now
       if (forward != _lastIPFrameSent)
       {
           aprintf ("\tP Frame not sent, sending it :%lu\n", forward);
-          ret = video_body->getFrameNoAlloc (forward, &img);
+          ret = video_body->getFrame (forward, &img,&seq);
           out->len=img.dataLength;
           out->flags=img.flags;
           _lastIPFrameSent = forward;
@@ -178,7 +182,7 @@ EncoderCopy::encode (uint32_t frame, ADMBitstream *out)
         // send n-1
             aprintf ("\tP Frame already, sending  :%lu\n",
                 frameStart + frame - 1);
-            ret =video_body->getFrameNoAlloc (_frameStart + frame - 1, &img);
+            ret =video_body->getFrame (_frameStart + frame - 1, &img,&seq);
             out->len=img.dataLength;
             out->flags=img.flags;
             out->ptsFrame = frame - 1;
@@ -191,7 +195,7 @@ EncoderCopy::encode (uint32_t frame, ADMBitstream *out)
         {
             aprintf ("\tSending Last B-frame :(%lu)\n",
                     _frameStart + frame - 1);
-            ret=video_body->getFrameNoAlloc (_frameStart+frame - 1,&img);
+            ret=video_body->getFrame (_frameStart+frame - 1,&img,&seq);
             out->len=img.dataLength;
             out->flags=img.flags;
             out->ptsFrame  = frame - 1;
@@ -201,7 +205,7 @@ EncoderCopy::encode (uint32_t frame, ADMBitstream *out)
 	{
         aprintf ("\tJust sending it :(%lu)-(%lu)\n", _frameStart + frame,
                 _lastIPFrameSent);
-        ret=video_body->getFrameNoAlloc (_frameStart+frame, &img);
+        ret=video_body->getFrame (_frameStart+frame, &img,&seq);
         out->len=img.dataLength;
         out->flags=img.flags;
         out->ptsFrame  = frame;

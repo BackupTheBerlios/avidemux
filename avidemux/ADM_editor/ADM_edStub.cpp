@@ -112,9 +112,11 @@ decoders 		*ADM_Composer::rawGetDecoder(uint32_t frame)
    ref = _segments[seg]._reference;
     return _videos[ref].decoder;
 }
-
-uint8_t
-  ADM_Composer::getFrameNoAlloc (uint32_t framenum, ADMCompressedImage *img, uint8_t * seq)
+/**
+    \fn getFrame
+    \brief returns the raw frame from the demuxer with len pts & dts
+*/
+uint8_t   ADM_Composer::getFrame (uint32_t framenum, ADMCompressedImage *img, uint8_t *isSeq)
 {
   uint32_t relframe;
   uint32_t seg;
@@ -127,19 +129,19 @@ uint8_t
 #if 0
   printf ("\n %lu --> %lu,%lu\n", framenum, seg, relframe);
 #endif
-  if (seq)
+  if (seg)
     {
       if ((lastseg == seg) && ((lastframe + 1) == relframe))
 	{
-	  *seq = 1;
+	  *isSeq = 1;
 	}
       else
-	*seq = 0;
+	*isSeq = 0;
     }
   lastseg = seg;
   lastframe = relframe;
   ref = _segments[seg]._reference;
-  return _videos[ref]._aviheader->getFrameNoAlloc (relframe, img);
+  return _videos[ref]._aviheader->getFrame (relframe,img);
 }
 // 
 // Check that the 2 frames are sequential with just B frames in between
@@ -210,9 +212,9 @@ uint8_t   ADM_Composer::isSequential (uint32_t framenum)
 //
 //  For that one the first segment is always right
 //                                                                                              
-uint32_t ADM_Composer::getTime (uint32_t fn)
+uint64_t ADM_Composer::getTime (uint32_t fn)
 {
-  return STUBB->getTime (fn);
+  return STUBB->getTime(fn);
 }
 
 uint32_t ADM_Composer::getFlags (uint32_t frame, uint32_t * flags)
@@ -245,38 +247,9 @@ uint32_t ADM_Composer::getFlagsAndSeg (uint32_t frame, uint32_t * flags,uint32_t
     *segs=seg;
     return _videos[ref]._aviheader->getFlags (relframe, flags);  
 }
-/** 
-      \fn hasPtsDts
-      \brief returns 1 if the frame has pts/dts
-      
-*/
-uint8_t         ADM_Composer::hasPtsDts(uint32_t frame)
-{
-  uint32_t    relframe;
-  uint32_t    seg,    ref;
-  if (!convFrame2Seg (frame, &seg, &relframe))
-    return 0;
-
-  ref = _segments[seg]._reference;
-  return _videos[ref]._aviheader->hasPtsDts();
-  
-}
 /**
-      \fn ptsDtsDelta
-      \brief returns pts/dts delta for the framenum (as seen by editor)
+    \fn getFrameSize
 */
-uint32_t       ADM_Composer::ptsDtsDelta(uint32_t frame)
-{
-  uint32_t    relframe;
-  uint32_t    seg,    ref;
-  if (!convFrame2Seg (frame, &seg, &relframe))
-    return 0;
-
-  ref = _segments[seg]._reference;
-  return _videos[ref]._aviheader->ptsDtsDelta(relframe);
-  
-}
-
 uint8_t ADM_Composer::getFrameSize (uint32_t frame, uint32_t * size)
 {
   uint32_t    relframe;
@@ -480,3 +453,16 @@ uint32_t ADM_Composer::searchForwardSeg(uint32_t startframe)
 			}
 	return 1;
 }
+/**
+    \fn getVideoDuration
+    \brief returns duration of the video track
+
+*/
+uint64_t ADM_Composer::getVideoDuration(void)
+{
+  if(_nb_segment) 
+    return _videos[0]._aviheader->getVideoDuration();  
+  return 0;
+}
+
+//EOF

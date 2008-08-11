@@ -1629,7 +1629,7 @@ uint8_t ADM_saveRaw (const char *name)
   uint8_t *buffer = new uint8_t[avifileinfo->width * avifileinfo->height * 3],ret=0;
   char *idx;
   DIA_working *work;
-
+  uint8_t seq;
   idx = new char[strlen (name) + 8];
   strcpy (idx, name);
   strcat (idx, ".idx");
@@ -1638,7 +1638,9 @@ uint8_t ADM_saveRaw (const char *name)
   if (!fd)
     return 0;
   work=new DIA_working(QT_TR_NOOP("Saving raw video stream"));
-
+  ADMCompressedImage image;
+  image.data=buffer;
+  image.dataLength=avifileinfo->width * avifileinfo->height * 3;
   // preamble
 #if 0
   video_body->getRawStart (frameStart, buffer, &len);
@@ -1686,19 +1688,20 @@ uint8_t ADM_saveRaw (const char *name)
 	    goto _abt;
           }
 	  // Write the found frame
-	  video_body->getRaw (found, buffer, &len);
+    
+	  video_body->getFrame (found, &image, &seq);
 	  fwrite (buffer, len, 1, fd);
 	  // and the B frames
 	  for (uint32_t j = i; j < found; j++)
 	    {
-	      video_body->getRaw (j, buffer, &len);
+	      video_body->getFrame (j, &image,&seq);
 	      fwrite (buffer, len, 1, fd);
 	    }
 	  i = found;		// Will be plussed by for
 	}
       else			// P or I frame
 	{
-	  video_body->getRaw (i, buffer, &len);
+	  video_body->getFrame (i, &image, &seq);
 	  fwrite (buffer, len, 1, fd);
 	  fprintf (fi, "%u,\n", len);
 	}
@@ -2259,59 +2262,7 @@ uint32_t GUI_GetScale(void)
 }
 
 
-///
-/// Update all  informations : current frame # and current time, total frame ...
-///_____________________________________________________________
 
-void  update_status_bar(void)
-{
-    char text[80];
-    double len;
-//    int val;
-
-    //    if(!guiReady) return ;
-    text[0] = 0;
- 
-	UI_updateFrameCount( curframe);
-	UI_updateTimeCount( curframe,avifileinfo->fps1000);
-       
-    // progress bar
-    len = 100;
-    if(avifileinfo->nb_frames>1)
-    	len=len / (double) (avifileinfo->nb_frames-1);
-    len *= (double) curframe;
-
-   
-
-     UI_setScale(len);
-   	
-}
-
-///
-/// Update some informations : current frame # and current time
-///_____________________________________________________________
-void rebuild_status_bar(void)
-{
-    char text[80];
-    double len;
-//    int val;
-
-    //    if(!guiReady) return ;
-    text[0] = 0;
- 
-	UI_setFrameCount( curframe, avifileinfo->nb_frames);
-	UI_setTimeCount( curframe, avifileinfo->nb_frames,avifileinfo->fps1000);
-	
-    // progress bar
-    len = 100;
-    if(avifileinfo->nb_frames>1)
-    	len=len / (double) (avifileinfo->nb_frames-1);
-    len *= (double) curframe;
-
-
-
-     UI_setScale(len);
-}
 
 /**
       \fn GUI_getFrameContent
@@ -2403,11 +2354,16 @@ void GUI_showCurrentFrameHex(void)
  uint32_t fullLen,flags;
  char sType[5];
  char sSize[15];
- 
+ ADMCompressedImage image;
+ uint8_t seq;
  if (!avifileinfo) return;
  
  buffer=new uint8_t [avifileinfo->width*avifileinfo->height*3];
- video_body->getRaw (curframe, buffer, &fullLen);  
+ image.data=buffer;
+ 
+
+ video_body->getFrame (curframe,&image,&seq);
+ fullLen=image.dataLength;
  video_body->getFlags (curframe, &flags);
  
  diaElemHex binhex("*****",fullLen,buffer);

@@ -22,8 +22,8 @@ class ADMCompressedImage
         uint32_t flags;
         /* Some interesting informations */
         uint32_t demuxerFrameNo; /* In bitstream order i.e. decoding order */
-        uint32_t demuxerPts;  /* In ms !*/
-        uint32_t demuxerDts;  /* In ms */
+        uint64_t demuxerPts;  /* In us !*/
+        uint64_t demuxerDts;  /* In us */
         /*         */
         void cleanup(uint32_t demuxerNo) 
             {

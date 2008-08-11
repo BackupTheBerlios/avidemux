@@ -233,11 +233,16 @@ uint8_t ADMImage::duplicateFull(ADMImage *src)
 	
 	return 1;
 }
+/**
+    \fn copyInfo
+    \brief Copy the additionnal infos attached to an image (flags/aspect ration/PTS)
+*/
 uint8_t ADMImage::copyInfo(ADMImage *src)
 {
 	_Qp=src->_Qp;
 	flags=src->flags;
 	_aspect=src->_aspect;
+    Pts=src->Pts;
 }
 //
 //	By design the reallocation of quant should happen at startup

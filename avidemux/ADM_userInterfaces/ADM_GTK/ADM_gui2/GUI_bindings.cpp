@@ -37,6 +37,8 @@
 #include "gtkgui.h"
 #include "DIA_coreToolkit.h"
 #include "ADM_userInterfaces/ADM_render/GUI_renderInternal.h"
+#include "ADM_video/ADM_vidMisc.h"
+
 extern uint8_t UI_getPhysicalScreenSize(void* window, uint32_t *w,uint32_t *h);
 extern void ADM_initUIGtk(GtkWidget *guiRootWindow);
 extern  ADM_RENDER_TYPE UI_getPreferredRender(void);;
@@ -754,6 +756,38 @@ void UI_setFrameCount(uint32_t curFrame,uint32_t total)
     gtk_label_set_text((GtkLabel *) guiTotalFrame, text);
     
 }
+/**
+    \fn UI_setTotalTime
+    \brief SEt the total duration of video
+*/
+void UI_setTotalTime(uint64_t curTime)
+{
+  char text[80];   
+ uint16_t mm,hh,ss,ms;
+ uint32_t shorty=(uint32_t)(curTime/1000);
+ 
+    ms2time(shorty,&hh,&mm,&ss,&ms);
+  	sprintf(text, "/%02d:%02d:%02d.%03d", hh, mm, ss, ms);
+    gtk_label_set_text((GtkLabel *) guiTotalTime, text);     
+	
+
+}
+/**
+    \fn UI_setCurrentTime
+    \brief Set current PTS of displayed video
+*/
+void UI_setCurrentTime(uint64_t curTime)
+{
+  char text[80];   
+ uint16_t mm,hh,ss,ms;
+ uint32_t shorty=(uint32_t)(curTime/1000);
+ 
+    ms2time(shorty,&hh,&mm,&ss,&ms);
+  	sprintf(text, "%02d:%02d:%02d.%03d", hh, mm, ss, ms);
+	gtk_write_entry_string(guiCurTime,text);
+
+}
+
 void UI_updateTimeCount(uint32_t curFrame,uint32_t fps)
 {
   char text[80];   
@@ -763,22 +797,6 @@ void UI_updateTimeCount(uint32_t curFrame,uint32_t fps)
   	sprintf(text, "%02d:%02d:%02d.%03d", hh, mm, ss, ms);
 //     gtk_label_set_text((GtkLabel *) guiCurTime, text);
 	gtk_write_entry_string(guiCurTime,text);
-
-}
-void UI_setTimeCount(uint32_t curFrame,uint32_t total, uint32_t fps)
-{
-  char text[80];   
- uint16_t mm,hh,ss,ms;
- 
- 	frame2time(curFrame,fps, &hh, &mm, &ss, &ms);
-  	sprintf(text, "%02d:%02d:%02d.%03d", hh, mm, ss, ms);
-     	//gtk_label_set_text((GtkLabel *) guiCurTime, text);
-     	gtk_write_entry_string(guiCurTime,text);
-     
- 	frame2time(total,fps, &hh, &mm, &ss, &ms);
-  	sprintf(text, "/ %02d:%02d:%02d.%03d", hh, mm, ss, ms);
-     	gtk_label_set_text((GtkLabel *) guiTotalTime, text);     
-		gtk_markscale_setNbFrames(guiSlider, total);
 
 }
 ///

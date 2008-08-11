@@ -195,12 +195,12 @@ uint8_t GenericAviSaveCopyPack::writeVideoChunk (uint32_t frame)
   uint8_t    ret1;
  ADMCompressedImage img;
  uint32_t oldtimeinc=0;
-
+uint8_t seq;
       img.data=vbuffer;
 
        if(!video_body->isReordered(frameStart+frame))
       {
-          ret1 = video_body->getFrameNoAlloc (frameStart + frame,&img);
+          ret1 = video_body->getFrame (frameStart + frame,&img,&seq);
           _videoFlag=img.flags;
       }
       else

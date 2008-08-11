@@ -15,6 +15,7 @@
 //		- aspect ratio
 //		- frame type
 //		- quantizer for each macroblock (16x16 pixels)
+//      - PTS : Presentation time in us of the image
 //	For the latter 3 infos are used
 //		quant which leads to the int8 quant array
 //		qstride = stride of array. Usually width+15)/16. 0 MEANS NOT USABLE
@@ -54,6 +55,11 @@ typedef enum
         ADM_IMAGE_BMP2=4
         
 } ADM_IMAGE_TYPE;
+/**
+    \class ADMImage
+    \brief Stores image
+
+*/
 class ADMImage
 {
 public:
@@ -69,10 +75,11 @@ public:
         uint32_t	_qSize;		/// Size of the *quant field
         ADM_ASPECT	_aspect;	/// Aspect ratio
         uint32_t	flags;		/// Flags for this image (AVI_KEY_FRAME/AVI_B_FRAME)
+        uint64_t    Pts;        /// Presentation time in us
 
 // This 3 fields are only used to convery container (reference to other datas)
 // Between codec & editor
-	uint8_t         _isRef;         /// If True means the datas are just a link to data we don't own!
+        uint8_t         _isRef;         /// If True means the datas are just a link to data we don't own!
         ADM_colorspace  _colorspace;    /// Colorspace we are moving, default is YV12
         uint8_t         _noPicture;     /// No picture to display
 
@@ -118,22 +125,22 @@ public:
         uint8_t         *_planes[3];     /// In case of linked data store y/u/v pointers
         uint32_t        _planeStride[3]; /// Same story
 
-		ADMImage(uint32_t width, uint32_t height);
+                ADMImage(uint32_t width, uint32_t height);
                 ADMImage(uint32_t width, uint32_t height,uint32_t dummy); /// To create linked datas image        
 
-                uint8_t   LumaReduceBy2(void);
-		~ADMImage();
+        uint8_t   LumaReduceBy2(void);
+                ~ADMImage();
         uint8_t getWidthHeight(uint32_t *w,uint32_t *h)
                     {
                           *w=_width;
                           *h=_height;
                           return 1;
                     }
-	uint8_t duplicate(ADMImage *src);	/// copy an image to ourself, including info
+        uint8_t duplicate(ADMImage *src);	/// copy an image to ourself, including info
         uint8_t duplicateSwapUV(ADMImage *src); /// copy an image to ourself, including info
-	uint8_t duplicateFull(ADMImage *src);	/// copy an image to ourself, including info
-	uint8_t copyInfo(ADMImage *src);	/// copy all the flags, not the data themselves
-	uint8_t copyQuantInfo(ADMImage *src);	/// copy quant table if any
+        uint8_t duplicateFull(ADMImage *src);	/// copy an image to ourself, including info
+        uint8_t copyInfo(ADMImage *src);	/// copy all the flags, not the data themselves
+        uint8_t copyQuantInfo(ADMImage *src);	/// copy quant table if any
         uint8_t isRef(void) { return _isRef;};
         uint8_t setLinkInfos(uint8_t *y,        /// To fill in infos for linked image
                         uint8_t *u,uint8_t *v,uint32_t stridey,

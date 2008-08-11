@@ -4,8 +4,8 @@
 
             GUI Part of get next frame, previous key frame, any frame etc...
 
-    begin                : Fri Apr 12 2002
-    copyright            : (C) 2002 by mean
+    
+    copyright            : (C) 2002/2008 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -43,6 +43,7 @@
 #include "ADM_preview.h"
 
 extern void    UI_purge(void );
+
 //____________________________________
 
 uint8_t GUI_getFrame(uint32_t frameno,  uint32_t *flags)
@@ -517,5 +518,62 @@ void A_jog(void)
       }
   }
   jog--;
+}
+/**
+    \fn update_status_bar
+    \brief  Update all  informations : current frame # and current time, total frame ...
+
+*/
+
+void  update_status_bar(void)
+{
+    char text[80];
+    double len;
+//    int val;
+
+    //    if(!guiReady) return ;
+    text[0] = 0;
+ 
+	UI_updateFrameCount( curframe);
+    UI_setCurrentTime(admPreview::getCurrentPts());
+	UI_setTotalTime(video_body->getVideoDuration());
+    
+    // progress bar
+    len = 100;
+    if(avifileinfo->nb_frames>1)
+    	len=len / (double) (avifileinfo->nb_frames-1);
+    len *= (double) curframe;
+
+   
+
+     UI_setScale(len);
+   	
+}
+
+/**
+    \fn rebuild_status_bar
+    \brief Update some informations : current frame # and current time
+*/
+void rebuild_status_bar(void)
+{
+    char text[80];
+    double len;
+//    int val;
+
+    //    if(!guiReady) return ;
+    text[0] = 0;
+ 
+	UI_setFrameCount( curframe, avifileinfo->nb_frames);
+	UI_setCurrentTime(admPreview::getCurrentPts());
+	
+    // progress bar
+    len = 100;
+    if(avifileinfo->nb_frames>1)
+    	len=len / (double) (avifileinfo->nb_frames-1);
+    len *= (double) curframe;
+
+
+
+     UI_setScale(len);
 }
 //EOF

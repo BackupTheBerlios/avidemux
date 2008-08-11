@@ -473,8 +473,9 @@ TryAgain:
                                 img.data=bufferin;
 				for(uint32_t i=0;i<scanned;i++)  //10
 				{
+                    
 					flags=0;
-  					vid->_aviheader->getFrameNoAlloc (i,&img);
+  					vid->_aviheader->getFrame (i,&img);
                                         if(!img.dataLength) continue;
 					if(!vid->decoder->uncompress( &img,buffer ))
 					{
@@ -519,6 +520,7 @@ TryAgain:
 				if(bframe || ffcheck)
 				{
 					printf("\n Mmm this appear to have b-frame...\n");
+#if 0
 					if(bconsistency )
 					{
 						printf("\n And the index is ok\n");
@@ -621,6 +623,7 @@ TryAgain:
 							}
                                                 }
 					}
+#endif
 				}
 				else
 				{
@@ -641,6 +644,7 @@ _VIDEOS *vid;
 	for(uint32_t i=0;i<_nb_video;i++)
 	{
 		vid=&_videos[i];
+#if 0
 		if(!vid->_reorderReady) // not already reordered ?
 		{
 				if(vid->decoder->bFramePossible()) // can be re-ordered ?
@@ -655,6 +659,7 @@ _VIDEOS *vid;
 
 				}
 		}
+#endif
 	}
 	return 1;
 }
@@ -1463,5 +1468,6 @@ uint8_t ADM_Composer::rebuildDuration(void)
     updateAudioTrack(i);
   return 1;
 }
+
 //
 //

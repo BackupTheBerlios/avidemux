@@ -41,7 +41,7 @@
 static uint8_t compBuffer[MAXIMUM_SIZE * MAXIMUM_SIZE * 3];
 
 
-
+#if 0
 uint8_t
   ADM_Composer::getRaw (uint32_t framenum, uint8_t * ptr, uint32_t * framelen)
 {
@@ -73,6 +73,7 @@ uint8_t
   return _videos[ref]._aviheader->getRawStart (ptr, len);
 
 }
+#endif
 /**_____________________________________________________________________
 		Main function
 		Caller ask for a frame from the editor
@@ -164,6 +165,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 	{
 	aprintf("following frame\n");
 	// B Frame ?
+#if 0
 	if(_videos[ref]._aviheader->isReordered())
 	{
 		// The frame we seek is not in cache, so 
@@ -216,6 +218,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 		}
 		
 	}
+#endif
 	// No b frame...
         
       	 if(!decodeCache(relframe,ref, result))			
@@ -353,11 +356,11 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 }
 
 
-//________________________________________________________________
-//	Read and decode the given frame into image cache entry
-//
-//
-//________________________________________________________________
+/**
+    \fn decodeCache
+    \brief Decode an image an update cache
+    
+*/
 
 uint8_t		ADM_Composer::decodeCache(uint32_t frame,uint32_t seg, ADMImage *image)
 {
@@ -369,10 +372,12 @@ ADMImage *tmpImage=NULL;
 uint8_t refOnly=0;
 uint32_t left,ww;
 ADMCompressedImage img;
+
         aprintf("decodeCache : Frame %u\n",frame);
         img.data=compBuffer;
         img.cleanup(frame);
-	 if (!_videos[seg]._aviheader->getFrameNoAlloc (frame,&img))
+    // Step 1, retrieve the compressed datas, including PTS & DTS infos
+	 if (!_videos[seg]._aviheader->getFrame (frame,&img))
 	{
 	  printf ("\nEditor: last decoding failed.%ld)\n",   frame );
 	  return 0;
@@ -757,6 +762,7 @@ uint8_t
   return getUncompressedFrame (*frame, out);
 
 }
+#if 0
 uint8_t	ADM_Composer::isReordered( uint32_t framenum )
 {
 uint32_t seg,relframe;
@@ -768,3 +774,4 @@ uint32_t seg,relframe;
     uint32_t ref=_segments[seg]._reference;
    return _videos[ref]._aviheader->isReordered();
 }
+#endif

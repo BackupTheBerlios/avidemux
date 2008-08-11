@@ -30,5 +30,6 @@ class admPreview
       static void displayNow(uint32_t framenum);
       static void cleanUp(void);  
       static ADMImage *getBuffer(void);
+      static uint64_t getCurrentPts(void);
 };
 #endif

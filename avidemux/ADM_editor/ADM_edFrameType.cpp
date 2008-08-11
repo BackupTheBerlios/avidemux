@@ -106,10 +106,11 @@ aviInfo    info;
 			}
 			else
 			{
+                
 				vi->decoder->decodeHeaderOnly();
 				for(uint32_t j=0;j<vi->_nb_video_frames;j++)
 				{
-	  				vi->_aviheader->getFrameNoAlloc (j,&img);
+	  				vi->_aviheader->getFrame (j,&img);
 					if(img.dataLength)
                                         {
 		    				vi->decoder->uncompress (&img, tmpImage);
@@ -135,11 +136,7 @@ aviInfo    info;
 					cur++;
 				}
 				vi->decoder->decodeFull();
-				// and there is b-frame
-				if(bframe)
-				{
-					vi->_reorderReady=vi->_aviheader->reorder();
-				}
+				
 			}
 	}
 	delete work;

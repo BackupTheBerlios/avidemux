@@ -142,9 +142,9 @@ for (uint32_t i = 0; i < _nb_segment; i++)
         qfprintf(fd,"app.markerA=%d;\n",frameStart);
         qfprintf(fd,"app.markerB=%d;\n",frameEnd);
 // Reordering : Warning works only for video with one source video
-        if(video_body->isReordered(0) && !vop)
+//        if(video_body->isReordered(0) && !vop)
         {
-            qfprintf(fd,"app.rebuildIndex();\n");
+ //           qfprintf(fd,"app.rebuildIndex();\n");
         }
         
 // postproc

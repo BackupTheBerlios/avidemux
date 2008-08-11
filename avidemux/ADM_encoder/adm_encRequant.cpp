@@ -138,8 +138,11 @@ next:
 uint8_t EncoderRequant::code(uint32_t frame,uint8_t *out, uint32_t *outlen)
 {
   uint32_t len;
-  uint8_t ret;
-  ret = video_body->getRaw (frame, _buffer, &len);
+  uint8_t ret,seq;
+  ADMCompressedImage image;
+    image.data=_buffer;
+    image.dataLength=REQUANT_BUFFER;
+  ret = video_body->getFrame(frame,&image,&seq);
   if(!ret)
   {
     printf("[Requant] Cannot read frame %u\n",frame);
@@ -229,8 +232,11 @@ EncoderRequant::encode (uint32_t frame, ADMBitstream *out)
                   if(!(_buffer[0]==0 && _buffer[1]==0 && _buffer[2]==1 && _buffer[3]==0xb3))
                   {
                     uint8_t buf[10*1024];
-                    uint32_t seq;
-                    video_body->getRawStart (frameStart, buf, &seq);	
+                    uint8_t seq;
+                    ADMCompressedImage image;
+                    image.data=buf;
+                    image.dataLength=REQUANT_BUFFER;
+                    video_body->getFrame (frameStart,&image, &seq);	
                     printf("Adding seq header (%lu)\n",seq);
                     memmove(_buffer+seq,_buffer,out->len);
                     memcpy(_buffer,buf,seq);

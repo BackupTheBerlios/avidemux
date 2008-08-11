@@ -51,6 +51,7 @@
 
 extern FILTER  videofilters[VF_MAX_FILTER];
 extern uint32_t nb_active_filter;
+extern void    UI_setCurrentTime(uint64_t curTime);
 
 static void previewBlit(ADMImage *from,ADMImage *to,uint32_t startx,uint32_t starty);
 
@@ -313,7 +314,15 @@ void admPreview::updateFilters(AVDMGenericVideoStream *first,AVDMGenericVideoStr
             }
   
 }
+/**
+    \fn getCurrentPts
+    \brief returns the PTS in us of the last displayed frame
+*/
+uint64_t admPreview::getCurrentPts(void)
+{
+        if(rdrImage) return rdrImage->Pts;
 
+}
 /**
       \fn admPreview::update
       \brief display data associated with framenum image
@@ -338,7 +347,10 @@ uint8_t admPreview::update(uint32_t framenum)
             if(zoom==ZOOM_1_1 || renderHasAccelZoom() )
             {
                if(!defered_display) 
+               {
                   renderUpdateImage(rdrImage->data,zoom);
+                  
+                }
             }else
             {
                 ADM_assert(resizer);
@@ -347,6 +359,7 @@ uint8_t admPreview::update(uint32_t framenum)
                 if(!defered_display) 
                   renderUpdateImage(resized->data,ZOOM_1_1);
             }
+            printf("[admPreview] PTs: %llu\n",rdrImage->Pts);
         }
         break;
       case ADM_PREVIEW_OUTPUT:
@@ -528,7 +541,10 @@ void admPreview::displayNow(uint32_t framenum)
       default: ADM_assert(0);
     }
 }
-
+/**
+    \fn cleanUp
+    \brief do the cleanup, what else ?
+*/
 void admPreview::cleanUp(void)
 {
 	admPreview::stop();
