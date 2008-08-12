@@ -338,10 +338,14 @@ uint8_t admPreview::update(uint32_t framenum)
     {
       case ADM_PREVIEW_NONE:
        {
+#if 0
         if( !video_body->getUncompressedFrame(framenum+playbackOffset,rdrImage,&flags))
         {
           return 0; 
         }
+#else
+        if(!video_body->NextPicture(rdrImage)) return 0;
+#endif
             UI_setFrameType(  rdrImage->flags,rdrImage->_Qp);
 
             if(zoom==ZOOM_1_1 || renderHasAccelZoom() )

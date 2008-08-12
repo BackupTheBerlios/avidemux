@@ -101,6 +101,10 @@ typedef struct
 	uint8_t								_reorderReady;
     uint8_t                             _unpackReady;
 	EditorCache							*_videoCache;
+    uint32_t                            lastSentFrame;   // Last frame read/sent to decoder
+    uint64_t                            lastDecodedPts;  // Pts of last frame out of decoder
+    uint64_t                            lastReadPts;     // Pts of the last frame we read
+
 }_VIDEOS;
 
 
@@ -205,8 +209,21 @@ class ADM_Composer : public ADM_audioStream
   				//_____________________________
   				// navigation & frame functions
   				//_____________________________
+                        bool        GoToIntra(uint32_t frame);
+                        bool        GoToTime(uint64_t time);
+                        bool        NextPicture(ADMImage *image);
+/************************************ Internal ******************************/
+                                    /// Decode frame and on until frame is popped out of decoders
+                        bool        DecodePictureUpToIntra(uint32_t frame,uint32_t ref);
+                                    /// compressed image->yb12 image image and do postproc/colorconversion
+                        bool        decompressImage(ADMImage *out,ADMCompressedImage *in,uint32_t ref);
+                                    /// Decode next image
+                        bool        DecodeNextPicture(uint32_t ref);
+                                    /// Get the next decoded picture
+                        bool     	getNextPicture(ADMImage *out,uint32_t ref);
+/************************************ Internal ******************************/
   						uint8_t 	getFrame(uint32_t   framenum,ADMCompressedImage *img,uint8_t *isSequential);
-						uint8_t  	getPicture(uint32_t framenum,uint8_t *ptr,uint32_t   *framelen,uint64_t *pts);
+						
    					
 	          			uint64_t 	getTime(uint32_t fn);
 						uint32_t 	getFlags(uint32_t frame,uint32_t *flags);

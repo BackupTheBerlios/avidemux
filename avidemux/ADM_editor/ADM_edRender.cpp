@@ -18,18 +18,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <math.h>
-#include "ADM_assert.h"
-
-#include "config.h"
-#include "fourcc.h"
+#include "ADM_default.h"
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_codecs/ADM_codec.h"
-#include "ADM_videoFilter.h"
-#include "avi_vars.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_EDITOR
@@ -39,41 +30,436 @@
 
 // FIXME BADLY !!!
 static uint8_t compBuffer[MAXIMUM_SIZE * MAXIMUM_SIZE * 3];
-
-
-#if 0
-uint8_t
-  ADM_Composer::getRaw (uint32_t framenum, uint8_t * ptr, uint32_t * framelen)
+/**
+        \fn GoToIntra
+        \brief Go to frame which must be an intra
+        @param frame is framenumber as seen by user
+        \return true on success, false on error
+*/
+bool        ADM_Composer::GoToIntra(uint32_t frame)
 {
-  uint32_t relframe, seg;	//,flags,len;
-
-//uint8_t ret=0;
-
-  if (!convFrame2Seg (framenum, &seg, &relframe))
-    {
-      printf ("\n Conversion failed !\n");
-      return 0;
-    }
-  uint32_t ref = _segments[seg]._reference;
-  return _videos[ref]._aviheader->getRaw (relframe, ptr, framelen);
-}
-
-uint8_t
-  ADM_Composer::getRawStart (uint32_t frame, uint8_t * ptr, uint32_t * len)
-{
-  uint32_t relframe, seg;	//,flags;
-//uint8_t ret=0;
-
+uint32_t relframe, seg, flags, len;
+  
+  // convert frame to block, relative frame
   if (!convFrame2Seg (frame, &seg, &relframe))
     {
-      printf ("\n Conversion failed !\n");
-      return 0;
+      printf ("[ADMComposer::goToIntra] Conversion failed for frame %lu !\n",frame);
+      return false;
     }
-  uint32_t ref = _segments[seg]._reference;
-  return _videos[ref]._aviheader->getRawStart (ptr, len);
+    return DecodePictureUpToIntra(relframe,seg);
+}
+/**
+    \fn GoToTime
+    \brief Go to time time (just before)
+    \return true on success, false on error
+*/
+bool        ADM_Composer::GoToTime(uint64_t time)
+{
+    return GoToIntra(0);
+}
+/**
+    \fn NextPicture
+    \brief decode & returns the next picture
+*/
+bool        ADM_Composer::NextPicture(ADMImage *image)
+{
+    return getNextPicture(image,0);
 
 }
-#endif
+//***************************** Internal API**************************
+/**
+    \fn DecodePictureUpToIntra
+    \brief Decode pictures from frameno, which must be an intra and on
+            until the decoded frameno is popped by the decoder
+
+    @param frame, framenumber relative to video ref (i.e. from its beginning)
+    @param ref  , video we are dealing with
+    returns true on success
+            fail on error
+
+*/
+bool ADM_Composer::DecodePictureUpToIntra(uint32_t frame,uint32_t ref)
+{
+  uint8_t ret = 0;
+  EditorCache   *cache;
+  ADMImage	*result;
+  uint32_t  flags;
+  ADMCompressedImage img;
+	
+    // PlaceHolder...
+    img.data=compBuffer;
+    img.cleanup(frame);
+    
+
+	_VIDEOS *vid=&_videos[ref];
+    vidHeader *demuxer=vid->_aviheader;
+	cache=_videos[ref]._videoCache;
+	ADM_assert(cache);
+    // Make sure frame is an intra
+    demuxer->getFlags(frame,&flags);
+    ADM_assert(flags==AVI_KEY_FRAME);
+
+    bool found=false;
+    vid->lastSentFrame=frame;
+    uint32_t nbFrames=vid->_nb_video_frames;
+    cache->flush();
+    // The PTS associated with our frame is the one we are looking for
+    uint64_t wantedPts=vid->_aviheader->getTime(frame);
+    while(found==false)
+    {
+        // Last frame ? if so repeat
+        if(vid->lastSentFrame>=nbFrames-1) vid->lastSentFrame=nbFrames-1;
+        // Fetch frame
+         if (!demuxer->getFrame (vid->lastSentFrame,&img))
+         {
+                printf("[DecodePictureUpToIntra] getFrame failed for frame %lu\n",vid->lastSentFrame);
+                cache->flush();
+                return false;
+         }
+         // Now uncompress it...
+         result=cache->getFreeImage();
+         if(!result)
+         {
+                printf("[DecodePictureUpToIntra] Cache full for frame %lu\n",vid->lastSentFrame);
+                return false;
+          }
+          if(!decompressImage(result,&img,ref))
+          {
+             printf("[DecodePictureUpToIntra] decode error for frame %lu\n",vid->lastSentFrame);
+             cache->invalidate(result);
+          }else
+            {
+                cache->updateFrameNum(result,vid->lastSentFrame);
+                uint64_t pts=result->Pts;
+                if(pts==ADM_COMPRESSED_NO_PTS) // No PTS available ?
+                {
+                    // increment it using average fps
+                    // FIXME TODO
+                    printf("[XX] Guessing PTS\n");
+                    vid->lastDecodedPts++;
+                    result->Pts=vid->lastDecodedPts;
+                }else       
+                    vid->lastDecodedPts=pts;
+            }
+          
+            // Found our image ?
+          if(result->Pts==wantedPts) 
+                found=true;
+          else 
+                vid->lastSentFrame++;
+    }
+    if(wantedPts) vid->lastReadPts=wantedPts-1;
+    else vid->lastReadPts=0;
+    return true;
+}
+/**
+    \fn getNextPicture
+    \brief returns the next picture
+    @param out : Where to put the decoded image to
+    @param ref : Video we are dealing with
+    @return true on success, false on failure
+
+*/
+bool ADM_Composer::getNextPicture(ADMImage *out,uint32_t ref)
+{
+  EditorCache   *cache=_videos[ref]._videoCache;
+  ADMImage	*result;
+  _VIDEOS *vid=&_videos[ref];
+
+   uint32_t loop=3;
+  
+	// Try decoding 3 frames ahead, if not we can consider it fails	
+    while(loop--)
+    {
+        // first decode a picture, cannot hurt...
+        if(DecodeNextPicture(ref)==false)
+        {
+            printf("[AdmComposer::getPicture] Next picture failed\n");
+        }
+        // Search the lowest PTS above our current DTS...
+        ADMImage *img=cache->findJustAfter(vid->lastReadPts);
+        if(img)
+        {
+            // Duplicate
+            out->duplicate(img);
+            vid->lastReadPts=img->Pts;
+            return true;
+        }
+    }
+    printf("[ADM_Composer::getPicture] Failed\n");
+    return false;
+}
+
+/**
+    \fn DecodeNextPicture
+    \brief Decode the next picture
+
+    @param ref  , video we are dealing with
+    returns true on success
+            fail on error
+
+*/
+bool ADM_Composer::DecodeNextPicture(uint32_t ref)
+{
+uint8_t ret = 0;
+  EditorCache   *cache;
+  ADMImage	*result;
+  uint32_t  flags;
+  ADMCompressedImage img;
+   _VIDEOS *vid=&_videos[ref];
+    vidHeader *demuxer=vid->_aviheader;
+	cache=_videos[ref]._videoCache;	
+    // PlaceHolder...
+    img.data=compBuffer;
+    img.cleanup(vid->lastSentFrame+1);
+   
+	ADM_assert(cache);
+    vid->lastSentFrame++;
+    
+    uint32_t frame=vid->lastSentFrame;
+
+    // Fetch frame
+     if (!demuxer->getFrame (frame,&img))
+     {
+            printf("[DecodePictureUpToIntra] getFrame failed for frame %lu\n",vid->lastSentFrame);
+            return false;
+     }
+     // Now uncompress it...
+     result=cache->getFreeImage();
+     if(!result)
+     {
+            printf("[DecodePictureUpToIntra] Cache full for frame %lu\n",vid->lastSentFrame);
+            return false;
+      }
+      if(!decompressImage(result,&img,ref))
+      {
+         printf("[DecodePictureUpToIntra] decode error for frame %lu\n",vid->lastSentFrame);
+         cache->invalidate(result);
+         return true; // Not an error in itself
+      }
+     cache->updateFrameNum(result,vid->lastSentFrame);
+     uint64_t pts=result->Pts;
+
+    if(pts==ADM_COMPRESSED_NO_PTS) // No PTS available ?
+    {
+        vid->lastDecodedPts++;
+        result->Pts=vid->lastDecodedPts;
+    }else       
+        vid->lastDecodedPts=pts;
+
+    return true;
+}
+/**
+    \fn decompressImage
+    \brief push an image inside decoder and pop one. Warning the popped one might be an older image due to decoder lag.
+            Also do postprocessing and color conversion
+*/
+bool ADM_Composer::decompressImage(ADMImage *out,ADMCompressedImage *in,uint32_t ref)
+{
+ ADMImage *tmpImage=NULL;
+ uint32_t ww,hh,left,right;
+ uint32_t refOnly=_videos[ref].decoder->dontcopy(); // can we skip one memcpy ?
+// This is only an empty Shell
+    if(refOnly)
+    {
+                uint32_t w,h;
+                if(_scratch) // Can we reuse the old scratch memory ?
+                {
+                    _scratch->getWidthHeight(&w,&h);
+                    if(w!=_imageBuffer->_width || _imageBuffer->_height!=h)
+                    {
+                        delete _scratch;
+                        _scratch=NULL;
+                    }
+                }
+                if(!_scratch)
+                {
+                  _scratch=new ADMImage(_imageBuffer->_width,_imageBuffer->_height,1);
+                }
+                tmpImage=_scratch;
+                ww=_imageBuffer->_width & 0xfffff0;
+                left=_imageBuffer->_width & 0xf;
+
+        }
+        else
+        {
+                tmpImage=_imageBuffer;
+                ww=_imageBuffer->_width;
+                left=0;
+       }
+    //
+    tmpImage->_colorspace=ADM_COLOR_YV12;
+	// Decode it
+        if (!_videos[ref].decoder->uncompress (in, tmpImage))
+	    {
+            printf("[decompressImage] uncompress failed\n");
+            return false;
+        }
+
+        // 
+        if(tmpImage->_noPicture && refOnly)
+        {
+            printf("[decompressImage] NoPicture\n");
+            return false;
+        }
+	// If not quant and it is already YV12, we can stop here
+	if((!tmpImage->quant || !tmpImage->_qStride) && tmpImage->_colorspace==ADM_COLOR_YV12)
+	{      
+		out->_Qp=2;
+		out->duplicate(tmpImage);
+		aprintf("[decompressImage] : No quant avail\n");
+		return true;
+	}
+	// We got everything, let's go
+	// 1 compute average quant
+	int qz;
+	uint32_t sumit=0;
+    // Dupe infos
+    out->copyInfo(tmpImage);
+        
+
+        // Do postprocessing if any
+	for(uint32_t z=0;z<tmpImage->_qSize;z++)
+	{
+            qz=(int)tmpImage->quant[z];
+			sumit+=qz;
+	}
+	sumit+=(tmpImage->_qSize-1);
+	float sum=(float)sumit;
+	sum/=tmpImage->_qSize;
+	if(sum>31) sum=31;
+	if(sum<1) sum=1;
+	
+        // update average Q	
+	tmpImage->_Qp=out->_Qp=(uint32_t)floor(sum);
+	
+	// Pp deactivated ?
+	if(!_pp.postProcType || !_pp.postProcStrength || tmpImage->_colorspace!=ADM_COLOR_YV12)
+    {
+        dupe(tmpImage,out,&(_videos[ref]));
+        aprintf("EdCache: Postproc disabled\n");
+		return 1;	
+	}
+	
+	int type;	
+	#warning FIXME should be FF_I_TYPE/B/P
+	if(tmpImage->flags & AVI_KEY_FRAME) type=1;
+		else if(tmpImage->flags & AVI_B_FRAME) type=3;
+			else type=2;
+
+        ADM_assert(tmpImage->_colorspace==ADM_COLOR_YV12);
+
+	// we do postproc !
+	// keep
+	uint8_t *oBuff[3];
+	const uint8_t *iBuff[3];
+	int	strideTab[3];
+	int	strideTab2[3];
+	aviInfo _info;
+		
+        getVideoInfo(&_info);
+        if(refOnly)
+        {
+                iBuff[0]= tmpImage->_planes[0];
+                iBuff[1]= tmpImage->_planes[1];
+                iBuff[2]= tmpImage->_planes[2];
+
+                strideTab2[0]=_info.width;
+                strideTab2[1]=_info.width>>1;
+                strideTab2[2]=_info.width>>1;
+
+                strideTab[0]=tmpImage->_planeStride[0];
+                strideTab[1]=tmpImage->_planeStride[1];
+                strideTab[2]=tmpImage->_planeStride[2];
+                
+        }
+        else
+        {
+                iBuff[0]= YPLANE((tmpImage));
+                iBuff[1]= UPLANE((tmpImage));
+                iBuff[2]= VPLANE((tmpImage));
+                                                        
+                strideTab[0]=strideTab2[0]=_info.width;
+                strideTab[1]=strideTab2[1]=_info.width>>1;
+                strideTab[2]=strideTab2[2]=_info.width>>1;
+        }
+        if(_pp.swapuv)
+        {
+                oBuff[0]= YPLANE(out);
+                oBuff[1]= VPLANE(out);
+                oBuff[2]= UPLANE(out);		
+        }else
+        {
+
+                oBuff[0]= YPLANE(out);
+                oBuff[1]= UPLANE(out);
+                oBuff[2]= VPLANE(out);                
+        }
+        pp_postprocess(
+            iBuff,
+            strideTab,
+            oBuff,
+            strideTab2,
+            ww,
+            _info.height,
+            (int8_t *)(tmpImage->quant),
+            tmpImage->_qStride,
+            _pp.ppMode,
+            _pp.ppContext,
+            type);			// img type
+        /* 
+                If there is a chroma block that needs padding
+                (width not multiple of 16) while postprocessing,
+                we process up to the nearest 16 multiple and
+                just copy luma & chroma info that was left over
+        */
+        if(refOnly && left)
+        {
+                uint8_t *src,*dst;
+                uint32_t stridein,strideout,right;
+                right=_info.width-left;
+                // Luma
+                dst=YPLANE(out)+right;
+                src=tmpImage->_planes[0]+right;
+                stridein=tmpImage->_planeStride[0];
+                strideout=_info.width;
+                for(uint32_t y=_info.height;y>0;y--)
+                {
+                        memcpy(dst,src,left);
+                        dst+=strideout;
+                        src+=stridein;
+                }
+                // Chroma
+                left>>=1;
+                right>>=1;
+                //
+                dst=UPLANE(out)+right;
+                src=tmpImage->_planes[1]+right;
+                stridein=tmpImage->_planeStride[1];
+                strideout=_info.width>>1;
+                for(uint32_t y=_info.height>>1;y>0;y--)
+                {
+                        memcpy(dst,src,left);
+                        dst+=strideout;
+                        src+=stridein;
+                }
+                //
+                dst=VPLANE(out)+right;
+                src=tmpImage->_planes[2]+right;
+                stridein=tmpImage->_planeStride[2];
+                strideout=_info.width>>1;
+                for(uint32_t y=_info.height>>1;y>0;y--)
+                {
+                        memcpy(dst,src,left);
+                        dst+=strideout;
+                        src+=stridein;
+                }
+                
+
+        }
+    return true;
+}
+
 /**_____________________________________________________________________
 		Main function
 		Caller ask for a frame from the editor
@@ -91,6 +477,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
   uint8_t ret = 0;
   EditorCache   *cache;
   ADMImage	*result;
+  
 //    static uint32_t lastlen=0;
 
 	if(flagz)
@@ -113,6 +500,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 	aprintf("Ed: Request for frame %lu seg %lu, old frame:%lu old seg:%lu\n",relframe,seg,_lastframe,_lastseg);
 	
 	// First look in the cache
+    
 	if((result=cache->getImage(relframe)))
 	{
 		aprintf(">>frame %lu is cached...\n",relframe);
@@ -141,8 +529,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 
      if (flags & AVI_KEY_FRAME)
     {
-    	aprintf("keyframe\n");
-     	if(!decodeCache(relframe,ref, result))	
+    	aprintf("keyframe\n");     	if(!decodeCache(relframe,ref, result))	
 		{
 			printf("Editor: Cannot key frame %lu\n",relframe);
 			return 0;
@@ -457,17 +844,8 @@ ADMCompressedImage img;
         // 
         if(tmpImage->_noPicture && refOnly && frame)
         {
-                // Try to grab previous image from buffer
-
-                ADMImage *prev; 
-                        prev=cache->getImage(frame-1);
-                        if(prev)
-                        {
-                                image->duplicate(prev);
-                                cache->updateFrameNum(image,frame);
-                               // Refonly !! delete tmpImage;
-                                return 1;
-                        }
+                cache->updateFrameNum(image,0xfffffffff);
+                return 0;
         }
 	// If not quant and it is already YV12, we can stop here
 	if((!tmpImage->quant || !tmpImage->_qStride) && tmpImage->_colorspace==ADM_COLOR_YV12)
@@ -485,7 +863,7 @@ ADMCompressedImage img;
 	sumit=0;
         // Dupe infos
         image->copyInfo(tmpImage);
-        //image->copyQuantInfo(tmpImage);
+        
 
         // Do postprocessing if any
 	for(uint32_t z=0;z<tmpImage->_qSize;z++)
@@ -548,8 +926,8 @@ ADMCompressedImage img;
                 else
                 {
 		        iBuff[0]= YPLANE((tmpImage));
-			iBuff[1]= UPLANE((tmpImage));
- 			iBuff[2]= VPLANE((tmpImage));
+                iBuff[1]= UPLANE((tmpImage));
+                iBuff[2]= VPLANE((tmpImage));
 		
                 	
                                                                 
@@ -632,12 +1010,11 @@ ADMCompressedImage img;
 
                 }
 _next:
-                // update some infos
-             //   if(refOnly) delete tmpImage;
+        // update some infos
+        //   if(refOnly) delete tmpImage;
 		cache->updateFrameNum(image,frame);
 		aprintf("EdCache: Postproc done\n");
 		return 1;	
-
 }
 uint8_t ADM_Composer::dupe(ADMImage *src,ADMImage *dst,_VIDEOS *vid)
 {
