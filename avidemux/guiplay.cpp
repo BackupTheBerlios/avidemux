@@ -1,12 +1,9 @@
 
 /***************************************************************************
-                          guiplay.cpp  -  description
-                             -------------------
-
-	This file is a part of callback but splitted for readability sake
-
-    begin                : Fri Dec 28 2001
-    copyright            : (C) 2001 by mean
+    \file  guiplay.cpp
+	\brief Playback loop
+    
+    copyright            : (C) 2001/2008 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -45,14 +42,13 @@
 //___________________________________
 
 static void resetTime(void);
-static void ComputePreload(void);
-static void FillAudio(void);
+static void ADM_playPreloadAudio(void);
+static void ADM_playFillAudio(void);
 extern void UI_purge(void);
 #define EVEN(x) (x&0xffffffe)
 
 //___________________________________
 uint8_t stop_req;
-static int called = 0;
 static uint32_t vids = 0, auds = 0, dauds = 0;
 static int32_t delta;
 
@@ -62,30 +58,29 @@ static uint32_t one_frame;
 static float *wavbuf = NULL;
 AUDMAudioFilter *playback = NULL;
 extern renderZoom currentZoom;
-//static uint8_t Vbuffer[7.0*5.6*3];
-//AVDMGenericVideoStream *getFirstVideoFilter( void)
-//
-//_____________________________________________________________
+static Clock    ticktock;
+
+/**
+    \fn         GUI_PlayAvi
+    \brief      MainLoop for internal movie playback
+
+*/
 void GUI_PlayAvi(void)
 {
-    uint32_t  time_e, time_a = 0;
-    uint32_t err = 0, acc = 0;
-    uint32_t max;
-
+    
     uint32_t framelen,flags;
     AVDMGenericVideoStream *filter;
-
-    vids = 0, auds = 0, dauds = 0;
+    uint32_t max,err;
+   
     // check we got everything...
-    if (!avifileinfo)
-	return;
-  if((curframe+1)>= avifileinfo->nb_frames-1)
-  {
+    if (!avifileinfo)	return;
+    if (!avifileinfo->fps1000)        return;
+    if((curframe+1)>= avifileinfo->nb_frames-1)
+    {
       printf("No frame left\n");
       return;
-   }
-    if (avifileinfo->fps1000 == 0)
-        return;
+    }
+    
     if (playing)
       {
         stop_req = 1;
@@ -111,42 +106,27 @@ void GUI_PlayAvi(void)
             filter=getFirstVideoFilter(curframe,remaining );
     }
     
-    max=filter->getInfo()->nb_frames;
-
-    // compute how much a frame lasts in ms
-    one_frame = (uint32_t) floor(1000.*1000.*10. / filter->getInfo()->fps1000);
-    err = one_frame % 10;
-    one_frame /= 10; // Duration of a frame in ms, err =leftover in 1/10 ms
-    
-    // go to RealTime...    
-    printf("One frame : %lu, err=%lu ms\n", one_frame, err);
-    
-    // prepare 1st frame
-
     stop_req = 0;
     playing = 1;
 
-#ifdef HAVE_AUDIO
-    ComputePreload();
-#endif
-    
-     
-     //renderStartPlaying();
-// reset timer reference
-    resetTime();
+
+    ADM_playPreloadAudio();
+
+
     admPreview::deferDisplay(1,curframe);
     admPreview::update(played_frame);
+    uint64_t firstPts,lastPts;
+    
+    uint32_t movieTime;
+    uint32_t systemTime;
+    firstPts=admPreview::getCurrentPts();
+    ticktock.reset();
     do
     {
         vids++;
         admPreview::displayNow(played_frame);;
         update_status_bar();
-        if (time_a == 0)
-            time_a = getTime(0);
-        // mark !
-        //printf("\n Rendering %lu frame\n",curframe);
-        // read frame in chunk
-
+      
         if((played_frame)>=(max-1))
         {
             printf("\nEnd met (%lu  / %lu )\n",played_frame,max);
@@ -154,52 +134,36 @@ void GUI_PlayAvi(void)
          }
         
         admPreview::update(played_frame+1);;
-	curframe++;
-	played_frame++;
+        curframe++;
+        played_frame++;
+        ADM_playFillAudio();
+        lastPts=admPreview::getCurrentPts();
+        systemTime = ticktock.getElapsedMS();
+        movieTime=(uint32_t)((lastPts-firstPts)/1000);
+        printf("[Playback] systemTime: %lu movieTime : %lu  \r",systemTime,movieTime);
+        if(systemTime>movieTime) // We are late, the current PTS is after current closk
+        {
 
-#ifdef HAVE_AUDIO
-	  FillAudio();
-#endif
-
-	  time_e = getTime(1);
-	  acc += err;
-	  if (acc > 10)
+        }
+	    else
 	    {
-		acc -= 10;
-		time_a++;
-	    }
-	  time_a += one_frame;
-	  // delta a is next frame time
-	  // time is is current time
-	  delta = time_a - time_e;
-	  if (delta <= 0)
-	    {
-		//if(delta<-19)  // allow 19 ms late without warning...
-		// tick seems to be ~ 18 ms
-		//printf("\n Late ....,due : %lu ms / found : %lu \n",
-		//                                              time_a,time_e); 
-		// a call to whatever sleep function will last at leat 10 ms
-		// give some time to GTK                
-	
-	  } else
-	    {
-		// a call to whatever sleep function will last at leat 10 ms
-		// give some time to GTK                		
-		if (delta > 10)
-		    GUI_Sleep(delta - 10);
-	    }
-     	//
-            UI_purge();
-            if(getPreviewMode()==ADM_PREVIEW_SEPARATE )
-            {
-              UI_purge();
-              UI_purge(); 
-            }
+                delta=movieTime-systemTime;                
+                // a call to whatever sleep function will last at leat 10 ms
+                // give some time to GTK                		
+                if (delta > 10)
+                    GUI_Sleep(delta - 10);
+                UI_purge();
+                if(getPreviewMode()==ADM_PREVIEW_SEPARATE )
+                {
+                  UI_purge();
+                  UI_purge(); 
+                }
+        }
       }
     while (!stop_req);
 
 abort_play:
-		// ___________________________________
+	// ___________________________________
     // Flush buffer   
     // go back to normal display mode
     //____________________________________
@@ -207,100 +171,82 @@ abort_play:
           
 	   getFirstVideoFilter( );
 
-           admPreview::deferDisplay(0,0);
-           UI_purge();
-           // Updated by expose ? 
-           admPreview::update(curframe);
-           UI_purge();
-     	   update_status_bar();
-#ifdef HAVE_AUDIO
+       admPreview::deferDisplay(0,0);
+       UI_purge();
+       // Updated by expose ? 
+       admPreview::update(curframe);
+       UI_purge();
+       update_status_bar();
+
     if (currentaudiostream)
       {
-	  if (wavbuf)
-	      ADM_dealloc(wavbuf);
-//          deleteAudioFilter(NULL);
-//	  currentaudiostream->endDecompress();
-	  AVDM_AudioClose();
-
+          if (wavbuf)
+              ADM_dealloc(wavbuf);
+          wavbuf=NULL;
+          AVDM_AudioClose();
       }
-#endif
     // done.
-
 	setpriority(PRIO_PROCESS, 0, originalPriority);
 };
 
-// return time in ms
-//____________________________________________
-void resetTime(void)
-{
-    called = 0;
-}
+/**
+    \fn ADM_playFillAudio
+    \brief send ~ worth of one video frame of audio
+*/
 
-
-#ifdef HAVE_AUDIO
-//________________________________
-//
-void FillAudio(void)
-//________________________________
+void ADM_playFillAudio(void)
 {
     uint32_t oaf = 0;
     uint32_t load = 0;
 	uint8_t channels;
 	uint32_t fq;
 
-    if (!audio_available)
-	return;
-    if (!currentaudiostream)
-	return;			// audio ?
+    if (!audio_available)	    return;
+    if (!currentaudiostream)	return;			// audio ?
 
-
+    one_audio_frame=256*2*2; // why not ?
     channels= playback->getInfo()->channels;
     fq=playback->getInfo()->frequency;  
 	  double db_vid, db_clock, db_wav;
 
 	  db_vid = vids;
 	  db_vid *= 1000.;
-          db_vid /= avifileinfo->fps1000;  // In second
+      db_vid /= avifileinfo->fps1000;  // In second
 
-          do
-          {
+     do
+      {
+      db_clock = ticktock.getElapsedMS();
+      db_clock /= 1000;  // in seconds
 
-
-          db_clock = getTime(1);
-          db_clock /= 1000;  // in seconds
-
-          db_wav = dauds;	// for ms
-          db_wav /= fq;
+      db_wav = dauds;	// for ms
+      db_wav /= fq;
 
 	  delta = (long int) floor(1000. * (db_wav - db_vid));
-#if 0
-	  printf(" v:%2.2lf   wav:%2.2lf t:%2.2lf delta : %ld  \r",
-		 db_vid, db_wav, db_clock, delta);
-#endif
-          // if delta grows, it means we are pumping
-          // too much audio (audio will come too early)
-          // if delta is small, it means we are late on audio
-          if (delta < AUDIO_PRELOAD)
-          {
-              AUD_Status status;
-                 if (! (oaf = playback->fill(2*one_audio_frame,  (wavbuf + load),&status)))
-                 {
-                      printf("\n Error reading audio stream...\n");
-                      return;
-                 }
-                dauds += oaf/channels;
-                load += oaf;
-          }
+      // if delta grows, it means we are pumping
+      // too much audio (audio will come too early)
+      // if delta is small, it means we are late on audio
+      if (delta < AUDIO_PRELOAD)
+      {
+          AUD_Status status;
+             if (! (oaf = playback->fill(2*one_audio_frame,  (wavbuf + load),&status)))
+             {
+                  printf("[Playback] Error reading audio stream...\n");
+                  return;
+             }
+            dauds += oaf/channels;
+            load += oaf;
       }
+    }
     while (delta < AUDIO_PRELOAD);
     AVDM_AudioPlay(wavbuf, load);
 }
 
+/**
+    \fn ADM_playPreloadAudio
+    \brief Preload audio
+*/
+void ADM_playPreloadAudio(void)
 
-//_______________________________________
-//
-void ComputePreload(void)
-//_______________________________________
 {
     uint32_t state,latency, one_sec;
     uint32_t small_;
@@ -308,23 +254,12 @@ void ComputePreload(void)
 
     wavbuf = 0;
 
-    if (!currentaudiostream)	// audio ?
-      {
-	  return;
-      }
-   
-
-
+    if (!currentaudiostream)	  return;
+    
     double db;
-    // go to the beginning...
+    uint64_t startPts=video_body->getTime(curframe);
 
-    db = curframe * 1000.;	// ms
-    db *= 1000.;		// fps is 1000 time too big
-    db /= avifileinfo->fps1000;
-    printf(".. Offset ...%ld ms\n", (uint64_t) floor(db + 0.49));
-    //      currentaudiostream->goToTime( (uint32_t)floor(db+0.49));        
-
-    playback = buildPlaybackFilter(currentaudiostream,(uint32_t) (db + 0.49), 0xffffffff);
+    playback = buildPlaybackFilter(currentaudiostream,startPts/1000, 0xffffffff);
     
     channels= playback->getInfo()->channels;
     one_audio_frame = (one_frame * wavinfo->frequency * channels);	// 1000 *nb audio bytes per ms
@@ -367,6 +302,4 @@ void ComputePreload(void)
     audio_available = 1;
 }
 
-
-#endif
 // EOF

@@ -80,7 +80,9 @@ uint8_t AUDMAudioFilter_Bridge::rewind(void)
 uint64_t ttime=_startTime;
   ttime*=1000; // ms->us
   printf("[Bridge] Going to time %d\n",_startTime);
-  return _incoming->goToTime(ttime);
+  uint8_t r= _incoming->goToTime(ttime);
+  if(!r) printf("[Bridge] Failed!\n");
+  return r;
 }
 /**
     \fn fill

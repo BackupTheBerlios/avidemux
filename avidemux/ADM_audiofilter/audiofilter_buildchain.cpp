@@ -197,6 +197,9 @@ AUDMAudioFilter *buildInternalAudioFilter(ADM_audioStream *currentaudiostream,ui
 
     \fn buildPlaybackFilter
     \brief Warning : starttime is in ms, not us!
+    @param currentaudiostream : audio stream to build playback from
+    @param starttime starting time in ms
+    @param duration duration of stream in ms
 */
 AUDMAudioFilter *buildPlaybackFilter(ADM_audioStream *currentaudiostream, uint32_t starttime, uint32_t duration)
 {
