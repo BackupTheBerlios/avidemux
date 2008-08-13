@@ -91,14 +91,14 @@ uint8_t sdlAudioDevice::callback( Uint8 *stream, int len)
 	
 	uint32_t left=0;
 	uint8_t *in,*out;
-
+    uint32_t wrCopy=wr_ptr;
 	in=(uint8_t *)&audioBuffer[rd_ptr];
 	out=(uint8_t *)stream;
 	aprintf("sdl : Fill : rd %lu wr:%lu nb asked:%lu \n",rd_ptr,wr_ptr,nb_sample);
-	if(wr_ptr>rd_ptr)
+	if(wrCopy>=rd_ptr)
 	{
-		left=wr_ptr-rd_ptr;	
-		if(left>len)
+		left=wrCopy-rd_ptr;	
+		if(left>=len)
 		{
 			memcpy(out,in,len);
 			rd_ptr+=len;
@@ -107,14 +107,14 @@ uint8_t sdlAudioDevice::callback( Uint8 *stream, int len)
 		{
 			memcpy(out,in,left);
 			memset(out+left,0,(len-left));
-			rd_ptr=wr_ptr; // empty!
+			rd_ptr=wrCopy; // empty!
 		}
 	}
 	else
 	{
 		// wrap ?
 		left=BUFFER_SIZE-rd_ptr;
-		if(left>len)
+		if(left>=len)
 		{
 			memcpy(out,in,len);
 			rd_ptr+=len;
@@ -126,7 +126,7 @@ uint8_t sdlAudioDevice::callback( Uint8 *stream, int len)
 			rd_ptr=0;
 			in=(uint8_t *)&audioBuffer[0];
 			len-=left;
-            left=wr_ptr;
+            left=wrCopy;
 			if(left>=len)
             {
                 memcpy(out,in,len);
@@ -135,7 +135,7 @@ uint8_t sdlAudioDevice::callback( Uint8 *stream, int len)
             {
                 memcpy(out,in,left);
                 memset(out+left,0,len-left); // Padd
-                rd_ptr=wr_ptr;
+                rd_ptr=wrCopy;
             }
         }
 	}
