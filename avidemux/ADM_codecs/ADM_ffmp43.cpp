@@ -444,7 +444,7 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
       return 0;
     }
     clonePic (&_frame, out);
-    printf("[AvCodec] Pts : %llu Out Pts:%llu \n",_frame.pts,out->Pts);
+    //printf("[AvCodec] Pts : %llu Out Pts:%llu \n",_frame.pts,out->Pts);
 
   return 1;
 }
