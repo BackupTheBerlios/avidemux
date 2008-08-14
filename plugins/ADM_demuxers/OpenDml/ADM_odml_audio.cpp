@@ -28,9 +28,9 @@ It is an fopen/fwrite lookalike interface to chunks
 #include "ADM_Video.h"
 #include "fourcc.h"
 #include "ADM_openDML.h"
-#include "ADM_audio/aviaudio.hxx"
+
 #include "ADM_odml_audio.h"
-#include "ADM_audiocodec/ADM_audiocodec.h"
+//#include "ADM_audiocodec/ADM_audiocodec.h"
 #include "ADM_audioStream.h"
 
 /**

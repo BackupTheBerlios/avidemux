@@ -41,9 +41,14 @@ uint32_t esdAudioDevice::getLatencyMs(void)
 */
 bool  esdAudioDevice::localStop(void) 
 {
-    if (esdDevice > 0) {
+    if (esdDevice >= 0) {
         esd_close(esdDevice);
-        esdDevice = 0;
+        esdDevice = -1;
+    }
+    if(esdServer>=0)
+    {
+        esd_close(esdServer);
+        esdServer=-1;
     }
     return true;
 }
@@ -56,6 +61,17 @@ bool esdAudioDevice::localInit(void)
 esd_format_t format;
 
 latency=0;
+esd_server_info_t *esdInfo;
+
+    esdServer=	esd_open_sound(NULL);
+    if(esdServer>=0)
+    {
+        esdInfo = esd_get_server_info(esdServer);
+        esd_print_server_info(esdInfo);
+
+    }
+
+
 
     format=ESD_STREAM | ESD_PLAY | ESD_BITS16;
     if(_channels==1) format|=ESD_MONO;
@@ -69,34 +85,12 @@ latency=0;
         return 0;
     }
     printf("[ESD] open succeedeed\n");
-    /*
-#ifdef ADM_BIG_ENDIAN    
-    int fmt = AFMT_S16_BE;
-#else
-    int fmt = AFMT_S16_LE;
-#endif    
-*/
-// Compute latency  esd_get_latency is causing a freeze
-// from VLC...
-#if 0
-        struct timeval start, stop;
-        esd_server_info_t * p_info;
+      
+    float l=esd_get_latency(esdServer);
+    printf("[ESD] Raw latency %f\n",l);
+    l=l/(44.1*4);
+    latency=(uint32_t)l;
 
-        gettimeofday( &start, NULL );
-        p_info = esd_get_server_info( esdDevice);
-        gettimeofday( &stop, NULL );
-
-        uint64_t serv_lat= (uint64_t)( stop.tv_sec - start.tv_sec )
-                           * 1000;
-        serv_lat += stop.tv_usec - start.tv_usec;
-    
-
-  
-  
-    latency=(uint32_t)(serv_lat);
-#else
-    latency=0; // harcoded value.... does not work with pulse+esd compat
-#endif
     printf("[ESD] Latency %u ms\n",latency);
     //printf("[ESD] get_esd_latency %u \n",esd_get_latency(esdDevice));
     return 1;

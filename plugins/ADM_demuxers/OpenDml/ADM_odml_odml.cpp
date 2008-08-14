@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
+
 #include "ADM_default.h"
 #include "ADM_Video.h"
 
@@ -24,9 +24,7 @@
 #include "ADM_openDML.h"
 
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_ODML
-#include "ADM_osSupport/ADM_debug.h"
+#define aprintf(...) {}
 
 //#define OPENDML_VERBOSE
 

@@ -15,7 +15,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
 
 #include "ADM_default.h"
 #include "ADM_Video.h"
@@ -23,10 +22,7 @@
 #include "fourcc.h"
 #include "ADM_openDML.h"
 
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_ODML
-#include "ADM_osSupport/ADM_debug.h"
+#define aprintf(...) {}
 
 #define OPENDML_VERBOSE
 uint8_t			OpenDMLHeader::isReordered( void )
@@ -41,7 +37,7 @@ uint8_t OpenDMLHeader::reorder( void )
 #define INDEX_ARRAY_TMPL  _idx
 #define FRAMETYPE_TMPL    intra
   
-#include "ADM_video/ADM_reorderTemplate.cpp"
+//#include "ADM_video/ADM_reorderTemplate.cpp"
 
 #undef INDEX_TMPL       
 #undef INDEX_ARRAY_TMPL 

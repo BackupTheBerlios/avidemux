@@ -42,7 +42,7 @@
     \brief Audio is run in a separate thread
 
 */
-#define ADM_THREAD_BUFFER_SIZE (2*1024*1024)
+#define ADM_THREAD_BUFFER_SIZE (8*1024*1024)
 #define MODULO_THREADED(x)  (x&(ADM_THREAD_BUFFER_SIZE-1))
 class audioDeviceThreaded: public audioDevice
 {

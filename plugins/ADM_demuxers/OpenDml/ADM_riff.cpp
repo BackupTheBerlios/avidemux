@@ -10,19 +10,12 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "ADM_default.h"
-#include "ADM_assert.h"
 
 #include "ADM_riff.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_ODML
-#include "ADM_osSupport/ADM_debug.h"
+#define aprintf(...) {}
 
 #ifdef ADM_DEBUG
 	//#define ODML_RIFF_VERBOSE

@@ -70,6 +70,7 @@ uint8_t audioDeviceThreaded::init(uint32_t channel, uint32_t fq )
     _channels=channel;
     _frequency=fq;
     sizeOf10ms=(_channels*_frequency*2)/100;
+    sizeOf10ms&=~15; // make sure it is a multiple of 16
     silence=new uint8_t[sizeOf10ms];
     memset(silence,0,sizeOf10ms);
     audioBuffer=new uint8_t[ADM_THREAD_BUFFER_SIZE];
@@ -137,7 +138,7 @@ bool        audioDeviceThreaded::writeData(uint8_t *data,uint32_t lenInByte)
     }
     if(wrIndex+lenInByte>ADM_THREAD_BUFFER_SIZE)
     {
-        printf("[AudioDevice] Overflow : start:%u len%u limit%u\n",wrIndex,lenInByte,ADM_THREAD_BUFFER_SIZE);
+        printf("[AudioDevice] Overflow rd:%lu  start(wr):%u len%u limit%u\n",rdIndex,wrIndex,lenInByte,ADM_THREAD_BUFFER_SIZE);
         mutex.unlock();
         return false;
     }

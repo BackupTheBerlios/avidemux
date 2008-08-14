@@ -20,12 +20,13 @@ class esdAudioDevice : public audioDeviceThreaded
 	 {
 		 protected :
                     int esdDevice;
+                    int esdServer;
                     uint32_t latency;
          virtual     bool     localInit(void);
          virtual     bool     localStop(void);
          virtual     void     sendData(void); 
 		  public:
-		  			esdAudioDevice(void) {esdDevice=-1;}
+		  			esdAudioDevice(void) {esdDevice=-1;esdServer=-1;}
 		     		 
                             uint32_t getLatencyMs(void);
 		 }     ;

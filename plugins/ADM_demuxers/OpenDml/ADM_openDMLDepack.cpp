@@ -10,20 +10,19 @@
 //
 //
 
-#include "config.h"
 #include "ADM_default.h"
 #include "ADM_Video.h"
-#include "prefs.h"
+
 
 #include "fourcc.h"
 #include "ADM_openDML.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
-#include "ADM_libraries/ADM_utilities/avidemutils.h"
+//#include "DIA_working.h"
+//#include "ADM_libraries/ADM_utilities/avidemutils.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_UNPACKER
-#include "ADM_osSupport/ADM_debug.h"
+
+#define aprintf(...) {}
+
 #ifdef ADM_DEBUG
 	//#define OPENDML_VERBOSE
 #endif
@@ -78,12 +77,12 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 
 	uint32_t originalPriority = getpriority(PRIO_PROCESS, 0);
 	uint32_t priorityLevel;
-
+#if 0
 	prefs->get(PRIORITY_INDEXING,&priorityLevel);
 	setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
-
+#endif
 	printf("Trying to unpack the stream\n");
-	DIA_working *working=new DIA_working(QT_TR_NOOP("Unpacking bitstream"));
+//	DIA_working *working=new DIA_working(QT_TR_NOOP("Unpacking bitstream"));
 	ADMCompressedImage image;
         image.data=buffer;
 	uint32_t img=0;
@@ -93,8 +92,8 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	while(img<nbFrame)
 	{
                 ADM_assert(nbDuped<2);
-		working->update(img,nbFrame);
-		if(!getFrameNoAlloc(img,&image))
+		//working->update(img,nbFrame);
+		if(!getFrame(img,&image))
 			{
 				printf("Error could not get frame %lu\n",img);
 				goto _abortUnpack;
@@ -192,7 +191,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	ret=1;
 _abortUnpack:
 	delete [] buffer;
-	delete working;
+	//delete working;
 #if 0	
 	for(uint32_t k=0;k<nbFrame;k++)
 	{

@@ -12,7 +12,7 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#include "config.h"
+
 
 #ifdef ADM_DEBUG
 //	#define ODML_INDEX_VERBOSE
@@ -24,11 +24,9 @@
 #include "fourcc.h"
 #include "ADM_openDML.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
+//#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_ODML
-#include "ADM_osSupport/ADM_debug.h"
+#define aprintf(...) {}
 #if 0
 uint8_t 	OpenDMLHeader::indexReindex(uint32_t vidTrack,uint32_t audioTrack,uint32_t audioTrackNumber)
 {
@@ -57,21 +55,21 @@ uint32_t shortTotal,shortCur,highFCC;
 	_audioIdx=new odmlIndex[MAXX];
 	shortTotal=(_fileSize)>>20;
 	
-	DIA_working *working=new DIA_working(QT_TR_NOOP("Indexing"));
+	//DIA_working *working=new DIA_working(QT_TR_NOOP("Indexing"));
 	
 	// 
 	while(pos<_fileSize-20 && achunk<MAXX-1 && vchunk < MAXX-1 && !end)
 	{
 		
 		shortCur=pos>>20;
-		
+#if 0		
 		working->update(shortCur,shortTotal);
 		if(!working->isAlive())
 		{
 			delete working;
 			return 0;
 		}
-		
+#endif		
 		
 		fcc=read32();
 		len=read32();
@@ -129,7 +127,7 @@ uint32_t shortTotal,shortCur,highFCC;
 	// update stuff
 	_videostream.dwLength= _mainaviheader.dwTotalFrames=vchunk;
 	_nbAudioChunk=achunk;
-	delete working;
+	//delete working;
 	return 1;
 	
 }

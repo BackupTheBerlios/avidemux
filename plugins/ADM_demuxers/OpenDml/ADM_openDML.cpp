@@ -14,7 +14,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
 #include "ADM_default.h"
 #include "ADM_Video.h"
 
@@ -23,13 +23,11 @@
 #include "DIA_coreToolkit.h"
 #include "ADM_odml_audio.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_ODML
-#include "ADM_osSupport/ADM_debug.h"
+#define aprintf(...) {}
 #ifdef ADM_DEBUG
 	//#define OPENDML_VERBOSE
 #endif
-
+#define QT_TR_NOOP(x) x
 
 uint8_t OpenDMLHeader::setFlag(uint32_t frame,uint32_t flags)
 {
@@ -78,26 +76,43 @@ uint8_t OpenDMLHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
 	return 0;
 
 }
-
-uint8_t  OpenDMLHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
+/**
+    \fn getFrame
+    \return frame # framenum in img
+*/
+uint8_t  OpenDMLHeader::getFrame(uint32_t framenum,ADMCompressedImage *img)
 {
 uint64_t offset=_idx[framenum].offset; //+_mdatOffset;
-	 		
-// 	if(_recHack)
-// 	{
-// 		offset=4+4+4;
-// 	} odmlIndex
-// 	
+	
 	if(framenum>= (uint32_t)_videostream.dwLength) return 0;
 	
  	fseeko(_fd,offset,SEEK_SET);
  	fread(img->data, _idx[framenum].size, 1, _fd);
   	img->dataLength=_idx[framenum].size;
-        img->flags=_idx[framenum].intra;
+    img->flags=_idx[framenum].intra;
+    img->demuxerDts=framenum*1000*40; // FIXME
+    img->demuxerPts=(framenum+2)*1000*40; // FIXME
 	aprintf("Size: %lu\n",_idx[framenum].size);
 //	if(offset & 1) printf("odd!\n");
  	return 1;
 }
+/**
+    \fn getFrame
+    \brief Return PTS of given frame
+*/
+uint64_t OpenDMLHeader::getTime(uint32_t frameNum)
+{
+    return (frameNum+2)*1000*40; 
+
+}
+/**
+    \fn getVideoDuration
+*/
+uint64_t  OpenDMLHeader::getVideoDuration(void)
+{
+    return (_videostream.dwLength+2)*1000*40; 
+}
+
 OpenDMLHeader::~OpenDMLHeader()
 {
 	close();

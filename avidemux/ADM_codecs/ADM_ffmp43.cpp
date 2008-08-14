@@ -449,7 +449,7 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
   return 1;
 }
 
-#define LOWDELAY() _context->flags |= CODEC_FLAG_LOW_DELAY
+#define LOWDELAY() {} //_context->flags |= CODEC_FLAG_LOW_DELAY
 
 
 decoderFFDiv3::decoderFFDiv3 (uint32_t w, uint32_t h):decoderFF (w, h)

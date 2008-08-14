@@ -18,7 +18,7 @@
 #include "avifmt2.h"
 
 #include "ADM_Video.h"
-#include "ADM_inputs/ADM_openDML/ADM_riff.h"
+#include "ADM_riff.h"
 #include "ADM_audioStream.h"
 class AVDMGenericAudioStream;
 
@@ -26,8 +26,7 @@ typedef struct odmlIndex
 {
 	uint64_t offset;
 	uint64_t size;
-	uint32_t  intra;
-
+	uint32_t intra;
 }odmlIndex;
 
 typedef struct odmlTrack
@@ -61,14 +60,13 @@ protected:
        				
 	  uint64_t			_fileSize;
 	  FILE 				*_fd;
-	  odmlIndex 			*_idx;
+	  odmlIndex 		*_idx;
+	  odmlAudioTrack                *_audioTracks;
+      ADM_audioStream              **_audioStreams;
+      uint32_t                       _nbAudioTracks;
+      uint32_t                       _currentAudioTrack;
 
-	  odmlAudioTrack                  *_audioTracks;
-      ADM_audioStream                   **_audioStreams;
-         uint32_t                       _nbAudioTracks;
-         uint32_t                       _currentAudioTrack;
-
-          odmlIndex                     *_audioIdx;
+      odmlIndex                     *_audioIdx;
 	  
 	  void 				walk(riffParser *p) ;
 	  uint32_t			_nbTrack;
@@ -143,10 +141,12 @@ virtual         uint8_t         changeAudioStream(uint32_t newstream);
 
 virtual 	uint8_t  setFlag(uint32_t frame,uint32_t flags);
 virtual 	uint32_t getFlags(uint32_t frame,uint32_t *flags);
-virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)	;
+virtual 	uint8_t  getFrame(uint32_t framenum,ADMCompressedImage *img);
 virtual 	uint8_t  getFrameSize(uint32_t frame,uint32_t *size) ;
 	     	 		
-virtual	        uint8_t	 getExtraHeaderData(uint32_t *len, uint8_t **data);
+virtual	    uint8_t	 getExtraHeaderData(uint32_t *len, uint8_t **data);
+virtual     uint64_t getTime(uint32_t frameNum);
+virtual     uint64_t getVideoDuration(void);
 };
 
 #endif

@@ -134,7 +134,7 @@ void GUI_PlayAvi(void)
             goto abort_play;
          }
         
-        admPreview::update(played_frame+1);;
+        if(false==admPreview::update(played_frame+1)) break;
         curframe++;
         played_frame++;
         ADM_playFillAudio();
@@ -231,6 +231,7 @@ void ADM_playFillAudio(void)
 
      while(AVDM_getMsFullness() < AUDIO_PRELOAD)
       {
+          //printf("Fullness:%u\n",AVDM_getMsFullness());
           db_wav = nbSamplesSent;	// in seconds also
           db_wav /= fq;
 
@@ -238,15 +239,15 @@ void ADM_playFillAudio(void)
           int deltaSys=( int) floor(1000. * (db_sys - db_clock));
 
            AUD_Status status;
-                 if (! (oaf = playback->fill(256*16,  wavbuf,&status)))
-                 {
-                      printf("[Playback] Error reading audio stream...\n");
-                      audio_available=0;
-                      return;
-                 }
-                AVDM_AudioPlay(wavbuf, oaf);
-                nbSamplesSent += oaf/channels;
-                load+=oaf;
+             if (! (oaf = playback->fill(256*16,  wavbuf,&status)))
+             {
+                  printf("[Playback] Error reading audio stream...\n");
+                  audio_available=0;
+                  return;
+             }
+            AVDM_AudioPlay(wavbuf, oaf);
+            nbSamplesSent += oaf/channels;
+            load+=oaf;
     }
     //printf("[Playback] Wrote %u bytes\n",load);
     // finally play the filled up buffer
@@ -308,13 +309,16 @@ void ADM_playPreloadAudio(void)
     // pump data until latency is over
     while(ticktock.getElapsedMS()<latency)
     {
-      if (!(small_ = playback->fill(slice, wavbuf,&status)))
-      {
-        printf("[Playback] Compensating for latency failed\n");
-        break;
-      }
-       AVDM_AudioPlay(wavbuf, slice);
-       ADM_usleep(1*1000);
+        if(AVDM_getMsFullness()<AUDIO_PRELOAD)
+        {
+          if (!(small_ = playback->fill(slice, wavbuf,&status)))
+          {
+            printf("[Playback] Compensating for latency failed\n");
+            break;
+          }
+          AVDM_AudioPlay(wavbuf, slice);
+        }
+       ADM_usleep(10*1000);
     }
     printf("[Playback] Latency is now %u\n",ticktock.getElapsedMS());
     audio_available = 1;
