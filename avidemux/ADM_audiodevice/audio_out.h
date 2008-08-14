@@ -32,8 +32,8 @@ uint32_t    AVDM_GetLayencyMs(void);
 AUDIO_DEVICE 	AVDM_getCurrentDevice( void);
 uint8_t         AVDM_setVolume(int volume);
 // Get infos
-uint32_t ADM_av_getNbDevices(void);
-bool     ADM_av_getDeviceInfo(int filter, const char **name, uint32_t *major,uint32_t *minor,uint32_t *patch);
-
+uint32_t    ADM_av_getNbDevices(void);
+bool        ADM_av_getDeviceInfo(int filter, const char **name, uint32_t *major,uint32_t *minor,uint32_t *patch);
+uint32_t    AVDM_getMsFullness(void); /// Fullness in ms
 #endif
 

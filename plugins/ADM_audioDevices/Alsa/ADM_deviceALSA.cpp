@@ -56,12 +56,15 @@ snd_pcm_t *pcm_handle;
     {
 		_init=0;
     }
-
-uint8_t alsaAudioDevice::init( uint32_t channel,uint32_t fq )
+/**
+    \fn localInit
+    \brief 
+*/
+bool alsaAudioDevice::localInit( void )
 {
 	int dir=0;
 
-	_channels=channel;
+	
 	_init=0;
    /* Playback stream */
     snd_pcm_stream_t stream = SND_PCM_STREAM_PLAYBACK;
@@ -87,7 +90,7 @@ uint8_t alsaAudioDevice::init( uint32_t channel,uint32_t fq )
     /* PCM device will return immediately. If SND_PCM_ASYNC is    */
     /* specified, SIGIO will be emitted whenever a period has     */
     /* been completely processed by the soundcard.                */
-    if (snd_pcm_open(&pcm_handle, pcm_name, stream, SND_PCM_NONBLOCK) < 0) {
+    if (snd_pcm_open(&pcm_handle, pcm_name, stream, 0*SND_PCM_NONBLOCK) < 0) {
       fprintf(stderr, "[Alsa]Error opening PCM device %s\n", pcm_name);
       return(0);
     }
@@ -129,18 +132,18 @@ uint8_t alsaAudioDevice::init( uint32_t channel,uint32_t fq )
     /* by the hardware, use nearest possible rate.         */
     int exact_rate;
     dir=0;
-    exact_rate = snd_pcm_hw_params_set_rate_near(pcm_handle, hwparams, &fq, &dir);
+    exact_rate = snd_pcm_hw_params_set_rate_near(pcm_handle, hwparams, &_frequency, &dir);
     if (dir != 0) {
-      fprintf(stderr, "[Alsa]The rate %lu Hz is not supported by your hardware.\n  ==> Using %d Hz instead.\n", fq, exact_rate);
+      fprintf(stderr, "[Alsa]The rate %lu Hz is not supported by your hardware.\n  ==> Using %d Hz instead.\n", _frequency, exact_rate);
     }
 
     /* Set number of channels */
-    if (snd_pcm_hw_params_set_channels(pcm_handle, hwparams, channel) < 0) {
+    if (snd_pcm_hw_params_set_channels(pcm_handle, hwparams, _channels) < 0) {
       fprintf(stderr, "[Alsa]Error setting channels.\n");
       return(0);
     }
 #if 0
-    	uint32_t periods=fq*2*channel*10;
+    	uint32_t periods= _frequency*2*channel*10;
 	uint32_t periodsize=1;
     /* Set number of periods. Periods used to be called fragments. */
     if (snd_pcm_hw_params_set_periods(pcm_handle, hwparams, periods, 0) < 0) {
@@ -212,33 +215,50 @@ If your hardware does not support a buffersize of 2^n, you can use the function 
 	  return(0);
 	}
 
-        printf("[Alsa]Success initializing: fq :%u channel %u\n",fq,channel);
+        printf("[Alsa]Success initializing: fq :%u channel %u\n", _frequency,_channels);
 
     // 2=fully initialized
     _init=2;
     return 1;
 }
 
-
-uint8_t alsaAudioDevice::play( uint32_t len, float *data )
+/**
+    \fn sendData
+    
+*/
+void alsaAudioDevice::sendData(void)
 {
-	int ret;
-        int16_t *pcm;
 	/* Write num_frames frames from buffer data to    */
 	/* the PCM device pointed to by pcm_handle.       */
 	/* Returns the number of frames actually written. */
+    if(2!=_init) return ;
+    uint32_t lenInBytes,lenInSample;
+    lenInBytes=sizeOf10ms*2; // 20 ms at a time
+    mutex.lock();
+    uint32_t avail;
+_again:
 
-	dither16(data, len, _channels);
+	avail=wrIndex-rdIndex;
 
-	if(2!=_init) return 0;
-        len=len/_channels;
-        pcm=(int16_t *)data;
-    	while(1)
-	{
-        	ret=snd_pcm_writei(pcm_handle, pcm, len);
-		if(ret==(int)len)
+    if(lenInBytes>avail) lenInBytes=avail;
+    lenInSample=lenInBytes/(_channels*2);
+    if(!lenInSample)
+    {
+        printf("[Alsa] Underflow\n");
+        mutex.unlock();
+        return ;
+    }
+        uint8_t *start=audioBuffer+rdIndex;
+        int ret;
+
+        mutex.unlock(); // There is a race here....
+       	ret=snd_pcm_writei(pcm_handle,start, lenInSample);
+        mutex.lock();
+		if(ret==(int)lenInSample)
 		{
-			return 1;
+			rdIndex+=lenInSample*2*_channels;
+            mutex.unlock();
+            return ;
 		}
 
 		if(ret<0)
@@ -249,28 +269,26 @@ uint8_t alsaAudioDevice::play( uint32_t len, float *data )
 					//wait a bit to flush datas
 					printf("[Alsa]ALSA EAGAIN\n");
 					snd_pcm_wait(pcm_handle, 1000);
-					continue;
+					goto _again;
 
 				case    -EPIPE:
 					printf("[Alsa]ALSA EPIPE\n");
 					snd_pcm_prepare(pcm_handle);
-					continue;
+					goto _again;
 				default:
-					printf("[Alsa]ALSA Error %d : Play %s (len=%lu)\n",ret, snd_strerror(ret),len);
-					return 1;
+					printf("[Alsa]ALSA Error %d : Play %s (len=%lu)\n",ret, snd_strerror(ret),0);
+					
 			}
 		}
-		else
-		{
-			//if(len<2) return 1;
-			len-=ret;
-                        pcm+=(ret*_channels);
-		}
-	}
-	return 1;
+		
+	mutex.unlock();
+	return ;
 }
+/**
+    \fn localStop
 
- uint8_t alsaAudioDevice::stop( void )
+*/
+ bool alsaAudioDevice::localStop( void )
  {
  // we have at least a partial initialization
  if(_init)
@@ -287,7 +305,7 @@ uint8_t alsaAudioDevice::play( uint32_t len, float *data )
       }
      }
      _init=0;
-     return 1;
+     return true;
 }
 
 uint8_t alsaAudioDevice::setVolume(int volume){

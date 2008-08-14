@@ -14,22 +14,24 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#ifndef ADM_deviceALSA_H
+#define ADM_deviceALSA_H
 
-
-	 class alsaAudioDevice : public audioDevice
-	 {
-		 protected :
-				//	0-> no init done
-				//	1-> device opened but init failed
-				//	2->fully initialized
-				uint32_t _init;
-		  public:
-                                    alsaAudioDevice(void);
-		     		virtual uint8_t init(uint32_t channel,uint32_t fq);
-	    			virtual uint8_t play(uint32_t len, float *data);
-		      		virtual uint8_t stop(void) ;
-                    virtual uint8_t setVolume(int volume);
-		 }     ;
+ class alsaAudioDevice : public audioDeviceThreaded
+ {
+     protected :
+            //	0-> no init done
+            //	1-> device opened but init failed
+            //	2->fully initialized
+            uint32_t _init;
+      public:
+                                alsaAudioDevice(void);
+            virtual     bool    localInit(void);
+            virtual     bool    localStop(void);
+            virtual     void    sendData(void); 
+            virtual     uint8_t setVolume(int volume);
+     }     ;
+#endif
 //EOF
 
 

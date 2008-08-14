@@ -69,6 +69,9 @@ uint8_t audioDeviceThreaded::init(uint32_t channel, uint32_t fq )
     // Allocate buffer
     _channels=channel;
     _frequency=fq;
+    sizeOf10ms=(_channels*_frequency*2)/100;
+    silence=new uint8_t[sizeOf10ms];
+    memset(silence,0,sizeOf10ms);
     audioBuffer=new uint8_t[ADM_THREAD_BUFFER_SIZE];
     rdIndex=wrIndex=0;
     stopRequest=AUDIO_DEVICE_STOPPED;
@@ -81,6 +84,19 @@ uint8_t audioDeviceThreaded::init(uint32_t channel, uint32_t fq )
     return 1;
 }
 /**
+    \fn getBufferFullness
+    \brief Returns the number of ms of audio in the buffer
+
+*/
+uint32_t   audioDeviceThreaded:: getBufferFullness(void)
+{
+    mutex.lock();
+    float nbBytes=wrIndex-rdIndex;
+    mutex.unlock();
+    nbBytes/=10*sizeOf10ms;
+    return 1+(uint32_t)nbBytes;
+}
+/**
     \fn stop
     \brief stop
 */
@@ -91,6 +107,7 @@ uint8_t audioDeviceThreaded::stop()
         delete [] audioBuffer;
         audioBuffer=NULL;
     }
+    
     if(stopRequest==AUDIO_DEVICE_STARTED)
     {
         stopRequest=AUDIO_DEVICE_STOP_REQ;
@@ -100,6 +117,8 @@ uint8_t audioDeviceThreaded::stop()
         }
     }
     localStop();
+    if(silence) delete [] silence;
+    silence=NULL;
     stopRequest=AUDIO_DEVICE_STOPPED;
     return 1;
 }

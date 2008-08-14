@@ -158,8 +158,9 @@ void GUI_PlayAvi(void)
                     if(delta>10)
                     {
                         GUI_Sleep(delta - 10);
+                        ADM_playFillAudio();
                     }
-                    ADM_playFillAudio();
+                    
                     UI_purge();
                     systemTime = ticktock.getElapsedMS();
                     delta=movieTime-systemTime;                
@@ -228,36 +229,28 @@ void ADM_playFillAudio(void)
     db_sys=ticktock.getElapsedMS();
     db_sys/=1000;
 
-     do
+     while(AVDM_getMsFullness() < AUDIO_PRELOAD)
       {
           db_wav = nbSamplesSent;	// in seconds also
           db_wav /= fq;
 
           delta = (long int) floor(1000. * (db_wav - db_clock));
           int deltaSys=( int) floor(1000. * (db_sys - db_clock));
-          //printf("[Playback] System :%02.02f Audio: %02.02f Video:%02.02f Delta : %04u Delta sys/video:%04d\n",db_sys,db_wav,db_clock,delta,deltaSys);
-          // Delta is the advance audio has compared to video (in ms)
-          // if delta grows, it means we are pumping
-          // too much audio (audio will come too early)
-          // if delta is small, it means we are late on audio
-          if (delta < AUDIO_PRELOAD)
-          {
-              AUD_Status status;
-                 if (! (oaf = playback->fill(256*16,  wavbuf+load,&status)))
+
+           AUD_Status status;
+                 if (! (oaf = playback->fill(256*16,  wavbuf,&status)))
                  {
-                      AVDM_AudioPlay(wavbuf, load);
                       printf("[Playback] Error reading audio stream...\n");
                       audio_available=0;
                       return;
                  }
+                AVDM_AudioPlay(wavbuf, oaf);
                 nbSamplesSent += oaf/channels;
                 load+=oaf;
-          }
     }
-    while (delta < AUDIO_PRELOAD);
     //printf("[Playback] Wrote %u bytes\n",load);
     // finally play the filled up buffer
-    AVDM_AudioPlay(wavbuf, load);
+    
 }
 
 /**

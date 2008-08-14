@@ -24,7 +24,7 @@
 std::vector <ADM_AudioDevices *> ListOfAudioDevices;
 
 
-static audioDevice *device=NULL;
+static audioDeviceThreaded *device=NULL;
 static AUDIO_DEVICE  currentDevice=0; //0 is always dummy
 
 static AUDIO_DEVICE ADM_audioByName(const char *name);
@@ -39,16 +39,15 @@ static uint8_t      DummyGetVersion(uint32_t *major,uint32_t *minor,uint32_t *pa
     *patch=0;
     return 0;
 }
-audioDevice *DummyCreateAudioDevice(void)
+audioDeviceThreaded *DummyCreateAudioDevice(void)
 {
     return new dummyAudioDevice;
 }
-void DummyDeleteAudioDevice(audioDevice *z)
+void DummyDeleteAudioDevice(audioDeviceThreaded *z)
 {
     dummyAudioDevice *a=(dummyAudioDevice *)z;
 }
 // --------- couple of stubs for dummy device  -------------
-
 /**
         \fn ADM_av_getNbDevices
         \brief Returns the number of av filter plugins except one
@@ -271,16 +270,24 @@ uint32_t AVDM_GetLayencyMs(void)
 	return device->getLatencyMs();
 }
 
+/**
+    \fn AVDM_getMsFullness
+    \brief returns the # of ms worth in the buffer
+*/
+uint32_t AVDM_getMsFullness(void)
+{
+    return device->getBufferFullness();
+
+}
+
+
 
 //**
-dummyAudioDevice::dummyAudioDevice(void) {};
-dummyAudioDevice::~dummyAudioDevice(void) {};
-uint8_t dummyAudioDevice::init(uint32_t channels, uint32_t fq)
-                                {printf("Null audio device\n"); UNUSED_ARG(fq); UNUSED_ARG(channels); return 1;}
-uint8_t dummyAudioDevice::play(uint32_t len, float *data)
-                                {UNUSED_ARG(len); UNUSED_ARG(data); return 1;}
-uint8_t dummyAudioDevice::stop(void)
-                                { return 1;}
+bool dummyAudioDevice::localInit(void)                                {return true;}
+bool dummyAudioDevice::localStop(void)                                {return true;}
+void  dummyAudioDevice::sendData(void)                                {ADM_usleep(5000);}
+
+
 
 // Else the linker will discard it...
 #include "ADM_audioDeviceThreaded.cpp"

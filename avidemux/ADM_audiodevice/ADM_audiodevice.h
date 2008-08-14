@@ -53,13 +53,15 @@ protected:
             admMutex    mutex;
             uint8_t     stopRequest;
             pthread_t   myThread;
-
-
+            uint32_t    sizeOf10ms; /// Nb of bytes to make 10 ms
+            uint8_t     *silence;   /// Silence
+public:
                             audioDeviceThreaded();
     virtual                 ~audioDeviceThreaded() ;
     virtual     bool        writeData(uint8_t *data,uint32_t lenInByte);
     virtual     bool        readData(uint8_t *data,uint32_t lenInByte);
-
+                uint32_t    getBufferFullness(void); /// Returns the number of ms of audio in the buffer
+protected:
     //
     virtual     bool     localInit(void)=0;
     virtual     bool     localStop(void)=0;
@@ -78,14 +80,12 @@ public:
     \class dummyAudioDevice
     \brief this dummy is used when no suitable device have been found.
 */
-class dummyAudioDevice : public audioDevice
+class dummyAudioDevice : public audioDeviceThreaded
 {
 		  public:
-                                        dummyAudioDevice(void) ;
-                                        ~dummyAudioDevice(void);
-                        virtual uint8_t init(uint32_t channels, uint32_t fq);
-                        virtual uint8_t play(uint32_t len, float *data);
-                        virtual uint8_t stop(void) ;
+                    virtual     bool     localInit(void);
+                    virtual     bool     localStop(void);
+                    virtual     void     sendData(void);    
 }   ;
 
 #endif

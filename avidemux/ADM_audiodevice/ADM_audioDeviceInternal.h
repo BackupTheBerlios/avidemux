@@ -14,8 +14,8 @@ class ADM_AudioDevices :public ADM_LibWrapper
 {
 public:
         int         initialised;
-        audioDevice *(*createAudioDevice)();
-        void         (*deleteAudioDevice)(audioDevice *device);
+        audioDeviceThreaded *(*createAudioDevice)();
+        void         (*deleteAudioDevice)(audioDeviceThreaded *device);
         uint8_t      (*getVersion)(uint32_t *major,uint32_t *minor,uint32_t *patch);
         // Only initialized once
         const char    *name;
@@ -49,8 +49,8 @@ public:
 		}
         ADM_AudioDevices(const char *name,const char *desc, 
                                 uint8_t      (*getVersion)(uint32_t *major,uint32_t *minor,uint32_t *patch),
-                                audioDevice *(*createAudioDevice)(),
-                                void         (*deleteAudioDevice)(audioDevice *device)) : ADM_LibWrapper()
+                                audioDeviceThreaded *(*createAudioDevice)(),
+                                void         (*deleteAudioDevice)(audioDeviceThreaded *device)) : ADM_LibWrapper()
 		{
 
                     this->name=name;
@@ -69,8 +69,8 @@ extern "C" { \
 const char *getName(void) {return #name;}\
 uint32_t getApiVersion(void) {return ADM_AUDIO_DEVICE_API_VERSION;} \
 const char *getDescriptor(void ) {return desc;} \
- audioDevice *create(void){return new Class;} \
- void destroy(audioDevice *z){Class *a=(Class *)z;delete a;} \
+ audioDeviceThreaded *create(void){return new Class;} \
+ void destroy(audioDeviceThreaded *z){Class *a=(Class *)z;delete a;} \
 uint8_t getVersion(uint32_t *mmajor,uint32_t *mminor,uint32_t *ppatch) \
     {\
         *mmajor=major;\
