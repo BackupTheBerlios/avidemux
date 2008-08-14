@@ -14,18 +14,19 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-class esdAudioDevice : public audioDevice
+#ifndef ADM_deviceEsd_H
+#define ADM_deviceEsd_H
+class esdAudioDevice : public audioDeviceThreaded
 	 {
 		 protected :
                     int esdDevice;
                     uint32_t latency;
+         virtual     bool     localInit(void);
+         virtual     bool     localStop(void);
+         virtual     void     sendData(void); 
 		  public:
 		  			esdAudioDevice(void) {esdDevice=-1;}
-		     		virtual uint8_t init(uint32_t channels, uint32_t fq);
-	    			virtual uint8_t play(uint32_t len, float *data);
-		      		virtual uint8_t stop(void);
-                            uint8_t setVolume(int volume);
+		     		 
                             uint32_t getLatencyMs(void);
 		 }     ;
-
+#endif

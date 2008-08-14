@@ -23,12 +23,13 @@
 #include  "ADM_audioDeviceInternal.h"
 #include  "ADM_devicePulseSimple.h"
 #include  "pulse/simple.h"
+#include  "pulse/error.h"
 
-ADM_DECLARE_AUDIODEVICE(PulseAudioS,pulseSimpleAudioDevice,1,0,0,"PulseAudioSimple audio device (c) mean");
+ADM_DECLARE_AUDIODEVICE(PulseAudioS,pulseSimpleAudioDevice,1,0,1,"PulseAudioSimple audio device (c) mean");
 #define INSTANCE  ((pa_simple *)instance)
 
-// By default we use float
-//#define ADM_PULSE_INT16
+// By default we use float NOT
+#define ADM_PULSE_INT16
 /**
     \fn pulseSimpleAudioDevice
     \brief Constructor
@@ -37,6 +38,7 @@ ADM_DECLARE_AUDIODEVICE(PulseAudioS,pulseSimpleAudioDevice,1,0,0,"PulseAudioSimp
 pulseSimpleAudioDevice::pulseSimpleAudioDevice()
 {
     instance=NULL;
+    latency=0;
 }
 /**
     \fn pulseSimpleAudioDevice
@@ -44,22 +46,16 @@ pulseSimpleAudioDevice::pulseSimpleAudioDevice()
 */
 uint32_t pulseSimpleAudioDevice::getLatencyMs(void)
 {
-    if(!instance) return 0;
-    int er;
-    pa_usec_t l=0;
-    l=pa_simple_get_latency(INSTANCE, &er);
-    printf("[Pulse] Latency :%lu\n",l);
-    l/=1000;
-    return (uint32_t )l;
+   return 500; //latency;
 }
 
 /**
-    \fn stop
+    \fn localStop
     \brief stop & release device
 
 */
 
-uint8_t  pulseSimpleAudioDevice::stop(void) 
+bool  pulseSimpleAudioDevice::localStop(void) 
 {
 int er;
     if(!instance) return 1;
@@ -72,24 +68,29 @@ int er;
 }
 
 /**
-    \fn init
+    \fn    localInit
     \brief Take & initialize the device
 
 */
-uint8_t pulseSimpleAudioDevice::init(uint32_t channels, uint32_t fq) 
+bool pulseSimpleAudioDevice::localInit(void) 
 {
 
 pa_simple *s;
 pa_sample_spec ss;
 int er;
- 
-#ifdef ADM_PULSE_INT16
-  ss.format = PA_SAMPLE_S16NE;
-#else
-    ss.format = PA_SAMPLE_FLOAT32NE;//PA_SAMPLE_S16NE; //FIXME big endian
-#endif
-  ss.channels = channels;
-  ss.rate =fq;
+pa_buffer_attr attr;
+
+    memset(&attr,0,sizeof(attr));
+    attr.maxlength = (uint32_t) -1;
+    attr.tlength = (uint32_t )-1;
+    attr.prebuf =(uint32_t) -1;
+    attr.minreq = (uint32_t) -1;
+    attr.fragsize =(uint32_t) -1;
+  
+
+  ss.format = PA_SAMPLE_S16LE;
+  ss.channels = _channels;
+  ss.rate =_frequency;
  
   instance= pa_simple_new(NULL,               // Use the default server.
                     "Avidemux2",           // Our application's name.
@@ -98,46 +99,60 @@ int er;
                     "Sound",            // Description of our stream.
                     &ss,                // Our sample format.
                     NULL,               // Use default channel map
-                    NULL ,             // Use default buffering attributes.
+                    NULL, //&attr ,             // Use default buffering attributes.
                     &er               // Ignore error code.
                     );
   if(!instance)
     {
-        printf("[PulseSimple] open failed\n");
+        printf("[PulseSimple] open failed :%s\n",pa_strerror(er));
         return 0;
     }
- pa_usec_t l=0;
-    l=pa_simple_get_latency(INSTANCE, &er);
-    printf("[Pulse] Latency :%lu\n",l);
-
+#if 0
+    pa_usec_t l=0;
+    // Latency...
+    Clock    ticktock;
+    ticktock.reset();
+    if(0>pa_simple_write(INSTANCE,silence, sizeOf10ms,&er))
+    {
+      fprintf(stderr, __FILE__": pa_simple_write() failed: %s\n", pa_strerror(er));
+    }
+    pa_simple_drain(INSTANCE,&er);
+    latency=ticktock.getElapsedMS();
+    printf("[Pulse] Latency :%lu, total %lu\n",latency,pa_simple_get_latency(INSTANCE,&er)/1000);
+#endif
     printf("[PulseSimple] open ok\n");
     return 1;
 
 }
 
 /**
-    \fn play
+    \fn sendData
     \brief Playback samples
 
 */
-uint8_t pulseSimpleAudioDevice::play(uint32_t len, float *data)
+void pulseSimpleAudioDevice::sendData(void)
 {
 int er;
-    if(!instance) return 0;
-#ifdef ADM_PULSE_INT16
-	dither16(data, len, _channels);
-    pa_simple_write(INSTANCE,data,len*2,&er);
-#else
-    pa_simple_write(INSTANCE,data,len*4,&er);
-#endif
-	return 1;
+    if(!instance) return ;
+	
+    mutex.lock();
+    uint32_t avail=wrIndex-rdIndex;
+    if(!avail)
+    {
+        pa_simple_write(INSTANCE,silence, sizeOf10ms,&er);
+        mutex.unlock();
+        return ;
+    }
+    if(avail>sizeOf10ms) avail=sizeOf10ms;
+    
+    uint8_t *data=audioBuffer+rdIndex;
+    mutex.unlock();
+    pa_simple_write(INSTANCE,data, avail,&er);
+    mutex.lock();
+    rdIndex+=avail;
+    mutex.unlock();
+	return ;
+
 }
-/**
-    \fn setVolume
-    \brief Cannot be done with pulse simple
-*/
-uint8_t pulseSimpleAudioDevice::setVolume(int volume)
-{
-	return 1;
-}
+
 //EOF

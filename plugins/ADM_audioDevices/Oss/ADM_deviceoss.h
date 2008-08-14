@@ -20,11 +20,10 @@ class ossAudioDevice : public audioDeviceThreaded
 {
 protected :
                                 int oss_fd;
-public:
     virtual     bool     localInit(void);
     virtual     bool     localStop(void);
     virtual     void     sendData(void); 
-   
+public:   
 			uint8_t setVolume(int volume);
 }     ;
 

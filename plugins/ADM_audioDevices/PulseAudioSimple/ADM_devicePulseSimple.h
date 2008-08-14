@@ -1,8 +1,8 @@
 /***************************************************************************
                           ADM_deviceEsd.h  -  description
                              -------------------
-                             Audio device for ESD sound daemon
-    copyright            : (C) 2005 by mean
+                             Audio device for PulseAudio sound daemon
+    copyright            : (C) 2005/2008 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -14,17 +14,19 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-class pulseSimpleAudioDevice : public audioDevice
-	 {
-		 protected :
-                    void  *instance;
-		  public:
-		  			pulseSimpleAudioDevice(void);
-		     		virtual uint8_t init(uint32_t channels, uint32_t fq);
-	    			virtual uint8_t play(uint32_t len, float *data);
-		      		virtual uint8_t stop(void);
-				    uint8_t setVolume(int volume);
-                    uint32_t getLatencyMs(void);
-		 }     ;
-
+#ifndef ADM_devicePulseSimple_H
+#define ADM_devicePulseSimple_H
+class pulseSimpleAudioDevice : public audioDeviceThreaded
+ {
+     protected :
+                     void    *instance;
+                     uint32_t latency;
+         virtual     bool     localInit(void);
+         virtual     bool     localStop(void);
+         virtual     void     sendData(void); 
+      public:
+                pulseSimpleAudioDevice(void);
+                
+                uint32_t getLatencyMs(void);
+     }     ;
+#endif

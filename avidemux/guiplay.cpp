@@ -303,7 +303,20 @@ void ADM_playPreloadAudio(void)
     nbSamplesSent = fill/channels;  // In sample
     AVDM_AudioPlay(wavbuf, fill);
     // Let audio latency sets in...
-    ADM_usleep(latency*1000);
+    ticktock.reset();
+    uint32_t slice=(wavinfo->frequency * channels)/100; // 10 ms
+    // pump data until latency is over
+    while(ticktock.getElapsedMS()<latency)
+    {
+      if (!(small_ = playback->fill(slice, wavbuf,&status)))
+      {
+        printf("[Playback] Compensating for latency failed\n");
+        break;
+      }
+       AVDM_AudioPlay(wavbuf, slice);
+       ADM_usleep(1*1000);
+    }
+    printf("[Playback] Latency is now %u\n",ticktock.getElapsedMS());
     audio_available = 1;
 }
 
