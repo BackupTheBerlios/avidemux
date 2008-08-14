@@ -1,5 +1,6 @@
 SET(ADM_audiodevice_SRCS 
 	ADM_audiodevice.cpp  
+
 	)
 
 ADD_ADM_LIB_ALL_TARGETS(ADM_audiodevice ${ADM_audiodevice_SRCS})

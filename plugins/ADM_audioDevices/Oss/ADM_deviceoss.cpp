@@ -82,29 +82,31 @@ uint8_t  ossAudioDevice::setVolume(int volume)
 
 }
 
-//_______________________________________________
-//
-//
-//_______________________________________________
-uint8_t  ossAudioDevice::stop(void) {
+/**
+    \fn localStop
+
+*/
+bool  ossAudioDevice::localStop(void) 
+{
     if (oss_fd > 0) {
+       // ioctloss_fd, SNDCTL_DSP_SKIP, NULL); // Flush
         close(oss_fd);
         oss_fd = 0;
     }
-    return 1;
+    return true;
 }
 
-//_______________________________________________
-//
-//
-//_______________________________________________
-uint8_t ossAudioDevice::init(uint32_t channels, uint32_t fq) 
+
+/**
+    \fn localInit
+*/
+bool ossAudioDevice::localInit(void) 
 {
-	_channels = channels;
- 
-    printf("[OSSS]: %lu Hz, %lu channels\n", fq, channels);
+	
+    int fq=_frequency;
+    printf("[OSSS]: %lu Hz, %lu channels\n", _frequency, _channels);
     // open OSS device
-    oss_fd = open(dsp, O_WRONLY | O_NONBLOCK);
+    oss_fd = open(dsp, O_WRONLY /*| O_NONBLOCK*/);
     if (oss_fd == -1) {
 /*
 	if( errno == EACCES )
@@ -114,20 +116,20 @@ uint8_t ossAudioDevice::init(uint32_t channels, uint32_t fq)
 	else
 */
            printf("[OSSS] Error initializing OSS: Error : %d\n", errno);
-        return 0;
+        return false;
     }
     // seems ok, set up audio 
     if (ioctl (oss_fd, SNDCTL_DSP_SPEED, &fq) < 0) {
         printf("[OSSS] Error setting up OSS(SPEED): Error : %d\n", errno);
         return 0;
     }
-    if (channels > 2) {
-        if (ioctl (oss_fd, SNDCTL_DSP_CHANNELS, &channels) < 0) {
+    if (_channels > 2) {
+        if (ioctl (oss_fd, SNDCTL_DSP_CHANNELS, &_channels) < 0) {
 	    printf("[OSSS] Error setting up OSS(CHANNELS): Error : %d\n", errno);
 	    return 0;
         }
     } else {
-        int chan = channels - 1;
+        int chan = _channels - 1;
         if (ioctl (oss_fd, SNDCTL_DSP_STEREO, &chan) < 0) {
 	    printf("[OSSS] Error setting up OSS(STEREO): Error : %d\n", errno);
 	    return 0;
@@ -140,30 +142,33 @@ uint8_t ossAudioDevice::init(uint32_t channels, uint32_t fq)
 #endif    
     if (ioctl (oss_fd, SNDCTL_DSP_SETFMT, &fmt) < 0) {
         printf("[OSSS] Error setting up OSS(FORMAT): Error : %d\n", errno);
-        return 0;
+        return false;
     }
 
-    return 1;
+    return true;
 }
 
-//_______________________________________________
-//
-//
-//_______________________________________________
-uint8_t ossAudioDevice::play(uint32_t len, float *data)
+/**
+     \fn sendData
+     \brief Send data to playback
+*/
+void    ossAudioDevice::sendData(void)
 {
-	uint32_t w;
+    int pack=_channels*_frequency*2;
+    int w;
+    pack/=100;
+    pack&=~3;   // Try to send 10 ms chunks
 
-	if (!oss_fd)
-		return 0;
-
-	dither16(data, len, _channels);
-
-	w = write(oss_fd, data, len*2);
-        if(w!=len*2)
-        {
-          printf("[OSS] Warning : %u / %u\n",w,len*2); 
-        }
-	return 1;
+	mutex.lock();
+    if(wrIndex-rdIndex<pack) pack=wrIndex-rdIndex;
+    mutex.unlock();
+    w = write(oss_fd, audioBuffer+rdIndex, pack);
+    mutex.lock();
+    rdIndex+=pack;
+    mutex.unlock();
+    if(w!=pack) printf("[OSS] Error :%u vs %u\n",w,pack);
+    ADM_usleep(1000);
+    return;
+   
 }
 //EOF

@@ -14,16 +14,18 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-class ossAudioDevice : public audioDevice
+#ifndef OSSAUDIODEVICE_H
+#define OSSAUDIODEVICE_H
+class ossAudioDevice : public audioDeviceThreaded
 {
 protected :
                                 int oss_fd;
 public:
-                                        ossAudioDevice(void) {oss_fd=0;}
-                        virtual uint8_t init(uint32_t channels, uint32_t fq);
-                        virtual uint8_t play(uint32_t len, float *data);
-                        virtual uint8_t stop(void);
+    virtual     bool     localInit(void);
+    virtual     bool     localStop(void);
+    virtual     void     sendData(void); 
+   
 			uint8_t setVolume(int volume);
 }     ;
 
+#endif

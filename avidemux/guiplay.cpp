@@ -38,7 +38,7 @@
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
 #include "ADM_preview.h"
 //___________________________________
-#define AUDIO_PRELOAD 150
+#define AUDIO_PRELOAD 200
 //___________________________________
 
 static void resetTime(void);
@@ -49,8 +49,8 @@ extern void UI_purge(void);
 
 //___________________________________
 uint8_t stop_req;
-static uint32_t vids = 0, auds = 0, dauds = 0;
-static int32_t delta;
+static uint32_t auds = 0, nbSamplesSent = 0;
+
 
 static uint16_t audio_available = 0;
 static uint32_t one_audio_frame = 0;
@@ -59,7 +59,7 @@ static float *wavbuf = NULL;
 AUDMAudioFilter *playback = NULL;
 extern renderZoom currentZoom;
 static Clock    ticktock;
-
+uint64_t firstPts,lastPts;
 /**
     \fn         GUI_PlayAvi
     \brief      MainLoop for internal movie playback
@@ -110,20 +110,21 @@ void GUI_PlayAvi(void)
     playing = 1;
 
 
-    ADM_playPreloadAudio();
+    
 
 
     admPreview::deferDisplay(1,curframe);
     admPreview::update(played_frame);
-    uint64_t firstPts,lastPts;
-    
+    firstPts=admPreview::getCurrentPts();
+    ADM_playPreloadAudio();
+
     uint32_t movieTime;
     uint32_t systemTime;
-    firstPts=admPreview::getCurrentPts();
+    
     ticktock.reset();
     do
     {
-        vids++;
+        
         admPreview::displayNow(played_frame);;
         update_status_bar();
       
@@ -140,19 +141,30 @@ void GUI_PlayAvi(void)
         lastPts=admPreview::getCurrentPts();
         systemTime = ticktock.getElapsedMS();
         movieTime=(uint32_t)((lastPts-firstPts)/1000);
-        printf("[Playback] systemTime: %lu movieTime : %lu  \r",systemTime,movieTime);
+       // printf("[Playback] systemTime: %lu movieTime : %lu  \r",systemTime,movieTime);
         if(systemTime>movieTime) // We are late, the current PTS is after current closk
         {
-
+            if(movieTime>systemTime+20)
+                printf("[Playback] We are late!\n");
         }
 	    else
 	    {
-                delta=movieTime-systemTime;                
+            int32_t delta;
+                delta=movieTime-systemTime;
                 // a call to whatever sleep function will last at leat 10 ms
                 // give some time to GTK                		
-                if (delta > 10)
-                    GUI_Sleep(delta - 10);
-                UI_purge();
+                while(delta > 10)
+                {
+                    if(delta>10)
+                    {
+                        GUI_Sleep(delta - 10);
+                    }
+                    ADM_playFillAudio();
+                    UI_purge();
+                    systemTime = ticktock.getElapsedMS();
+                    delta=movieTime-systemTime;                
+                }
+                
                 if(getPreviewMode()==ADM_PREVIEW_SEPARATE )
                 {
                   UI_purge();
@@ -204,40 +216,47 @@ void ADM_playFillAudio(void)
     if (!audio_available)	    return;
     if (!currentaudiostream)	return;			// audio ?
 
-    one_audio_frame=256*2*2; // why not ?
+  
     channels= playback->getInfo()->channels;
     fq=playback->getInfo()->frequency;  
-	  double db_vid, db_clock, db_wav;
+	double db_clock, db_wav,db_sys;
+    int32_t delta=0;
 
-	  db_vid = vids;
-	  db_vid *= 1000.;
-      db_vid /= avifileinfo->fps1000;  // In second
+    db_clock = admPreview::getCurrentPts()-firstPts;
+    db_clock /= 1000000.;  // in seconds
+
+    db_sys=ticktock.getElapsedMS();
+    db_sys/=1000;
 
      do
       {
-      db_clock = ticktock.getElapsedMS();
-      db_clock /= 1000;  // in seconds
+          db_wav = nbSamplesSent;	// in seconds also
+          db_wav /= fq;
 
-      db_wav = dauds;	// for ms
-      db_wav /= fq;
-
-	  delta = (long int) floor(1000. * (db_wav - db_vid));
-      // if delta grows, it means we are pumping
-      // too much audio (audio will come too early)
-      // if delta is small, it means we are late on audio
-      if (delta < AUDIO_PRELOAD)
-      {
-          AUD_Status status;
-             if (! (oaf = playback->fill(2*one_audio_frame,  (wavbuf + load),&status)))
-             {
-                  printf("[Playback] Error reading audio stream...\n");
-                  return;
-             }
-            dauds += oaf/channels;
-            load += oaf;
-      }
+          delta = (long int) floor(1000. * (db_wav - db_clock));
+          int deltaSys=( int) floor(1000. * (db_sys - db_clock));
+          //printf("[Playback] System :%02.02f Audio: %02.02f Video:%02.02f Delta : %04u Delta sys/video:%04d\n",db_sys,db_wav,db_clock,delta,deltaSys);
+          // Delta is the advance audio has compared to video (in ms)
+          // if delta grows, it means we are pumping
+          // too much audio (audio will come too early)
+          // if delta is small, it means we are late on audio
+          if (delta < AUDIO_PRELOAD)
+          {
+              AUD_Status status;
+                 if (! (oaf = playback->fill(256*16,  wavbuf+load,&status)))
+                 {
+                      AVDM_AudioPlay(wavbuf, load);
+                      printf("[Playback] Error reading audio stream...\n");
+                      audio_available=0;
+                      return;
+                 }
+                nbSamplesSent += oaf/channels;
+                load+=oaf;
+          }
     }
     while (delta < AUDIO_PRELOAD);
+    //printf("[Playback] Wrote %u bytes\n",load);
+    // finally play the filled up buffer
     AVDM_AudioPlay(wavbuf, load);
 }
 
@@ -248,7 +267,7 @@ void ADM_playFillAudio(void)
 void ADM_playPreloadAudio(void)
 
 {
-    uint32_t state,latency, one_sec;
+    uint32_t state,latency, preload;
     uint32_t small_;
     uint32_t channels;
 
@@ -262,11 +281,9 @@ void ADM_playPreloadAudio(void)
     playback = buildPlaybackFilter(currentaudiostream,startPts/1000, 0xffffffff);
     
     channels= playback->getInfo()->channels;
-    one_audio_frame = (one_frame * wavinfo->frequency * channels);	// 1000 *nb audio bytes per ms
-    one_audio_frame /= 1000; // In elemtary info (float)
-    printf("1 audio frame = %lu bytes\n", one_audio_frame);
-    // 3 sec buffer..               
-    wavbuf =  (float *)  ADM_alloc((3 *  2*channels * wavinfo->frequency*wavinfo->channels));
+    preload=  (wavinfo->frequency * channels)/5;	// 200 ms preload
+    // 4 sec buffer..               
+    wavbuf =  (float *)  ADM_alloc((20*sizeof(float)*preload)); // 4 secs buffers
     ADM_assert(wavbuf);
     // Call it twice to be sure it is properly setup
      state = AVDM_AudioSetup(playback->getInfo()->frequency,  channels );
@@ -279,23 +296,18 @@ void ADM_playPreloadAudio(void)
           GUI_Error_HIG(QT_TR_NOOP("Trouble initializing audio device"), NULL);
           return;
       }
-    // compute preload                      
-    //_________________
-    // we preload 1/4 a second
-
-     one_sec = (wavinfo->frequency *  channels)  >> 2;
-     one_sec+=(latency*wavinfo->frequency *  channels*2)/1000;
+     
      AUD_Status status;
     uint32_t fill=0;
-    while(fill<one_sec)
+    while(fill<preload)
     {
-      if (!(small_ = playback->fill(one_sec-fill, wavbuf,&status)))
+      if (!(small_ = playback->fill(preload-fill, wavbuf+fill,&status)))
       {
         break;
       }
-    fill+=small_;
+      fill+=small_;
     }
-    dauds += fill/channels;  // In sample
+    nbSamplesSent = fill/channels;  // In sample
     AVDM_AudioPlay(wavbuf, fill);
     // Let audio latency sets in...
     ADM_usleep(latency*1000);

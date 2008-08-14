@@ -363,7 +363,7 @@ uint8_t admPreview::update(uint32_t framenum)
                 if(!defered_display) 
                   renderUpdateImage(resized->data,ZOOM_1_1);
             }
-            printf("[admPreview] PTs: %llu\n",rdrImage->Pts);
+           // printf("[admPreview] PTs: %llu\n",rdrImage->Pts);
         }
         break;
       case ADM_PREVIEW_OUTPUT:

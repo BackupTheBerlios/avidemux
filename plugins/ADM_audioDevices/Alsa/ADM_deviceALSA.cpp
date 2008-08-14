@@ -30,10 +30,24 @@
 #include <alsa/asoundlib.h>
 #include  "ADM_audiodevice.h"
 #include  "ADM_audioDeviceInternal.h"
+
+
+#ifdef ADM_ADEVICE_DMIX
+#define alsaAudioDevice alsaAudioDeviceDmix
+#include  "ADM_deviceALSA.h"
+ADM_DECLARE_AUDIODEVICE(AlsaDmix,alsaAudioDevice,1,0,0,"Alsa Audio Device (dmix) (c) Mean 2008");
+#define ADEVICE "dmix"
+#endif
+
+#if ADM_ADEVICE_HW
+#define alsaAudioDevice alsaAudioDeviceHw0
 #include  "ADM_deviceALSA.h"
 
+ADM_DECLARE_AUDIODEVICE(AlsaHw0,alsaAudioDevice,1,0,0,"Alsa Audio Device (hw:0) (c) Mean 2008");
+#define ADEVICE "hw:0"
+#endif
 
-ADM_DECLARE_AUDIODEVICE(Alsa,alsaAudioDevice,1,0,0,"Alsa audio device (c) mean");
+
 
 /* Handle for the PCM device */
 snd_pcm_t *pcm_handle;
@@ -61,7 +75,7 @@ uint8_t alsaAudioDevice::init( uint32_t channel,uint32_t fq )
 
   static char *pcm_name;
 //  if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &pcm_name) != RC_OK )
-               pcm_name = ADM_strdup("dmix");
+               pcm_name = ADM_strdup(ADEVICE);
     printf("[Alsa] Using device :%s\n",pcm_name);
  /* Allocate the snd_pcm_hw_params_t structure on the stack. */
     snd_pcm_hw_params_alloca(&hwparams);

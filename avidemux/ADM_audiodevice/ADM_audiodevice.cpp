@@ -270,6 +270,8 @@ uint32_t AVDM_GetLayencyMs(void)
 {
 	return device->getLatencyMs();
 }
+
+
 //**
 dummyAudioDevice::dummyAudioDevice(void) {};
 dummyAudioDevice::~dummyAudioDevice(void) {};
@@ -280,5 +282,6 @@ uint8_t dummyAudioDevice::play(uint32_t len, float *data)
 uint8_t dummyAudioDevice::stop(void)
                                 { return 1;}
 
-
+// Else the linker will discard it...
+#include "ADM_audioDeviceThreaded.cpp"
 //**

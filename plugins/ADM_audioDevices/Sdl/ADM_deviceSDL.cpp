@@ -92,54 +92,17 @@ uint8_t sdlAudioDevice::callback( Uint8 *stream, int len)
 	uint32_t left=0;
 	uint8_t *in,*out;
     uint32_t wrCopy=wr_ptr;
-	in=(uint8_t *)&audioBuffer[rd_ptr];
-	out=(uint8_t *)stream;
-	aprintf("sdl : Fill : rd %lu wr:%lu nb asked:%lu \n",rd_ptr,wr_ptr,nb_sample);
-	if(wrCopy>=rd_ptr)
-	{
-		left=wrCopy-rd_ptr;	
-		if(left>=len)
-		{
-			memcpy(out,in,len);
-			rd_ptr+=len;
-		}
-		else
-		{
-			memcpy(out,in,left);
-			memset(out+left,0,(len-left));
-			rd_ptr=wrCopy; // empty!
-		}
-	}
-	else
-	{
-		// wrap ?
-		left=BUFFER_SIZE-rd_ptr;
-		if(left>=len)
-		{
-			memcpy(out,in,len);
-			rd_ptr+=len;
-		}
-		else // wrap!
-		{
-			memcpy(out,in,left);
-			out+=left;
-			rd_ptr=0;
-			in=(uint8_t *)&audioBuffer[0];
-			len-=left;
-            left=wrCopy;
-			if(left>=len)
-            {
-                memcpy(out,in,len);
-                rd_ptr+=len;
-            }else       
-            {
-                memcpy(out,in,left);
-                memset(out+left,0,len-left); // Padd
-                rd_ptr=wrCopy;
-            }
-        }
-	}
+    uint32_t avail=wr_ptr-rd_ptr;
+    if(avail<len)
+    {
+        printf("[SDLAudio] underflow wanted :%u got %u\n",len,avail);
+        memset(stream+avail,0,len-avail);
+        len=avail;
+    }
+    memcpy(stream,audioBuffer+rd_ptr,len);
+    rd_ptr+=len;
     return 1;
+   
 }
 /**
     \fn init
@@ -202,55 +165,31 @@ uint8_t sdlAudioDevice::play(uint32_t len, float *data)
  	// First put stuff into the buffer
 	uint8_t *dest;
 	uint32_t left;
-    
+    int needStart=0;
+
 	dither16(data, len, _channels);
-
-	// We have len float of datas, now converted to int16_t
     len*=2; // in bytes!
-    uint8_t *src=(uint8_t *)data;
 
-	// Check we have room left
-	if(wr_ptr>=rd_ptr)
-	{
-		left=BUFFER_SIZE-(wr_ptr)+rd_ptr;
-	}
-	else
-	{
-		left=rd_ptr-wr_ptr;
-	}
-	if(len>left)
-	{
-		printf("[SDLAUDIO]*****AudioCore:Buffer full!****\n");
-		return 0;
-	}
-
-	// We have room left, copy it
-	dest=(uint8_t *)&audioBuffer[wr_ptr];
-	
-	SDL_LockAudio();
-	if(wr_ptr>=rd_ptr)
-    {
-        if(wr_ptr+len<BUFFER_SIZE)
-        {
-            memcpy(dest,src,len);
-            wr_ptr+=len;
-        }
-        else
-        {
-            left=BUFFER_SIZE-wr_ptr;
-            memcpy(dest,src,left);
-            memcpy(audioBuffer,src+left,(len-left));
-            wr_ptr=len-left;	
-        }
+    // Shrink ?
+    SDL_LockAudio();
+    if(wr_ptr>BUFFER_SIZE/2 && rd_ptr>BUFFER_SIZE/8)
+    {   
+        memmove(audioBuffer,audioBuffer+rd_ptr,(wr_ptr-rd_ptr));
+        wr_ptr-=rd_ptr;
+        rd_ptr=0;
     }
-	//aprintf("AudioSDL: Putting %lu bytes rd:%lu wr:%lu \n",len*2,rd_ptr,wr_ptr);
+    
+    if(wr_ptr+len>BUFFER_SIZE)
+    {
+        printf("[SDLAUDIO] Overflow wr=%u len=%u\n",wr_ptr,len);
+        SDL_UnlockAudio();
+        return 0;
+    }
+    memcpy(audioBuffer+wr_ptr,data,len);
+    if(!wr_ptr) needStart=1;
+    wr_ptr+=len;
 	SDL_UnlockAudio();
- 	if(!frameCount)
-	{
-		_inUse=1;
-		SDL_PauseAudio(0);;
-	}
-	
+    if(needStart) SDL_PauseAudio(0);
 	return 1;
 }
 /**
