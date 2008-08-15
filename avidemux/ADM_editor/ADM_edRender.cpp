@@ -90,7 +90,7 @@ bool ADM_Composer::DecodePictureUpToIntra(uint32_t frame,uint32_t ref)
     img.data=compBuffer;
     img.cleanup(frame);
     
-
+    printf("[EditorRender] DecodeUpToInta %u ref:%u\n",frame,ref);
 	_VIDEOS *vid=&_videos[ref];
     vidHeader *demuxer=vid->_aviheader;
 	cache=_videos[ref]._videoCache;
@@ -105,11 +105,13 @@ bool ADM_Composer::DecodePictureUpToIntra(uint32_t frame,uint32_t ref)
     cache->flush();
     // The PTS associated with our frame is the one we are looking for
     uint64_t wantedPts=vid->_aviheader->getTime(frame);
-    while(found==false)
+    uint32_t tries=8;
+    while(found==false && tries--)
     {
         // Last frame ? if so repeat
         if(vid->lastSentFrame>=nbFrames-1) vid->lastSentFrame=nbFrames-1;
         // Fetch frame
+         printf("[Editor] Decoding I frame %u\n",vid->lastSentFrame);
          if (!demuxer->getFrame (vid->lastSentFrame,&img))
          {
                 printf("[DecodePictureUpToIntra] getFrame failed for frame %lu\n",vid->lastSentFrame);
@@ -123,6 +125,7 @@ bool ADM_Composer::DecodePictureUpToIntra(uint32_t frame,uint32_t ref)
                 printf("[DecodePictureUpToIntra] Cache full for frame %lu\n",vid->lastSentFrame);
                 return false;
           }
+        
           if(!decompressImage(result,&img,ref))
           {
              printf("[DecodePictureUpToIntra] decode error for frame %lu\n",vid->lastSentFrame);
@@ -147,6 +150,11 @@ bool ADM_Composer::DecodePictureUpToIntra(uint32_t frame,uint32_t ref)
                 found=true;
           else 
                 vid->lastSentFrame++;
+    }
+    if(found==false) 
+    {
+        printf("[GoToIntra] Could not find decoded frame!\n");
+        return false;
     }
     if(wantedPts) vid->lastReadPts=wantedPts-1;
     else vid->lastReadPts=0;
@@ -217,8 +225,9 @@ uint8_t ret = 0;
     vid->lastSentFrame++;
     
     uint32_t frame=vid->lastSentFrame;
-
+    printf("[EditorRender] DecodeNext %u ref:%u\n",frame,ref);
     // Fetch frame
+     printf("[Editor] Decoding frame %u\n",frame);
      if (!demuxer->getFrame (frame,&img))
      {
             printf("[DecodePictureUpToIntra] getFrame failed for frame %lu\n",vid->lastSentFrame);
@@ -302,6 +311,7 @@ bool ADM_Composer::decompressImage(ADMImage *out,ADMCompressedImage *in,uint32_t
             printf("[decompressImage] NoPicture\n");
             return false;
         }
+        printf("[::Decompress] in:%lu out:%lu\n",in->demuxerPts,out->Pts);
 	// If not quant and it is already YV12, we can stop here
 	if((!tmpImage->quant || !tmpImage->_qStride) && tmpImage->_colorspace==ADM_COLOR_YV12)
 	{      

@@ -7747,7 +7747,9 @@ static int decode_frame(AVCodecContext *avctx,
         int i, pics, cross_idr, out_of_order, out_idx;
 
         s->mb_y= 0;
-
+        /* MEANX */
+        s->current_picture_ptr->opaque=pict->opaque;
+        /* /MEANX */
         s->current_picture_ptr->qscale_type= FF_QSCALE_TYPE_H264;
         s->current_picture_ptr->pict_type= s->pict_type;
 

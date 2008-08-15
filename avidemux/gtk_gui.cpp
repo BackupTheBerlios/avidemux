@@ -1007,7 +1007,10 @@ int A_openAvi2 (const char *name, uint8_t mode)
 	delete[] longname;
 	return 1;
 }
+/**
+    \fn updateLoaded
 
+*/
 void  updateLoaded ()
 {
   avifileinfo = new aviInfo;

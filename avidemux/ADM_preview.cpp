@@ -344,6 +344,10 @@ uint8_t admPreview::update(uint32_t framenum)
           return 0; 
         }
 #else
+        if(!framenum) 
+        {
+            if(!video_body->GoToIntra(0)) return 0;
+        }
         if(!video_body->NextPicture(rdrImage)) return 0;
 #endif
             UI_setFrameType(  rdrImage->flags,rdrImage->_Qp);

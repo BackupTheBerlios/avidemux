@@ -77,6 +77,19 @@ uint8_t OpenDMLHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
 
 }
 /**
+    \fn frameToUs
+    \brief convert a framenumber to us
+*/
+uint64_t OpenDMLHeader::frameToUs(uint32_t frame)
+{
+    float f=frame;
+    f*=_videostream.dwScale;
+    f/=_videostream.dwRate;
+    f*=1000000.;
+    printf("[openDML]%u->%f\n",frame,f);
+    return (uint64_t)f;
+}
+/**
     \fn getFrame
     \return frame # framenum in img
 */
@@ -90,8 +103,8 @@ uint64_t offset=_idx[framenum].offset; //+_mdatOffset;
  	fread(img->data, _idx[framenum].size, 1, _fd);
   	img->dataLength=_idx[framenum].size;
     img->flags=_idx[framenum].intra;
-    img->demuxerDts=framenum*1000*40; // FIXME
-    img->demuxerPts=(framenum+2)*1000*40; // FIXME
+    img->demuxerDts=frameToUs(framenum);; // FIXME
+    img->demuxerPts=frameToUs(framenum); // FIXME
 	aprintf("Size: %lu\n",_idx[framenum].size);
 //	if(offset & 1) printf("odd!\n");
  	return 1;
@@ -102,7 +115,7 @@ uint64_t offset=_idx[framenum].offset; //+_mdatOffset;
 */
 uint64_t OpenDMLHeader::getTime(uint32_t frameNum)
 {
-    return (frameNum+2)*1000*40; 
+    return frameToUs(frameNum); 
 
 }
 /**
@@ -110,7 +123,7 @@ uint64_t OpenDMLHeader::getTime(uint32_t frameNum)
 */
 uint64_t  OpenDMLHeader::getVideoDuration(void)
 {
-    return (_videostream.dwLength+2)*1000*40; 
+    return frameToUs(_videostream.dwLength); 
 }
 
 OpenDMLHeader::~OpenDMLHeader()
