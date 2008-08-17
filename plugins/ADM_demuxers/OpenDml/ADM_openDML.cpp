@@ -86,7 +86,7 @@ uint64_t OpenDMLHeader::frameToUs(uint32_t frame)
     f*=_videostream.dwScale;
     f/=_videostream.dwRate;
     f*=1000000.;
-    printf("[openDML]%u->%f\n",frame,f);
+    aprintf("[openDML]%u->%f\n",frame,f);
     return (uint64_t)f;
 }
 /**
@@ -104,7 +104,9 @@ uint64_t offset=_idx[framenum].offset; //+_mdatOffset;
   	img->dataLength=_idx[framenum].size;
     img->flags=_idx[framenum].intra;
     img->demuxerDts=frameToUs(framenum);; // FIXME
-    img->demuxerPts=frameToUs(framenum); // FIXME
+    if(!framenum) img->demuxerPts=0;
+    else
+        img->demuxerPts=ADM_COMPRESSED_NO_PTS;//frameToUs(framenum); // FIXME
 	aprintf("Size: %lu\n",_idx[framenum].size);
 //	if(offset & 1) printf("odd!\n");
  	return 1;

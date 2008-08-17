@@ -534,7 +534,7 @@ void previewBlit(ADMImage *from,ADMImage *to,uint32_t startx,uint32_t starty)
       \brief  display on screen immediately. The image has been calculated previously by update
 */
 
-void admPreview::displayNow(uint32_t framenum)
+void admPreview::displayNow(void)
 {
 
     uint32_t fl,len;	

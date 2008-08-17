@@ -29,7 +29,7 @@ class admPreview
       static void setMainDimension(uint32_t, uint32_t );
       static void updateFilters(AVDMGenericVideoStream *first,AVDMGenericVideoStream *last);
       static void deferDisplay(uint32_t onoff,uint32_t startat);
-      static void displayNow(uint32_t framenum);
+      static void displayNow(void);
       static void cleanUp(void);  
       static ADMImage *getBuffer(void);
       static uint64_t getCurrentPts(void);

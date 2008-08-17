@@ -104,7 +104,7 @@ typedef struct
     uint32_t                            lastSentFrame;   // Last frame read/sent to decoder
     uint64_t                            lastDecodedPts;  // Pts of last frame out of decoder
     uint64_t                            lastReadPts;     // Pts of the last frame we read
-
+    uint64_t                            timeIncrementInUs; // in case the video has no PTS, time increment (us)
 }_VIDEOS;
 
 

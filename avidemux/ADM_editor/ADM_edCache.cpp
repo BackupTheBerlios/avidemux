@@ -176,7 +176,7 @@ uint64_t value=0x100000000;
 		if(_elem[i].frameNum==ADM_INVALID_CACHE) continue;
 		if(_elem[i].image->Pts>pts)
         {
-            printf("[Editor::findJustAfer] Looking for %lu, got %lu\n",pts,_elem[i].image->Pts);
+            //printf("[Editor::findJustAfer] Looking for %lu, got %lu\n",pts,_elem[i].image->Pts);
             if(_elem[i].image->Pts < value)
             {
                 value=_elem[i].image->Pts;

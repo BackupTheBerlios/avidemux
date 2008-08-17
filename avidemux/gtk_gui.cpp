@@ -400,7 +400,7 @@ int nw;
         case ACT_ZOOM_4_1:
                 currentZoom=(renderZoom)((action-ACT_ZOOM_1_4)+ZOOM_1_4);
                 changePreviewZoom(currentZoom);
-              //  admPreview::update(curframe);
+                admPreview::samePicture();
                 break;
 
 
@@ -473,12 +473,14 @@ int nw;
 		break;
     case ACT_GotoTime:
                 {
+#if 0
                         uint16_t mm,hh,ss,ms;
                              frame2time(curframe,avifileinfo->fps1000,&hh,&mm,&ss,&ms);
                              if(DIA_gotoTime(&hh,&mm,&ss))
                                 {
                                         A_jumpToTime(hh,mm,ss, 0);
                                 }
+#endif
                 }
                 break;
     case ACT_SaveRaw:
@@ -603,36 +605,36 @@ int nw;
         GUI_PrevFrame();
       break;
     case ACT_Forward100Frames:
-      GUI_GoToKFrame (curframe + (avifileinfo->fps1000 / 1000 * 4));
+      //GUI_GoToKFrame (curframe + (avifileinfo->fps1000 / 1000 * 4));
       break;
 
     case ACT_Back100Frames:
-      GUI_GoToKFrame (curframe - (avifileinfo->fps1000 / 1000 * 4));
+      //GUI_GoToKFrame (curframe - (avifileinfo->fps1000 / 1000 * 4));
       break;
 
 
     case ACT_Forward50Frames:
-      GUI_GoToFrame (curframe + 50);
+      //GUI_GoToFrame (curframe + 50);
       break;
 
     case ACT_Forward25Frames:
-      GUI_GoToFrame (curframe + 25);
+      //GUI_GoToFrame (curframe + 25);
       break;
 
     case ACT_Back50Frames:
-      if (curframe >= 50)
+      //if (curframe >= 50)
 	{
 	  DIA_StartBusy ();
-	  GUI_GoToFrame (curframe - 50);
+	  //GUI_GoToFrame (curframe - 50);
 	  DIA_StopBusy ();
 	}
       break;
 
     case ACT_Back25Frames:
-      if (curframe >= 25)
+    //  if (curframe >= 25)
 	{
 	  DIA_StartBusy ();
-	  GUI_GoToFrame (curframe - 25);
+	  //GUI_GoToFrame (curframe - 25);
 	  DIA_StopBusy ();
 
 	}
@@ -668,9 +670,9 @@ int nw;
       if( prefs->get(FEATURE_SWAP_IF_A_GREATER_THAN_B, &swapit) != RC_OK )
          swapit = 1;
       if (action == ACT_MarkA)
-	frameStart = curframe;
+            frameStart = video_body->getCurrentFrame();
       else
-	frameEnd = curframe;
+            frameEnd = video_body->getCurrentFrame();
       if (frameStart > frameEnd && swapit )	// auto swap
 	{
 	  uint32_t y;
@@ -691,11 +693,11 @@ int nw;
       break;
     case ACT_Goto:
       uint32_t fn;
-      fn=curframe;
+      fn=video_body->getCurrentFrame();
       if (DIA_GetIntegerValue ((int *)&fn,0,avifileinfo->nb_frames,QT_TR_NOOP("Go to Frame"),QT_TR_NOOP("_Go to frame:")))
 	{
 		if (fn < avifileinfo->nb_frames)
-			GUI_GoToFrame (curframe);
+			GUI_GoToFrame (fn);
 		else
 			GUI_Error_HIG (QT_TR_NOOP("Out of bounds"), NULL);
 	}
@@ -713,7 +715,7 @@ int nw;
       		}
 		break;
     case ACT_Paste:
-
+#if 0
       		video_body->pasteFromClipBoard(curframe);
 		 old=curframe;
       		ReSync ();
@@ -725,6 +727,7 @@ int nw;
       		UI_setMarkers (frameStart, frameEnd);
  		curframe=old;
         	GUI_GoToFrame (curframe);
+#endif
 		break;
       break;
 
@@ -754,7 +757,7 @@ int nw;
     case ACT_Delete:
     case ACT_Cut:
     
-     
+#if 0     
       old=frameStart;
       if( A_delete(frameStart,frameEnd))
       {
@@ -766,7 +769,7 @@ int nw;
       	GUI_GoToFrame (old);      
       }
       
-      
+#endif      
       break;
 
     case ACT_AudioMap:
@@ -826,7 +829,7 @@ int nw;
       break;
       // set decoder option (post processing ...)
     case ACT_DecoderOption:
-      video_body->setDecodeParam ( curframe);
+      video_body->setDecodeParam ( video_body->getCurrentFrame());
 
       break;
     case ACT_VideoParameter:
@@ -980,7 +983,7 @@ int A_openAvi2 (const char *name, uint8_t mode)
         {
             uint32_t nbAudio;
             audioInfo *infos=NULL;
-            if(video_body->getAudioStreamsInfo(curframe+1,&nbAudio,&infos))
+            if(video_body->getAudioStreamsInfo(video_body->getCurrentFrame()+1,&nbAudio,&infos))
             {
                 if(nbAudio>1)
                 {   // Multiple track warn user
@@ -1024,7 +1027,7 @@ void  updateLoaded ()
       return;
     }
 
-  curframe = 0;
+  
   getFirstVideoFilter(); // reinit first filter
 
   // now get audio information if exists
@@ -1050,7 +1053,7 @@ void  updateLoaded ()
 
   // Init renderer
     admPreview::setMainDimension(avifileinfo->width, avifileinfo->height);
-  curframe = 0;  
+  
 
   // Draw first frame
   GUI_setAllFrameAndTime();
@@ -1083,6 +1086,7 @@ void  updateLoaded ()
   
   
       admPreview::seekToIntra (0);
+      admPreview::samePicture();
       GUI_setCurrentFrameAndTime();
    
    printf("\n** conf updated **\n");
@@ -1337,7 +1341,7 @@ void A_saveImg (const char *name)
 {
   
   ADMImage image(avifileinfo->width,avifileinfo->height);
-  GUI_getFrameContent(&image, curframe);
+  GUI_getFrameContent(&image, video_body->getCurrentFrame());
   if(image.saveAsBmp(name))
         GUI_Info_HIG (ADM_LOG_INFO,QT_TR_NOOP("Done"),QT_TR_NOOP( "Saved \"%s\"."), ADM_GetFileName(name));
   else

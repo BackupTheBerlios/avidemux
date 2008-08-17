@@ -350,13 +350,15 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
       return 1;
     }
    // Put a safe value....
-    if(in->demuxerPts==ADM_COMPRESSED_NO_PTS)
-        out->Pts=in->demuxerDts;
-    else
-        out->Pts=in->demuxerPts;
+   out->Pts=in->demuxerPts;
   _frame.opaque=(void *)out->Pts;
   
   ret = avcodec_decode_video (_context, &_frame, &got_picture, in->data, in->dataLength);
+  if(!bFramePossible())
+  {
+    // No delay, the value is sure, no need to hide it in opaque
+    _frame.opaque=(void *)in->demuxerPts;
+  }
   out->_qStride = 0;		//Default = no quant
   if (0 > ret && !_context->hurry_up)
     {

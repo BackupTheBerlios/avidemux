@@ -70,40 +70,31 @@ void GUI_PlayAvi(void)
     
     uint32_t framelen,flags;
     AVDMGenericVideoStream *filter;
-    uint32_t max,err;
+    uint32_t max,err,oldFrame;
    
     // check we got everything...
     if (!avifileinfo)	return;
     if (!avifileinfo->fps1000)        return;
-    if((curframe+1)>= avifileinfo->nb_frames-1)
-    {
-      printf("No frame left\n");
-      return;
-    }
     
     if (playing)
       {
         stop_req = 1;
         return;
       }
-
+    oldFrame=video_body->getCurrentFrame();
 	uint32_t priorityLevel;
 
 	originalPriority = getpriority(PRIO_PROCESS, 0);
 	prefs->get(PRIORITY_PLAYBACK,&priorityLevel);
 	setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
-
-  uint32_t played_frame=0;
-  uint32_t remaining=avifileinfo->nb_frames-curframe;
-
     
     if(getPreviewMode()==ADM_PREVIEW_OUTPUT)
     {
-            filter=getLastVideoFilter(curframe,remaining);
+            filter=getLastVideoFilter();
     }
     else
     {
-            filter=getFirstVideoFilter(curframe,remaining );
+            filter=getFirstVideoFilter( );
     }
     
     stop_req = 0;
@@ -114,8 +105,8 @@ void GUI_PlayAvi(void)
 
 
     admPreview::deferDisplay(1,curframe);
-    admPreview::nextPicture();
-//    admPreview::update(played_frame);
+    admPreview::samePicture();
+
     firstPts=admPreview::getCurrentPts();
     ADM_playPreloadAudio();
 
@@ -126,19 +117,9 @@ void GUI_PlayAvi(void)
     do
     {
         
-        admPreview::displayNow(played_frame);;
+        admPreview::displayNow();;
         GUI_setCurrentFrameAndTime();
-      
-        if((played_frame)>=(max-1))
-        {
-            printf("\nEnd met (%lu  / %lu )\n",played_frame,max);
-            goto abort_play;
-         }
-        
-//        if(false==admPreview::update(played_frame+1)) break;
-        if(false==admPreview::nextPicture) break;
-        curframe++;
-        played_frame++;
+        if(false==admPreview::nextPicture()) break;
         ADM_playFillAudio();
         lastPts=admPreview::getCurrentPts();
         systemTime = ticktock.getElapsedMS();
@@ -179,29 +160,29 @@ void GUI_PlayAvi(void)
 
 abort_play:
 	// ___________________________________
-    // Flush buffer   
     // go back to normal display mode
     //____________________________________
-    playing = 0;
+       playing = 0;
           
 	   getFirstVideoFilter( );
 
        admPreview::deferDisplay(0,0);
+       
+       
        UI_purge();
-       // Updated by expose ? 
-//       admPreview::update(curframe);
-       UI_purge();
+       video_body->setCurrentFrame(oldFrame);
+       admPreview::samePicture();
        GUI_setCurrentFrameAndTime();
-
-    if (currentaudiostream)
-      {
+       UI_purge();
+       if (currentaudiostream)
+       {
           if (wavbuf)
               ADM_dealloc(wavbuf);
           wavbuf=NULL;
           AVDM_AudioClose();
-      }
-    // done.
-	setpriority(PRIO_PROCESS, 0, originalPriority);
+       }
+       // done.
+	   setpriority(PRIO_PROCESS, 0, originalPriority);
 };
 
 /**
@@ -272,7 +253,7 @@ void ADM_playPreloadAudio(void)
     if (!currentaudiostream)	  return;
     
     double db;
-    uint64_t startPts=video_body->getTime(curframe);
+    uint64_t startPts=video_body->getTime(video_body->getCurrentFrame());
 
     playback = buildPlaybackFilter(currentaudiostream,startPts/1000, 0xffffffff);
     

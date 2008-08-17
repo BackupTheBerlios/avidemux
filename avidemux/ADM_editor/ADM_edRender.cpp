@@ -22,10 +22,7 @@
 #include "ADM_default.h"
 #include "ADM_editor/ADM_edit.hxx"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_EDITOR
-#include "ADM_osSupport/ADM_debug.h"
-
+#define aprintf printf
 #include "ADM_pp.h"
 
 // FIXME BADLY !!!
@@ -147,9 +144,7 @@ bool ADM_Composer::DecodePictureUpToIntra(uint32_t frame,uint32_t ref)
                 if(pts==ADM_COMPRESSED_NO_PTS) // No PTS available ?
                 {
                     // increment it using average fps
-                    // FIXME TODO
-                    printf("[XX] Guessing PTS\n");
-                    vid->lastDecodedPts++;
+                    vid->lastDecodedPts+=vid->timeIncrementInUs;
                     result->Pts=vid->lastDecodedPts;
                 }else       
                     vid->lastDecodedPts=pts;
@@ -226,6 +221,7 @@ bool ADM_Composer::getNextPicture(ADMImage *out,uint32_t ref)
             // Duplicate
             if(out)
             {
+                aprintf("[getNextPicture] Looking for after %lu, got %lu\n",vid->lastReadPts,img->Pts);
                 out->duplicate(img);
                 vid->lastReadPts=img->Pts;
                 currentFrame++;
@@ -291,7 +287,7 @@ uint8_t ret = 0;
 
     if(pts==ADM_COMPRESSED_NO_PTS) // No PTS available ?
     {
-        vid->lastDecodedPts++;
+        vid->lastDecodedPts+=vid->timeIncrementInUs;
         result->Pts=vid->lastDecodedPts;
     }else       
         vid->lastDecodedPts=pts;
@@ -351,7 +347,7 @@ bool ADM_Composer::decompressImage(ADMImage *out,ADMCompressedImage *in,uint32_t
             printf("[decompressImage] NoPicture\n");
             return false;
         }
-        printf("[::Decompress] in:%lu out:%lu\n",in->demuxerPts,out->Pts);
+        aprintf("[::Decompress] in:%lu out:%lu\n",in->demuxerPts,out->Pts);
 	// If not quant and it is already YV12, we can stop here
 	if((!tmpImage->quant || !tmpImage->_qStride) && tmpImage->_colorspace==ADM_COLOR_YV12)
 	{      

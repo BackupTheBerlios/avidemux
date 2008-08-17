@@ -385,6 +385,14 @@ UNUSED_ARG(mode);
   _videos[_nb_video].decoder = getDecoder (info.fcc,  info.width, info.height, l, d,info.bpp);
 
   _videos[_nb_video]._videoCache   =   new EditorCache(10,info.width,info.height) ;
+
+  float frameD=info.fps1000;
+  frameD=frameD/1000;
+  frameD=1/frameD;
+  frameD*=1000000;
+  _videos[_nb_video].timeIncrementInUs=(uint64_t)frameD;
+  printf("[Editor] About %u microseconds per frame\n",_videos[_nb_video].timeIncrementInUs);
+  
   //
   //  And automatically create the segment
   //
