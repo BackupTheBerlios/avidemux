@@ -1182,7 +1182,7 @@ bool        ADM_Composer::setCurrentFrame(uint32_t frame)
         {
             if(f&AVI_KEY_FRAME) break;
         }
-        keyFrame;
+        keyFrame--;
     }
     if(false==GoToIntra(keyFrame))
     {
