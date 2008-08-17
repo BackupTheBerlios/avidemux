@@ -400,7 +400,7 @@ int nw;
         case ACT_ZOOM_4_1:
                 currentZoom=(renderZoom)((action-ACT_ZOOM_1_4)+ZOOM_1_4);
                 changePreviewZoom(currentZoom);
-                admPreview::update(curframe);
+              //  admPreview::update(curframe);
                 break;
 
 
@@ -512,7 +512,7 @@ int nw;
       DIA_properties ();
       break;
     case ACT_Begin:
-      GUI_GoToFrame (0);
+      GUI_GoToKFrame (0);
 
       break;
 	case ACT_BitRate:
@@ -572,7 +572,7 @@ int nw;
             admPreview::stop();
             setPreviewMode(newpreview);
             admPreview::start();
-            admPreview::update(curframe);
+//            admPreview::update(curframe);
       }
       break;
     case ACT_StopAvi:
@@ -721,7 +721,7 @@ int nw;
 		{
                   GUI_Error_HIG (QT_TR_NOOP("Something bad happened (II))"), NULL);
 		}
-     		 rebuild_status_bar ();
+     		 GUI_setAllFrameAndTime ();
       		UI_setMarkers (frameStart, frameEnd);
  		curframe=old;
         	GUI_GoToFrame (curframe);
@@ -739,7 +739,7 @@ int nw;
   		video_body->getVideoInfo (avifileinfo);
 		frameEnd=avifileinfo->nb_frames-1;
       		frameStart=0;
-      		rebuild_status_bar ();
+      		GUI_setAllFrameAndTime ();
       		UI_setMarkers (frameStart, frameEnd);
       		ReSync ();
 
@@ -819,7 +819,7 @@ int nw;
           printf("[MainUI] New framerate :%u\n",info.fps1000);
           // update display
           video_body->getVideoInfo (avifileinfo);
-          rebuild_status_bar();
+          GUI_setAllFrameAndTime();
 
         }
 	}
@@ -843,7 +843,7 @@ int nw;
       if (getPreviewMode()!=ADM_PREVIEW_NONE)
       {
          admPreview::start();
-         admPreview::update (curframe);
+//         admPreview::update (curframe);
       }
       break;
 
@@ -1053,7 +1053,7 @@ void  updateLoaded ()
   curframe = 0;  
 
   // Draw first frame
-  rebuild_status_bar();
+  GUI_setAllFrameAndTime();
 
   video_body->getMarkers(&frameStart,&frameEnd);
   UI_setMarkers (frameStart, frameEnd);
@@ -1082,8 +1082,8 @@ void  updateLoaded ()
         
   
   
-      admPreview::update (curframe);
-      update_status_bar();
+      admPreview::seekToIntra (0);
+      GUI_setCurrentFrameAndTime();
    
    printf("\n** conf updated **\n");
 }
@@ -1140,7 +1140,7 @@ void ReSync (void)
     }
   else
     isaviaud = 0;
-  rebuild_status_bar ();
+  GUI_setAllFrameAndTime ();
 
   // Since we modified avi stream, rebuild audio stream accordingly
   video_body->getAudioStream (&aviaudiostream);
@@ -1874,7 +1874,7 @@ uint32_t count;
 
       frameEnd=avifileinfo->nb_frames-1;
       frameStart=0;
-      rebuild_status_bar ();
+      GUI_setAllFrameAndTime ();
       UI_setMarkers (frameStart, frameEnd);
       ReSync ();
      return 1;
@@ -2181,7 +2181,7 @@ void A_Resync(void)
 {
 // Just in case update file info
         if(!avifileinfo) return;
-        rebuild_status_bar();
+        GUI_setAllFrameAndTime();
         
         if(curframe>avifileinfo->nb_frames) curframe=frameEnd;
         UI_setMarkers (frameStart, frameEnd);

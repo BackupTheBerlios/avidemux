@@ -330,7 +330,48 @@ uint64_t admPreview::getCurrentPts(void)
       @param framenum, framenumber
 */
 
-uint8_t admPreview::update(uint32_t framenum)
+uint8_t admPreview::seekToIntra(uint32_t frame)
+{
+    if(!video_body->GoToIntra(frame)) 
+    {
+        printf("[PReview::seekToIntra] GoToIntra %u failed\n",frame);
+        return 0;
+    }
+    return samePicture();
+
+}
+/**
+    \fn samePicture
+*/
+uint8_t admPreview::samePicture(void)
+{
+    if(!video_body->samePicture(rdrImage)) return false;
+    UI_setFrameType(  rdrImage->flags,rdrImage->_Qp);
+    if(zoom==ZOOM_1_1 || renderHasAccelZoom() )
+    {
+       if(!defered_display) 
+       {
+          renderUpdateImage(rdrImage->data,zoom);
+          
+        }
+    }else
+    {
+        ADM_assert(resizer);
+        ADM_assert(resized);
+        resizer->resize(rdrImage,resized);
+        if(!defered_display) 
+          renderUpdateImage(resized->data,ZOOM_1_1);
+    }
+    return true;
+}
+/**
+      \fn admPreview::update
+      \brief display data associated with framenum image
+      @param image : current main image (input)
+      @param framenum, framenumber
+*/
+
+uint8_t admPreview::nextPicture(void)
 {
     uint32_t fl,len,flags;	
 
@@ -344,10 +385,7 @@ uint8_t admPreview::update(uint32_t framenum)
           return 0; 
         }
 #else
-        if(!framenum) 
-        {
-            if(!video_body->GoToIntra(0)) return 0;
-        }
+
         if(!video_body->NextPicture(rdrImage)) return 0;
 #endif
             UI_setFrameType(  rdrImage->flags,rdrImage->_Qp);
@@ -370,6 +408,7 @@ uint8_t admPreview::update(uint32_t framenum)
            // printf("[admPreview] PTs: %llu\n",rdrImage->Pts);
         }
         break;
+#if 0
       case ADM_PREVIEW_OUTPUT:
             if(framenum<=preview->getInfo()->nb_frames-1)
                   {
@@ -475,6 +514,7 @@ uint8_t admPreview::update(uint32_t framenum)
                   renderUpdateImage(resized->data,ZOOM_1_1);
               }
               break;
+#endif
       default: ADM_assert(0);
     }
 }
@@ -574,5 +614,29 @@ void admPreview::cleanUp(void)
 		delete previewImage; 
 		previewImage=NULL;
 	}
+}
+/**
+    \fn nextKeyFrame
+
+*/
+bool admPreview::nextKeyFrame(void)
+{
+    uint32_t frame=video_body->getCurrentFrame();
+    if(!video_body->getNKFrame(&frame)) return false;
+    if(!video_body->GoToIntra(frame)) return false;
+    samePicture();
+    return true;
+}
+/**
+    \fn previousKeyFrame
+
+*/
+bool admPreview::previousKeyFrame(void)
+{
+    uint32_t frame=video_body->getCurrentFrame();
+    if(!video_body->getPKFrame(&frame)) return false;
+    if(!video_body->GoToIntra(frame)) return false;
+    samePicture();
+    return true;
 }
 // EOF

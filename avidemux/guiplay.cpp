@@ -114,7 +114,8 @@ void GUI_PlayAvi(void)
 
 
     admPreview::deferDisplay(1,curframe);
-    admPreview::update(played_frame);
+    admPreview::nextPicture();
+//    admPreview::update(played_frame);
     firstPts=admPreview::getCurrentPts();
     ADM_playPreloadAudio();
 
@@ -126,7 +127,7 @@ void GUI_PlayAvi(void)
     {
         
         admPreview::displayNow(played_frame);;
-        update_status_bar();
+        GUI_setCurrentFrameAndTime();
       
         if((played_frame)>=(max-1))
         {
@@ -134,7 +135,8 @@ void GUI_PlayAvi(void)
             goto abort_play;
          }
         
-        if(false==admPreview::update(played_frame+1)) break;
+//        if(false==admPreview::update(played_frame+1)) break;
+        if(false==admPreview::nextPicture) break;
         curframe++;
         played_frame++;
         ADM_playFillAudio();
@@ -187,9 +189,9 @@ abort_play:
        admPreview::deferDisplay(0,0);
        UI_purge();
        // Updated by expose ? 
-       admPreview::update(curframe);
+//       admPreview::update(curframe);
        UI_purge();
-       update_status_bar();
+       GUI_setCurrentFrameAndTime();
 
     if (currentaudiostream)
       {

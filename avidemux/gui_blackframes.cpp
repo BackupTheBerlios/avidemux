@@ -187,7 +187,7 @@ void GUI_NextPrevBlackFrame(int dir)
         reresh_count++;
         if(reresh_count>100)
         {
-                update_status_bar();
+                GUI_setCurrentFrameAndTime();
                 reresh_count=0;
         }       
    }
@@ -196,8 +196,8 @@ void GUI_NextPrevBlackFrame(int dir)
    {
       curframe=orgFrame;
    }
-    admPreview::update( curframe) ;
-    update_status_bar();
+//    admPreview::update( curframe) ;
+    GUI_setCurrentFrameAndTime();
 
    return ;
 }
@@ -259,7 +259,7 @@ uint8_t A_ListAllBlackFrames(char *name)
         reresh_count++;
         if(reresh_count>100)
         {
-                update_status_bar();
+                GUI_setCurrentFrameAndTime();
                 reresh_count=0;
         }
     }

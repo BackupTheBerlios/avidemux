@@ -139,23 +139,23 @@ class ADM_Composer : public ADM_audioStream
   					uint8_t		decodeCache(uint32_t frame,uint32_t seg, ADMImage *image);
   					uint32_t 	_nb_segment;
 					uint32_t 	_nb_video;
-					uint32_t  _nb_clipboard;
+					uint32_t    _nb_clipboard;
   					uint32_t 	_total_frames;
   					uint32_t 	_audio_size;
   					// _audiooffset points to the offset / the total segment
   					// not the used part !
   					uint32_t  _audioseg;
-					int64_t  _audioSample;
+					int64_t   _audioSample;
   					uint32_t  _audiooffset;
-					uint8_t	   _haveMarkers; // used for load/save edl
+					uint8_t	  _haveMarkers; // used for load/save edl
+                    
+       				uint32_t _lastseg,_lastframe,_lastlen;
 
-       					uint32_t _lastseg,_lastframe,_lastlen;
-
-					uint32_t	max_seg;
+					uint32_t	    max_seg;
   					_SEGMENT 		*_segments;
 					_SEGMENT 		_clipboard[MAX_SEG];
 					_VIDEOS 		_videos[MAX_VIDEO];
-                                        ADMImage                *_scratch;
+                    ADMImage        *_scratch;
 						uint8_t  	convFrame2Seg(uint32_t framenum,uint32_t *seg,
 																			uint32_t *relframe);
 						uint8_t  	convSeg2Frame(	uint32_t *framenum,
@@ -169,13 +169,13 @@ class ADM_Composer : public ADM_audioStream
 						uint8_t 	removeFrom( uint32_t from, uint32_t seg,uint8_t included);
 						uint8_t 	checkInSeg( uint32_t seg, uint32_t frame);
 						uint8_t 	sanityCheck( void);
-				       		uint8_t  	updateAudioTrack(uint32_t seg);			   	
+				        uint8_t  	updateAudioTrack(uint32_t seg);			   	
 						void 		deleteAllVideos(void );
 
 						uint8_t 	getMagic(const char *name,uint32_t *magic);
 						uint8_t 	identify(const char *name, fileType *type);
 						uint32_t 	searchForwardSeg(uint32_t startframe);
-                                                uint8_t         tryIndexing(const char *name, const char *idxname=NULL);
+                        uint8_t     tryIndexing(const char *name, const char *idxname=NULL);
 
   public:
                             uint8_t hasVBRVideos(void);
@@ -209,10 +209,19 @@ class ADM_Composer : public ADM_audioStream
   				//_____________________________
   				// navigation & frame functions
   				//_____________________________
+public:
+/************************************ Public API ***************************/
+protected:
+                        uint32_t    currentFrame;
+public:
+                        uint32_t    getCurrentFrame(void);
+                        bool        setCurrentFrame(uint32_t frame);
                         bool        GoToIntra(uint32_t frame);
                         bool        GoToTime(uint64_t time);
                         bool        NextPicture(ADMImage *image);
+                        bool        samePicture(ADMImage *image);
 /************************************ Internal ******************************/
+public:
                                     /// Decode frame and on until frame is popped out of decoders
                         bool        DecodePictureUpToIntra(uint32_t frame,uint32_t ref);
                                     /// compressed image->yb12 image image and do postproc/colorconversion
@@ -221,6 +230,8 @@ class ADM_Composer : public ADM_audioStream
                         bool        DecodeNextPicture(uint32_t ref);
                                     /// Get the next decoded picture
                         bool     	getNextPicture(ADMImage *out,uint32_t ref);
+                                    /// Get again last decoded picture
+                        bool        getSamePicture(ADMImage *out,uint32_t ref);
 /************************************ Internal ******************************/
   						uint8_t 	getFrame(uint32_t   framenum,ADMCompressedImage *img,uint8_t *isSequential);
 						
@@ -233,7 +244,7 @@ class ADM_Composer : public ADM_audioStream
 						uint32_t 	getFlagsAndSeg (uint32_t frame, 
 									uint32_t * flags,uint32_t *segs);
 						uint8_t  	setFlag(uint32_t frame,uint32_t flags);
-						uint8_t	updateVideoInfo(aviInfo *info);
+						uint8_t	    updateVideoInfo(aviInfo *info);
 
 						uint8_t  	getFrameSize(uint32_t frame,uint32_t *size) ;
 						uint8_t		sanityCheckRef(uint32_t start, uint32_t end,
@@ -283,13 +294,10 @@ virtual CHANNEL_TYPE    *getChannelMapping(void );
 					//
                   			uint8_t			getUncompressedFrame(uint32_t frame,ADMImage *out,
 									uint32_t *flagz=NULL)    ;
-					// Obsolete									
-	     	  			uint8_t			getUncompressedFramePKF(uint32_t *frame,ADMImage *out)    ;
-	     	  			uint8_t			getUncompressedFrameNKF(uint32_t *frame,ADMImage *out)    ;
-
+protected:					// Obsolete									
               				uint8_t			searchNextKeyFrame(uint32_t in,uint32_t *oseg, uint32_t * orel);
                  			uint8_t			searchPreviousKeyFrame(uint32_t in,uint32_t *oseg, uint32_t * orel);
-
+public:
 					uint8_t   		rebuildFrameType ( void);
                   // kludg
                   			void 			propagateBuildMap( void );

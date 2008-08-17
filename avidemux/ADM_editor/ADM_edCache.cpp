@@ -187,3 +187,21 @@ uint64_t value=0x100000000;
 	if(smallest==-1) return NULL;
     return _elem[smallest].image;
 }
+/**
+    \fn getByPts
+    \brief returns the image that has exactly that PTS
+*/
+ADMImage *EditorCache::getByPts(uint64_t Pts)
+{
+    for(int i=0;i<_nbImage;i++)
+	{
+		if(_elem[i].frameNum==ADM_INVALID_CACHE) continue;
+		if(_elem[i].image->Pts==Pts)
+        {
+            _elem[i].lastUse=_counter;
+			_counter++;
+            return _elem[i].image;
+        }
+    }
+    return NULL;
+}

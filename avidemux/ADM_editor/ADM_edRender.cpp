@@ -66,6 +66,15 @@ bool        ADM_Composer::NextPicture(ADMImage *image)
     return getNextPicture(image,0);
 
 }
+/**
+    \fn samePicture
+    \brief returns the last already decoded picture
+*/
+bool        ADM_Composer::samePicture(ADMImage *image)
+{
+    return getSamePicture(image,0);
+
+}
 //***************************** Internal API**************************
 /**
     \fn DecodePictureUpToIntra
@@ -106,6 +115,7 @@ bool ADM_Composer::DecodePictureUpToIntra(uint32_t frame,uint32_t ref)
     // The PTS associated with our frame is the one we are looking for
     uint64_t wantedPts=vid->_aviheader->getTime(frame);
     uint32_t tries=8;
+    
     while(found==false && tries--)
     {
         // Last frame ? if so repeat
@@ -156,10 +166,35 @@ bool ADM_Composer::DecodePictureUpToIntra(uint32_t frame,uint32_t ref)
         printf("[GoToIntra] Could not find decoded frame!\n");
         return false;
     }
-    if(wantedPts) vid->lastReadPts=wantedPts-1;
-    else vid->lastReadPts=0;
+    vid->lastReadPts=wantedPts;
+    currentFrame=frame;
     return true;
 }
+/**
+    \fn getSamePicture
+    \brief returns the last already decoded picture
+    @param out : Where to put the decoded image to
+    @param ref : Video we are dealing with
+    @return true on success, false on failure
+
+*/
+bool ADM_Composer::getSamePicture(ADMImage *out,uint32_t ref)
+{
+    _VIDEOS *vid=&_videos[ref];
+    vidHeader *demuxer=vid->_aviheader;
+	EditorCache   *cache =_videos[ref]._videoCache;
+	ADM_assert(cache);
+
+  ADMImage *in=cache->getByPts(vid->lastDecodedPts);
+  if(!in)
+  {
+    printf("[ADM_Composer::getSamePicture] Failed\n");
+    return false;
+  }
+  out->duplicate(in);
+  return true;
+}
+
 /**
     \fn getNextPicture
     \brief returns the next picture
@@ -189,8 +224,12 @@ bool ADM_Composer::getNextPicture(ADMImage *out,uint32_t ref)
         if(img)
         {
             // Duplicate
-            out->duplicate(img);
-            vid->lastReadPts=img->Pts;
+            if(out)
+            {
+                out->duplicate(img);
+                vid->lastReadPts=img->Pts;
+                currentFrame++;
+            }
             return true;
         }
     }
@@ -233,6 +272,7 @@ uint8_t ret = 0;
             printf("[DecodePictureUpToIntra] getFrame failed for frame %lu\n",vid->lastSentFrame);
             return false;
      }
+    
      // Now uncompress it...
      result=cache->getFreeImage();
      if(!result)
@@ -1068,9 +1108,10 @@ uint8_t ADM_Composer::getPostProc( uint32_t *type, uint32_t *strength, uint32_t 
 }
 //______________________________________________
 //_______________________________________________
-//
-//      Render previous kf
-//
+/**
+    \fn getPKFrame
+    \brief returns the keyFrame strictly before *frame
+*/
 uint8_t	ADM_Composer::getPKFrame(uint32_t *frame)
 {
 	uint32_t fr, seg, relframe;	//,len; //flags,ret,nf;
@@ -1089,30 +1130,11 @@ uint8_t	ADM_Composer::getPKFrame(uint32_t *frame)
   ADM_assert (convSeg2Frame (frame, seg, relframe));
   return 1;
 }
-uint8_t
-  ADM_Composer::getUncompressedFramePKF (uint32_t * frame, ADMImage * out)
-{
-  uint32_t fr, seg, relframe;	//,len; //flags,ret,nf;
+/**
+    \fn getNKFrame
+    \brief returns the keyFrame strictly after *frame
+*/
 
-
-
-  fr = *frame;
-
-  if (*frame == 0)
-    {
-      return getUncompressedFrame (0, out);
-    }
-
-
-  if (!searchPreviousKeyFrame (fr, &seg, &relframe))
-    {
-      printf (" NKF not found\n");
-      return 0;
-    }
-  ADM_assert (convSeg2Frame (frame, seg, relframe));
-
-  return getUncompressedFrame (*frame, out);
-}
 uint8_t	ADM_Composer::getNKFrame(uint32_t *frame)
 {
 	uint32_t fr, seg, relframe;	//,len; //flags,ret,nf;
@@ -1127,28 +1149,6 @@ uint8_t	ADM_Composer::getNKFrame(uint32_t *frame)
   return 1;
 }
 
-//
-//      Render Next kf
-//
-uint8_t
-  ADM_Composer::getUncompressedFrameNKF (uint32_t * frame, ADMImage * out)
-{
-  uint32_t fr, seg, relframe, nf;	//flags,ret,len;
-
-  fr = *frame;
-
-  if (!searchNextKeyFrame (fr, &seg, &relframe))
-    {
-      printf (" NKF not found\n");
-      return 0;
-    }
-
-
-  ADM_assert (nf = convSeg2Frame (frame, seg, relframe));
-
-  return getUncompressedFrame (*frame, out);
-
-}
 #if 0
 uint8_t	ADM_Composer::isReordered( uint32_t framenum )
 {
@@ -1162,3 +1162,43 @@ uint32_t seg,relframe;
    return _videos[ref]._aviheader->isReordered();
 }
 #endif
+/**
+    \fn getCurrentFrame
+*/ 
+uint32_t    ADM_Composer::getCurrentFrame(void)
+{
+    return currentFrame;
+}
+/**
+    \fn setCurrentFrame
+*/
+bool        ADM_Composer::setCurrentFrame(uint32_t frame)
+{
+    // Seatch previous keyFrame
+    uint32_t keyFrame=frame,f;
+    while(keyFrame)
+    {
+        if(getFlags(keyFrame,&f))
+        {
+            if(f&AVI_KEY_FRAME) break;
+        }
+        keyFrame;
+    }
+    if(false==GoToIntra(keyFrame))
+    {
+        printf("[setCurrentFrame] GoToIntra failed for frame %u\n",keyFrame);
+        return false;
+    }
+    //Now go forward
+    uint32_t mx=frame-keyFrame;
+    uint32_t i=0;
+    for(i=0;i<mx;i++)
+    {
+        if(NextPicture(NULL) ==false)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+//EOF

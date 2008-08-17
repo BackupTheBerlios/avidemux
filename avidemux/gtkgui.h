@@ -20,8 +20,8 @@ void 			A_saveAudio	(char *name);
 void 			A_saveAudioDecoded	(char *name);
 void 			A_saveAVI		(char *name);
 void 			A_playAvi		(void);
-void 			update_status_bar(void );
-void 			rebuild_status_bar(void );
+void 			GUI_setCurrentFrameAndTime(void );
+void 			GUI_setAllFrameAndTime(void );
 
 
 

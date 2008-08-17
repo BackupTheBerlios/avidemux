@@ -44,19 +44,6 @@
 
 extern void    UI_purge(void );
 
-//____________________________________
-
-uint8_t GUI_getFrame(uint32_t frameno,  uint32_t *flags)
-{
-uint32_t len;
-
-	//return video_body->getUncompressedFrame(frameno,image,flags);
-	AVDMGenericVideoStream *filter=getFirstCurrentVideoFilter( );
-	ADM_assert(filter);
-	return 1;
-
-
-}
 /**
     \fn GUI_NextFrame
     \brief next frame
@@ -68,18 +55,9 @@ uint32_t flags;
     if (playing)	return;
     if (!avifileinfo) return;
 
-    if( !GUI_getFrame(curframe+1,&flags))
-        {
-              GUI_Error_HIG(QT_TR_NOOP("Decompressing error"),QT_TR_NOOP( "Cannot decode next frame."));
-        }
-
-
-      curframe ++;
-      admPreview::update( curframe) ;
-      update_status_bar();
-
+      admPreview::nextPicture( ) ;
+      GUI_setCurrentFrameAndTime();
       UI_purge();
-
 }
 
 
@@ -90,34 +68,17 @@ uint32_t flags;
 */
 void GUI_NextKeyFrame(void)
 {
-    uint32_t f;
-    uint32_t flags;
-
+ 
     if (playing)	return;
     if (!avifileinfo) return;
 
-    f=curframe;
-
-    if(!video_body->getNKFrame(&f))
+    if(!admPreview::nextKeyFrame())
     {
-        GUI_Error_HIG("Decompressing error", NULL);
+        GUI_Error_HIG(QT_TR_NOOP("Error"),QT_TR_NOOP("Cannot go to next keyframe"));
         return;
     }
-
-    if(true!=video_body->GoToIntra(f))
-    {
-        GUI_Error_HIG(QT_TR_NOOP("Decompressing error"),QT_TR_NOOP( "GoToIntra failed."));
-        return;
-    }
-    if( !GUI_getFrame(curframe,&flags))
-    {
-      GUI_Error_HIG(QT_TR_NOOP("Decompressing error"),QT_TR_NOOP( "Cannot decode keyframe."));
-    }
-    curframe=f;
-    admPreview::update( curframe) ;
-    update_status_bar();
+    GUI_setCurrentFrameAndTime();
     UI_purge();
-    
 }
 
 /**
@@ -126,21 +87,27 @@ void GUI_NextKeyFrame(void)
 */
 void GUI_GoToKFrame(uint32_t frame)
 {
-   uint32_t old=curframe;
-
 
     if (playing)            return;
     if(!avifileinfo) return;
-
-    if(frame>=avifileinfo->nb_frames)
+    uint32_t f;
+    video_body->getFlags(0,&f);
+    if(!frame && (f&AVI_KEY_FRAME))
     {
-        curframe=avifileinfo->nb_frames-1;
+
+    }else
+    {
+        if(!video_body->getPKFrame(&frame))
+        {
+            printf("[GUI_GoToKFrame] failed for frame %u\n",frame);
+            return;
+        }
     }
-
-    curframe=frame;
-    GUI_PreviousKeyFrame();	
+    admPreview::seekToIntra(frame);
+    admPreview::samePicture();
+    GUI_setCurrentFrameAndTime();
+    UI_purge();
 }
-
 /**
     \fn GUI_GoToFrame
     \brief go to a given frame. Half broken, do not use.
@@ -152,17 +119,10 @@ uint32_t flags;
       if (playing)              return 0;
       if (!avifileinfo)         return 0;
       if(frame>=avifileinfo->nb_frames) return 0;
-
-      if( !GUI_getFrame(frame ,&flags))
-      {
-              GUI_Error_HIG(QT_TR_NOOP("Decompressing error"),QT_TR_NOOP( "Cannot decode the frame."));
-              return 0;
-      }
-        
-      curframe = frame;
-      // Rewind to previous kf...
-      GUI_PreviousKeyFrame();
-      return 1;
+    
+     if(! video_body->setCurrentFrame(frame)) return 0;
+     return admPreview::samePicture();
+    
 }
 
 /**
@@ -179,33 +139,16 @@ void GUI_PreviousKeyFrame(void)
 
     if (playing)		return;
     if (!avifileinfo)   return;
-    if (!curframe)     
+
+
+    if(!admPreview::previousKeyFrame())
     {
-        f=0;
-    }else   
-    {
-        f=curframe;
-        if(!f) f=0;
-        else
-            if(!video_body->getPKFrame(&f))
-            {
-                  return;
-            }
-    }
-    if( !GUI_getFrame(curframe,&flags))
-    {
-      GUI_Error_HIG(QT_TR_NOOP("Decompressing error"),QT_TR_NOOP( "Cannot decode keyframe."));
-    }
-    if(true!=video_body->GoToIntra(f))
-    {
-        GUI_Error_HIG(QT_TR_NOOP("Decompressing error"),QT_TR_NOOP( "GoToIntra failed."));
+        GUI_Error_HIG(QT_TR_NOOP("Error"),QT_TR_NOOP("Cannot go to next keyframe"));
         return;
     }
-    curframe=f;
-    admPreview::update( curframe) ;
-
-    update_status_bar();
+    GUI_setCurrentFrameAndTime();
     UI_purge();
+
 };
 
 uint8_t A_rebuildKeyFrame(void)
@@ -282,12 +225,11 @@ void A_jog(void)
   jog--;
 }
 /**
-    \fn update_status_bar
+    \fn     GUI_setAllFrameAndTime
     \brief  Update all  informations : current frame # and current time, total frame ...
 
 */
-
-void  update_status_bar(void)
+void  GUI_setAllFrameAndTime(void)
 {
     char text[80];
     double len;
@@ -296,7 +238,7 @@ void  update_status_bar(void)
     //    if(!guiReady) return ;
     text[0] = 0;
  
-	UI_updateFrameCount( curframe);
+	UI_updateFrameCount(video_body->getCurrentFrame());
     UI_setCurrentTime(admPreview::getCurrentPts());
 	UI_setTotalTime(video_body->getVideoDuration());
     
@@ -304,7 +246,7 @@ void  update_status_bar(void)
     len = 100;
     if(avifileinfo->nb_frames>1)
     	len=len / (double) (avifileinfo->nb_frames-1);
-    len *= (double) curframe;
+    len *= (double) video_body->getCurrentFrame();
 
    
 
@@ -313,10 +255,10 @@ void  update_status_bar(void)
 }
 
 /**
-    \fn rebuild_status_bar
+    \fn GUI_setCurrentFrameAndTime
     \brief Update some informations : current frame # and current time
 */
-void rebuild_status_bar(void)
+void GUI_setCurrentFrameAndTime(void)
 {
     char text[80];
     double len;
@@ -325,14 +267,14 @@ void rebuild_status_bar(void)
     //    if(!guiReady) return ;
     text[0] = 0;
  
-	UI_setFrameCount( curframe, avifileinfo->nb_frames);
+	UI_setFrameCount( video_body->getCurrentFrame(), avifileinfo->nb_frames);
 	UI_setCurrentTime(admPreview::getCurrentPts());
 	
     // progress bar
     len = 100;
     if(avifileinfo->nb_frames>1)
     	len=len / (double) (avifileinfo->nb_frames-1);
-    len *= (double) curframe;
+    len *= (double) video_body->getCurrentFrame();
 
 
 
