@@ -221,7 +221,7 @@ bool ADM_Composer::getNextPicture(ADMImage *out,uint32_t ref)
             // Duplicate
             if(out)
             {
-                aprintf("[getNextPicture] Looking for after %lu, got %lu\n",vid->lastReadPts,img->Pts);
+                aprintf("[getNextPicture] Looking for after %lu, got %lu delta=%u ms\n",vid->lastReadPts,img->Pts,(img->Pts-vid->lastReadPts)/1000);
                 out->duplicate(img);
                 vid->lastReadPts=img->Pts;
                 currentFrame++;
@@ -347,7 +347,7 @@ bool ADM_Composer::decompressImage(ADMImage *out,ADMCompressedImage *in,uint32_t
             printf("[decompressImage] NoPicture\n");
             return false;
         }
-        aprintf("[::Decompress] in:%lu out:%lu\n",in->demuxerPts,out->Pts);
+        aprintf("[::Decompress] in:%lu out:%lu flags:%x\n",in->demuxerPts,out->Pts,out->flags);
 	// If not quant and it is already YV12, we can stop here
 	if((!tmpImage->quant || !tmpImage->_qStride) && tmpImage->_colorspace==ADM_COLOR_YV12)
 	{      

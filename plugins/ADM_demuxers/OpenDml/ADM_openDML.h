@@ -27,6 +27,8 @@ typedef struct odmlIndex
 	uint64_t offset;
 	uint64_t size;
 	uint32_t intra;
+    uint64_t pts;
+    uint64_t dts;
 }odmlIndex;
 
 typedef struct odmlTrack
@@ -110,11 +112,11 @@ protected:
                                                 return (i[3]<<24)+(i[2]<<16)+(i[1]<<8)+i[0];
                                         };
 
-	  uint8_t			reorder( void );
-	  uint8_t			isReordered( void );
-	  	  	
+	  uint8_t           computePtsDts(void);
+      uint8_t           mpegReorder(void);
+	  uint8_t			unpackPacked( void );	  	
 public:
-	  uint8_t			unpackPacked( void );
+	  
 virtual   void 				Dump(void) ;
 
 					OpenDMLHeader( void ) ;

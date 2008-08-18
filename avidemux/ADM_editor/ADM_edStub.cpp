@@ -209,12 +209,30 @@ uint8_t   ADM_Composer::isSequential (uint32_t framenum)
 }
 
 
-//
-//  For that one the first segment is always right
-//                                                                                              
+/** 
+    \fn getTime
+    \brief return or estimate the pts of frame fn
+*/
 uint64_t ADM_Composer::getTime (uint32_t fn)
 {
-  return STUBB->getTime(fn);
+    uint64_t t= STUBB->getTime(fn);
+    uint32_t org=fn;
+    if(t!=ADM_COMPRESSED_NO_PTS) return t;
+    if(!fn) return 0;
+    
+    // Try to guess what is the time...
+    while(1)
+    {
+        fn--;
+        if(STUBB->getTime(fn)!=ADM_COMPRESSED_NO_PTS)
+        {
+            t=STUBB->getTime(fn);
+            t+= _videos[0].timeIncrementInUs*(org-fn);
+            return t;
+        }
+    }
+    printf("[ADM_Composer::getTime] Cannot estimate time for frame %u\n",org);
+    return 0;
 }
 
 uint32_t ADM_Composer::getFlags (uint32_t frame, uint32_t * flags)

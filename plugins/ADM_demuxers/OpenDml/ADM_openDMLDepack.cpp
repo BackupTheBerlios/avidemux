@@ -1,14 +1,25 @@
-//
-// C++ Implementation: ADM_openDMLDepack
-//
-// Description: 
-//
-//
-// Author: mean <fixounet@free.fr>, (C) 2004
-//
-// Copyright: See COPYING file that comes with this distribution
-//
-//
+/***************************************************************************
+    
+    \file ADM_openDMLDepack
+    \brief Removed packed bitstream stuff
+    copyright            : (C) 2001/2008 by mean
+    email                : fixounet@free.fr
+
+This class deals with a chunked / not chunked stream
+It is an fopen/fwrite lookalike interface to chunks
+
+
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #include "ADM_default.h"
 #include "ADM_Video.h"
@@ -38,14 +49,18 @@ typedef struct vopS
 }vopS;
 #define MAX_VOP 10
 
+/* Forward declaration */
 uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,uint32_t *offset);
 uint8_t extractVopInfo(uint8_t *data, uint32_t len,uint32_t timeincbits,uint32_t *vopType,uint32_t *modulo, uint32_t *time_inc,uint32_t *vopcoded);
 uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h,uint32_t *time_inc);
 
-
+/* Static ones */
 static uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop,uint32_t *timeincbits);
-
 static const char *s_voptype[4]={"I frame","P frame","B frame","D frame"};
+/**
+    \fn unpackPacked
+    \brief Removed packed bitstream hack
+*/
 uint8_t OpenDMLHeader::unpackPacked( void )
 {
 	uint32_t nbFrame;
@@ -84,20 +99,20 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	printf("Trying to unpack the stream\n");
 //	DIA_working *working=new DIA_working(QT_TR_NOOP("Unpacking bitstream"));
 	ADMCompressedImage image;
-        image.data=buffer;
+    image.data=buffer;
 	uint32_t img=0;
-        uint32_t modulo,time_inc,vopcoded,vopType;
-        uint32_t timeincbits=16;
-        uint32_t oldtimecode=0xffffffff;
+    uint32_t modulo,time_inc,vopcoded,vopType;
+    uint32_t timeincbits=16;
+    uint32_t oldtimecode=0xffffffff;
 	while(img<nbFrame)
 	{
-                ADM_assert(nbDuped<2);
+        ADM_assert(nbDuped<2);
 		//working->update(img,nbFrame);
 		if(!getFrame(img,&image))
-			{
-				printf("Error could not get frame %lu\n",img);
-				goto _abortUnpack;
-			}
+        {
+            printf("Error could not get frame %lu\n",img);
+            goto _abortUnpack;
+        }
 		aprintf("--Frame:%lu/%lu, len %lu, nbDuped%u\n",img,nbFrame,image.dataLength,nbDuped);
 		
 		if(image.dataLength<=2)

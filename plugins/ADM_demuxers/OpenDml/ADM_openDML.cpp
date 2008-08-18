@@ -37,7 +37,9 @@ uint8_t OpenDMLHeader::setFlag(uint32_t frame,uint32_t flags)
 	_idx[frame].intra=flags;    
 	return 1;
 }
-
+/**
+        \fn getFlags
+*/
 uint32_t OpenDMLHeader::getFlags(uint32_t frame,uint32_t *flags)
 {
 *flags=0;
@@ -55,6 +57,9 @@ uint32_t OpenDMLHeader::getFlags(uint32_t frame,uint32_t *flags)
 	if(!frame) *flags=AVI_KEY_FRAME;
 	return 1;
 }
+/**
+        \fn getFrameSize
+*/
  uint8_t  OpenDMLHeader::getFrameSize(uint32_t frame,uint32_t *size) 
 {
 	*size=0;
@@ -62,7 +67,9 @@ uint32_t OpenDMLHeader::getFlags(uint32_t frame,uint32_t *flags)
 	*size=_idx[frame].size;
 	return 1;
 }
-
+/**
+    \fn getExtraHeaderData
+*/
 uint8_t OpenDMLHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
 {
 	if(_videoExtraLen)
@@ -103,21 +110,21 @@ uint64_t offset=_idx[framenum].offset; //+_mdatOffset;
  	fread(img->data, _idx[framenum].size, 1, _fd);
   	img->dataLength=_idx[framenum].size;
     img->flags=_idx[framenum].intra;
-    img->demuxerDts=frameToUs(framenum);; // FIXME
-    if(!framenum) img->demuxerPts=0;
-    else
-        img->demuxerPts=ADM_COMPRESSED_NO_PTS;//frameToUs(framenum); // FIXME
+    img->demuxerDts=_idx[framenum].dts; // FIXME
+    img->demuxerPts=_idx[framenum].pts;
+    
+    
 	aprintf("Size: %lu\n",_idx[framenum].size);
 //	if(offset & 1) printf("odd!\n");
  	return 1;
 }
 /**
     \fn getFrame
-    \brief Return PTS of given frame
+    \brief Return PTS of given frame. It is only approximate...
 */
 uint64_t OpenDMLHeader::getTime(uint32_t frameNum)
 {
-    return frameToUs(frameNum); 
+    return _idx[frameNum].pts; 
 
 }
 /**
@@ -214,11 +221,10 @@ WAVHeader 	*OpenDMLHeader::getAudioInfo(void )
 		return NULL;
 	
 } ;
-//______________________________________
-//
-// Open and get the headears/index built
-// along way
-//______________________________________
+/**
+    \fn open
+
+*/
 uint8_t    OpenDMLHeader::open(const char *name)
 {
 uint8_t badAvi=0;
@@ -329,14 +335,6 @@ uint32_t rd;
 			return 0;
 		}
 		
-		// STOP HERE -> Alex <-
-		//return 0;
-		// STOP HERE -> Alex <-
-		
-		
-		
-									
-
 		// then bih stuff
 		int32_t extra;
 //		_fd=fopen(name,"rb");
@@ -504,7 +502,58 @@ uint32_t rd;
                 else
                 _videostream.fccHandler=_video_bih.biCompression;
                 printf("\nOpenDML file successfully read..\n");
+                if(ret==1) computePtsDts();
                 return ret;
+}
+/**
+    \fn computePtsDts
+    \brief Compute PtsDts
+*/
+extern uint8_t isMpeg4Compatible (uint32_t fourcc);
+uint8_t OpenDMLHeader::computePtsDts(void)
+{
+    // if it is mpeg4-sp, removed packet bitstream & reindex
+    if(isMpeg4Compatible(_videostream.fccHandler))  OpenDMLHeader::unpackPacked(  );
+    // Now if we have B frames, it is properly tagged
+    // Begin by putting PTS=DTS i.e. no B-frames
+    for(int i=0;i<_videostream.dwLength;i++)
+    {
+       odmlIndex *idx=&( _idx[i]);
+       idx->pts=ADM_COMPRESSED_NO_PTS;
+       idx->dts=frameToUs(i);
+    }
+    _idx[0].pts=0;
+    // If it is mpeg4-SP compatible ?
+    // We can only call it here because the frames are marked as b frame!
+    if(isMpeg4Compatible(_videostream.fccHandler))
+    {
+        mpegReorder();
+    }   
+    return 1;
+}
+/**
+    \fn mpegReorder
+    \brief Compute PTS when handling mpeg 1/2/4sp type of b frames
+
+*/
+uint8_t OpenDMLHeader::mpegReorder(void)
+{
+    int last=0;
+    for(int i=1;i<_videostream.dwLength;i++)
+    {
+        if(_idx[i].intra & AVI_B_FRAME)
+        {
+            _idx[i].pts=frameToUs(i-1);
+        }else
+        {
+            if(last)
+            {
+                _idx[last].pts=frameToUs(i-1);
+            }
+            last=i;
+        }
+    }
+    return 1;
 }
 /*
 	Count how many audio track is found

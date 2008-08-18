@@ -605,8 +605,8 @@ uint8_t  flvHeader::getFrame(uint32_t frame,ADMCompressedImage *img)
      fread(img->data,idx->size,1,_fd);
      img->dataLength=idx->size;
      img->flags=idx->flags;
-     img->demuxerDts=idx->timeCodeUs;
-     img->demuxerPts=ADM_COMPRESSED_NO_PTS;
+     img->demuxerDts=ADM_COMPRESSED_NO_PTS;
+     img->demuxerPts=idx->timeCodeUs;;
      return 1;
 }
 /**

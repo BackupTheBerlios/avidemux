@@ -25,6 +25,7 @@
 #define aprintf(...) {}
 
 #define OPENDML_VERBOSE
+#if 0
 uint8_t			OpenDMLHeader::isReordered( void )
 { 
  	return _reordered;
@@ -44,3 +45,5 @@ uint8_t OpenDMLHeader::reorder( void )
 #undef FRAMETYPE_TMPL   
              
 }
+#endif
+//EOF
