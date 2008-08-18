@@ -16,8 +16,9 @@ protected:
                 uint32_t currentIndex;
                 odmlIndex *index;
                 uint32_t   nbIndex;
+                WAVHeader *wavHeader;
 public: 
-                ADM_aviAudioAccess(odmlIndex *idx,
+                ADM_aviAudioAccess(odmlIndex *idx,WAVHeader *hdr,
 						uint32_t nbchunk,
 						const char *name,
 						uint32_t extraLen,
@@ -32,7 +33,7 @@ public:
                 virtual uint64_t  getDurationInUs(void) {return 0;};
                 virtual uint32_t  getLength(void) {return length;}
                 virtual bool      goToTime(uint64_t timeUs) {ADM_assert(0);}
-                
+                virtual bool      isCBR(void) ;
                 virtual uint64_t  getPos(void);
                 
                 

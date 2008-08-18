@@ -29,7 +29,7 @@ ADM_audioStreamMP3::ADM_audioStreamMP3(WAVHeader *header,ADM_audioAccess *access
     // and built vbr map if needed
     // The 2 conditions below means there is no gap i.e. avi style stream
     // else not needed
-    if(access->isCBR()==false && access->canSeekTime()==false)
+    if( access->canSeekTime()==false)
     {
         ADM_assert(access->canSeekOffset()==true);
         buildTimeMap();
@@ -134,7 +134,7 @@ uint64_t newDts,pos;
 
     ADM_assert(access->canSeekOffset()==true);
     access->setPos(0);
- 
+    printf("[audioStreamMP3] Starting time map\n");
     rewind();
     while(1)
     {
@@ -182,6 +182,7 @@ uint64_t newDts,pos;
     }
     rewind();
     access->setPos(0);
+    printf("[audioStreamMP3] Ending time map\n");
     return true;
 }
   

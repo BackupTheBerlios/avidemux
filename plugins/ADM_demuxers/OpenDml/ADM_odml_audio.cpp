@@ -37,7 +37,7 @@ It is an fopen/fwrite lookalike interface to chunks
     \fn ADM_aviAudioAccess
 
 */
-ADM_aviAudioAccess::ADM_aviAudioAccess(odmlIndex *idx,
+ADM_aviAudioAccess::ADM_aviAudioAccess(odmlIndex *idx,WAVHeader *hdr,
 						uint32_t nbchunk,
 						const char *name,
 						uint32_t extraLen,
@@ -54,6 +54,17 @@ ADM_aviAudioAccess::ADM_aviAudioAccess(odmlIndex *idx,
     ADM_assert(fd);
     pos=0;
     currentIndex=0;
+    wavHeader=hdr;
+}
+/**
+    \fn isCBR
+
+*/
+bool      ADM_aviAudioAccess::isCBR(void) 
+{
+    if(wavHeader->encoding==WAV_MP3 && wavHeader->blockalign==1152) return false;
+    return true;
+
 }
 /**
     \fn getPos

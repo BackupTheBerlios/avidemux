@@ -488,7 +488,7 @@ uint32_t rd;
                         for(int i=0;i<_nbAudioTracks;i++)
                         {
                                 track=&(_audioTracks[i]);
-                                ADM_aviAudioAccess *access=new ADM_aviAudioAccess(track->index,
+                                ADM_aviAudioAccess *access=new ADM_aviAudioAccess(track->index,track->wavHeader,
                                             track->nbChunks,
                                             myName,
                                             track->extraDataLen,track->extraData);
