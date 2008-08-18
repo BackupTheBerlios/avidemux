@@ -349,6 +349,7 @@ int GUI_YesNo(const char *primary, const char *secondary_format)
 	return ret;
 }
 extern int GUI_Alternate(char *title,char *choice1,char *choice2);
+extern DIA_workingBase *createWorking(const char *title);
 } // End of namespace
 
 static CoreToolkitDescriptor GtkCoreToolkitDescriptor=
@@ -361,7 +362,8 @@ static CoreToolkitDescriptor GtkCoreToolkitDescriptor=
 		&ADM_GtkCoreUIToolkit::GUI_Alternate,
 		&ADM_GtkCoreUIToolkit::GUI_Verbose,
 		&ADM_GtkCoreUIToolkit::GUI_Quiet,
-		&ADM_GtkCoreUIToolkit::GUI_isQuiet
+		&ADM_GtkCoreUIToolkit::GUI_isQuiet,
+        &ADM_GtkCoreUIToolkit::createWorking
 };
 
 void InitCoreToolkit(void )

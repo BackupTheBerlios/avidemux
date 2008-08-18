@@ -56,17 +56,24 @@ gint on_destroy_abort(GtkObject * object, gpointer user_data)
 
 	return TRUE;
 };
-
-DIA_working::DIA_working( void )
+//********************************
+class DIA_workingGtk : public DIA_workingBase
 {
-	GtkWidget *dialog;
+protected:
+        virtual void 	    postCtor( void );
+public:
+                            DIA_workingGtk( const char *title=NULL );
+        virtual		        ~DIA_workingGtk();
+            // If returns 1 -> Means aborted
+        virtual uint8_t  	update(uint32_t percent);
+        virtual uint8_t 	update(uint32_t current,uint32_t total);
+        virtual uint8_t  	isAlive (void );
+                void        closeDialog(void);
+        
+};
 
-	dialog=create_dialog1();
-    gtk_register_dialog(dialog);
-	_priv=(void *)_priv;
-	postCtor();
-}
-DIA_working::DIA_working( const char *title )
+//********************************
+DIA_workingGtk::DIA_workingGtk( const char *title ) : DIA_workingBase(title)
 {
 	GtkWidget *dialog;
 
@@ -79,7 +86,7 @@ DIA_working::DIA_working( const char *title )
 	postCtor();
 }
 
-void DIA_working :: postCtor( void )
+void DIA_workingGtk :: postCtor( void )
 {
 		GtkWidget 	*dialog;
 
@@ -97,7 +104,7 @@ void DIA_working :: postCtor( void )
 		lastper=0;
 		_nextUpdate=0;
 }
-uint8_t DIA_working::update(uint32_t percent)
+uint8_t DIA_workingGtk::update(uint32_t percent)
 {
 	#define GUI_UPDATE_RATE 1000
 
@@ -110,7 +117,7 @@ uint8_t DIA_working::update(uint32_t percent)
 	   return 0;
 	}
 
-	aprintf("DIA_working::update(%lu) called\n", percent);
+	aprintf("DIA_workingGtk::update(%lu) called\n", percent);
 	elapsed=_clock.getElapsedMS();
 
 	if(elapsed<_nextUpdate) 
@@ -142,13 +149,13 @@ uint8_t DIA_working::update(uint32_t percent)
 	return 0;
 }
 
-uint8_t DIA_working::update(uint32_t cur, uint32_t total)
+uint8_t DIA_workingGtk::update(uint32_t cur, uint32_t total)
 {
 		double d,n;
 		uint32_t percent;
 		if(!_priv) return 1;
 
-		aprintf("DIA_working::update(uint32_t %lu,uint32_t %lu) called\n", cur, total);
+		aprintf("DIA_workingGtk::update(uint32_t %lu,uint32_t %lu) called\n", cur, total);
 		if(!total) return 0;
 
 		d=total;
@@ -162,19 +169,19 @@ uint8_t DIA_working::update(uint32_t cur, uint32_t total)
 
 }
 
-uint8_t DIA_working::isAlive (void )
+uint8_t DIA_workingGtk::isAlive (void )
 {
 	if(!_priv) return 0;
 	return 1;
 }
 
-DIA_working::~DIA_working()
+DIA_workingGtk::~DIA_workingGtk()
 {
 	closeDialog();
         
 }
 
-void DIA_working::closeDialog( void )
+void DIA_workingGtk::closeDialog( void )
 {
 	GtkWidget *dialog;
 
@@ -187,7 +194,13 @@ void DIA_working::closeDialog( void )
 		_priv=NULL;
 	}
 }
-
+namespace ADM_GtkCoreUIToolkit
+{
+DIA_workingBase *createWorking(const char *title)
+{
+    return new DIA_workingGtk(title);
+}
+};
 //-------------------------------------------------------------
 GtkWidget*
 create_dialog1 (void)

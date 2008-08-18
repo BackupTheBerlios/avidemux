@@ -27,7 +27,7 @@
 #include "DIA_coreToolkit.h"
 #include "ADM_assert.h"
 
-#include "ADM_audiodevice/audio_out.h"
+#include "audio_out.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"

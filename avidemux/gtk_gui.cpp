@@ -47,10 +47,10 @@
 #include "ADM_userInterfaces/ADM_render/GUI_render.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
 
-#include "ADM_audiodevice/audio_out.h"
+#include "audio_out.h"
 
 #include "ADM_userInterfaces/ADM_commonUI/DIA_busy.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
+#include "DIA_working.h"
 #include "DIA_factory.h"
 #include "DIA_enter.h"
 

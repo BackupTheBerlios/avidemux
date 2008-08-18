@@ -31,7 +31,7 @@
 
 #include "ADM_encoder/adm_encConfig.h"
 #include "prefs.h"
-#include "ADM_audiodevice/audio_out.h"
+#include "audio_out.h"
 
 #ifdef USE_XVID_4
 extern void xvid4_init(void);

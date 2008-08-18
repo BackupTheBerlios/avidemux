@@ -25,7 +25,7 @@
 
 #include "DIA_fileSel.h"
 #include "prototype.h"
-#include "ADM_audiodevice/audio_out.h"
+#include "audio_out.h"
 
 #include "DIA_coreToolkit.h"
 #include "ADM_audio/aviaudio.hxx"

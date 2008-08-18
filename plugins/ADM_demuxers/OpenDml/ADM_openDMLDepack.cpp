@@ -28,7 +28,7 @@ It is an fopen/fwrite lookalike interface to chunks
 #include "fourcc.h"
 #include "ADM_openDML.h"
 
-//#include "DIA_working.h"
+#include "DIA_working.h"
 //#include "ADM_libraries/ADM_utilities/avidemutils.h"
 
 
@@ -38,7 +38,7 @@ It is an fopen/fwrite lookalike interface to chunks
 	//#define OPENDML_VERBOSE
 #endif
 #define DEPACK_VERBOSE
-
+#define QT_TR_NOOP(x) x
 typedef struct vopS
 {
 	uint32_t offset;
@@ -97,7 +97,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
 #endif
 	printf("Trying to unpack the stream\n");
-//	DIA_working *working=new DIA_working(QT_TR_NOOP("Unpacking bitstream"));
+	DIA_working *working=new DIA_working(QT_TR_NOOP("Unpacking bitstream"));
 	ADMCompressedImage image;
     image.data=buffer;
 	uint32_t img=0;
@@ -107,7 +107,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	while(img<nbFrame)
 	{
         ADM_assert(nbDuped<2);
-		//working->update(img,nbFrame);
+		working->update(img,nbFrame);
 		if(!getFrame(img,&image))
         {
             printf("Error could not get frame %lu\n",img);
@@ -206,7 +206,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	ret=1;
 _abortUnpack:
 	delete [] buffer;
-	//delete working;
+	delete working;
 #if 0	
 	for(uint32_t k=0;k<nbFrame;k++)
 	{

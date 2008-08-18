@@ -21,25 +21,38 @@
 #ifndef __DIA_WK__
 #define __DIA_WK__
 
-	class DIA_working
+	class DIA_workingBase
 	{
-		private :
+		protected :
 				uint32_t 	lastper;
-				Clock	_clock;
+				Clock	    _clock;
 				uint32_t	_nextUpdate;
 				uint32_t 	elapsed;
-				void 		postCtor( void );
+				
 		public:
 				void 		*_priv;
-						DIA_working( void );
-						DIA_working( const char *title );
-						~DIA_working();
+                            DIA_workingBase( const char *title=NULL ) {};
+				virtual		~DIA_workingBase(){};
 				// If returns 1 -> Means aborted
-				uint8_t  	update(uint32_t percent);
-				uint8_t 	update(uint32_t current,uint32_t total);
-				uint8_t  	isAlive (void );
-				void 		closeDialog(void);
+				virtual uint8_t  	update(uint32_t percent) {ADM_assert(0);}
+				virtual uint8_t 	update(uint32_t current,uint32_t total){ADM_assert(0);};
+				virtual uint8_t  	isAlive (void ){ADM_assert(0);};
+				
 	};
 
+    class DIA_working : public DIA_workingBase
+    {
+protected:
+                    void        *son;
+            
+public:
+                                DIA_working( const char *title=NULL );
+            virtual		        ~DIA_working();
+				// If returns 1 -> Means aborted
+			virtual uint8_t  	update(uint32_t percent);
+            virtual uint8_t 	update(uint32_t current,uint32_t total);
+            virtual uint8_t  	isAlive (void );
+            
+    };
 
 #endif

@@ -57,6 +57,7 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_core/include")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_coreUI/include")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_coreImage/include")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_coreAudio/include")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_coreAudioDevice/include")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_coreDemuxer/include")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_utilities")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_ffmpeg/ADM_lavutil")
@@ -172,7 +173,7 @@ SET(ADM_SUBDIR
 	ADM_filter
 	ADM_videoFilter
 	ADM_video
-	ADM_audiodevice
+	#ADM_audiodevice
 	#ADM_ocr
 )
 FOREACH(_current ${ADM_SUBDIR})
@@ -322,7 +323,7 @@ ENDIF (ADM_UI_QT4)
 ADD_ADMLIB_ALL_TARGETS(ADM_utilities)
 
 ###########################################
-# ADM_core/ADM_coreUI
+#  Our own shared libs
 ###########################################
 ADD_SUBDIRECTORY(ADM_core)
 ADD_LIB_ALL_TARGETS(ADM_core)
@@ -334,6 +335,8 @@ ADD_SUBDIRECTORY(ADM_coreAudio)
 ADD_LIB_ALL_TARGETS(ADM_coreAudio)
 ADD_SUBDIRECTORY(ADM_coreDemuxer)
 ADD_LIB_ALL_TARGETS(ADM_coreDemuxer)
+ADD_SUBDIRECTORY(ADM_coreAudioDevice)
+ADD_LIB_ALL_TARGETS(ADM_coreAudioDevice)
 
 # To be removed
 #ADD_SUBDIRECTORY(ADM_audioEncoder)

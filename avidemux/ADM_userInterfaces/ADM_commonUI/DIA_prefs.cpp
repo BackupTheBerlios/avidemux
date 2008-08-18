@@ -16,7 +16,7 @@
 #include "ADM_default.h"
 # include "prefs.h"
 
-#include "ADM_audiodevice/audio_out.h"
+#include "audio_out.h"
 #include "ADM_assert.h"
 #include "ADM_userInterfaces/ADM_render/GUI_render.h"
 

@@ -28,7 +28,7 @@
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_videoFilter.h"
 #include "avi_vars.h"
-#include "../ADM_userInterfaces/ADM_commonUI/DIA_working.h"
+#include "DIA_working.h"
 #include "DIA_coreToolkit.h"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
 

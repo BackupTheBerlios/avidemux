@@ -27,7 +27,7 @@
 #include "aviaudio.hxx"
 #include "prefs.h"
 
-#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
+#include "DIA_working.h"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
 
 #include "ADM_mp3info.h"

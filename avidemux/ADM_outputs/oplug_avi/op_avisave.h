@@ -18,7 +18,7 @@
  #define   __AVI_SAVE__
 
 #include "ADM_default.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
+#include "DIA_working.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_encoding.h"
 #include "ADM_image.h"
 #include "ADM_osSupport/ADM_fileio.h"

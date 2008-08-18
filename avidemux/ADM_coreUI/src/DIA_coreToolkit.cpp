@@ -219,3 +219,12 @@ uint8_t  DIA_GetFloatValue(float *value, float min, float max, const char *title
   }
   return 0;     
 }
+/**
+    \fn createWorking
+    \brief
+*/
+DIA_workingBase *createWorking(const char *title)
+{
+    if(Toolkit->createWorking) return Toolkit->createWorking(title);
+    return NULL;
+}
