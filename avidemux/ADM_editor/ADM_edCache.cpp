@@ -169,7 +169,7 @@ void EditorCache::dump( void)
 ADMImage    *EditorCache::findJustAfter(uint64_t pts)
 {
 int smallest=-1;
-uint64_t value=0x100000000;
+uint64_t value=0x100000000LL;
 
     for(uint32_t i=0;i<_nbImage;i++)
 	{
