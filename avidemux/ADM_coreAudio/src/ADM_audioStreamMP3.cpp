@@ -8,7 +8,7 @@ GPL-v2
 #include "ADM_default.h"
 #include "ADM_audioStreamMP3.h"
 #include "ADM_mp3info.h"
-
+#include "DIA_working.h"
 /**
     \fn ADM_audioStreamMP3
     \brief constructor
@@ -37,6 +37,7 @@ ADM_audioStreamMP3::ADM_audioStreamMP3(WAVHeader *header,ADM_audioAccess *access
     }
     // Time based
     durationInUs=access->getDurationInUs();
+    
 
 }
 
@@ -78,6 +79,7 @@ bool         ADM_audioStreamMP3::goToTime(uint64_t nbUs)
     // Search the switching point..
     for(int i=0;i<seekPoints.size()-1;i++)
     {
+        //printf("[%d]Target %u * %u * %u *\n",i,nbUs,seekPoints[i]->timeStamp,seekPoints[i+1]->timeStamp);
         if(seekPoints[i]->timeStamp<=nbUs && seekPoints[i+1]->timeStamp>=nbUs)
         {
             start=limit=0;
@@ -131,7 +133,8 @@ bool ADM_audioStreamMP3::buildTimeMap(void)
 {
 uint32_t size;
 uint64_t newDts,pos;
-
+DIA_working *work=new DIA_working("Building time map");
+    
     ADM_assert(access->canSeekOffset()==true);
     access->setPos(0);
     printf("[audioStreamMP3] Starting time map\n");
@@ -147,6 +150,7 @@ uint64_t newDts,pos;
             delete seek;
             break;
         }
+        limit+=size;
         // Mark this point
         seekPoints.push_back(seek);
         // Shrink ?
@@ -158,10 +162,11 @@ uint64_t newDts,pos;
         }
         // Start at...
         pos=access->getPos();
+        work->update(pos,access->getLength());
         // consume all packets
         while(1)
         {
-            if(limit-start<ADM_LOOK_AHEAD) continue;
+            if(limit-start<ADM_LOOK_AHEAD) break;
             MpegAudioInfo info;
             uint32_t offset;
             if(!getMpegFrameInfo(buffer+start,ADM_LOOK_AHEAD, &info,NULL,&offset))
@@ -181,6 +186,7 @@ uint64_t newDts,pos;
 
     }
     rewind();
+    delete work;
     access->setPos(0);
     printf("[audioStreamMP3] Ending time map\n");
     return true;

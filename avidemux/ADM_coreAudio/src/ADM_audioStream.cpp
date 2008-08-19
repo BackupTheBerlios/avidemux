@@ -21,6 +21,7 @@ ADM_audioStream::ADM_audioStream(WAVHeader *header,ADM_audioAccess *access)
     this->access=access;
     lastDts=ADM_AUDIO_NO_DTS;
     lastDtsBase=0;
+    sampleElapsed=0;
     if(access)
         if(access->canGetDuration()==true)
                 durationInUs=access->getDurationInUs();
