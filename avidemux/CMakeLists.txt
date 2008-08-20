@@ -138,6 +138,7 @@ gui_savenew.cpp
 main.cpp  
 gui_action.cpp
 gui_blackframes.cpp
+ADM_imageLoader.cpp  
 
 )
 
