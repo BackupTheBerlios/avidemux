@@ -1,7 +1,6 @@
 SET(ADM_coreUtils_SRCS 
 ADM_bitstream.cpp 
 ADM_fileio.cpp 
-ADM_gettext.cpp  
 avidemutils.cpp  
 ADM_quota.cpp
 fourcc.cpp

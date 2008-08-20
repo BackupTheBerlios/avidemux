@@ -139,7 +139,7 @@ main.cpp
 gui_action.cpp
 gui_blackframes.cpp
 ADM_imageLoader.cpp  
-
+ADM_gettext.cpp
 )
 
 ADD_EXECUTABLE(avidemux2_cli MACOSX_BUNDLE ${ADM_EXE_SRCS} ${MO_FILES})

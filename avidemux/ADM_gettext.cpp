@@ -1,4 +1,5 @@
-
+#include "config.h"
+#ifdef HAVE_GETTEXT
 #include "ADM_default.h"
 
 #include <stdio.h>
@@ -35,4 +36,4 @@ void initGetText(void)
 
 	printf("[Locale] Test: %s\n\n", dgettext("avidemux", "_File"));
 };
-
+#endif
