@@ -21,7 +21,7 @@
 #define aprintf(...) {}
 
 #define NB_BUCKET 8
-ADM_DECLARE_AUDIODEVICE(Win32,win32AudioDevice,1,0,0,"win32 audio device (c) mean/gruntster");
+
 static uint32_t bucketSize;
 static HWAVEOUT myDevice;
 static MMRESULT myError;
@@ -73,12 +73,12 @@ bool win32AudioDevice::localInit(void)
 	if (_inUse) 
 	{
 		printf("[Win32] Already running?\n");
-		return flse;
+		return false;
 	}
 
 	_inUse = 1;
 	
-	bucketSize = _channels * frequency;
+	bucketSize = _channels * _frequency;
 
 	WAVEFORMATEX wav;
 
@@ -132,7 +132,7 @@ uint8_t  win32AudioDevice::setVolume(int volume)
 void win32AudioDevice::sendData(void)
 {
 	uint8_t success = 0;
-    len=wrIndex-rdIndex;
+    uint32_t len=wrIndex-rdIndex;
 
 	for (uint32_t i = 0; i < NB_BUCKET; i++)
 	{

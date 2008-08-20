@@ -11,7 +11,7 @@
 //
 
 #ifndef ADM_DEVICEWIN32_H
-#endif ADM_DEVICEWIN32_H
+#define ADM_DEVICEWIN32_H
 class win32AudioDevice : public audioDeviceThreaded
 {
 protected:
