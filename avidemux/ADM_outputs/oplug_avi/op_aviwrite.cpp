@@ -44,7 +44,7 @@
 #include "op_aviwrite.hxx"
 
 #include "ADM_quota.h"
-#include "ADM_osSupport/ADM_fileio.h"
+#include "ADM_fileio.h"
 
 // MOD Feb 2005 by GMV
 #include "ADM_osSupport/ADM_debugID.h"
