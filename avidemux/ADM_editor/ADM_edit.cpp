@@ -1102,15 +1102,7 @@ uint8_t ADM_Composer::updateAudioTrack (uint32_t seg)
 #warning FIXME, does not work if audio track is shorter
 
 }
-uint8_t WAV2AudioInfo(WAVHeader *hdr,audioInfo *info)
-{
-    info->bitrate=(hdr->byterate*8)/1000;
-    info->channels=hdr->channels;
-    info->encoding=hdr->encoding;
-    info->frequency=hdr->frequency;
-    info->av_sync=0;
-    return 1;
-}
+
 
 
 //__________________________________________________
