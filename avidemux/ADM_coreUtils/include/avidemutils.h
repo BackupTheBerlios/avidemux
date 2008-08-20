@@ -18,5 +18,12 @@ char *ADM_escape(const ADM_filename *incoming);
 
 int32_t ADM_getNiceValue(uint32_t priorityLevel);
 
+// FourCC stuff
+uint8_t isMpeg4Compatible (uint32_t fourcc);
+uint8_t isMpeg12Compatible (uint32_t fourcc);
+uint8_t isH264Compatible (uint32_t fourcc);
+uint8_t isMSMpeg4Compatible (uint32_t fourcc);
+uint8_t isVP6Compatible (uint32_t fourcc);
+uint8_t isDVCompatible (uint32_t fourcc);
 #endif
 //EOF

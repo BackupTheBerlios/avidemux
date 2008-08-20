@@ -370,4 +370,118 @@ int32_t ADM_getNiceValue(uint32_t priorityLevel)
 			break;
 	}
 }
+
+uint8_t isMpeg4Compatible (uint32_t fourcc)
+{
+#define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
+						{divx4=1; }
+
+  uint8_t divx4 = 0;
+
+  CHECK ("FMP4");
+  CHECK ("fmp4");
+  CHECK ("DIVX");
+  CHECK ("divx");
+  CHECK ("DX50");
+  CHECK ("xvid");
+  CHECK ("XVID");
+  CHECK ("BLZ0");
+  CHECK ("M4S2");
+  CHECK ("3IV2");
+
+  return divx4;
+
+#undef CHECK
+}
+#ifdef ADM_BIG_ENDIAN
+#define SWAP32(x) x=R32(x)
+#else
+#define SWAP32(x) ;
+#endif
+
+uint8_t isMpeg12Compatible (uint32_t fourcc)
+{
+#define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
+						{mpeg=1; }
+
+  uint8_t mpeg = 0;
+  CHECK ("MPEG");
+  CHECK ("mpg1");
+  CHECK ("mpg2");
+  SWAP32 (fourcc);
+  if (fourcc == 0x10000002 || fourcc==0x10000001) //Mplayer fourcc
+    mpeg = 1;
+  return mpeg;
+#undef CHECK
+}
+uint8_t isH264Compatible (uint32_t fourcc)
+{
+#define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
+                                                {h264=1; }
+
+  uint8_t h264 = 0;
+
+  CHECK ("X264");
+  CHECK ("x264");
+  CHECK ("h264");
+  CHECK ("H264");
+  CHECK ("AVC1");
+  CHECK ("avc1");
+  return h264;
+
+#undef CHECK
+}
+
+uint8_t isMSMpeg4Compatible (uint32_t fourcc)
+{
+#define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
+						{divx3=1; }
+
+  uint8_t divx3 = 0;
+
+  CHECK ("MP43");
+  CHECK ("mp43");
+  CHECK ("div3");
+  CHECK ("DIV3");
+  CHECK ("DIV4");
+  CHECK ("div4");
+  CHECK ("COL1");
+
+  return divx3;
+
+#undef CHECK
+}
+uint8_t isVP6Compatible (uint32_t fourcc)
+{
+
+#define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
+						{divx3=1; }
+
+  uint8_t divx3 = 0;
+
+  CHECK ("VP6F");
+  CHECK ("VP6 ");
+  CHECK ("VP61");
+  CHECK ("VP62");
+
+  return divx3;
+
+#undef CHECK
+}
+uint8_t isDVCompatible (uint32_t fourcc)
+{
+#define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
+						{dv=1; }
+
+  uint8_t dv = 0;
+
+  CHECK ("dvsd");
+  CHECK ("DVDS");
+  CHECK ("dvpp");
+
+  return dv;
+
+#undef CHECK
+}
+
 //EOF
