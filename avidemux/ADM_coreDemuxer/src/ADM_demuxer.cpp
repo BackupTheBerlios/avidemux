@@ -114,8 +114,12 @@ WAVHeader *wav;
         if(!wav) return 1;
         *nbStreams=1;
         *infos=new audioInfo[1];
-        WAV2AudioInfo(wav,*infos);
+        (*infos)->bitrate=(wav->byterate*8)/1000;
+        (*infos)->channels=wav->channels;
+        (*infos)->encoding=wav->encoding;
+        (*infos)->frequency=wav->frequency;
         (*infos)->av_sync=0;
+        
         return 1;
 
 }
