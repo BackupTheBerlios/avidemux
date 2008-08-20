@@ -28,7 +28,7 @@ endif(USE_OSS)
 #ADD_SUBDIRECTORY(Jack)
 #endif(USE_JACK)
 
-#if(WIN32)
-#ADD_SUBDIRECTORY(Win32)
-#endif(WIN32)
+if(WIN32)
+ADD_SUBDIRECTORY(Win32)
+endif(WIN32)
 #

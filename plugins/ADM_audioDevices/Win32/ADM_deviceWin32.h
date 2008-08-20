@@ -10,17 +10,21 @@
 //
 //
 
-
-class win32AudioDevice : public audioDevice
+#ifndef ADM_DEVICEWIN32_H
+#endif ADM_DEVICEWIN32_H
+class win32AudioDevice : public audioDeviceThreaded
 {
 protected:
-	uint8_t	_inUse;
+	uint8_t	    _inUse;
+	virtual     bool     localInit(void);
+    virtual     bool     localStop(void);
+    virtual     void     sendData(void); 
+
 public:
+    uint8_t setVolume(int volume);
 	win32AudioDevice(void);
-	virtual uint8_t init(uint32_t channels, uint32_t fq);
-	virtual uint8_t play(uint32_t len, float *data);
-	virtual uint8_t stop(void);
-	virtual uint8_t setVolume(int volume);
+
 };
+#endif
 
 

@@ -11,9 +11,6 @@
 //
 
 #include "ADM_default.h"
-#include "ADM_audiodevice.h"
-
-
 #include  "ADM_audiodevice.h"
 #include  "ADM_audioDeviceInternal.h"
 
@@ -24,7 +21,7 @@
 #define aprintf(...) {}
 
 #define NB_BUCKET 8
-
+ADM_DECLARE_AUDIODEVICE(Win32,win32AudioDevice,1,0,0,"win32 audio device (c) mean/gruntster");
 static uint32_t bucketSize;
 static HWAVEOUT myDevice;
 static MMRESULT myError;
@@ -39,10 +36,10 @@ win32AudioDevice::win32AudioDevice(void)
 	_inUse=0;
 }
 
-uint8_t win32AudioDevice::stop(void) 
+bool win32AudioDevice::localStop(void) 
 {
 	if (!_inUse)
-		return 0;
+		return false;
 
 	printf("[Win32] Closing audio\n");
 
@@ -66,32 +63,32 @@ uint8_t win32AudioDevice::stop(void)
 	_inUse=0;
 	myDevice = NULL;
 
-	return 1;
+	return true;
 }
 
-uint8_t win32AudioDevice::init(uint32_t channels, uint32_t fq) 
+bool win32AudioDevice::localInit(void) 
 {
-	printf("[Win32] Opening Audio, channels=%u freq=%u\n",channels, fq);
+	printf("[Win32] Opening Audio, channels=%u freq=%u\n",_channels, _frequency);
 
 	if (_inUse) 
 	{
 		printf("[Win32] Already running?\n");
-		return 0;
+		return flse;
 	}
 
 	_inUse = 1;
-	_channels = channels;
-	bucketSize = channels * fq;
+	
+	bucketSize = _channels * frequency;
 
 	WAVEFORMATEX wav;
 
 	memset(&wav, 0, sizeof(WAVEFORMATEX));
 
 	wav.wFormatTag = WAVE_FORMAT_PCM;
-	wav.nSamplesPerSec = fq;
-	wav.nChannels = channels;
-	wav.nBlockAlign = 2 * channels;
-	wav.nAvgBytesPerSec = 2 * channels * fq;
+	wav.nSamplesPerSec = _frequency;
+	wav.nChannels = _channels;
+	wav.nBlockAlign = 2 * _channels;
+	wav.nAvgBytesPerSec = 2 * _channels * _frequency;
 	wav.wBitsPerSample = 16;
 
 	myError = waveOutOpen(&myDevice, WAVE_MAPPER, &wav, NULL, NULL, CALLBACK_NULL);
@@ -132,30 +129,26 @@ uint8_t  win32AudioDevice::setVolume(int volume)
 	return 1;
 }
 
-uint8_t win32AudioDevice::play(uint32_t len, float *data)
+void win32AudioDevice::sendData(void)
 {
-	if (len == 0)
-		return 1;
-
-	dither16(data, len, _channels);
-	len *= 2;
 	uint8_t success = 0;
+    len=wrIndex-rdIndex;
 
 	for (uint32_t i = 0; i < NB_BUCKET; i++)
 	{
 		if (waveHdr[i].dwFlags & WHDR_DONE)
 		{
 			waveHdr[i].dwFlags &= ~WHDR_DONE;
-
+            mutex.lock();
 			if (len > bucketSize)
 				waveHdr[i].dwBufferLength = bucketSize;
 			else
 				waveHdr[i].dwBufferLength = len;
 
-			memcpy(waveHdr[i].lpData, data, waveHdr[i].dwBufferLength);
-			data += waveHdr[i].dwBufferLength;
+			memcpy(waveHdr[i].lpData, audioBuffer+rdIndex, waveHdr[i].dwBufferLength);
+			rdIndex += waveHdr[i].dwBufferLength;
 			len -= waveHdr[i].dwBufferLength;
-
+            mutex.unlock();
 			if (waveOutWrite(myDevice, &waveHdr[i], sizeof(WAVEHDR)) == MMSYSERR_NOERROR)
 				success = 1;
 			else
@@ -169,10 +162,10 @@ uint8_t win32AudioDevice::play(uint32_t len, float *data)
 	if (len != 0)
 	{
 		printf("[Win32] No audio buffer available, %u bytes discarded\n", len);
-		return 0;
+		return ;
 	}
 
-	return success;
+	return ;
 }
 
 void handleMM(MMRESULT err)
