@@ -232,7 +232,7 @@ SET(ADM_TAILS
 	ADM_toolkit
 	ADM_codecs
 	ADM_requant
-	ADM_infoExtractor)
+	)
 
 FOREACH(_current ${ADM_TAILS})
 	ADD_SUBDIRECTORY(${_current})

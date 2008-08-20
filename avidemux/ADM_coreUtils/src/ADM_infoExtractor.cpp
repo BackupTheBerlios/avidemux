@@ -11,7 +11,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
 
 #include "ADM_default.h"
 #include "ADM_Video.h"
@@ -19,13 +19,10 @@
 #include "fourcc.h"
 #include "ADM_inputs/ADM_mp4/ADM_mp4.h"
 
-
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_3GP
-#include "ADM_osSupport/ADM_debug.h"
-
+#define aprintf(...) {}
 extern "C"
 {
+#define ADM_NO_CONFIG_H
 #include "common.h"
 #include "bswap.h"
 #define INT_MAX (0x7FFFFFFF)
@@ -33,7 +30,7 @@ extern "C"
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/golomb.h"
 }
 
-#include "ADM_infoExtractor/ADM_h264_tag.h"
+#include "ADM_h264_tag.h"
 
 static void refineH264FrameType(uint8_t *head,uint8_t *tail,uint32_t *flags);
 /*

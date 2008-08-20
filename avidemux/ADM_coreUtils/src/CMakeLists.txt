@@ -4,6 +4,7 @@ ADM_fileio.cpp
 avidemutils.cpp  
 ADM_quota.cpp
 fourcc.cpp
+ADM_infoExtractor.cpp
 prefs.cpp)
 
 ADD_LIBRARY(ADM_coreUtils SHARED ${ADM_coreUtils_SRCS})
