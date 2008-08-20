@@ -14,4 +14,3 @@ ADD_LIBRARY(ADM_dm_opendml SHARED ${ADM_openDML_SRCS})
 
 INIT_DEMUXER(ADM_dm_opendml)
 INSTALL_DEMUXER(ADM_dm_opendml)
-ADD_ADM_LIB_ALL_TARGETS(ADM_dm_opendml ${ADM_openDML_SRCS})
