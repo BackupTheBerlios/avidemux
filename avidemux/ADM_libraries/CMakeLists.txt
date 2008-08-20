@@ -3,7 +3,6 @@ subdirs (PREORDER ADM_libmpeg2enc)
 subdirs (PREORDER ADM_lvemux)
 subdirs (PREORDER ADM_mplex)
 subdirs (PREORDER ADM_smjs)
-subdirs (PREORDER ADM_utilities)
 subdirs (PREORDER ADM_xvidratectl)
 
 if (ADM_DEBUG AND FIND_LEAKS)

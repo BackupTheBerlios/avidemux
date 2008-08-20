@@ -12,25 +12,25 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
 #include "ADM_default.h"
 
-#include "ADM_lavcodec.h"
-//#include "ADM_colorspace/colorspace.h"
-#include "ADM_image.h"
 
+#include "ADM_image.h"
+#if 0
+#include "ADM_lavcodec.h"
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_ffmp43.h"
 #include "ADM_codecs/ADM_png.h"
+#endif
 
 #include "ADM_bitmap.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "DIA_coreToolkit.h"
 //**********************************
-static ADMImage *createImageFromFile_jpeg(const char *filename);
+//static ADMImage *createImageFromFile_jpeg(const char *filename);
 static ADMImage *createImageFromFile_Bmp(const char *filename);
 static ADMImage *createImageFromFile_Bmp2(const char *filename);
-static ADMImage *createImageFromFile_png(const char *filename);
+//static ADMImage *createImageFromFile_png(const char *filename);
 //***********************************
 static uint8_t read8(FILE *fd)
 {
@@ -70,12 +70,14 @@ ADMImage *createImageFromFile(const char *filename)
 		case  ADM_IMAGE_UNKNOWN: 
 					printf("[imageLoader] Trouble identifying /loading %s\n",filename);
 					return NULL;
+#if 0
 		case ADM_IMAGE_JPG:
 					return createImageFromFile_jpeg(filename);
 					break;
 		case ADM_IMAGE_PNG:
 					return createImageFromFile_png(filename);
 					break;
+#endif
 		case ADM_IMAGE_BMP2:
 					return createImageFromFile_Bmp2(filename);
 					break;
@@ -85,6 +87,7 @@ ADMImage *createImageFromFile(const char *filename)
 	}
 	ADM_assert(0);
 }
+#if 0
 /**
  * 	\fn createImageFromFile_jpeg
  *  \brief Create image from jpeg file
@@ -189,6 +192,7 @@ ADMImage *createImageFromFile_jpeg(const char *filename)
 		    delete [] data;
 		    return image;		
 }
+#endif
 /**
  * 	\fn createImageFromFile_jpeg
  *  \brief Create image from Bmp
@@ -297,6 +301,7 @@ ADMImage *createImageFromFile_Bmp2(const char *filename)
     	delete [] data;
     	return image;		
 }
+#if 0
 /**
  * 	\fn createImageFromFile_png
  *  \brief Create image from PNG
@@ -342,6 +347,7 @@ ADMImage *createImageFromFile_png(const char *filename)
     	delete [] data;
     	return image;		
 }
+#endif
 /**
  * 		\fn ADM_identidyImageFile
  * 		\brief Identidy image type, returns type and width/height

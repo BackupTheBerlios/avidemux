@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
-#include "config.h"
+#include "ADM_coreConfig.h"
 
 /* qfopen stands for quota-fopen() */
 FILE *qfopen(const char *, const char *);

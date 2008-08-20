@@ -13,14 +13,9 @@
 
 
 
-
-
-#include "config.h"
-
-#ifdef USE_LIBXML2
 #include <libxml/tree.h>
 #include <libxml/parser.h>
-#endif
+
 #include "ADM_default.h"
 
 #include "ADM_osSupport/ADM_quota.h"
@@ -149,7 +144,7 @@ static opt_def opt_defs [] = {
 int num_opts = 80;
 // </prefs_gen>
 
-#ifdef USE_LIBXML2
+
 /*
 ** we cannot put this into the header file, cause libxml headers
 ** are not reachable in all directories/Makefiles
@@ -234,7 +229,7 @@ void set_content(const char *option, xmlNodePtr x){
 	fprintf(stderr,"Prefs: %s => %s\n",opt_defs[idx].name,opt_defs[idx].current_val);
 	#endif
 }
-#endif
+
 
 #include "prefs.h"
 
@@ -242,9 +237,9 @@ preferences::preferences(){
 	internal_lastfiles[0] = internal_lastfiles[1] = NULL;
 	internal_lastfiles[2] = internal_lastfiles[3] = NULL;
 	internal_lastfiles[4] = NULL;
-	#ifdef USE_LIBXML2
+	
 	xdoc = NULL;
-	#endif
+	
 }
 
 preferences::~preferences(){
@@ -253,19 +248,12 @@ preferences::~preferences(){
 		if( internal_lastfiles[idx] )
 			ADM_dealloc(internal_lastfiles[idx]);
 	}
-	#ifdef USE_LIBXML2
+	
 	if( xdoc )
 		xmlFreeDoc(xdoc);
-	#endif
+	
 }
 
-#ifndef USE_LIBXML2
-int preferences::load(){
-	fprintf(stderr,"preferences::load() not implemented.\n"
-                       "Please compile avidemux with libxml2 support.\n");
-	return RC_FAILED;
-}
-#else
 int preferences::load(){
    xmlNodePtr p;
    char *rcfile;
@@ -361,16 +349,8 @@ int preferences::load(){
 	printf("Preferences found and loaded\n");
 	return RC_OK;
 }
-#endif
 
-#ifndef USE_LIBXML2
-int preferences::save(){
-	// build xml tree and save it
-	fprintf(stderr,"preferences::save() not implemented.\n"
-                       "Please compile avidemux with libxml2 support.\n");
-	return RC_FAILED;
-}
-#else
+
 int preferences::save(){
    xmlNodePtr n;
    char buf[1024];
@@ -475,7 +455,7 @@ int preferences::save_xml_to_file(){
 	return RC_OK;
 #endif
 }
-#endif
+
 /*
 int preferences::get(options option, uint8_t *val){
    unsigned int x;
@@ -894,7 +874,7 @@ int preferences::set_lastfile(const char* file){
 		opt_defs[LASTFILES_FILE1].current_val = ADM_strdup(internal_file);
 	}
 
-#ifdef USE_LIBXML2
+
 	// change the xmlDocument
 	if( ! xdoc ){
 		// no .avidemuxrc file or not loaded yet
@@ -928,7 +908,7 @@ int preferences::set_lastfile(const char* file){
 			(xmlChar*)(opt_defs[LASTFILES_FILE4].current_val?opt_defs[LASTFILES_FILE4].current_val:""));
 		save_xml_to_file();
 	}
-#endif
+
 
 #ifdef DEBUG_PREFS
 	PRT_LAFI("=> LASTFILES_",1,opt_defs[LASTFILES_FILE1].current_val);

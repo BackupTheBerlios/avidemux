@@ -40,7 +40,7 @@
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME  MODULE_COMMANDLINE
 #include "ADM_osSupport/ADM_debug.h"
-#include "ADM_libraries/ADM_utilities/avidemutils.h"
+#include "avidemutils.h"
 
 #include "ADM_filter/vidVCD.h"
 #include "ADM_video/ADM_vidMisc.h"

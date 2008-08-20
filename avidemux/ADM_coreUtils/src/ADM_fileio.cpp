@@ -14,13 +14,6 @@
 * MODIFIED BY GMV 30.1.05: prepared for ODML
 */
 
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ADM_assert.h"
-#include <math.h>
 #include "ADM_default.h"
 #include "ADM_osSupport/ADM_fileio.h"
 #include "ADM_osSupport/ADM_quota.h"

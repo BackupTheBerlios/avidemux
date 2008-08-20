@@ -28,7 +28,7 @@
 #include "prefs.h"
 
 #include "DIA_working.h"
-#include "ADM_libraries/ADM_utilities/avidemutils.h"
+#include "avidemutils.h"
 
 #include "ADM_mp3info.h"
 
