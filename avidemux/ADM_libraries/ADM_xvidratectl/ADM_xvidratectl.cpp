@@ -50,7 +50,7 @@
 #include <math.h>
 #include <limits.h>
 #include "ADM_default.h"
-#include "ADM_osSupport/ADM_quota.h"
+#include "ADM_quota.h"
 #include "ADM_assert.h"
 #include "ADM_xvidr_internal.h"
 #include "ADM_osSupport/ADM_debugID.h"

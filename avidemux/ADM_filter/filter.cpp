@@ -37,7 +37,7 @@
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_PREVIEW
 #include "ADM_osSupport/ADM_debug.h"
-#include "ADM_osSupport/ADM_quota.h"
+#include "ADM_quota.h"
 #include "ADM_preview.h"
 //
 

@@ -5,13 +5,12 @@
 #define ADM_LEGACY_PROGGY
 #include <errno.h>
 
-#include "config.h"
 #include "ADM_default.h"
 #include "ADM_quota.h"
-
+#include "DIA_coreToolkit.h"
 #undef free
 
-extern uint8_t DIA_quota(char *);
+
 struct qfile_t {
         const char *filename;
         unsigned int ignore;
@@ -24,7 +23,6 @@ static qfile_t qfile[qfile_len];
 #include "DIA_coreToolkit.h"
 
          
-#ifdef USE_LIBXML2
 #include <libxml/tree.h>
 int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
 
@@ -60,7 +58,6 @@ uint8_t  quotaInit(void)
             memset(qfile,0,sizeof(qfile));  
             return 1;
 }
-#endif
 
 /* why here?: don't use mean's malloc rewrites for all of the xml2 library */
 #include "ADM_assert.h"
@@ -88,7 +85,7 @@ FILE *qfopen(const char *path, const char *mode){
 						        path,
 							(errno==ENOSPC?"filesystem full":"quota exceeded"),
 							"Please free up some space and press RETRY to try again.")!=-1);
-			DIA_quota(msg);
+			GUI_Error_HIG("Error","msg");
 			/* same behaviour for IGNORE and RETRY */
 			continue;
 		}
@@ -174,7 +171,7 @@ ssize_t qwrite(int fd, const void *buf, size_t numbytes){
 			                                (qfile[fd].filename?qfile[fd].filename:"__unknown__"),
 			                                (errno==ENOSPC?"filesystem full":"quota exceeded"),
 			                                "Please free up some space and press RETRY to try again.")!=-1);
-			rc = DIA_quota(msg);
+			rc = GUI_Alternate(msg,"Ignore","Retry");
 			if( rc == 0 /* ignore */ ){
 				qfile[fd].ignore = 1;
 				return -1;

@@ -25,7 +25,7 @@
 #include <errno.h>
 
 #include "fourcc.h"
-#include "ADM_osSupport/ADM_quota.h"
+#include "ADM_quota.h"
 #include "avi_vars.h"
 
 #include "ADM_assert.h"

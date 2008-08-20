@@ -43,7 +43,7 @@
 #include "avilist.h"
 #include "op_aviwrite.hxx"
 
-#include "ADM_osSupport/ADM_quota.h"
+#include "ADM_quota.h"
 #include "ADM_osSupport/ADM_fileio.h"
 
 // MOD Feb 2005 by GMV

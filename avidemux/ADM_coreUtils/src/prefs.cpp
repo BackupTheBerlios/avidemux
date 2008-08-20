@@ -18,7 +18,7 @@
 
 #include "ADM_default.h"
 
-#include "ADM_osSupport/ADM_quota.h"
+#include "ADM_quota.h"
 #include <unistd.h>	/* access(), R_OK */
 #include <errno.h>	/* errno, ENOENT */
 #include <dirent.h>
