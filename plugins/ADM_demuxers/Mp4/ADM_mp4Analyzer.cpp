@@ -1088,43 +1088,18 @@ int tag,l;
 uint8_t MP4Header::updateCtts(MPsampleinfo *info )
 {
     uint32_t scope=info->nbCtts;
-
-            if(scope>_videostream.dwLength) scope=_videostream.dwLength;
-
-            // Search floor value
-            uint32_t  flor=0xFFFFFFFF;
-            uint32_t  cel=0;
-            for(uint32_t i=0;i<scope;i++)
-            {
-              if(info->Ctts[i]>4294967290)
-              {
-                if(i)
-                  info->Ctts[i]=info->Ctts[0];
-                else
-                  info->Ctts[i]=info->Ctts[1];
-              }
-              if(info->Ctts[i] >cel) cel=info->Ctts[i];
-              if(info->Ctts[i]<flor) flor=info->Ctts[i];
-            }
-            printf("[3GP] Ctts min %u max %u\n",flor,cel);
-            for(uint32_t i=0;i<scope;i++)
-            {
-              int floops=info->Ctts[i]-flor;
-               float f=floops;
-               aprintf("Frame %u ctts %u scale:%u dwRate:%u\n",i,floops,_videoScale,_videostream.dwRate);
-                uint32_t delta;
-                f*=_videostream.dwRate;
-                f/=1000. ;; // in frame
-                f/=_videoScale;
-                floops=1+(uint32_t)floor(f+0.49);
-                aprintf(">Frame :%u delta=%d\n",i,floops);
-              if(floops<0)
-              {
-                printf("[3GPP] CTTS negative for frame %u : %d\n",i,floops);
-                floops=0;
-              }
-              _tracks[0].index[i].deltaPtsDts=floops;
-            } // scope
+    float f;
+    if(scope>_videostream.dwLength) scope=_videostream.dwLength;
+    printf("[MP4]**************** Updating CTTS **********************\n");
+    for(int i=0;i<scope;i++)
+    {
+        f=(int32_t)info->Ctts[i];
+        f/=_videoScale;
+        f*=1000000; // us
+        f+=_tracks[0].index[i].dts;
+        _tracks[0].index[i].pts=(uint64_t)f;
+    }
+          
   return 1;
 }
 //***********************************
@@ -1146,3 +1121,4 @@ MPsampleinfo::~MPsampleinfo()
 }
 
 // EOF
+

@@ -113,6 +113,7 @@ virtual 	uint8_t                 getFrame(uint32_t framenum,ADMCompressedImage *
           AVIStreamHeader           *getVideoStreamHeader(void ) { return &_videostream;}
           MainAVIHeader             *getMainHeader(void ) { return &_mainaviheader;}
           ADM_BITMAPINFOHEADER      *getBIH(void ) { return &_video_bih;}
+                                     /// Returns PTS of frame...
 virtual   uint64_t                   getTime(uint32_t frameNum)=0;
 virtual   uint64_t                   getVideoDuration(void)=0;
 

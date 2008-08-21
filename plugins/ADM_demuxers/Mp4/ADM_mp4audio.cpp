@@ -91,19 +91,19 @@ ADM_mp4AudioAccess::~ADM_mp4AudioAccess()
 bool      ADM_mp4AudioAccess::goToTime(uint64_t timeUs)
 {
 uint64_t target=timeUs;
-		if(target>_index[_nb_chunks-1].time)
+		if(target>_index[_nb_chunks-1].dts)
 		{
-			printf("[MP4]: going out of time asked %lu : avail %lu\n",timeUs/1000,_index[_nb_chunks-1].time/1000);
+			printf("[MP4]: going out of time asked %lu : avail %lu\n",timeUs/1000,_index[_nb_chunks-1].dts/1000);
 			_current_index=_nb_chunks-1;
 			return true;
 		}
 		for(uint32_t i=0;i<_nb_chunks;i++)
 		{
-			if(_index[i].time >= target)
+			if(_index[i].dts >= target)
 			{
 				_current_index=i;
 				printf("[MP4] Go to time succeeded chunk :%lu time ask:%lu time get:%lu\n",i,timeUs/1000,
-						_index[i].time/1000);
+						_index[i].dts/1000);
 				return true;
 			}
 		
@@ -131,7 +131,7 @@ double delta;
         printf("[MP4 Audio] Cannot read \n"); 
         return false;
       }
-      *dts=_index[_current_index].time;
+      *dts=_index[_current_index].dts;
       *size=r;
 	  _current_index++;
 	  return true;
@@ -142,7 +142,7 @@ double delta;
 
 uint64_t  ADM_mp4AudioAccess::getDurationInUs(void)
 {
-    return _index[_nb_chunks-1].time;
+    return _index[_nb_chunks-1].dts;
 
 }
 //EOF

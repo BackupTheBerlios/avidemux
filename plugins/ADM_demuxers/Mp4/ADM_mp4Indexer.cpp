@@ -106,7 +106,8 @@ uint32_t i,j,cur;
                         sz=sz*info->SzIndentical;
                         /* */
                         track->index[i].size=sz;
-                        track->index[i].time=0; // No seek
+                        track->index[i].dts=0; // No seek
+                        track->index[i].pts=ADM_COMPRESSED_NO_PTS; // No seek
                         if(sz>MAX_CHUNK_SIZE)
                         {
                             max+=sz/MAX_CHUNK_SIZE;
@@ -134,7 +135,8 @@ uint32_t i,j,cur;
                         sz*=PACK_SIZE;
                         /* */
                         track->index[i].size=sz;
-                        track->index[i].time=0; // No seek
+                        track->index[i].dts=0; // No seek
+                        track->index[i].pts=ADM_COMPRESSED_NO_PTS; // No seek
                         if(sz>MAX_CHUNK_SIZE)
                         {
                             max+=sz/MAX_CHUNK_SIZE;
@@ -155,7 +157,8 @@ uint32_t i,j,cur;
                 sampleDuration/=trackScale;    // Duration of one sample
                 for(i=0;i<info->nbCo;i++)
                 {
-                        track->index[i].time=(uint64_t)floor(totalDuration);
+                        track->index[i].dts=(uint64_t)floor(totalDuration);
+                        track->index[i].pts=ADM_COMPRESSED_NO_PTS; // No seek
                         totalDuration+=sampleDuration*samplePerChunk[i];
                         adm_printf(ADM_PRINT_VERY_VERBOSE,"Audio chunk : %lu time :%lu\n",i,track->index[i].time);
                 }
@@ -190,7 +193,8 @@ uint32_t i,j,cur;
                           {
                                 newindex[w].offset=track->index[i].offset+part*one_go;
                                 newindex[w].size=one_go;
-                                newindex[w].time=track->index[i].time+part*time_increment; 
+                                newindex[w].dts=track->index[i].dts+part*time_increment; 
+                                newindex[w].pts=ADM_COMPRESSED_NO_PTS; // No seek
                                 ADM_assert(w<newNbCo);
                                 w++;
                                 part++;
@@ -199,7 +203,8 @@ uint32_t i,j,cur;
                           // The last one...
                                 newindex[w].offset=track->index[i].offset+part*one_go;
                                 newindex[w].size=sz;
-                                newindex[w].time=track->index[i].time+part*time_increment+((time_increment*sz)/one_go); 
+                                newindex[w].dts=track->index[i].dts+part*time_increment+((time_increment*sz)/one_go); 
+                                newindex[w].pts=ADM_COMPRESSED_NO_PTS;
                                 w++;
                     }
                     delete [] track->index;
@@ -305,7 +310,8 @@ uint32_t i,j,cur;
 			{
 				for(uint32_t j=0;j<info->SttsN[i];j++)
 				{
-                                        track->index[start].time=(uint64_t)info->SttsC[i];
+                    track->index[start].dts=(uint64_t)info->SttsC[i];
+                    track->index[start].pts=ADM_COMPRESSED_NO_PTS;
 					start++;
 					ADM_assert(start<=nbChunk);
 				}	
@@ -315,7 +321,10 @@ uint32_t i,j,cur;
 		{
 			// All same duration
 			for(uint32_t i=0;i<nbChunk;i++)
-                                track->index[i].time=(uint64_t)info->SttsC[0]; // this is not an error!
+            {
+                track->index[i].dts=(uint64_t)info->SttsC[0]; // this is not an error!
+                track->index[i].pts=ADM_COMPRESSED_NO_PTS;
+            }
 		
 		}
 		// now collapse
@@ -325,11 +334,12 @@ uint32_t i,j,cur;
 		
 		for(uint32_t i=0;i<nbChunk;i++)
 		{
-                        thisone=track->index[i].time;
+            thisone=track->index[i].dts;
 			ftot=total;
 			ftot*=1000.*1000.;
 			ftot/=trackScale;
-                        track->index[i].time=(uint64_t)floor(ftot);
+            track->index[i].dts=(uint64_t)floor(ftot);
+            track->index[i].pts=ADM_COMPRESSED_NO_PTS;
 			total+=thisone;
                         adm_printf(ADM_PRINT_VERY_VERBOSE,"Audio chunk : %lu time :%lu\n",i,track->index[i].time);
 		}

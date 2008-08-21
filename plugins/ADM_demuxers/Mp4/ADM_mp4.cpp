@@ -115,7 +115,10 @@ uint32_t MP4Header::getFlags(uint32_t frame,uint32_t *flags)
 */
 uint64_t                   MP4Header::getTime(uint32_t frameNum)
 {
-    return VDEO.index[frameNum].time;
+    ADM_assert(frameNum<VDEO.nbIndex);
+    // Assume if not PTS, PTS=DTS (non mpeg4/non h264 streams)
+    if(VDEO.index[frameNum].pts==ADM_COMPRESSED_NO_PTS) return VDEO.index[frameNum].dts;
+    return VDEO.index[frameNum].pts;
 }
 /**
     \fn getVideoDuration
@@ -132,14 +135,22 @@ uint8_t  MP4Header::getFrame(uint32_t framenum,ADMCompressedImage *img)
     {
       return 0; 
     }
-    uint64_t offset=VDEO.index[framenum].offset; //+_mdatOffset;
+
+MP4Index *idx=&(VDEO.index[framenum]);
+
+    uint64_t offset=idx->offset; //+_mdatOffset;
 
 
     fseeko(_fd,offset,SEEK_SET);
-    fread(img->data, VDEO.index[framenum].size, 1, _fd);
-    img->dataLength=VDEO.index[framenum].size;
-	img->flags = VDEO.index[framenum].intra;
+    fread(img->data, idx->size, 1, _fd);
+    img->dataLength=idx->size;
+	img->flags = idx->intra;
 
+    img->demuxerDts=idx->dts;
+    img->demuxerPts=idx->pts;
+    if(img->demuxerPts==ADM_COMPRESSED_NO_PTS)
+        img->demuxerPts=img->demuxerDts;
+    
     return 1;
 }
 MP4Header::~MP4Header()

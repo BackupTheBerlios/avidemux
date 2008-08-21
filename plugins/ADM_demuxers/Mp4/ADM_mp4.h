@@ -60,8 +60,8 @@ typedef struct MP4Index
 	uint64_t offset; // Offset in file to get frame
 	uint64_t size;   // Size of frame in bytes
 	uint32_t intra;  // Flags associated with frame
-	uint64_t time;   // Decoder time in ms
-        uint32_t deltaPtsDts; // Delta in frame between pts & dts
+	uint64_t pts;   // Decoder time in ms
+    uint64_t dts; // Delta in frame between pts & dts
 
 }MP4Index;
 class MP4Track

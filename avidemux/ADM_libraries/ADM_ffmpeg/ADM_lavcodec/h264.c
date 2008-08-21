@@ -7739,6 +7739,9 @@ static int decode_frame(AVCodecContext *avctx,
         av_log(avctx, AV_LOG_ERROR, "no frame!\n");
         return -1;
     }
+        /* MEANX NOT SURE*/
+        s->current_picture_ptr->opaque=pict->opaque;
+        /* /MEANX NOT SURE*/
 
     if(!(s->flags2 & CODEC_FLAG2_CHUNKS) || (s->mb_y >= s->mb_height && s->mb_height)){
         Picture *out = s->current_picture_ptr;
@@ -7747,9 +7750,6 @@ static int decode_frame(AVCodecContext *avctx,
         int i, pics, cross_idr, out_of_order, out_idx;
 
         s->mb_y= 0;
-        /* MEANX */
-        s->current_picture_ptr->opaque=pict->opaque;
-        /* /MEANX */
         s->current_picture_ptr->qscale_type= FF_QSCALE_TYPE_H264;
         s->current_picture_ptr->pict_type= s->pict_type;
 
