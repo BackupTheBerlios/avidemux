@@ -23,8 +23,8 @@
 #include "avifmt2.h"
 
 #include "ADM_Video.h"
-#include "ADM_audio/aviaudio.hxx"
-#include "ADM_inputs/ADM_mp4/ADM_atom.h"
+//#include "ADM_audio/aviaudio.hxx"
+#include "ADM_atom.h"
 
 
 class MPsampleinfo
@@ -77,38 +77,40 @@ public:
                 MP4Track(void);
                 ~MP4Track();
 };
-#if 0
-//
-//	Audio track
-//
-class MP4Audio : public AVDMGenericAudioStream
+
+
+class ADM_mp4AudioAccess : public ADM_audioAccess
 {
 protected:
-
-           	uint32_t 					_nb_chunks;
+                uint32_t 					_nb_chunks;
               	uint32_t 					_current_index;
-	    	MP4Index 					*_index;
-		FILE						*_fd;
-		uint32_t					_extraLen;
-		uint8_t						*_extraData;
-		uint64_t                                         _audioDuration;
-		
-		
+                MP4Index 					*_index;
+                FILE						*_fd; 
 public:
-					MP4Audio(const char *name,MP4Track *trak);
-// MP4Index *idx,
-// 						uint32_t nbchunk, FILE * fd,WAVHeader *incoming,
-// 						uint32_t extraLen,uint8_t *extraData,uint32_t duration);
-	virtual				~MP4Audio();
-        virtual uint32_t 		read(uint32_t len,uint8_t *buffer);
-        virtual uint8_t  		goTo(uint32_t newoffset);
-		   uint8_t			getNbChunk(uint32_t *ch);
-	virtual uint8_t 		getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
-	virtual uint8_t 		goToTime(uint32_t mstime);
-	virtual uint8_t			extraData(uint32_t *l,uint8_t **d);
-
+                                  ADM_mp4AudioAccess(const char *name,MP4Track *trak) ;
+                virtual           ~ADM_mp4AudioAccess();
+                                    /// Hint, the stream is pure CBR (AC3,MP2,MP3)
+                virtual bool      isCBR(void) { return false;}
+                                    /// Return true if the demuxer can seek in time
+                virtual bool      canSeekTime(void) {return true;};
+                                    /// Return true if the demuxer can seek by offser
+                virtual bool      canSeekOffset(void) {return false;};
+                                    /// Return true if we can have the audio duration
+                virtual bool      canGetDuration(void) {return true;};
+                                    /// Returns audio duration in us
+                virtual uint64_t  getDurationInUs(void);
+                                    /// Returns length in bytes of the audio stream
+                virtual uint32_t  getLength(void){return 0;}
+                                    /// Set position in bytes
+                virtual bool      setPos(uint64_t pos){ADM_assert(0); return 0;};
+                                    /// Get position in bytes
+                virtual uint64_t  getPos(){ADM_assert(0); return 0;};
+                                    /// Go to a given time
+                virtual bool      goToTime(uint64_t timeUs);
+                virtual bool    getPacket(uint8_t *buffer, uint32_t *size, uint32_t maxSize,uint64_t *dts);
 };
-#endif
+
+
 #define _3GP_MAX_TRACKS 8
 #define VDEO _tracks[0]
 #define ADIO _tracks[nbAudioTrack+1]._rdWav
@@ -128,7 +130,7 @@ protected:
           uint32_t                      _videoScale;
           int64_t						_movieDuration; // in ms
           uint32_t                      _videoFound;
-          uint8_t	                indexify(
+          uint8_t	                     indexify(
                                                 MP4Track *track,   
                                                 uint32_t trackScale,
                                               MPsampleinfo *info,
@@ -141,14 +143,13 @@ protected:
         int64_t                      _audioDuration;
         uint32_t                      _currentAudioTrack;
         uint8_t                       parseAtomTree(adm_atom *atom);
-//        MP4Audio                      *_audioTracks[_3GP_MAX_TRACKS-1];
+        ADM_mp4AudioAccess            *audioAccess[_3GP_MAX_TRACKS-1];
+        ADM_audioStream               *audioStream[_3GP_MAX_TRACKS-1];
         uint32_t                      nbAudioTrack;
          /*********************************/
 	uint32_t                         readPackedLen(adm_atom *tom );
 	
 public:
-          uint8_t               hasPtsDts(void) {return 1;} // Return 1 if the container gives PTS & DTS info
-          uint32_t              ptsDtsDelta(uint32_t framenum);
 virtual   void 	                Dump(void) {};
 
                                 MP4Header( void ) ;
@@ -165,7 +166,7 @@ virtual   uint8_t                       getExtraHeaderData(uint32_t *len, uint8_
   //__________________________
 
 virtual 	WAVHeader 	*getAudioInfo(void ); 
-//virtual 	uint8_t		getAudioStream(AVDMGenericAudioStream **audio);
+virtual 	uint8_t		getAudioStream(ADM_audioStream **audio);
 
 // Frames
   //__________________________
@@ -174,14 +175,14 @@ virtual 	WAVHeader 	*getAudioInfo(void );
 
 virtual 	uint8_t  setFlag(uint32_t frame,uint32_t flags);
 virtual 	uint32_t getFlags(uint32_t frame,uint32_t *flags);
-virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img);
- virtual     uint8_t getFrameSize (uint32_t frame, uint32_t * size);
+virtual 	uint8_t  getFrame(uint32_t framenum,ADMCompressedImage *img);
+virtual     uint8_t getFrameSize (uint32_t frame, uint32_t * size);
 // Multi track
 uint8_t        changeAudioStream(uint32_t newstream);
-uint32_t     getCurrentAudioStreamNumber(void);
-uint8_t     getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos);
-uint8_t      isReordered( void );
-uint8_t      reorder( void );
+uint32_t       getCurrentAudioStreamNumber(void);
+uint8_t        getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos);
+virtual   uint64_t                   getTime(uint32_t frameNum);
+virtual   uint64_t                   getVideoDuration(void);
 
 };
 

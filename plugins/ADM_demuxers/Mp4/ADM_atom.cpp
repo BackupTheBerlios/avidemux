@@ -17,19 +17,17 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
 
 #include <string.h>
 #include <math.h>
 
 #include "ADM_default.h"
-#include "ADM_editor/ADM_Video.h"
+#include "ADM_Video.h"
 
 #include "fourcc.h"
 #include "ADM_atom.h"
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_3GP
-#include "ADM_osSupport/ADM_debug.h"
+#define aprintf(...) {}
 
 adm_atom::adm_atom(adm_atom *atom)
 {

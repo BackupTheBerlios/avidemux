@@ -34,7 +34,7 @@ extern "C" {
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME  MODULE_CODEC
 #include "ADM_osSupport/ADM_debug.h"
-#include "ADM_video/ADM_videoInfoExtractor.h"
+#include "ADM_videoInfoExtractor.h"
 
 extern int ADM_cpu_num_processors(void);
 

@@ -13,25 +13,24 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
 
 #include <math.h>
 
 #include "ADM_default.h"
-#include "ADM_editor/ADM_Video.h"
+#include "ADM_Video.h"
 
 #include "fourcc.h"
 #include "ADM_mp4.h"
 #include "DIA_coreToolkit.h"
-#include "ADM_codecs/ADM_codec.h"
+//#include "ADM_codecs/ADM_codec.h"
 
 #include "ADM_mp4Tree.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_3GP
-#include "ADM_osSupport/ADM_debug.h"
+#define adm_printf(...) {}
+#define aprintf(...) {}
 
-
+#define QT_TR_NOOP(x) x
 #define TRACK_OTHER 0
 #define TRACK_AUDIO 1
 #define TRACK_VIDEO 2
@@ -46,7 +45,7 @@ typedef enum
 	Tag_DecSpecificInfo 	=0x05
 }MP4_Tag;
 
-extern char* ms2timedisplay(uint32_t ms);
+//extern char* ms2timedisplay(uint32_t ms);
 
 /**
       \fn    LookupMainAtoms
@@ -128,7 +127,7 @@ void MP4Header::parseMvhd(void *ztom)
 	else
 		_videoScale = 1000;
 
-	printf("Movie duration: %s\n", ms2timedisplay(duration));
+	//printf("Movie duration: %s\n", ms2timedisplay(duration));
 
 	_movieDuration = duration;
 }
@@ -246,7 +245,7 @@ uint8_t MP4Header::parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t
 		   duration = (duration * 1000.) / trackScale;
 		   adm_printf(ADM_PRINT_DEBUG, "MDHD, duration in mdhd: %u (scaled ms)\n", duration);
 		   trackDuration = duration;
-		   printf("MDHD, Track duration: %s, trackScale: %u\n", ms2timedisplay((1000 * duration) / trackScale), trackScale);
+//		   printf("MDHD, Track duration: %s, trackScale: %u\n", ms2timedisplay((1000 * duration) / trackScale), trackScale);
 
 		   break;
        }

@@ -14,21 +14,22 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
 
 #include <string.h>
 
 #include <math.h>
 
-#include "ADM_assert.h"
 #include "ADM_default.h"
 #include "fourcc.h"
 #include "ADM_atom.h"
 #include "ADM_mp4Tree.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_3GP
-#include "ADM_osSupport/ADM_debug.h"
+
+#define aprintf(...) {}
+#define adm_printf(...) {}
+
+#define QT_TR_NOOP(x) x
 
 typedef struct ADMAtomDesc
 {

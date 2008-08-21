@@ -52,24 +52,22 @@ version 2 media descriptor :
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
 
 #include <string.h>
 #include <math.h>
 
 #include "ADM_default.h"
-#include "ADM_editor/ADM_Video.h"
+#include "ADM_Video.h"
 
 #include "fourcc.h"
 #include "ADM_mp4.h"
 
-#include "ADM_codecs/ADM_codec.h"
+//#include "ADM_codecs/ADM_codec.h"
 
-#include "ADM_video/ADM_videoInfoExtractor.h"
+#include "ADM_videoInfoExtractor.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_3GP
-#include "ADM_osSupport/ADM_debug.h"
+#define aprintf(...) {}
 
 //#define MP4_VERBOSE
 #define MAX_CHUNK_SIZE (3*1024)
@@ -112,9 +110,23 @@ uint32_t MP4Header::getFlags(uint32_t frame,uint32_t *flags)
   
         return 1;
 }
+/**
+    \fn getTime
+*/
+uint64_t                   MP4Header::getTime(uint32_t frameNum)
+{
+    return VDEO.index[frameNum].time;
+}
+/**
+    \fn getVideoDuration
+*/
+uint64_t                   MP4Header::getVideoDuration(void)
+{
+    return _movieDuration*1000LL; //VDEO.index[VDEO.nbIndex-1].time;
 
+}
 
-uint8_t  MP4Header::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
+uint8_t  MP4Header::getFrame(uint32_t framenum,ADMCompressedImage *img)
 {
     if(framenum>=VDEO.nbIndex)
     {
@@ -157,11 +169,11 @@ MP4Header::MP4Header(void)
         _videoScale=1;
         _videoFound=0;
 }
-uint8_t	MP4Header::getAudioStream(AVDMGenericAudioStream **audio)
+uint8_t	MP4Header::getAudioStream(ADM_audioStream **audio)
 {  
     if(nbAudioTrack) 
     {
-        *audio=_audioTracks[_currentAudioTrack];
+        *audio=audioStream[_currentAudioTrack];
     }  else 
         *audio=NULL;
     return 1;
@@ -171,7 +183,7 @@ WAVHeader 	*MP4Header::getAudioInfo(void )
 	if(!nbAudioTrack)
 		return NULL; 
        
-        return _audioTracks[_currentAudioTrack]->getInfo();
+        return audioStream[_currentAudioTrack]->getInfo();
 } ;
 uint8_t   MP4Header::getExtraHeaderData(uint32_t *len, uint8_t **data)
 {
@@ -302,7 +314,7 @@ uint8_t    MP4Header::open(const char *name)
                         bfer=new uint8_t[sz];
                         ADMCompressedImage img;
                         img.data=bfer;
-                        if(getFrameNoAlloc(0,&img))
+                        if(getFrame(0,&img))
                         {
                         if(extractH263Info(bfer,sz,&w,&h))
                         {
@@ -326,8 +338,8 @@ uint8_t    MP4Header::open(const char *name)
         if(nbAudioTrack) _isaudiopresent=1; // Still needed ?
         for(int audio=0;audio<nbAudioTrack;audio++)
         {
-            _audioTracks[audio]=new MP4Audio(name,&(_tracks[1+audio]));   
-            
+            audioAccess[audio]=new ADM_mp4AudioAccess(name,&(_tracks[1+audio]));
+            audioStream[audio]=ADM_audioCreateStream(&(_tracks[1+audio]._rdWav), audioAccess[audio]);  
         }
         fseeko(_fd,0,SEEK_SET);
         printf("3gp/mov file successfully read..\n");
@@ -351,11 +363,7 @@ uint32_t MP4Header::readPackedLen(adm_atom *tom )
 	}while(b&0x80);
 	return len;
 }
-uint32_t              MP4Header::ptsDtsDelta(uint32_t frame)
-{
-   if(frame >= _videostream.dwLength) return 0;
-   return VDEO.index[frame].deltaPtsDts;
-}
+
 uint8_t MP4Header::getFrameSize (uint32_t frame, uint32_t * size){
   if(frame >= _videostream.dwLength) return 0;
   *size = VDEO.index[frame].size;
@@ -385,31 +393,5 @@ uint32_t     MP4Header::getCurrentAudioStreamNumber(void)
              //   (*infos)[i]=_tracks[i+1]._rdWav.encoding;
         }
         return 1;
-}
-uint8_t                 MP4Header::isReordered( void )
-{ 
-        return _reordered;
-}
-/***************************************/
-uint8_t MP4Header::reorder( void )
-{
-
-        if( _reordered) return 1;
-        printf("Reordering...\n");
-#define INDEX_TMPL        MP4Index
-#define INDEX_ARRAY_TMPL  (VDEO.index)
-#define FRAMETYPE_TMPL    intra
-  
-#include "ADM_video/ADM_reorderTemplate.cpp"
-
-#undef INDEX_TMPL       
-#undef INDEX_ARRAY_TMPL 
-#undef FRAMETYPE_TMPL   
-        VDEO.nbIndex= _mainaviheader.dwTotalFrames;
-        // last frame cannot be B frame
-        index[last].intra&=~AVI_B_FRAME;
-          _reordered=ret;
-        return ret;
-
 }
 //EOF 

@@ -13,21 +13,22 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
+
 
 #include <string.h>
 #include <math.h>
 
 #include "ADM_default.h"
-#include "ADM_editor/ADM_Video.h"
+#include "ADM_Video.h"
 
 #include "fourcc.h"
 #include "ADM_mp4.h"
 #include "DIA_coreToolkit.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_3GP
-#include "ADM_osSupport/ADM_debug.h"
+#define aprintf(...) {}
+#define adm_printf(...) {}
+
+#define QT_TR_NOOP(x) x
 
 uint32_t sample2byte(WAVHeader *hdr,uint32_t sample);
 
