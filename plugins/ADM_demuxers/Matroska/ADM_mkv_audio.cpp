@@ -171,12 +171,14 @@ bool    mkvAccess::getPacket(uint8_t *dest, uint32_t *packlen, uint32_t maxSize,
     mkvIndex *dex=_track->_index;
     uint64_t size=dex[_currentBlock].size-3;
     uint64_t time=dex[_currentBlock].Dts;
+    if(!time && _currentBlock) time=ADM_AUDIO_NO_DTS;
+    vprintf("[MKV] Time :%lu block:%u\n",time,_currentBlock);
     // Read headers & flags
      int16_t dummyTime=_parser->readSignedInt(2);
      //if(!track) printf("TC: %d\n",timecode);
      uint8_t flags=_parser->readu8();
      int     lacing=((flags>>1)&3);   
-        
+        vprintf("[MKV] Lacing : %u\n",lacing);
      switch(lacing)
             {
               case 0 : // no lacing
@@ -241,47 +243,45 @@ bool    mkvAccess::getPacket(uint8_t *dest, uint32_t *packlen, uint32_t maxSize,
 
               case 3: // Ebml lacing
                 {
-#if 0
-                        int nbLaces=_clusterParser->readu8()+1;
-                        int32_t curSize=_clusterParser->readEBMCode();
+                        uint64_t head=_parser->tell();
+                        int nbLaces=_parser->readu8()+1;
+                        int32_t curSize=_parser->readEBMCode();
                         int32_t delta;
+                        uint32_t sum;
+                        
 
                         vprintf("Ebml nbLaces :%u lacesize(0):%u\n",nbLaces,curSize);
 
                         _Laces[0]=curSize;
+                        sum=curSize;
                         ADM_assert(nbLaces<MKV_MAX_LACES);
                         for(int i=1;i<nbLaces-1;i++)
                         {
-                          delta=_clusterParser->readEBMCode_Signed();
+                          delta=_parser->readEBMCode_Signed();
                           vprintf("Ebml delta :%d lacesize[%d]->:%d\n",delta,i,curSize+delta);
                           curSize+=delta;
                           ADM_assert(curSize>0);
                           _Laces[i]=curSize;
+                          sum+=curSize;
 
                         }
-                        int64_t d=_clusterParser->tell();
-
-                        d=tail-d;
-                        /* We have the remaining size after laces, substract the already known lace size */
-                        for(int i=0;i<nbLaces-1;i++)
-                        {
-                          d-=_Laces[i];
-                        }
-                        // What is left is the sift of the last lace
-                        if(d>0)
-                          _Laces[nbLaces-1]=(uint32_t)d;
-                        else
-                        {
-                          printf("[MKVAUDIO] OOps overflow on ebml\n");
-                          nbLaces--;
-                        }
-                        _currentLace=0;
+                        uint64_t tail=_parser->tell();
+                        uint64_t consumed=head+size-tail;
+                    
+                        _Laces[nbLaces-1]=consumed-sum;
                         _maxLace=nbLaces;
-                        return getPacket(dest, packlen,maxSize, timecode);
-#endif
-                      }
+                        
 
-
+                      // Take the 1st laces, it has timestamp
+                      _parser->readBin(dest,_Laces[0]);
+                      *packlen= _Laces[0];
+                      ADM_assert(*packlen<maxSize);
+                      vprintf("Continuing lacing : dts : %lu %u bytes, lacing %u/%u\n",time,*packlen,_currentLace,_maxLace);
+                      *timecode=time;
+                      _currentBlock++;
+                      _currentLace=1;
+                      return 1;
+                }
                       break;
               default:
                     printf("Unsupported lacing %u\n",lacing);

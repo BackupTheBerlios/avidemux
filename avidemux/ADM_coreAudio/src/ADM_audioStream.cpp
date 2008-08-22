@@ -71,12 +71,19 @@ uint64_t dts=0;
     if(!access->getPacket(buffer,size,sizeMax,&dts)) return 0;
     // We got the packet
     // Try to guess the nbSample
-    if(lastDts==ADM_AUDIO_NO_DTS)
+    if(dts==ADM_AUDIO_NO_DTS)
     {
-        *nbSample=512;
-        printf("[audioStream] Cant guess nb sample, setting 512\n");
+        if(wavHeader.encoding==WAV_AAC) 
+            *nbSample=1024;
+        else        
+        {
+            *nbSample=512;
+            printf("[audioStream] Cant guess nb sample, setting 512\n");
+        }
+        *odts=ADM_AUDIO_NO_DTS;
         return 1;
     }
+    //printf("[ADM_audioStream::get Packet : Size %u dts:%lu\n",size,dts);
     float f=dts-lastDts;
     f*=wavHeader.frequency;
     f/=1000;
@@ -84,6 +91,7 @@ uint64_t dts=0;
     setDts(dts);
     *nbSample=(uint32_t)(f+0.5);
     *odts=dts;
+    return 1;
 }
 /**
         \fn getExtraData

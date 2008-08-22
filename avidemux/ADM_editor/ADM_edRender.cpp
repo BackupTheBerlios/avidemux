@@ -22,7 +22,7 @@
 #include "ADM_default.h"
 #include "ADM_editor/ADM_edit.hxx"
 
-#define aprintf printf
+#define aprintf(...) {}// printf
 #include "ADM_pp.h"
 
 // FIXME BADLY !!!
@@ -96,7 +96,7 @@ bool ADM_Composer::DecodePictureUpToIntra(uint32_t frame,uint32_t ref)
     img.data=compBuffer;
     img.cleanup(frame);
     
-    printf("[EditorRender] DecodeUpToInta %u ref:%u\n",frame,ref);
+    aprintf("[EditorRender] DecodeUpToInta %u ref:%u\n",frame,ref);
 	_VIDEOS *vid=&_videos[ref];
     vidHeader *demuxer=vid->_aviheader;
 	cache=_videos[ref]._videoCache;
@@ -118,7 +118,7 @@ bool ADM_Composer::DecodePictureUpToIntra(uint32_t frame,uint32_t ref)
         // Last frame ? if so repeat
         if(vid->lastSentFrame>=nbFrames-1) vid->lastSentFrame=nbFrames-1;
         // Fetch frame
-         printf("[Editor] Decoding I frame %u\n",vid->lastSentFrame);
+         aprintf("[Editor] Decoding I frame %u\n",vid->lastSentFrame);
          if (!demuxer->getFrame (vid->lastSentFrame,&img))
          {
                 printf("[DecodePictureUpToIntra] getFrame failed for frame %lu\n",vid->lastSentFrame);
@@ -260,9 +260,9 @@ uint8_t ret = 0;
     vid->lastSentFrame++;
     
     uint32_t frame=vid->lastSentFrame;
-    printf("[EditorRender] DecodeNext %u ref:%u\n",frame,ref);
+    aprintf("[EditorRender] DecodeNext %u ref:%u\n",frame,ref);
     // Fetch frame
-     printf("[Editor] Decoding frame %u\n",frame);
+     aprintf("[Editor] Decoding frame %u\n",frame);
      if (!demuxer->getFrame (frame,&img))
      {
             printf("[DecodePictureUpToIntra] getFrame failed for frame %lu\n",vid->lastSentFrame);

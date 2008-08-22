@@ -15,6 +15,8 @@
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_EDITOR
 #include "ADM_osSupport/ADM_debug.h"
+
+#define aprintf(...) {}
 /**
     \fn EditorCache
     \brief Constructor
