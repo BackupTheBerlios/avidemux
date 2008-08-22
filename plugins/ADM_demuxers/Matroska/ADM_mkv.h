@@ -23,8 +23,8 @@
 #define ADM_MKV_H
 
 #include "ADM_Video.h"
-#include "ADM_audio/aviaudio.hxx"
-#include "ADM_inputs/ADM_matroska/ADM_ebml.h"
+#include "ADM_audioStream.h"
+#include "ADM_ebml.h"
 
 /**
     \struct mkvIndex
@@ -167,7 +167,7 @@ class mkvHeader         :public vidHeader
 
 virtual 	WAVHeader              *getAudioInfo(void );
 virtual 	uint8_t                 getAudioStream(ADM_audioStream  **audio);
-//virtual     uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **info);
+
 
 // Frames
   //__________________________
@@ -176,11 +176,14 @@ virtual 	uint8_t                 getAudioStream(ADM_audioStream  **audio);
 
     virtual uint8_t  setFlag(uint32_t frame,uint32_t flags);
     virtual uint32_t getFlags(uint32_t frame,uint32_t *flags);
-    virtual uint8_t  getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img);
+    virtual uint8_t  getFrameSize(uint32_t frame,uint32_t *size);
+    virtual uint8_t  getFrame(uint32_t framenum,ADMCompressedImage *img);
+    virtual uint64_t getTime(uint32_t frameNum);
 
-            uint8_t  getExtraHeaderData(uint32_t *len, uint8_t **data);
-            uint8_t  isReordered( void );
-            uint8_t  reorder( void );
+    virtual uint64_t getVideoDuration(void);
+    virtual	uint8_t	 getExtraHeaderData(uint32_t *len, uint8_t **data);
+
+
 
 };
 #endif

@@ -348,11 +348,38 @@ uint32_t mkvHeader::getFlags(uint32_t frame,uint32_t *flags)
   return 1;
 }
 /**
+    \fn getTime
+*/
+uint64_t mkvHeader::getTime(uint32_t frame)
+{
+ if(frame>=_tracks[0]._nbIndex) return ADM_COMPRESSED_NO_PTS;
+  return _tracks[0]._index[frame].Pts;
+}
+/**
+    \fn getVideoDuration
+
+*/
+uint64_t mkvHeader::getVideoDuration(void)
+{
+    return _tracks[0]._index[_tracks[0]._nbIndex-1].Pts;
+}
+
+/**
+    \fn getFrameSize
+*/
+uint8_t                 mkvHeader::getFrameSize(uint32_t frame,uint32_t *size)
+{
+    if(frame>=_tracks[0]._nbIndex) return 0;
+    *size=_tracks[0]._index[frame].size;
+    return 1;
+}
+
+/**
   \fn getFrameNoAlloc
    \brief Read a video frames, return size & flags
 */
 
-uint8_t  mkvHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
+uint8_t  mkvHeader::getFrame(uint32_t framenum,ADMCompressedImage *img)
 {
   ADM_assert(_parser);
   if(framenum>=_tracks[0]._nbIndex) return 0;
@@ -367,7 +394,8 @@ uint8_t  mkvHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
   img->dataLength=dx->size-3;
 
   img->flags=dx->flags;
-
+  img->demuxerDts=dx->Dts;
+  img->demuxerPts=dx->Pts;
   if(!framenum) img->flags=AVI_KEY_FRAME;
 
 
@@ -383,31 +411,7 @@ uint8_t  mkvHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
                 *data=_tracks[0].extraData;
                 return 1;
 }
-/*
-    __________________________________________________________
-*/
-uint8_t			mkvHeader::isReordered( void )
-{
- 	return _reordered;
-}
-/*
-    __________________________________________________________
-*/
-uint8_t mkvHeader::reorder( void )
-{
 
-#define INDEX_TMPL        mkvIndex
-#define INDEX_ARRAY_TMPL  (_tracks[0]._index)
-#define FRAMETYPE_TMPL    flags
-
-#include "ADM_video/ADM_reorderTemplate.cpp"
-
-#undef INDEX_TMPL
-#undef INDEX_ARRAY_TMPL
-#undef FRAMETYPE_TMPL
-     _tracks[0]._nbIndex=_videostream.dwLength;
-         return 1;
-}
 /*
     __________________________________________________________
 */

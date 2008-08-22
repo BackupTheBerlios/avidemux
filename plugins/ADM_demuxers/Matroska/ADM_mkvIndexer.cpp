@@ -21,8 +21,7 @@
 #include "ADM_mkv.h"
 
 #include "mkv_tags.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_idx_pg.h"
-#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
+#include "DIA_working.h"
 #define VIDEO _tracks[0]
 /**
     \fn videoIndexer
