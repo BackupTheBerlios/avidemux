@@ -166,6 +166,7 @@ bool    mkvAccess::getPacket(uint8_t *dest, uint32_t *packlen, uint32_t maxSize,
       _currentLace++;
       return true;
     }
+    if(_currentBlock>=_track->_nbIndex) return false;
     // Else we start a new lace (or no lacing at all)
     goToBlock(_currentBlock);
     mkvIndex *dex=_track->_index;
