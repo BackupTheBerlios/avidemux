@@ -100,6 +100,7 @@ public:
                 virtual bool      goToTime(uint64_t timeUs);
                                     /// Grab extra data                
                 virtual bool      getPacket(uint8_t *buffer, uint32_t *size, uint32_t maxSize,uint64_t *dts);
+                virtual bool      getExtraData(uint32_t *l, uint8_t **d);
 };
 
 

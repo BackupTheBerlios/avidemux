@@ -56,6 +56,15 @@ mkvAccess::mkvAccess(const char *name,mkvTrak *track)
   }
 }
 /**
+    \fn getExtraData
+*/
+bool      mkvAccess::getExtraData(uint32_t *l, uint8_t **d)
+{
+    *l=_track->extraDataLen;
+    *d=_track->extraData;
+    return true;
+}
+/**
     \fn getDurationInUs
 */
 uint64_t  mkvAccess::getDurationInUs(void)
@@ -216,6 +225,7 @@ bool    mkvAccess::getPacket(uint8_t *dest, uint32_t *packlen, uint32_t maxSize,
                         *packlen=_Laces[0];
                         *timecode=time;
                         _currentBlock++;
+                        _maxLace=nbLaces;
                         return 1;
                       }
 
