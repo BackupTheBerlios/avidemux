@@ -13,16 +13,12 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
+#if 0
 #include <string.h>
 #include <math.h>
 
 #include "ADM_default.h"
-#include "ADM_assert.h"
+
 #include "dmx_demuxerMSDVR.h"
 
 #include "../ADM_asf/ADM_asfPacket.h"
@@ -417,5 +413,6 @@ uint8_t dmx_demuxerMSDVR::open(const char *name)
   printf("[MSDVR] Opened ok\n");
   return 1;
 }
+#endif
 // ******************************************************
 // EOF

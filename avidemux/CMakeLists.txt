@@ -203,7 +203,7 @@ ADD_ADMLIB_ALL_TARGETS(${ADM_OUTPUTS})
 ###########################################
 # Construct ADM_inputs
 ###########################################
-ADD_SUBDIRECTORY(ADM_inputs)
+#ADD_SUBDIRECTORY(ADM_inputs)
 ADD_SUBDIRECTORY(ADM_UIs)
 
 SET(ADM_INPUTS
@@ -334,6 +334,8 @@ ADD_SUBDIRECTORY(ADM_coreAudio)
 ADD_LIB_ALL_TARGETS(ADM_coreAudio)
 ADD_SUBDIRECTORY(ADM_coreDemuxer)
 ADD_LIB_ALL_TARGETS(ADM_coreDemuxer)
+ADD_SUBDIRECTORY(ADM_coreDemuxerMpeg)
+ADD_LIB_ALL_TARGETS(ADM_coreDemuxerMpeg)
 ADD_SUBDIRECTORY(ADM_coreAudioDevice)
 ADD_LIB_ALL_TARGETS(ADM_coreAudioDevice)
 ADD_SUBDIRECTORY(ADM_coreUtils)

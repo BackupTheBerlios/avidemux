@@ -14,16 +14,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
+#include "ADM_default.h"
 #include <string.h>
 #include <math.h>
-
-#include "ADM_default.h"
-#include "ADM_assert.h"
-
 
 #include "dmx_demuxer.h"
 

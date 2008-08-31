@@ -27,19 +27,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
 #include "ADM_default.h"
-#include "ADM_assert.h"
 
 //#define TS_VERBOSE 1
 
-#include "../ADM_mpegdemuxer/dmx_mpegstartcode.h"
+#include "dmx_mpegstartcode.h"
 #include "dmx_demuxerTS.h"
 uint8_t         dmx_demuxerTS::changePid(uint32_t newpid,uint32_t newpes)
 {

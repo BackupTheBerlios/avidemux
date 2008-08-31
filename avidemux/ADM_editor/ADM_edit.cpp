@@ -48,16 +48,16 @@
 #include "ADM_videoFilter.h"
 //#include "ADM_dialog/DIA_working.h"
 
-#include "ADM_inputs/ADM_mpegdemuxer/dmx_video.h"
-#include "ADM_inputs/ADM_mpegdemuxer/dmx_identify.h"
-#include "ADM_inputs/ADM_mpegdemuxer/dmx_probe.h"
+//#include "ADM_inputs/ADM_mpegdemuxer/dmx_video.h"
+//#include "ADM_inputs/ADM_mpegdemuxer/dmx_identify.h"
+//#include "ADM_inputs/ADM_mpegdemuxer/dmx_probe.h"
 #include "prefs.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_EDITOR
 #include "ADM_osSupport/ADM_debug.h"
 
-#include "ADM_inputs/ADM_mpegdemuxer/dmx_indexer.h"
+#//include "ADM_inputs/ADM_mpegdemuxer/dmx_indexer.h"
 #include "ADM_outputfmt.h"
 //#include "ADM_gui2/GUI_ui.h"
 

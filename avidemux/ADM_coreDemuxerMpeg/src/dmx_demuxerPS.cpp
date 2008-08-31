@@ -15,17 +15,10 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
 #include "ADM_default.h"
-#include "ADM_assert.h"
-
-
 
 #include "dmx_demuxerPS.h"
 uint8_t         dmx_demuxerPS::changePid(uint32_t newpid,uint32_t newpes)

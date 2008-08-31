@@ -23,8 +23,8 @@
 
 #include "DIA_fileSel.h"
 #include "DIA_factory.h"
-#include "ADM_inputs/ADM_mpegdemuxer/dmx_mpegstartcode.h"
-#include "ADM_inputs/ADM_mpegdemuxer/dmx_demuxerTS.h"
+#include "ADM_coreDemuxerMpeg/include/dmx_mpegstartcode.h"
+#include "ADM_coreDemuxerMpeg/include/dmx_demuxerTS.h"
 
 
 #include "ADM_codecs/ADM_codec.h"

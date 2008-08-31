@@ -38,7 +38,7 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_videoFilter.h"
 
-#include "ADM_inputs/ADM_mpegdemuxer/dmx_identify.h"
+#include "ADM_coreDemuxerMpeg/include/dmx_identify.h"
 #include "ADM_assert.h"
 
 DMX_TYPE dmxIdentify(const char *name);
