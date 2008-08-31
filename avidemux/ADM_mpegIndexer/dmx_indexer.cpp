@@ -23,9 +23,9 @@
 
 #include "DIA_coreToolkit.h"
 #include "DIA_fileSel.h"
-#include "ADM_osSupport/ADM_quota.h"
+#include "ADM_quota.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_idx_pg.h"
-#include "ADM_libraries/ADM_utilities/avidemutils.h"
+#include "avidemutils.h"
 
 
 #include "ADM_osSupport/ADM_debugID.h"

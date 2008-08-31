@@ -222,6 +222,11 @@ SET(ADM_INPUTS
 )
 
 ADD_ADMLIB_ALL_TARGETS(${ADM_INPUTS})
+#########################################
+# Mpeg Indexer (Mpeg TS/PS/...)
+#########################################
+ADD_SUBDIRECTORY(ADM_mpegIndexer)
+ADD_ADMLIB_ALL_TARGETS(ADM_mpegIndexer)
 
 #########################################
 # Tails

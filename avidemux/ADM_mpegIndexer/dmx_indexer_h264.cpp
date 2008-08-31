@@ -20,7 +20,7 @@
 #include "ADM_assert.h"
 
 #include "DIA_fileSel.h"
-#include "ADM_osSupport/ADM_quota.h"
+#include "ADM_quota.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_idx_pg.h"
 
 
@@ -41,7 +41,7 @@
 
 #include "dmx_indexer_internal.h"
 
-#include "ADM_infoExtractor/ADM_h264_tag.h"
+#include "ADM_h264_tag.h"
 #undef aprintf
 #define aprintf printf
 static const char Type[5]={'X','I','P','B','P'};
