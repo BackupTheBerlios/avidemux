@@ -21,24 +21,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "config.h"
+#include "ADM_default.h"
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#include "ADM_editor/ADM_Video.h"
+#include "ADM_Video.h"
 #include "fourcc.h"
 #include "ADM_pics.h"
-#include "ADM_toolkit/bitmap.h"
+//#include "ADM_toolkit/bitmap.h"
 
-#include "ADM_assert.h"
-#include "DIA_fileSel.h"
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_INPIC
-#include "ADM_osSupport/ADM_debug.h"
-
+#define aprintf(...) {}
 static uint16_t s16;
 static uint32_t s32;
 #define MAX_ACCEPTED_OPEN_FILE 99999
@@ -49,9 +42,51 @@ picHeader::picHeader(void)
 	_imgSize = NULL;
 	_fileMask = NULL;
 }
+/**
+    \fn getTime
+*/
 
-//****************************************************************
-uint8_t picHeader::getFrameNoAlloc(uint32_t framenum, ADMCompressedImage *img)
+uint64_t                   picHeader::getTime(uint32_t frameNum)
+{
+    float f=    _videostream.dwScale ;
+    f=f/ _videostream.dwRate ;
+    f*=1000000;
+
+    f*=frameNum;
+    return (uint64_t)f;
+
+}
+/**
+    \fn getVideoDuration
+*/
+
+uint64_t                   picHeader::getVideoDuration(void)
+{
+    float f=    _videostream.dwScale ;
+    f=f/ _videostream.dwRate ;
+    f*=1000000;
+
+    f*=_videostream.dwLength;
+    return (uint64_t)f;
+
+
+}
+
+
+/**
+    \fn getFrameSize
+*/
+uint8_t                 picHeader::getFrameSize(uint32_t frame,uint32_t *size)
+{
+    if (frame >= (uint32_t)_videostream.dwLength)
+		return 0;
+    *size= _imgSize[frame];
+    return 1;
+}
+/**
+    \fn getFrame
+*/
+uint8_t picHeader::getFrame(uint32_t framenum, ADMCompressedImage *img)
 {
 	if (framenum >= (uint32_t)_videostream.dwLength)
 		return 0;
@@ -86,6 +121,38 @@ uint8_t picHeader::close(void)
 
 	return 0;
 }
+
+/**
+    \fn  getAudioInfo
+
+*/
+
+WAVHeader  *picHeader::getAudioInfo(void )
+{
+
+    return NULL;
+}
+/**
+    \fn getAudioStream
+
+*/
+
+uint8_t     picHeader::getAudioStream(ADM_audioStream  **audio)
+{
+    *audio=NULL;
+    return 1;
+}
+/**
+    \fn getAudioStreamsInfo
+
+*/
+uint8_t     picHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **info)
+{
+    *nbStreams=0;
+    *info=NULL;
+    return 1;
+}
+
 //****************************************************************
 /*
 	Open a bunch of images

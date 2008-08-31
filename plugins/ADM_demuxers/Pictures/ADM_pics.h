@@ -1,8 +1,8 @@
 /***************************************************************************
                           ADM_pics.h  -  description
                              -------------------
-    begin                : Mon Jun 3 2002
-    copyright            : (C) 2002 by mean
+    
+    copyright            : (C) 2002-2008 by mean/gruntster
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -23,7 +23,7 @@
 #include "avifmt2.h"
 
 #include "ADM_Video.h"
-#include "ADM_audio/aviaudio.hxx"
+#include "ADM_audioStream.h"
 
 enum
 {
@@ -32,14 +32,18 @@ enum
 	PIC_BMP2=3,
 	PIC_PNG=4
 };
+/**
+    \class picHeader
+    \brief Demuxers for images (PNG/BMP/...)
 
+*/
 class picHeader         :public vidHeader
 {
 protected:
 	char *_fileMask;
 
 					uint32_t 		_nb_file;
-       					uint32_t 		_first,_offset,_w,_h;
+                    uint32_t 		_first,_offset,_w,_h;
 
 					uint32_t		*_imgSize;
 					uint32_t 		_type;
@@ -54,8 +58,8 @@ public:
 
 virtual   void 				Dump(void) {};
 
-			picHeader( void );
-       		    ~picHeader(  ) { };
+                            picHeader( void );
+                            ~picHeader(  ) { };
 // AVI io
 virtual 	uint8_t			open(const char *name);
 virtual 	uint8_t			close(void) ;
@@ -67,8 +71,10 @@ virtual 	uint8_t			close(void) ;
   //				 Audio
   //__________________________
 
-virtual 	WAVHeader *getAudioInfo(void ) { return NULL ;} ;
 
+    virtual WAVHeader  *getAudioInfo(void ) ;
+    virtual uint8_t     getAudioStream(ADM_audioStream  **audio);
+    virtual uint8_t     getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **info);
 
 // Frames
   //__________________________
@@ -77,8 +83,11 @@ virtual 	WAVHeader *getAudioInfo(void ) { return NULL ;} ;
 
 virtual 	uint8_t  setFlag(uint32_t frame,uint32_t flags);
 virtual 	uint32_t getFlags(uint32_t frame,uint32_t *flags);
-virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *);
+virtual 	uint8_t  getFrame(uint32_t framenum,ADMCompressedImage *);
 
+virtual   uint64_t                   getTime(uint32_t frameNum);
+virtual   uint64_t                   getVideoDuration(void);
+virtual 	uint8_t                 getFrameSize(uint32_t frame,uint32_t *size);
 };
 
 
