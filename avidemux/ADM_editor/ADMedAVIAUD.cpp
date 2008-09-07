@@ -24,10 +24,8 @@ Todo:
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include "ADM_assert.h"
+#include "ADM_default.h"
 #include <math.h>
 
 #include "config.h"
@@ -66,12 +64,10 @@ uint32_t nbSamples,fillerSample=0;   // FIXME : Store & fix the DTS error correc
 uint64_t dts;
 uint32_t inSize,nbOut;
 bool drop=false;
+
     *samples=0;
     ADM_audioStreamTrack *trk=getTrack(0);
-    if(!trk) return 0;
-   // if(_videos[0]._audioCodec->isDummy()==true) return 0;
-    // fixme
-    
+    if(!trk) return 0;    
 
     // Read a packet from stream 0
 again:

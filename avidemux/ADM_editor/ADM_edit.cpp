@@ -389,6 +389,13 @@ UNUSED_ARG(mode);
             header=thisVid->_aviheader->getAudioInfo( );
             memcpy(&(track->wavheader),header,sizeof(*header));
 
+            // We need at last fq so that advanceDts will work
+            if(!i && !_nb_video)
+            {
+                wavHeader.frequency=header->frequency;
+                wavHeader.channels=header->channels;
+            }
+
             thisVid->_aviheader->getAudioStream(&stream);
             ADM_assert(stream);
             track->stream=stream;
