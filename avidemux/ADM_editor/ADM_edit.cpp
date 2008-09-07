@@ -116,13 +116,17 @@ uint32_t type,value;
 	Remap 1:1 video to segments
 
 */
+#define YOURAUDIO(x) _videos[x].audioTracks[_videos[x].currentAudioStream]
 uint8_t ADM_Composer::resetSeg( void )
 {
 	_total_frames=0;
 	for(uint32_t i=0;i<_nb_video;i++)
 	{
 		_segments[i]._reference = i;
-  		_segments[i]._audio_size = _videos[i]._audio_size;
+        if(_videos[i].audioTracks)
+            _segments[i]._audio_size = YOURAUDIO(i)->size;
+        else
+            _segments[i]._audio_size=0;
   		_segments[i]._audio_start = 0;
   		_segments[i]._start_frame = 0;
 		_segments[i]._audio_duration = 0;		
@@ -187,9 +191,15 @@ ADM_Composer::deleteAllVideos (void)
       _videos[vid]._videoCache=NULL;
      // Delete audio codec too
      // audioStream will be deleted by the demuxer
-      if(_videos[vid]._audioCodec)
-        delete _videos[vid]._audioCodec;
-      _videos[vid]._audioCodec=NULL;
+      if(_videos[vid].audioTracks)
+      {
+            for(int i=0;i<_videos[vid].nbAudioStream;i++)
+            {
+                delete _videos[vid].audioTracks[i];
+            }
+            delete [] _videos[vid].audioTracks;
+            _videos[vid].audioTracks=NULL;
+      }
     }
 
   memset (_videos, 0, sizeof (_videos));
@@ -351,23 +361,48 @@ UNUSED_ARG(mode);
   if (!_wavinfo)
     {
       printf ("\n *** NO AUDIO ***\n");
-      _videos[_nb_video]._audiostream = NULL;
-      _videos[_nb_video]._audioCodec=NULL;
+      _videos[_nb_video].audioTracks = NULL;
+      _videos[_nb_video].nbAudioStream=0;
+      _videos[_nb_video].currentAudioStream=0;
     }
   else
     {
-      
+        // Read and construct the audio tracks for that videos
+
+      uint32_t nbStream;
+      audioInfo *info;
       uint32_t extraLen;
       uint8_t  *extraData;
-      _videos[_nb_video]._aviheader->getAudioStream (&_videos[_nb_video]. _audiostream);
+      ADM_audioStream *stream;
+      WAVHeader *header;
 
-      ADM_audioStream *stream=_videos[_nb_video]. _audiostream;
-      stream->getExtraData(&extraLen,&extraData);
-      durationInUs=stream->getDurationInUs();
-      _videos[_nb_video]._audio_duration=durationInUs;
-      _videos[_nb_video]._audioCodec=getAudioCodec(_wavinfo->encoding,_wavinfo,extraLen,extraData);
-      memcpy(&wavHeader,_videos[0]._audiostream->getInfo(),sizeof(wavHeader));
-      printf("[Editor] Duration in seconds: %"LLU", in samples: %"LLU"\n",_videos[_nb_video]._audio_duration/_wavinfo->frequency,_videos[_nb_video]._audio_duration);
+      _VIDEOS *thisVid=&(_videos[_nb_video]);
+      thisVid->_aviheader->getAudioStreamsInfo(&nbStream, &info);
+      // Create streams
+      thisVid->audioTracks=new ADM_audioStreamTrack*[nbStream];
+    
+      for(int i=0;i<nbStream;i++)
+      {
+            ADM_audioStreamTrack *track=new ADM_audioStreamTrack;
+            
+            thisVid->_aviheader->changeAudioStream(i);
+            header=thisVid->_aviheader->getAudioInfo( );
+            memcpy(&(track->wavheader),header,sizeof(*header));
+
+            thisVid->_aviheader->getAudioStream(&stream);
+            ADM_assert(stream);
+            track->stream=stream;
+            
+            track->duration=stream->getDurationInUs();
+            track->size=0;
+
+            stream->getExtraData(&extraLen,&extraData);
+            track->codec=getAudioCodec(_wavinfo->encoding,_wavinfo,extraLen,extraData);
+
+            thisVid->audioTracks[i]=track;
+
+      }
+//      printf("[Editor] Duration in seconds: %"LLU", in samples: %"LLU"\n",_videos[_nb_video]._audio_duration/_wavinfo->frequency,_videos[_nb_video]._audio_duration);
     }
 
   printf ("\n Decoder FCC: ");
@@ -396,14 +431,15 @@ UNUSED_ARG(mode);
   //
   //  And automatically create the segment
   //
+    ADM_audioStreamTrack *trk=_videos[_nb_video].audioTracks[0];
   _segments[_nb_segment]._reference = _nb_video;
-  _segments[_nb_segment]._audio_size = _videos[_nb_video]._audio_size;
-  _segments[_nb_segment]._audio_duration =_videos[_nb_video]._audio_duration;
+  _segments[_nb_segment]._audio_size = trk->size;
+  _segments[_nb_segment]._audio_duration =trk->duration;
   _segments[_nb_segment]._audio_start = 0;
   _segments[_nb_segment]._start_frame = 0;
   _segments[_nb_segment]._nb_frames   =   _videos[_nb_video]._nb_video_frames ;
 
-  _videos[_nb_video]._isAudioVbr=0;
+  
 //****************************
    
 
@@ -489,7 +525,11 @@ _VIDEOS *vid;
 uint8_t ADM_Composer::hasVBRVideos(void)
 {
         for(int i=0;i<_nb_video;i++)
-                if(_videos[i]._isAudioVbr) return 1;
+        {
+                ADM_audioStreamTrack *trk=getTrack(i);
+                if(trk)
+                    if(trk->vbr) return 1;
+        }
         return 0;
 }
 
@@ -712,6 +752,10 @@ uint32_t   seg,rel,reference;
         reference=_segments[seg]._reference;
         return _videos[reference]._aviheader->getCurrentAudioStreamNumber();
 }
+/**
+        \fn changeAudioStream
+
+*/
 uint8_t ADM_Composer::changeAudioStream(uint32_t frame,uint32_t newstream)
 {
 uint32_t   seg,rel,reference;
@@ -725,25 +769,13 @@ aviInfo    info;
                 return 0;
         }
         reference=_segments[seg]._reference;
-        if(!_videos[reference]._aviheader->changeAudioStream(newstream))
+        ADM_audioStreamTrack **trks=_videos[reference].audioTracks;
+        uint32_t nb=_videos[reference].nbAudioStream;
+        if(newstream>=nb)
         {
-                printf("Editor : stream change failed for frame %u seg %u stream %u\n",frame,seg,newstream);
-                return 0;
+            return 0;
         }
-        // Now update audio tracks infos
-        wav = _videos[reference]._aviheader->getAudioInfo ();
-        if(!wav)
-        {
-                ADM_assert(0); // Cannot change to a non existing track!
-        }
-        _videos[reference]._aviheader->getVideoInfo (&info);
-        _videos[reference]._aviheader->getAudioStream (&_videos[reference]._audiostream);
-
-        duration=_videos[reference]._nb_video_frames;
-        duration/=info.fps1000;
-        duration*=1000;                 // duration in seconds
-        duration*=wav->frequency;          // In sample
-        _videos[reference]._audio_duration=(uint64_t)floor(duration);
+        _videos[reference].currentAudioStream=newstream;
         for(uint32_t i=0;i<_nb_segment;i++)
                 updateAudioTrack(i);
         return 1;
@@ -957,8 +989,8 @@ ADM_Composer::dumpSeg (void)
   printf ("\n________Video______________");
   for (seg = 0; seg < _nb_video; seg++)
     {
-      printf ("\n Video : %lu, nb video  :%lu, audio size:%lu  audioDuration:%lu",
-	      seg, _videos[seg]._nb_video_frames, _videos[seg]._audio_size,_videos[seg]._audio_duration);
+//      printf ("\n Video : %lu, nb video  :%lu, audio size:%lu  audioDuration:%lu",
+//	      seg, _videos[seg]._nb_video_frames, _videos[seg]._audio_size,_videos[seg]._audio_duration);
 
     }
 
@@ -1052,50 +1084,9 @@ uint8_t ADM_Composer::updateAudioTrack (uint32_t seg)
 
   reference = _segments[seg]._reference;
   // Mika
-  if (!_videos[reference]._audiostream)
+  if (!getTrack(reference))
     return 1;
-  // Compute the resulting duration
-  // Of the segment
-  double duration;
-  aviInfo info;
-  	_videos[reference]._aviheader->getVideoInfo(&info);
-  	duration= _segments[seg]._nb_frames;
-	ADM_assert(info.fps1000);
-	duration/=info.fps1000;
-	duration*=1000*_videos[reference]._audiostream->getInfo()->frequency;
-	
-  _segments[seg]._audio_duration = (uint64_t)floor(duration);
 
-  // If we cannot go to sync point start --> no need to continue
-  // It can happen if audio track is shorter than video
-#if 0 // BAZOOKA
-  if (!audioGoToFn (seg, _segments[seg]._start_frame, &off))
-    {
-      _segments[seg]._audio_size = 0;
-      printf (" cannot seek audio tp frame : %lu\n", seg);
-      return 1;
-
-    }
-//  pos_start = _videos[reference]._audiostream->getPos ();
-
-  // Now try to go to the end...
-  // if it fails, try previous frame stamp
-  tf = _segments[seg]._start_frame + _segments[seg]._nb_frames;	//-1;
-
-  while ((!audioGoToFn (seg, tf, &off)
-	  && ((tf - 1) > _segments[seg]._start_frame)))
-    {
-      printf (" trying to sync on frame %lu\n", tf);
-      tf--;
-    }
-#endif
-//  pos_end = _videos[reference]._audiostream->getPos ();
-
-  _segments[seg]._audio_size = pos_end - pos_start;
-  _segments[seg]._audio_start = pos_start;
-  
-  printf (" Audio start : %lu end : %lu size : %lu\n", pos_start, pos_end,
-	  _segments[seg]._audio_size);
 
   return 1;
 
@@ -1147,20 +1138,6 @@ uint8_t ADM_Composer::sanityCheck (void)
 void
 ADM_Composer::propagateBuildMap (void)
 {
-uint8_t need_update=0;
-  if (_nb_video)
-    {
-    for(uint32_t i=0;i<_nb_video;i++)
-    	{
-    		if(! _videos[i]._isAudioVbr)
-		{
-//			if((    		_videos[i]._isAudioVbr=_videos[i]._audiostream->buildAudioTimeLine ()))
-			{
-				need_update=1;
-			}
-		}
-	}
-    }
 
 }
 //_________________________________________
@@ -1257,25 +1234,6 @@ uint8_t         ADM_Composer::tryIndexing(const char *name, const char *idxname)
 */
 uint8_t ADM_Composer::rebuildDuration(void)
 {
-  double duration;
-  WAVHeader *wav ;
-  aviInfo    info;
-  printf("[Editor] updating soundtracks duration\n");
-  _videos[   0     ]._aviheader->getVideoInfo (&info);
-  for(int i=0;i<_nb_video;i++)
-  {
-    wav= _videos[i]._aviheader->getAudioInfo ();
-      if(wav)
-      {
-          duration=_videos[i]._nb_video_frames;
-          duration/=info.fps1000;
-          duration*=1000;                 // duration in seconds
-          duration*=wav->frequency;          // In sample
-          _videos[i]._audio_duration=(uint64_t)floor(duration);
-      }
-  }
-  for(int i=0;i<_nb_segment;i++)
-    updateAudioTrack(i);
   return 1;
 }
 

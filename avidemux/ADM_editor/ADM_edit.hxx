@@ -76,26 +76,40 @@ typedef enum
     ENV_EDITOR_SMART=  0x0005,
 	ENV_EDITOR_LAST=   0x8000
 }_ENV_EDITOR_FLAGS;
+/**
+    \class ADM_audioStreamTack
+
+*/
+class ADM_audioStreamTrack
+{
+public:
+    ADM_audioStream  *stream;
+    audioInfo        *info;
+    ADM_Audiocodec   *codec;
+    WAVHeader		 wavheader;
+    bool             vbr;
+    uint64_t         duration;
+    uint64_t         size;
+
+protected:
+
+};
 //
 //  The start frame correspond to the frame 0 of the segment (quite obvisous)
 //  _nb_video_frames is the number of active frame in the segment
 //
 //
+
 typedef struct
 {
   	vidHeader 							*_aviheader;
   	decoders							*decoder;
     COL_Generic2YV12                    *color;
 
-	uint32_t  							_audio_size;
-	uint64_t							_audio_duration; //! IN SAMPLE
-
-
-
-	ADM_audioStream      				*_audiostream;
-	uint8_t								_isAudioVbr;
-	WAVHeader							*_wavheader;
-    ADM_Audiocodec                      *_audioCodec;
+	
+    uint32_t                            nbAudioStream;
+    uint32_t                            currentAudioStream;
+    ADM_audioStreamTrack                **audioTracks;
 
 	uint32_t							_nb_video_frames;	
 	uint8_t								_reorderReady;
@@ -125,7 +139,7 @@ typedef struct
 class ADM_Composer : public ADM_audioStream
 {
   private:
-
+                
     uint8_t                             audioBuffer[ADM_EDITOR_AUDIO_BUFFER_SIZE];
     uint32_t                            audioBufferStart;
     uint32_t                            audioBufferEnd;
@@ -155,6 +169,12 @@ class ADM_Composer : public ADM_audioStream
   					_SEGMENT 		*_segments;
 					_SEGMENT 		_clipboard[MAX_SEG];
 					_VIDEOS 		_videos[MAX_VIDEO];
+                    ADM_audioStreamTrack *getTrack(uint32_t i)
+                                            {
+                                                if(!_videos[i].audioTracks) return NULL;
+                                                return _videos[i].audioTracks[_videos[i].currentAudioStream];
+
+                                            }
                     ADMImage        *_scratch;
 						uint8_t  	convFrame2Seg(uint32_t framenum,uint32_t *seg,
 																			uint32_t *relframe);

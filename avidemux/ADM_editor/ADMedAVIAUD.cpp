@@ -51,6 +51,9 @@ Todo:
 #define vprintf printf
 #endif
 
+// ADM_audioStreamTack *
+#define MYAUDIO (_videos[0].audioTracks[_videos[0].currentAudioStream])
+
 /**
     \fn     getPCMPacket
     \brief  Get audio packet
@@ -64,7 +67,8 @@ uint64_t dts;
 uint32_t inSize,nbOut;
 bool drop=false;
     *samples=0;
-    if(!_videos[0]._audiostream) return 0;
+    ADM_audioStreamTrack *trk=getTrack(0);
+    if(!trk) return 0;
    // if(_videos[0]._audioCodec->isDummy()==true) return 0;
     // fixme
     
@@ -73,7 +77,7 @@ bool drop=false;
 again:
     drop=false;
     fillerSample=0;
-    if(!_videos[0]._audiostream->getPacket(audioBuffer,&inSize,ADM_EDITOR_AUDIO_BUFFER_SIZE,&nbSamples,&dts))
+    if(!trk->stream->getPacket(audioBuffer,&inSize,ADM_EDITOR_AUDIO_BUFFER_SIZE,&nbSamples,&dts))
     {
             adm_printf(ADM_PRINT_ERROR,"[Composer::getPCMPacket] Read failed\n");
             return 0;
@@ -98,7 +102,7 @@ again:
             f/=1000000.;
             // in samples!
             uint32_t fillerSample=(uint32_t )(f+0.49);
-            uint32_t mx=sizeMax/wavHeader.channels;
+            uint32_t mx=sizeMax/trk->wavheader.channels;
             
             if(mx<fillerSample) fillerSample=mx;
             // arbitrary cap, max 4kSample in one go
@@ -107,11 +111,11 @@ again:
             {
                 fillerSample=4*1024;
             }
-            uint32_t start=fillerSample*sizeof(float)*wavHeader.channels;
+            uint32_t start=fillerSample*sizeof(float)*trk->wavheader.channels;
             memset(dest,0,start);
 
             advanceDtsBySample(fillerSample);
-            dest+=fillerSample*wavHeader.channels;
+            dest+=fillerSample*trk->wavheader.channels;
             vprintf("[Composer::getPCMPacket] Adding %u padding samples, dts is now %lu\n",fillerSample,lastDts);
        }
       }
@@ -121,7 +125,7 @@ again:
         if(lastDts==ADM_AUDIO_NO_DTS) lastDts=dts;
     }
     // Call codec...
-    if(!_videos[0]._audioCodec->run(audioBuffer, inSize, dest, &nbOut))
+    if(!trk->codec->run(audioBuffer, inSize, dest, &nbOut))
     {
             adm_printf(ADM_PRINT_ERROR,"[Composer::getPCMPacket] codec failed failed\n");
             return 0;
@@ -130,7 +134,7 @@ again:
     //
     //
     uint32_t decodedSample=nbOut;
-    decodedSample/=wavHeader.channels;
+    decodedSample/=trk->wavheader.channels;
     if(!decodedSample && !fillerSample) goto again;
     if(nbSamples!=decodedSample)
         printf("[Composer::getPCMPacket] Demuxer was wrong %d vs %d samples!\n",nbSamples,decodedSample);
@@ -143,7 +147,7 @@ again:
     *odts=lastDts;
     advanceDtsBySample(decodedSample);
     vprintf("[Composer::getPCMPacket] Adding %u decodedSample, dts is not %lu\n",fillerSample,lastDts);
-    ADM_assert(sizeMax>=(fillerSample+decodedSample)*wavHeader.channels);
+    ADM_assert(sizeMax>=(fillerSample+decodedSample)*trk->wavheader.channels);
     return 1;
 }
 /**
@@ -152,9 +156,10 @@ again:
 */
 uint8_t ADM_Composer::getPacket(uint8_t  *dest, uint32_t *len,uint32_t sizeMax, uint32_t *samples,uint64_t *odts)
 {
-    if(!_videos[0]._audiostream) return 0;
+     ADM_audioStreamTrack *trk=getTrack(0);
+    if(!trk) return 0;
     // Read a packet from stream 0
-     return _videos[0]._audiostream->getPacket(dest,len,sizeMax,samples,odts);
+     return trk->stream->getPacket(dest,len,sizeMax,samples,odts);
     
 }
 /**
@@ -165,8 +170,11 @@ uint8_t ADM_Composer::getPacket(uint8_t  *dest, uint32_t *len,uint32_t sizeMax, 
 bool ADM_Composer::goToTime (uint64_t ustime)
 {
     printf("[Editor] go to time %02.2f secs\n",((float)ustime)/1000000.);
-    if(!_videos[0]._audiostream) return false;
-    if(true==_videos[0]._audiostream->goToTime(ustime))
+    ADM_audioStreamTrack *trk=getTrack(0);
+    if(!trk) return 0;
+    
+    
+    if(true==trk->stream->goToTime(ustime))
     {
         setDts(ustime);
         return true;
@@ -180,12 +188,8 @@ bool ADM_Composer::goToTime (uint64_t ustime)
 */
 uint8_t ADM_Composer::getAudioStream (ADM_audioStream ** audio)
 {
-  if (*audio)
-    {
-      delete *audio;
-      *audio = NULL;
-    }
-  if (!_videos[0]._audiostream)
+   ADM_audioStreamTrack *trk=getTrack(0);
+    if(!trk)
     {
       *audio = NULL;
       return 0;
@@ -201,8 +205,9 @@ uint8_t ADM_Composer::getAudioStream (ADM_audioStream ** audio)
 */
 WAVHeader       *ADM_Composer::getInfo(void)
 {
-    if(!_videos[0]._audiostream) return NULL;
-    return _videos[0]._audiostream->getInfo();
+     ADM_audioStreamTrack *trk=getTrack(0);
+    if(!trk) return 0;
+    return trk->stream->getInfo();
 }
 /**
     \fn getChannelMapping
@@ -210,7 +215,9 @@ WAVHeader       *ADM_Composer::getInfo(void)
 */
  CHANNEL_TYPE    *ADM_Composer::getChannelMapping(void )
 {
-    return (_videos[0]._audioCodec->channelMapping);
+  ADM_audioStreamTrack *trk=getTrack(0);
+    if(!trk) return NULL;
+    return trk->codec->channelMapping;
 
 }
 //EOF
