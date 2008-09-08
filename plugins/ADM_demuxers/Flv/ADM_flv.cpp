@@ -471,21 +471,24 @@ uint8_t flvHeader::insertAudio(uint32_t pos,uint32_t size,uint32_t pts)
     return 1;
 }    
 
-/*
-  __________________________________________________________
+
+
+/**
+    \fn getAudioInfo
+    \brief returns wav header for stream i (=0)
 */
-WAVHeader *flvHeader::getAudioInfo(void )
+WAVHeader *flvHeader::getAudioInfo(uint32_t i )
 {
   if(_isaudiopresent)
     return &wavHeader;
   else
       return NULL;
 }
-/*
-    __________________________________________________________
+/**
+   \fn getAudioStream
 */
 
-uint8_t flvHeader::getAudioStream(ADM_audioStream **audio)
+uint8_t   flvHeader::getAudioStream(uint32_t i,ADM_audioStream  **audio)
 {
   if(_isaudiopresent)
   {
@@ -493,6 +496,19 @@ uint8_t flvHeader::getAudioStream(ADM_audioStream **audio)
     return 1;
   }
   *audio=NULL;
+  return 0; 
+}
+/**
+    \fn getNbAudioStreams
+
+*/
+uint8_t   flvHeader::getNbAudioStreams(void)
+{
+ if(_isaudiopresent)
+  {
+    
+    return 1;
+  }
   return 0; 
 }
 /*
@@ -634,29 +650,5 @@ uint8_t flvHeader::getFrameSize (uint32_t frame, uint32_t * size)
   return 1;
 }
 
-/**
-    \fn getAudioStreamsInfo
-    \brief returns infos about audio streams (code,...)
-    @param nbStreams (out) nb audio streams
-    @param infos (out) pointer to streams info. It is up to the caller to free them.
-*/
-uint8_t  flvHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
-{
-    if(!_isaudiopresent)
-    {
-        *nbStreams=0;
-        *infos=NULL;
-        return 1;
-    }
-    *nbStreams=1;
-    audioInfo *nfo=new audioInfo;
-    nfo->encoding=wavHeader.encoding;
-    nfo->bitrate=(wavHeader.byterate*8)/1000;;
-    nfo->channels=(wavHeader.channels);
-    nfo->frequency=(wavHeader.frequency);
-    nfo->av_sync=0;
-    *infos=nfo;
-    return 1;
-}
 
 //EOF

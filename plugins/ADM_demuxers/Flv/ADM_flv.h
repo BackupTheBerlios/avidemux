@@ -131,10 +131,9 @@ class flvHeader         :public vidHeader
   //__________________________
   //  Audio
   //__________________________
-
-    virtual WAVHeader  *getAudioInfo(void ) ;
-    virtual uint8_t     getAudioStream(ADM_audioStream  **audio);
-    virtual uint8_t     getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **info);
+virtual 	WAVHeader              *getAudioInfo(uint32_t i )  ;
+virtual 	uint8_t                 getAudioStream(uint32_t i,ADM_audioStream  **audio);
+virtual     uint8_t                 getNbAudioStreams(void);
 // Frames
   //__________________________
   //  video
