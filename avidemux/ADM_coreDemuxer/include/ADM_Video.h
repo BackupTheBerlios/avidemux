@@ -94,11 +94,9 @@ virtual 	uint8_t		close(void)=0;
   //				 Audio
   //__________________________
 
-virtual 	WAVHeader              *getAudioInfo(void ) =0 ;
-virtual 	uint8_t                 getAudioStream(ADM_audioStream  **audio)=0;
-virtual     uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **info)=0;
-virtual     uint8_t                 changeAudioStream(uint32_t newstream);
-virtual     uint32_t                getCurrentAudioStreamNumber(void) { return 0;}
+virtual 	WAVHeader              *getAudioInfo(uint32_t i ) =0 ;
+virtual 	uint8_t                 getAudioStream(uint32_t i,ADM_audioStream  **audio)=0;
+virtual     uint8_t                 getNbAudioStreams(void)=0;
 // Frames
   //__________________________
   //				 video

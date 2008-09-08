@@ -357,8 +357,9 @@ UNUSED_ARG(mode);
   // Update audio infos
   // an spawn the appropriate decoder
   //_________________________
-  _wavinfo = _videos[_nb_video]._aviheader->getAudioInfo ();	//wavinfo); // will be null if no audio
-  if (!_wavinfo)
+   uint32_t nbAStream=_videos[_nb_video]._aviheader->getNbAudioStreams();
+  
+  if (!nbAStream)
     {
       printf ("\n *** NO AUDIO ***\n");
       _videos[_nb_video].audioTracks = NULL;
@@ -369,7 +370,7 @@ UNUSED_ARG(mode);
     {
         // Read and construct the audio tracks for that videos
 
-      uint32_t nbStream;
+      
       audioInfo *info;
       uint32_t extraLen;
       uint8_t  *extraData;
@@ -377,16 +378,15 @@ UNUSED_ARG(mode);
       WAVHeader *header;
 
       _VIDEOS *thisVid=&(_videos[_nb_video]);
-      thisVid->_aviheader->getAudioStreamsInfo(&nbStream, &info);
       // Create streams
-      thisVid->audioTracks=new ADM_audioStreamTrack*[nbStream];
+      thisVid->audioTracks=new ADM_audioStreamTrack*[nbAStream];
     
-      for(int i=0;i<nbStream;i++)
+      for(int i=0;i<nbAStream;i++)
       {
             ADM_audioStreamTrack *track=new ADM_audioStreamTrack;
             
-            thisVid->_aviheader->changeAudioStream(i);
-            header=thisVid->_aviheader->getAudioInfo( );
+            
+            header=thisVid->_aviheader->getAudioInfo(i );
             memcpy(&(track->wavheader),header,sizeof(*header));
 
             // We need at last fq so that advanceDts will work
@@ -396,7 +396,7 @@ UNUSED_ARG(mode);
                 wavHeader.channels=header->channels;
             }
 
-            thisVid->_aviheader->getAudioStream(&stream);
+            thisVid->_aviheader->getAudioStream(i,&stream);
             ADM_assert(stream);
             track->stream=stream;
             
@@ -741,7 +741,26 @@ uint32_t seg,rel,reference;
                 return 0;
         }
         reference=_segments[seg]._reference;
-        return _videos[reference]._aviheader->getAudioStreamsInfo(nbStreams,infos);
+        if(!_videos[reference].nbAudioStream)
+        {
+            *nbStreams=0;
+            *infos=NULL;
+        }
+       // return _videos[reference]._aviheader->getAudioStreamsInfo(nbStreams,infos);
+        
+        *nbStreams=_videos[reference].nbAudioStream;
+        *infos=new audioInfo[*nbStreams];
+        for(int i=0;i<*nbStreams;i++)
+        {
+            WAVHeader *wav=&(_videos[reference].audioTracks[i]->wavheader);
+            (*infos)->bitrate=(wav->byterate*8)/1000;
+            (*infos)->channels=wav->channels;
+            (*infos)->encoding=wav->encoding;
+            (*infos)->frequency=wav->frequency;
+            (*infos)->av_sync=0;
+         }
+        return 1;
+    return 0;
 }
 /*
         Change the audio track for the source video attached to the "frame" frame
@@ -757,7 +776,8 @@ uint32_t   seg,rel,reference;
                 return 0;
         }
         reference=_segments[seg]._reference;
-        return _videos[reference]._aviheader->getCurrentAudioStreamNumber();
+        
+        return _videos[reference].currentAudioStream;
 }
 /**
         \fn changeAudioStream
