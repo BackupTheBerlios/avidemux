@@ -105,6 +105,14 @@ uint8_t mkvHeader::open(const char *name)
         reformatVorbisHeader(&(_tracks[1+i]));
     }
   }
+    _access=new mkvAccess *[_nbAudioTrack];
+    _audioStreams=new ADM_audioStream *[_nbAudioTrack];
+    for(int i=0;i<_nbAudioTrack;i++)
+    {
+        _access[i]=new mkvAccess(_filename,&(_tracks[i+1]));
+        _audioStreams[i]=ADM_audioCreateStream(&(_tracks[1+i].wavHeader), _access[i]);;
+    }
+
   printf("[MKV]Matroska successfully read\n");
 
   return 1;
@@ -217,37 +225,11 @@ uint8_t mkvHeader::walk(void *seed)
    }
   return 1;
 }
+
+
+
 /**
-
-*/
-/*
-  __________________________________________________________
-*/
-WAVHeader *mkvHeader::getAudioInfo(void )
-{
-  if(_nbAudioTrack)
-  {
-    return &(_tracks[1+_currentAudioTrack].wavHeader);
-  }
-  return NULL;
-}
-/*
-    __________________________________________________________
-*/
-
-uint8_t mkvHeader::getAudioStream(ADM_audioStream **audio)
-{
-  if(_nbAudioTrack)
-  {
-      mkvAccess *access=new mkvAccess(_filename,&(_tracks[_currentAudioTrack+1]));
-      *audio=ADM_audioCreateStream(&(_tracks[1+_currentAudioTrack].wavHeader), access);;
-      return 1;
-  }
-  *audio=NULL;
-  return 0;
-}
-/*
-    __________________________________________________________
+   \fn Dump
 */
 
 void mkvHeader::Dump(void)
@@ -255,8 +237,8 @@ void mkvHeader::Dump(void)
 
 }
 
-/*
-    __________________________________________________________
+/**
+    \fn close
 */
 
 uint8_t mkvHeader::close(void)
@@ -295,6 +277,17 @@ uint8_t mkvHeader::close(void)
         *dx=NULL;
     }
   }
+    if(_audioStreams)
+    {
+        for(int i=0;i<_nbAudioTrack;i++) if(_audioStreams[i]) delete _audioStreams[i];
+        delete [] _audioStreams;
+    }
+    if(_access)
+    {
+        for(int i=0;i<_nbAudioTrack;i++) if(_access[i]) delete _access[i];
+        delete [] _access;
+    }
+
 }
 /*
     __________________________________________________________
@@ -312,6 +305,8 @@ uint8_t mkvHeader::close(void)
   _clustersCeil=0;
   _nbClusters=0;
   _currentAudioTrack=0;
+  _access=NULL;
+  _audioStreams=NULL;
 }
 /*
     __________________________________________________________
@@ -412,50 +407,6 @@ uint8_t  mkvHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
                 return 1;
 }
 
-/*
-    __________________________________________________________
-*/
-uint8_t  mkvHeader::changeAudioStream(uint32_t newstream)
-{
-    ADM_assert(_currentAudioTrack<_nbAudioTrack);
-    _currentAudioTrack=newstream;
-    return 1;
-}
-/*
-    __________________________________________________________
-*/
-uint32_t  mkvHeader::getCurrentAudioStreamNumber(void)
-{
-  return _currentAudioTrack;
-}
-/**
-    \fn getAudioStreamsInfo
-    \brief returns infos about audio streams (code,...)
-    @param nbStreams (out) nb audio streams
-    @param infos (out) pointer to streams info. It is up to the caller to free them.
-*/
-uint8_t  mkvHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
-{
-    if(!_nbAudioTrack)
-    {
-        *nbStreams=0;
-        *infos=NULL;
-        return 1;
-    }
-    *nbStreams=_nbAudioTrack;
-    *infos=new audioInfo[_nbAudioTrack];
-    memset(*infos,0,sizeof(audioInfo)*_nbAudioTrack);
-    for(int i=0;i<_nbAudioTrack;i++)
-    {
-      audioInfo *inf=&((*infos)[i]);
-      WAVHeader *head=&(_tracks[i+1].wavHeader);
-      inf->encoding=head->encoding;
-      inf->bitrate=(head->byterate*8)/1000;
-      inf->channels=head->channels;
-      inf->frequency=head->frequency;
-    }
-    return 1;
-}
 /**
     \fn mkreformatVorbisHeader
     \brief reformat oggvorbis header to avidemux style
@@ -512,14 +463,37 @@ Bytes n+1..: The Vorbis identification header, followed by the Vorbis comment he
       trk->extraDataLen=nwlen;
   return 1;
 }
-//****************************************
 /**
-      \fn ptsDtsDelta
-      \brief returns delta between presentation time & decoder time
+    \fn getNbAudioStreams
 */
-uint32_t              mkvHeader::ptsDtsDelta(uint32_t framenum)
+uint8_t                 mkvHeader::getNbAudioStreams(void)
 {
-    ADM_assert(framenum<_tracks[0]._nbIndex);
-    return (uint32_t)(_tracks[0]._index[framenum].Pts-_tracks[0]._index[framenum].Dts);
+    return _nbAudioTrack;
 }
+/**
+    \fn getAudioInfo
+*/
+
+WAVHeader              *mkvHeader::getAudioInfo(uint32_t i )  
+{
+    if(!_nbAudioTrack) return NULL;
+    ADM_assert(i<_nbAudioTrack)
+    return &(_tracks[1+i].wavHeader);
+}
+/**
+    \fn getAudioStream
+*/
+uint8_t                 mkvHeader::getAudioStream(uint32_t i,ADM_audioStream  **audio)
+{
+ if(_nbAudioTrack)
+  {
+      ADM_assert(i<_nbAudioTrack)
+      *audio=_audioStreams[i];
+      return 1;
+  }
+  *audio=NULL;
+  return 0;
+
+}
+//****************************************
 //EOF

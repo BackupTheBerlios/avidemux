@@ -114,7 +114,9 @@ public:
 #define _3GP_MAX_TRACKS 8
 #define VDEO _tracks[0]
 #define ADIO _tracks[nbAudioTrack+1]._rdWav
-
+/**
+    \class MP4Header
+*/
 class MP4Header         :public vidHeader
 {
 protected:
@@ -165,8 +167,9 @@ virtual   uint8_t                       getExtraHeaderData(uint32_t *len, uint8_
   //				 Audio
   //__________________________
 
-virtual 	WAVHeader 	*getAudioInfo(void ); 
-virtual 	uint8_t		getAudioStream(ADM_audioStream **audio);
+virtual 	WAVHeader              *getAudioInfo(uint32_t i )  ;
+virtual 	uint8_t                 getAudioStream(uint32_t i,ADM_audioStream  **audio);
+virtual     uint8_t                 getNbAudioStreams(void);
 
 // Frames
   //__________________________

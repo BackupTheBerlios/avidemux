@@ -122,36 +122,7 @@ uint8_t picHeader::close(void)
 	return 0;
 }
 
-/**
-    \fn  getAudioInfo
 
-*/
-
-WAVHeader  *picHeader::getAudioInfo(void )
-{
-
-    return NULL;
-}
-/**
-    \fn getAudioStream
-
-*/
-
-uint8_t     picHeader::getAudioStream(ADM_audioStream  **audio)
-{
-    *audio=NULL;
-    return 1;
-}
-/**
-    \fn getAudioStreamsInfo
-
-*/
-uint8_t     picHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **info)
-{
-    *nbStreams=0;
-    *info=NULL;
-    return 1;
-}
 
 //****************************************************************
 /*

@@ -180,22 +180,45 @@ MP4Header::MP4Header(void)
         _videoScale=1;
         _videoFound=0;
 }
-uint8_t	MP4Header::getAudioStream(ADM_audioStream **audio)
-{  
+/**
+    \fn getAudioInfo
+    \brief
+*/
+WAVHeader    *MP4Header::getAudioInfo(uint32_t i )  
+{
     if(nbAudioTrack) 
     {
-        *audio=audioStream[_currentAudioTrack];
+        ADM_assert(i<nbAudioTrack);
+        return &(_tracks[i+1]._rdWav);
+    }  
+       
+    return NULL;
+
+}
+/**
+    \fn getAudioStream
+*/
+
+uint8_t      MP4Header::getAudioStream(uint32_t i,ADM_audioStream  **audio)
+{
+    if(nbAudioTrack) 
+    {
+        ADM_assert(i<nbAudioTrack);
+        *audio=audioStream[i];
     }  else 
         *audio=NULL;
     return 1;
-};
-WAVHeader 	*MP4Header::getAudioInfo(void )
-{ 	
-	if(!nbAudioTrack)
-		return NULL; 
-       
-        return audioStream[_currentAudioTrack]->getInfo();
-} ;
+}
+/**
+    \fn getNbAudioStreams
+*/
+uint8_t      MP4Header::getNbAudioStreams(void)
+{
+    return nbAudioTrack;
+
+}
+
+
 uint8_t   MP4Header::getExtraHeaderData(uint32_t *len, uint8_t **data)
 {
 uint32_t old;
@@ -390,19 +413,5 @@ uint32_t     MP4Header::getCurrentAudioStreamNumber(void)
 { 
     return _currentAudioTrack;
 }
- uint8_t   MP4Header::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
-{
-        *nbStreams=nbAudioTrack;
-        if(nbAudioTrack)
-        {
-            *infos=new audioInfo[nbAudioTrack];
-            for(int i=0;i<nbAudioTrack;i++)
-            {
-                WAV2AudioInfo(&(_tracks[i+1]._rdWav),&((*infos)[i]));
-            }
-                
-             //   (*infos)[i]=_tracks[i+1]._rdWav.encoding;
-        }
-        return 1;
-}
+ 
 //EOF 

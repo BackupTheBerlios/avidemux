@@ -113,7 +113,8 @@ public:
 class mkvHeader         :public vidHeader
 {
   protected:
-
+    mkvAccess               **_access;
+    ADM_audioStream         **_audioStreams;
     ADM_ebml_file           *_parser;
     char                    *_filename;
     mkvTrak                 _tracks[ADM_MKV_MAX_TRACKS+1];
@@ -142,14 +143,9 @@ class mkvHeader         :public vidHeader
     uint8_t                 indexClusters(ADM_ebml_file *parser);
     uint8_t                 indexBlock(ADM_ebml_file *parser,uint32_t count,uint32_t timecodeMS);
 
-    uint8_t                 changeAudioStream(uint32_t newstream);
-    uint32_t                getCurrentAudioStreamNumber(void);
-    uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos);
     uint8_t                 rescaleTrack(mkvTrak *track,uint32_t durationMs);
   public:
 
-      uint8_t               hasPtsDts(void) {return 1;} // Return 1 if the container gives PTS & DTS info
-      uint32_t              ptsDtsDelta(uint32_t framenum);
 
     virtual   void          Dump(void);
 
@@ -161,15 +157,13 @@ class mkvHeader         :public vidHeader
   //__________________________
   //  Info
   //__________________________
-
+ //__________________________
+  //				 Audio
   //__________________________
-  //  Audio
-  //__________________________
 
-virtual 	WAVHeader              *getAudioInfo(void );
-virtual 	uint8_t                 getAudioStream(ADM_audioStream  **audio);
-
-
+virtual 	WAVHeader              *getAudioInfo(uint32_t i )  ;
+virtual 	uint8_t                 getAudioStream(uint32_t i,ADM_audioStream  **audio);
+virtual     uint8_t                 getNbAudioStreams(void);
 // Frames
   //__________________________
   //  video
