@@ -250,7 +250,7 @@ uint8_t ADM_Composer::addFile (const char *name, uint8_t mode,fileType forcedTyp
 {
   uint8_t    ret =    0;
   aviInfo    info;
-  WAVHeader *    _wavinfo;
+  
   
 
 UNUSED_ARG(mode);
@@ -376,11 +376,11 @@ UNUSED_ARG(mode);
       uint8_t  *extraData;
       ADM_audioStream *stream;
       WAVHeader *header;
-
+      
       _VIDEOS *thisVid=&(_videos[_nb_video]);
       // Create streams
       thisVid->audioTracks=new ADM_audioStreamTrack*[nbAStream];
-    
+      thisVid->nbAudioStream=nbAStream;
       for(int i=0;i<nbAStream;i++)
       {
             ADM_audioStreamTrack *track=new ADM_audioStreamTrack;
@@ -404,7 +404,7 @@ UNUSED_ARG(mode);
             track->size=0;
 
             stream->getExtraData(&extraLen,&extraData);
-            track->codec=getAudioCodec(_wavinfo->encoding,_wavinfo,extraLen,extraData);
+            track->codec=getAudioCodec(header->encoding,header,extraLen,extraData);
 
             thisVid->audioTracks[i]=track;
 
@@ -451,15 +451,18 @@ UNUSED_ARG(mode);
    
 
   // next one please
-        if(_wavinfo)
-        if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
+        if(_videos[_nb_video].audioTracks)
         {
-          uint32_t autovbr=0;
-          prefs->get(FEATURE_AUTO_BUILDMAP,&autovbr);
-          if(autovbr || GUI_Confirmation_HIG(QT_TR_NOOP("Build Time Map"),QT_TR_NOOP( "Build VBR time map?"), VBR_MSG))
-                {
-               // _videos[_nb_video]._isAudioVbr=_videos[_nb_video]._audiostream->buildAudioTimeLine ();
-                }
+            WAVHeader *    _wavinfo=&(_videos[_nb_video].audioTracks[0]->wavheader);
+            if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
+            {
+              uint32_t autovbr=0;
+              prefs->get(FEATURE_AUTO_BUILDMAP,&autovbr);
+              if(autovbr || GUI_Confirmation_HIG(QT_TR_NOOP("Build Time Map"),QT_TR_NOOP( "Build VBR time map?"), VBR_MSG))
+                    {
+                   // _videos[_nb_video]._isAudioVbr=_videos[_nb_video]._audiostream->buildAudioTimeLine ();
+                    }
+            }
         }
 
 	_nb_video++;
