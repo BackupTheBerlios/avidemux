@@ -200,27 +200,44 @@ OpenDMLHeader::OpenDMLHeader(void)
         _currentAudioTrack=0;
         myName=NULL;
 }
-uint8_t	OpenDMLHeader::getAudioStream(ADM_audioStream **audio)
-{  	
+
+/**
+    \fn getAudioInfo
+
+*/
+WAVHeader              *OpenDMLHeader::getAudioInfo(uint32_t i ) 
+{
+if(_nbAudioTracks)
+		return _audioStreams[_currentAudioTrack]->getInfo();
+	else
+		return NULL;
+}
+/**
+    \fn getAudioStream
+
+*/
+uint8_t                 OpenDMLHeader::getAudioStream(uint32_t i,ADM_audioStream  **audio)
+{
         if(_nbAudioTracks)
         {
 
-                *audio=_audioStreams[_currentAudioTrack];
+                ADM_assert(i<_nbAudioTracks);
+                *audio=_audioStreams[i];
                 ADM_assert(*audio);
                 return 1;
         }
         *audio=NULL;
         return 0;	
-};
-WAVHeader 	*OpenDMLHeader::getAudioInfo(void )
-{ 	
-	
-	if(_nbAudioTracks)
-		return _audioStreams[_currentAudioTrack]->getInfo();
-	else
-		return NULL;
-	
-} ;
+}
+/**
+    \fn getNbAudioStreams
+
+*/
+uint8_t                 OpenDMLHeader::getNbAudioStreams(void)
+{
+    return _nbAudioTracks;
+}
+
 /**
     \fn open
 
@@ -842,25 +859,3 @@ odmlAudioTrack::~odmlAudioTrack()
         if(avistream) delete avistream;
 }
 
-uint8_t         OpenDMLHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
-{
-        *nbStreams=_nbAudioTracks;
-        if(!_nbAudioTracks)
-                {
-                        *infos=NULL;
-                        return 1;
-                }
-        *infos=new audioInfo[_nbAudioTracks];
-        for(int i=0;i<_nbAudioTracks;i++)
-        {
-            WAV2AudioInfo(_audioTracks[i].wavHeader,&((*infos)[i]));
-        }
-        return 1;
-
-}
-uint8_t         OpenDMLHeader::changeAudioStream(uint32_t newstream)
-{
-                ADM_assert(newstream < _nbAudioTracks);
-                _currentAudioTrack=newstream;
-                return 1;
-}

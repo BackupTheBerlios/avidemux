@@ -37,7 +37,9 @@ typedef struct odmlTrack
 	odmlIndex strh;
 	odmlIndex indx;
 }odmlTrack;
-
+/**
+    \class odmlAudioTrack
+*/
 class odmlAudioTrack
 {
 public:
@@ -52,10 +54,12 @@ public:
                  uint8_t                 *extraData;
                  uint32_t                trackNum;
                  uint32_t                totalLen;
-                AVIStreamHeader          *avistream;
+                 AVIStreamHeader          *avistream;
 };
 
-
+/**
+    \class OpenDMLHeader
+*/
 class OpenDMLHeader         :public vidHeader
 {
 protected:
@@ -132,11 +136,9 @@ virtual 	uint8_t			close(void) ;
   //				 Audio
   //__________________________
 
-virtual 	WAVHeader 	*getAudioInfo(void ); 
-virtual 	uint8_t		        getAudioStream(ADM_audioStream **audio);
-virtual         uint8_t         getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos);
-virtual         uint8_t         changeAudioStream(uint32_t newstream);
-                uint32_t        getCurrentAudioStreamNumber(void) { return _currentAudioTrack;}
+virtual 	WAVHeader              *getAudioInfo(uint32_t i )  ;
+virtual 	uint8_t                 getAudioStream(uint32_t i,ADM_audioStream  **audio);
+virtual     uint8_t                 getNbAudioStreams(void);
 // Frames
   //__________________________
   //				 video
