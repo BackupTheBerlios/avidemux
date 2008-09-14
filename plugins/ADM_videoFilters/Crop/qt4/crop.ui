@@ -5,84 +5,172 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>348</width>
     <height>300</height>
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Dialog</string>
+   <string>Crop</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="leftMargin" >
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
     <number>9</number>
    </property>
-   <property name="topMargin" >
-    <number>9</number>
-   </property>
-   <property name="rightMargin" >
-    <number>9</number>
-   </property>
-   <property name="bottomMargin" >
-    <number>9</number>
-   </property>
-   <property name="horizontalSpacing" >
+   <property name="spacing" >
     <number>6</number>
    </property>
-   <property name="verticalSpacing" >
-    <number>6</number>
-   </property>
-   <item row="2" column="0" colspan="5" >
+   <item>
+    <layout class="QGridLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item row="0" column="3" >
+      <widget class="QLabel" name="label_2" >
+       <property name="text" >
+        <string>Right:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" >
+      <widget class="QLabel" name="label_4" >
+       <property name="text" >
+        <string>Top:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4" >
+      <widget class="QSpinBox" name="spinBoxRight" >
+       <property name="maximum" >
+        <number>2147483647</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2" >
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType" >
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>26</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="1" column="5" >
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="1" column="6" >
+      <widget class="QPushButton" name="pushButtonReset" >
+       <property name="text" >
+        <string>Reset</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" >
+      <widget class="QSpinBox" name="spinBoxTop" >
+       <property name="maximum" >
+        <number>2147483647</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4" >
+      <widget class="QSpinBox" name="spinBoxBottom" >
+       <property name="maximum" >
+        <number>2147483647</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3" >
+      <widget class="QLabel" name="label_3" >
+       <property name="text" >
+        <string>Bottom:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" >
+      <widget class="QLabel" name="label" >
+       <property name="text" >
+        <string>Left:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="5" >
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType" >
+        <enum>QSizePolicy::MinimumExpanding</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="1" >
+      <widget class="QSpinBox" name="spinBoxLeft" >
+       <property name="maximum" >
+        <number>2147483647</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="6" >
+      <widget class="QPushButton" name="pushButtonAutoCrop" >
+       <property name="text" >
+        <string>Auto Crop</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2" >
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType" >
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>26</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QSlider" name="horizontalSlider" >
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="5" >
+   <item>
     <widget class="QGraphicsView" name="graphicsView" />
    </item>
-   <item row="1" column="4" >
-    <widget class="QPushButton" name="pushButtonReset" >
-     <property name="text" >
-      <string>Reset</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>Left:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label_4" >
-     <property name="text" >
-      <string>Top:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2" >
-    <widget class="QLabel" name="label_3" >
-     <property name="text" >
-      <string>Bottom:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3" >
-    <widget class="QSpinBox" name="spinBoxBottom" />
-   </item>
-   <item row="0" column="2" >
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
-      <string>Right:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="3" >
-    <widget class="QSpinBox" name="spinBoxRight" />
-   </item>
-   <item row="4" column="0" colspan="5" >
+   <item>
     <widget class="QDialogButtonBox" name="buttonBox" >
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
@@ -92,21 +180,19 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1" >
-    <widget class="QSpinBox" name="spinBoxLeft" />
-   </item>
-   <item row="1" column="1" >
-    <widget class="QSpinBox" name="spinBoxTop" />
-   </item>
-   <item row="0" column="4" >
-    <widget class="QPushButton" name="pushButtonAutoCrop" >
-     <property name="text" >
-      <string>AutCrop</string>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>spinBoxLeft</tabstop>
+  <tabstop>spinBoxRight</tabstop>
+  <tabstop>spinBoxTop</tabstop>
+  <tabstop>spinBoxBottom</tabstop>
+  <tabstop>pushButtonAutoCrop</tabstop>
+  <tabstop>pushButtonReset</tabstop>
+  <tabstop>horizontalSlider</tabstop>
+  <tabstop>graphicsView</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

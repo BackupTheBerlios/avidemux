@@ -1,7 +1,31 @@
 #ifndef Q_mainfilter_h
 #define Q_mainfilter_h
 
+#include <QtGui/QItemDelegate>
 #include "ui_mainfilter.h"
+
+class FilterItemEventFilter : public QObject
+{
+	Q_OBJECT
+
+protected:
+	bool eventFilter(QObject *object, QEvent *event);
+
+public:
+	FilterItemEventFilter(QWidget *parent = 0);
+};
+
+class FilterItemDelegate : public QItemDelegate
+{
+	Q_OBJECT
+
+private:
+	FilterItemEventFilter *filter;
+
+public:
+	FilterItemDelegate(QWidget *parent = 0);
+	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+};
 
 class filtermainWindow : public QDialog
 {
@@ -30,6 +54,7 @@ public slots:
 	void allDoubleClick( QListWidgetItem  *item);
 	void filterFamilyClick(QListWidgetItem *item);
 	void filterFamilyClick(int  item);
+	void preview(bool b);
 
 private:
 	void setSelected(int sel);

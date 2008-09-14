@@ -19,65 +19,34 @@
    <string>Video Filter Manager</string>
   </property>
   <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
    <property name="spacing" >
     <number>6</number>
    </property>
-   <property name="leftMargin" >
-    <number>9</number>
-   </property>
-   <property name="topMargin" >
-    <number>9</number>
-   </property>
-   <property name="rightMargin" >
-    <number>9</number>
-   </property>
-   <property name="bottomMargin" >
-    <number>9</number>
-   </property>
    <item>
     <layout class="QGridLayout" >
-     <property name="leftMargin" >
+     <property name="margin" >
       <number>0</number>
      </property>
-     <property name="topMargin" >
-      <number>0</number>
-     </property>
-     <property name="rightMargin" >
-      <number>0</number>
-     </property>
-     <property name="bottomMargin" >
-      <number>0</number>
-     </property>
-     <property name="horizontalSpacing" >
-      <number>6</number>
-     </property>
-     <property name="verticalSpacing" >
+     <property name="spacing" >
       <number>6</number>
      </property>
      <item row="4" column="0" colspan="2" >
       <layout class="QGridLayout" >
-       <property name="leftMargin" >
+       <property name="margin" >
         <number>0</number>
        </property>
-       <property name="topMargin" >
-        <number>0</number>
-       </property>
-       <property name="rightMargin" >
-        <number>0</number>
-       </property>
-       <property name="bottomMargin" >
-        <number>0</number>
-       </property>
-       <property name="horizontalSpacing" >
-        <number>6</number>
-       </property>
-       <property name="verticalSpacing" >
+       <property name="spacing" >
         <number>6</number>
        </property>
        <item row="0" column="1" >
         <widget class="QPushButton" name="pushButtonSVCD" >
          <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+          <sizepolicy>
+           <hsizetype>5</hsizetype>
+           <vsizetype>0</vsizetype>
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -99,7 +68,9 @@
        <item row="1" column="1" >
         <widget class="QPushButton" name="pushButtonVCD" >
          <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+          <sizepolicy>
+           <hsizetype>5</hsizetype>
+           <vsizetype>0</vsizetype>
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -121,7 +92,9 @@
        <item row="1" column="0" >
         <widget class="QPushButton" name="pushButtonHalfDVD" >
          <property name="sizePolicy" >
-          <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+          <sizepolicy>
+           <hsizetype>7</hsizetype>
+           <vsizetype>5</vsizetype>
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -143,7 +116,9 @@
        <item row="0" column="0" >
         <widget class="QPushButton" name="pushButtonDVD" >
          <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+          <sizepolicy>
+           <hsizetype>5</hsizetype>
+           <vsizetype>0</vsizetype>
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -167,7 +142,9 @@
      <item rowspan="4" row="1" column="2" colspan="2" >
       <widget class="QListWidget" name="listWidgetAvailable" >
        <property name="sizePolicy" >
-        <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+        <sizepolicy>
+         <hsizetype>7</hsizetype>
+         <vsizetype>7</vsizetype>
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -178,18 +155,17 @@
          <height>0</height>
         </size>
        </property>
-       <property name="cursor" stdset="0" >
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
-       <property name="alternatingRowColors" >
-        <bool>true</bool>
+       <property name="spacing" >
+        <number>2</number>
        </property>
       </widget>
      </item>
      <item rowspan="3" row="1" column="0" colspan="2" >
       <widget class="QListWidget" name="listFilterCategory" >
        <property name="sizePolicy" >
-        <sizepolicy vsizetype="Expanding" hsizetype="Fixed" >
+        <sizepolicy>
+         <hsizetype>0</hsizetype>
+         <vsizetype>7</vsizetype>
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -200,24 +176,6 @@
          <height>340</height>
         </size>
        </property>
-       <property name="cursor" stdset="0" >
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
-       <property name="mouseTracking" >
-        <bool>false</bool>
-       </property>
-       <property name="autoFillBackground" >
-        <bool>false</bool>
-       </property>
-       <property name="styleSheet" >
-        <string/>
-       </property>
-       <property name="alternatingRowColors" >
-        <bool>false</bool>
-       </property>
-       <property name="selectionMode" >
-        <enum>QAbstractItemView::SingleSelection</enum>
-       </property>
        <property name="selectionBehavior" >
         <enum>QAbstractItemView::SelectRows</enum>
        </property>
@@ -227,38 +185,14 @@
          <height>24</height>
         </size>
        </property>
-       <property name="textElideMode" >
-        <enum>Qt::ElideRight</enum>
-       </property>
-       <property name="movement" >
-        <enum>QListView::Static</enum>
-       </property>
-       <property name="flow" >
-        <enum>QListView::TopToBottom</enum>
-       </property>
-       <property name="isWrapping" stdset="0" >
-        <bool>false</bool>
-       </property>
        <property name="resizeMode" >
         <enum>QListView::Adjust</enum>
-       </property>
-       <property name="layoutMode" >
-        <enum>QListView::SinglePass</enum>
        </property>
        <property name="spacing" >
         <number>3</number>
        </property>
-       <property name="viewMode" >
-        <enum>QListView::ListMode</enum>
-       </property>
-       <property name="modelColumn" >
+       <property name="currentRow" >
         <number>0</number>
-       </property>
-       <property name="uniformItemSizes" >
-        <bool>false</bool>
-       </property>
-       <property name="batchSize" >
-        <number>100</number>
        </property>
        <item>
         <property name="text" >
@@ -345,7 +279,9 @@
      <item row="0" column="5" >
       <widget class="QLabel" name="label_2" >
        <property name="sizePolicy" >
-        <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
+        <sizepolicy>
+         <hsizetype>5</hsizetype>
+         <vsizetype>4</vsizetype>
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -358,7 +294,9 @@
      <item rowspan="4" row="1" column="5" colspan="11" >
       <widget class="QListWidget" name="listWidgetActive" >
        <property name="sizePolicy" >
-        <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+        <sizepolicy>
+         <hsizetype>7</hsizetype>
+         <vsizetype>7</vsizetype>
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -369,30 +307,18 @@
          <height>0</height>
         </size>
        </property>
-       <property name="cursor" stdset="0" >
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
-       <property name="alternatingRowColors" >
-        <bool>true</bool>
+       <property name="spacing" >
+        <number>2</number>
        </property>
       </widget>
      </item>
      <item row="5" column="5" colspan="11" >
       <layout class="QHBoxLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
        <property name="spacing" >
         <number>6</number>
-       </property>
-       <property name="leftMargin" >
-        <number>0</number>
-       </property>
-       <property name="topMargin" >
-        <number>0</number>
-       </property>
-       <property name="rightMargin" >
-        <number>0</number>
-       </property>
-       <property name="bottomMargin" >
-        <number>0</number>
        </property>
        <item>
         <spacer>
@@ -410,7 +336,9 @@
        <item>
         <widget class="QToolButton" name="toolButtonConfigure" >
          <property name="sizePolicy" >
-          <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+          <sizepolicy>
+           <hsizetype>0</hsizetype>
+           <vsizetype>5</vsizetype>
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -423,7 +351,9 @@
        <item>
         <widget class="QToolButton" name="toolButtonPartial" >
          <property name="sizePolicy" >
-          <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+          <sizepolicy>
+           <hsizetype>0</hsizetype>
+           <vsizetype>5</vsizetype>
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -497,20 +427,11 @@
      </item>
      <item row="5" column="2" colspan="2" >
       <layout class="QHBoxLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
        <property name="spacing" >
         <number>6</number>
-       </property>
-       <property name="leftMargin" >
-        <number>0</number>
-       </property>
-       <property name="topMargin" >
-        <number>0</number>
-       </property>
-       <property name="rightMargin" >
-        <number>0</number>
-       </property>
-       <property name="bottomMargin" >
-        <number>0</number>
        </property>
        <item>
         <spacer>
@@ -543,7 +464,9 @@
      <item row="0" column="2" >
       <widget class="QLabel" name="label" >
        <property name="sizePolicy" >
-        <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
+        <sizepolicy>
+         <hsizetype>5</hsizetype>
+         <vsizetype>4</vsizetype>
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -576,20 +499,11 @@
    </item>
    <item>
     <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
      <property name="spacing" >
       <number>6</number>
-     </property>
-     <property name="leftMargin" >
-      <number>0</number>
-     </property>
-     <property name="topMargin" >
-      <number>0</number>
-     </property>
-     <property name="rightMargin" >
-      <number>0</number>
-     </property>
-     <property name="bottomMargin" >
-      <number>0</number>
      </property>
      <item>
       <spacer>
@@ -631,6 +545,26 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>listFilterCategory</tabstop>
+  <tabstop>listWidgetAvailable</tabstop>
+  <tabstop>listWidgetActive</tabstop>
+  <tabstop>pushButtonDVD</tabstop>
+  <tabstop>pushButtonSVCD</tabstop>
+  <tabstop>pushButtonHalfDVD</tabstop>
+  <tabstop>pushButtonVCD</tabstop>
+  <tabstop>toolButtonAdd</tabstop>
+  <tabstop>toolButtonConfigure</tabstop>
+  <tabstop>toolButtonPartial</tabstop>
+  <tabstop>toolButtonLoad</tabstop>
+  <tabstop>toolButtonSave</tabstop>
+  <tabstop>toolButtonSaveScript</tabstop>
+  <tabstop>toolButtonDown</tabstop>
+  <tabstop>toolButtonUp</tabstop>
+  <tabstop>pushButtonRemove</tabstop>
+  <tabstop>pushButtonPreview</tabstop>
+  <tabstop>buttonClose</tabstop>
+ </tabstops>
  <resources>
   <include location="filter.qrc" />
  </resources>

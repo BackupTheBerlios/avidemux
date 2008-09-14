@@ -27,11 +27,9 @@
 #endif
 
 #include "T_preview.h"
-#include "ADM_colorspace.h"
+#include "Q_seekablePreview.h"
 #include "../ADM_render/GUI_render.h"
 #include "../ADM_render/GUI_accelRender.h"
-#include "prefs.h"
-#include "ADM_assert.h"
     
 void UI_QT4VideoWidget(QFrame *host);
 static QFrame *hostFrame=NULL;
@@ -45,7 +43,16 @@ void DIA_previewInit(uint32_t width, uint32_t height) {}
 uint8_t DIA_previewUpdate(uint8_t *data) {return 1;}
 void DIA_previewEnd(void) {}
 uint8_t DIA_previewStillAlive(void) {return 1;}
-uint8_t	DIA_filterPreview(const char *captionText, AVDMGenericVideoStream *videoStream, uint32_t frame) {}
+
+uint8_t	DIA_filterPreview(const char *captionText, AVDMGenericVideoStream *videoStream, uint32_t frame)
+{
+	ADM_assert(frame <= videoStream->getInfo()->nb_frames);
+
+	printf("** DIA_filterPreview %i **\n", frame);
+	Ui_seekablePreviewWindow previewDialog(videoStream, frame);
+
+	previewDialog.exec();
+}
 
 //****************************************************************************************************
 /*
@@ -56,6 +63,7 @@ uint8_t	DIA_filterPreview(const char *captionText, AVDMGenericVideoStream *video
 */
 static uint8_t *rgbDataBuffer=NULL;
 static uint32_t displayW=0,displayH=0;
+
 //****************************************************************************************************
 /*
   This is the class that will display the video images.
