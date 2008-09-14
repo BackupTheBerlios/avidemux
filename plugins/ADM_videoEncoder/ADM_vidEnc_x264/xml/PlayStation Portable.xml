@@ -278,7 +278,6 @@
       <pbFrameQuantiser>1.300000</pbFrameQuantiser>
       <adaptiveQuantiserMode>global</adaptiveQuantiserMode>
       <adaptiveQuantiserStrength>1.000000</adaptiveQuantiserStrength>
-      <rateControlEquation>blurCplx^(1-qComp)</rateControlEquation>
       <quantiserCurveCompression>0.600000</quantiserCurveCompression>
       <reduceFluxBeforeCurveCompression>20.000000</reduceFluxBeforeCurveCompression>
       <reduceFluxAfterCurveCompression>0.500000</reduceFluxAfterCurveCompression>

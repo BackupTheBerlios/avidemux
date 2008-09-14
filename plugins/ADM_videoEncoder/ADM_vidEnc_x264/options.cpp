@@ -45,12 +45,6 @@ x264Options::~x264Options(void)
 
 void x264Options::cleanUp(void)
 {
-	if (_param.rc.psz_rc_eq)
-	{
-		free(_param.rc.psz_rc_eq);
-		_param.rc.psz_rc_eq = NULL;
-	}
-
 	if (_configurationName)
 	{
 		free(_configurationName);
@@ -65,7 +59,6 @@ void x264Options::reset(void)
 	cleanUp();
 
 	x264_param_default(&_param);
-	_param.rc.psz_rc_eq = strdup(_param.rc.psz_rc_eq);
 	_param.vui.i_sar_height = 1;
 	_param.vui.i_sar_width = 1;
 	_param.i_threads = 0;	// set to auto-detect; default is disabled
@@ -80,7 +73,6 @@ x264_param_t* x264Options::getParameters(void)
 	x264_param_t *param = new x264_param_t;
 
 	memcpy(param, &_param, sizeof(x264_param_t));
-	param->rc.psz_rc_eq = strdup(_param.rc.psz_rc_eq);
 	param->rc.i_zones = getZoneCount();
 
 	if (param->rc.i_zones)
@@ -893,19 +885,6 @@ void x264Options::setAdaptiveQuantiserStrength(float adaptiveQuantiserStrength)
 }
 #endif
 
-char* x264Options::getRateControlEquation(void)
-{
-	return _param.rc.psz_rc_eq;
-}
-
-void x264Options::setRateControlEquation(const char *rateControlEquation)
-{
-	if (_param.rc.psz_rc_eq)
-		free(_param.rc.psz_rc_eq);
-
-	_param.rc.psz_rc_eq = strdup(rateControlEquation);
-}
-
 float x264Options::getQuantiserCurveCompression(void)
 {
 	return _param.rc.f_qcompress;
@@ -1412,7 +1391,6 @@ void x264Options::addX264OptionsToXml(xmlNodePtr xmlNodeRoot)
 	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"adaptiveQuantiserMode", xmlBuffer);
 	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"adaptiveQuantiserStrength", number2String(xmlBuffer, bufferSize, getAdaptiveQuantiserStrength()));
 #endif
-	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"rateControlEquation", (xmlChar*)getRateControlEquation());
 	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"quantiserCurveCompression", number2String(xmlBuffer, bufferSize, getQuantiserCurveCompression()));
 	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"reduceFluxBeforeCurveCompression", number2String(xmlBuffer, bufferSize, getReduceFluxBeforeCurveCompression()));
 	xmlNewChild(xmlNodeChild, NULL, (xmlChar*)"reduceFluxAfterCurveCompression", number2String(xmlBuffer, bufferSize, getReduceFluxAfterCurveCompression()));
@@ -1958,8 +1936,6 @@ void x264Options::parseRateControlOptions(xmlNode *node)
 			else if (strcmp((char*)xmlChild->name, "adaptiveQuantiserStrength") == 0)
 				setAdaptiveQuantiserStrength(atof(content));
 #endif
-			else if (strcmp((char*)xmlChild->name, "rateControlEquation") == 0)
-				setRateControlEquation(content);
 			else if (strcmp((char*)xmlChild->name, "quantiserCurveCompression") == 0)
 				setQuantiserCurveCompression(atof(content));
 			else if (strcmp((char*)xmlChild->name, "reduceFluxBeforeCurveCompression") == 0)

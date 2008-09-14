@@ -299,9 +299,6 @@ public:
 	void setAdaptiveQuantiserStrength(float adaptiveQuantiserStrength);
 #endif
 
-	char* getRateControlEquation(void);
-	void setRateControlEquation(const char *rateControlEquation);
-
 	float getQuantiserCurveCompression(void);
 	void setQuantiserCurveCompression(float quantiserCurveCompression);
 

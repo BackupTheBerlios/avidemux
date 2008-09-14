@@ -723,8 +723,6 @@ void x264ConfigDialog::loadSettings(vidEncOptions *encodeOptions, x264Options *o
 		delete [] zoneOptions;
 	}
 
-	ui.rateControlEqLineEdit->setText(options->getRateControlEquation());
-
 	// Output tab
 	if (!options->getIdcLevel())
 		options->setIdcLevel(51);
@@ -925,8 +923,6 @@ void x264ConfigDialog::saveSettings(vidEncOptions *encodeOptions, x264Options *o
 
 	for (int zone = 0; zone < zoneOptions.count(); zone++)
 		options->addZone(zoneOptions[zone]);
-
-	options->setRateControlEquation(ui.rateControlEqLineEdit->text().toUtf8().constData());
 
 	// Output tab
 	options->setIdcLevel(idcLevel[ui.idcLevelComboBox->currentIndex()]);
