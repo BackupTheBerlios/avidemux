@@ -322,9 +322,9 @@ static uint32_t unescapeH264(uint32_t len,uint8_t *in, uint8_t *out)
     
 }
 
-static uint8_t extractVUIInfo(GetBitContext *s, uint32_t *fps1000)
+static uint8_t extractVUIInfo(GetBitContext *s, uint32_t *fps1000, uint32_t *darNum, uint32_t *darDen)
 {
-	*fps1000 = 0;
+	*fps1000 = *darNum = *darDen = 0;
 
 	if (get_bits1(s))
 	{
@@ -332,8 +332,13 @@ static uint8_t extractVUIInfo(GetBitContext *s, uint32_t *fps1000)
 
 		if (aspect_ratio_information == 255)
 		{
-			get_bits(s, 16);
-			get_bits(s, 16);
+			*darNum = get_bits_long(s, 16);
+			*darDen = get_bits_long(s, 16);
+		}
+		else if (aspect_ratio_information < sizeof(pixel_aspect) / sizeof(*pixel_aspect))
+		{
+			*darNum = pixel_aspect[aspect_ratio_information].num;
+			*darDen = pixel_aspect[aspect_ratio_information].den;
 		}
 	}
 
@@ -379,7 +384,7 @@ static uint8_t extractVUIInfo(GetBitContext *s, uint32_t *fps1000)
     \brief Extract info from H264 SPS
     See 7.3.2.1 of 14496-10
 */
-uint8_t extractSPSInfo(uint8_t *data, uint32_t len,uint32_t *wwidth,uint32_t *hheight, uint32_t *fps1000)
+uint8_t extractSPSInfo(uint8_t *data, uint32_t len,uint32_t *wwidth,uint32_t *hheight, uint32_t *fps1000, uint32_t *darNum, uint32_t *darDen)
 {
    GetBitContext s;
    
@@ -465,7 +470,7 @@ uint8_t extractSPSInfo(uint8_t *data, uint32_t len,uint32_t *wwidth,uint32_t *hh
 		   }
 
 		   if(get_bits1(&s))
-			   extractVUIInfo(&s, fps1000);
+			   extractVUIInfo(&s, fps1000, darNum, darDen);
 
            return 1;
 }
