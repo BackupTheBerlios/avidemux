@@ -26,8 +26,7 @@ extern admMutex accessMutex;
 typedef struct 
 {
   Encoder                   *videoEncoder;
-//  AVDMGenericAudioStream    *audioEncoder;
-  mplexMuxer                *muxer;
+  //mplexMuxer                *muxer;
   ADMBitstream              *bitstream;
   uint32_t                  nbVideoFrame;
   uint32_t                  audioTargetSample;

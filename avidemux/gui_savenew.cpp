@@ -30,20 +30,20 @@
 //#include "ADM_codecs/ADM_divxEncode.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
-#include "ADM_outputs/oplug_avi/op_aviwrite.hxx"
-#include "ADM_outputs/oplug_avi/op_avisave.h"
-#include "ADM_outputs/oplug_avi/op_savecopy.h"
-#include "ADM_outputs/oplug_mp4/oplug_mp4.h"
-#include "ADM_outputs/oplug_flv/oplug_flv.h"
+//#include "ADM_outputs/oplug_avi/op_aviwrite.hxx"
+//#include "ADM_outputs/oplug_avi/op_avisave.h"
+//#include "ADM_outputs/oplug_avi/op_savecopy.h"
+//#include "ADM_outputs/oplug_mp4/oplug_mp4.h"
+//#include "ADM_outputs/oplug_flv/oplug_flv.h"
 #include "ADM_encoder/adm_encoder.h"
 
-#include "ADM_outputs/oplug_avi/op_saveprocess.h"
-#include "ADM_outputs/oplug_avi/op_savesmart.hxx"
+//#include "ADM_outputs/oplug_avi/op_saveprocess.h"
+//#include "ADM_outputs/oplug_avi/op_savesmart.hxx"
 
 
 #include "DIA_fileSel.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
-#include "ADM_outputs/oplug_mpegFF/oplug_vcdff.h"
+//#include "ADM_outputs/oplug_mpegFF/oplug_vcdff.h"
 
 static uint8_t  A_SaveAudioNVideo(const char *name);
  extern int A_SaveUnpackedVop(const char *name);
@@ -56,6 +56,7 @@ static uint8_t  A_SaveAudioNVideo(const char *name);
 
 int A_Save(const char *name)
 {
+#if 0
 uint32_t end;
 int ret=0;
 	// depending on the type we save a avi, a mpeg or a XVCD
@@ -234,9 +235,11 @@ int ret=0;
         }
         getFirstVideoFilter(0,avifileinfo->nb_frames);
         return ret;
+#endif
 }
 uint8_t  A_SaveAudioDualAudio(const char *inname)
 {
+#if 0
 GenericAviSaveCopyDualAudio *nw;
 const char *name;
 uint8_t ret=0;
@@ -257,11 +260,12 @@ uint8_t ret=0;
 	//	ret=nw->saveAvi(name);
       // 		delete nw;
                 return ret;
-
+#endif
 }
 //___________________________________
 int A_SaveUnpackedVop(const char *name)
 {
+#if 0
   aviInfo info;
 GenericAviSave	*nw;
 int ret;
@@ -277,9 +281,11 @@ int ret;
 	ret=nw->saveAvi(name);
 	delete nw;
 	return ret;
+#endif
 }
 int A_SavePackedVop(const char *name)
 {
+#if 0
   aviInfo info;
 GenericAviSave	*nw;
 int ret;
@@ -295,10 +301,12 @@ int ret;
 	ret=nw->saveAvi(name);
 	delete nw;
 	return ret;
+#endif
 }
 //___________________________________
 uint8_t  A_SaveAudioNVideo(const char *name)
 {
+#if 0
      uint32_t needSmart=0,fl;
      GenericAviSave	*nw=NULL;
      aviInfo info;
@@ -356,4 +364,5 @@ uint8_t  A_SaveAudioNVideo(const char *name)
      delete nw;
 
 return ret;
+#endif
 }

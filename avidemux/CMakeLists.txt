@@ -60,6 +60,7 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_coreAudio/include")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_coreUtils/include")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_coreAudioDevice/include")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_coreDemuxer/include")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_coreMuxer/include")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_ffmpeg/ADM_lavutil")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/ADM_libraries/ADM_ffmpeg/ADM_lavcodec")
 
@@ -188,7 +189,7 @@ ENDFOREACH(_current ${ADM_SUBDIR})
 ADD_SUBDIRECTORY(ADM_outputs)
 
 SET(ADM_OUTPUTS	
-	oplug_avi
+	#oplug_avi
 	#oplug_mp4
 	#oplug_mpeg
 	#oplug_mpegFF
@@ -249,9 +250,9 @@ ENDFOREACH(_current ${ADM_TAILS})
 ADD_SUBDIRECTORY(ADM_libraries)
 
 ADD_ADMLIB_ALL_TARGETS(
-	ADM_mplex
+	#ADM_mplex
 	ADM_libmpeg2enc
-	ADM_lvemux
+	#ADM_lvemux
 	ADM_xvidratectl
 )
 ADD_LIB_ALL_TARGETS(
@@ -345,6 +346,8 @@ ADD_SUBDIRECTORY(ADM_coreAudioDevice)
 ADD_LIB_ALL_TARGETS(ADM_coreAudioDevice)
 ADD_SUBDIRECTORY(ADM_coreUtils)
 ADD_LIB_ALL_TARGETS(ADM_coreUtils)
+ADD_SUBDIRECTORY(ADM_coreMuxer)
+ADD_LIB_ALL_TARGETS(ADM_coreMuxer)
 
 # To be removed
 #ADD_SUBDIRECTORY(ADM_audioEncoder)

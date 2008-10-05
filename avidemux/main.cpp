@@ -74,6 +74,7 @@ extern uint8_t ADM_vf_loadPlugins(const char *path);
 extern uint8_t ADM_av_loadPlugins(const char *path);
 extern uint8_t ADM_ae_loadPlugins(const char *path);
 extern uint8_t ADM_dm_loadPlugins(const char *path);
+extern uint8_t ADM_mx_loadPlugins(const char *path);
 extern void loadPlugins(void);
 extern void InitFactory(void);
 extern void InitCoreToolkit(void);
@@ -236,6 +237,10 @@ int main(int argc, char *argv[])
     char *avPlugins = ADM_getInstallRelativePath(startDir,"ADM_plugins","audioDevices");    
     char *aePlugins = ADM_getInstallRelativePath(startDir,"ADM_plugins","audioEncoders");    
     char *dmPlugins = ADM_getInstallRelativePath(startDir,"ADM_plugins","demuxers");    
+    char *mxPlugins = ADM_getInstallRelativePath(startDir,"ADM_plugins","muxers");    
+
+    ADM_mx_loadPlugins(mxPlugins);
+    delete [] mxPlugins;
 
 	ADM_ad_loadPlugins(adPlugins);
 	delete [] adPlugins;

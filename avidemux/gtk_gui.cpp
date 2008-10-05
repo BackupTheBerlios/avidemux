@@ -39,8 +39,8 @@
 #include "gui_action.hxx"
 #include "gtkgui.h"
 
-#include "ADM_outputs/oplug_avi/GUI_mux.h"
-#include "ADM_outputs/oplug_mpegFF/oplug_vcdff.h"
+//#include "ADM_outputs/oplug_avi/GUI_mux.h"
+//#include "ADM_outputs/oplug_mpegFF/oplug_vcdff.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"
 #include "ADM_encoder/adm_encConfig.h"
@@ -144,7 +144,7 @@ int ignore_change;
 extern uint8_t DIA_ocrGen(void);
 extern uint8_t DIA_ocrDvb(void);
 uint8_t A_TimeShift(void);
-PARAM_MUX muxMode = MUX_REGULAR;
+//PARAM_MUX muxMode = MUX_REGULAR;
 int muxParam = 0;
 
 extern uint8_t UI_getPhysicalScreenSize(void* window, uint32_t *w,uint32_t *h);
@@ -302,7 +302,7 @@ int nw;
       return;
       break;
     case ACT_SetMuxParam:
-      ADM_aviUISetMuxer();
+      //ADM_aviUISetMuxer();
       return;
       break;
     case ACT_Fast:
@@ -2559,6 +2559,30 @@ ADM_RENDER_TYPE UI_getPreferredRender(void)
         }
 
         return render;
+}
+
+const char *getStrFromAudioCodec( uint32_t codec)
+{
+      switch(codec)
+      {
+              case WAV_DTS: return QT_TR_NOOP("DTS");
+              case WAV_PCM: return QT_TR_NOOP("PCM");
+              case WAV_MP2: return QT_TR_NOOP("MP2");
+              case WAV_MP3: return QT_TR_NOOP("MP3");
+              case WAV_WMA:  return QT_TR_NOOP("WMA");
+              case WAV_LPCM: return QT_TR_NOOP("LPCM");	
+              case WAV_AC3:  return QT_TR_NOOP("AC3");
+              case WAV_OGG: return QT_TR_NOOP("Ogg Vorbis");
+              case WAV_MP4: return QT_TR_NOOP("MP4");
+              case WAV_AAC: return QT_TR_NOOP("AAC");
+              case WAV_QDM2: return QT_TR_NOOP("QDM2");
+              case WAV_AMRNB: return QT_TR_NOOP("AMR-NB");
+              case WAV_MSADPCM: return QT_TR_NOOP("MSADPCM");
+              case WAV_ULAW: return QT_TR_NOOP("ULAW");
+              case WAV_IMAADPCM: return QT_TR_NOOP("IMA ADPCM");
+              case WAV_8BITS_UNSIGNED:return QT_TR_NOOP("8-bit PCM");
+      }
+      return QT_TR_NOOP("Unknown codec");
 }
 
 //

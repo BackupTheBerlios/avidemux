@@ -24,7 +24,7 @@ class ADM_dynMuxer :public ADM_LibWrapper
 public:
         int         initialised;
         ADM_muxer    *(*createmuxer)();
-        void         (*deletemuxer)(ADM_muxer *demuxer);
+        void         (*deletemuxer)(ADM_muxer *muxer);
         uint8_t      (*getVersion)(uint32_t *major,uint32_t *minor,uint32_t *patch);
         const char    *name;
         const char    *descriptor;
@@ -34,18 +34,18 @@ public:
         {
         const char   *(*getDescriptor)();
         uint32_t     (*getApiVersion)();
-        const char  *(*getDemuxerName)();
+        const char  *(*getMuxerName)();
 
 			initialised = (loadLibrary(file) && getSymbols(7,
-				&createdemuxer, "create",
-				&deletedemuxer, "destroy",
-				&getDemuxerName, "getName",
+				&createmuxer, "create",
+				&deletemuxer, "destroy",
+				&getMuxerName, "getName",
 				&getApiVersion,  "getApiVersion",
 				&getVersion,     "getVersion",
 				&getDescriptor,  "getDescriptor"));
                 if(initialised)
                 {
-                    name=getDemuxerName();
+                    name=getMuxerName();
                     apiVersion=getApiVersion();
                     descriptor=getDescriptor();
                     printf("[Muxer]Name :%s ApiVersion :%d Description :%s\n",name,apiVersion,descriptor);
