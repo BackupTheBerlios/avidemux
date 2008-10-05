@@ -14,11 +14,12 @@
  *                                                                         *
  ***************************************************************************/
 #include "ADM_default.h"
-#include "ADM_dummy.h"
 #include "ADM_muxerInternal.h"
+#include "ADM_dummy.h"
+
 #include "fourcc.h"
 
-ADM_MUXER_BEGIN( dummyMuxer,
+ADM_MUXER_BEGIN( muxerDummy,
                     1,0,0,
                     "dummy",
                     "dummy muxer plugin (c) Mean 2008"

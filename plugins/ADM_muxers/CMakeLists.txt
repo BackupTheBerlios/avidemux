@@ -1,4 +1,5 @@
-ADD_SUBDIRECTORY(oplug_avi)
+ADD_SUBDIRECTORY(muxerDummy)
+#ADD_SUBDIRECTORY(oplug_avi)
 #ADD_SUBDIRECTORY(oplug_mp4)
 #ADD_SUBDIRECTORY(oplug_mpeg)
 #ADD_SUBDIRECTORY(oplug_mpegFF)

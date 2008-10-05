@@ -36,7 +36,7 @@ public:
         uint32_t     (*getApiVersion)();
         const char  *(*getMuxerName)();
 
-			initialised = (loadLibrary(file) && getSymbols(7,
+			initialised = (loadLibrary(file) && getSymbols(6,
 				&createmuxer, "create",
 				&deletemuxer, "destroy",
 				&getMuxerName, "getName",
@@ -58,8 +58,8 @@ public:
 
 #define ADM_MUXER_BEGIN( Class,maj,mn,pat,name,desc) \
 extern "C" {\
-vidHeader   *create(void){ return new Class; } \
-void         destroy(vidHeader *h){ Class *z=(Class *)h;delete z;} \
+ADM_muxer   *create(void){ return new Class; } \
+void         destroy(ADM_muxer *h){ Class *z=(Class *)h;delete z;} \
 uint8_t      getVersion(uint32_t *major,uint32_t *minor,uint32_t *patch) {*major=maj;*minor=mn;*patch=pat;} \
 uint32_t     getApiVersion(void) {return ADM_MUXER_API_VERSION;} \
 const char  *getName(void) {return name;} \

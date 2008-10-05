@@ -38,11 +38,11 @@ class ADM_muxer
 public:
                           ADM_muxer() {};
         virtual           ~ADM_muxer() {};
-        virtual bool      open(const char *filename, ADM_videoStream *videoStream,
+        virtual bool      open(const char *filename,   ADM_videoStream *videoStream,
                                 uint32_t nbAudioTrack, ADM_audioStream *audioStreams)=0;
 
         virtual  bool     save(void)=0;
-        virtual  void     close(void)=0; 
+        virtual  bool     close(void)=0; 
 
 
 };
