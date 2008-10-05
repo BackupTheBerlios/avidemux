@@ -450,7 +450,7 @@ void call_autosplit(char *p)
 
 		int32_t i;
 		sscanf(p,"%ld",&i);
-		ADM_aviSetSplitSize(i);
+//		ADM_aviSetSplitSize(i);
 }
 
 void setBegin(char *p) 
