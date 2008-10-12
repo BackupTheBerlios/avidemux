@@ -43,6 +43,7 @@ public:
 
         virtual  bool     save(void)=0;
         virtual  bool     close(void)=0; 
+        virtual  bool     configure(void) {return true;};
 
 
 };

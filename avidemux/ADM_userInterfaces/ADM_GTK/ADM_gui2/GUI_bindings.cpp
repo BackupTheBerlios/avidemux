@@ -39,6 +39,7 @@
 #include "ADM_userInterfaces/ADM_render/GUI_renderInternal.h"
 #include "ADM_video/ADM_vidMisc.h"
 
+
 extern uint8_t UI_getPhysicalScreenSize(void* window, uint32_t *w,uint32_t *h);
 extern void ADM_initUIGtk(GtkWidget *guiRootWindow);
 extern  ADM_RENDER_TYPE UI_getPreferredRender(void);;
@@ -85,8 +86,13 @@ static int update_ui=0;
 void GUI_gtk_grow_off(int onff);
 static void GUI_initCustom(void);
 const char * GUI_getCustomScript(uint32_t nb);
+
 uint32_t audioEncoderGetNumberOfEncoders(void);
 const char  *audioEncoderGetDisplayName(uint32_t i);
+
+extern uint32_t ADM_mx_getNbMuxers(void);
+extern const char *ADM_mx_getDisplayName(uint32_t i);
+
 
 #ifdef HAVE_AUDIO
 extern uint8_t AVDM_setVolume(int volume);
@@ -521,15 +527,19 @@ uint8_t  bindGUI( void )
         /*   Fill in output format window */
         uint32_t nbFormat;
 
-                nbFormat=sizeof(ADM_allOutputFormat)/sizeof(ADM_FORMAT_DESC);
+                nbFormat=ADM_mx_getNbMuxers();
                 combo_box=GTK_COMBO_BOX(lookup_widget(guiRootWindow,FORMAT_WIDGET));
                 gtk_combo_box_remove_text(combo_box,0);
                 printf("Found %d Format \n",nbFormat);		       
                 for(uint32_t i=0;i<nbFormat;i++)
                 {
-                        gtk_combo_box_append_text      (combo_box,QT_TR_NOOP(ADM_allOutputFormat[i].text));	
+                        name=ADM_mx_getDisplayName(i);
+                        gtk_combo_box_append_text      (combo_box,QT_TR_NOOP(name));	
                 }
         gtk_combo_box_set_active(combo_box,0);
+
+
+
         /* File in preview mode combobox */
             const char *previewText[]=
                 {
@@ -1055,17 +1065,7 @@ int enable;
 }
 void on_format_change(void)
 {
-int enable;
-       if(update_ui) return;
-        ADM_OUT_FORMAT fmt=UI_GetCurrentFormat();
-        if(fmt==ADM_AVI_UNP || fmt==ADM_AVI_PAK)
-        {
-          gtk_widget_set_sensitive(lookup_widget(guiRootWindow,VIDEO_WIDGET),0);  
-          
-        }else
-        {
-          gtk_widget_set_sensitive(lookup_widget(guiRootWindow,VIDEO_WIDGET),1);  
-        }
+
 
 }
 
@@ -1131,16 +1131,27 @@ void UI_PrintCurrentVCodec(const char *str)
  	
 
 }
-ADM_OUT_FORMAT UI_GetCurrentFormat( void )
+/**
+    \fn UI_GetCurrentFormat
+    \brief Returns index of the currently selected container
+
+*/
+uint32_t UI_GetCurrentFormat( void )
 {
 
-	return (ADM_OUT_FORMAT)gtk_combo_box_get_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,FORMAT_WIDGET)));
+	return (uint32_t)gtk_combo_box_get_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,FORMAT_WIDGET)));
 }
-uint8_t UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
+/**
+    \fn UI_GetCurrentFormat
+    \brief Returns index of the currently selected container
+
+*/
+
+bool UI_SetCurrentFormat( uint32_t  fmt )
 {
 
 	 gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,FORMAT_WIDGET)),fmt);
-	return 1;
+	return true;
 }
 /**
     \fn DNDmerge

@@ -27,23 +27,14 @@
 
 #include "ADM_videoFilter.h"
 #include "ADM_videoFilter_internal.h"
-//#include "ADM_codecs/ADM_divxEncode.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
-//#include "ADM_outputs/oplug_avi/op_aviwrite.hxx"
-//#include "ADM_outputs/oplug_avi/op_avisave.h"
-//#include "ADM_outputs/oplug_avi/op_savecopy.h"
-//#include "ADM_outputs/oplug_mp4/oplug_mp4.h"
-//#include "ADM_outputs/oplug_flv/oplug_flv.h"
 #include "ADM_encoder/adm_encoder.h"
-
-//#include "ADM_outputs/oplug_avi/op_saveprocess.h"
-//#include "ADM_outputs/oplug_avi/op_savesmart.hxx"
 
 
 #include "DIA_fileSel.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
-//#include "ADM_outputs/oplug_mpegFF/oplug_vcdff.h"
+#include "ADM_muxer.h"
 
 static uint8_t  A_SaveAudioNVideo(const char *name);
  extern int A_SaveUnpackedVop(const char *name);
@@ -53,9 +44,28 @@ static uint8_t  A_SaveAudioNVideo(const char *name);
  extern uint8_t ADM_saveRaw(const char *name);
  uint8_t A_SaveAudioDualAudio(const char *name);
  extern uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format);
+ADM_muxer *ADM_MuxerSpawnFromIndex(int index);
 
+/**
+    \fn A_Save
+*/
 int A_Save(const char *name)
 {
+    int ret=1;
+    ADM_muxer *muxer=NULL;
+    int index=UI_GetCurrentFormat();
+    if(!ADM_MuxerSpawnFromIndex(index))
+    {
+        GUI_Error_HIG("Muxer","Cannot instantiante muxer");
+        return 0;
+    }
+    // Audio Stream ?
+
+    // Video Stream ?
+    GUI_Info_HIG(ADM_LOG_INFO,"Muxer","done.");
+    if(muxer) delete muxer;
+    return ret;
+}
 #if 0
 uint32_t end;
 int ret=0;
@@ -236,7 +246,7 @@ int ret=0;
         getFirstVideoFilter(0,avifileinfo->nb_frames);
         return ret;
 #endif
-}
+
 uint8_t  A_SaveAudioDualAudio(const char *inname)
 {
 #if 0

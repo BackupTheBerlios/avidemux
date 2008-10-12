@@ -35,8 +35,9 @@ int 	UI_getCurrentVCodec(void);
 void UI_setAudioCodec( int i);
 void UI_setVideoCodec( int i);
 
-ADM_OUT_FORMAT 	UI_GetCurrentFormat( void );
-uint8_t 	UI_SetCurrentFormat( ADM_OUT_FORMAT fmt );
+/* We deal index wise here...*/
+uint32_t UI_GetCurrentFormat( void );
+bool 	 UI_SetCurrentFormat( uint32_t fmt );
 
 void UI_toogleSide(void);
 void UI_toogleMain(void);

@@ -15,7 +15,7 @@
 #include "GUI_ui.h"
 #include "ADM_colorspace.h"
 
-static ADM_OUT_FORMAT format=ADM_AVI;
+static uint32_t format=0;
 static int audioCodec=0;
 static int videoCodec=0;
  
@@ -31,12 +31,12 @@ void UI_setAudioCodec( int i)
 }
 
 //**************************************************
-uint8_t 	UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
+bool 	UI_SetCurrentFormat( uint32_t fmt )
 {
 format=fmt;
 }
 
-ADM_OUT_FORMAT 	UI_GetCurrentFormat( void )
+uint32_t 	UI_GetCurrentFormat( void )
 {
   return format;
 }

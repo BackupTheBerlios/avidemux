@@ -27,6 +27,7 @@ public:
         void         (*deletemuxer)(ADM_muxer *muxer);
         uint8_t      (*getVersion)(uint32_t *major,uint32_t *minor,uint32_t *patch);
         const char    *name;
+        const char    *displayName;
         const char    *descriptor;
         uint32_t      apiVersion;
 
@@ -35,17 +36,20 @@ public:
         const char   *(*getDescriptor)();
         uint32_t     (*getApiVersion)();
         const char  *(*getMuxerName)();
+        const char  *(*getDisplayName)();
 
-			initialised = (loadLibrary(file) && getSymbols(6,
+			initialised = (loadLibrary(file) && getSymbols(7,
 				&createmuxer, "create",
 				&deletemuxer, "destroy",
 				&getMuxerName, "getName",
+                &getDisplayName, "getDisplayName",
 				&getApiVersion,  "getApiVersion",
 				&getVersion,     "getVersion",
 				&getDescriptor,  "getDescriptor"));
                 if(initialised)
                 {
                     name=getMuxerName();
+                    displayName=getDisplayName();
                     apiVersion=getApiVersion();
                     descriptor=getDescriptor();
                     printf("[Muxer]Name :%s ApiVersion :%d Description :%s\n",name,apiVersion,descriptor);
@@ -56,7 +60,7 @@ public:
         }
 };
 
-#define ADM_MUXER_BEGIN( Class,maj,mn,pat,name,desc) \
+#define ADM_MUXER_BEGIN( Class,maj,mn,pat,name,desc,displayName) \
 extern "C" {\
 ADM_muxer   *create(void){ return new Class; } \
 void         destroy(ADM_muxer *h){ Class *z=(Class *)h;delete z;} \
@@ -64,6 +68,7 @@ uint8_t      getVersion(uint32_t *major,uint32_t *minor,uint32_t *patch) {*major
 uint32_t     getApiVersion(void) {return ADM_MUXER_API_VERSION;} \
 const char  *getName(void) {return name;} \
 const char  *getDescriptor(void) {return desc;} \
+const char  *getDisplayName(void) { return displayName;} \
 }
 
 #endif

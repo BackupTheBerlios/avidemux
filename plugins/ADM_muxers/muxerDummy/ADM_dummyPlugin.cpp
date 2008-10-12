@@ -21,7 +21,8 @@
 
 ADM_MUXER_BEGIN( muxerDummy,
                     1,0,0,
-                    "dummy",
-                    "dummy muxer plugin (c) Mean 2008"
+                    "dummy",    // Internal name
+                    "dummy2 muxer plugin (c) Mean 2008",
+                    "Dummy Muxer" // DIsplay name
                 );
 

@@ -554,16 +554,15 @@ uint8_t A_setContainer(const char *cont)
        printf("Cannot set output format \"%s\"\n",cont);
        return 0;
 }
-
+/**
+    \fn getCurrentContainerAsString
+    \brief
+*/
+extern const char *ADM_mx_getName(uint32_t i);
 const char *getCurrentContainerAsString(void)
 {
-        ADM_OUT_FORMAT cont=UI_GetCurrentFormat();
-        for(int i=0;i<sizeof(container)/sizeof(ADM_CONTAINER);i++)
-        {
-                if(container[i].type==cont) 
-                        return container[i].name;
-        }
-        ADM_assert(0);
-        return NULL;
-
+        uint32_t index=UI_GetCurrentFormat();
+    
+        return ADM_mx_getName(index);
 }
+//EOF

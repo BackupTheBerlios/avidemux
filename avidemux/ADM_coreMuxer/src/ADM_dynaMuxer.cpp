@@ -32,6 +32,25 @@ uint32_t ADM_mx_getNbMuxers(void)
     return ListOfMuxers.size();
 }
 /**
+    \fn ADM_mx_getDisplayName
+    \brief Returns display name for muxer i
+*/
+const char *ADM_mx_getDisplayName(uint32_t i)
+{
+    ADM_assert(i<ListOfMuxers.size());
+    return ListOfMuxers[i]->displayName;
+}
+/**
+    \fn ADM_mx_getName
+    \brief Returns internal name for muxer i
+*/
+const char *ADM_mx_getName(uint32_t i)
+{
+    ADM_assert(i<ListOfMuxers.size());
+    return ListOfMuxers[i]->name;
+}
+
+/**
     \fn     ADM_dm_getDemuxerInfo
     \brief  Get Infos about the demuxer #th plugin
 */
@@ -126,6 +145,17 @@ uint32_t mark;
         return ListOfMuxers[found]->createmuxer();
     }
     return NULL;
+}
+
+/**
+    \fn ADM_MuxerSpawnFromIndex
+    \brief Locate the correct demuxer and instantiate it
+
+*/
+ADM_muxer *ADM_MuxerSpawnFromIndex(int index)
+{
+    ADM_assert(index<ListOfMuxers.size());
+    return ListOfMuxers[index]->createmuxer();
 }
 
 // EOF
