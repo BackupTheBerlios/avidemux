@@ -157,6 +157,31 @@ ADM_muxer *ADM_MuxerSpawnFromIndex(int index)
     ADM_assert(index<ListOfMuxers.size());
     return ListOfMuxers[index]->createmuxer();
 }
+//___________________________________________
+extern "C"
+{
+    #include "ADM_libraries/ADM_ffmpeg/ADM_lavformat/avformat.h"
+    #include "ADM_libraries/ADM_ffmpeg/ADM_lavformat/avio.h" // to get regiter protocol
+};
+extern "C"
+{
+extern void movenc_init(void);
+extern void flvenc_init(void);
+extern void matroskaenc_init(void);
+}
+extern struct URLProtocol file_protocol ;
+/**
 
+
+*/
+void ADM_lavFormatInit(void)
+{
+    // Init lavformat
+
+        movenc_init();
+        flvenc_init();
+        matroskaenc_init();
+        register_protocol(&file_protocol);
+}
 // EOF
 

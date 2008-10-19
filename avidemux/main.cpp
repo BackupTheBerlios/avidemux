@@ -41,6 +41,7 @@ extern void xvid4_init(void);
 
 extern void  ADM_lavInit();
 extern void  ADM_lavDestroy();
+extern void  ADM_lavFormatInit(void);
 extern "C" {
      extern uint8_t     ADM_InitMemcpy(void);
 };
@@ -101,7 +102,6 @@ bool SpidermonkeyInit(void);
 void SpidermonkeyDestroy(void);
 
 extern pthread_mutex_t g_pSpiderMonkeyMutex;
-
 #if defined(ADM_DEBUG) && defined(FIND_LEAKS)
 extern const char* new_progname;
 extern int check_leaks();
@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
 #ifdef HAVE_ENCODER
      registerVideoFilters();
 #endif
-
+    ADM_lavFormatInit();
 	//***************Plugins *********************
 	// Load system wide audio decoder plugin
 #ifdef __APPLE__

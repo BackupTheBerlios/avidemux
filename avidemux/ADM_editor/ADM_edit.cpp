@@ -240,13 +240,13 @@ ADM_Composer::~ADM_Composer ()
     
     @param name: filename
     @param mode: 0 open, 1 append
-    @param forcedType : if !=Unknown_FileType, it enables to force the file type
+    
 
     @return 1 on success, 0 on failure
         
 
 */
-uint8_t ADM_Composer::addFile (const char *name, uint8_t mode,fileType forcedType)
+uint8_t ADM_Composer::addFile (const char *name, uint8_t mode)
 {
   uint8_t    ret =    0;
   aviInfo    info;

@@ -1,6 +1,7 @@
 
 SET(ADMcoreMuxer_SRCS
 ADM_dynaMuxer.cpp
+ADM_videoCopy.cpp
 )	
 #*************************************************
 ADD_LIBRARY(ADM_coreMuxer SHARED ${ADMcoreMuxer_SRCS})

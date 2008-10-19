@@ -35,6 +35,7 @@
 #include "DIA_fileSel.h"
 #include "ADM_userInterfaces/ADM_commonUI/GUI_ui.h"
 #include "ADM_muxer.h"
+#include "ADM_videoCopy.h"
 
 static uint8_t  A_SaveAudioNVideo(const char *name);
  extern int A_SaveUnpackedVop(const char *name);
@@ -54,15 +55,34 @@ int A_Save(const char *name)
     int ret=1;
     ADM_muxer *muxer=NULL;
     int index=UI_GetCurrentFormat();
-    if(!ADM_MuxerSpawnFromIndex(index))
+    if(!(muxer=ADM_MuxerSpawnFromIndex(index)))
     {
         GUI_Error_HIG("Muxer","Cannot instantiante muxer");
         return 0;
     }
     // Audio Stream ?
-
+    ADM_audioStream *audio=NULL;
+    if(!video_body->getAudioStream(&audio))
+    {
+        GUI_Error_HIG("Audio","Cannot get audiostream");
+        return 0;
+    }
+    
     // Video Stream ?
-    GUI_Info_HIG(ADM_LOG_INFO,"Muxer","done.");
+    ADM_videoStream *video=new ADM_videoStreamCopy();
+    //
+    ADM_audioStream *astreams[1]={audio};
+    if(!muxer->open(name,video,1,astreams))
+    {
+        GUI_Error_HIG("Muxer","Cannot open ");
+        
+    }else   
+    {
+        muxer->save();
+        muxer->close();
+    }
+    //
+
     if(muxer) delete muxer;
     return ret;
 }

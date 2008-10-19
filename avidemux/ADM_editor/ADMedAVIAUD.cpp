@@ -216,5 +216,18 @@ WAVHeader       *ADM_Composer::getInfo(void)
     return trk->codec->channelMapping;
 
 }
+/**
+    \fn getExtraData
+*/
+bool            ADM_Composer::getExtraData(uint32_t *l, uint8_t **d)
+{
+    *l=0;
+    *d=NULL;
+     ADM_audioStreamTrack *trk=getTrack(0);
+    if(!trk) return false;
+    return trk->stream->getExtraData(l,d); 
+
+}
+
 //EOF
 

@@ -96,7 +96,7 @@ virtual bool            goToTime(uint64_t nbUs);
 /// Returns current time in us. Not used.
 //virtual uint8_t         getTime(uint64_t *nbUs);
 /// Returns extra configuration data
-        bool            getExtraData(uint32_t *l, uint8_t **d);
+virtual bool            getExtraData(uint32_t *l, uint8_t **d);
 /// Returns or compute duration. If the access cannot provide it, it will be computed here
         uint64_t        getDurationInUs(void) {return durationInUs;}
 };

@@ -1,9 +1,8 @@
 /***************************************************************************
-                          oplug_vcdff.h  -  description
-                             -------------------
-    begin                : Sun Nov 10 2002
-    copyright            : (C) 2002 by mean
+    copyright            : (C) 2007 by mean
     email                : fixounet@free.fr
+    
+      See lavformat/flv[dec/env].c for detail
  ***************************************************************************/
 
 /***************************************************************************
@@ -14,8 +13,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifdef USE_FFMPEG
-#include "ADM_editor/ADM_outputfmt.h"
-uint8_t oplug_mp4(const char *name,ADM_OUT_FORMAT type);
+#include "ADM_default.h"
+#include "ADM_muxerInternal.h"
+#include "muxerMP4.h"
 
-#endif
+#include "fourcc.h"
+
+ADM_MUXER_BEGIN( muxerMP4,
+                    1,0,0,
+                    "MP4",    // Internal name
+                    "MP4 muxer plugin (c) Mean 2008",
+                    "MP4 Muxer" // DIsplay name
+                );
+

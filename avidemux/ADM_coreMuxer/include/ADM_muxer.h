@@ -19,14 +19,15 @@ protected:
             uint32_t fourCC;
             bool     isCFR;
 public:
-            ADM_videoStream() {};
-    virtual ~ADM_videoStream() {};
+                      ADM_videoStream() {};
+            virtual ~ADM_videoStream() {};
             uint32_t getWidth(void) {return width;}
             uint32_t getHeight(void) {return height;}
             uint32_t getFCC(void) {return fourCC;}
             bool     getIsCfr(void) {return isCFR;}
+            uint32_t getAvgFps1000(void) {return averageFps1000;}
 
-virtual     bool     getPacket(uint32_t *len, uint8_t *data, uint32_t maxLen,uint64_t pts,uint64_t dts);
+virtual     bool     getPacket(uint32_t *len, uint8_t *data, uint32_t maxLen,uint64_t pts,uint64_t dts)=0;
 virtual     bool     getExtraData(uint32_t *extraLen, uint8_t **extraData) {*extraLen=0;*extraData=NULL;return true;};
 };
 /**
@@ -39,7 +40,7 @@ public:
                           ADM_muxer() {};
         virtual           ~ADM_muxer() {};
         virtual bool      open(const char *filename,   ADM_videoStream *videoStream,
-                                uint32_t nbAudioTrack, ADM_audioStream *audioStreams)=0;
+                                uint32_t nbAudioTrack, ADM_audioStream **audioStreams)=0;
 
         virtual  bool     save(void)=0;
         virtual  bool     close(void)=0; 

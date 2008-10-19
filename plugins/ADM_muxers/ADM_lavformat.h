@@ -28,7 +28,7 @@ typedef enum
         MUXER_DUMMY
 }ADM_MUXER_TYPE;
 
-
+/*
 class ADMMpegMuxer
 {
 protected:
@@ -100,7 +100,7 @@ public:
         virtual uint8_t audioEof(void);
         virtual uint8_t videoEof(void);
 
-};
+};*/
 #define TS_PACKET_SIZE 188
 
 typedef struct
@@ -116,7 +116,7 @@ typedef struct
     uint32_t tableId;
     uint32_t sectionId;
 }channel;
-
+/*
 class tsMuxer : public ADMMpegMuxer
 {
 protected:
@@ -162,6 +162,7 @@ public:
         virtual uint8_t needAudio(void);
 
 };
+*/
 #endif
 //EOF
 

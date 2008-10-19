@@ -42,30 +42,7 @@
 #define MAX_VIDEO   100
 
 #define ADM_EDITOR_AUDIO_BUFFER_SIZE (128*1024)
-typedef enum
-{
-		Unknown_FileType=0,
-		AVI_FileType=1,
-		Mpeg_FileType=2,
-		Nuppel_FileType=3,
-		BMP_FileType=4  ,
-		MpegIdx_FileType=5,
-		H263_FileType=6,
-		Mp4_FileType=7,
-		WorkBench_FileType=8,
-		Ogg_FileType=9,
-		_3GPP_FileType=10,
-		VCodec_FileType=11,
-		Script_FileType=12,
-		NewMpeg_FileType=13,
-		ECMAScript_FileType=14,
-        AvsProxy_FileType=15,
-        Matroska_FileType=16,
-        ASF_FileType=17,
-        FLV_FileType=18,
-        AMV_FileType=19,
-		DUMMY_FILETYPE=99
-}fileType;
+
 
 typedef enum
 {
@@ -193,7 +170,7 @@ class ADM_Composer : public ADM_audioStream
 						void 		deleteAllVideos(void );
 
 						uint8_t 	getMagic(const char *name,uint32_t *magic);
-						uint8_t 	identify(const char *name, fileType *type);
+
 						uint32_t 	searchForwardSeg(uint32_t startframe);
                         uint8_t     tryIndexing(const char *name, const char *idxname=NULL);
 
@@ -219,7 +196,7 @@ class ADM_Composer : public ADM_audioStream
   				//_______________________
   				// specific to composer
   				//_______________________
-  						uint8_t 	addFile (const char *name, uint8_t mode=0,fileType forcedType=Unknown_FileType);
+  						uint8_t 	addFile (const char *name, uint8_t mode=0);
   						uint8_t 	cleanup( void);
 			   			uint8_t 	isMultiSeg( void) { if(_nb_segment>1) return 1; else return 0;}
   						uint8_t 	removeFrames(uint32_t start,uint32_t end);
