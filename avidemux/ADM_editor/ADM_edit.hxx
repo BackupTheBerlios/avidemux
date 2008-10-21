@@ -217,6 +217,7 @@ public:
                         bool        GoToTime(uint64_t time);
                         bool        NextPicture(ADMImage *image);
                         bool        samePicture(ADMImage *image);
+                        bool        getCompressedPicure(uint32_t framenum,ADMCompressedImage *img);
 /************************************ Internal ******************************/
 public:
                                     /// Decode frame and on until frame is popped out of decoders

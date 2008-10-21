@@ -72,6 +72,23 @@ bool        ADM_Composer::samePicture(ADMImage *image)
     return getSamePicture(image,0);
 
 }
+/**
+        \fn getCompressedPicure
+        \brief bypass decoder and directly get the source image
+
+*/
+bool        ADM_Composer::getCompressedPicure(uint32_t framenum,ADMCompressedImage *img)
+{
+uint8_t ref = 0;
+    
+    _VIDEOS *vid=&_videos[ref];
+    vidHeader *demuxer=vid->_aviheader;
+
+    img->cleanup(framenum);
+
+    if (!demuxer->getFrame (framenum,img)) return false;
+    return true;
+}
 //***************************** Internal API**************************
 /**
     \fn DecodePictureUpToIntra

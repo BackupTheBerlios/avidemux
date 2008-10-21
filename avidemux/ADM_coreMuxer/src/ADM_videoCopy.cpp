@@ -45,10 +45,18 @@ bool     ADM_videoStreamCopy::getExtraData(uint32_t *extraLen, uint8_t **extraDa
 /**
     \fn getPacket
 */
-bool  ADM_videoStreamCopy::getPacket(uint32_t *len, uint8_t *data, uint32_t maxLen,uint64_t pts,uint64_t dts)
+bool  ADM_videoStreamCopy::getPacket(uint32_t *len, uint8_t *data, uint32_t maxLen,uint64_t *pts,uint64_t *dts)
 {
-    *len=0;
-    pts=dts=0;
+    image.data=data;
+    if(false==video_body->getCompressedPicure(start,&image))
+    {
+            printf("[StreamCopy] Get packet failed for frame %d\n",start);
+            return false;
+    }
+    *len=image.dataLength;
+    ADM_assert(*len<maxLen);
+    *pts=image.demuxerPts;
+    *dts=image.demuxerPts;
     return true;
 }
      
