@@ -45,7 +45,9 @@ bool     ADM_videoStreamCopy::getExtraData(uint32_t *extraLen, uint8_t **extraDa
 /**
     \fn getPacket
 */
-bool  ADM_videoStreamCopy::getPacket(uint32_t *len, uint8_t *data, uint32_t maxLen,uint64_t *pts,uint64_t *dts)
+bool  ADM_videoStreamCopy::getPacket(uint32_t *len, uint8_t *data, uint32_t maxLen,
+                    uint64_t *pts,uint64_t *dts,
+                    uint32_t *flags)
 {
     image.data=data;
     if(false==video_body->getCompressedPicure(start,&image))
@@ -57,6 +59,8 @@ bool  ADM_videoStreamCopy::getPacket(uint32_t *len, uint8_t *data, uint32_t maxL
     ADM_assert(*len<maxLen);
     *pts=image.demuxerPts;
     *dts=image.demuxerPts;
+    *flags=image.flags;
+    start++;
     return true;
 }
      

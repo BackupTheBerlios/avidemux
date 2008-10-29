@@ -21,6 +21,8 @@
 #include "muxerMP4.h"
 #include "DIA_coreToolkit.h"
 
+#define ADM_NO_PTS 0xFFFFFFFFFFFFFFFFLL // FIXME
+
 extern "C" {
 //#include "ADM_lavcodec.h"
 #include "ADM_lavformat/avformat.h"
@@ -131,7 +133,7 @@ bool muxerMP4::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
 	}
     AVCodecContext *c;
 	c = video_st->codec;
-
+    
   // probably a memeleak here
         char *foo=ADM_strdup(file);
         
@@ -267,6 +269,9 @@ bool muxerMP4::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
         }
 
         ADM_assert(av_write_header(oc)>=0);
+        vStream=s;
+        aStreams=a;
+        nbAStreams=nbAudioTrack;
         return true;
 }
 /**
@@ -275,7 +280,37 @@ bool muxerMP4::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
 bool muxerMP4::save(void) 
 {
     printf("[MP4] Saving\n");
-    return false;
+    uint32_t bufSize=vStream->getWidth()*vStream->getHeight()*3;
+    uint8_t *buffer=new uint8_t[bufSize];
+    uint32_t len,flags;
+    uint64_t pts,dts;
+    int ret;
+    int written=0;
+    while(true==vStream->getPacket(&len, buffer, bufSize,&pts,&dts,&flags))
+    {
+	AVPacket pkt;
+            if(pts==ADM_NO_PTS) pts=0x8000000000000000LL;  // AV_NOPTS_VALUE
+            if(dts==ADM_NO_PTS) dts=0x8000000000000000LL;
+            printf("[MP4] Len : %d flags:%x Pts:%ld Dts:%ld\n",len,flags,pts,dts);
+            av_init_packet(&pkt);
+            pkt.dts=dts;
+            pkt.pts=pts;
+            pkt.stream_index=0;
+            pkt.data= buffer;
+            pkt.size= len;
+            if(flags & 0x10) // FIXME AVI_KEY_FRAME
+                        pkt.flags |= PKT_FLAG_KEY;
+            ret =av_write_frame(oc, &pkt);
+            if(ret)
+            {
+                printf("[LavFormat]Error writing video packet\n");
+                break;
+            }
+            written++;
+    }
+    delete [] buffer;
+    printf("[MP4] Wrote %d frames\n",written);
+    return true;
 }
 /**
     \fn close
@@ -283,6 +318,24 @@ bool muxerMP4::save(void)
 */
 bool muxerMP4::close(void) 
 {
+    if(oc)
+    {
+        av_write_trailer(oc);
+        url_fclose((oc->pb));
+        if(audio_st)
+        {
+             av_free(audio_st);
+        }
+        if(video_st)
+        {
+             av_free(video_st);
+        }
+        video_st=NULL;
+        audio_st=NULL;
+        if(oc)
+            av_free(oc);
+        oc=NULL;
+    }
     printf("[MP4] Closing\n");
     return true;
 }

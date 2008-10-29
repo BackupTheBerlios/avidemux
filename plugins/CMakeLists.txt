@@ -131,7 +131,7 @@ INCLUDE(admCheckMiscLibs)
 #ADD_SUBDIRECTORY(ADM_videoEncoder)
 #ADD_SUBDIRECTORY(ADM_videoFilters)
 #ADD_SUBDIRECTORY(ADM_audioEncoders)
-#ADD_SUBDIRECTORY(ADM_demuxers)
+ADD_SUBDIRECTORY(ADM_demuxers)
 ADD_SUBDIRECTORY(ADM_muxers)
 
 ########################################

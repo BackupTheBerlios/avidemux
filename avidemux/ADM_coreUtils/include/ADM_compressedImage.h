@@ -9,7 +9,7 @@
 #ifndef ADM_COMPRESSED_IMAGE_H
 #define ADM_COMPRESSED_IMAGE_H
 
-#define ADM_COMPRESSED_NO_PTS 0xffffffff
+#define ADM_COMPRESSED_NO_PTS (0xFFFFFFFFFFFFFFFFLL) // Same as ADM_NO_PTS
 class ADMCompressedImage
 {
   

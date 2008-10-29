@@ -18,7 +18,8 @@ public:
              ADM_videoStreamCopy();
     virtual ~ADM_videoStreamCopy();
 
-virtual     bool     getPacket(uint32_t *len, uint8_t *data, uint32_t maxLen,uint64_t *pts,uint64_t *dts);
+virtual     bool     getPacket(uint32_t *len, uint8_t *data, uint32_t maxLen,uint64_t *pts,uint64_t *dts,
+                                    uint32_t *flags);
 virtual     bool     getExtraData(uint32_t *extraLen, uint8_t **extraData) ;
 };
 #endif
