@@ -58,7 +58,7 @@ bool  ADM_videoStreamCopy::getPacket(uint32_t *len, uint8_t *data, uint32_t maxL
     *len=image.dataLength;
     ADM_assert(*len<maxLen);
     *pts=image.demuxerPts;
-    *dts=image.demuxerPts;
+    *dts=image.demuxerDts;
     *flags=image.flags;
     start++;
     return true;

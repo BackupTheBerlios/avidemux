@@ -274,6 +274,17 @@ bool muxerMP4::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
         nbAStreams=nbAudioTrack;
         return true;
 }
+
+uint64_t rescaleLavPts(uint64_t us, uint32_t avgFps1000)
+{
+
+     if(us==ADM_NO_PTS) return 0x8000000000000000LL;  // AV_NOPTS_VALUE
+    double db=(double)us;
+    db= db*1000.;
+    db=db/avgFps1000;
+    return (uint64_t) db;
+}
+
 /**
     \fn save
 */
@@ -289,9 +300,9 @@ bool muxerMP4::save(void)
     while(true==vStream->getPacket(&len, buffer, bufSize,&pts,&dts,&flags))
     {
 	AVPacket pkt;
-            if(pts==ADM_NO_PTS) pts=0x8000000000000000LL;  // AV_NOPTS_VALUE
-            if(dts==ADM_NO_PTS) dts=0x8000000000000000LL;
-            printf("[MP4] Len : %d flags:%x Pts:%ld Dts:%ld\n",len,flags,pts,dts);
+            pts=rescaleLavPts(pts,vStream->getAvgFps1000());
+            dts=rescaleLavPts(dts,vStream->getAvgFps1000());
+            printf("[MP4] Len : %d flags:%x Pts:%llu Dts:%llu\n",len,flags,pts,dts);
             av_init_packet(&pkt);
             pkt.dts=dts;
             pkt.pts=pts;
