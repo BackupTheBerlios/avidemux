@@ -364,6 +364,13 @@ bool muxerMP4::save(void)
 	AVPacket pkt;
             aprintf("[MP5] LastDts:%08lu Dts:%08lu (%04.4lu) Delta : %u\n",lastVideoDts,dts,dts/1000000,dts-lastVideoDts);
             rawDts=dts;
+            if(rawDts==ADM_NO_PTS)
+            {
+                lastVideoDts+=videoIncrement;
+            }else
+            {
+                lastVideoDts=dts;
+            }
             pts=rescaleLavPts(pts,scale);
             dts=rescaleLavPts(dts,scale);
             aprintf("[MP4] RawDts:%lu Scaled Dts:%lu\n",rawDts,dts);
@@ -408,8 +415,9 @@ bool muxerMP4::save(void)
                     f*=fq; // In samples
                     f/=1000.*1000.; // In sec
                    
-
+                    
                     uint64_t rescaledDts=(uint64_t)(f+0.4);
+                    aprintf("[MP4] Video frame  %d, audio Dts :%lu size :%lu nbSample : %lu rescaled:%lu\n",written,audioDts,audioSize,nbSample,rescaledDts);
                     av_init_packet(&pkt);
                     pkt.dts=rescaledDts;
                     pkt.pts=rescaledDts;
@@ -422,6 +430,7 @@ bool muxerMP4::save(void)
                         printf("[LavFormat]Error writing audio packet\n");
                         break;
                     }
+                    aprintf("%u vs %u\n",audioDts/1000,(lastVideoDts+videoIncrement)/1000);
                     if(audioDts!=ADM_NO_PTS)
                     {
                         if(audioDts>lastVideoDts+videoIncrement) break;
