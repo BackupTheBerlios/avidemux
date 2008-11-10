@@ -41,6 +41,59 @@ uint8_t isH264Compatible (uint32_t fourcc);
 uint8_t isMSMpeg4Compatible (uint32_t fourcc);
 uint8_t isDVCompatible (uint32_t fourcc);
 
+#if 1
+#define aprintf(...) {}
+#else
+#define aprintf printf
+#endif
+
+
+/**
+    \fn rescaleFps
+    \brief Rescale fps to be accurate (i.e. 23.976 become 24000/1001)
+
+*/
+void  rescaleFps(uint32_t fps1000, AVRational *rational)
+{
+    switch(fps1000)
+    {
+    case 23976 :
+    {
+        rational->num=1001;
+        rational->den=24000;
+        break;
+    }
+    case 29970 :
+    {
+        rational->num=1001;
+        rational->den=30000;
+        break;
+    }
+    default:
+    rational->num=1000;
+    rational->den=fps1000;
+    }
+    printf("[MP3] TimeBase for video %d/%d\n",rational->num,rational->den);
+}
+/**
+        \fn rescaleLavPts
+        \brief Rescale PTS/DTS the lavformat way, i.e. relative to the scale.
+*/
+uint64_t rescaleLavPts(uint64_t us, AVRational *scale)
+{
+
+     if(us==ADM_NO_PTS) return 0x8000000000000000LL;  // AV_NOPTS_VALUE
+    double db=(double)us;
+    double s=scale->den;
+
+     db*=s;
+     db=(db)/1000000.; // in seconds
+    uint64_t i=(uint64_t)db; // round up to the closer num value
+    i=(i+scale->num-1)/scale->num;
+    i*=scale->num;
+    return i;
+}
+
 
 /**
     \fn     muxerMP4
@@ -143,11 +196,21 @@ bool muxerMP4::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
         {
                 c->codec_id = CODEC_ID_MPEG4;
                 c->has_b_frames=1; // in doubt...
+                c->max_b_frames=2;
         }else
         {
                 if(isH264Compatible(s->getFCC()))
                 {
-                        c->has_b_frames=1; // in doubt...
+                        if(s->providePts()==true)
+                        {
+                            c->has_b_frames=1; // in doubt...
+                            c->max_b_frames=2;
+                        }else
+                        {
+                            printf("[MP4] Source video has no PTS information, assuming no b frames\n");
+                            c->has_b_frames=0; // No PTS=cannot handle CTS...
+                            c->max_b_frames=0;
+                        }
                         c->codec_id = CODEC_ID_H264;
                         c->codec=new AVCodec;
                         memset(c->codec,0,sizeof(AVCodec));
@@ -190,11 +253,10 @@ bool muxerMP4::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
         c->width = s->getWidth();
         c->height =s->getHeight();
 
-        
-        c->time_base=(AVRational){1000,s->getAvgFps1000()};
+        rescaleFps(s->getAvgFps1000(),&(c->time_base));
         c->gop_size=15;
-        c->max_b_frames=2;
-        c->has_b_frames=1;
+        
+        
 
 // *******************************************
 // *******************************************
@@ -272,19 +334,6 @@ bool muxerMP4::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
         nbAStreams=nbAudioTrack;
         return true;
 }
-/**
-
-*/
-uint64_t rescaleLavPts(uint64_t us, uint32_t avgFps1000,uint32_t scale)
-{
-
-     if(us==ADM_NO_PTS) return 0x8000000000000000LL;  // AV_NOPTS_VALUE
-    double db=(double)us;
-     
-     db*=scale;
-     db=(db+99999)/1000000.; // in seconds
-    return (uint64_t) (db);
-}
 
 /**
     \fn save
@@ -295,7 +344,7 @@ bool muxerMP4::save(void)
     uint32_t bufSize=vStream->getWidth()*vStream->getHeight()*3;
     uint8_t *buffer=new uint8_t[bufSize];
     uint32_t len,flags;
-    uint64_t pts,dts;
+    uint64_t pts,dts,rawDts;
     uint64_t lastVideoDts=0;
     uint64_t videoIncrement;
     int ret;
@@ -309,32 +358,33 @@ bool muxerMP4::save(void)
 
 
     printf("[MP4]avg fps=%u\n",vStream->getAvgFps1000());
-
+    AVRational *scale=&(video_st->codec->time_base);
     while(true==vStream->getPacket(&len, buffer, bufSize,&pts,&dts,&flags))
     {
 	AVPacket pkt;
-            printf("[MP5] LastDts:%08lu Dts:%08lu (%04.4lu) Delta : %u\n",lastVideoDts,dts,dts/1000000,dts-lastVideoDts);
-            
-            if(pts==ADM_NO_PTS)  // FIXME!!!
-            {
-                pts=2*videoIncrement+dts;
-            }
-            pts=rescaleLavPts(pts,vStream->getAvgFps1000(),video_st->codec->time_base.den);
-            
-            dts=rescaleLavPts(dts,vStream->getAvgFps1000(),video_st->codec->time_base.den);
-            
-            printf("[MP4] Rescaled: Len : %d flags:%x Pts:%llu Dts:%llu\n",len,flags,pts,dts);
+            aprintf("[MP5] LastDts:%08lu Dts:%08lu (%04.4lu) Delta : %u\n",lastVideoDts,dts,dts/1000000,dts-lastVideoDts);
+            rawDts=dts;
+            pts=rescaleLavPts(pts,scale);
+            dts=rescaleLavPts(dts,scale);
+            aprintf("[MP4] RawDts:%lu Scaled Dts:%lu\n",rawDts,dts);
+            aprintf("[MP4] Rescaled: Len : %d flags:%x Pts:%llu Dts:%llu\n",len,flags,pts,dts);
 
             av_init_packet(&pkt);
             pkt.dts=dts;
-            pkt.pts=pts;
+            if(vStream->providePts()==true)
+            {
+                pkt.pts=pts;
+            }else
+            {
+                pkt.pts=pkt.dts;
+            }
             pkt.stream_index=0;
             pkt.data= buffer;
             pkt.size= len;
             if(flags & 0x10) // FIXME AVI_KEY_FRAME
                         pkt.flags |= PKT_FLAG_KEY;
             ret =av_write_frame(oc, &pkt);
-            printf("[MP4]Frame:%u, DTS=%08lu PTS=%08lu\n",written,dts,pts);
+            aprintf("[MP4]Frame:%u, DTS=%08lu PTS=%08lu\n",written,dts,pts);
             if(ret)
             {
                 printf("[LavFormat]Error writing video packet\n");
@@ -348,14 +398,16 @@ bool muxerMP4::save(void)
                 uint64_t audioDts;
                 ADM_audioStream*a=aStreams[audio];
                 uint32_t fq=a->getInfo()->frequency;
+                int nb=0;
                 while(a->getPacket(audioBuffer,&audioSize, AUDIO_BUFFER_SIZE,&nbSample,&audioDts))
                 {
                     // Write...
-            
+                    nb++;
                     AVPacket pkt;
-                    float f=audioDts;
-                    f/=1000.*1000.; // In sec
+                    double f=audioDts;
                     f*=fq; // In samples
+                    f/=1000.*1000.; // In sec
+                   
 
                     uint64_t rescaledDts=(uint64_t)(f+0.4);
                     av_init_packet(&pkt);
@@ -375,13 +427,13 @@ bool muxerMP4::save(void)
                         if(audioDts>lastVideoDts+videoIncrement) break;
                     }
                 }
-
+                if(!nb) printf("[MP4] No audio for video frame %d\n",written);
             }
 
     }
     delete [] buffer;
     delete [] audioBuffer;
-    printf("[MP4] Wrote %d frames\n",written);
+    printf("[MP4] Wrote %d frames, nb audio streams %d\n",written,nbAStreams);
     return true;
 }
 /**

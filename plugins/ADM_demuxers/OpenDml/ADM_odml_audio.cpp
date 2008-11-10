@@ -118,7 +118,11 @@ uint64_t  ADM_aviAudioAccess::getPos(void)
 */
 bool   ADM_aviAudioAccess::getPacket(uint8_t *buffer, uint32_t *size, uint32_t maxSize,uint64_t *dts)
 {
-        if(currentIndex>=nbIndex) return 0;
+        if(currentIndex>=nbIndex) 
+        {
+            printf("[OpenDmlDemuxer] Index Exceeded %d/%d\n",currentIndex,nbIndex);
+            return 0;
+        }
         fseeko(fd,index[currentIndex].offset,SEEK_SET);
         if(index[currentIndex].size>maxSize) ADM_assert(0);
         fread(buffer,1,index[currentIndex].size,fd);
