@@ -164,6 +164,7 @@ uint8_t GUI_close(void);
 extern void A_jog(void);
 extern void DIA_glyphEdit(void);
 extern uint8_t DIA_pluginsInfo(void);
+extern bool ADM_mux_configure(int index);
 //___________________________________________
 // serialization of user event through gui
 //
@@ -302,7 +303,10 @@ int nw;
       return;
       break;
     case ACT_SetMuxParam:
-      //ADM_aviUISetMuxer();
+        {
+        int index=UI_GetCurrentFormat();
+        ADM_mux_configure(index);
+        }
       return;
       break;
     case ACT_Fast:

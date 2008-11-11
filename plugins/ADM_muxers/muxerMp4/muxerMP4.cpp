@@ -47,7 +47,11 @@ uint8_t isDVCompatible (uint32_t fourcc);
 #define aprintf printf
 #endif
 
-
+M4MUXERCONFIG muxerConfig=
+{
+    MP4_MUXER_MP4,
+    true
+};
 /**
     \fn rescaleFps
     \brief Rescale fps to be accurate (i.e. 23.976 become 24000/1001)

@@ -18,6 +18,21 @@
 #define ADM_MUXER_MP4
 
 #include "ADM_muxer.h"
+
+typedef enum
+{
+    MP4_MUXER_MP4,
+    MP4_MUXER_PSP
+}MP4_MUXER_TYPE;
+
+typedef struct
+{
+    MP4_MUXER_TYPE muxerType;
+    uint32_t       useAlternateMP3Tag;
+}M4MUXERCONFIG;
+
+extern M4MUXERCONFIG muxerConfig;
+
 class muxerMP4 : public ADM_muxer
 {
 protected:

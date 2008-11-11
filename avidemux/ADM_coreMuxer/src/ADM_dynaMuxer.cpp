@@ -21,7 +21,15 @@ void ADM_muxersCleanup(void);
 ADM_muxer *ADM_muxerSpawn(uint32_t magic,const char *name);
 
 std::vector <ADM_dynMuxer *> ListOfMuxers;
-
+/**
+    \fn ADM_mux_configure
+    \brief 
+*/
+bool ADM_mux_configure(int index)
+{
+    ADM_assert(index<ListOfMuxers.size());
+    return ListOfMuxers[index]->configure();
+}
 
 /**
         \fn ADM_mx_getNbMuxers

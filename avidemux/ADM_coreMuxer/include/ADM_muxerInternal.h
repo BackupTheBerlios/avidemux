@@ -16,7 +16,7 @@
 #ifndef  ADM_muxerInternal_H
 #define  ADM_muxerInternal_H
 
-#define ADM_MUXER_API_VERSION 1
+#define ADM_MUXER_API_VERSION 2
 #include "ADM_dynamicLoading.h"
 #include "ADM_muxer.h"
 class ADM_dynMuxer :public ADM_LibWrapper
@@ -30,6 +30,9 @@ public:
         const char    *displayName;
         const char    *descriptor;
         uint32_t      apiVersion;
+        bool  (*configure)(void);
+        bool  (*getConfiguration)(uint32_t *len,uint8_t *data);
+        bool  (*setConfiguration)(uint32_t *len,uint8_t *data);
 
         ADM_dynMuxer(const char *file) : ADM_LibWrapper()
         {
@@ -37,15 +40,21 @@ public:
         uint32_t     (*getApiVersion)();
         const char  *(*getMuxerName)();
         const char  *(*getDisplayName)();
+        
 
-			initialised = (loadLibrary(file) && getSymbols(7,
+
+			initialised = (loadLibrary(file) && getSymbols(7+3,
 				&createmuxer, "create",
 				&deletemuxer, "destroy",
 				&getMuxerName, "getName",
                 &getDisplayName, "getDisplayName",
 				&getApiVersion,  "getApiVersion",
 				&getVersion,     "getVersion",
-				&getDescriptor,  "getDescriptor"));
+				&getDescriptor,  "getDescriptor",
+                &configure,"configure",
+                &setConfiguration,"setConfiguration",
+                &getConfiguration,"getConfiguration"
+                ));
                 if(initialised)
                 {
                     name=getMuxerName();
@@ -60,7 +69,7 @@ public:
         }
 };
 
-#define ADM_MUXER_BEGIN( Class,maj,mn,pat,name,desc,displayName) \
+#define ADM_MUXER_BEGIN( Class,maj,mn,pat,name,desc,displayName,configureFunc,conf,confSize) \
 extern "C" {\
 ADM_muxer   *create(void){ return new Class; } \
 void         destroy(ADM_muxer *h){ Class *z=(Class *)h;delete z;} \
@@ -69,6 +78,14 @@ uint32_t     getApiVersion(void) {return ADM_MUXER_API_VERSION;} \
 const char  *getName(void) {return name;} \
 const char  *getDescriptor(void) {return desc;} \
 const char  *getDisplayName(void) { return displayName;} \
+bool        getConfiguration(uint32_t *len,uint8_t **data) \
+                    {*len=confSize;*data=(uint8_t *)conf;return true;}\
+bool        setConfiguration(uint32_t *len,uint8_t *data)\
+                    {\
+                    if(*len!=confSize) return false;\
+                    if(conf) memcpy(conf,data,confSize);\
+                    return true;} \
+ bool  configure(void) {return configureFunc();}\
 }
 
 #endif

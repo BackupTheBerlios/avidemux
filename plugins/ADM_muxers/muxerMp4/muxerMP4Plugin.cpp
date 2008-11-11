@@ -18,11 +18,15 @@
 #include "muxerMP4.h"
 
 #include "fourcc.h"
+ bool mp4Configure(void);
 
 ADM_MUXER_BEGIN( muxerMP4,
                     1,0,0,
                     "MP4",    // Internal name
                     "MP4 muxer plugin (c) Mean 2008",
-                    "MP4 Muxer" // DIsplay name
+                    "MP4 Muxer", // DIsplay name
+                    mp4Configure,
+                    &muxerConfig,
+                    sizeof(muxerConfig)
                 );
 
