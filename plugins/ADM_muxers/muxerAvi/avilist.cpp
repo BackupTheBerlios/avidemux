@@ -21,7 +21,7 @@
  /*
 * MODIFIED BY GMV 30.1.05: prepared for ODML
 */
-#include "config.h"
+
 #include "ADM_default.h"
 #include "avifmt.h"
 #include "avifmt2.h"

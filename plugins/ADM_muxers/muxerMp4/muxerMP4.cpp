@@ -161,7 +161,9 @@ bool muxerMP4::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
 
     }
     /* All seems fine, open stuff */
-    fmt=guess_format("mp4", NULL, NULL);
+    const char *f="mp4";
+    if(muxerConfig.muxerType==MP4_MUXER_PSP) f="psp";
+    fmt=guess_format(f, NULL, NULL);
     if(!fmt)
     {
             printf("[Mp4] guess format failed\n");

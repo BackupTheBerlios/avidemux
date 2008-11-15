@@ -20,12 +20,12 @@
 */
  
 
-#include "config.h"
+
 #include "ADM_default.h"
 #include "ADM_threads.h"
 
 #include "fourcc.h"
-#include "avi_vars.h"
+
 #include "DIA_coreToolkit.h"
 
 //#include "avilist.h"
@@ -33,10 +33,10 @@
 #include "ADM_videoFilter.h"
 
 #include "ADM_videoFilter.h"
-#include "ADM_encoder/ADM_vidEncode.hxx"
 
-#include "ADM_audio/aviaudio.hxx"
-#include "ADM_audiofilter/audioprocess.hxx"
+
+
+
 #include "op_aviwrite.hxx"
 #include "op_avisave.h"
 #include "GUI_mux.h"
