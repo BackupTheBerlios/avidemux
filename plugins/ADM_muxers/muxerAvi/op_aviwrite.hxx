@@ -62,7 +62,7 @@ typedef struct
 
 #include "avifmt.h"
 #include "avifmt2.h"
-
+#include <vector>
 /**
     \class aviWrite
 
@@ -73,15 +73,14 @@ typedef struct
         doODML_t             doODML;
 		FILE 		         *_out;
         ADMFile              *_file;
-        IdxEntry             *myindex;  // Belongs to class ????
 		MainAVIHeader	     _mainheader;
 		AVIStreamHeader      _videostream;
 		ADM_BITMAPINFOHEADER _bih;
-
+        std::vector <IdxEntry > myindex;
 		uint32_t nb_audio;
 		AVIStreamHeader _audio[ADM_AVI_MAX_AUDIO_TRACK];
-
-		uint32_t asize;
+        uint32_t        audioSize[ADM_AVI_MAX_AUDIO_TRACK];
+        uint32_t        audioNbBlocks[ADM_AVI_MAX_AUDIO_TRACK];
 
 		uint32_t vframe;
 
@@ -133,7 +132,7 @@ public:
 	uint8_t saveBegin (
              const char         *name,
 		     ADM_videoStream    *video,
-		     uint32_t 		    nb_frame,
+		     
              uint32_t           nbAudioStreams,
              ADM_audioStream 	*audiostream[]);
                            

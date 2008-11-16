@@ -1,6 +1,6 @@
-/***************************************************************************
-            \file            muxerMP4
-            \brief           i/f to lavformat mpeg4 muxer
+/**********************************************************************
+            \file            muxerAvi
+            \brief           Avi openDML muxer
                              -------------------
     
     copyright            : (C) 2008 by mean
@@ -40,7 +40,7 @@ uint8_t isDVCompatible (uint32_t fourcc);
 
 AVIMUXERCONFIG muxerConfig=
 {
-    0
+    HIDDEN
 };
 
 
@@ -73,7 +73,6 @@ bool muxerAvi::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
         if(!writter.saveBegin (
              file,
 		     s,
-		     0,
              nbAudioTrack,
              a))
         {
@@ -128,7 +127,11 @@ bool muxerAvi::save(void)
                     printf("[AVI] Error writting video frame\n");
                     break;
             }
+
+            printf("[AVI] Written :%d, computed:%d\n",written,frameNo);
+
             written++;
+            
             // Now send audio until they all have DTS > lastVideoDts+increment
             for(int audioIndex=0;audioIndex<nbAStreams;audioIndex++)
             {
@@ -140,7 +143,7 @@ bool muxerAvi::save(void)
                 while(a->getPacket(audioBuffer,&audioSize, AUDIO_BUFFER_SIZE,&nbSample,&audioDts))
                 {
                     nb=writter.saveAudioFrame(audioIndex,audioSize,audioBuffer) ;
-                    aprintf("%u vs %u\n",audioDts/1000,(lastVideoDts+videoIncrement)/1000);
+                    //printf("%u vs %u\n",audioDts/1000,(lastVideoDts+videoIncrement)/1000);
                     if(audioDts!=ADM_NO_PTS)
                     {
                         if(audioDts>lastVideoDts+videoIncrement) break;
@@ -165,11 +168,6 @@ bool muxerAvi::close(void)
 {
  
     printf("[AVI] Closing\n");
-    return true;
-}
-
-extern "C" bool AviConfigure(void)
-{
     return true;
 }
 //EOF

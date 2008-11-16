@@ -2,6 +2,7 @@ include(mx_plugin)
 SET(ADM_avi_SRCS 
         muxerAvi.cpp        
         muxerAviPlugin.cpp   
+        muxerAviConfig.cpp
         op_aviwrite.cpp
         avilist.cpp
 
