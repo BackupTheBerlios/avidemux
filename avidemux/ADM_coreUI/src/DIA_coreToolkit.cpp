@@ -228,3 +228,12 @@ DIA_workingBase *createWorking(const char *title)
     if(Toolkit->createWorking) return Toolkit->createWorking(title);
     return NULL;
 }
+/**
+    \fn createEncoding
+*/
+DIA_encodingBase *createEncoding(uint32_t fps1000)
+{
+ if(Toolkit->createEncoding) return Toolkit->createEncoding(fps1000);
+    return new DIA_encodingBase(fps1000);
+} 
+// EOF

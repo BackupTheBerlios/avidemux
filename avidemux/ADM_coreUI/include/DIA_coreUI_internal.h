@@ -19,6 +19,7 @@
 #include "DIA_fileSel.h"
 #include "DIA_factory.h"
 #include "DIA_working.h"
+#include "DIA_encoding.h"
 // Dia enter
 typedef struct
 {
@@ -124,7 +125,8 @@ typedef int             CREATE_GUI_ALTERNATE(char *title,char *choice1,char *cho
 typedef void            CREATE_GUI_VERBOSE(void);
 typedef void            CREATE_GUI_QUIET(void);
 typedef uint8_t			CREATE_GUI_IS_GUIET(void);
-typedef DIA_workingBase *CREATE_GUI_WORKING(const char *title);
+typedef DIA_workingBase  *CREATE_GUI_WORKING(const char *title);
+typedef DIA_encodingBase *CREATE_GUI_ENCODING(uint32_t fps1000);
 // GUI_Sleep is internal
 typedef struct
 {
@@ -138,6 +140,7 @@ typedef struct
 	CREATE_GUI_QUIET 			*quiet;
 	CREATE_GUI_IS_GUIET 		*isQuiet;
     CREATE_GUI_WORKING          *createWorking;
+    CREATE_GUI_ENCODING         *createEncoding;
 }CoreToolkitDescriptor;
 //
 uint8_t  DIA_toolkitInit(CoreToolkitDescriptor *d);

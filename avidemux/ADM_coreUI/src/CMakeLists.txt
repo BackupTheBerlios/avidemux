@@ -3,6 +3,7 @@ SET(ADM_coreUI_SRCS
 	DIA_fileSel.cpp
         DIA_coreToolkit.cpp
         DIA_working.cpp
+        DIA_encoding.cpp
 )
 
 ADD_LIBRARY(ADM_coreUI SHARED ${ADM_coreUI_SRCS})
