@@ -63,4 +63,12 @@ bool  ADM_videoStreamCopy::getPacket(uint32_t *len, uint8_t *data, uint32_t maxL
     start++;
     return true;
 }
+/**
+    \fn getVideoDuration
+*/
+uint64_t        ADM_videoStreamCopy::getVideoDuration(void)
+{
+    return video_body->getVideoDuration();
+
+}
      

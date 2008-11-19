@@ -31,6 +31,7 @@ virtual     bool     getPacket(uint32_t *len, uint8_t *data, uint32_t maxLen,uin
                                         uint32_t *flags)=0;
 virtual     bool     getExtraData(uint32_t *extraLen, uint8_t **extraData) {*extraLen=0;*extraData=NULL;return true;};
 virtual     bool     providePts(void) {return false;}
+virtual     uint64_t getVideoDuration(void) {return 1;}
 };
 /**
  *      \class ADM_muxer
