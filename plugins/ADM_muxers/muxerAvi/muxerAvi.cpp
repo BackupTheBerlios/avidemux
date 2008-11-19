@@ -21,7 +21,7 @@
 #include "fourcc.h"
 #include "muxerAvi.h"
 #include "DIA_coreToolkit.h"
-
+#include "DIA_encoding.h"
 //#include "DIA_encoding.h"
 
 #define ADM_NO_PTS 0xFFFFFFFFFFFFFFFFLL // FIXME
@@ -98,6 +98,7 @@ bool muxerAvi::save(void)
     uint64_t pts,dts,rawDts;
     uint64_t lastVideoDts=0;
     uint64_t videoIncrement;
+    uint64_t videoDuration=vStream->getVideoDuration();
     int ret;
     int written=0;
     float f=(float)vStream->getAvgFps1000();
@@ -109,9 +110,12 @@ bool muxerAvi::save(void)
 
 
     printf("[AVI]avg fps=%u\n",vStream->getAvgFps1000());
-
+    DIA_encodingBase  *progress=createEncoding(vStream->getAvgFps1000());
+    progress->setContainer("AVI");
+    
     while(true==vStream->getPacket(&len, buffer, bufSize,&pts,&dts,&flags))
     {
+            
             rawDts=dts;
             if(rawDts==ADM_NO_PTS)
             {
@@ -120,6 +124,14 @@ bool muxerAvi::save(void)
             {
                 lastVideoDts=dts;
             }
+
+            float p=(float)lastVideoDts/(float)videoDuration;
+            p=p*100.;
+            uint32_t percent=(uint32_t)p;
+            if(percent>100) percent=100;
+            progress->setPercent(percent);
+            //printf("[Avi] %d %%\n",percent);
+
             uint32_t frameNo=lastVideoDts/videoIncrement;
         
             if(!writter.saveVideoFrame( len, flags,buffer))
@@ -128,7 +140,7 @@ bool muxerAvi::save(void)
                     break;
             }
 
-            printf("[AVI] Written :%d, computed:%d\n",written,frameNo);
+          //  printf("[AVI] Written :%d, computed:%d\n",written,frameNo);
 
             written++;
             
@@ -151,13 +163,12 @@ bool muxerAvi::save(void)
                 }
                 if(!nb) printf("[AVI] No audio for video frame %d\n",written);
             }
-
     }
     writter.setEnd();
     delete [] buffer;
     delete [] audioBuffer;
     printf("[AVI] Wrote %d frames, nb audio streams %d\n",written,nbAStreams);
-
+    delete progress;
     return true;
 }
 /**
