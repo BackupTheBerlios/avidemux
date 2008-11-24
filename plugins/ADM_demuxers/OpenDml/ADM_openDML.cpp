@@ -185,7 +185,7 @@ uint8_t    OpenDMLHeader::close( void )
 
 OpenDMLHeader::OpenDMLHeader(void)
 {
-        _fd=NULL;
+    _fd=NULL;
 	_idx=NULL;	
 	_nbTrack=0;
 	memset(&(_Tracks[0]),0,sizeof(_Tracks));
@@ -194,11 +194,12 @@ OpenDMLHeader::OpenDMLHeader(void)
 	_videoExtraLen=0;
 	_reordered=0;
 	_recHack=0;
-        // Audio
-        _audioTracks=NULL;
-        _nbAudioTracks=0;
-        _currentAudioTrack=0;
-        myName=NULL;
+    // Audio
+    _audioTracks=NULL;
+    _nbAudioTracks=0;
+    _currentAudioTrack=0;
+    myName=NULL;
+    ptsAvailable=false;
 }
 
 /**
@@ -269,7 +270,7 @@ uint32_t rd;
 		if(MKFCC('R','I','F','F')!=(rd=parser->read32()))
 			{
 				printf("Not riff\n");badAvi=1;
-				printf("%lx != %lx\n",rd,MKFCC('R','I','F','F'));
+				printf("%x != %x\n",rd,MKFCC('R','I','F','F'));
 			}
 		parser->read32();
 		if(MKFCC('A','V','I',' ')!=parser->read32())
@@ -326,8 +327,8 @@ uint32_t rd;
 			fseeko(_fd,_Tracks[i].strh.offset,SEEK_SET);
 			if(_Tracks[i].strh.size!=sizeof(_videostream))
 			{
-				printf("Mmm(1) we have a bogey here, size mismatch : %"LLU"\n",_Tracks[i].strh.size);
-				printf("expected %d\n",sizeof(_videostream));
+				printf("Mmm(1) we have a bogey here, size mismatch : %lu\n",_Tracks[i].strh.size);
+				printf("expected %lu\n",sizeof(_videostream));
 				if(_Tracks[i].strh.size<sizeof(_videostream)-8) // RECT is not mandatory
 				{
                                   GUI_Error_HIG(QT_TR_NOOP("Malformed header"), NULL);
@@ -342,7 +343,7 @@ uint32_t rd;
 			if(_videostream.fccType==MKFCC('v','i','d','s'))
 				{
 					vidTrack=i;
-					printf("Video track is %ld\n",i);
+					printf("Video track is %u\n",i);
 					break;
 				}		
 		}
@@ -401,8 +402,8 @@ uint32_t rd;
                                         fseeko(_fd,_Tracks[run].strh.offset,SEEK_SET);
                                         if(_Tracks[run].strh.size != sizeof(_audiostream))
                                         {
-                                                printf("Mmm(2) we have a bogey here, size mismatch : %"LLU"\n",_Tracks[run].strh.size);
-                                                printf("expected %d\n",sizeof(_audiostream));
+                                                printf("Mmm(2) we have a bogey here, size mismatch : %lu\n",_Tracks[run].strh.size);
+                                                printf("expected %lu\n",sizeof(_audiostream));
                                                 if(_Tracks[run].strh.size<sizeof(_audiostream)-8)
                                                 {
                                                   GUI_Error_HIG(QT_TR_NOOP("Malformed header"), NULL);
@@ -570,6 +571,7 @@ uint8_t OpenDMLHeader::mpegReorder(void)
             last=i;
         }
     }
+    ptsAvailable=1;
     return 1;
 }
 /*
@@ -586,8 +588,8 @@ uint32_t count=0;
 			if(_Tracks[i].strh.size!=sizeof(tmp))
 			{
 				
-				printf("Mmm(3) we have a bogey here, size mismatch : %"LLU"\n",_Tracks[i].strh.size);
-				printf("expected %d\n",sizeof(tmp));
+				printf("Mmm(3) we have a bogey here, size mismatch : %lu\n",_Tracks[i].strh.size);
+				printf("expected %lu\n",sizeof(tmp));
 				if(_Tracks[i].strh.size<sizeof(tmp)-8)
 				{
                                   GUI_Error_HIG(QT_TR_NOOP("Malformed header"), NULL);
@@ -604,18 +606,18 @@ uint32_t count=0;
 			if(tmp.fccType==MKFCC('a','u','d','s'))
 				{
 					count++;
-					printf("Track %lu/%lu is audio\n",i,_nbTrack);	
+					printf("Track %u/%u is audio\n",i,_nbTrack);	
 				}
 			else
 			{
                                 if(tmp.fccType==MKFCC('v','i','d','s') && tmp.fccHandler==MKFCC('D','X','S','B'))
                                 {
 
-                                        printf("Track %lu/%lu is subs\n",i,_nbTrack);  
+                                        printf("Track %u/%u is subs\n",i,_nbTrack);  
                                 }
                                 else
                                 {
-                                        printf("Track %lu/%lu :\n",i,_nbTrack);
+                                        printf("Track %u/%u :\n",i,_nbTrack);
                                         fourCC::print(tmp.fccType);
                                         fourCC::print(tmp.fccHandler);
                                         printf("\n");
@@ -636,7 +638,7 @@ void OpenDMLHeader::Dump( void )
         printf(  "Main header\n" );
         printf(  "______________________\n" );  
 
-#define X_DUMP(x) printf(#x":\t\t:%ld\n",_mainaviheader.x);
+#define X_DUMP(x) printf(#x":\t\t:%d\n",_mainaviheader.x);
     	X_DUMP(dwStreams);
     	X_DUMP(dwMicroSecPerFrame) ;
 	X_DUMP(dwMaxBytesPerSec);
@@ -648,12 +650,12 @@ void OpenDMLHeader::Dump( void )
     	X_DUMP(dwHeight);
  	printf("\n");
 #undef X_DUMP
-#define X_DUMP(x) printf("\n "#x":\t\t:%ld",_videostream.x);
+#define X_DUMP(x) printf("\n "#x":\t\t:%d",_videostream.x);
 
 				
 	printf(  "video stream attached:\n" );
 	printf(  "______________________\n" );	
-	printf(" Extra Data  : %ld",_videoExtraLen);
+	printf(" Extra Data  : %u",_videoExtraLen);
 	if(_videoExtraLen)
 	{
 		mixDump( _videoExtraData, _videoExtraLen);
@@ -684,7 +686,7 @@ void OpenDMLHeader::Dump( void )
         for(int i=0;i<_nbAudioTracks;i++)
      	{
 #undef X_DUMP
-#define X_DUMP(x) printf("\n "#x":\t\t:%ld",_audioTracks[i].avistream->x);
+#define X_DUMP(x) printf("\n "#x":\t\t:%d",_audioTracks[i].avistream->x);
 
 
 
@@ -696,7 +698,7 @@ void OpenDMLHeader::Dump( void )
 	  fourCC::print(_audioTracks[i].avistream->fccType);
 	  printf("\n fccHandler :");
 	  fourCC::print(_audioTracks[i].avistream->fccHandler);
-	  printf("\n fccHandler :0x%lx", _audioTracks[i].avistream->fccHandler);
+	  printf("\n fccHandler :0x%x", _audioTracks[i].avistream->fccHandler);
 
 
 	  X_DUMP(dwFlags);
@@ -714,7 +716,7 @@ void OpenDMLHeader::Dump( void )
 #undef X_DUMP
 
         printWavHeader(_audioTracks[i].wavHeader);
-        printf(" Extra Data  : %ld\n",_audioTracks[i].extraDataLen);
+        printf(" Extra Data  : %u\n",_audioTracks[i].extraDataLen);
 	if(_audioTracks[i].extraDataLen)
 	{
 		mixDump( _audioTracks[i].extraData, _audioTracks[i].extraDataLen);
@@ -750,7 +752,7 @@ void OpenDMLHeader::walk(riffParser *p)
 				aprintf("main header found \n");
 				if(len!=sizeof(_mainaviheader))
 				{
-					printf("oops : %d / %d\n",len,sizeof(_mainaviheader));
+					printf("oops : %u / %lu\n",len,sizeof(_mainaviheader));
 				}
 				p->read(len,(uint8_t *)&_mainaviheader);
 
@@ -761,7 +763,7 @@ void OpenDMLHeader::walk(riffParser *p)
 				break;
 		case MKFCC('i','d','x','1'):
                                 _regularIndex.offset=p->getPos();
-                                printf("Idx1 found at offset %"LLX"\n",_regularIndex.offset);
+                                printf("Idx1 found at offset %lx\n",_regularIndex.offset);
                                 _regularIndex.size=len;
 				return;
 				break;				

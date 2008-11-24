@@ -77,6 +77,8 @@ protected:
 	  void 				walk(riffParser *p) ;
 	  uint32_t			_nbTrack;
 	  uint8_t			_recHack;
+      //
+      bool              ptsAvailable;
 	  //_________________________________________
 	  // This is temporary stuff to read the avi
 	  //_________________________________________
@@ -152,6 +154,7 @@ virtual 	uint8_t  getFrameSize(uint32_t frame,uint32_t *size) ;
 virtual	    uint8_t	 getExtraHeaderData(uint32_t *len, uint8_t **data);
 virtual     uint64_t getTime(uint32_t frameNum);
 virtual     uint64_t getVideoDuration(void);
+virtual     bool     providePts(void) {return ptsAvailable;};
 };
 
 #endif
