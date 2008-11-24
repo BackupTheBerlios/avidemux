@@ -62,17 +62,20 @@ int A_Save(const char *name)
     }
     // Audio Stream ?
     ADM_audioStream *audio=NULL;
+    int nbAStream=1;
     if(!video_body->getAudioStream(&audio))
     {
-        GUI_Error_HIG("Audio","Cannot get audiostream");
-        return 0;
+        //GUI_Error_HIG("Audio","Cannot get audiostream");
+        //return 0;
+        audio=NULL;
+        nbAStream=0; // FIXME
     }
     
     // Video Stream ?
     ADM_videoStream *video=new ADM_videoStreamCopy();
     //
     ADM_audioStream *astreams[1]={audio};
-    if(!muxer->open(name,video,1,astreams))
+    if(!muxer->open(name,video,nbAStream,astreams))
     {
         GUI_Error_HIG("Muxer","Cannot open ");
         

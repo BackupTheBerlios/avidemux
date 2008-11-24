@@ -438,10 +438,18 @@ UNUSED_ARG(mode);
   //
   //  And automatically create the segment
   //
-    ADM_audioStreamTrack *trk=_videos[_nb_video].audioTracks[0];
+  if(_videos[_nb_video].audioTracks)
+    {
+        ADM_audioStreamTrack *trk=_videos[_nb_video].audioTracks[0];
+        _segments[_nb_segment]._audio_size = trk->size;
+        _segments[_nb_segment]._audio_duration =trk->duration;
+    }else
+    {
+        _segments[_nb_segment]._audio_size = 0;
+        _segments[_nb_segment]._audio_duration =0;
+    }
+
   _segments[_nb_segment]._reference = _nb_video;
-  _segments[_nb_segment]._audio_size = trk->size;
-  _segments[_nb_segment]._audio_duration =trk->duration;
   _segments[_nb_segment]._audio_start = 0;
   _segments[_nb_segment]._start_frame = 0;
   _segments[_nb_segment]._nb_frames   =   _videos[_nb_video]._nb_video_frames ;
