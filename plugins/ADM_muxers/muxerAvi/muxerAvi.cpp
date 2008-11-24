@@ -2,7 +2,7 @@
             \file            muxerAvi
             \brief           Avi openDML muxer
                              -------------------
-    
+    TODO: Fill in drops/holes in audio as for video
     copyright            : (C) 2008 by mean
     email                : fixounet@free.fr
         
@@ -25,7 +25,7 @@
 //#include "DIA_encoding.h"
 
 #define ADM_NO_PTS 0xFFFFFFFFFFFFFFFFLL // FIXME
-
+#define AUDIO_BUFFER_SIZE 48000*6*sizeof(float)
 // Fwd ref
 uint8_t isMpeg4Compatible (uint32_t fourcc);
 uint8_t isH264Compatible (uint32_t fourcc);
@@ -50,6 +50,8 @@ AVIMUXERCONFIG muxerConfig=
 */
 muxerAvi::muxerAvi() 
 {
+    audioBuffer=NULL;
+    videoBuffer=NULL;
 };
 /**
     \fn     muxerMP4
@@ -85,66 +87,13 @@ bool muxerAvi::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
         aStreams=a;
         return true;
 }
-
 /**
-    \fn save
+        \fn fillAudio
+        \brief Put audio datas until targetDts is reached
 */
-bool muxerAvi::save(void) 
+bool muxerAvi::fillAudio(uint64_t targetDts)
 {
-    printf("[AVI] Saving\n");
-    uint32_t bufSize=vStream->getWidth()*vStream->getHeight()*3;
-    uint8_t *buffer=new uint8_t[bufSize];
-    uint32_t len,flags;
-    uint64_t pts,dts,rawDts;
-    uint64_t lastVideoDts=0;
-    uint64_t videoIncrement;
-    uint64_t videoDuration=vStream->getVideoDuration();
-    int ret;
-    int written=0;
-    float f=(float)vStream->getAvgFps1000();
-    f=1000./f;
-    f*=1000000;
-    videoIncrement=(uint64_t)f;
-#define AUDIO_BUFFER_SIZE 48000*6*sizeof(float)
-    uint8_t *audioBuffer=new uint8_t[AUDIO_BUFFER_SIZE];
-
-
-    printf("[AVI]avg fps=%u\n",vStream->getAvgFps1000());
-    DIA_encodingBase  *progress=createEncoding(vStream->getAvgFps1000());
-    progress->setContainer("AVI");
-    
-    while(true==vStream->getPacket(&len, buffer, bufSize,&pts,&dts,&flags))
-    {
-            
-            rawDts=dts;
-            if(rawDts==ADM_NO_PTS)
-            {
-                lastVideoDts+=videoIncrement;
-            }else
-            {
-                lastVideoDts=dts;
-            }
-
-            float p=(float)lastVideoDts/(float)videoDuration;
-            p=p*100.;
-            uint32_t percent=(uint32_t)p;
-            if(percent>100) percent=100;
-            progress->setPercent(percent);
-            //printf("[Avi] %d %%\n",percent);
-
-            uint32_t frameNo=lastVideoDts/videoIncrement;
-        
-            if(!writter.saveVideoFrame( len, flags,buffer))
-            {
-                    printf("[AVI] Error writting video frame\n");
-                    break;
-            }
-
-          //  printf("[AVI] Written :%d, computed:%d\n",written,frameNo);
-
-            written++;
-            
-            // Now send audio until they all have DTS > lastVideoDts+increment
+// Now send audio until they all have DTS > lastVideoDts+increment
             for(int audioIndex=0;audioIndex<nbAStreams;audioIndex++)
             {
                 uint32_t audioSize,nbSample;
@@ -158,15 +107,79 @@ bool muxerAvi::save(void)
                     //printf("%u vs %u\n",audioDts/1000,(lastVideoDts+videoIncrement)/1000);
                     if(audioDts!=ADM_NO_PTS)
                     {
-                        if(audioDts>lastVideoDts+videoIncrement) break;
+                        if(audioDts>targetDts) break;
                     }
                 }
-                if(!nb) printf("[AVI] No audio for video frame %d\n",written);
+                if(!nb) aprintf("[AVI] No audio for video frame %lu\n",targetDts);
             }
+
+}
+/**
+    \fn save
+*/
+bool muxerAvi::save(void) 
+{
+    printf("[AVI] Saving\n");
+    uint32_t bufSize=vStream->getWidth()*vStream->getHeight()*3;
+    
+    uint32_t len,flags;
+    uint64_t pts,dts,rawDts;
+    uint64_t lastVideoDts=0;
+    uint64_t videoIncrement;
+    uint64_t videoDuration=vStream->getVideoDuration();
+    int ret;
+    int written=0;
+    float f=(float)vStream->getAvgFps1000();
+    f=1000./f;
+    f*=1000000;
+    videoIncrement=(uint64_t)f;  // Video increment in AVI-Tick
+
+    audioBuffer=new uint8_t[AUDIO_BUFFER_SIZE];
+    videoBuffer=new uint8_t[bufSize];
+
+    printf("[AVI]avg fps=%u\n",vStream->getAvgFps1000());
+    DIA_encodingBase  *progress=createEncoding(vStream->getAvgFps1000());
+    progress->setContainer("AVI");
+    
+    uint64_t aviTime=0;
+    while(true==vStream->getPacket(&len, videoBuffer, bufSize,&pts,&dts,&flags))
+    {
+            
+            rawDts=dts;
+            if(rawDts!=ADM_NO_PTS)
+            {
+                lastVideoDts=dts;
+                if(written)
+                    while(lastVideoDts>aviTime+videoIncrement) // If the video is more than one avi tick away...
+                    {
+                        writter.saveVideoFrame( 0, 0,videoBuffer); // Insert dummy video frame
+                        fillAudio(aviTime+videoIncrement);    // and matching audio
+                        aviTime+videoIncrement;
+                    }
+            }
+        
+            if(!writter.saveVideoFrame( len, flags,videoBuffer))  // Put our real video
+            {
+                    printf("[AVI] Error writting video frame\n");
+                    break;
+            }
+
+            fillAudio(aviTime+videoIncrement);      // And matching video
+            
+            
+            uint32_t  percent=(100*aviTime)/videoDuration;
+            if(percent>100) percent=100;
+            progress->setPercent(percent);
+
+            written++;
+            aviTime+=videoIncrement;
     }
     writter.setEnd();
-    delete [] buffer;
+
+    delete [] videoBuffer;
+    videoBuffer=NULL;
     delete [] audioBuffer;
+    audioBuffer=NULL;
     printf("[AVI] Wrote %d frames, nb audio streams %d\n",written,nbAStreams);
     delete progress;
     return true;

@@ -35,7 +35,10 @@ class muxerAvi : public ADM_muxer
 protected:
         bool    setupAudio(int trackNumber, ADM_audioStream *audio);
         bool    setupVideo(ADM_videoStream *video);
+        bool    fillAudio(uint64_t targetDts);
         aviWrite  writter;
+        uint8_t   *audioBuffer;
+        uint8_t   *videoBuffer;
 public:
                 muxerAvi();
         virtual ~muxerAvi();
