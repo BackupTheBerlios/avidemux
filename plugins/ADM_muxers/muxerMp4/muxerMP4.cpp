@@ -20,26 +20,17 @@
 #include "fourcc.h"
 #include "muxerMP4.h"
 #include "DIA_coreToolkit.h"
+#include "ADM_muxerUtils.h"
 
-//#include "DIA_encoding.h"
 
-#define ADM_NO_PTS 0xFFFFFFFFFFFFFFFFLL // FIXME
 
-extern "C" 
-{
-#include "ADM_lavformat/avformat.h"
-};
+
 
 static    AVOutputFormat *fmt=NULL;
 static    AVFormatContext *oc=NULL;
 static    AVStream *audio_st;
 static    AVStream *video_st;
 static    double audio_pts, video_pts;
-// Fwd ref
-uint8_t isMpeg4Compatible (uint32_t fourcc);
-uint8_t isH264Compatible (uint32_t fourcc);
-uint8_t isMSMpeg4Compatible (uint32_t fourcc);
-uint8_t isDVCompatible (uint32_t fourcc);
 
 #if 1
 #define aprintf(...) {}
@@ -52,51 +43,6 @@ M4MUXERCONFIG muxerConfig=
     MP4_MUXER_MP4,
     true
 };
-/**
-    \fn rescaleFps
-    \brief Rescale fps to be accurate (i.e. 23.976 become 24000/1001)
-
-*/
-void  rescaleFps(uint32_t fps1000, AVRational *rational)
-{
-    switch(fps1000)
-    {
-    case 23976 :
-    {
-        rational->num=1001;
-        rational->den=24000;
-        break;
-    }
-    case 29970 :
-    {
-        rational->num=1001;
-        rational->den=30000;
-        break;
-    }
-    default:
-    rational->num=1000;
-    rational->den=fps1000;
-    }
-    printf("[MP3] TimeBase for video %d/%d\n",rational->num,rational->den);
-}
-/**
-        \fn rescaleLavPts
-        \brief Rescale PTS/DTS the lavformat way, i.e. relative to the scale.
-*/
-uint64_t rescaleLavPts(uint64_t us, AVRational *scale)
-{
-
-     if(us==ADM_NO_PTS) return 0x8000000000000000LL;  // AV_NOPTS_VALUE
-    double db=(double)us;
-    double s=scale->den;
-
-     db*=s;
-     db=(db)/1000000.; // in seconds
-    uint64_t i=(uint64_t)db; // round up to the closer num value
-    i=(i+scale->num-1)/scale->num;
-    i*=scale->num;
-    return i;
-}
 
 
 /**
@@ -201,8 +147,15 @@ bool muxerMP4::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
         if(isMpeg4Compatible(s->getFCC()))
         {
                 c->codec_id = CODEC_ID_MPEG4;
-                c->has_b_frames=1; // in doubt...
-                c->max_b_frames=2;
+                if(s->providePts()==true)
+                {
+                    c->has_b_frames=1; // in doubt...
+                    c->max_b_frames=2;
+                }else   
+                {
+                    c->has_b_frames=0; // No PTS=cannot handle CTS...
+                    c->max_b_frames=0;
+                }
         }else
         {
                 if(isH264Compatible(s->getFCC()))
