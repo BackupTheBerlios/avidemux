@@ -1,7 +1,8 @@
 /***************************************************************************
-                          ADM_muxerUtils.cpp  -  description
+                          oplug_vcdff.h  -  description
                              -------------------
-    copyright            : (C) 2008 by mean
+    begin                : Sun Nov 10 2002
+    copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -13,34 +14,30 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifndef ADM_MUXER_UTILS_H
-#define ADM_MUXER_UTILS_H
-extern "C" 
+#ifndef ADM_MUXER_FLV
+#define ADM_MUXER_FLV
+
+#include "ADM_muxer.h"
+
+typedef struct
 {
-#include "ADM_lavformat/avformat.h"
+    
+    uint32_t       dummy;
+}FLVMUXERCONFIG;
+
+extern FLVMUXERCONFIG muxerConfig;
+
+class muxerFlv : public ADM_muxer
+{
+protected:
+
+public:
+                muxerFlv();
+        virtual ~muxerFlv();
+        virtual bool open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,ADM_audioStream **a);
+        virtual bool save(void) ;
+        virtual bool close(void) ;
+
 };
 
-#define ADM_NO_PTS 0xFFFFFFFFFFFFFFFFLL // FIXME
-
-// Fwd ref
-uint8_t isMpeg4Compatible (uint32_t fourcc);
-uint8_t isH264Compatible (uint32_t fourcc);
-uint8_t isMSMpeg4Compatible (uint32_t fourcc);
-uint8_t isDVCompatible (uint32_t fourcc);
-uint8_t isVP6Compatible (uint32_t fourcc);
-
-/**
-    \fn rescaleFps
-    \brief Rescale fps to be accurate (i.e. 23.976 become 24000/1001)
-
-*/
-void  rescaleFps(uint32_t fps1000, AVRational *rational);
-
-/**
-        \fn rescaleLavPts
-        \brief Rescale PTS/DTS the lavformat way, i.e. relative to the scale.
-*/
-uint64_t rescaleLavPts(uint64_t us, AVRational *scale);
-
 #endif
-
