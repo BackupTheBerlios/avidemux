@@ -114,6 +114,7 @@ class flvHeader         :public vidHeader
     char        *readFlvString(void);
     uint8_t     parseMetaData(uint32_t remaining);
     void        setProperties(const char *name,float value);
+    uint32_t    searchMinimum(void);
   public:
 
 

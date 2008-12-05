@@ -301,7 +301,7 @@ bool muxerFlv::save(void)
     while(true==vStream->getPacket(&len, buffer, bufSize,&pts,&dts,&flags))
     {
 	AVPacket pkt;
-            aprintf("[MP5] LastDts:%08lu Dts:%08lu (%04.4lu) Delta : %u\n",lastVideoDts,dts,dts/1000000,dts-lastVideoDts);
+            printf("[MP5] LastDts:%08lu Dts:%08lu (%04.4lu) Delta : %u\n",lastVideoDts,dts,dts/1000000,dts-lastVideoDts);
             rawDts=dts;
             if(rawDts==ADM_NO_PTS)
             {
@@ -310,13 +310,13 @@ bool muxerFlv::save(void)
             {
                 lastVideoDts=dts;
             }
-#define RESCALE(x)            if(x==ADM_NO_PTS) x=0x8000000000000000LL; else x=x/1000;
-            RESCALE(pts);
-            RESCALE(dts); // In ms
+#define RESCALE(x) x=rescaleLavPts(x,scale);
+
+            dts=lastVideoDts/1000;
             
             aprintf("[FLV] RawDts:%lu Scaled Dts:%lu\n",rawDts,dts);
             aprintf("[FLV] Rescaled: Len : %d flags:%x Pts:%llu Dts:%llu\n",len,flags,pts,dts);
-
+            RESCALE(pts);
             av_init_packet(&pkt);
             pkt.dts=dts;
             if(vStream->providePts()==true)
@@ -343,7 +343,7 @@ bool muxerFlv::save(void)
             for(int audio=0;audio<nbAStreams;audio++)
             {
                 uint32_t audioSize,nbSample;
-                uint64_t audioDts;
+                uint64_t audioDts,rescaled;
                 ADM_audioStream*a=aStreams[audio];
                 uint32_t fq=a->getInfo()->frequency;
                 int nb=0;
@@ -352,16 +352,12 @@ bool muxerFlv::save(void)
                     // Write...
                     nb++;
                     AVPacket pkt;
-                    double f=audioDts;
-                    f*=fq; // In samples
-                    f/=1000.*1000.; // In sec
-                   
+                    rescaled=audioDts/1000;
                     
-                    uint64_t rescaledDts=(uint64_t)(f+0.4);
                     aprintf("[FLV] Video frame  %d, audio Dts :%lu size :%lu nbSample : %lu rescaled:%lu\n",written,audioDts,audioSize,nbSample,rescaledDts);
                     av_init_packet(&pkt);
-                    pkt.dts=rescaledDts;
-                    pkt.pts=rescaledDts;
+                    pkt.dts=rescaled;
+                    pkt.pts=rescaled;
                     pkt.stream_index=1+audio;
                     pkt.data= audioBuffer;
                     pkt.size= audioSize;

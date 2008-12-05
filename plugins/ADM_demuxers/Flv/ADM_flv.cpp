@@ -2,6 +2,9 @@
     copyright            : (C) 2007 by mean
     email                : fixounet@free.fr
     
+
+Not sure if the timestamp is PTS or DTS (...)
+
       See lavformat/flv[dec/env].c for detail
  ***************************************************************************/
 
@@ -160,6 +163,22 @@ endit:
     fseeko(_fd,endPos,SEEK_SET);
     return 1;
 }
+/**
+    \fn searchMinimum
+    \brief returns minimum time in us between 2 video frames
+
+*/
+uint32_t flvHeader::searchMinimum(void)
+{
+    uint32_t delta=0xF000000;
+    for(int i=0;i<videoTrack->_nbIndex-1;i++)
+    {
+        flvIndex *x=&(videoTrack->_index[i]);
+        if((x[1].timeCodeUs-x[0].timeCodeUs)<delta) delta=x[1].timeCodeUs-x[0].timeCodeUs;
+
+    }
+    return delta;
+}
 
 /**
       \fn open
@@ -309,7 +328,18 @@ uint8_t flvHeader::open(const char *name)
      else  f=25000;
     // If it was available from the metadata, use the one from metadata
     if(! _videostream.dwRate)
-        _videostream.dwRate=(uint32_t)floor(f);
+    {
+        float d=searchMinimum();
+        printf("[FLV] minimum delta :%d\n",(uint32_t)d);
+        d=1/d;
+        d*=1000*1000*1000;
+        
+        uint32_t avg=(uint32_t)floor(f);
+        uint32_t max=(uint32_t)floor(d);
+        if(max<2) max=2; // 500 fps max
+        printf("[FLV] Avg fps :%d, max fps :%d\n",avg,max);
+        _videostream.dwRate=max;
+    }
     _videostream.dwScale=1000;
     _mainaviheader.dwMicroSecPerFrame=ADM_UsecFromFps1000(_videostream.dwRate);
    printf("[FLV] Duration %u ms\n",videoTrack->_index[videoTrack->_nbIndex-1].timeCodeUs/1000);
@@ -621,7 +651,9 @@ uint8_t  flvHeader::getFrame(uint32_t frame,ADMCompressedImage *img)
      fread(img->data,idx->size,1,_fd);
      img->dataLength=idx->size;
      img->flags=idx->flags;
-     img->demuxerDts=ADM_COMPRESSED_NO_PTS;
+     //img->demuxerDts=ADM_COMPRESSED_NO_PTS;
+    // For flash assume PTS=DTS (???)
+     img->demuxerDts=idx->timeCodeUs;;
      img->demuxerPts=idx->timeCodeUs;;
      return 1;
 }
