@@ -52,6 +52,7 @@ muxerAvi::muxerAvi()
 {
     audioBuffer=NULL;
     videoBuffer=NULL;
+    clocks=NULL;
 };
 /**
     \fn     muxerMP4
@@ -61,7 +62,13 @@ muxerAvi::muxerAvi()
 muxerAvi::~muxerAvi() 
 {
     printf("[AVI] Destructing\n");
-
+    if(clocks)
+    {
+        for(int i=0;i<nbAStreams;i++)
+            delete clocks[i];
+        delete [] clocks;
+        clocks=NULL;
+    }
 }
 
 /**
@@ -85,6 +92,10 @@ bool muxerAvi::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
         vStream=s;
         nbAStreams=nbAudioTrack;
         aStreams=a;
+        clocks=new audioClock*[nbAStreams];
+        for(int i=0;i<nbAStreams;i++)
+            clocks[i]=new audioClock(a[i]->getInfo()->frequency);
+
         return true;
 }
 /**
@@ -103,7 +114,15 @@ bool muxerAvi::fillAudio(uint64_t targetDts)
                 int nb=0;
                 while(a->getPacket(audioBuffer,&audioSize, AUDIO_BUFFER_SIZE,&nbSample,&audioDts))
                 {
+                    audioClock *clk=clocks[audioIndex];
+                    if(audioDts!=ADM_NO_PTS)
+                        if( abs(audioDts-clk->getTimeUs())>5000) 
+                        {
+                            printf("[Avi] Audio skew!");
+                            clk->setTimeUs(audioDts);
+                        }
                     nb=writter.saveAudioFrame(audioIndex,audioSize,audioBuffer) ;
+                    clk->advanceBySample(nbSample);
                     //printf("%u vs %u\n",audioDts/1000,(lastVideoDts+videoIncrement)/1000);
                     if(audioDts!=ADM_NO_PTS)
                     {
@@ -142,29 +161,30 @@ bool muxerAvi::save(void)
     progress->setContainer("AVI");
     
     uint64_t aviTime=0;
-    while(true==vStream->getPacket(&len, videoBuffer, bufSize,&pts,&dts,&flags))
+    if(false==vStream->getPacket(&len, videoBuffer, bufSize,&pts,&dts,&flags)) goto abt;
+    if(dts==ADM_NO_PTS) dts=0;
+    lastVideoDts=dts;
+    while(1)
     {
-            
-            rawDts=dts;
-            if(rawDts!=ADM_NO_PTS)
+            if(dts>aviTime+videoIncrement)
             {
+                writter.saveVideoFrame( 0, 0,videoBuffer); // Insert dummy video frame
+            }else
+            {
+                if(!writter.saveVideoFrame( len, flags,videoBuffer))  // Put our real video
+                {
+                        printf("[AVI] Error writting video frame\n");
+                        goto abt;
+                }
+                if(false==vStream->getPacket(&len, videoBuffer, bufSize,&pts,&dts,&flags)) goto abt;
+                if(dts==ADM_NO_PTS)
+                {
+                    dts=lastVideoDts+videoIncrement;
+                }
                 lastVideoDts=dts;
-                if(written)
-                    while(lastVideoDts>aviTime+videoIncrement) // If the video is more than one avi tick away...
-                    {
-                        writter.saveVideoFrame( 0, 0,videoBuffer); // Insert dummy video frame
-                        fillAudio(aviTime+videoIncrement);    // and matching audio
-                        aviTime+videoIncrement;
-                    }
             }
-        
-            if(!writter.saveVideoFrame( len, flags,videoBuffer))  // Put our real video
-            {
-                    printf("[AVI] Error writting video frame\n");
-                    break;
-            }
-
-            fillAudio(aviTime+videoIncrement);      // And matching video
+             
+            fillAudio(aviTime+videoIncrement);    // and matching audio
             
             
             uint32_t  percent=(100*aviTime)/videoDuration;
@@ -174,6 +194,7 @@ bool muxerAvi::save(void)
             written++;
             aviTime+=videoIncrement;
     }
+abt:
     writter.setEnd();
 
     delete [] videoBuffer;

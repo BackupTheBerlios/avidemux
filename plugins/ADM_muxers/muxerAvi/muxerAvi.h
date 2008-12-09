@@ -14,11 +14,12 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifndef ADM_MUXER_MP4
-#define ADM_MUXER_MP4
+#ifndef ADM_MUXER_AVI
+#define ADM_MUXER_AVI
 
 #include "ADM_muxer.h"
 #include "op_aviwrite.hxx"
+#include "ADM_audioClock.h"
 
 typedef struct
 {
@@ -39,6 +40,7 @@ protected:
         aviWrite  writter;
         uint8_t   *audioBuffer;
         uint8_t   *videoBuffer;
+        audioClock **clocks;
 public:
                 muxerAvi();
         virtual ~muxerAvi();
