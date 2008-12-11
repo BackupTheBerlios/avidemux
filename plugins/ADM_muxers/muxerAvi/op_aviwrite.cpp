@@ -331,6 +331,8 @@ uint32_t extraLen=0;
                       wav.blockalign=1;
                 break;
         case WAV_MP3:
+           {
+          int samplePerFrame=1152; // see http://msdn.microsoft.com/en-us/library/ms787304(VS.85).aspx
 		  // then update VBR fields
 		  mp3vbr.cbsize = R16(12);
 		  mp3vbr.wId = R16(1);
@@ -339,12 +341,29 @@ uint32_t extraLen=0;
 		  mp3vbr.ncodecdelay = 0;
 
 		  wav.bitspersample = 0;
-		  mp3vbr.nblocksize=R16(0x180); //384; // ??
+		  mp3vbr.nblocksize=samplePerFrame; //384; // ??
 
 		  header->dwScale = 1;
 	  	  header->dwInitialFrames = 1;
           extra=(uint8_t *)&mp3vbr;
 		  extraLen=sizeof(mp3vbr);
+          if (1) // FIXME stream->isVBR()) //wav->blockalign ==1152)	// VBR audio
+		  {			// We do like nandub do
+		  	//ADM_assert (audiostream->asTimeTrack ());
+		  	wav.blockalign = samplePerFrame;	// just a try
+            wav.bitspersample = 16;
+            header->dwRate 	= wav.frequency;	//wav->byterate;
+			header->dwScale = wav.blockalign;
+			header->dwLength= _videostream.dwLength;
+  			header->dwSampleSize = 0;
+			mp3vbr.nblocksize=samplePerFrame;	
+			
+		   }	
+		   else 
+           {
+             wav.blockalign=1;
+           }
+           }
 		  break;
 
 

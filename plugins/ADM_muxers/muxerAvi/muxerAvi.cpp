@@ -112,9 +112,11 @@ bool muxerAvi::fillAudio(uint64_t targetDts)
                 ADM_audioStream*a=aStreams[audioIndex];
                 uint32_t fq=a->getInfo()->frequency;
                 int nb=0;
+                audioClock *clk=clocks[audioIndex];
+
                 while(a->getPacket(audioBuffer,&audioSize, AUDIO_BUFFER_SIZE,&nbSample,&audioDts))
                 {
-                    audioClock *clk=clocks[audioIndex];
+                    printf("[Audio] Packet size %lu sample:%lu dts:%lu target :%lu\n",audioSize,nbSample,audioDts,targetDts);
                     if(audioDts!=ADM_NO_PTS)
                         if( abs(audioDts-clk->getTimeUs())>5000) 
                         {
@@ -131,7 +133,7 @@ bool muxerAvi::fillAudio(uint64_t targetDts)
                 }
                 if(!nb) aprintf("[AVI] No audio for video frame %lu\n",targetDts);
             }
-
+            return true;
 }
 /**
     \fn save
