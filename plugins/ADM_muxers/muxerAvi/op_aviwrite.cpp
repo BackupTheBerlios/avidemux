@@ -360,6 +360,13 @@ uint32_t extraLen=0;
           if (1) // FIXME stream->isVBR()) //wav->blockalign ==1152)	// VBR audio
 		  {			// We do like nandub do
 		  	//ADM_assert (audiostream->asTimeTrack ());
+            if(wav.frequency>=32000)  // mpeg1
+            {
+                samplePerFrame=1152;
+            }else                       // Mpeg2 , we assume layer3
+            {
+                samplePerFrame=576;
+            }
 		  	wav.blockalign = samplePerFrame;	// just a try
             wav.bitspersample = 16;
             header->dwRate 	= wav.frequency;	//wav->byterate;
