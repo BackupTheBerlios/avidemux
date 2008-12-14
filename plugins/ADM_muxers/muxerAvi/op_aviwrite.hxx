@@ -60,9 +60,25 @@ typedef struct
   uint32_t len;
 }IdxEntry;
 
+
 #include "avifmt.h"
 #include "avifmt2.h"
 #include <vector>
+
+/**
+    \struct aviAudioTrack
+    \brief  Describe a audiotrack
+
+*/
+typedef struct
+{
+    AVIStreamHeader header;
+    uint32_t        sizeInBytes;
+    uint32_t        nbBlocks;
+    uint32_t        audioHeaderOffset;
+}aviAudioTrack;
+
+
 /**
     \class aviWrite
 
@@ -77,10 +93,8 @@ typedef struct
 		AVIStreamHeader      _videostream;
 		ADM_BITMAPINFOHEADER _bih;
         std::vector <IdxEntry > myindex;
-		uint32_t nb_audio;
-		AVIStreamHeader _audio[ADM_AVI_MAX_AUDIO_TRACK];
-        uint32_t        audioSize[ADM_AVI_MAX_AUDIO_TRACK];
-        uint32_t        audioNbBlocks[ADM_AVI_MAX_AUDIO_TRACK];
+		uint32_t             nb_audio;
+        aviAudioTrack        audioTracks[ADM_AVI_MAX_AUDIO_TRACK];
 
 		uint32_t vframe;
 

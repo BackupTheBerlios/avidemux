@@ -87,8 +87,7 @@ aviWrite::aviWrite( void )
 	odml_indexes=NULL;
     
     doODML=muxerConfig.odmlType;	// default; TODO: user should be able to choose NO for plain avi
-    memset(audioSize,0,sizeof(audioSize));
-    memset(audioNbBlocks,0,sizeof(audioNbBlocks));
+    memset(&(audioTracks),0,sizeof(audioTracks));
 }
 /**
     \fn ~ aviWrite
@@ -132,7 +131,7 @@ uint8_t aviWrite::updateHeader (MainAVIHeader * mainheader,
 
 
         ADM_assert(_file);
-
+        printf("[Avi] Updating headers...\n");
         _file->seek(32);
 // Update main header
 #ifdef ADM_BIG_ENDIAN
@@ -152,7 +151,18 @@ uint8_t aviWrite::updateHeader (MainAVIHeader * mainheader,
     _file->seek(0x6c);
     _file->write ((uint8_t *)videostream, sizeof (AVIStreamHeader));        
 #endif
-  // TODO update audio too!
+  // update audio headers
+    for(int i=0;i<nb_audio;i++)
+    {
+        _file->seek(audioTracks[i].audioHeaderOffset);
+/*
+        setStreamInfo (_file,
+			(uint8_t *) header,
+	 		(uint8_t *) &wav, sizeof (WAVHeader),
+			odml_audio_super_idx_size,odml_stream_nbr,
+			extra,extraLen, 0x1000);
+*/
+    }
   return 1;
 }
 
@@ -533,7 +543,10 @@ uint8_t aviWrite::saveBegin (
     video->getExtraData(&videoextraLen, &videoextra);
 	writeVideoHeader(videoextra,videoextraLen );
     for(int i=0;i<nb_audio;i++)
-        writeAudioHeader(audiostream[i],_audio+i,i+1);
+    {
+        audioTracks[i].audioHeaderOffset=LMain->Tell();
+        writeAudioHeader(audiostream[i],&(audioTracks[i].header),i+1);
+    }
 	odml_write_dummy_chunk(LMain, &odml_header_fpos, 16);
 
 	LMain->End();
@@ -584,12 +597,13 @@ uint8_t aviWrite::saveVideoFrame (uint32_t len, uint32_t flags, uint8_t * data)
 */
 uint8_t aviWrite::saveAudioFrame (uint32_t index,uint32_t len, uint8_t * data)
 {
-    audioSize[index]+=len;
-    audioNbBlocks[index]++;
+    aviAudioTrack *trk=&(audioTracks[index]);
+    trk->sizeInBytes+=len;
+    trk->nbBlocks++;
 
 	odml_riff_break(len+8); // data size + fcc + size info (padding is handled in odml_riff_break)
 	if(!odml_index_frame(1+index, len,false)){
-		aprintf("\ncan not index audio frame stream:%u block %u size :%u\n",index,audioNbBlocks[index]-1,len);
+		aprintf("\ncan not index audio frame stream:%u block %u size :%u\n",index,trk->nbBlocks-1,len);
 	}
     char tag[5]="01wb";
     tag[1]='1'+index;
@@ -730,7 +744,12 @@ uint8_t aviWrite::setEnd (void)
   updateHeader (&_mainheader, &_videostream);
 
 
-	printf("\n End of movie, \n video frames : %u\n audio frames : %u",vframe,audioSize[0]);
+	printf("\n End of movie, \n video frames : %u\n",vframe);
+    for(int i=0;i<nb_audio;i++)
+    {
+        printf("Track %d Size :%lu bytes, %lu blocks\n",i,audioTracks[i].sizeInBytes,audioTracks[i].nbBlocks);
+    }
+ 
   // need to update headers now
   // AUDIO SIZE ->TODO
   delete _file;
