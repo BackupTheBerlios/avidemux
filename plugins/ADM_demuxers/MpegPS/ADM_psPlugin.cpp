@@ -14,14 +14,14 @@
  *                                                                         *
  ***************************************************************************/
 #include "ADM_default.h"
-#include "ADM_flv.h"
+#include "ADM_ps.h"
 #include "ADM_demuxerInternal.h"
 #include "fourcc.h"
-
-ADM_DEMUXER_BEGIN( flvHeader,
+#if 0
+ADM_DEMUXER_BEGIN( psHeader,
                     1,0,0,
-                    "flv",
-                    "flash demuxer plugin (c) Mean 2007/2007"
+                    "ps",
+                    "mpeg ps demuxer plugin (c) Mean 2007/2008"
                 );
 
 /**
@@ -30,11 +30,6 @@ ADM_DEMUXER_BEGIN( flvHeader,
 
 extern "C"  uint32_t         probe(uint32_t magic, const char *fileName)
 {
-    if (fourCC::check (magic, (uint8_t *) "FLV\1"))
-    {
-	  printf (" [flvHeader] FLV file detected...\n");
-	  return 100;
-    }
-    printf (" [flvHeader] Cannot open that\n");
-    return 0;
+   return 50;
 }
+#endif

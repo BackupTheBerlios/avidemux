@@ -2,7 +2,7 @@
     copyright            : (C) 2006 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
-
+#if 0
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -125,3 +125,4 @@ bool      ADM_flvAccess::goToBlock(uint32_t block)
 }
 
 //EOF
+#endif

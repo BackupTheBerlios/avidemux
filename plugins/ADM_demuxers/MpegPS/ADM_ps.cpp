@@ -16,7 +16,7 @@ Not sure if the timestamp is PTS or DTS (...)
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#if 0
 #include "ADM_default.h"
 #include "fourcc.h"
 #include "DIA_coreToolkit.h"
@@ -684,3 +684,4 @@ uint8_t flvHeader::getFrameSize (uint32_t frame, uint32_t * size)
 
 
 //EOF
+#endif
