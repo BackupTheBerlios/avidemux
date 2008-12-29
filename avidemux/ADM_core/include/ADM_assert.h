@@ -102,9 +102,20 @@ extern adm_fast_memcpy myAdmMemcpy;
 		char *ADM_slashToBackSlash(const char *in);
         #define ADM_cleanupPath(x) ADM_slashToBackSlash(x)
 #else
+    #ifdef ADM_CPU_64BIT
+        #define LLX "lx"
+        #define LLU "lu"
+        #define LX "x"
+        #define LU "u"
+        
+    #else
         #define LLX "llx"
         #define LLU "llu"
-        #define ADM_cleanupPath(x) ADM_strdup(x)
+        #define LX "lx"
+        #define LU "lu"
+
+    #endif
+    #define ADM_cleanupPath(x) ADM_strdup(x)
 #endif
 
 
