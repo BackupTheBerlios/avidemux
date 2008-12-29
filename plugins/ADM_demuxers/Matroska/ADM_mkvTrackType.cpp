@@ -43,6 +43,7 @@ MKVCC mkvCC[]=
   
   {"A_AAC",0,WAV_AAC,""},
   {"A_VORBIS",0,WAV_OGG,""},
+  {"A_DTS",0,WAV_DTS,""},
   
   // Video
   {"V_MPEG2",1,0,"MPEG"}, // Mpeg2
