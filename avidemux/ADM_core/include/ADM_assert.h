@@ -98,6 +98,9 @@ extern adm_fast_memcpy myAdmMemcpy;
 #ifdef __WIN32
         #define LLX "I64x"
         #define LLU "I64u"
+        #define LLD "I64d"
+        #define LU  "lu"
+        #define LX  "lx"
         
 		char *ADM_slashToBackSlash(const char *in);
         #define ADM_cleanupPath(x) ADM_slashToBackSlash(x)
@@ -105,12 +108,14 @@ extern adm_fast_memcpy myAdmMemcpy;
     #ifdef ADM_CPU_64BIT
         #define LLX "lx"
         #define LLU "lu"
+        #define LLD "ld"
         #define LX "x"
         #define LU "u"
         
     #else
         #define LLX "llx"
         #define LLU "llu"
+        #define LLD "lld"
         #define LX "lx"
         #define LU "lu"
 
