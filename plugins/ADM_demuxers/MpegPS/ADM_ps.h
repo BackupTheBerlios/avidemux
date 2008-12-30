@@ -1,5 +1,5 @@
 /***************************************************************************
-                         ADM_FLV
+                         ADM_PS
                              -------------------
     begin                : Mon Jun 3 2002
     copyright            : (C) 2002 by mean
@@ -17,53 +17,24 @@
  
 
 
-#ifndef ADM_FLV_H
-#define ADM_FLV_H
+#ifndef ADM_PS_H
+#define ADM_PS_H
 
 #include "ADM_Video.h"
-//#include "ADM_audio/aviaudio.hxx"
 #include "ADM_audioStream.h"
 
-typedef struct 
-{
-    uint64_t pos;       // Absolute position in bytes
-    uint32_t size;      // Size in bytes
-    uint32_t flags;
-    uint64_t timeCodeUs;  // Time code in us from start
-}flvIndex;
-//**********************************************
-class flvTrak 
-{
-public:
-          flvTrak(int nb);
-          ~flvTrak();
-  uint8_t grow(void);
-  //
-  uint32_t  streamIndex;
-  uint32_t  length;
-  uint8_t    *extraData;
-  uint32_t   extraDataLen;
-  flvIndex  *_index;
-  uint32_t  _nbIndex;  // current size of the index
-  uint32_t  _indexMax; // Max size of the index
-  uint32_t  _sizeInBytes; // Approximate size in bytes of that stream
-  uint32_t  _defaultFrameDuration; // in us!
-};
 /**
-    \fn ADM_flvAccess
+    \fn ADM_psAccess
 */
-class ADM_flvAccess : public ADM_audioAccess
+class ADM_psAccess : public ADM_audioAccess
 {
 protected:
                       
-                FILE             *_fd;
-                flvTrak          *_track;
-                uint32_t         currentBlock;
-                bool             goToBlock(uint32_t block);
+             
                 
 public:
-                                  ADM_flvAccess(const char *name,flvTrak *trak); 
-                virtual           ~ADM_flvAccess();
+                                  ADM_psAccess(const char *name) {}; 
+                virtual           ~ADM_psAccess() {};
                                     /// Hint, the stream is pure CBR (AC3,MP2,MP3)
                 virtual bool      isCBR(void) { return true;}
                                     /// Return true if the demuxer can seek in time
@@ -75,53 +46,28 @@ public:
                                     /// Returns audio duration in us
                 virtual uint64_t  getDurationInUs(void) ;
                                     /// Go to a given time
-                virtual bool      goToTime(uint64_t timeUs);
-                virtual bool      getPacket(uint8_t *buffer, uint32_t *size, uint32_t maxSize,uint64_t *dts);
+                virtual bool      goToTime(uint64_t timeUs) {return false;}
+                virtual bool      getPacket(uint8_t *buffer, uint32_t *size, uint32_t maxSize,uint64_t *dts) {return false;}
 };
 
 
 /**
-    \Class flvHeader
-    \brief Flash demuxer
+    \Class psHeader
+    \brief mpeg ps demuxer
 
 */
-class flvHeader         :public vidHeader
+class psHeader         :public vidHeader
 {
   protected:
                                 
-    FILE                    *_fd;
-    char                    *_filename;
-    flvTrak                 *videoTrack;
-    flvTrak                 *audioTrack;
-    WAVHeader               wavHeader;
-    ADM_audioStream         *_audioStream;
-    ADM_flvAccess           *access;
-    /* */
-    
-    uint8_t     read(uint32_t len, uint8_t *where);
-    uint8_t     read8(void);
-    uint32_t    read16(void);
-    uint32_t    read24(void);
-    uint32_t    read32(void);
-    uint8_t     Skip(uint32_t len);
-    uint8_t     insertVideo(uint32_t pos,uint32_t size,uint32_t frameType,uint32_t pts);
-    uint8_t     insertAudio(uint32_t pos,uint32_t size,uint32_t pts);
-    uint8_t     setAudioHeader(uint32_t format,uint32_t fq,uint32_t bps,uint32_t channels);
-    uint8_t     setVideoHeader(uint8_t codec,uint32_t *remaining);
-    
-    
-    uint8_t     getFrameSize (uint32_t frame, uint32_t * size);
-    char        *readFlvString(void);
-    uint8_t     parseMetaData(uint32_t remaining);
-    void        setProperties(const char *name,float value);
-    uint32_t    searchMinimum(void);
+   
   public:
 
 
     virtual   void          Dump(void);
 
-            flvHeader( void );
-   virtual  ~flvHeader(  ) ;
+            psHeader( void ) ;
+   virtual  ~psHeader(  ) ;
 // AVI io
     virtual uint8_t  open(const char *name);
     virtual uint8_t  close(void) ;
@@ -146,6 +92,7 @@ virtual     uint8_t                 getNbAudioStreams(void);
     virtual uint64_t getTime(uint32_t frame);
             uint8_t  getExtraHeaderData(uint32_t *len, uint8_t **data);
     virtual uint64_t getVideoDuration(void);
+    virtual uint8_t  getFrameSize(uint32_t frame,uint32_t *size) ;
 
 };
 #endif
