@@ -374,6 +374,7 @@ uint8_t flvHeader::open(const char *name)
 uint64_t flvHeader::getVideoDuration(void)
 {
      uint64_t dur=videoTrack->_index[videoTrack->_nbIndex-1].timeCodeUs; 
+    return dur;
 }
 
 /**
