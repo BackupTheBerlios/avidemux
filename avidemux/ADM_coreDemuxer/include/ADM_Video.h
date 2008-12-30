@@ -25,6 +25,11 @@
 
 #include "ADM_compressedImage.h"
 #include "ADM_audioStream.h"
+
+#ifndef ADM_NO_PTS
+#define ADM_NO_PTS 0xFFFFFFFFFFFFFFFFLL // FIXME
+#endif
+
 typedef struct 
 {
     uint32_t encoding;  // Same as in wavheader
