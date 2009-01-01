@@ -22,7 +22,7 @@
 #include "dmxPSPacket.h"
 
 #include "avidemutils.h"
-
+#include "ADM_quota.h"
 
 static const char Type[5]={'X','I','P','B','P'};
 
@@ -45,7 +45,17 @@ static const uint32_t FPS[16]={
                 0                       // 15
         };
 
+typedef struct
+{
+    uint32_t w;
+    uint32_t h;
+    uint32_t fps;
+    uint32_t interlaced;
+    uint32_t ar;
+}PSVideo;
 
+static void writeVideo(FILE *file,PSVideo *video);
+static void writeSystem(FILE *file,const char *filename,bool append);
 /**
       \fn psIndexer 
       \brief main indexing loop for mpeg2 payload
@@ -57,14 +67,24 @@ uint32_t packetIndex;
 
 uint8_t streamid;   
 uint32_t temporal_ref,ftype,val;
-uint32_t imageW,imageH,imageAR ,imageFPS;
 
 uint8_t buffer[50*1024];
 bool grabbing=false;
 bool seq_found=false;
 uint32_t nbPic=0;
+FILE *index;
 
-
+PSVideo video;
+    
+    char indexName[strlen(file)+5];
+    sprintf(indexName,"%s.idx",file);
+    index=qfopen(indexName,"wt");
+    if(!index)
+    {
+        printf("[PsIndex] Cannot create %s\n",indexName);
+        return false;
+    }
+    writeSystem(index,file,true);
     psPacketLinear *pkt=new psPacketLinear(0xE0);
     pkt->open(file,false);
    
@@ -94,16 +114,16 @@ uint32_t nbPic=0;
                           //
                           seq_found=1;
                           val=pkt->readi32();
-                          imageW=val>>20;
-                          imageW=((imageW+15)&~15);
-                          imageH= (((val>>8) & 0xfff)+15)& ~15;
+                          video.w=val>>20;
+                          video.w=((video.w+15)&~15);
+                          video.h= (((val>>8) & 0xfff)+15)& ~15;
 
-                          imageAR = (val >> 4) & 0xf;
+                          video.ar = (val >> 4) & 0xf;
 
                           
-                          imageFPS= FPS[val & 0xf];
-                          printf("[PSIndexer] %dx%d %d fps AR:%d\n",imageW,imageH,imageFPS,imageAR);
+                          video.fps= FPS[val & 0xf];
                           pkt->forward(4);
+                          writeVideo(index,&video);
                           break;
                   case 0xb8: // GOP
                           
@@ -128,7 +148,7 @@ uint32_t nbPic=0;
                           // skip illegal values
                           if(ftype<1 || ftype>3)
                           {
-                                  printf("[Indexer]Met illegal pic at %"LLX" + %"LLX"\n",
+                                  printf("[Indexer]Met illegal pic at %"LLX" + %"LX"\n",
                                                   packetStart,packetIndex);
                                   continue;
                           }
@@ -138,21 +158,54 @@ uint32_t nbPic=0;
 */
                           if(ftype==1) // intra
                           {
-                                if(nbPic) printf("\n");
-                                printf("Video %"LLX":%"LX" ts:%"LLD":%"LLD,packetStart,packetIndex,pts,dts);
+                                if(!nbPic) 
+                                {
+                                    qfprintf(index,"[Data]\n");
+                                }else qfprintf(index,"\n");
+                                qfprintf(index,"Video %"LLX":%"LX" ts:%"LLD":%"LLD,packetStart,packetIndex,pts,dts);
                            }
-                            printf(" %c",Type[ftype]);
+                            qfprintf(index," %c",Type[ftype]);
                             nbPic++;
                           break;
                   default:
                     break;
                   }
       }
+    
         printf("\n");
+        
+        qfprintf(index,"\n[End]\n");
+        qfclose(index);
         delete pkt;
         return 1; 
 }
+/**
+    \fn writeVideo
+    \brief Write Video section of index file
+*/
+void writeVideo(FILE *file,PSVideo *video)
+{
+    qfprintf(file,"[Video]\n");
+    qfprintf(file,"Width=%d\n",video->w);
+    qfprintf(file,"Height=%d\n",video->h);
+    qfprintf(file,"Fps=%d\n",video->fps);
+    qfprintf(file,"Interlaced=%d\n",video->interlaced);
+    qfprintf(file,"AR=%d\n",video->ar);
 
+}
+/**
+    \fn writeSystem
+    \brief Write system part of index file
+*/
+void writeSystem(FILE *file,const char *filename,bool append)
+{
+    qfprintf(file,"PSD1\n");
+    qfprintf(file,"[System]\n");
+    qfprintf(file,"Type=P\n");
+    qfprintf(file,"File=%s\n",filename);
+    qfprintf(file,"Append=%d\n",append);
+
+}
 
 /********************************************************************************************/
 /********************************************************************************************/

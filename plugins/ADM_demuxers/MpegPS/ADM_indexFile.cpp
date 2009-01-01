@@ -44,7 +44,10 @@ bool  dmxToken::isNumeric(void)
 bool num=true;
 int l=strlen(value);
     for(int i=0;i<l;i++)
-        if(!isdigit(value[i])) num=false;
+    {
+        char v=value[i];
+        if(!isdigit(v)&& v!=0x0a && v!=0x0d) num=false;
+    }
     return num;
 }   
 /**

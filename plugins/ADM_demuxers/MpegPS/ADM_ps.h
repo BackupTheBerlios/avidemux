@@ -22,6 +22,20 @@
 
 #include "ADM_Video.h"
 #include "ADM_audioStream.h"
+#include "dmx_io.h"
+#include "ADM_indexFile.h"
+#include "dmxPSPacket.h"
+#include <vector>
+//std::vector <dmxToken *> ListOfTokens;
+
+typedef struct 
+{
+    uint64_t  startAt;
+    uint32_t  index;
+    uint8_t   type; // 1=I 2=P 3=B
+    uint64_t  pts;
+    uint64_t  dts;
+}dmxFrame;
 
 /**
     \fn ADM_psAccess
@@ -29,7 +43,7 @@
 class ADM_psAccess : public ADM_audioAccess
 {
 protected:
-                      
+                
              
                 
 public:
@@ -59,8 +73,14 @@ public:
 class psHeader         :public vidHeader
 {
   protected:
-                                
-   
+    
+    bool    interlaced;
+    bool    readVideo(indexFile *index);
+    bool    readIndex(indexFile *index);
+    std::vector <dmxFrame *> ListOfFrames;      
+    fileParser      parser;
+    uint32_t       lastFrame;
+    psPacketLinear *psPacket;
   public:
 
 
