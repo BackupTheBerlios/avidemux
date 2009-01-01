@@ -38,7 +38,7 @@ size_t          ADM_fread (void *ptr, size_t size, size_t n, FILE *sstream);
 size_t          ADM_fwrite (void *ptr, size_t size, size_t n, FILE *sstream);
 FILE            *ADM_fopen (const char *file, const char *mode);
 int             ADM_fclose (FILE *file);
-uint8_t         ADM_fileExist(char *name);
+uint8_t         ADM_fileExist(const char *name);
 uint8_t         ADM_mkdir(const char *name);
 
 /* Replacements for memory allocation functions */

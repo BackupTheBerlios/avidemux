@@ -219,7 +219,7 @@ void  ADM_LowerCase(char *string)
 
 }
 
-uint8_t         ADM_fileExist(char *name)
+uint8_t         ADM_fileExist(const char *name)
 {
 FILE *file;
                 file=fopen(name,"rb");
