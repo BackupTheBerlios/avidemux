@@ -19,15 +19,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <math.h>
 
 #include "ADM_default.h"
-
-
 #include "dmx_io.h"
 
  
@@ -60,6 +54,7 @@ fileParser::~fileParser()
         }
         if(_buffer) delete [] _buffer;
         _buffer=NULL;
+        _nbFd=0;
 }
 
 /*

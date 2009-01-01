@@ -6,6 +6,7 @@ SET(ADM_ps_SRCS
 	ADM_psAudio.cpp
     dmxPSPacket.cpp
     dmx_io.cpp
+    ADM_indexFile.cpp
 )
 
 ADD_LIBRARY(ADM_dm_ps SHARED ${ADM_ps_SRCS})

@@ -19,8 +19,10 @@
  #define DMX_DMX
  
 #include "dmx_io.h"
- 
-#define ADM_NO_PTS 0xFFFFFFFFFFFFFFFFLL
+
+#ifndef ADM_NO_PTS
+    #define ADM_NO_PTS 0xFFFFFFFFFFFFFFFFLL
+#endif
 #include "dmx_indexer.h"
 
 typedef enum 

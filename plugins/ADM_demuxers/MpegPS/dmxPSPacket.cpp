@@ -88,14 +88,14 @@ bool    psPacket::setPos(uint64_t pos)
     \brief Only returns packet of type pid
 */      
 
-bool        psPacket::getPacketOfType(uint8_t pid,uint32_t maxSize, uint32_t *packetSize,uint64_t *pts,uint64_t *dts,uint8_t *buffer)
+bool        psPacket::getPacketOfType(uint8_t pid,uint32_t maxSize, uint32_t *packetSize,uint64_t *pts,uint64_t *dts,uint8_t *buffer,uint64_t *startAt)
 {
 
     bool xit=false;
     uint8_t tmppid;
     while(1)
     {
-        if(true!=getPacket(maxSize,&tmppid,packetSize,pts,dts,buffer))
+        if(true!=getPacket(maxSize,&tmppid,packetSize,pts,dts,buffer,startAt))
                 return false;
         else
                 if(tmppid==pid) return true;
@@ -105,11 +105,11 @@ bool        psPacket::getPacketOfType(uint8_t pid,uint32_t maxSize, uint32_t *pa
 /**
     \fn getPacket
 */      
-bool        psPacket::getPacket(uint32_t maxSize, uint8_t *pid, uint32_t *packetSize,uint64_t *opts,uint64_t *odts,uint8_t *buffer)
+bool        psPacket::getPacket(uint32_t maxSize, uint8_t *pid, uint32_t *packetSize,uint64_t *opts,uint64_t *odts,uint8_t *buffer,uint64_t *startAt)
 {
 uint32_t globstream,len;
 uint8_t  stream,substream;
-uint64_t abs,pts,dts;
+uint64_t pts,dts;
         // Resync on our stream
 _again2:
         *pid=0;
@@ -120,7 +120,9 @@ _again2:
                 printf("[DmxPS] cannot sync  at "LLU"/"LLU"\n",pos,_size);
                 return false;
         }
-        _file->getpos(&abs);
+// Position of this packet just before startcode
+        _file->getpos(startAt);
+        startAt-=4;
 // Handle out of band stuff        
         if(stream==PACK_START_CODE) 
         {
@@ -385,6 +387,133 @@ uint8_t align=0;
         *olen=size;
         return 1;
 }
+//************************************************************************************
 
+#define ADM_PACKET_LINEAR 10*1024
+/**
+    \fn psPacket
+*/
+psPacketLinear::psPacketLinear(uint8_t pid) : psPacket()
+{
+    oldStartAt=startAt=0xfffffff;
+    oldBufferLen=bufferLen=0;
+    bufferIndex=0;
+    myPid=pid;
+    eof=false;
+}
+/**
+    \fn ~psPacket
+*/
+psPacketLinear::~psPacketLinear() 
+{
+}
+/**
+    \fn refill
+*/
+bool psPacketLinear::refill(void) 
+{
+// In case a startcade spawns across 2 packets
+// we have to keep track of the old one
+        oldBufferDts=bufferDts;
+        oldBufferPts=bufferPts;
+        oldStartAt=startAt;
+        oldBufferLen=bufferLen;
+        if( false== getPacketOfType(myPid,ADM_PACKET_LINEAR, &bufferLen,&bufferPts,&bufferDts,buffer,&startAt)) return false;
+        return true;
+}
+/**
+    \fn readi8
+*/
+uint8_t psPacketLinear::readi8(void)
+{
+    if(bufferIndex<bufferLen)
+    {
+        return buffer[bufferIndex++];
+    }
+    if(false==refill()) 
+    {
+        eof=1;
+        return 0;
+    }
+    ADM_assert(bufferLen);
+    bufferIndex=1;
+    return buffer[0];
+    
+}
+/**
+    \fn readi16
+*/
+uint16_t psPacketLinear::readi16(void)
+{
+    if(bufferIndex+1<bufferLen)
+    {
+        uint16_t v=(buffer[bufferIndex]<<8)+buffer[bufferIndex+1];;
+        bufferIndex+=2;
+        return v;
+    }
+    return (readi8()<<8)+readi8();
+}
+/**
+    \fn readi32
+*/
+uint32_t psPacketLinear::readi32(void)
+{
+    if(bufferIndex+3<bufferLen)
+    {
+        uint8_t *p=buffer+bufferIndex;
+        uint32_t v=(p[0]<<24)+(p[1]<<16)+(p[2]<<8)+p[3];
+        bufferIndex+=4;
+        return v;
+    }
+    return (readi16()<<16)+readi16();
+}
+/**
+    \fn forward
+*/
+bool psPacketLinear::forward(uint32_t v)
+{
+    if(bufferIndex+v-1<bufferLen)
+    {
+        bufferIndex+=v;
+        return true;
+    }
+    if(!refill()) return false;
+    v-=(bufferLen-bufferIndex);
+    return forward(v);
+}
+
+/**
+    \fn bool    read(uint32_t len, uint8_t *buffer);
+    \brief
+*/
+bool    psPacketLinear::read(uint32_t len, uint8_t *buffer)
+{
+    return false;
+}
+/**
+        \fn getInfo
+        \brief Returns info about the current (or previous if it spawns) packet.
+            It is expected that the caller will do -4 to the index to get the start of the 
+            startCode
+*/
+bool    psPacketLinear::getInfo(uint64_t *startAt, uint32_t *index, uint64_t *pts,uint64_t *dts)
+{
+    if(bufferIndex<4)
+    {
+        *startAt=this->oldStartAt;
+        *index=oldBufferLen+bufferIndex;
+        *pts=oldBufferPts;
+        *dts=oldBufferDts;
+
+    }else
+    {
+        *startAt=this->startAt;
+        *index=bufferIndex;
+        *pts=bufferPts;
+        *dts=bufferDts;
+    }
+    return true;
+
+};
 
 //EOF
