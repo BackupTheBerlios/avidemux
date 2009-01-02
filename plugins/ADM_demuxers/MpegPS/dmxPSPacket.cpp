@@ -419,6 +419,7 @@ bool psPacketLinear::refill(void)
         oldStartAt=startAt;
         oldBufferLen=bufferLen;
         if( false== getPacketOfType(myPid,ADM_PACKET_LINEAR, &bufferLen,&bufferPts,&bufferDts,buffer,&startAt)) return false;
+        bufferIndex=0;
         return true;
 }
 /**
@@ -495,15 +496,26 @@ bool psPacketLinear::forward(uint32_t v)
 bool    psPacketLinear::read(uint32_t len, uint8_t *out)
 {
     // Enough already ?
-    uint32_t avail=bufferLen-bufferIndex;
-    uint32_t chunk=avail;
-    if(chunk>len) chunk=len;
-    memcpy(out,buffer+bufferIndex,chunk);
-    bufferIndex+=chunk;
-    len-=chunk;
-    if(bufferIndex==bufferLen) refill();
-    consumed+=chunk;
-    if(len) return read(len,out+chunk);
+    while(len)
+    {
+        uint32_t avail=bufferLen-bufferIndex;
+        uint32_t chunk=avail;
+        if(chunk>len) chunk=len;
+#if 0
+        printf("len:%ld avail:%ld chunk %ld index:%d size:%d\n",
+                len,avail,chunk,bufferIndex,bufferLen);
+#endif
+        memcpy(out,buffer+bufferIndex,chunk);
+        bufferIndex+=chunk;
+        len-=chunk;
+        out+=chunk;
+        consumed+=chunk;
+        if(bufferIndex==bufferLen)
+        {
+            //printf("Refill\n");
+            if(false==refill()) return false;
+        }
+    }
     return true;
 }
 /**

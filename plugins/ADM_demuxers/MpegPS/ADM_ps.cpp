@@ -358,7 +358,7 @@ uint8_t  psHeader::getFrame(uint32_t frame,ADMCompressedImage *img)
 {
     if(frame>=ListOfFrames.size()) return 0;
     dmxFrame *pk=ListOfFrames[frame];
-    if(frame==(lastFrame+1) && frame)
+    if(frame==(lastFrame+1) && pk->type!=1)
     {
         lastFrame++;
         bool r=psPacket->read(pk->len,img->data);
