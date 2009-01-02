@@ -8,6 +8,20 @@
 
 #include "dmx_io.h"
 #include "ADM_Video.h"
+
+/**
+    \struct psPacketInfo
+
+*/
+typedef struct
+{
+    uint64_t pts;
+    uint64_t dts;
+    uint64_t startAt;
+    uint32_t offset;
+
+}psPacketInfo;
+
 /**
     \class psPacket
 */
@@ -48,10 +62,12 @@ protected:
         uint32_t oldBufferLen;
         uint64_t oldBufferPts;
         uint64_t oldBufferDts;
+        uint32_t consumed;
 
 public:
                 psPacketLinear(uint8_t pid);
                 ~psPacketLinear();
+        uint32_t getConsumed(void);
         uint8_t  readi8();
         uint16_t readi16();
         uint32_t readi32();
@@ -59,7 +75,8 @@ public:
         bool    read(uint32_t len, uint8_t *buffer);
         bool    forward(uint32_t v);
         bool    stillOk(void) {return !eof;};
-        bool    getInfo(uint64_t *startAt, uint32_t *index, uint64_t *pts,uint64_t *dts);
+        bool    getInfo(psPacketInfo *info);
+        bool    seek(uint64_t packetStart, uint32_t offset);
 };
 
 

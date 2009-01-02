@@ -122,7 +122,7 @@ _again2:
         }
 // Position of this packet just before startcode
         _file->getpos(startAt);
-        startAt-=4;
+        *startAt-=4;
 // Handle out of band stuff        
         if(stream==PACK_START_CODE) 
         {
@@ -426,6 +426,7 @@ bool psPacketLinear::refill(void)
 */
 uint8_t psPacketLinear::readi8(void)
 {
+    consumed++;
     if(bufferIndex<bufferLen)
     {
         return buffer[bufferIndex++];
@@ -449,6 +450,7 @@ uint16_t psPacketLinear::readi16(void)
     {
         uint16_t v=(buffer[bufferIndex]<<8)+buffer[bufferIndex+1];;
         bufferIndex+=2;
+        consumed+=2;
         return v;
     }
     return (readi8()<<8)+readi8();
@@ -463,6 +465,7 @@ uint32_t psPacketLinear::readi32(void)
         uint8_t *p=buffer+bufferIndex;
         uint32_t v=(p[0]<<24)+(p[1]<<16)+(p[2]<<8)+p[3];
         bufferIndex+=4;
+        consumed+=4;
         return v;
     }
     return (readi16()<<16)+readi16();
@@ -475,10 +478,13 @@ bool psPacketLinear::forward(uint32_t v)
     if(bufferIndex+v-1<bufferLen)
     {
         bufferIndex+=v;
+        consumed+=v;
         return true;
     }
     if(!refill()) return false;
-    v-=(bufferLen-bufferIndex);
+    uint32_t delta=bufferLen-bufferIndex;
+    v-=delta;
+    consumed+=delta;
     return forward(v);
 }
 
@@ -486,9 +492,19 @@ bool psPacketLinear::forward(uint32_t v)
     \fn bool    read(uint32_t len, uint8_t *buffer);
     \brief
 */
-bool    psPacketLinear::read(uint32_t len, uint8_t *buffer)
+bool    psPacketLinear::read(uint32_t len, uint8_t *out)
 {
-    return false;
+    // Enough already ?
+    uint32_t avail=bufferLen-bufferIndex;
+    uint32_t chunk=avail;
+    if(chunk>len) chunk=len;
+    memcpy(out,buffer+bufferIndex,chunk);
+    bufferIndex+=chunk;
+    len-=chunk;
+    if(bufferIndex==bufferLen) refill();
+    consumed+=chunk;
+    if(len) return read(len,out+chunk);
+    return true;
 }
 /**
         \fn getInfo
@@ -496,24 +512,50 @@ bool    psPacketLinear::read(uint32_t len, uint8_t *buffer)
             It is expected that the caller will do -4 to the index to get the start of the 
             startCode
 */
-bool    psPacketLinear::getInfo(uint64_t *startAt, uint32_t *index, uint64_t *pts,uint64_t *dts)
+bool    psPacketLinear::getInfo(psPacketInfo *info)
 {
     if(bufferIndex<4)
     {
-        *startAt=this->oldStartAt;
-        *index=oldBufferLen+bufferIndex;
-        *pts=oldBufferPts;
-        *dts=oldBufferDts;
+        info->startAt=this->oldStartAt;
+        info->offset=oldBufferLen+bufferIndex;
+        info->pts=oldBufferPts;
+        info->dts=oldBufferDts;
 
     }else
     {
-        *startAt=this->startAt;
-        *index=bufferIndex;
-        *pts=bufferPts;
-        *dts=bufferDts;
+        info->startAt=this->startAt;
+        info->offset=bufferIndex;
+        info->pts=bufferPts;
+        info->dts=bufferDts;
     }
     return true;
 
 };
-
+/**
+    \fn seek
+    \brief Async jump
+*/
+bool    psPacketLinear::seek(uint64_t packetStart, uint32_t offset)
+{
+    if(!_file->setpos(packetStart))
+    {
+        printf("[psPacket] Cannot seek to %"LLX"\n",packetStart);
+        return 0;
+    }
+    refill();
+    ADM_assert(offset<bufferLen);
+    bufferIndex=offset;
+    
+    return true;
+}
+/**
+    \fn getConsumed
+    \brief returns the # of bytes consumed since the last call
+*/
+uint32_t psPacketLinear::getConsumed(void)
+{
+    uint32_t c=consumed;
+    consumed=0;
+    return c;
+}
 //EOF

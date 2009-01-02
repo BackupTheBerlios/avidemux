@@ -99,10 +99,12 @@ bool    psHeader::readIndex(indexFile *index)
 {
 char buffer[2000];
         printf("[psDemuxer] Reading index\n");
+        if(!index->goToSection("Data")) return false;
         while(1)
         {
             if(!index->readString(2000,(uint8_t *)buffer)) return true;
             if(buffer[0]=='[') return true;
+            if(buffer[0]==0xa || buffer[0]==0xd) continue; // blank line
             // Now split the line
             if(strncmp(buffer,"Video ",6))
             {
@@ -112,18 +114,67 @@ char buffer[2000];
             char *head=buffer+6;
             uint64_t pts,dts,startAt;
             uint32_t offset;
-            if(4!=sscanf(head,"%"LLX":%"LX" ts:%"LLU":%"LLU,&startAt,&offset,&pts,&dts))
+            if(4!=sscanf(head,"at:%"LLX":%"LX" Pts:%"LLD":%"LLD,&startAt,&offset,&pts,&dts))
             {
                     printf("[psDemuxer] cannot read fields in  :%s\n",buffer);
                     return false;
             }
-            dmxFrame *frame=new dmxFrame;
-            frame->startAt=startAt;
-            frame->index=offset;
-            frame->type=1;
-            frame->pts=pts;
-            frame->dts=dts;
-            ListOfFrames.push_back(frame);
+            
+            char *start=strstr(buffer," I:");
+            if(!start) continue;
+            start+=1;
+            int count=0;
+            while(1)
+            {
+                char *cur=start;
+                char type=1;
+                char *next;
+                uint32_t len;
+                type=*cur;
+                if(type==0x0a || type==0x0d) break;
+                cur++;
+                if(*(cur)!=':')
+                {
+                    printf("[psDemux] <%s> instead of : (%c %x %x):\n",*cur,*(cur-1),*cur);
+                }
+                *cur++;
+                next=strstr(start," ");
+                ADM_assert(1==sscanf(cur,"%"LX,&len));
+                
+                
+                dmxFrame *frame=new dmxFrame;
+                if(!count)
+                {
+                    frame->pts=pts;
+                    frame->dts=dts;
+                    frame->startAt=startAt;
+                    frame->index=offset;
+
+                }else       
+                {
+                    frame->pts=ADM_NO_PTS;
+                    frame->dts=ADM_NO_PTS;
+                    frame->startAt=0;
+                    frame->index=0;
+                }
+                switch(type)
+                {
+                    case 'I': frame->type=1;break;
+                    case 'P': frame->type=2;break;
+                    case 'B': frame->type=3;break;
+                    default: ADM_assert(0);
+                }
+                frame->len=len;
+                ListOfFrames.push_back(frame);
+                count++;
+                if(!next) 
+                {
+                    break;
+                }
+                start=next+1;
+            }
+
+         
         }
 
     return false;
@@ -231,7 +282,7 @@ uint8_t psHeader::close(void)
  psHeader::psHeader( void ) : vidHeader()
 { 
     interlaced=false;
-    
+    lastFrame=0xffffffff;
     
 }
 /**
@@ -289,13 +340,49 @@ uint64_t psHeader::getTime(uint32_t frame)
     return pts;
 }
 /**
+    \fn timeConvert
+    \brief FIXME
+*/
+uint64_t psHeader::timeConvert(uint64_t x)
+{
+    if(x==ADM_NO_PTS) return ADM_NO_PTS;
+    x=x-ListOfFrames[0]->pts;
+    return x;
+
+}
+/**
         \fn getFrame
 */
 
 uint8_t  psHeader::getFrame(uint32_t frame,ADMCompressedImage *img)
 {
-     
-     return false;
+    if(frame>=ListOfFrames.size()) return 0;
+    dmxFrame *pk=ListOfFrames[frame];
+    if(frame==(lastFrame+1) && frame)
+    {
+        lastFrame++;
+        bool r=psPacket->read(pk->len,img->data);
+             img->dataLength=pk->len;
+             img->demuxerFrameNo=frame;
+             img->demuxerDts=timeConvert(pk->dts);
+             img->demuxerPts=timeConvert(pk->pts);
+             getFlags(frame,&(img->flags));
+             return r;
+    }
+    if(pk->type==1)
+    {
+        if(!psPacket->seek(pk->startAt,pk->index)) return false;
+         bool r=psPacket->read(pk->len,img->data);
+             img->dataLength=pk->len;
+             img->demuxerFrameNo=frame;
+             img->demuxerDts=timeConvert(pk->dts);
+             img->demuxerPts=timeConvert(pk->pts);
+             getFlags(frame,&(img->flags));
+             lastFrame=frame;
+             return r;
+
+    }
+    return false;
 }
 /**
         \fn getExtraHeaderData
@@ -313,7 +400,8 @@ uint8_t  psHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
 */
 uint8_t psHeader::getFrameSize (uint32_t frame, uint32_t * size)
 {
-    *size=0;
+    if(frame>=ListOfFrames.size()) return 0;
+    *size=ListOfFrames[frame]->len;
     return true;
 }
 

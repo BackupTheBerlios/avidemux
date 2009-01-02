@@ -35,6 +35,7 @@ typedef struct
     uint8_t   type; // 1=I 2=P 3=B
     uint64_t  pts;
     uint64_t  dts;
+    uint32_t  len;
 }dmxFrame;
 
 /**
@@ -81,6 +82,7 @@ class psHeader         :public vidHeader
     fileParser      parser;
     uint32_t       lastFrame;
     psPacketLinear *psPacket;
+    uint64_t        timeConvert(uint64_t x);
   public:
 
 

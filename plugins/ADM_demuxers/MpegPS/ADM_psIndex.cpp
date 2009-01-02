@@ -54,28 +54,49 @@ typedef struct
     uint32_t ar;
 }PSVideo;
 
+typedef enum
+{
+    idx_startAtImage,
+    idx_startAtGopOrSeq
+}indexerState;
+typedef struct
+{
+    uint64_t pts,dts,startAt;
+    uint32_t offset;
+    uint32_t frameType;
+    uint32_t nbPics;
+    indexerState state;
+    psPacketLinear *pkt;
+}indexerData;
+
+typedef enum
+{
+    markStart,
+    markEnd,
+    markNow
+}markType;
+
 static void writeVideo(FILE *file,PSVideo *video);
 static void writeSystem(FILE *file,const char *filename,bool append);
+static void Mark(FILE *file, indexerData *data,psPacketInfo *info,markType update);
+
+
 /**
       \fn psIndexer 
       \brief main indexing loop for mpeg2 payload
 */
 uint8_t   psIndexer(const char *file)
 {
-uint64_t packetStart,dts,pts;
-uint32_t packetIndex;
-
-uint8_t streamid;   
-uint32_t temporal_ref,ftype,val;
+uint32_t temporal_ref,val;
 
 uint8_t buffer[50*1024];
-bool grabbing=false;
 bool seq_found=false;
-uint32_t nbPic=0;
 FILE *index;
-
 PSVideo video;
-    
+indexerData  data;    
+psPacketInfo info;
+
+    memset(&data,0,sizeof(data));
     char indexName[strlen(file)+5];
     sprintf(indexName,"%s.idx",file);
     index=qfopen(indexName,"wt");
@@ -87,7 +108,7 @@ PSVideo video;
     writeSystem(index,file,true);
     psPacketLinear *pkt=new psPacketLinear(0xE0);
     pkt->open(file,false);
-   
+    data.pkt=pkt;
       while(1)
       {
         uint32_t code=0xffff+0xffff0000;
@@ -98,14 +119,14 @@ PSVideo video;
         if(!pkt->stillOk()) break;
         uint8_t startCode=pkt->readi8();
 
-        pkt->getInfo(&packetStart, &packetIndex, &pts,&dts);
+        pkt->getInfo(&info);
+        info.offset-=4;
 
           switch(startCode)
                   {
                   case 0xB3: // sequence start
-                          if(grabbing) continue;
-                          grabbing=1;    
-                          
+                          Mark(index,&data,&info,markStart);
+                          data.state=idx_startAtGopOrSeq;
                           if(seq_found)
                           {
                                   pkt->forward(8);  // Ignore
@@ -124,48 +145,49 @@ PSVideo video;
                           video.fps= FPS[val & 0xf];
                           pkt->forward(4);
                           writeVideo(index,&video);
+                          qfprintf(index,"[Data]");
                           break;
                   case 0xb8: // GOP
                           
                           if(!seq_found) continue;
-                          if(grabbing) 
+                          if(data.state==idx_startAtGopOrSeq) 
                           {         
                                   continue;;
                           }
+                          
+                          Mark(index,&data,&info,markStart);
+                          data.state=idx_startAtGopOrSeq;
                           break;
                   case 0x00 : // picture
-                        
+                        {
+                          int type;
+                          markType update=markNow;
                           if(!seq_found)
                           { 
                                   continue;
-                                  printf("No sequence start yet, skipping..\n");
+                                  printf("[psIndexer]No sequence start yet, skipping..\n");
                           }
-                          grabbing=0;
+                          
                           val=pkt->readi16();
                           temporal_ref=val>>6;
-                          ftype=7 & (val>>3);
-                          //aprintf("Temporal ref:%lu\n",temporal_ref);
-                          // skip illegal values
-                          if(ftype<1 || ftype>3)
+                          type=7 & (val>>3);
+                          if( type<1 ||  type>3)
                           {
                                   printf("[Indexer]Met illegal pic at %"LLX" + %"LX"\n",
-                                                  packetStart,packetIndex);
+                                                  info.startAt,info.offset);
                                   continue;
                           }
-/*
-                          printf("[PsIndexer] Found image %c at %"LLU":%"LU" pts:%"LLD" dts:%"LLD"\n",
-                                                                Type[ftype],packetStart,packetIndex,pts,dts);
-*/
-                          if(ftype==1) // intra
+                          
+                          
+                          if(data.state==idx_startAtGopOrSeq) 
                           {
-                                if(!nbPic) 
-                                {
-                                    qfprintf(index,"[Data]\n");
-                                }else qfprintf(index,"\n");
-                                qfprintf(index,"Video %"LLX":%"LX" ts:%"LLD":%"LLD,packetStart,packetIndex,pts,dts);
-                           }
-                            qfprintf(index," %c",Type[ftype]);
-                            nbPic++;
+                                update=markEnd;
+                          }
+                          data.frameType=type;
+                          Mark(index,&data,&info,update);
+                          data.state=idx_startAtImage;
+                          data.nbPics++;
+                        }
                           break;
                   default:
                     break;
@@ -173,12 +195,49 @@ PSVideo video;
       }
     
         printf("\n");
-        
+        Mark(index,&data,&info,markStart);
         qfprintf(index,"\n[End]\n");
         qfclose(index);
         delete pkt;
         return 1; 
 }
+/**
+    \fn index
+    \brief update the file
+*/
+void Mark(FILE *file, indexerData *data,psPacketInfo *info,markType update)
+{
+    if(update==markStart || update==markNow)
+    {
+        if(data->nbPics)
+        {
+            // Write previous image data (size) : TODO
+            qfprintf(file,":%06"LX" ",data->pkt->getConsumed()); // Size
+        }
+        else data->pkt->getConsumed();
+    }
+    if(update==markEnd || update==markNow)
+    {
+        if(data->frameType==1)
+        {
+            // start a new line
+            qfprintf(file,"\nVideo at:%08"LLX":%04"LX" Pts:%08"LLD":%08"LLD" ",data->startAt,data->offset,info->pts,info->dts);
+        }
+    
+        qfprintf(file,"%c",Type[data->frameType]);
+    }
+    if(update==markEnd || update==markNow)
+    {
+        data->pts=info->pts;
+        data->dts=info->dts;
+    }
+    if(update==markStart || update==markNow)
+    {
+        data->startAt=info->startAt;
+        data->offset=info->offset;
+    }
+}
+
 /**
     \fn writeVideo
     \brief Write Video section of index file
