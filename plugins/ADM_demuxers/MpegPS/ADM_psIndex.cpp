@@ -67,6 +67,7 @@ typedef struct
     uint32_t nbPics;
     indexerState state;
     psPacketLinear *pkt;
+    int32_t        nextOffset;
 }indexerData;
 
 typedef enum
@@ -204,15 +205,27 @@ psPacketInfo info;
 /**
     \fn index
     \brief update the file
+
+    The offset part is due to the fact that we read 2 bytes from the pic header to know the pic type.
+    So when going from a pic to a pic, it is self cancelling.
+    If the beginning is not a pic, but a gop start for example, we had to add/remove those.
+
 */
 void Mark(FILE *file, indexerData *data,psPacketInfo *info,markType update)
 {
+    int offset=data->nextOffset;
+    data->nextOffset=0;
+    
+     if( update==markStart)
+     {
+                offset=2;
+     }
     if(update==markStart || update==markNow)
     {
         if(data->nbPics)
         {
             // Write previous image data (size) : TODO
-            qfprintf(file,":%06"LX" ",data->pkt->getConsumed()); // Size
+            qfprintf(file,":%06"LX" ",data->pkt->getConsumed()+offset); // Size
         }
         else data->pkt->getConsumed();
     }
@@ -222,6 +235,7 @@ void Mark(FILE *file, indexerData *data,psPacketInfo *info,markType update)
         {
             // start a new line
             qfprintf(file,"\nVideo at:%08"LLX":%04"LX" Pts:%08"LLD":%08"LLD" ",data->startAt,data->offset,info->pts,info->dts);
+            data->nextOffset=-2;
         }
     
         qfprintf(file,"%c",Type[data->frameType]);

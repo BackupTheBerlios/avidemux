@@ -214,7 +214,11 @@ bool    psHeader::readVideo(indexFile *index)
 */
 uint64_t psHeader::getVideoDuration(void)
 {
-     return 0;
+    float f;
+        f=_videostream.dwRate;
+        f*=1000;
+        f*=ListOfFrames.size();
+     return (uint64_t)f;
 }
 
 
@@ -366,6 +370,7 @@ uint8_t  psHeader::getFrame(uint32_t frame,ADMCompressedImage *img)
              img->demuxerFrameNo=frame;
              img->demuxerDts=timeConvert(pk->dts);
              img->demuxerPts=timeConvert(pk->pts);
+             //printf("[>>>] %d:%02x %02x %02x %02x\n",frame,img->data[0],img->data[1],img->data[2],img->data[3]);
              getFlags(frame,&(img->flags));
              return r;
     }
@@ -378,10 +383,12 @@ uint8_t  psHeader::getFrame(uint32_t frame,ADMCompressedImage *img)
              img->demuxerDts=timeConvert(pk->dts);
              img->demuxerPts=timeConvert(pk->pts);
              getFlags(frame,&(img->flags));
+             //printf("[>>>] %d:%02x %02x %02x %02x\n",frame,img->data[0],img->data[1],img->data[2],img->data[3]);
              lastFrame=frame;
              return r;
 
     }
+    printf(" [PsDemux] lastFrame :%d this frame :%d\n",lastFrame,frame);
     return false;
 }
 /**
