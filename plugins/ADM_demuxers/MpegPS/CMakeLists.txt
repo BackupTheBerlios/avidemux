@@ -3,6 +3,7 @@ SET(ADM_ps_SRCS
 	ADM_ps.cpp
 	ADM_psPlugin.cpp
 	ADM_psIndex.cpp
+	ADM_psReadIndex.cpp
 	ADM_psAudio.cpp
     dmxPSPacket.cpp
     dmx_io.cpp

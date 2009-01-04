@@ -106,7 +106,9 @@ uint8_t decoderFF::clonePic (AVFrame * src, ADMImage * out)
       out->_qSize = out->_qStride = 0;
       out->quant = NULL;
     }
-    out->Pts=(uint32_t) (uint64_t)(src->opaque);
+    printf("[LAVC] Old pts :%"LLD" new pts :%"LLD"\n",out->Pts, (uint64_t)(src->opaque));
+    out->Pts= (uint64_t)(src->opaque);
+    return 1;
 }
 /**
         \fn decoderMultiThread
@@ -363,7 +365,7 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
   out->_qStride = 0;		//Default = no quant
   if (0 > ret && !_context->hurry_up)
     {
-      printf ("\n[lavc] error in FFMP43/mpeg4!\n");
+      printf ("\n[lavc] error in lavcodec decoder!\n");
       printf ("[lavc] Err: %d, size :%d\n", ret, in->dataLength);
       return 0;
     }

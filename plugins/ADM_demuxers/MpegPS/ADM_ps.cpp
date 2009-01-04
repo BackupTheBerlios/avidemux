@@ -73,6 +73,7 @@ uint8_t psHeader::open(const char *name)
         printf("[psDemux] Cannot read index for file %s\n",idxName);
         goto abt;
     }
+    updatePtsDts();
     _videostream.dwLength= _mainaviheader.dwTotalFrames=ListOfFrames.size();
     printf("[psDemux] Found %d video frames\n",_videostream.dwLength);
     if(_videostream.dwLength)_isvideopresent=1;
@@ -91,132 +92,15 @@ abt:
     return r;
 }
 /**
-        \fn readVideo
-        \brief Read the [video] section of the index file
-
-*/
-bool    psHeader::readIndex(indexFile *index)
-{
-char buffer[2000];
-        printf("[psDemuxer] Reading index\n");
-        if(!index->goToSection("Data")) return false;
-        while(1)
-        {
-            if(!index->readString(2000,(uint8_t *)buffer)) return true;
-            if(buffer[0]=='[') return true;
-            if(buffer[0]==0xa || buffer[0]==0xd) continue; // blank line
-            // Now split the line
-            if(strncmp(buffer,"Video ",6))
-            {
-                    printf("[psDemuxer] Invalid line :%s\n",buffer);
-                    return false;
-            }
-            char *head=buffer+6;
-            uint64_t pts,dts,startAt;
-            uint32_t offset;
-            if(4!=sscanf(head,"at:%"LLX":%"LX" Pts:%"LLD":%"LLD,&startAt,&offset,&pts,&dts))
-            {
-                    printf("[psDemuxer] cannot read fields in  :%s\n",buffer);
-                    return false;
-            }
-            
-            char *start=strstr(buffer," I:");
-            if(!start) continue;
-            start+=1;
-            int count=0;
-            while(1)
-            {
-                char *cur=start;
-                char type=1;
-                char *next;
-                uint32_t len;
-                type=*cur;
-                if(type==0x0a || type==0x0d) break;
-                cur++;
-                if(*(cur)!=':')
-                {
-                    printf("[psDemux] <%s> instead of : (%c %x %x):\n",*cur,*(cur-1),*cur);
-                }
-                *cur++;
-                next=strstr(start," ");
-                ADM_assert(1==sscanf(cur,"%"LX,&len));
-                
-                
-                dmxFrame *frame=new dmxFrame;
-                if(!count)
-                {
-                    frame->pts=pts;
-                    frame->dts=dts;
-                    frame->startAt=startAt;
-                    frame->index=offset;
-
-                }else       
-                {
-                    frame->pts=ADM_NO_PTS;
-                    frame->dts=ADM_NO_PTS;
-                    frame->startAt=0;
-                    frame->index=0;
-                }
-                switch(type)
-                {
-                    case 'I': frame->type=1;break;
-                    case 'P': frame->type=2;break;
-                    case 'B': frame->type=3;break;
-                    default: ADM_assert(0);
-                }
-                frame->len=len;
-                ListOfFrames.push_back(frame);
-                count++;
-                if(!next) 
-                {
-                    break;
-                }
-                start=next+1;
-            }
-
-         
-        }
-
-    return false;
-}
-/**
-        \fn readVideo
-        \brief Read the [video] section of the index file
-
-*/
-bool    psHeader::readVideo(indexFile *index)
-{
-    printf("[psDemuxer] Reading Video\n");
-    if(!index->readSection("Video")) return false;
-    uint32_t w,h,fps,ar;
-    
-    w=index->getAsUint32("Width");
-    h=index->getAsUint32("height");
-    fps=index->getAsUint32("Fps");
-
-    if(!w || !h || !fps) return false;
-
-    interlaced=index->getAsUint32("Interlaced");
-    
-    _video_bih.biWidth=_mainaviheader.dwWidth=w ;
-    _video_bih.biHeight=_mainaviheader.dwHeight=h;             
-    _videostream.dwScale=1000;
-    _videostream.dwRate=fps;
-
-    _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"MPEG");
-
-    return true;
-}
-
-/**
         \fn getVideoDuration
         \brief Returns duration of video in us
 */
 uint64_t psHeader::getVideoDuration(void)
 {
     float f;
-        f=_videostream.dwRate;
-        f*=1000;
+        f=1000*1000*1000;
+        f/=_videostream.dwRate; // in uss
+        
         f*=ListOfFrames.size();
      return (uint64_t)f;
 }
@@ -350,7 +234,9 @@ uint64_t psHeader::getTime(uint32_t frame)
 uint64_t psHeader::timeConvert(uint64_t x)
 {
     if(x==ADM_NO_PTS) return ADM_NO_PTS;
-    x=x-ListOfFrames[0]->pts;
+    x=x-ListOfFrames[0]->dts;
+    x=x*1000;
+    x/=90;
     return x;
 
 }
@@ -368,8 +254,8 @@ uint8_t  psHeader::getFrame(uint32_t frame,ADMCompressedImage *img)
         bool r=psPacket->read(pk->len,img->data);
              img->dataLength=pk->len;
              img->demuxerFrameNo=frame;
-             img->demuxerDts=timeConvert(pk->dts);
-             img->demuxerPts=timeConvert(pk->pts);
+             img->demuxerDts=pk->dts;
+             img->demuxerPts=pk->pts;
              //printf("[>>>] %d:%02x %02x %02x %02x\n",frame,img->data[0],img->data[1],img->data[2],img->data[3]);
              getFlags(frame,&(img->flags));
              return r;
@@ -380,8 +266,8 @@ uint8_t  psHeader::getFrame(uint32_t frame,ADMCompressedImage *img)
          bool r=psPacket->read(pk->len,img->data);
              img->dataLength=pk->len;
              img->demuxerFrameNo=frame;
-             img->demuxerDts=timeConvert(pk->dts);
-             img->demuxerPts=timeConvert(pk->pts);
+             img->demuxerDts=pk->dts;
+             img->demuxerPts=pk->pts;
              getFlags(frame,&(img->flags));
              //printf("[>>>] %d:%02x %02x %02x %02x\n",frame,img->data[0],img->data[1],img->data[2],img->data[3]);
              lastFrame=frame;

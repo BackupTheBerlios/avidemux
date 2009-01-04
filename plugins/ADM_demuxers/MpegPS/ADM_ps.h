@@ -83,6 +83,7 @@ class psHeader         :public vidHeader
     uint32_t       lastFrame;
     psPacketLinear *psPacket;
     uint64_t        timeConvert(uint64_t x);
+    bool            updatePtsDts(void);
   public:
 
 
