@@ -1,14 +1,14 @@
 /***************************************************************************
                           dmx_io.cpp  -  description
                              -------------------
-    
+
     copyright            : (C) 2005 by mean
     email                : fixounet@free.fr
-    
+
     This just handles mpeg sync search and little endian/big endin integer reading
     It also handle multiple files seen as one logical file and buffering
         to speed up ios
-    
+
  ***************************************************************************/
 
 /***************************************************************************
@@ -25,7 +25,7 @@
 
 #include "dmx_io.h"
 
- 
+
 fileParser::fileParser( void )
 {
                 _fd=NULL;
@@ -45,13 +45,13 @@ fileParser::~fileParser()
                  for(uint32_t i=0;i<_nbFd;i++)
                  {
                                 if(_fd[i])
-                                        fclose(_fd[i]); 
+                                        fclose(_fd[i]);
                  }
                 delete [] _fd;
                 delete [] _sizeFd;
                 delete [] _sizeFdCumul;
-                 
-                
+
+
         }
         if(_buffer) delete [] _buffer;
         _buffer=NULL;
@@ -80,7 +80,7 @@ uint8_t fileParser::open( const char *filename,FP_TYPE *multi )
 
         int i = 0;                          // index (general use)
 
-        
+
         // find the last dot
         dot = strrchr( filename, '.' );
 
@@ -131,7 +131,7 @@ uint8_t fileParser::open( const char *filename,FP_TYPE *multi )
         {
                 // split the filename in <left>, <number> and <right>
                 // -----
-                
+
                 // <left> part
                 left = new char[(dot - filename - decimals) + 1];
                 strncpy( left, filename, (dot - filename - decimals) );
@@ -149,7 +149,7 @@ uint8_t fileParser::open( const char *filename,FP_TYPE *multi )
                 // add the file, and all existing follow-ups
                 // -----
                 uint32_t tabSize;
-                
+
                 tabSize=(uint32_t)pow(10,decimals);
                 buffer_fd = new FILE * [tabSize];
                 buffer_sizeFd = new uint64_t [tabSize];
@@ -225,7 +225,7 @@ uint8_t fileParser::open( const char *filename,FP_TYPE *multi )
                         else
                                 *multi=FP_DONT_APPEND;
                 }
-        
+
                 printf( " found %d files \n", count );
                 printf( "Done \n" );
         } // if( decimals == 0 )
@@ -236,18 +236,18 @@ uint8_t fileParser::open( const char *filename,FP_TYPE *multi )
 /*----------------------------------------
 
 ------------------------------------------*/
-  
+
 uint8_t fileParser::forward(uint64_t jmp)
 {
                 // still in the buffer ?
                 if((_off+jmp)<_tail)
-                {       
+                {
                         _off+=jmp;
                         return 1;
                 }
-                
+
                // locate the new file
-               
+
                if(_off+jmp>=_size)
                         {
                                _off=_size-1;
@@ -267,14 +267,14 @@ uint8_t fileParser::forward(uint64_t jmp)
                         }
 
                 }
-                
+
                 return 0;
 }
 
 uint8_t fileParser::setpos(uint64_t o)
 {
 
-                if(o>=_head && o<_tail) 
+                if(o>=_head && o<_tail)
                 {
                         _off=o;
                         return 1;
@@ -291,7 +291,7 @@ uint8_t fileParser::setpos(uint64_t o)
                                         }
                         }
                         printf("\n cannot seek to %"LLU"\n",o);
-                        return 0;               
+                        return 0;
 }
 //
 //      Search packet signature and return packet type
@@ -301,28 +301,28 @@ uint8_t fileParser::sync(uint8_t *stream)
 uint32_t val,hnt;
 
         val=0;
-        hnt=0;                  
+        hnt=0;
         // preload
-        if((4+_off)>=_size) 
+        if((4+_off)>=_size)
         {
-                printf("Dmx IO: End of file met (%"LLU" / %"LLU" seg%lu)\n",_off,_size,_nbFd);
+                printf("Dmx IO: End of file met (%"LLU" / %"LLU" seg%"LU")\n",_off,_size,_nbFd);
                 return 0;
         }
         hnt=(read8i()<<16) + (read8i()<<8) +read8i();
-        
+
 
         while((hnt!=0x00001))
-        {                                
+        {
                 hnt<<=8;
-                val=read8i();                                   
+                val=read8i();
                 hnt+=val;
                 hnt&=0xffffff;
                 if(_curFd==_nbFd-1)
-                {       
+                {
                                 if((4+_off)>=_size) return 0;
                 }
         }
-                                
+
         *stream=read8i();
         return 1;
 }
@@ -334,27 +334,27 @@ uint8_t fileParser::syncH264(uint8_t *stream)
 uint32_t val,hnt;
 
         val=0;
-        hnt=0;                  
+        hnt=0;
         // preload
-        if((5+_off)>=_size) 
+        if((5+_off)>=_size)
         {
-                printf("Dmx IO: End of file met (%"LLU" / %"LLU" seg%lu)\n",_off,_size,_nbFd);
+                printf("Dmx IO: End of file met (%"LLU" / %"LLU" seg%"LU")\n",_off,_size,_nbFd);
                 return 0;
         }
         hnt=(read8i()<<24)+(read8i()<<16) + (read8i()<<8) +read8i();
-        
+
 
         while((hnt!=0x1))
-        {                                
+        {
                 hnt<<=8;
-                val=read8i();                                   
+                val=read8i();
                 hnt+=val;
                 if(_curFd==_nbFd-1)
-                {       
+                {
                                 if((5+_off)>=_size) return 0;
                 }
         }
-                                
+
         *stream=read8i();
         return 1;
 }
@@ -363,14 +363,14 @@ uint8_t fileParser::getpos(uint64_t *o)
 {
          *o=_off;
          return 1;
-        
+
 }
 
 
- uint64_t fileParser::getSize( void ) 
+ uint64_t fileParser::getSize( void )
 {
-        return  _size;   
-         
+        return  _size;
+
 }
 /*--------------------------------------------------
                 Read l bytes from file
@@ -383,9 +383,9 @@ uint64_t remain,begin,mx,last;
 
         ADM_assert(_off>=_head);
         ADM_assert(_off<=_tail);
-              
+
         if(_head>=_size-1) return 0;
- 
+
 // Check we do not go out of bound
         if(_off+len>=_size)
         {
@@ -399,12 +399,12 @@ uint64_t remain,begin,mx,last;
 
         // everything in cache ?
         if(len<=remain)
-        {                
+        {
                 memcpy(buffer,_buffer+begin,len);
                 _off+=len;
                 return len;
         }
-        
+
         // No enough data, purge cache
         if(remain)
         {
@@ -414,7 +414,7 @@ uint64_t remain,begin,mx,last;
                 buffer+=remain;
                 return remain+read32(len,buffer);
         }
-        
+
         // Reload ?
         // What is left in that file ?
         mx=_sizeFd[_curFd]+_sizeFdCumul[_curFd]-_off;
@@ -423,10 +423,10 @@ uint64_t remain,begin,mx,last;
         {
                 fread(buffer,mx,1,_fd[_curFd]);
                 len-=mx;
-                _off+=mx;                
+                _off+=mx;
                 buffer+=mx;
                 _head=_tail=_off;
-                _curFd++;                
+                _curFd++;
                 if(_curFd>=_nbFd) return 0;
                 fseeko(_fd[_curFd],0,SEEK_SET);
                 return mx+read32(len,buffer);
@@ -440,16 +440,16 @@ uint64_t remain,begin,mx,last;
         fread(_buffer,mx,1,_fd[_curFd]);
         _head=_off;
         _tail=_head+mx;
-        
+
          return len;
-        
-}       
+
+}
 #ifdef NO_INLINE_FP
 uint32_t fileParser::read32i(void )
 {
        uint32_t v;
        uint8_t c[4];
-       uint8_t *p;        
+       uint8_t *p;
         // case one, it fits in the buffer
         //
         if(_off+4<_tail)
@@ -491,11 +491,11 @@ uint8_t r;
         if(_off+1<_tail)
         {
                 r= _buffer[_off-_head];
-                _off++;     
+                _off++;
         }
         else
         {
-                read32(1,&r);     
+                read32(1,&r);
         }
         return r;
 }

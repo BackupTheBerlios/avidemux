@@ -40,7 +40,7 @@ uint32_t ADM_UsecFromFps1000(uint32_t fps1000);
 
 
 // misc dump functions
-extern "C" 
+extern "C"
 {
 	void mixDump_c(uint8_t * ptr, uint32_t len)
 	{
@@ -77,7 +77,7 @@ void mixDump(uint8_t * ptr, uint32_t len)
 
 		  if ((i % 16) == 15)
 		    {
-					printf("\n %04lx : %s %s", (i >> 4) << 4, str, str2);
+					printf("\n %04"LX" : %s %s", (i >> 4) << 4, str, str2);
 					*str = 0;
 					*str2 = 0;
 		    }
@@ -85,8 +85,8 @@ void mixDump(uint8_t * ptr, uint32_t len)
 	// left over
 	if(len%16!=0)
 	{
-		 printf("\n %04lx : %s %s", (len >> 4) << 4, str, str2);
-	}      
+		 printf("\n %04"LX" : %s %s", (len >> 4) << 4, str, str2);
+	}
 }
 /*
 	A bunch of Endianness swapper to ease handling
@@ -131,7 +131,7 @@ void Endian_AviMainHeader(MainAVIHeader *m)
 
 		SWAP32(dwWidth);
 		SWAP32(dwHeight);
-	
+
 	#undef SWAP32
 
 #endif
@@ -165,12 +165,12 @@ void Endian_WavHeader(WAVHeader *w)
 #ifdef ADM_BIG_ENDIAN
 	#define SWAP32(x) w->x=R32(w->x)
 	#define SWAP16(x) w->x=R16(w->x)
-		SWAP16(encoding);	
-		SWAP16(channels);	
-		SWAP32(frequency);	
-		SWAP32(byterate);	
-		SWAP16(blockalign);	
-		SWAP16(bitspersample);	
+		SWAP16(encoding);
+		SWAP16(channels);
+		SWAP32(frequency);
+		SWAP32(byterate);
+		SWAP16(blockalign);
+		SWAP16(bitspersample);
 
 	#undef SWAP32
 	#undef SWAP16
@@ -181,7 +181,7 @@ void Endian_WavHeader(WAVHeader *w)
 }
 // Here we copy in reverse order
 // Useful to do LE/BE conv on nomber
-// 
+//
 void memcpyswap(uint8_t *dest, uint8_t *src, uint32_t size)
 {
 	dest+=size-1;
@@ -204,11 +204,11 @@ uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode
 {
     uint32_t startcode=0xffffffff;
     uint8_t  *ptr=start;
-  
-    
+
+
     while(ptr<end)
 	{
-		startcode=(startcode<<8)+*ptr;		
+		startcode=(startcode<<8)+*ptr;
 		if((startcode&0xffffff00)==0x100)
 		{
 			*outstartcode=*ptr;
@@ -220,7 +220,7 @@ uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode
 	return 0; // startcode not found
 }
 //**********************************************************
-// Convert \ to \\ 
+// Convert \ to \\
 // Needed for win32 which uses \ to store filename+path
 //**********************************************************
 char *ADM_escape(const ADM_filename *incoming)
@@ -237,7 +237,7 @@ int l=0;
         out[0]=0;
         return out;
     }
-    
+
     for(int i=0;i<l;i++) if(incoming[i]=='\\') to_escape++;
     out=new char[l+to_escape+1];
     cur=out;
@@ -336,7 +336,7 @@ int mx=sizeof(allArs)/sizeof(ARDescriptor);
 ARDescriptor *desc=allArs;
     for(int i=0;i<mx;i++)
     {
-      
+
       if(width==desc->width && height==desc->height)
       {
         *string=desc->string;
@@ -357,7 +357,7 @@ int32_t ADM_getNiceValue(uint32_t priorityLevel)
 			return -18;
 			break;
 		case 1: // Above Normal
-			return -10;			
+			return -10;
 			break;
 		case 2: // Normal
 			return 0;

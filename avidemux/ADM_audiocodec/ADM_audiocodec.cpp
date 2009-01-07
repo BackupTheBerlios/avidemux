@@ -41,7 +41,7 @@ ADM_Audiocodec *out = NULL;
                                         {
                                                 info->encoding=fourcc=WAV_8BITS_UNSIGNED;
                                         }
-			
+
 			}
  		switch(fourcc)
    			{
@@ -59,11 +59,11 @@ ADM_Audiocodec *out = NULL;
                                         break;
 				case WAV_PCM:
     					printf("\n Audio codec:  WAV\n");
-#ifdef ADM_BIG_ENDIAN				
+#ifdef ADM_BIG_ENDIAN
     					out= (ADM_Audiocodec *)new ADM_AudiocodecWavSwapped(fourcc);
 #else
 					out= (ADM_Audiocodec *)new ADM_AudiocodecWav(fourcc);
-#endif					
+#endif
                   			break;
 				case WAV_8BITS:
 					printf("\n 8 BIts pseudo codec\n");
@@ -72,21 +72,21 @@ ADM_Audiocodec *out = NULL;
 				case WAV_8BITS_UNSIGNED:
 					printf("\n 8 BIts pseudo codec unsigned\n");
     					out= (ADM_Audiocodec *)new ADM_Audiocodec8Bits(fourcc);
-					break;		
+					break;
 		  		case WAV_LPCM:
 					printf("\n Audio codec:  LPCM swapped\n");
-#ifndef ADM_BIG_ENDIAN				
+#ifndef ADM_BIG_ENDIAN
     					out= (ADM_Audiocodec *)new ADM_AudiocodecWavSwapped(fourcc);
 #else
 					out= (ADM_Audiocodec *)new ADM_AudiocodecWav(fourcc);
-#endif					
+#endif
                   		break;
 #ifdef USE_LIBDCA
                 case WAV_DTS:
 					if (dca->isAvailable())
 					{
 						printf("\n Audio codec:  DTS\n");
-						out= (ADM_Audiocodec *) new ADM_AudiocodecDCA(fourcc, info);						
+						out= (ADM_Audiocodec *) new ADM_AudiocodecDCA(fourcc, info);
 					}
 
 					break;
@@ -114,7 +114,7 @@ ADM_Audiocodec *out = NULL;
 
 	if (out == NULL)
 	{
-		printf("\n Unknown codec : %lu",fourcc);
+		printf("\n Unknown codec : %"LU,fourcc);
 		out = (ADM_Audiocodec *) new ADM_AudiocodecUnknown(fourcc);
 	}
 	// For channel mapping, simple case we do it here so that the decoder does not have
@@ -128,8 +128,8 @@ ADM_Audiocodec *out = NULL;
 					out->channelMapping[1] = CH_FRONT_RIGHT;
 					break;
 			default:break;
-	
-	
+
+
 	}
 	return out;
 }

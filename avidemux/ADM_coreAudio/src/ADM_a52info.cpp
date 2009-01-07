@@ -1,7 +1,7 @@
 //
 // C++ Implementation: ADM_a52info
 //
-// Description: 
+// Description:
 //
 //
 // Author: mean <fixounet@free.fr>, (C) 2004
@@ -89,7 +89,7 @@ uint8_t ADM_AC3GetInfo(uint8_t *buf, uint32_t len, uint32_t *fq, uint32_t *br, u
 uint32_t l;
 int ibr,ifq,flags;
 uint32_t of=0;
-		
+
 	*syncoff=of=0;
      	printf("\n Syncing on %d \n",len);
 	// Search for startcode
@@ -106,7 +106,7 @@ uint32_t of=0;
 		 	len--;
 			buf++;
 			of++;
-			continue;		 
+			continue;
 		 }
 		 // Try to get syncinfo
 	        l=ADM_a52_syncinfo (buf,&flags, &ifq, &ibr);
@@ -118,7 +118,7 @@ uint32_t of=0;
 			printf("Sync failed..continuing\n");
 			continue;
 		}
-		printf("Sync found at offset %lu\n",of);
+		printf("Sync found at offset %"LU"\n",of);
 		*syncoff=of;
 		*fq=(uint32_t)ifq;
 		*br=(uint32_t)ibr>>3;

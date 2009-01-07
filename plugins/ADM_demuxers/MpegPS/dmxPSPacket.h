@@ -36,8 +36,8 @@ public:
                 ~psPacket();
     bool        open(const char *filenames,bool dontappend);
     bool        close(void);
-    bool        getPacket(uint32_t maxSize, uint8_t *pid, uint32_t *packetSize,uint64_t *pts,uint64_t *dts,uint8_t *buffer,uint64_t *startAt);
-    bool        getPacketOfType(uint8_t pid,uint32_t maxSize, uint32_t *packetSize,uint64_t *pts,uint64_t *dts,uint8_t *buffer,uint64_t *startAt);
+    virtual bool        getPacket(uint32_t maxSize, uint8_t *pid, uint32_t *packetSize,uint64_t *pts,uint64_t *dts,uint8_t *buffer,uint64_t *startAt);
+    virtual bool        getPacketOfType(uint8_t pid,uint32_t maxSize, uint32_t *packetSize,uint64_t *pts,uint64_t *dts,uint8_t *buffer,uint64_t *startAt);
     uint64_t    getPos(void);
     bool        setPos(uint64_t pos);
 };
@@ -78,7 +78,28 @@ public:
         bool    getInfo(psPacketInfo *info);
         bool    seek(uint64_t packetStart, uint32_t offset);
 };
+/**
+    \class psPacketLinearTracker
+*/
+typedef struct
+{
+    uint32_t count;
+    uint32_t size;
+    uint64_t firstDts;
+    uint64_t lastDts;
+}packetStats;
 
+class psPacketLinearTracker : public psPacketLinear
+{
+protected:
+      packetStats stats[256];
+
+public:
+                        psPacketLinearTracker(uint8_t pid);
+                        ~psPacketLinearTracker();
+         packetStats    *getStat(int intdex);
+virtual  bool           getPacketOfType(uint8_t pid,uint32_t maxSize, uint32_t *packetSize,uint64_t *pts,uint64_t *dts,uint8_t *buffer,uint64_t *startAt);
+};
 
 
 #endif

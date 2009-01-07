@@ -1,14 +1,14 @@
 //
 // C++ Implementation: ADM_MP3Info
 //
-// Description: 
+// Description:
 //		Decode an mp3 frame an fill the info field
 //			The second is a template to check we do not do bogus frame detection
 //
 // Author: mean <fixounet@free.fr>, (C) 2004
 //
 // Copyright: See COPYING file that comes with this distribution
-//	
+//
 //
 /***************************************************************************
  *                                                                         *
@@ -27,8 +27,8 @@
 
 #include "ADM_mp3info.h"
 
-static  uint32_t MP3Fq[4] = { 44100, 48000, 32000, 0 };       
-static uint32_t MP2Fq[4] = { 22050, 24000, 16000, 0 };       
+static  uint32_t MP3Fq[4] = { 44100, 48000, 32000, 0 };
+static uint32_t MP2Fq[4] = { 22050, 24000, 16000, 0 };
 static uint32_t Bitrate[8][16]=
 {
 	// Level 1 / Layer 0
@@ -58,7 +58,7 @@ uint32_t nfq,fqindex,brindex,index;
 			memcpy(a+1,stream,3);
 			do
 			{
-				
+
 				memmove(a,a+1,3);
 				a[3]=stream[start+3];
 				if(start>=maxSearch-3) break;
@@ -66,7 +66,7 @@ uint32_t nfq,fqindex,brindex,index;
 				if(a[0]==0xff && ((a[1]&0xF0)==0xF0))
 				{
 					// Layer
-					mpegInfo->layer=4-(a[1]>>1)&3;	
+					mpegInfo->layer=4-(a[1]>>1)&3;
 					mpegInfo->level=4-(a[1]>>3)&3;
 					if(mpegInfo->level==3) continue;
 					if(mpegInfo->level==4) mpegInfo->level=3;
@@ -75,16 +75,16 @@ uint32_t nfq,fqindex,brindex,index;
                                         mpegInfo->privatebit=(a[2]&1);
 					mpegInfo->mode=(a[3])>>6;
                                         mpegInfo->mode_extension=((a[3])>>4)&3;
-										
+
 					fqindex=(a[2]>>2)&3;
 					brindex=(a[2]>>4);
-					
+
 					// Remove impossible case
 					if(mpegInfo->layer==0) continue;
 					// Check fq
                                         if((a[1]>>4)&1)
                                         {
-                                          mpegInfo->lsf=0;                                          
+                                          mpegInfo->lsf=0;
                                         }
                                         else
                                           mpegInfo->lsf=1;
@@ -99,7 +99,7 @@ uint32_t nfq,fqindex,brindex,index;
 					// impossible fq
 					if(!mpegInfo->samplerate) continue;
 					// Bitrate now
-					
+
 					// Compute bitrate
 					switch(mpegInfo->level)
 					{
@@ -108,15 +108,15 @@ uint32_t nfq,fqindex,brindex,index;
 							index=4+mpegInfo->layer;
 							break;
 						case 1:
-							index=mpegInfo->layer;	
+							index=mpegInfo->layer;
 							break;
 						default:
 							continue;
 					}
-					
+
 					mpegInfo->bitrate=Bitrate[index][brindex];
 					if(!mpegInfo->bitrate) continue;
-					
+
 					// Check consistency
 					if(templ)
 					{
@@ -125,21 +125,21 @@ uint32_t nfq,fqindex,brindex,index;
                                                   printf("[MP3]samplerate does not match\n");
                                                   continue;
                                                 }
-					
+
 					}
 					found=1;
 				}
-				
+
 			}while(!found && start<maxSearch-4);
 			if(!found)
-				{	
+				{
 					return 0;
 				}
 /*	*/
 			// Sample in the packet
 			if(mpegInfo->level==1)
 			{
-				if(1==mpegInfo->layer) 
+				if(1==mpegInfo->layer)
 					mpegInfo->samples=384;
 				else
 					mpegInfo->samples=1152;
@@ -147,17 +147,17 @@ uint32_t nfq,fqindex,brindex,index;
 			}
 			else
 			{	// Mpeg2/2.5
-				if(1==mpegInfo->layer) 
+				if(1==mpegInfo->layer)
 					mpegInfo->samples=384;
 				else
 					mpegInfo->samples=576;
 				*offset=start-1;
-			
+
 			}
-			
+
 			// Packet size
 			//L1:FrameLengthInBytes = (12 * BitRate / SampleRate + Padding) * 4
-		
+
 			switch(mpegInfo->layer)
 			{
 				case 1:
@@ -168,17 +168,17 @@ uint32_t nfq,fqindex,brindex,index;
 				default:
 				//FrameLengthInBytes = 144 * BitRate / SampleRate + Padding
                                   uint32_t slot_per_frame;
-                                        if(mpegInfo->layer==3 && mpegInfo->level==2)  slot_per_frame=72; 
+                                        if(mpegInfo->layer==3 && mpegInfo->level==2)  slot_per_frame=72;
                                                 else slot_per_frame=144;
                                         mpegInfo->size=(slot_per_frame*mpegInfo->bitrate*1000)/mpegInfo->samplerate;
-					mpegInfo->size+=mpegInfo->padding;			
+					mpegInfo->size+=mpegInfo->padding;
 			}
 			if(*offset)
 				{
-					printf("MP3: Skipped %lu bytes\n",*offset);
-					
+					printf("MP3: Skipped %"LU" bytes\n",*offset);
+
 				}
-#if 0		
+#if 0
 			printf("%02x %02x %02x %02x\n",a[0],a[1],a[2],a[3]);
 			printf("Packet found : at :%d level:%d layer:%d fq:%d bitrate:%d mode:%d\n",
 					start-1,mpegInfo->level,mpegInfo->layer,mpegInfo->samplerate,
@@ -187,12 +187,12 @@ uint32_t nfq,fqindex,brindex,index;
                                0,mpegInfo->mode_extension);
 			printf("Padd:%lu, crc on:%lu size:%lu\n",mpegInfo->padding,mpegInfo->protect,
 								mpegInfo->size);
-#endif				
-			
-			return 1;
-			
+#endif
 
-	
+			return 1;
+
+
+
 
 }
 //____________

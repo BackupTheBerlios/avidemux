@@ -102,7 +102,7 @@ uint32_t type,value;
   _pp.swapuv=0;
   _pp.forcedQuant=0;
   updatePostProc(&_pp);
-  _imageBuffer=NULL;    
+  _imageBuffer=NULL;
   _internalFlags=0;
   // Start with a clean base
   memset (_videos, 0, sizeof (_videos));
@@ -110,7 +110,7 @@ uint32_t type,value;
   _segments = new _SEGMENT[max_seg];
   memset (_segments, 0, sizeof (_segments));
   _scratch=NULL;
-  
+
 }
 /**
 	Remap 1:1 video to segments
@@ -129,7 +129,7 @@ uint8_t ADM_Composer::resetSeg( void )
             _segments[i]._audio_size=0;
   		_segments[i]._audio_start = 0;
   		_segments[i]._start_frame = 0;
-		_segments[i]._audio_duration = 0;		
+		_segments[i]._audio_duration = 0;
 		_segments[i]._nb_frames   =   _videos[i]._nb_video_frames ;
 		_total_frames+=_segments[i]._nb_frames  ;
 		updateAudioTrack (i);
@@ -203,8 +203,8 @@ ADM_Composer::deleteAllVideos (void)
     }
 
   memset (_videos, 0, sizeof (_videos));
-  
-  
+
+
   if(_imageBuffer)
   	delete _imageBuffer;
   _imageBuffer=NULL;
@@ -237,21 +237,21 @@ ADM_Composer::~ADM_Composer ()
 /**
     \fn addFile
     \brief	Load or append a file.	The file type is determined automatically and the ad-hoc video decoder is spawned
-    
+
     @param name: filename
     @param mode: 0 open, 1 append
-    
+
 
     @return 1 on success, 0 on failure
-        
+
 
 */
 uint8_t ADM_Composer::addFile (const char *name, uint8_t mode)
 {
   uint8_t    ret =    0;
   aviInfo    info;
-  
-  
+
+
 
 UNUSED_ARG(mode);
 	_haveMarkers=0; // by default no markers are present
@@ -309,11 +309,11 @@ UNUSED_ARG(mode);
          return 0;
       }
    }
- 
+
   // else update info
   _videos[_nb_video]._aviheader->getVideoInfo (&info);
   _videos[_nb_video]._aviheader->setMyName (name);
-  
+
   // Printf some info about extradata
   {
     uint32_t l=0;
@@ -332,7 +332,7 @@ UNUSED_ARG(mode);
         uint32_t type,value;
 
         if(!prefs->get(DEFAULT_POSTPROC_TYPE,&type)) type=3;
-        if(!prefs->get(DEFAULT_POSTPROC_VALUE,&value)) value=3; 	
+        if(!prefs->get(DEFAULT_POSTPROC_VALUE,&value)) value=3;
 
 	deletePostProc(&_pp );
  	initPostProc(&_pp,info.width,info.height);
@@ -347,8 +347,8 @@ UNUSED_ARG(mode);
 	_imageBuffer->quant=new uint8_t[_imageBuffer->_qSize];
 	_imageBuffer->_qStride=(info.width+15)>>4;
  }
-    
- 
+
+
 //    fourCC::print( info.fcc );
   _total_frames += info.nb_frames;
   _videos[_nb_video]._nb_video_frames = info.nb_frames;
@@ -358,7 +358,7 @@ UNUSED_ARG(mode);
   // an spawn the appropriate decoder
   //_________________________
    uint32_t nbAStream=_videos[_nb_video]._aviheader->getNbAudioStreams();
-  
+
   if (!nbAStream)
     {
       printf ("\n *** NO AUDIO ***\n");
@@ -370,13 +370,13 @@ UNUSED_ARG(mode);
     {
         // Read and construct the audio tracks for that videos
 
-      
+
       audioInfo *info;
       uint32_t extraLen;
       uint8_t  *extraData;
       ADM_audioStream *stream;
       WAVHeader *header;
-      
+
       _VIDEOS *thisVid=&(_videos[_nb_video]);
       // Create streams
       thisVid->audioTracks=new ADM_audioStreamTrack*[nbAStream];
@@ -384,8 +384,8 @@ UNUSED_ARG(mode);
       for(int i=0;i<nbAStream;i++)
       {
             ADM_audioStreamTrack *track=new ADM_audioStreamTrack;
-            
-            
+
+
             header=thisVid->_aviheader->getAudioInfo(i );
             memcpy(&(track->wavheader),header,sizeof(*header));
 
@@ -399,7 +399,7 @@ UNUSED_ARG(mode);
             thisVid->_aviheader->getAudioStream(i,&stream);
             ADM_assert(stream);
             track->stream=stream;
-            
+
             track->duration=stream->getDurationInUs();
             track->size=0;
 
@@ -433,8 +433,8 @@ UNUSED_ARG(mode);
   frameD=1/frameD;
   frameD*=1000000;
   _videos[_nb_video].timeIncrementInUs=(uint64_t)frameD;
-  printf("[Editor] About %u microseconds per frame\n",_videos[_nb_video].timeIncrementInUs);
-  
+  printf("[Editor] About %"LU" microseconds per frame\n",_videos[_nb_video].timeIncrementInUs);
+
   //
   //  And automatically create the segment
   //
@@ -454,9 +454,9 @@ UNUSED_ARG(mode);
   _segments[_nb_segment]._start_frame = 0;
   _segments[_nb_segment]._nb_frames   =   _videos[_nb_video]._nb_video_frames ;
 
-  
+
 //****************************
-   
+
 
   // next one please
         if(_videos[_nb_video].audioTracks)
@@ -481,7 +481,7 @@ UNUSED_ARG(mode);
 // 2- check  for consistency with reported flags
 //______________________________________
 	uint8_t count=0;
-TryAgain:	
+TryAgain:
 	_VIDEOS 	*vid;
 	uint32_t err=0;
 
@@ -499,10 +499,10 @@ TryAgain:
 			printf("\n no  B- frame with that codec \n");
 			return 1;
 		}
-          
+
 		GoToIntra(0);
 		printf(" End of B-frame check\n");
-		
+
   return 1;
 }
 /**
@@ -525,7 +525,7 @@ _VIDEOS *vid;
 						{
 							aviInfo    info;
 							_videos[i]._aviheader->getVideoInfo (&info);
-                                                        
+
 							printf(" Video %lu has been reordered\n",i);
 						}
 
@@ -537,7 +537,7 @@ _VIDEOS *vid;
 }
 /*
         If one of the videos has VBR audio we handle the whole editor audio has VBR
-        If it is CBR, it is not harmful 
+        If it is CBR, it is not harmful
         and it avoid loosing the VBR info in case we do VBR time map upon loading
 */
 uint8_t ADM_Composer::hasVBRVideos(void)
@@ -591,7 +591,7 @@ uint32_t seg,relframe,ref;
     }
     // Search source
      ref = _segments[seg]._reference;
-    _videos[ref].decoder->setParam ();        
+    _videos[ref].decoder->setParam ();
   }
   return 1;
 
@@ -734,7 +734,7 @@ uint8_t ADM_Composer::removeFrames (uint32_t start, uint32_t end)
   sanityCheck ();
   // Compute total nb of frame
   _total_frames = computeTotalFrames ();
-  printf ("\n %lu frames ", _total_frames);
+  printf ("\n %"LU" frames ", _total_frames);
   return 1;
 
 }
@@ -758,7 +758,7 @@ uint32_t seg,rel,reference;
             *infos=NULL;
         }
        // return _videos[reference]._aviheader->getAudioStreamsInfo(nbStreams,infos);
-        
+
         *nbStreams=_videos[reference].nbAudioStream;
         *infos=new audioInfo[*nbStreams];
         for(int i=0;i<*nbStreams;i++)
@@ -787,7 +787,7 @@ uint32_t   seg,rel,reference;
                 return 0;
         }
         reference=_segments[seg]._reference;
-        
+
         return _videos[reference].currentAudioStream;
 }
 /**
@@ -1199,7 +1199,7 @@ uint8_t r=0;
 }
 #if BAZOOKA
 //_________________________________________
-//    Try indexing the file, return 1 if file successfully indexed 
+//    Try indexing the file, return 1 if file successfully indexed
 //              0 else
 //_________________________________________
 //
@@ -1213,7 +1213,7 @@ uint8_t         ADM_Composer::tryIndexing(const char *name, const char *idxname)
             {
                 return 0;
             }
-		}  
+		}
           char      *idx;
           DMX_TYPE  type;
           uint32_t  nbTrack=0,audioTrack=0;
@@ -1226,7 +1226,7 @@ uint8_t         ADM_Composer::tryIndexing(const char *name, const char *idxname)
                         return 0;
                 }
 
-          
+
                 if(type==DMX_MPG_PS || type==DMX_MPG_TS || type==DMX_MPG_TS2)
                 {
                        if(nbTrack>2)
@@ -1236,7 +1236,7 @@ uint8_t         ADM_Composer::tryIndexing(const char *name, const char *idxname)
 			}
 /*                        else
 		       {
-                           
+
                         if(!DIA_dmx(name,type,nbTrack,tracks,&audioTrack))
                         {
                                 delete [] tracks;
@@ -1261,7 +1261,7 @@ uint8_t         ADM_Composer::tryIndexing(const char *name, const char *idxname)
                         delete [] tracks;
                 delete [] idx;
 
-                if(!r) GUI_Error_HIG(QT_TR_NOOP("Indexing failed"), NULL); 
+                if(!r) GUI_Error_HIG(QT_TR_NOOP("Indexing failed"), NULL);
                 return r;
 }
 #endif

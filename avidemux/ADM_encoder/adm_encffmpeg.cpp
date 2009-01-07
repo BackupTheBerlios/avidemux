@@ -240,7 +240,7 @@ EncoderFFMPEGDV::configure (AVDMGenericVideoStream * instream, int useExistingLo
   _fps = info->fps1000;
   _w = info->width;
   _h = info->height;
-  
+
   _vbuffer = new ADMImage (_w, _h);
   ADM_assert (_vbuffer);
   _in = instream;
@@ -287,12 +287,12 @@ EncoderFFMPEGFLV1::configure (AVDMGenericVideoStream * instream, int useExisting
   _fps = info->fps1000;
   _w = info->width;
   _h = info->height;
-  
+
   _vbuffer = new ADMImage (_w, _h);
   ADM_assert (_vbuffer);
   _in = instream;
 
- 
+
   _codec = new ffmpegEncoderCBR (_w, _h, _id);
   _codec->setConfig (&_settings);
   _codec->init (_param.bitrate, _fps, 0);
@@ -395,9 +395,9 @@ uint8_t EncoderFFMPEG::configure (AVDMGenericVideoStream * instream, int useExis
     case COMPRESS_2PASS_BITRATE:
       ffmpegEncoderCQ * cdec;
       if(_param.mode==COMPRESS_2PASS)
-        printf ("\n ffmpeg dual size: %lu", _param.finalsize);
+        printf ("\n ffmpeg dual size: %"LU, _param.finalsize);
       else
-        printf ("\n ffmpeg dual bitrate: %lu", _param.avg_bitrate);
+        printf ("\n ffmpeg dual bitrate: %"LU, _param.avg_bitrate);
       _state = enc_Pass1;
       cdec = new ffmpegEncoderCQ (_w, _h, _id);	// Pass1
       cdec->setConfig (&_settings);
@@ -420,7 +420,7 @@ uint8_t EncoderFFMPEG::configure (AVDMGenericVideoStream * instream, int useExis
 
     }
   _in = instream;
-  printf ("\n ffmpeg Encoder , w: %lu h:%lu mode:%d", _w, _h, _state);
+  printf ("\n ffmpeg Encoder , w: %"LU" h:%"LU" mode:%d", _w, _h, _state);
   return 1;
 
 }
@@ -493,7 +493,7 @@ uint8_t EncoderFFMPEG::encode (uint32_t frame, ADMBitstream *out)
 	    printf ("\n codec error on 1st pass !");
 	    return 0;
 	  }
-	//printf("Inq:%lu outq:%lu\n",inq,enc.out_quantizer);                       
+	//printf("Inq:%lu outq:%lu\n",inq,enc.out_quantizer);
 	_frametogo++;
 	return 1;
 	break;
@@ -554,7 +554,7 @@ uint8_t EncoderFFMPEG::startPass2 (void)
   uint32_t    vbr = 0;
   switch(_param.mode)
   {
-    case COMPRESS_2PASS:          
+    case COMPRESS_2PASS:
           // compute average bitrate
             vbr= ADM_computeBitrate(_fps, _frametogo,_param.finalsize);
             break;
@@ -572,9 +572,9 @@ uint8_t EncoderFFMPEG::startPass2 (void)
     return 0;
   }
 
-  printf ("\n ** Total size     : %lu MBytes \n", _param.finalsize);
-//  printf(" ** Total frame    : %lu  \n",_totalframe);   
-  printf (" (using avg bitrate of %lu kbps", vbr / 1000);
+  printf ("\n ** Total size     : %"LU" MBytes \n", _param.finalsize);
+//  printf(" ** Total frame    : %"LU"  \n",_totalframe);
+  printf (" (using avg bitrate of %"LU" kbps", vbr / 1000);
   return 1;
 }
 //-----------------------ffmpegEncoderHuff

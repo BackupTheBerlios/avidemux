@@ -225,7 +225,7 @@ EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream, int useExistin
   switch (_param.mode)
     {
     case COMPRESS_CQ:
-      printf ("ffmpeg mpeg1 cq mode: %ld\n", _param.qz);
+      printf ("ffmpeg mpeg1 cq mode: %"LU"\n", _param.qz);
       _state = enc_CQ;
       setMatrix ();		//_settings.user_matrix,_settings.gop_size);
       _codec = new ffmpegEncoderCQ (_w, _h, _id);
@@ -234,7 +234,7 @@ EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream, int useExistin
       _codec->init (_param.qz, _fps, 0);
       break;
     case COMPRESS_CBR:
-      printf ("ffmpeg mpeg1 cbr mode: %ld\n", _param.bitrate);
+      printf ("ffmpeg mpeg1 cbr mode: %"LU"\n", _param.bitrate);
       _state = enc_CBR;
       setMatrix ();
       _codec = new ffmpegEncoderCBR (_w, _h, _id);
@@ -261,7 +261,7 @@ EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream, int useExistin
 	    _xrc = new ADM_newXvidRcVBV (_fps, _logname);
 
 	    _state = enc_Pass1;
-	    printf ("\n ffmpeg dual size: %lu MB, using xvid rc",
+	    printf ("\n ffmpeg dual size: %"LU" MB, using xvid rc",
 		    _param.finalsize >> 10);
 	    setMatrix ();
 	    cdec = new ffmpegEncoderCQ (_w, _h, _id);	// Pass1
@@ -274,7 +274,7 @@ EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream, int useExistin
 	else
 	  {
 	    _state = enc_Pass1;
-	    printf ("\n ffmpeg dual size: %lu", _param.finalsize);
+	    printf ("\n ffmpeg dual size: %"LU, _param.finalsize);
 	    setMatrix ();
 	    cdec = new ffmpegEncoderCQ (_w, _h, _id);	// Pass1
 
@@ -291,21 +291,21 @@ EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream, int useExistin
 
     }
   _in = instream;
-  printf ("\n ffmpeg Encoder , w: %lu h:%lu mode:%d", _w, _h, _state);
+  printf ("\n ffmpeg Encoder , w: %"LU" h:%"LU" mode:%d", _w, _h, _state);
   return 1;
 
 }
 uint8_t EncoderFFMPEGMpeg1::verifyLog(const char *file,uint32_t nbFrame)
 {
-  
+
   if(_use_xvid_ratecontrol)
   {
       return ADM_newXvidRcVBV::verifyLog(file,nbFrame);
   }else
   {
-    return 0; // For now assume it is corrupted 
+    return 0; // For now assume it is corrupted
   }
-  
+
 }
 
 
@@ -390,12 +390,12 @@ EncoderFFMPEGMpeg1::startPass2 (void)
     br=_param.avg_bitrate*1000;
     printf("[FFmpeg Mpeg1/2] 2pass avg bitrate %u kb/s\n",br/1000);
   }else ADM_assert(0);
- 
+
   printf("[FFmpeg Mpeg1/2] Max bitrate :%u\n", (_settings.maxBitrate));
   avg_bitrate = br;
   if(_param.mode==COMPRESS_2PASS)
-      printf ("\n ** Total size     : %lu MBytes \n", _param.finalsize);
-  printf (" ** Total frame    : %lu  \n", _totalframe);
+      printf ("\n ** Total size     : %"LU" MBytes \n", _param.finalsize);
+  printf (" ** Total frame    : %"LU"  \n", _totalframe);
 
   printf ("\n VBR parameters computed\n");
   _state = enc_Pass2;
@@ -428,7 +428,7 @@ EncoderFFMPEGMpeg1::startPass2 (void)
   // ******************************************
     uint32_t f;
 
-   
+
      f=_param.finalsize;
   // Checking against max bitrate
     uint32_t maxb=_settings.maxBitrate*1000;
@@ -439,17 +439,17 @@ EncoderFFMPEGMpeg1::startPass2 (void)
         printf("[FFmpeg1/2] Max bitrate exceeded, clipping\n");
         br=maxb;
     }
-      
+
       d=_totalframe;
       d*=1000.;
       d/=_fps;            // D is a duration in second
       d*=br;              // * bitrate = total bits
       d/=8;               // Byte
       d/=1024*1024;       // MB
-      
+
       f=(uint32_t)d;
-   
-  
+
+
   _xrc->setVBVInfo (_settings.maxBitrate, _settings.minBitrate,
 		    _settings.bufferSize);
   printf("Average bitrate :%u finale size %u\n",br,f);

@@ -1,11 +1,11 @@
 /**
         \file ADM_pluginLoad.cpp
         \brief Interface for dynamically loaded audio decoder
-        
+
         There are 2 known problem here
         1: The destructor is called instead of calling destroy in the class factory
         2: Memory leak, ADM_audioPlugins is not destroyed as of today
-        
+
 */
 
 
@@ -29,11 +29,11 @@
 #endif
 /*  Exported functions */
 uint32_t ADM_ad_getNbFilters(void);
-bool     ADM_ad_getFilterInfo(int filter, const char **name, 
+bool     ADM_ad_getFilterInfo(int filter, const char **name,
                                 uint32_t *major,uint32_t *minor,uint32_t *patch);
 
 /**
- * 
+ *
  */
 class ADM_ad_plugin : public ADM_LibWrapper
 {
@@ -77,7 +77,7 @@ static uint8_t tryLoadingAudioPlugin(const char *file)
 	if (plugin->getApiVersion() != AD_API_VERSION)
 	{
 		printf("[ADM_ad_plugin] File %s has API version too old (%d vs %d)\n",
-			ADM_GetFileName(file), ADM_GetFileName(file), AD_API_VERSION);
+			ADM_GetFileName(file), plugin->getApiVersion(), AD_API_VERSION);
 		goto Err_ad;
 	}
 
@@ -121,7 +121,7 @@ bool ADM_ad_getFilterInfo(int filter, const char **name, uint32_t *major,uint32_
 
     	ADM_ad_plugin *a=ADM_audioPlugins[filter];
         a->getDecoderVersion(major, minor, patch);
-        
+
         *name=a->getInfo();
         return 1;
 }

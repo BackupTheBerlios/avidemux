@@ -1,9 +1,9 @@
 /** *************************************************************************
     \fn ADM_assert.h
-    \brief Replacement for assert etc ... (low level funcs)  
-                      
+    \brief Replacement for assert etc ... (low level funcs)
+
     copyright            : (C) 2008 by mean
-    
+
  ***************************************************************************/
 
 /***************************************************************************
@@ -21,7 +21,7 @@
 #define ADM_assert(x) { if(!(x)) {ADM_backTrack("Assert failed :"#x,__LINE__,__FILE__);  }}
 
 /* Functions we want to override to have better os support / debug / error control */
-    
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -100,8 +100,9 @@ extern adm_fast_memcpy myAdmMemcpy;
         #define LLU "I64u"
         #define LLD "I64d"
         #define LU  "lu"
+        #define LD  "ld"
         #define LX  "lx"
-        
+
 		char *ADM_slashToBackSlash(const char *in);
         #define ADM_cleanupPath(x) ADM_slashToBackSlash(x)
 #else
@@ -110,14 +111,16 @@ extern adm_fast_memcpy myAdmMemcpy;
         #define LLU "lu"
         #define LLD "ld"
         #define LX "x"
+        #define LD "d"
         #define LU "u"
-        
+
     #else
         #define LLX "llx"
         #define LLU "llu"
         #define LLD "lld"
         #define LX "lx"
         #define LU "lu"
+        #define LD "ld"
 
     #endif
     #define ADM_cleanupPath(x) ADM_strdup(x)
@@ -125,4 +128,4 @@ extern adm_fast_memcpy myAdmMemcpy;
 
 
 #endif
-// EOF 
+// EOF

@@ -28,10 +28,10 @@ void ADMImage_stat( void )
 {
 	printf("\nImages stat:\n");
 	printf("___________\n");
-	printf("Max memory consumed (MB)     : %lu\n",imgMaxMem>>10);
-	printf("Current memory consumed (MB) : %lu\n",imgCurMem>>10);
-	printf("Max image used               : %lu\n",imgMaxNb);
-	printf("Cur image used               : %lu\n",imgCurNb);
+	printf("Max memory consumed (MB)     : %"LU"\n",imgMaxMem>>10);
+	printf("Current memory consumed (MB) : %"LU"\n",imgCurMem>>10);
+	printf("Max image used               : %"LU"\n",imgMaxNb);
+	printf("Cur image used               : %"LU"\n",imgCurNb);
 
 }
 //
@@ -39,7 +39,7 @@ void ADMImage_stat( void )
 //
 void    ADMImage::commonInit(uint32_t w,uint32_t h)
 {
-        _width=w;        
+        _width=w;
         _height=h;
         quant=NULL;
         _qStride=0;
@@ -47,7 +47,7 @@ void    ADMImage::commonInit(uint32_t w,uint32_t h)
         flags=0;
         _qSize=0;
         _aspect=ADM_ASPECT_1_1;
-        
+
         imgCurNb++;
         _planes[0]=_planes[1]=_planes[2]=NULL;
         _noPicture=0;
@@ -67,11 +67,11 @@ ADMImage::ADMImage(uint32_t width, uint32_t height)
 };
 // Create a fake image with external datas
 ADMImage::ADMImage(uint32_t width, uint32_t height,uint32_t dummy)
-{       
-        commonInit(width,height); 
+{
+        commonInit(width,height);
         _isRef=1;
-        data=NULL;                
-                
+        data=NULL;
+
 };
 //
 //	Deallocate
@@ -87,7 +87,7 @@ ADMImage::~ADMImage()
                imgCurMem-=(_width*_height*3)>>1;
 	}
 	imgCurNb--;
-	
+
 }
 
 //
@@ -104,10 +104,10 @@ uint8_t ADMImage::duplicateMacro(ADMImage *src,uint32_t swap)
         // cleanup if needed
         if(quant) delete [] quant;
         quant=NULL;
- 
-       _qStride=0;      
+
+       _qStride=0;
         _qSize=0;
-        
+
         copyInfo(src);
         if(!src->_isRef)
         {
@@ -127,12 +127,12 @@ uint8_t ADMImage::duplicateMacro(ADMImage *src,uint32_t swap)
         {
                 if(src->_noPicture)
                 {
-                        // no pic available, blacken it                        
+                        // no pic available, blacken it
                         memset(YPLANE(this),0,_width*_height);
                         memset(UPLANE(this),128,(_width*_height)>>2);
                         memset(VPLANE(this),128,(_width*_height)>>2);
                         return 1;
-                        
+
                 }
                // The source is a reference
                 // We have to use the alternate informations
@@ -161,7 +161,7 @@ uint8_t ADMImage::duplicateMacro(ADMImage *src,uint32_t swap)
                         memcpy(out,in,w); \
                         in+=stride;       \
                         out+=w;           \
-                } 
+                }
                 PLANE_CPY(h);
 
                 w>>=1;
@@ -173,7 +173,7 @@ uint8_t ADMImage::duplicateMacro(ADMImage *src,uint32_t swap)
                         out=UPLANE(this);
                 stride=src->_planeStride[1];
                 PLANE_CPY(h);
-        
+
                 in=src->_planes[2];
                 if(swap)
                         out=UPLANE(this);
@@ -221,8 +221,8 @@ uint8_t ADMImage::duplicateFull(ADMImage *src)
 	// Sanity check
 	ADM_assert(src->_width==_width);
 	ADM_assert(src->_height==_height);
-	
-	
+
+
 	copyInfo(src);
         ADM_assert(!_isRef);
 
@@ -230,7 +230,7 @@ uint8_t ADMImage::duplicateFull(ADMImage *src)
 	memcpy(UPLANE(this),UPLANE(src),(_width*_height)>>2);
 	memcpy(VPLANE(this),VPLANE(src),(_width*_height)>>2);
 	copyQuantInfo(src);
-	
+
 	return 1;
 }
 /**
@@ -261,14 +261,14 @@ uint8_t ADMImage::copyQuantInfo(ADMImage *src)
 	{	// need a new quant
 		quant=new uint8_t[src->_qSize];
 		_qSize=src->_qSize;
-	
+
 	}
-	
+
 	// Same size ?
-	ADM_assert(_qSize==src->_qSize);		
-	_qStride=src->_qStride;		
-	memcpy(quant,src->quant,_qSize);	
-	
+	ADM_assert(_qSize==src->_qSize);
+	_qStride=src->_qStride;
+	memcpy(quant,src->quant,_qSize);
+
 	return 1;
 }
 uint8_t ADMImage::blacken(void)
@@ -285,7 +285,7 @@ uint8_t ADMImage::blacken(void)
 */
 uint8_t ADMImage::copyTo(ADMImage *dest, uint32_t x,uint32_t y)
 {
-      
+
     uint32_t box_w=_width, box_h=_height;
     // Clip if needed
     if(y>dest->_height)
@@ -293,12 +293,12 @@ uint8_t ADMImage::copyTo(ADMImage *dest, uint32_t x,uint32_t y)
         printf("Y out : %u %u\n",y,dest->_height);
          return 1;
     }
-    if(x>dest->_width) 
+    if(x>dest->_width)
     {
         printf("X out : %u %u\n",x,dest->_width);
          return 1;
     }
-    
+
     if(x+box_w>dest->_width) box_w=dest->_width-x;
     if(y+box_h>dest->_height) box_h=dest->_height-y;
 
@@ -327,7 +327,7 @@ uint8_t ADMImage::copyTo(ADMImage *dest, uint32_t x,uint32_t y)
 */
 uint8_t ADMImage::copyToAlpha(ADMImage *dest, uint32_t x,uint32_t y,uint32_t alpha)
 {
-      
+
     uint32_t box_w=_width, box_h=_height;
     // Clip if needed
     if(y>dest->_height)
@@ -335,12 +335,12 @@ uint8_t ADMImage::copyToAlpha(ADMImage *dest, uint32_t x,uint32_t y,uint32_t alp
         printf("Y out : %u %u\n",y,dest->_height);
          return 1;
     }
-    if(x>dest->_width) 
+    if(x>dest->_width)
     {
         printf("X out : %u %u\n",x,dest->_width);
          return 1;
     }
-    
+
     if(x+box_w>dest->_width) box_w=dest->_width-x;
     if(y+box_h>dest->_height) box_h=dest->_height-y;
 
@@ -362,31 +362,31 @@ uint8_t ADMImage::copyToAlpha(ADMImage *dest, uint32_t x,uint32_t y,uint32_t alp
 uint8_t BitBlitAlpha(uint8_t *dst, uint32_t pitchDst,uint8_t *src,uint32_t pitchSrc,
 		uint32_t width, uint32_t height,uint32_t alpha)
 {
-    
+
     for(int y=0;y<height;y++)
     {
     	for(int x=0;x<width;x++)
     	{
     		uint32_t s=src[x],d=dst[x];
-    		
+
     		d=s*alpha+(255-alpha)*d;
     		d>>=8;
     		dst[x]=d;
     	}
         src+=pitchSrc;
-        dst+=pitchDst;   
+        dst+=pitchDst;
     }
     return 1;
 }
 
 uint8_t BitBlit(uint8_t *dst, uint32_t pitchDst,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height)
 {
-    
+
     for(int y=0;y<height;y++)
     {
         memcpy(dst,src,width);
         src+=pitchSrc;
-        dst+=pitchDst;   
+        dst+=pitchDst;
     }
     return 1;
 }

@@ -1,7 +1,7 @@
 //
 // C++ Interface: ADM_memsupport
 //
-// Description: 
+// Description:
 //	Wrapper for all memory alloc/dealloc
 //
 //	Ensures 16 byte alignment for all memory allocations on Linux and Windows (to
@@ -67,7 +67,7 @@ void ADM_memStatEnd(void)
 void ADM_memStat(void)
 {
 	printf("Global mem stat\n______________\n");
-	printf("\tMemory consumed: %lu (MB)\n", ADM_consumed >> 20);
+	printf("\tMemory consumed: %"LU" (MB)\n", ADM_consumed >> 20);
 }
 
 #if !defined(ADM_DEBUG) || !defined(FIND_LEAKS)
@@ -76,7 +76,7 @@ void ADM_memStat(void)
     \brief Replacement for system Calloc using our memory management
     \param nbElem : # of elements to allocate
     \param elSize : Size of one element in bytes
-    \return pointer 
+    \return pointer
 */
 void *ADM_calloc(size_t nbElm, size_t elSize)
 {
@@ -227,7 +227,7 @@ extern "C"
 /**
  * av_realloc semantics (same as glibc): if ptr is NULL and size > 0,
  * identical to malloc(size). If size is zero, it is identical to
- * free(ptr) and NULL is returned.  
+ * free(ptr) and NULL is returned.
  */
 void *ADM_realloc(void *ptr, size_t newsize)
 {
@@ -248,8 +248,8 @@ void *ADM_realloc(void *ptr, size_t newsize)
 	if(!ptr)
 		return ADM_alloc(newsize);
 
-	if(!newsize) 
-	{    	
+	if(!newsize)
+	{
 		ADM_dealloc(ptr);
 		return NULL;
 	}
@@ -291,7 +291,7 @@ void *av_realloc(void *ptr, unsigned int newsize)
 void av_free(void *ptr)
 {
 	if(ptr)
-		ADM_dealloc(ptr);  
+		ADM_dealloc(ptr);
 }
 
 char *ADM_strdup(const char *in)
@@ -344,12 +344,12 @@ void ADM_dezalloc(void *ptr)
 void *ADM_realloc(void *ptr, size_t newsize)
 {
 	void *nalloc;
-    
+
     if(!ptr)
 		return operator new(newsize, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0);
 
-    if(!newsize) 
-    {    
+    if(!newsize)
+    {
 		operator delete(ptr, (char*)_DEBUG_NEW_CALLER_ADDRESS, 0);
 		return NULL;
     }

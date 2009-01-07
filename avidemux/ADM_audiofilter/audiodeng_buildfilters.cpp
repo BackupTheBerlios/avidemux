@@ -62,7 +62,7 @@ static const externalSource Sources[]=
         {AudioAC3,"AC3"},
         {AudioNone,"NONE"}
 };
-typedef struct 
+typedef struct
 {
   const char         *name;
   CHANNEL_CONF conf;
@@ -115,7 +115,7 @@ uint8_t                    setCurrentMixerFromString(const char *name)
 {
         uint32_t nb=sizeof(Mixer_strings)/sizeof(Mixer_String);
         for(uint32_t i=0;i<nb;i++)
-                if(!strcasecmp(name,Mixer_strings[i].name)) 
+                if(!strcasecmp(name,Mixer_strings[i].name))
                 {
                   audioMixing= Mixer_strings[i].conf;
                   return 1;
@@ -166,18 +166,18 @@ int32_t  audioGetNormalizeValue(void)
 uint32_t audioGetResample(void)
 {
       return audioFreq;
-        
+
 }
 uint32_t audioGetDrc(void)
 {
-  return audioDRC; 
+  return audioDRC;
 }
 uint32_t audioGetDelay(void)
 {
         if(audioShift && audioDelay)
         {
                 return audioDelay;
-                
+
         }
         return 0;
 }
@@ -202,7 +202,7 @@ void audioFilterNormalizeValue(int v)
 }
 
 uint8_t audioFilterDelay(int32_t delay)
-{	
+{
 	if(delay)
 	{
 		audioShift=1;
@@ -228,7 +228,7 @@ uint8_t audioFilterFilm2Pal(uint8_t onoff)
 uint8_t audioFilterDrc(uint8_t onoff)
 {
   audioDRC=onoff;
-  return 1; 
+  return 1;
 }
 uint8_t audioFilterPal2Film(uint8_t onoff)
 {
@@ -247,7 +247,7 @@ void audioFilterResample(uint32_t onoff)
 	else
 		audioResampleMode=RESAMPLING_NONE;
 
-} 
+}
 //______________________________
 //#include "ADM_gui2/GUI_ui.h"
 uint8_t UI_setTimeShift(int onoff,int value);
@@ -262,9 +262,9 @@ void audioFilter_configureFilters( void )
 	 		&audioFilmConv,&audioMixing );
          if(audioDelay!=olddelay ||oldshift!= audioShift)
          {  // Refresh
-             
+
              UI_setTimeShift(audioShift,audioDelay);
-             
+
          }
 
 }
@@ -279,13 +279,13 @@ void audioFilter_configureFilters( void )
 			{ \
 				tmp+=strlen(#x); \
 				aprintf("-- %s\n",tmp); \
-				sscanf(tmp,"=%d ",&x); \
+				sscanf(tmp,"=%d ",(int *)&x); \
 			} \
 			 else \
 			{ printf("*** %s not found !***\n",#x);} \
 		}
 #define Add(x) {sprintf(tmp,"%s=%d ",#x,x);strcat(conf,tmp);}
-	
+
 uint8_t audioFilterSetByName( const char *name)
 {
 	const char *tmp;
@@ -320,14 +320,14 @@ const char *audioFilterGetName( void )
 	return conf;
 
 }
- 
+
 
 /*
 	Refresh   activeAudioEncoder value
 	depending on what's selected
 
 */
-	 
+
 
 
 void audioSetResample(uint32_t fq)

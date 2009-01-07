@@ -43,7 +43,7 @@ uint32_t retry=50;
 		// we do nothing in case of WAV or unhandler stream
   		// that left only MP3 for now ...
      if (_wavheader->encoding != WAV_MP3 &&_wavheader->encoding != WAV_MP2 )
-      {	
+      {
 	  return 0;
       }
       // in case of mpeg3 we will build a pseudo memory map
@@ -63,16 +63,16 @@ uint32_t retry=50;
       // ms10 is the raw length of 10 ms of uncompressed audio
       // in sample
       ms10=_wavheader->frequency/100;
-      
-      
+
+
      if (_audioMap)
 		 delete[] _audioMap;
 
      _audioMap=new ST_point[100*3600*4]; // 4 hours / 6 Megs
 
-     
+
       ADM_assert(_audioMap);
-     
+
       DIA_working *work;
 
       work=new DIA_working(QT_TR_NOOP("Building VBR map"));
@@ -89,7 +89,7 @@ uint32_t retry=50;
 					work=new DIA_working(QT_TR_NOOP("Building VBR map"));
 					work->update(offset,_length);
 				}
-                
+
                 		// read a packet
 				if(!getPacket(internalBuffer, &len,&sample))
 				{
@@ -100,7 +100,7 @@ uint32_t retry=50;
                                     }
 					printf("MapVBR:Get packet failed\n");
 					break;
-				}		  
+				}
 			        offset+=len;
 			      	rd += sample*Mul;
       				_audioMap[index].foffset=offset;
@@ -122,7 +122,7 @@ end:
         }
       _nbMap=index;
       _wavheader->blockalign=1152; // Mark it as VBR
-      printf("\n Nb entries in timeline : %lu\n",_nbMap);
+      printf("\n Nb entries in timeline : %"LU"\n",_nbMap);
       delete work;
       goTo(0);	// Purge
      return 1;

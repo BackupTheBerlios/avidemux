@@ -4,7 +4,7 @@
 
 	Encoder for ffmpeg
 	Reverse enginereed from mplayer & transcode
-		
+
 
     begin                : Tue Sep 10 2002
     copyright            : (C) 2002 by mean
@@ -163,7 +163,7 @@ ffmpegEncoder::encodePreamble (uint8_t * in)
         _frame.data[0] = in;
         _frame.data[2] = in + _w * _h;
         _frame.data[1] = in + _w * _h + ((_w * _h) >> 1);
-      
+
         break;
     default:
       ADM_assert(0);
@@ -223,11 +223,11 @@ ffmpegEncoder::gopMpeg1 (void)
   printf ("[LAVCODEC]Using 2 b frames\n");
   if (_id == FF_MPEG2)
     {
-      _context->mpeg_quant = 1;	//1; // Should be mpeg quant 
+      _context->mpeg_quant = 1;	//1; // Should be mpeg quant
     }
   else
     {
-      _context->mpeg_quant = 0;	//1; // Should be mpeg quant 
+      _context->mpeg_quant = 0;	//1; // Should be mpeg quant
     }
   if (_settingsPresence)
     {
@@ -287,18 +287,18 @@ ffmpegEncoder::gopMpeg1 (void)
   //
   //_context->dsp_mask= FF_MM_FORCE;
   printf ("[LAVCODEC]Mpeg12 settings:\n____________\n");
-  printf ("[LAVCODEC]FF Max rate   (header) : %lu kbps\n",
+  printf ("[LAVCODEC]FF Max rate   (header) : %"LU" kbps\n",
 	  (_context->rc_max_rate_header) / 1000);
-  printf ("[LAVCODEC]FF Buffer Size(header) : %lu bits / %lu kB\n",
+  printf ("[LAVCODEC]FF Buffer Size(header) : %"LU" bits / %"LU" kB\n",
 	  (_context->rc_buffer_size_header),
 	  _context->rc_buffer_size_header / (8 * 1024));
-  printf ("[LAVCODEC]FF Max rate   (rc) : %lu kbps\n", (_context->rc_max_rate) / 1000);
-  printf ("[LAVCODEC]FF Buffer Size(rc) : %lu bits / %lu kB\n",
+  printf ("[LAVCODEC]FF Max rate   (rc) : %"LU" kbps\n", (_context->rc_max_rate) / 1000);
+  printf ("[LAVCODEC]FF Buffer Size(rc) : %"LU" bits / %"LU" kB\n",
 	  (_context->rc_buffer_size), _context->rc_buffer_size / (8 * 1024));
 
-  printf ("[LAVCODEC]FF GOP Size    : %lu\n", _context->gop_size);
-  printf ("[LAVCODEC]FF Bitrate    : %lu (kb/s)\n", _context->bit_rate/1000);
-  
+  printf ("[LAVCODEC]FF GOP Size    : %"LU"\n", _context->gop_size);
+  printf ("[LAVCODEC]FF Bitrate    : %"LU" (kb/s)\n", _context->bit_rate/1000);
+
   return 1;
 }
 
@@ -308,14 +308,14 @@ ffmpegEncoder::initContext (void)
   int res = 0;
 
   // set a gop size close to what's requested for most
-  // player compatiblity               
+  // player compatiblity
   if (_id == FF_MPEG1 || _id == FF_MPEG2)
     gopMpeg1 ();
   // if (_id == FF_HUFF || _id == FF_FFV1)
   _context->strict_std_compliance = -1;
   if (_id == FF_HUFF || _id == FF_FFV1 ||_id == FF_FFHUFF )
     _context->strict_std_compliance = -2;
-  
+
   switch (_id)
     {
     case FF_MPEG4:
@@ -357,9 +357,9 @@ ffmpegEncoder::initContext (void)
     case FF_SNOW:
       WRAP_Open (CODEC_ID_SNOW);
       break;
-      
+
     case FF_DV:
-      if(_context->width!=720 || _context->height!=576) 
+      if(_context->width!=720 || _context->height!=576)
             return 0; // should be caught by upper layers before going here...
       WRAP_Open (CODEC_ID_DVVIDEO);
       break;
@@ -442,7 +442,7 @@ ffmpegEncoder::setConfig (FFcodecSetting * set)
 uint8_t
 ffmpegEncoderCQ::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
 {
-  printf ("[LAVCODEC] Using Q=%u\n",val); 
+  printf ("[LAVCODEC] Using Q=%u\n",val);
   mplayer_init ();
   _qual = val;
   _vbr = vbr;
@@ -475,7 +475,7 @@ uint8_t ffmpegEncoderCQ::encode (ADMImage * in, ADMBitstream * out)
   int32_t    sz = 0;
   uint32_t    f;
   uint8_t    r=0;
-  
+
   _frame.quality = (int) floor (FF_QP2LAMBDA * _qual + 0.5);
   r=ffmpegEncoder::encode(in,out);
   out->out_quantizer=_qual;
@@ -529,7 +529,7 @@ uint8_t ffmpegEncoderCBR::init (uint32_t val, uint32_t fps1000)
   else
 	  _context->bit_rate = _br*1000;
 
-  printf ("[LAVCODEC] Using  bitrate in context :%lu kbps",_context->bit_rate/1000);
+  printf ("[LAVCODEC] Using  bitrate in context :%"LU" kbps",_context->bit_rate/1000);
 
   return initContext ();
 
@@ -821,8 +821,8 @@ ffmpegEncoderHuff::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
 
 */
 
-ffmpegEncoderHuff::ffmpegEncoderHuff (uint32_t width, uint32_t height,FF_CODEC_ID id) 
-  :   ffmpegEncoder (width,height, id,PIX_FMT_YUV422P) 
+ffmpegEncoderHuff::ffmpegEncoderHuff (uint32_t width, uint32_t height,FF_CODEC_ID id)
+  :   ffmpegEncoder (width,height, id,PIX_FMT_YUV422P)
 {
   // Allocate our resampler & intermediate
   yuy2=new uint8_t[width*height*2];
@@ -838,12 +838,12 @@ ffmpegEncoderHuff::~ffmpegEncoderHuff()
   if(yuy2)
   {
     delete [] yuy2;
-    yuy2=NULL;  
+    yuy2=NULL;
   }
   if(convert)
   {
    delete convert;
-    convert=NULL; 
+    convert=NULL;
   }
   stopEncoder ();
 }
@@ -857,7 +857,7 @@ ffmpegEncoderHuff::~ffmpegEncoderHuff()
     encodePreamble(yuy2);
     /* Convert */
    convert->convert(in->data,yuy2);
-    
+
     /***/
     if ((sz = avcodec_encode_video (_context, out->data, out->bufferSize, &_frame)) < 0)
         return 0;
@@ -891,7 +891,7 @@ ffmpegEncoder::getExtraData (uint32_t * l, uint8_t ** d)
 {
   *d = (uint8_t *) _context->extradata;
   *l = _context->extradata_size;
-  printf ("[LAVCODEC]We got some extra data: %lu\n", *l);
+  printf ("[LAVCODEC]We got some extra data: %"LU"\n", *l);
   if (*l)
     return 1;
 

@@ -570,4 +570,65 @@ uint32_t psPacketLinear::getConsumed(void)
     consumed=0;
     return c;
 }
+/* ********************************************************* */
+/**
+    \fn psPacketLinearTracker
+*/
+ psPacketLinearTracker::psPacketLinearTracker(uint8_t pid)  : psPacketLinear(pid)
+{
+    memset(stats,0,sizeof(stats));
+    for(int i=0;i<256;i++)
+    {
+        packetStats *p=stats+i;
+        p->lastDts=ADM_NO_PTS;
+        p->lastDts=ADM_NO_PTS;
+    }
+}
+/**
+    \fn ~psPacketLinearTracker
+*/
+psPacketLinearTracker::~psPacketLinearTracker()
+{
+
+
+}
+/**
+        \fn getStat
+*/
+packetStats    *psPacketLinearTracker::getStat(int index)
+{   
+    if(index<0 || index>=256) ADM_assert(0);
+    return stats+index;
+}
+/**
+    \fn getPacketgetPacketOfType
+    \brief Keep track of all the packets we have seen so far.
+    Usefull to detect the streams present and to look up the PTS/DTS of audio streams for the audio part of the index
+*/
+bool           psPacketLinearTracker::getPacketOfType(uint8_t pid,uint32_t maxSize, uint32_t *packetSize,uint64_t *pts,uint64_t *dts,uint8_t *buffer,uint64_t *startAt)
+{
+ bool xit=false;
+    uint8_t tmppid;
+    while(1)
+    {
+        if(true!=getPacket(maxSize,&tmppid,packetSize,pts,dts,buffer,startAt))
+                return false;
+        else
+        {
+                // Update 
+                ADM_assert(tmppid<0x100);
+                packetStats *p=stats+tmppid;
+                p->count++;
+                p->size+=*packetSize;
+                uint64_t ts=*pts;
+                if(ts==ADM_NO_PTS) ts=*dts;
+                if(p->firstDts==ADM_NO_PTS) p->firstDts=ts;
+                if(ts!=ADM_NO_PTS)
+                    p->lastDts=ts;
+                if(tmppid==pid) return true;
+        }
+    }
+    return false;
+}
+
 //EOF

@@ -1,8 +1,8 @@
 /***************************************************************************
                           ADM_codecwma.cpp  -  description
                              -------------------
-        We do also AMR here                      
-                             
+        We do also AMR here
+
     begin                : Tue Nov 12 2002
     copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
@@ -36,17 +36,17 @@
 
 uint8_t scratchPad[SCRATCH_PAD_SIZE];
 
-   uint8_t ADM_AudiocodecWMA::beginDecompress( void ) 
+   uint8_t ADM_AudiocodecWMA::beginDecompress( void )
    {
             _tail=_head=0;
             return 1;
    };
-   uint8_t ADM_AudiocodecWMA::endDecompress( void ) 
+   uint8_t ADM_AudiocodecWMA::endDecompress( void )
    {
           _tail=_head=0;
           return 1;
    };
-   
+
  ADM_AudiocodecWMA::ADM_AudiocodecWMA(uint32_t fourcc,WAVHeader *info,uint32_t l,uint8_t *d)
        :  ADM_Audiocodec(fourcc)
  {
@@ -81,23 +81,23 @@ uint8_t scratchPad[SCRATCH_PAD_SIZE];
     }
     _context->extradata=(uint8_t *)d;
     _context->extradata_size=(int)l;
-    printf(" Using %ld bytes of extra header data\n",l);
+    printf(" Using %"LU" bytes of extra header data\n",l);
     mixDump((uint8_t *)_context->extradata,_context->extradata_size);
 
    AVCodec *codec=avcodec_find_decoder(_context->codec_id);
-   if(!codec) {GUI_Error_HIG(QT_TR_NOOP("Internal error"), QT_TR_NOOP("Cannot open WMA2 codec."));ADM_assert(0);} 
+   if(!codec) {GUI_Error_HIG(QT_TR_NOOP("Internal error"), QT_TR_NOOP("Cannot open WMA2 codec."));ADM_assert(0);}
     if (avcodec_open(_context, codec) < 0)
     {
         printf("\n Lavc audio decoder init failed !\n");
         ADM_assert(0);
     }
     if(!_blockalign)
-    { 
+    {
       if(_context->block_align) _blockalign=_context->block_align;
       else
       {
         printf("FFWMA : no blockalign taking 378\n");
-        _blockalign=378;   
+        _blockalign=378;
       }
     }
     printf("FFwma init successful (blockalign %d)\n",info->blockalign);
@@ -107,7 +107,7 @@ uint8_t scratchPad[SCRATCH_PAD_SIZE];
         avcodec_close(_context);
         ADM_dealloc(_context);
         _contextVoid=NULL;
-}    
+}
 /*-------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------*/
 
@@ -136,7 +136,7 @@ int nbChunk;
           pout=SCRATCH_PAD_SIZE;
           out=avcodec_decode_audio2(_context,(int16_t *)scratchPad,
                                    &pout,_buffer+_head,nbChunk*_blockalign);
-                
+
           if(out<0)
           {
             printf( " *** WMA decoding error (%u)***\n",_blockalign);
@@ -146,7 +146,7 @@ int nbChunk;
           if(pout>=SCRATCH_PAD_SIZE)
           {
             printf("Produced : %u, buffer %u,in%u\n",pout,SCRATCH_PAD_SIZE,_tail-_head);
-            ADM_assert(0); 
+            ADM_assert(0);
           }
           if(_context->codec_id == CODEC_ID_NELLYMOSER)
           { // Hack, it returns inconsistent size
@@ -161,9 +161,9 @@ int nbChunk;
             *outptr++=((float)run16[i])/32767.;
           }
         }
-        
-        
-        
+
+
+
         return 1;
 }
 

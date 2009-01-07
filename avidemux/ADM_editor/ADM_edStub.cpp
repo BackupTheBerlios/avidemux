@@ -31,7 +31,7 @@
 */
 uint32_t ADM_Composer::getSpecificMpeg4Info( void )
 {
-	if(_nb_segment) 
+	if(_nb_segment)
 		if(_videos[0].decoder)
 	 		return _videos[0].decoder->getSpecificMpeg4Info();
 	return 0;
@@ -63,7 +63,7 @@ uint8_t
       curseg++;
 
     };
-  printf("\n Frame 2 seg failed! (%lu)\n",framenum);
+  printf("\n Frame 2 seg failed! (%"LU")\n",framenum);
   dumpSeg();
   return 0;
 
@@ -143,7 +143,7 @@ uint8_t   ADM_Composer::getFrame (uint32_t framenum, ADMCompressedImage *img, ui
   ref = _segments[seg]._reference;
   return _videos[ref]._aviheader->getFrame (relframe,img);
 }
-// 
+//
 // Check that the 2 frames are sequential with just B frames in between
 // B > A!
 // Return 1 if they are in sequence
@@ -153,16 +153,16 @@ uint8_t ADM_Composer::sequentialFramesB(uint32_t frameA,uint32_t frameB)
 	uint32_t relframeA,segA;
 	uint32_t relframeB,segB,ref;
 	uint32_t flags;
-	
+
 	ADM_assert(frameB>frameA);
-	
+
 	if (!convFrame2Seg (frameA, &segA, &relframeA))
-  	{	
+  	{
   		printf("Editor: seq : convFrame2seg failed!\n");
     		return 0;
   	}
   	if (!convFrame2Seg (frameB, &segB, &relframeB))
-  	{	
+  	{
   		printf("Editor: seq : convFrame2seg failed!\n");
     		return 0;
   	}
@@ -171,19 +171,19 @@ uint8_t ADM_Composer::sequentialFramesB(uint32_t frameA,uint32_t frameB)
 	// printf("%lu %lu -> seg differs: %lu,%lu\n",frameA,frameB,segA,segB);
 	 return 0;
 	}
-	
+
 	 ref = _segments[segA]._reference;
-	
+
 	for(uint32_t i=relframeA+1;i<relframeB;i++)
 	{
 		_videos[ref]._aviheader->getFlags(i,&flags);
-		if(!(flags&AVI_B_FRAME)) 
+		if(!(flags&AVI_B_FRAME))
 		{
 	//		printf("Start: %lu ko:%lu end:%lu\n",relframeA+1,i,relframeB);
 			return 0;		// There is not only B frame between A & B
 		}
 	}
-	
+
 	return 1;
 
 }
@@ -201,7 +201,7 @@ uint8_t   ADM_Composer::isSequential (uint32_t framenum)
   	printf("Editor: seq : convFrame2seg failed!\n");
     return 0;
   }
-  
+
 	if ((lastseg == seg) && ((lastframe + 1) == relframe))
 	  return 1;
 	else
@@ -209,7 +209,7 @@ uint8_t   ADM_Composer::isSequential (uint32_t framenum)
 }
 
 
-/** 
+/**
     \fn getTime
     \brief return or estimate the pts of frame fn
 */
@@ -219,7 +219,7 @@ uint64_t ADM_Composer::getTime (uint32_t fn)
     uint32_t org=fn;
     if(t!=ADM_COMPRESSED_NO_PTS) return t;
     if(!fn) return 0;
-    
+
     // Try to guess what is the time...
     while(1)
     {
@@ -261,9 +261,9 @@ uint32_t ADM_Composer::getFlagsAndSeg (uint32_t frame, uint32_t * flags,uint32_t
   if (!convFrame2Seg (frame, &seg, &relframe))
     return 0;
   uint32_t    ref =   _segments[seg]._reference;
-  
+
     *segs=seg;
-    return _videos[ref]._aviheader->getFlags (relframe, flags);  
+    return _videos[ref]._aviheader->getFlags (relframe, flags);
 }
 /**
     \fn getFrameSize
@@ -347,7 +347,7 @@ uint8_t ADM_Composer::getVideoInfo (aviInfo * info)
 
 //______________________________
 //    Info etc... to be removed later
-//______________________________                                        
+//______________________________
 AVIStreamHeader *
 ADM_Composer::getVideoStreamHeader (void)
 {
@@ -391,13 +391,13 @@ uint32_t i=0;
 	}
 	if(flags & AVI_B_FRAME)
 	{
-		printf("Ending B frame -> abort (%lu)\n",end-1);
+		printf("Ending B frame -> abort (%"LU")\n",end-1);
 		*fatal=1;
 		return 0;
 	}
 	if(!getFlagsAndSeg (start, &flags,&seg))
 	{
-				printf("Cannot get flags for frame %lu\n",start);
+				printf("Cannot get flags for frame %"LU"\n",start);
 				goto _abt;
 	}
 	if(flags & AVI_B_FRAME)
@@ -411,36 +411,36 @@ uint32_t i=0;
 			//printf("%08lu/%08lu\r",i,end-start);
 			if(!getFlagsAndSeg (i, &flags,&seg))
 			{
-				printf("Cannot get flags for frame %lu\n",i);
+				printf("Cannot get flags for frame %"LU"\n",i);
 				goto _abt;
 			}
 			if(flags & AVI_B_FRAME)
 			{ 	// search if we have to send a I/P frame in adance
-				if(segnonB!=seg) 
+				if(segnonB!=seg)
 				{
-					printf("bw failed! (%lu/%lu)\n",seg,segnonB);
+					printf("bw failed! (%"LU"/%"LU")\n",seg,segnonB);
 					 goto _abt;
 				}
 ;
-				
+
 				forwardseg=searchForwardSeg(i);
 				if(seg!=forwardseg)
 				{
-					printf("Fw failed! (%lu/%lu)\n",seg,forwardseg);
+					printf("Fw failed! (%"LU"/%"LU")\n",seg,forwardseg);
 					 goto _abt;
-				}								
+				}
 			}
 			else // it is not a B frame and we have nothing on hold, sent it..
 			{
 				lastnonb=i;
-				segnonB=seg;				
+				segnonB=seg;
 			}
 	}
 	ok=1;
 _abt:
 	if(!ok)
 	{
-		printf("Frame %d has lost its fw/bw reference frame (%lu/%lu)\n",i,start,end);
+		printf("Frame %d has lost its fw/bw reference frame (%"LU"/%"LU")\n",i,start,end);
 	}
 	return ok;
 }
@@ -461,7 +461,7 @@ uint32_t ADM_Composer::searchForwardSeg(uint32_t startframe)
 					return seg;
 
 				}
-				
+
 				if(!r)
 				{
 					seg=0xffff;
@@ -478,8 +478,8 @@ uint32_t ADM_Composer::searchForwardSeg(uint32_t startframe)
 */
 uint64_t ADM_Composer::getVideoDuration(void)
 {
-  if(_nb_segment) 
-    return _videos[0]._aviheader->getVideoDuration();  
+  if(_nb_segment)
+    return _videos[0]._aviheader->getVideoDuration();
   return 0;
 }
 

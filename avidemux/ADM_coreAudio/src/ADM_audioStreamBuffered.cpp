@@ -38,9 +38,9 @@ bool ADM_audioStreamBuffered::refill(void)
         // By construction, the error should be minimal
         if(newDts!=ADM_AUDIO_NO_DTS)
         {
-            if( abs(newDts-lastDts)>ADM_MAX_SKEW) 
+            if( abs(newDts-lastDts)>ADM_MAX_SKEW)
             {
-                printf("[AudioStream] Warning skew in dts %d\n",newDts-lastDts);
+                printf("[AudioStream] Warning skew in dts %"LD"\n",newDts-lastDts);
                 setDts(newDts);
             }
             // If we have a DTS and the buffer is empty, set the dts inconditionnaly
@@ -109,7 +109,7 @@ bool      ADM_audioStreamBuffered::peek(uint32_t n,uint8_t *d)
 bool      ADM_audioStreamBuffered::goToTime(uint64_t nbUs)
 {
     if(true==ADM_audioStream::goToTime(nbUs))
-    {   
+    {
         limit=start=0;
         return true;
     }
@@ -131,7 +131,7 @@ bool      ADM_audioStreamBuffered::needBytes(uint32_t nbBytes)
 */
 bool      ADM_audioStreamBuffered::skipBytes(uint32_t nbBytes)
 {
-    if((limit-start)>=nbBytes) 
+    if((limit-start)>=nbBytes)
     {
         start+=nbBytes;
         return true;
