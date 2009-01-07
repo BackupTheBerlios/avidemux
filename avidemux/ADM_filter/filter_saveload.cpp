@@ -202,7 +202,7 @@ CONFcouple *couple;
 							return 0;
 					}
 				// now we got the tag
-				printf("\n %lu tag \n",itag);
+				printf("\n %"LU" tag \n",itag);
 
 				// and we can build a CONFCouple if necessary
 				xmlNodePtr conf;
@@ -238,7 +238,7 @@ CONFcouple *couple;
 				// next filter please!
 				subnode=subnode->next;
 			}
-			printf("\n found : %lu filters\n",nb_filters);
+			printf("\n found : %"LU" filters\n",nb_filters);
 	xmlFreeDoc(xdoc);
 	return 1;
 }

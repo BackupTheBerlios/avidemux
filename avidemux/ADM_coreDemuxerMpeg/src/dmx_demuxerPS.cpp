@@ -177,7 +177,7 @@ uint8_t dmx_demuxerPS::setPos( uint64_t abs,uint64_t  rel)
 				{
 						if(_pesBufferLen<rel)
 							{
-								printf("Asked setpos to go %lu whereas %lu is max\n",
+								printf("Asked setpos to go %"LLU" whereas %"LU" is max\n",
 											rel,_pesBufferLen);
 								ADM_assert(rel<_pesBufferLen);
 							}
@@ -200,7 +200,7 @@ uint8_t dmx_demuxerPS::setPos( uint64_t abs,uint64_t  rel)
 
                 if(rel>_pesBufferLen)
                 {
-                        printf("Set pos failed : asked rel:%"LU" max: %"LU", absPos:%"LLU" absPosafterRefill:%"LLU"\n",
+                        printf("Set pos failed : asked rel:%"LLU" max: %"LU", absPos:%"LLU" absPosafterRefill:%"LLU"\n",
                                         rel,_pesBufferLen,abs,_pesBufferStart);
                         ADM_assert(rel<_pesBufferLen);
                 }
@@ -238,7 +238,7 @@ uint32_t mx;
                 }
                 if(!refill())
                 {
-                        printf("Refill failed at %d  \n",_pesBufferStart);
+                        printf("Refill failed at %"LLD"  \n",_pesBufferStart);
                         _lastErr=1;
                          return 0;
                 }
@@ -296,7 +296,7 @@ uint32_t val,hnt;
 #endif
                                  if(left>_oldPesLen)
                                 {
-                                        printf("Need %lu bytes from previous packet, which len is %"LU"\n",left,_oldPesLen);
+                                        printf("Need %"LU" bytes from previous packet, which len is %"LU"\n",left,_oldPesLen);
                                         ADM_assert(0);
                                 }
                                 *abs=_oldPesStart;

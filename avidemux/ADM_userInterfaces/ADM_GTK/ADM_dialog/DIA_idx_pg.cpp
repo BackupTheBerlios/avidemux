@@ -1,8 +1,8 @@
 /***************************************************************************
                           DIA_dmx.cpp  -  description
-                             -------------------     
-Indexer progress dialog                             
-    
+                             -------------------
+Indexer progress dialog
+
     copyright            : (C) 2005 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
@@ -68,7 +68,7 @@ DIA_progressIndexing::~DIA_progressIndexing()
         gtk_widget_destroy(dialog);
         dialog=NULL;
 }
-uint8_t       DIA_progressIndexing::isAborted(void) 
+uint8_t       DIA_progressIndexing::isAborted(void)
 {
         return abted;
 }
@@ -94,7 +94,7 @@ uint8_t       DIA_progressIndexing::update(uint32_t done,uint32_t total, uint32_
         sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
         gtk_label_set_text(GTK_LABEL(WID(labelTime)),string);
 
-        sprintf(string,"%0lu",nbImage);
+        sprintf(string,"%0"LU,nbImage);
         gtk_label_set_text(GTK_LABEL(WID(labelNbImage)),string);
 
         f=done;

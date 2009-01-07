@@ -1,7 +1,7 @@
 /***************************************************************************
-                        2nd gen indexer                                                 
-                             
-    
+                        2nd gen indexer
+
+
     copyright            : (C) 2005 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
@@ -53,7 +53,7 @@ uint8_t dmx_indexer(const char *mpeg,char *file);
 
 /**
         \fn    dmx_indexer
-        \brief Create index file    
+        \brief Create index file
         @param mpeg Name of the file to index
         @param file Name of the index file to create
         @param preferedAudio Default audio track
@@ -71,13 +71,13 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
         dmx_demuxer *demuxer;
 
         char *realname=ADM_PathCanonize(mpeg);
-        FILE *out;        
+        FILE *out;
         DMX_TYPE mpegType;
         uint8_t  mpegTypeChar;
         uint32_t multi=0;
-        
+
         dmx_payloadType payloadType=DMX_PAYLOAD_MPEG2;
-        
+
 
 
         mpegType=dmxIdentify(realname);
@@ -88,7 +88,7 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
                 return 0;
         }
 
-     
+
 
         switch(mpegType)
         {
@@ -118,7 +118,7 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
                                     case ADM_STREAM_MPEG4:      payloadType=DMX_PAYLOAD_MPEG4;break;
                                     case ADM_STREAM_MPEG_VIDEO: payloadType=DMX_PAYLOAD_MPEG2;break;
                                   default: ADM_assert(0);
-  
+
                                   }
                                 break;
                                 }
@@ -135,7 +135,7 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
                 		{
                 		dmx_demuxerPS *dmx;
                                 fileParser    *fp;
-                                FP_TYPE       type=FP_PROBE; 
+                                FP_TYPE       type=FP_PROBE;
                                         fp=new fileParser;
                                         fp->open(realname,&type);
                                         delete fp;
@@ -152,7 +152,7 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
                 default : ADM_assert(0);
 
         }
-        
+
         demuxer->open(realname);
 
         out=qfopen(file,"wt");
@@ -172,23 +172,23 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
         qfprintf(out,"Payload  : %c%c%c%c\n",'M','P','E','G'); // width...
         qfprintf(out,"Nb Gop   : %08lu \n",0); // width...
         qfprintf(out,"Nb Images: %010lu \n",0); // width...
-        qfprintf(out,"Nb Audio : %02lu\n",nbTracks-1); 
-        qfprintf(out,"Main aud : %02lu\n",preferedAudio); 
+        qfprintf(out,"Nb Audio : %02lu\n",nbTracks-1);
+        qfprintf(out,"Main aud : %02lu\n",preferedAudio);
         qfprintf(out,"Streams  : ");
         for(int s=0;s<nbTracks;s++)
         {
                 if(!s){
 			qfprintf(out,"V%04x:%04x ",tracks[0].pid,tracks[0].pes);
 		}else{
-			qfprintf(out,"A%04x:%04x ",tracks[s].pid,tracks[s].pes);                
+			qfprintf(out,"A%04x:%04x ",tracks[s].pid,tracks[s].pes);
 		}
         }
         qfprintf(out,"\n");
-        qfprintf(out,"# NGop NImg nbImg type:abs:rel:size ...\n"); 
+        qfprintf(out,"# NGop NImg nbImg type:abs:rel:size ...\n");
 
-        
+
         uint8_t  grabbing=0,seq_found=0;
-        
+
         uint32_t total_frame=0,val;
 
 		uint32_t originalPriority = getpriority(PRIO_PROCESS, 0);
@@ -201,17 +201,17 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
 
         printf("*********Indexing started (%d audio tracks)***********\n",nbTracks);
         dmx_runData run;
-        
+
         memset(&run,0,sizeof(dmx_runData));
-        
+
         run.totalFileSize=demuxer->getSize();
         run.demuxer=demuxer;
         run.work=work;
         run.nbTrack=nbTracks;
         run.fd=out;
-        
+
         dmx_videoIndexer *idxer=NULL;
-        
+
         switch(payloadType)
         {
           case DMX_PAYLOAD_MPEG2:
@@ -224,15 +224,15 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
                             idxer=new dmx_videoIndexerH264(&run);
                             break;
           default: ADM_assert(0);
-        }                
-        
+        }
+
         idxer->run();
         idxer->cleanup();
-        
+
         delete idxer;
         idxer=NULL;
-        
-              
+
+
         printf("*********Indexing Ended (%d audio tracks)***********\n",nbTracks);
 
          switch(run.imageAR)
@@ -253,7 +253,7 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
         delta=delta/1000; // in second
         if(delta)
         {
-                 compfps= (1000*run.nbImage)/delta;    // 3 Million images should be enough, no overflow                
+                 compfps= (1000*run.nbImage)/delta;    // 3 Million images should be enough, no overflow
         }
         else
         {
@@ -275,9 +275,9 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
         err*=100;
         err/=run.imageFPS*2;
         if(err<0) err=-err;
-        printf("%lu :%lu / %lu , %f\n",run.imageFPS,run.imageFPS*2,compfps,err);
+        printf("%"LU" :%"LU" / %"LU" , %f\n",run.imageFPS,run.imageFPS*2,compfps,err);
 
-        if(err<10) 
+        if(err<10)
         {
                 type='I';
                 printf("Seems to be field encoded\n");
@@ -307,17 +307,17 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
                             qfprintf(out,"Payload  : H264\n"); // MPEG,MP_4,H264
                             break;
           default: ADM_assert(0);
-        }                            
+        }
         qfprintf(out,"Nb Gop   : %08lu \n",run.nbGop); // width...
         qfprintf(out,"Nb Images: %010lu \n",run.nbImage); // width...
 
         qfclose(out);
-        delete work;  
+        delete work;
 
         printf("*********Indexing stopped***********\n");
-        printf("Found       :%lu gop\n",run.nbGop);
-        printf("Found       :%lu image\n",run.nbImage);                
-        printf("Average fps :%lu /1000 fps\n",compfps);
+        printf("Found       :%"LU" gop\n",run.nbGop);
+        printf("Found       :%"LU" image\n",run.nbImage);
+        printf("Average fps :%"LU" /1000 fps\n",compfps);
 
           delete demuxer;
           delete [] realname;
@@ -338,14 +338,14 @@ uint32_t computeTimeDifference(TimeStamp *f,TimeStamp *l)
                         result=result*next+r;
 
 #define PRINT(z,x) printf(#z"%02d:%02d:%02d\n",x->hh,x->mm,x->ss,x->ff);
-        DOIT(hh,0);                        
-        DOIT(mm,60);        
-        DOIT(ss,60);        
+        DOIT(hh,0);
+        DOIT(mm,60);
+        DOIT(ss,60);
         DOIT(ff,1000);
 #if 0
-        PRINT(first,f);         
+        PRINT(first,f);
         PRINT(last,l);
-        
+
 #endif
         printf("Time difference:%lu s\n",result/1000);
         return result;

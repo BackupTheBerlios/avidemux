@@ -49,9 +49,9 @@ static void 	GUI_XvEnd( void );
 static uint8_t 	GUI_XvDisplay(uint8_t * src, uint32_t w, uint32_t h,renderZoom zoom);
 static uint8_t 	GUI_XvSync(void);
 
-static uint8_t getAtom(char *string);
+static uint8_t getAtom(const char *string);
 //________________Wrapper around Xv_______________
-XvAccelRender::XvAccelRender( void ) 
+XvAccelRender::XvAccelRender( void )
 {
 
 }
@@ -128,7 +128,7 @@ uint8_t GUI_XvDisplay(uint8_t * src, uint32_t w, uint32_t h,renderZoom zoom)
             case ZOOM_2:   factor=8;break;
             case ZOOM_4:   factor=16;break;
             default : ADM_assert(0);
-          
+
         }
 	destW=(w*factor)/4;
         destH=(h*factor)/4;
@@ -158,7 +158,7 @@ uint8_t GUI_XvSync(void)
 {
 	if(xv_display)
 	  	XSync(xv_display, False);
-	return 1;		
+	return 1;
 }
 //------------------------------------
 //
@@ -171,18 +171,18 @@ uint8_t GUI_XvInit(GUI_WindowInfo * window, uint32_t w, uint32_t h)
     unsigned int port, adaptors;
     static XvAdaptorInfo *ai;
     static XvAdaptorInfo *curai;
-    
+
 #if 0
     win = gtk_widget_get_parent_window(window);
     xv_display = GDK_WINDOW_XDISPLAY(win);
 //      xv_win= RootWindow(xv_display,0);
     xv_win = GDK_WINDOW_XWINDOW(GTK_WIDGET(window)->window);
-#endif    
+#endif
 
     xv_display=(Display *)window->display;
     xv_win=window->window;
-    
-    
+
+
 #define WDN xv_display
     xv_port = 0;
 
@@ -231,7 +231,7 @@ unsigned long num_adaptors;
 		 curai->name);
 	  printf("\n Num Adap	 	: %lu", curai->num_adaptors);
 	  printf("\n Num fmt	 	: %lu", curai->num_formats);
-#endif	  
+#endif
 	  formats = curai->formats;
 
 	  //
@@ -253,15 +253,15 @@ unsigned long num_adaptors;
 	  goto failed;
       }
 #ifdef 	COLORSPACE_YV12
-    printf("\n Xv YV12 found at port :%d, format : %ld", port, xv_format);
+    printf("\n Xv YV12 found at port :%d, format : %"LD, port, xv_format);
 #else
-    printf("\n Xv YUY2 found at port :%d, format : %ld", port, xv_format);
+    printf("\n Xv YUY2 found at port :%d, format : %"LD, port, xv_format);
 #endif
 
     if (Success != XvGrabPort(WDN, port, 0))
 	goto failed;
     {
-	
+
 	xv_port = port;
 /*
    Display *display,
@@ -273,7 +273,7 @@ unsigned long num_adaptors;
    XShmSegmentInfo *shminfo
 
 */
-        
+
         XSetWindowAttributes xswa;
         XWindowAttributes attribs;
         static Atom xv_atom;
@@ -289,7 +289,7 @@ unsigned long num_adaptors;
         else printf("No autopaint \n");
 
         /* if we have to deal with colorkeying ... */
-        
+
 	xvimage = XvShmCreateImage(WDN, xv_port,
 				   xv_format, 0, w, h, &Shminfo);
 
@@ -318,7 +318,7 @@ unsigned long num_adaptors;
 	xv_xgc.graphics_exposures = False;
 
 	xv_gc = XCreateGC(xv_display, xv_win, 0L, &xv_xgc);
-	
+
 	//ADM_assert(BadWindow!=XSelectInput(xv_display, xv_win, ExposureMask | VisibilityChangeMask));
 
     }
@@ -340,7 +340,7 @@ uint8_t GUI_XvList(Display * dis, uint32_t port, uint32_t * fmt)
     int k, f = 0;
 
     formatValues = XvListImageFormats(dis, port, &imgfmt);
-// when "formatValues" is NULL, imgfmt should be zero, too 
+// when "formatValues" is NULL, imgfmt should be zero, too
 //    if (formatValues)
 
 // this will run endless or segfault if the colorspace searched for isn't found
@@ -360,13 +360,13 @@ uint8_t GUI_XvList(Display * dis, uint32_t port, uint32_t * fmt)
 		    f = 1;
 		    *fmt = formatValues[k].id;
 		}
-    }// else   
+    }// else
      //	f = 0; // f has already been initialized zero
 	if (formatValues) //checking if it's no NULL-pointer won't hurt
-	    XFree(formatValues); 
+	    XFree(formatValues);
     return f;
 }
-uint8_t getAtom(char *string)
+uint8_t getAtom(const char *string)
 {
   XvAttribute * attributes;
   int attrib_count,i;

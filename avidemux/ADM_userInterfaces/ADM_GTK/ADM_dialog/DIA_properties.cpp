@@ -29,17 +29,17 @@ void DIA_properties( void )
 
     if (playing)
         return;
-  
+
     text[0] = 0;
     if (!avifileinfo)
         return;
-  
+
         // Fetch info
         info=video_body->getSpecificMpeg4Info();
         vop=!!(info & ADM_VOP_ON);
         qpel=!!(info & ADM_QPEL_ON);
         gmc=!!(info & ADM_GMC_ON);
-        
+
         dialog = create_dialog1();
 
         gtk_register_dialog(dialog);
@@ -60,38 +60,38 @@ void DIA_properties( void )
         duration/=1000;
         ms2time((uint32_t)duration,&hh,&mm,&ss,&ms);
         sprintf(text, QT_TR_NOOP("%02d:%02d:%02d.%03d"), hh, mm, ss, ms);
-        FILL_ENTRY(label_duration);	
+        FILL_ENTRY(label_duration);
         // Fill in vop, gmc & qpel
         SET_YES(labelPacked,vop);
         SET_YES(labelGMC,gmc);
         SET_YES(labelQP,qpel);
-        // Aspect ratio 
+        // Aspect ratio
         const char *s;
         war=video_body->getPARWidth();
         har=video_body->getPARHeight();
         getAspectRatioFromAR(war,har, &s);
         sprintf(text, QT_TR_NOOP("%s (%u:%u)"), s,war,har);
-        FILL_ENTRY(labelAspectRatio);	
+        FILL_ENTRY(labelAspectRatio);
         // Now audio
         WAVHeader *wavinfo=NULL;
         if (currentaudiostream) wavinfo=currentaudiostream->getInfo();
           if(wavinfo)
           {
-              
+
               switch (wavinfo->channels)
                 {
                 case 1:
-                    sprintf(text, QT_TR_NOOP("Mono"));
+                    sprintf(text,"%s", QT_TR_NOOP("Mono"));
                     break;
                 case 2:
-                    sprintf(text, QT_TR_NOOP("Stereo"));
+                    sprintf(text,"%s", QT_TR_NOOP("Stereo"));
                     break;
                 default:
                     sprintf(text, "%d",wavinfo->channels);
                     break;
                 }
                 FILL_ENTRY(label1_audiomode);
-              
+
                 sprintf(text, QT_TR_NOOP("%lu Hz"), wavinfo->frequency);
                 FILL_ENTRY(label_fq);
                 sprintf(text, QT_TR_NOOP("%lu Bps / %lu kbps"), wavinfo->byterate,      wavinfo->byterate * 8 / 1000);
@@ -111,14 +111,14 @@ void DIA_properties( void )
 
                         sprintf(text, QT_TR_NOOP("%.2f MB"), l / 1048576.F);
                         FILL_ENTRY(labelFileSize);
-                }                
+                }
         //        SET_YES(labelVbr, currentaudiostream->isVBR());
         } else
           {
                 DISABLE_WIDGET(frame2);
           }
-  
-        gtk_dialog_run(GTK_DIALOG(dialog));	
+
+        gtk_dialog_run(GTK_DIALOG(dialog));
         gtk_unregister_dialog(dialog);
         gtk_widget_destroy(dialog);
 }

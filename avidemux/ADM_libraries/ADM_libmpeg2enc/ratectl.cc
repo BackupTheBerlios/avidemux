@@ -194,8 +194,8 @@ static double scale_quantf( int q_scale_type, double quant )
 		}
 
 		quantf = (double)
-		  wl * (double)non_linear_mquant_table[map_non_linear_mquant[iquantl]] 
-			+ 
+		  wl * (double)non_linear_mquant_table[map_non_linear_mquant[iquantl]]
+			+
 		  wh * (double)non_linear_mquant_table[map_non_linear_mquant[iquanth]]
 			;
 	}
@@ -215,7 +215,7 @@ static double scale_quantf( int q_scale_type, double quant )
 int scale_quant( int q_scale_type , double quant )
 {
 	int iquant;
-	
+
 	if ( q_scale_type  )
 	{
 		iquant = (int) floor(quant+0.5);
@@ -260,7 +260,7 @@ double inv_scale_quant( int q_scale_type, int raw_code )
  *
  * On-the-fly rate controller.  The constructor sets up the initial
  * control and estimator parameter values to values that experience
- * suggest make sense.  All the important ones are dynamically 
+ * suggest make sense.  All the important ones are dynamically
  * tuned anyway so these values are not too critical.
  *
  ****************************/
@@ -318,7 +318,7 @@ void OnTheFlyRateCtl::InitSeq(bool reinit)
 	}
 	else
 	{
-		per_pict_bits = 
+		per_pict_bits =
 			static_cast<int32_t>(opt->fieldpic
 								 ? opt->bit_rate / field_rate
 								 : opt->bit_rate / ctl->decode_frame_rate
@@ -438,9 +438,9 @@ void OnTheFlyRateCtl::InitGOP( int np, int nb)
 	else
 	{
 		double recovery_fraction = field_rate/(overshoot_gain * fields_in_gop);
-		double recovery_gain = 
+		double recovery_gain =
 			recovery_fraction > 1.0 ? 1.0 : overshoot_gain * recovery_fraction;
-		int available_bits = 
+		int available_bits =
 			static_cast<int>( (opt->bit_rate+buffer_variation*recovery_gain)
 							  * fields_in_gop/field_rate);
 		double Xsum = Ni*Xi+Np*Xp+Nb*Xb;
@@ -485,7 +485,7 @@ void OnTheFlyRateCtl::InitPict(Picture &picture)
 	   of DCT coefficients) and actual quantisation weighted activty.
 	   We use this to try to predict the activity of each frame.
 	*/
-	
+
 	calc_actj(picture, &actsum, &varsum );
 	avg_act = actsum/(double)(mb_per_pict);
 	avg_var = varsum/(double)(mb_per_pict);
@@ -502,7 +502,7 @@ void OnTheFlyRateCtl::InitPict(Picture &picture)
 	   - global complexity averages
 	   - predicted activity measures
 	   - fixed type based weightings
-	   
+
 	   T = (Nx * Xx/Kx) / Sigma_j (Nj * Xj / Kj)
 
 	   N.b. B frames are an exception as there is *no* predictive
@@ -510,11 +510,11 @@ void OnTheFlyRateCtl::InitPict(Picture &picture)
 	   that highly active B frames are inevitably the result of
 	   transients and/or scene changes.  Psycho-visual considerations
 	   suggest there's no point rendering sudden transients
-	   terribly well as they're not percieved accurately anyway.  
+	   terribly well as they're not percieved accurately anyway.
 
 	   In the case of scene changes similar considerations apply.  In
 	   this case also we want to save bits for the next I or P frame
-	   where they will help improve other frames too.  
+	   where they will help improve other frames too.
 	   TODO: Experiment with *inverse* predictive correction for B-frames
 	   and turning off active-block boosting for B-frames.
 
@@ -522,18 +522,18 @@ void OnTheFlyRateCtl::InitPict(Picture &picture)
 	   bit-pool a one-GOP bit-pool.
 	*/
 
-	
+
 	if( opt->still_size > 0 )
 		available_bits = per_pict_bits;
 	else
 	{
 		int feedback_correction =
-			static_cast<int>( fast_tune 
+			static_cast<int>( fast_tune
 							  ?	buffer_variation * overshoot_gain
-							  : (buffer_variation+gop_buffer_correction) 
+							  : (buffer_variation+gop_buffer_correction)
 							    * overshoot_gain
 				);
-		available_bits = 
+		available_bits =
 			static_cast<int>( (opt->bit_rate+feedback_correction)
 							  * fields_in_gop/field_rate
 							  );
@@ -545,10 +545,10 @@ void OnTheFlyRateCtl::InitPict(Picture &picture)
 	switch (picture.pict_type)
 	{
 	case I_TYPE:
-		
+
 		/* There is little reason to rely on the *last* I-frame as
 		   they're not closely related.  The slow correction of K
-		   should be enough to fine-tune.  
+		   should be enough to fine-tune.
 		*/
 
 		d = d0i;
@@ -601,7 +601,7 @@ void OnTheFlyRateCtl::InitPict(Picture &picture)
 		break;
 	}
 
-	/* 
+	/*
 	   If we're fed a sequences of identical or near-identical images
 	   we can get actually get allocations for frames that exceed
 	   the video buffer size!  This of course won't work so we arbitrarily
@@ -614,7 +614,7 @@ void OnTheFlyRateCtl::InitPict(Picture &picture)
 	mjpeg_debug( "T=%05d A=%06d D=%06d (%06d) ", (int)T/8, (int)available_bits/8, (int)buffer_variation/8, (int)(buffer_variation + gop_buffer_correction)/8 );
 
 
-	/* 
+	/*
 	   To account for the wildly different sizes of frames
 	   we compute a correction to the current instantaneous
 	   buffer state that accounts for the fact that all other
@@ -656,7 +656,7 @@ void OnTheFlyRateCtl::InitPict(Picture &picture)
 	if( no_avg_K )
 		target_Q = current_Q;
 	else
-		target_Q = scale_quantf(picture.q_scale_type, 
+		target_Q = scale_quantf(picture.q_scale_type,
 								avg_K * avg_act *(mb_per_pict) / T);
 
 	picture.avg_act = avg_act;
@@ -740,7 +740,7 @@ static void calc_actj(Picture &picture, double *act_sum, double *var_sum)
 
 
 			for( l = 0; l < 6; ++l )
-				blksum += 
+				blksum +=
 					(*pquant_weight_coeff_sum)
 					( picture.mbinfo[k].RawDCTblocks()[l], i_q_mat ) ;
 			actj = (double)blksum / (double)COEFFSUM_SCALE;
@@ -790,13 +790,13 @@ void OnTheFlyRateCtl::UpdatePict(Picture &picture)
 		int padding_bytes;
 		if( frame_overshoot > frame_overshoot_margin )
 		{
-			mjpeg_warn( "Rate overshoot: VCD hi-res still %d bytes too large! ", 
+			mjpeg_warn( "Rate overshoot: VCD hi-res still %d bytes too large! ",
 						((int)AP)/8-opt->still_size);
 		}
-		
+
 		//
 		// Aim for an actual size squarely in the middle of the 2048
-		// byte granuality of the still_size coding.  This gives a 
+		// byte granuality of the still_size coding.  This gives a
 		// safety margin for headers etc.
 		//
 		frame_overshoot = frame_overshoot - frame_overshoot_margin;
@@ -831,13 +831,13 @@ void OnTheFlyRateCtl::UpdatePict(Picture &picture)
 	  of the game we allow a small increase in the pool.  If we
 	  dropping towards a dangerously low buffer we decrease the pool
 	  (rather more vigorously).
-	  
+
 	  Note that since we cannot hold more than a buffer-full if we have
 	  a positive buffer_variation in CBR we assume it was padded away
 	  and in VBR we assume we only sent until the buffer was full.
 	*/
 
-	
+
 	bits_used += (bitcount()-prev_bitcount);
 	prev_bitcount = bitcount();
 	bits_transported += per_pict_bits;
@@ -849,7 +849,7 @@ void OnTheFlyRateCtl::UpdatePict(Picture &picture)
 		if( ctl->quant_floor > 0 )
 		{
 			bits_transported = bits_used;
-			buffer_variation = 0;	
+			buffer_variation = 0;
 		}
 		else if( buffer_variation > undershoot_carry )
 		{
@@ -865,14 +865,14 @@ void OnTheFlyRateCtl::UpdatePict(Picture &picture)
 		Qsum += picture.mbinfo[i].mquant;
 	}
 
-	
+
     /* AQ is the average Quantisation of the block.
 	   Its only used for stats display as the integerisation
 	   of the quantisation value makes it rather coarse for use in
 	   estimating bit-demand */
 	AQ = (double)Qsum/(double)mb_per_pict;
 	sum_avg_quant += AQ;
-	
+
 	/* X (Chi - Complexity!) is an estimate of "bit-demand" for the
 	frame.  I.e. how many bits it would need to be encoded without
 	quantisation.  It is used in adaptively allocating bits to busy
@@ -889,7 +889,7 @@ void OnTheFlyRateCtl::UpdatePict(Picture &picture)
 	picture.AQ = AQ;
 	picture.SQ = sum_avg_quant;
 
-	mjpeg_debug( "D=%d R=%d GC=%d", 
+	mjpeg_debug( "D=%d R=%d GC=%d",
 				 buffer_variation/8,
 				 (int)R/8,
 				 gop_buffer_correction/8  );
@@ -954,7 +954,7 @@ void OnTheFlyRateCtl::UpdatePict(Picture &picture)
 			avg_KB = K;
 			first_B = 0;
 		}
-		else 
+		else
 		{
 			avg_KB = (K + avg_KB * K_AVG_WINDOW_B) / (K_AVG_WINDOW_B+1.0) ;
 			if( fast_tune )
@@ -988,7 +988,7 @@ void OnTheFlyRateCtl::UpdatePict(Picture &picture)
 
 }
 
-/* compute initial quantization stepsize (at the beginning of picture) 
+/* compute initial quantization stepsize (at the beginning of picture)
    ctl->quant_floor != 0 is the VBR case where we set a bitrate as a (high)
    maximum and then put a floor on quantisation to achieve a reasonable
    overall size.
@@ -997,7 +997,7 @@ static int init_quant;
 
 int OnTheFlyRateCtl::InitialMacroBlockQuant(Picture &picture)
 {
-	
+
 	int mquant = scale_quant( picture.q_scale_type, d*62.0/r );
 	init_quant = mquant = intmax(mquant, static_cast<int>(ctl->quant_floor));
 
@@ -1035,7 +1035,7 @@ int OnTheFlyRateCtl::MacroBlockQuant( const MacroBlock &mb )
 	   bits used vs. bits in proportion to activity encoded
 	*/
 
-	double dj = ((double)d) + 
+	double dj = ((double)d) +
 		((double)(bitcount()-S) - actcovered * ((double)T) / actsum);
 
 
@@ -1059,8 +1059,8 @@ int OnTheFlyRateCtl::MacroBlockQuant( const MacroBlock &mb )
 
 	double act_boost;
 #ifdef OLD_QUANTISATION_STEARING
-	double N_act =  ( act < avg_act || picture.pict_type == B_TYPE ) ? 
-		1.0 : 
+	double N_act =  ( act < avg_act || picture.pict_type == B_TYPE ) ?
+		1.0 :
 		(ctl->act_boost*act +  avg_act)/(act + ctl->act_boost*avg_act);
 	act_boost = 1.0/N_act;
 #else
@@ -1071,7 +1071,7 @@ int OnTheFlyRateCtl::MacroBlockQuant( const MacroBlock &mb )
 		else
 		{
 			double max_boost_var = ctl->boost_var_ceil/2;
-			double above_max_boost = 
+			double above_max_boost =
 				(static_cast<double>(lum_variance)-max_boost_var)
 				/ max_boost_var;
 			act_boost = 1.0 + (ctl->act_boost-1.0) * (1.0-above_max_boost);
@@ -1080,14 +1080,14 @@ int OnTheFlyRateCtl::MacroBlockQuant( const MacroBlock &mb )
 	else
 		act_boost = 1.0;
 
-#endif	
+#endif
 	sum_vbuf_Q += scale_quantf(picture.q_scale_type,Qj/act_boost);
 	mquant = scale_quant(picture.q_scale_type,Qj/act_boost) ;
-	
+
 	/* Update activity covered */
 
 	actcovered += act;
-	 
+
 	return mquant;
 #ifdef OUTPUT_STAT
 /*
@@ -1125,7 +1125,7 @@ void OnTheFlyRateCtl::VbvEndOfPict(Picture &picture)
  * has to be called directly after writing the picture start code, the
  * reference point for vbv_delay
  *
- * A.Stevens 2000: 
+ * A.Stevens 2000:
  * Actually we call it just before the start code is written, but anyone
  * who thinks 32 bits +/- in all these other approximations matters is fooling
  * themselves.
@@ -1133,7 +1133,7 @@ void OnTheFlyRateCtl::VbvEndOfPict(Picture &picture)
 
 void OnTheFlyRateCtl::CalcVbvDelay(Picture &picture)
 {
-	
+
 	/* number of 1/90000 s ticks until next picture is to be decoded */
 	if (picture.pict_type == B_TYPE)
 	{
@@ -1187,7 +1187,7 @@ void OnTheFlyRateCtl::CalcVbvDelay(Picture &picture)
 			picture_delay = next_ip_delay;
 		}
 
-		if (!opt->fieldpic || 
+		if (!opt->fieldpic ||
 			picture.topfirst!=(picture.pict_struct==TOP_FIELD))
 		{
 			/* frame picture or second field */
@@ -1266,7 +1266,7 @@ void OnTheFlyRateCtl::CalcVbvDelay(Picture &picture)
 		double oversize = opt->vbv_buffer_size -
 			(decoding_time / 90000.0 * bit_rate - (double)(bitcnt_EOP+frame_undershoot));
 		if(!quiet || oversize > 0.0  )
-			mjpeg_warn("vbv_delay overflow frame %d - %f.0 bytes!", 
+			mjpeg_warn("vbv_delay overflow frame %d - %f.0 bytes!",
 					   frame_num,
 					   oversize / 8.0
 				);

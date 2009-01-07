@@ -36,7 +36,7 @@ private:
 public:
                              DIA_encodingGtk( uint32_t fps1000 );
                 virtual      ~DIA_encodingGtk( );
-                
+
                 virtual void reset( void );
                 virtual void setPhasis(const char *n);
                 virtual void setCodec(const char *n);
@@ -66,7 +66,7 @@ static void shutdown_toggled(void);
 static uint8_t stopReq=0;
 /**
     \fn DIA_encodingGtk
-*/  
+*/
 DIA_encodingGtk::DIA_encodingGtk( uint32_t fps1000 ) : DIA_encodingBase(fps1000)
 {
 uint32_t useTray=0;
@@ -78,7 +78,7 @@ uint32_t useTray=0;
         setFps(fps1000);
 
         dialog=create_dialog1();
-        
+
         gtk_register_dialog(dialog);
 
 	#ifndef __WIN32
@@ -141,7 +141,7 @@ void DIA_encodingGtk::setFps(uint32_t fps)
         memset(_bitrate,0,sizeof(_bitrate));
         _bitrate_sum=0;
         _average_bitrate=0;
-        
+
 }
 gint on_destroy_abort(GtkObject * object, gpointer user_data)
 {
@@ -171,7 +171,7 @@ void change_priority(void)
 		gtk_signal_connect(GTK_OBJECT(WID(combobox_priority)), "changed", GTK_SIGNAL_FUNC(change_priority), NULL);
 
 		GUI_Error_HIG(QT_TR_NOOP("Privileges Required"), QT_TR_NOOP( "Root privileges are required to perform this operation."));
-		
+
 		return;
 	}
 #endif
@@ -179,7 +179,7 @@ void change_priority(void)
 	uint32_t priorityLevel;
 
 	priorityLevel = gtk_combo_box_get_active(GTK_COMBO_BOX(WID(combobox_priority)));
-	
+
 	setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
 }
 
@@ -278,7 +278,7 @@ void DIA_encodingGtk::setContainer(const char *container)
         gtk_label_set_text(GTK_LABEL(WID(label_container)),container);
 }
 #define  ETA_SAMPLE_PERIOD 60000 //Use last n millis to calculate ETA
-#define  GUI_UPDATE_RATE 500  
+#define  GUI_UPDATE_RATE 500
 
 void DIA_encodingGtk::setFrame(uint32_t nb,uint32_t size, uint32_t quant,uint32_t total)
 {
@@ -292,11 +292,11 @@ void DIA_encodingGtk::setFrame(uint32_t nb,uint32_t size, uint32_t quant,uint32_
                 _lastFrame=0;
                 _fps_average=0;
                 _videoSize=size;
-    
+
                 _nextUpdate = _lastTime + GUI_UPDATE_RATE;
                 _nextSampleStartTime=_lastTime + ETA_SAMPLE_PERIOD;
                 _nextSampleStartFrame=0;
-          } 
+          }
           _lastnb = nb;
           _current=nb%_roundup;
           _bitrate[_current].size=size;
@@ -310,14 +310,14 @@ void DIA_encodingGtk::setPercent(uint32_t percent)
 uint32_t tim;
 
 	   ADM_assert(dialog);
-          
+
           tim=clock.getElapsedMS();
            // printf(" cur:%u last:%u next :%u\n",tim,_lastTime,_nextUpdate);
           if(_lastTime > tim) return;
-          if( tim < _nextUpdate) return ; 
+          if( tim < _nextUpdate) return ;
           _nextUpdate = tim+GUI_UPDATE_RATE;
-  
-         
+
+
           // update progress bar
             float f=percent;
             f=f/100;
@@ -326,10 +326,10 @@ uint32_t tim;
           gtk_progress_set_percentage(GTK_PROGRESS(WID(progressbar1)),(gfloat)f);
 
           sprintf(string,QT_TR_NOOP("%d%%"),(int)(100*f));
-          
+
           if(GUI_isQuiet()) printf("[Encoding]%s\n",string);
               gtk_progress_bar_set_text       (GTK_PROGRESS_BAR(WID(progressbar1)), string);
-         
+
         UI_purge();
 
 }
@@ -343,12 +343,12 @@ uint32_t tim;
            //
            //
           if(!_lastnb) return;
-          
+
           tim=clock.getElapsedMS();
           if(_lastTime > tim) return;
-          if( tim < _nextUpdate) return ; 
+          if( tim < _nextUpdate) return ;
           _nextUpdate = tim+GUI_UPDATE_RATE;
-  
+
           sprintf(string,"%u",_lastnb);
           gtk_label_set_text(GTK_LABEL(WID(label_frame)),string);
 
@@ -362,7 +362,7 @@ uint32_t tim;
             sum+=_bitrate[i].size;
             aquant+=_bitrate[i].quant;
           }
-          
+
           aquant/=_roundup;
 
           sum=(sum*8)/1000;
@@ -372,11 +372,11 @@ uint32_t tim;
             second=_lastnb;
             second/=_fps1000;
             second*=1000;
-           
+
           whole/=second;
           whole/=1000;
           whole*=8;
-      
+
           gsum=(uint32_t)whole;
 
           setBitrate(sum,gsum);
@@ -387,13 +387,13 @@ uint32_t tim;
           deltaTime=tim-_lastTime;
           deltaFrame=_lastnb-_lastFrame;
 
-          _fps_average    =(float)( deltaFrame*1000.0F / deltaTime ); 
+          _fps_average    =(float)( deltaFrame*1000.0F / deltaTime );
 
           sprintf(string,"%.2f",_fps_average);
           gtk_label_set_text(GTK_LABEL(WID(label_fps)),string);
-  
+
           uint32_t   hh,mm,ss;
-  
+
             double framesLeft=(_total-_lastnb);
 
 			ms2time(tim,&hh,&mm,&ss);
@@ -401,7 +401,7 @@ uint32_t tim;
 			gtk_label_set_text(GTK_LABEL(WID(label_elapsed)),string);
 
 		//	gtk_label_set_text(GTK_LABEL(WID(label_eta)), ms2timedisplay((uint32_t) floor(0.5 + deltaTime * framesLeft / deltaFrame)));
- 
+
            // Check if we should move on to the next sample period
           if (tim >= _nextSampleStartTime + ETA_SAMPLE_PERIOD ) {
             _lastTime=_nextSampleStartTime;
@@ -422,10 +422,10 @@ uint32_t tim;
           gtk_progress_set_percentage(GTK_PROGRESS(WID(progressbar1)),(gfloat)f);
 
           sprintf(string,QT_TR_NOOP("%d%%"),(int)(100*f));
-          
+
           if(GUI_isQuiet()) printf("[Encoding]%s\n",string);
               gtk_progress_bar_set_text       (GTK_PROGRESS_BAR(WID(progressbar1)), string);
-          
+
         _totalSize=_audioSize+_videoSize;
         setSize(_totalSize>>20);
         setAudioSizeIn((_audioSize>>20));
@@ -444,21 +444,21 @@ void DIA_encodingGtk::setQuantIn(int size)
 void DIA_encodingGtk::setSize(int size)
 {
       ADM_assert(dialog);
-          sprintf(string,QT_TR_NOOP("%lu MB"),size);
+          sprintf(string,QT_TR_NOOP("%"LU" MB"),size);
           gtk_label_set_text(GTK_LABEL(WID(label_size)),string);
 
 }
 void DIA_encodingGtk::setAudioSizeIn(int size)
 {
       ADM_assert(dialog);
-          sprintf(string,QT_TR_NOOP("%lu MB"),size);
+          sprintf(string,QT_TR_NOOP("%"LU" MB"),size);
           gtk_label_set_text(GTK_LABEL(WID(label_asize)),string);
 
 }
 void DIA_encodingGtk::setVideoSizeIn(int size)
 {
       ADM_assert(dialog);
-          sprintf(string,QT_TR_NOOP("%lu MB"),size);
+          sprintf(string,QT_TR_NOOP("%"LU" MB"),size);
           gtk_label_set_text(GTK_LABEL(WID(label_vsize)),string);
 
 }
@@ -469,7 +469,7 @@ void DIA_encodingGtk::setAudioSize(uint32_t size)
 }
 uint8_t DIA_encodingGtk::isAlive( void )
 {
-     
+
         updateUI();
 
 	if(stopReq)
@@ -477,10 +477,10 @@ uint8_t DIA_encodingGtk::isAlive( void )
 		if(DIA_Paused(  ))		//=GUI_Question("Continue encoding, no will stop it ?"))
 		{
 			stopReq=0;
-		}		
+		}
 	}
 
-	if(!stopReq) return 1;	
+	if(!stopReq) return 1;
 
 	return 0;
 }

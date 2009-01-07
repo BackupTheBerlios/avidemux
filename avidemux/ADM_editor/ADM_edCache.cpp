@@ -15,13 +15,13 @@
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_EDITOR
 #include "ADM_osSupport/ADM_debug.h"
-
+#undef aprintf
 #define aprintf(...) {}
 /**
     \fn EditorCache
     \brief Constructor
 */
-	
+
 EditorCache::EditorCache(uint32_t size,uint32_t w, uint32_t h)
 {
 	_elem=new cacheElem[size];
@@ -93,13 +93,13 @@ ADMImage	*EditorCache::getFreeImage(void)
             {
                 min=delta;
                 found=i;
-                
+
             }
         }
     if(found==-1) ADM_assert("Could not get a free image\n");
 	_elem[found].lastUse=_counter+1;;
 	_elem[found].frameNum=ADM_IN_USE_CACHE;
-	
+
 	return _elem[found].image;
 
 }
@@ -127,7 +127,7 @@ void        EditorCache::invalidate(ADMImage *image)
         if(_elem[i].image==image);
             {
                    _elem[i].lastUse=ADM_INVALID_CACHE;;
-                   _elem[i].frameNum=ADM_INVALID_CACHE; 
+                   _elem[i].frameNum=ADM_INVALID_CACHE;
                   return;
             }
     }
@@ -149,9 +149,9 @@ uint8_t		EditorCache::updateFrameNum(ADMImage *image,uint32_t frameno)
 			_elem[i].lastUse=_counter;
 			_counter++;
 			return 1;
-		
+
 		}
-	
+
 	}
 	ADM_assert(0);
 

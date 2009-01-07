@@ -1,5 +1,5 @@
 /***************************************************************************
-    \file ADM_audioDeviceThreaded.cpp  
+    \file ADM_audioDeviceThreaded.cpp
     \brief Base class for audio playback with a dedicated thread
 
     copyright            : (C) 2008 by mean
@@ -46,16 +46,16 @@ audioDeviceThreaded *device=(audioDeviceThreaded *)in;
     return NULL;
 }
 /**
-    
+
 */
 void audioDeviceThreaded::Loop(void)
 {
     printf("[AudioDeviceThreaded] Entering loop\n");
     while(stopRequest==AUDIO_DEVICE_STARTED)
     {
-        
+
         sendData();
-        
+
     }
     stopRequest=AUDIO_DEVICE_STOP_GR;
     printf("[AudioDeviceThreaded] Exiting loop\n");
@@ -81,7 +81,7 @@ uint8_t audioDeviceThreaded::init(uint32_t channel, uint32_t fq )
     // Spawn
     stopRequest=AUDIO_DEVICE_STARTED;
     ADM_assert(!pthread_create(&myThread,NULL,bouncer,this));
-    
+
     return 1;
 }
 /**
@@ -108,11 +108,11 @@ uint8_t audioDeviceThreaded::stop()
         delete [] audioBuffer;
         audioBuffer=NULL;
     }
-    
+
     if(stopRequest==AUDIO_DEVICE_STARTED)
     {
         stopRequest=AUDIO_DEVICE_STOP_REQ;
-        while(stopRequest==AUDIO_DEVICE_STOP_REQ) 
+        while(stopRequest==AUDIO_DEVICE_STOP_REQ)
         {
             ADM_usleep(1000);
         }
@@ -138,7 +138,7 @@ bool        audioDeviceThreaded::writeData(uint8_t *data,uint32_t lenInByte)
     }
     if(wrIndex+lenInByte>ADM_THREAD_BUFFER_SIZE)
     {
-        printf("[AudioDevice] Overflow rd:%lu  start(wr):%u len%u limit%u\n",rdIndex,wrIndex,lenInByte,ADM_THREAD_BUFFER_SIZE);
+        printf("[AudioDevice] Overflow rd:%"LU"  start(wr):%u len%u limit%u\n",rdIndex,wrIndex,lenInByte,ADM_THREAD_BUFFER_SIZE);
         mutex.unlock();
         return false;
     }
@@ -165,7 +165,7 @@ bool        audioDeviceThreaded::readData(uint8_t *data,uint32_t lenInByte)
 }
 /**
     \fn play
-    
+
 */
 uint8_t     audioDeviceThreaded::play(uint32_t len, float *data)
 {

@@ -433,7 +433,7 @@ UNUSED_ARG(mode);
   frameD=1/frameD;
   frameD*=1000000;
   _videos[_nb_video].timeIncrementInUs=(uint64_t)frameD;
-  printf("[Editor] About %"LU" microseconds per frame\n",_videos[_nb_video].timeIncrementInUs);
+  printf("[Editor] About %"LLU" microseconds per frame\n",_videos[_nb_video].timeIncrementInUs);
 
   //
   //  And automatically create the segment
@@ -526,7 +526,7 @@ _VIDEOS *vid;
 							aviInfo    info;
 							_videos[i]._aviheader->getVideoInfo (&info);
 
-							printf(" Video %lu has been reordered\n",i);
+							printf(" Video %"LU" has been reordered\n",i);
 						}
 
 				}
@@ -853,7 +853,7 @@ uint32_t seg=0xfff;
   // if seg1 != seg2 we can just modify seg1 and seg2
   if (seg1 != seg2)
     {
-    aprintf("Diff  seg: %lu /%lu from %lu to %lu \n",seg1,seg2,rel1,rel2);
+    aprintf("Diff  seg: %"LU" /%"LU" from %"LU" to %"LU" \n",seg1,seg2,rel1,rel2);
       // remove end of seg1
 	_clipboard[_nb_clipboard]._reference=_segments[seg1]._reference;
 	_clipboard[_nb_clipboard]._start_frame=rel1;
@@ -876,18 +876,18 @@ uint32_t seg=0xfff;
 	      (_segments[seg1]._start_frame +
 	       _segments[seg1]._nb_frames - 1)))
 	{
-	  aprintf("Full seg: %lu from %lu to %lu \n",seg1,rel1,rel2);
+	  aprintf("Full seg: %"LU" from %"LU" to %"LU" \n",seg1,rel1,rel2);
 		memcpy(&_clipboard[_nb_clipboard++], &_segments[seg1],sizeof(_segments[0]));
 	}
       else
 	{
 	  // we just take a part of one chunk
-	  aprintf("Same seg: %lu from %lu to %lu \n",seg1,rel1,rel2);
+	  aprintf("Same seg: %"LU" from %"LU" to %"LU" \n",seg1,rel1,rel2);
 	  memcpy(&_clipboard[_nb_clipboard], &_segments[seg1],sizeof(_segments[0]));
 	  _clipboard[_nb_clipboard]._start_frame=rel1;
 	  _clipboard[_nb_clipboard]._nb_frames=rel2-rel1;
 	_nb_clipboard++;
-	aprintf("clipboard: %lu \n",_nb_clipboard);
+	aprintf("clipboard: %"LU" \n",_nb_clipboard);
 	}
     }
 	dumpSeg();
@@ -915,7 +915,7 @@ uint32_t rel,seg;
 	else
 	if(rel==_segments[seg]._start_frame+_segments[seg]._nb_frames )
 	{
-		aprintf("\n setting at the end of seg %lu\n",seg);
+		aprintf("\n setting at the end of seg %"LU"\n",seg);
 		// we put it after OLD insert OLD+1
 		for(uint32_t i=0;i<_nb_clipboard;i++)
 			duplicateSegment(seg);
@@ -1027,7 +1027,7 @@ ADM_Composer::dumpSeg (void)
   printf ("\n________Video______________");
   for (seg = 0; seg < _nb_video; seg++)
     {
-//      printf ("\n Video : %lu, nb video  :%lu, audio size:%lu  audioDuration:%lu",
+//      printf ("\n Video : %"LU", nb video  :%"LU", audio size:%"LU"  audioDuration:%"LU"",
 //	      seg, _videos[seg]._nb_video_frames, _videos[seg]._audio_size,_videos[seg]._audio_duration);
 
     }
@@ -1036,7 +1036,7 @@ ADM_Composer::dumpSeg (void)
   for (seg = 0; seg < _nb_segment; seg++)
     {
       printf
-	("\n Seg : %lu, ref: %lu start :%lu, size:%lu audio size : %lu audio start : %lu duration:%lu",
+	("\n Seg : %"LU", ref: %"LU" start :%"LU", size:%"LU" audio size : %"LU" audio start : %"LU" duration:%"LLU"",
 	 seg, _segments[seg]._reference, _segments[seg]._start_frame,
 	 _segments[seg]._nb_frames, _segments[seg]._audio_size,
 	 _segments[seg]._audio_start,
@@ -1048,7 +1048,7 @@ ADM_Composer::dumpSeg (void)
   for (seg = 0; seg < _nb_clipboard; seg++)
     {
       printf
-	("\n Seg : %lu, ref: %lu start :%lu, size:%lu audio size : %lu audio start : %lu  duration:%lu\n",
+	("\n Seg : %"LU", ref: %"LU" start :%"LU", size:%"LU" audio size : %"LU" audio start : %"LU"  duration:%"LLU"\n",
 	 seg, _clipboard[seg]._reference, _clipboard[seg]._start_frame,
 	 _clipboard[seg]._nb_frames, _clipboard[seg]._audio_size,
 	 _clipboard[seg]._audio_start,

@@ -135,10 +135,10 @@ static uint64 cnt_b_i, cnt_b_ni;
 	// seq header
 	static uint horizontal_size_value;
 	static uint vertical_size_value;
-	
+
 	// pic header
 	static uint picture_coding_type;
-	
+
 	// pic code ext
 	static uint f_code[2][2];
 	static uint intra_dc_precision;
@@ -148,7 +148,7 @@ static uint64 cnt_b_i, cnt_b_ni;
 	static uint q_scale_type;
 	static uint intra_vlc_format;
 	static uint alternate_scan;
-	
+
 	// error
 	static int validPicHeader;
 	static int validSeqHeader;
@@ -160,10 +160,10 @@ static uint64 cnt_b_i, cnt_b_ni;
 	static uint new_quantizer_scale;
 	static uint last_coded_scale;
 	static int	 h_offset, v_offset;
-	
+
 	// rate
 	static double quant_corr;
-	
+
 	// block data
 	typedef struct
 	{
@@ -196,7 +196,7 @@ static uint64 cnt_b_i, cnt_b_ni;
 		wbuf = owbuf; \
 		mloka1 = rbuf - cbuf; if (mloka1) memmove(orbuf, cbuf, mloka1);\
 		cbuf = rbuf = orbuf; rbuf += mloka1;
-	
+
 	#define LOCK(x) \
 		while (unlikely(x > (rbuf-cbuf))) \
 		{ \
@@ -215,7 +215,7 @@ static uint64 cnt_b_i, cnt_b_ni;
 		wbuf = owbuf; \
 		mloka1 = rbuf - cbuf; if (mloka1) memmove(orbuf, cbuf, mloka1);\
 		cbuf = rbuf = orbuf; rbuf += mloka1;
-	
+
 	#define AUTOPAD 0
 	// Meanx: We add a fake sync sequence at the end to allow full decoding of the picture
 	// else it will wait for the next frame to complete that one
@@ -225,7 +225,7 @@ static uint64 cnt_b_i, cnt_b_ni;
 	// We remove this extra datas at the end, along with extra craps (padding) that may be
 	// there also. It is very empirical.
 	//  //Meanx
-	
+
 	#define LOCK(x) \
 		while (unlikely(x > (rbuf-cbuf))) \
 		{ \
@@ -252,18 +252,18 @@ static uint64 cnt_b_i, cnt_b_ni;
 			inbytecnt += mloka1; \
 			rbuf += mloka1; \
 			if((rbuf-cbuf)<x)  \
-				{printf("Not enough : %lu %lu\n",x,rbuf-cbuf);RETURN}\
-		} 
-		
+				{printf("Not enough : %"LU" %"LU"\n",x,rbuf-cbuf);RETURN}\
+		}
+
 	#define FORCE_LOCK() \
 		mloka1=mean_read_available; \
 		memcpy(rbuf, mean_read, mloka1); \
 		mean_read_available-=mloka1;\
 		mean_read+=mloka1; \
 		inbytecnt += mloka1; \
-		rbuf += mloka1; 
-		
-	
+		rbuf += mloka1;
+
+
 #endif
 #ifdef STAT
 
@@ -315,13 +315,13 @@ static uint64 cnt_b_i, cnt_b_ni;
 #if 1
 	#define RETURN  \
 		{mean_track();\
-		goto _req_exit;}	
+		goto _req_exit;}
 #else
 	#define RETURN {mean_track();}
 #endif
-	
+
 #endif
-	
+
 #define COPY(x)\
 		assert(x > 0); \
 		assert(wbuf + x < owbuf + BUF_SIZE); \
@@ -337,13 +337,13 @@ static uint64 cnt_b_i, cnt_b_ni;
 		assert (cbuf <= rbuf); \
 		assert (cbuf < orbuf + BUF_SIZE); \
 		assert (cbuf >= orbuf);
-	
+
 #define SEEKW(x)\
 		wbuf += x; \
 		assert (wbuf < owbuf + BUF_SIZE); \
 		assert (wbuf >= owbuf);
 // MEANX : Some prototyping does not hurt
-//  
+//
 static int putAC(int run, int signed_level, int vlcformat);
 static void putnonintrablk(RunLevel *blk);
 static void putmbtype(int mb_type);
@@ -352,8 +352,8 @@ static void mpeg2_slice ( const int code );
 static void mean_track(void );
 //
 // / MEANX
-		
-		
+
+
 static inline void putbits(uint val, int n)
 {
 	assert(n < 32);
@@ -368,13 +368,13 @@ static inline void putbits(uint val, int n)
 		val &= ~(0xffffffffU << n);
 		outbitcnt = BITS_IN_BUF;
 	}
-	
+
 	if (likely(n))
 	{
 		outbitbuf = (outbitbuf << n) | val;
 		outbitcnt -= n;
 	}
-	
+
 	assert(outbitcnt > 0);
 	assert(outbitcnt <= BITS_IN_BUF);
 }
@@ -531,7 +531,7 @@ static int getNewQuant(int curQuant)
 {
 	double calc_quant, quant_to_use;
 	int mquant = 0;
-	
+
 	calc_quant = curQuant * fact_x;
 	quant_corr = (((inbytecnt - (rbuf - cbuf)) / fact_x) - (outbytecnt + (wbuf - owbuf))) / REACT_DELAY;
 	quant_to_use = calc_quant - quant_corr;
@@ -542,24 +542,24 @@ static int getNewQuant(int curQuant)
 		case P_TYPE:
 			mquant = increment_quant(curQuant);
 			break;
-			
+
 		case B_TYPE:
 			mquant = intmax(scale_quant(quant_to_use), increment_quant(curQuant));
 			break;
-			
+
 		default:
 			assert(0);
 			break;
 	}
-	
+
 	/*
 		LOGF("type: %s orig_quant: %3i calc_quant: %7.1f quant_corr: %7.1f using_quant: %3i\n",
 		(picture_coding_type == I_TYPE ? "I_TYPE" : (picture_coding_type == P_TYPE ? "P_TYPE" : "B_TYPE")),
 		(int)curQuant, (float)calc_quant, (float)quant_corr, (int)mquant);
 	*/
-		
+
 	assert(mquant >= curQuant);
-	
+
 	return mquant;
 }
 
@@ -576,9 +576,9 @@ int putAC(int run, int signed_level, int vlcformat)
 {
 	int level, len;
 	const VLCtable *ptab = NULL;
-	
+
 	level = (signed_level<0) ? -signed_level : signed_level; /* abs(signed_level) */
-	
+
 	// assert(!(run<0 || run>63 || level==0 || level>2047));
 	if(run<0 || run>63)
 	{
@@ -592,9 +592,9 @@ int putAC(int run, int signed_level, int vlcformat)
 		sliceError++;
 		return 1;
 	}
-	
+
 	len = 0;
-	
+
 	if (run<2 && level<41)
 	{
 		if (vlcformat)  ptab = &dct_code_tab1a[run][level-1];
@@ -607,7 +607,7 @@ int putAC(int run, int signed_level, int vlcformat)
 		else ptab = &dct_code_tab2[run-2][level-1];
 		len = ptab->len;
 	}
-	
+
 	if (len) /* a VLC code exists */
 	{
 		putbits(ptab->code, len);
@@ -619,7 +619,7 @@ int putAC(int run, int signed_level, int vlcformat)
 		putbits(run, 6); /* 6 bit code for run */
 		putbits(((uint)signed_level) & 0xFFF, 12);
 	}
-	
+
 	return 0;
 }
 
@@ -637,16 +637,16 @@ static inline int putACfirst(int run, int val)
 void putnonintrablk(RunLevel *blk)
 {
 	assert(blk->level);
-	
+
 	if (putACfirst(blk->run, blk->level)) return;
 	blk++;
-	
+
 	while(blk->level)
 	{
 		if (putAC(blk->run, blk->level, 0)) return;
 		blk++;
 	}
-	
+
 	putbits(2,2);
 }
 
@@ -681,25 +681,25 @@ static inline int get_macroblock_modes ()
     switch (picture_coding_type)
 	{
 		case I_TYPE:
-	
+
 			tab = MB_I + UBITS (bit_buf, 1);
 			DUMPBITS (bit_buf, bits, tab->len);
 			macroblock_modes = tab->modes;
-		
+
 			if ((! (frame_pred_frame_dct)) && (picture_structure == FRAME_PICTURE))
 			{
 				macroblock_modes |= UBITS (bit_buf, 1) * DCT_TYPE_INTERLACED;
 				DUMPBITS (bit_buf, bits, 1);
 			}
-		
+
 			return macroblock_modes;
-	
+
 		case P_TYPE:
-	
+
 			tab = MB_P + UBITS (bit_buf, 5);
 			DUMPBITS (bit_buf, bits, tab->len);
 			macroblock_modes = tab->modes;
-		
+
 			if (picture_structure != FRAME_PICTURE)
 			{
 				if (macroblock_modes & MACROBLOCK_MOTION_FORWARD)
@@ -729,13 +729,13 @@ static inline int get_macroblock_modes ()
 				}
 				return macroblock_modes;
 			}
-	
+
 		case B_TYPE:
-	
+
 			tab = MB_B + UBITS (bit_buf, 6);
 			DUMPBITS (bit_buf, bits, tab->len);
 			macroblock_modes = tab->modes;
-		
+
 			if (picture_structure != FRAME_PICTURE)
 			{
 				if (! (macroblock_modes & MACROBLOCK_INTRA))
@@ -764,7 +764,7 @@ static inline int get_macroblock_modes ()
 				}
 				return macroblock_modes;
 			}
-	
+
 		default:
 			return 0;
     }
@@ -776,15 +776,15 @@ static inline int get_quantizer_scale ()
     int quantizer_scale_code;
 
     quantizer_scale_code = UBITS (bit_buf, 5);
-	DUMPBITS (bit_buf, bits, 5); 
-	
+	DUMPBITS (bit_buf, bits, 5);
+
 	if (!quantizer_scale_code)
     {
 		DEBF("illegal quant scale code: %d\n", quantizer_scale_code);
 		sliceError++;
 		quantizer_scale_code++;
     }
-	
+
 	if (q_scale_type) return non_linear_quantizer_scale[quantizer_scale_code];
     else return quantizer_scale_code << 1;
 }
@@ -808,13 +808,13 @@ static inline int get_motion_delta (const int f_code)
 		tab = MV_4 + UBITS (bit_buf, 4);
 		delta = (tab->delta << f_code) + 1;
 		COPYBITS (bit_buf, bits, tab->len);
-	
+
 		sign = SBITS (bit_buf, 1);
 		COPYBITS (bit_buf, bits, 1);
-	
+
 		if (f_code) delta += UBITS (bit_buf, f_code);
 		COPYBITS (bit_buf, bits, f_code);
-	
+
 		return (delta ^ sign) - sign;
     }
 	else
@@ -823,16 +823,16 @@ static inline int get_motion_delta (const int f_code)
 		tab = MV_10 + UBITS (bit_buf, 10);
 		delta = (tab->delta << f_code) + 1;
 		COPYBITS (bit_buf, bits, tab->len);
-	
+
 		sign = SBITS (bit_buf, 1);
 		COPYBITS (bit_buf, bits, 1);
-	
+
 		if (f_code)
 		{
 			delta += UBITS (bit_buf, f_code);
 			COPYBITS (bit_buf, bits, f_code);
 		}
-	
+
 		return (delta ^ sign) - sign;
     }
 }
@@ -947,7 +947,7 @@ static void get_intra_block_B14 ()
     int i, li;
     int val;
     const DCTtab * tab;
-	
+
     li = i = 0;
 
     while (1)
@@ -955,10 +955,10 @@ static void get_intra_block_B14 ()
 		if (bit_buf >= 0x28000000)
 		{
 			tab = DCT_B14AC_5 + (UBITS (bit_buf, 5) - 5);
-	
+
 			i += tab->run;
 			if (i >= 64) break;	/* end of block */
-	
+
 	normal_code:
 			DUMPBITS (bit_buf, bits, tab->len);
 			val = tab->level;
@@ -968,22 +968,22 @@ static void get_intra_block_B14 ()
 				if (putAC(i - li - 1, (val * q) / nq, 0)) break;
 				li = i;
 			}
-	
+
 			DUMPBITS (bit_buf, bits, 1);
-	
+
 			continue;
 		}
 		else if (bit_buf >= 0x04000000)
 		{
 			tab = DCT_B14_8 + (UBITS (bit_buf, 8) - 4);
-	
+
 			i += tab->run;
 			if (i < 64) goto normal_code;
-	
+
 			/* escape code */
 			i += (UBITS (bit_buf, 12) & 0x3F) - 64;
 			if (i >= 64) break;	/* illegal, check needed to avoid buffer overflow */
-	
+
 			DUMPBITS (bit_buf, bits, 12);
 			val = SBITS (bit_buf, 12);
 			if (abs(val) >= tst)
@@ -991,9 +991,9 @@ static void get_intra_block_B14 ()
 				if (putAC(i - li - 1, (val * q) / nq, 0)) break;
 				li = i;
 			}
-	
+
 			DUMPBITS (bit_buf, bits, 12);
-	
+
 			continue;
 		}
 		else if (bit_buf >= 0x02000000)
@@ -1023,7 +1023,7 @@ static void get_intra_block_B14 ()
 		}
 		break;	/* illegal, check needed to avoid buffer overflow */
 	}
-	
+
 	COPYBITS (bit_buf, bits, 2);	/* end of block code */
 }
 
@@ -1034,7 +1034,7 @@ static void get_intra_block_B15 ()
     int i, li;
     int val;
     const DCTtab * tab;
-	
+
     li = i = 0;
 
     while (1)
@@ -1042,13 +1042,13 @@ static void get_intra_block_B15 ()
 		if (bit_buf >= 0x04000000)
 		{
 			tab = DCT_B15_8 + (UBITS (bit_buf, 8) - 4);
-	
+
 			i += tab->run;
 			if (i < 64)
 			{
 	normal_code:
 				DUMPBITS (bit_buf, bits, tab->len);
-				
+
 				val = tab->level;
 				if (val >= tst)
 				{
@@ -1056,17 +1056,17 @@ static void get_intra_block_B15 ()
 					if (putAC(i - li - 1, (val * q) / nq, 1)) break;
 					li = i;
 				}
-		
+
 				DUMPBITS (bit_buf, bits, 1);
-		
+
 				continue;
 			}
 			else
 			{
 				i += (UBITS (bit_buf, 12) & 0x3F) - 64;
-				
+
 				if (i >= 64) break;	/* illegal, check against buffer overflow */
-		
+
 				DUMPBITS (bit_buf, bits, 12);
 				val = SBITS (bit_buf, 12);
 				if (abs(val) >= tst)
@@ -1074,9 +1074,9 @@ static void get_intra_block_B15 ()
 					if (putAC(i - li - 1, (val * q) / nq, 1)) break;
 					li = i;
 				}
-		
+
 				DUMPBITS (bit_buf, bits, 12);
-		
+
 				continue;
 			}
 		}
@@ -1135,42 +1135,42 @@ static int get_non_intra_block_drop (RunLevel *blk)
 		if (bit_buf >= 0x28000000)
 		{
 			tab = DCT_B14AC_5 + (UBITS (bit_buf, 5) - 5);
-	
+
 	entry_1:
 			i += tab->run;
 			if (i >= 64) break;	/* end of block */
-	
+
 	normal_code:
-	
+
 			DUMPBITS (bit_buf, bits, tab->len);
 			val = tab->level;
 			val = (val ^ SBITS (bit_buf, 1)) - SBITS (bit_buf, 1); /* if (bitstream_get (1)) val = -val; */
-	
+
 			blk->level = val;
 			blk->run = i - li - 1;
 			li = i;
 			blk++;
-	
+
 			DUMPBITS (bit_buf, bits, 1);
-	
+
 			continue;
 		}
-	
+
 	entry_2:
-	
+
 		if (bit_buf >= 0x04000000)
 		{
 			tab = DCT_B14_8 + (UBITS (bit_buf, 8) - 4);
-	
+
 			i += tab->run;
 			if (i < 64) goto normal_code;
-	
+
 			/* escape code */
-	
+
 			i += (UBITS (bit_buf, 12) & 0x3F) - 64;
-			
+
 			if (i >= 64) break;	/* illegal, check needed to avoid buffer overflow */
-	
+
 			DUMPBITS (bit_buf, bits, 12);
 			val = SBITS (bit_buf, 12);
 
@@ -1178,9 +1178,9 @@ static int get_non_intra_block_drop (RunLevel *blk)
 			blk->run = i - li - 1;
 			li = i;
 			blk++;
-			
+
 			DUMPBITS (bit_buf, bits, 12);
-	
+
 			continue;
 		}
 		else if (bit_buf >= 0x02000000)
@@ -1211,9 +1211,9 @@ static int get_non_intra_block_drop (RunLevel *blk)
 		break;	/* illegal, check needed to avoid buffer overflow */
 	}
     DUMPBITS (bit_buf, bits, 2);	/* dump end of block code */
-	
+
 	// remove last coeff
-	if (blk != sblk) 
+	if (blk != sblk)
 	{
 		blk--;
 		// remove more coeffs if very late
@@ -1234,7 +1234,7 @@ static int get_non_intra_block_drop (RunLevel *blk)
 	}
 
 	blk->level = 0;
-	
+
     return i;
 }
 
@@ -1260,14 +1260,14 @@ static int get_non_intra_block_rq (RunLevel *blk)
 		if (bit_buf >= 0x28000000)
 		{
 			tab = DCT_B14AC_5 + (UBITS (bit_buf, 5) - 5);
-	
+
 	entry_1:
 			i += tab->run;
 			if (i >= 64)
 			break;	/* end of block */
-	
+
 	normal_code:
-	
+
 			DUMPBITS (bit_buf, bits, tab->len);
 			val = tab->level;
 			if (val >= tst)
@@ -1278,29 +1278,29 @@ static int get_non_intra_block_rq (RunLevel *blk)
 				li = i;
 				blk++;
 			}
-			
+
 			//if ( ((val) && (tab->level < tst)) || ((!val) && (tab->level >= tst)) )
 			//	LOGF("level: %i val: %i tst : %i q: %i nq : %i\n", tab->level, val, tst, q, nq);
-	
+
 			DUMPBITS (bit_buf, bits, 1);
-	
+
 			continue;
 		}
-	
+
 	entry_2:
 		if (bit_buf >= 0x04000000)
 		{
 			tab = DCT_B14_8 + (UBITS (bit_buf, 8) - 4);
-	
+
 			i += tab->run;
 			if (i < 64) goto normal_code;
-	
+
 			/* escape code */
-	
+
 			i += (UBITS (bit_buf, 12) & 0x3F) - 64;
-			
+
 			if (i >= 64) break;	/* illegal, check needed to avoid buffer overflow */
-	
+
 			DUMPBITS (bit_buf, bits, 12);
 			val = SBITS (bit_buf, 12);
 			if (abs(val) >= tst)
@@ -1310,9 +1310,9 @@ static int get_non_intra_block_rq (RunLevel *blk)
 				li = i;
 				blk++;
 			}
-			
+
 			DUMPBITS (bit_buf, bits, 12);
-	
+
 			continue;
 		}
 		else if (bit_buf >= 0x02000000)
@@ -1337,14 +1337,14 @@ static int get_non_intra_block_rq (RunLevel *blk)
 		{
 			tab = DCT_16 + UBITS (bit_buf, 16);
 			DUMPBITS (bit_buf, bits, 16);
-			
+
 			i += tab->run;
 			if (i < 64) goto normal_code;
 		}
 		break;	/* illegal, check needed to avoid buffer overflow */
 	}
     DUMPBITS (bit_buf, bits, 2);	/* dump end of block code */
-	
+
 	blk->level = 0;
 
     return i;
@@ -1464,14 +1464,14 @@ do {															\
 void putmbdata(int macroblock_modes)
 {
 		putmbtype(macroblock_modes & 0x1F);
-		
+
 		switch (picture_coding_type)
 		{
 			case I_TYPE:
 				if ((! (frame_pred_frame_dct)) && (picture_structure == FRAME_PICTURE))
 					putbits(macroblock_modes & DCT_TYPE_INTERLACED ? 1 : 0, 1);
 				break;
-		
+
 			case P_TYPE:
 				if (picture_structure != FRAME_PICTURE)
 				{
@@ -1488,7 +1488,7 @@ void putmbdata(int macroblock_modes)
 						putbits(macroblock_modes & DCT_TYPE_INTERLACED ? 1 : 0, 1);
 					break;
 				}
-		
+
 			case B_TYPE:
 				if (picture_structure != FRAME_PICTURE)
 				{
@@ -1531,7 +1531,7 @@ static inline int slice_init (int code)
 	if (picture_coding_type == P_TYPE) new_quantizer_scale = quantizer_scale;
 	else new_quantizer_scale = getNewQuant(quantizer_scale);
 	put_quantiser(new_quantizer_scale);
-	
+
 	/*LOGF("************************\nstart of slice %i in %s picture. ori quant: %i new quant: %i\n", code,
 		(picture_coding_type == I_TYPE ? "I_TYPE" : (picture_coding_type == P_TYPE ? "P_TYPE" : "B_TYPE")),
 		quantizer_scale, new_quantizer_scale);*/
@@ -1593,10 +1593,10 @@ void mpeg2_slice ( const int code )
 		int macroblock_modes;
 		int mba_inc;
 		const MBAtab * mba;
-	
+
 		macroblock_modes = get_macroblock_modes ();
 		if (macroblock_modes & MACROBLOCK_QUANT) quantizer_scale = get_quantizer_scale ();
-		
+
 		//LOGF("blk %i : ", h_offset >> 4);
 
 		if (macroblock_modes & MACROBLOCK_INTRA)
@@ -1613,15 +1613,15 @@ void mpeg2_slice ( const int code )
 			else macroblock_modes |= MACROBLOCK_QUANT; //add MACROBLOCK_QUANT
 			putmbdata(macroblock_modes);
 			if (macroblock_modes & MACROBLOCK_QUANT) put_quantiser(new_quantizer_scale);
-			
+
 			//if (macroblock_modes & MACROBLOCK_QUANT) LOGF("put new quant: %i ", new_quantizer_scale);
-		
+
 			if (concealment_motion_vectors)
 			{
 				if (picture_structure == FRAME_PICTURE) motion_fr_conceal ();
 				else motion_fi_conceal ();
 			}
-			
+
 			slice_intra_DCT ( 0);
 			slice_intra_DCT ( 0);
 			slice_intra_DCT ( 0);
@@ -1657,20 +1657,20 @@ void mpeg2_slice ( const int code )
 					case MC_16X8: MOTION_CALL (motion_fi_16x8, macroblock_modes); break;
 					case MC_DMV: MOTION_CALL (motion_fi_dmv, MACROBLOCK_MOTION_FORWARD); break;
 				}
-				
+
 			assert(wbuf - owbuf < 32);
-			
+
 			n_wbuf = wbuf;
 			n_outbitcnt = outbitcnt;
 			n_outbitbuf = outbitbuf;
 			assert(owbuf == n_owbuf);
-			
+
 			outbitcnt = o_outbitcnt;
 			outbitbuf = o_outbitbuf;
 			owbuf = o_owbuf;
 			wbuf = o_wbuf;
 			// end saving data
-			
+
 #ifdef STAT
 			if (picture_coding_type == P_TYPE) cnt_p_ni++;
 			else if (picture_coding_type == B_TYPE) cnt_b_ni++;
@@ -1678,20 +1678,20 @@ void mpeg2_slice ( const int code )
 
 			if (picture_coding_type == P_TYPE) new_quantizer_scale = quantizer_scale;
 			else new_quantizer_scale = getNewQuant(quantizer_scale);
-			
+
 			//LOG("non intra "); if (macroblock_modes & MACROBLOCK_QUANT) LOGF("got new quant: %i ", quantizer_scale);
-	
+
 			if (macroblock_modes & MACROBLOCK_PATTERN)
 			{
 				int coded_block_pattern = get_coded_block_pattern ();
-				
+
 				if (coded_block_pattern & 0x20) slice_non_intra_DCT(0);
 				if (coded_block_pattern & 0x10) slice_non_intra_DCT(1);
 				if (coded_block_pattern & 0x08) slice_non_intra_DCT(2);
 				if (coded_block_pattern & 0x04) slice_non_intra_DCT(3);
 				if (coded_block_pattern & 0x02) slice_non_intra_DCT(4);
 				if (coded_block_pattern & 0x01) slice_non_intra_DCT(5);
-				
+
 				if (picture_coding_type == B_TYPE)
 				{
 					if (coded_block_pattern & 0x20) if (isNotEmpty(block[0])) new_coded_block_pattern |= 0x20;
@@ -1708,7 +1708,7 @@ void mpeg2_slice ( const int code )
 			if (last_coded_scale == new_quantizer_scale) macroblock_modes &= 0xFFFFFFEF; // remove MACROBLOCK_QUANT
 			else if (macroblock_modes & MACROBLOCK_PATTERN) macroblock_modes |= MACROBLOCK_QUANT; //add MACROBLOCK_QUANT
 			assert( (macroblock_modes & MACROBLOCK_PATTERN) || !(macroblock_modes & MACROBLOCK_QUANT) );
-			
+
 			putmbdata(macroblock_modes);
 			if (macroblock_modes & MACROBLOCK_QUANT) put_quantiser(new_quantizer_scale);
 
@@ -1719,11 +1719,11 @@ void mpeg2_slice ( const int code )
 			for (batb = 0; batb < (n_wbuf - n_owbuf); batb++) putbits(n_owbuf[batb], 8);
 			putbits(n_outbitbuf, BITS_IN_BUF - n_outbitcnt);
 			// end saved motion data...
-			
+
 			if (macroblock_modes & MACROBLOCK_PATTERN)
 			{
 				putcbp(new_coded_block_pattern);
-				
+
 				if (new_coded_block_pattern & 0x20) putnonintrablk(block[0]);
 				if (new_coded_block_pattern & 0x10) putnonintrablk(block[1]);
 				if (new_coded_block_pattern & 0x08) putnonintrablk(block[2]);
@@ -1732,11 +1732,11 @@ void mpeg2_slice ( const int code )
 				if (new_coded_block_pattern & 0x01) putnonintrablk(block[5]);
 			}
 		}
-	
+
 		//LOGF("\n\to: %i c: %i n: %i\n", quantizer_scale, last_coded_scale, new_quantizer_scale);
-	
+
 		NEXT_MACROBLOCK;
-	
+
 		mba_inc = 0;
 		while (1)
 		{
@@ -1763,7 +1763,7 @@ void mpeg2_slice ( const int code )
 		}
 		COPYBITS (bit_buf, bits, mba->len);
 		mba_inc += mba->mba;
-	
+
 		if (mba_inc) do { NEXT_MACROBLOCK; } while (--mba_inc);
     }
 
@@ -1803,7 +1803,7 @@ void usage(int status)
   fprintf(stderr,"\t -v                print version\n");
 
   exit(status);
-  
+
 }
 
 
@@ -1813,7 +1813,7 @@ int main (int argc, char *argv[])
 	int ch;
 	char *ifile=NULL, *ofile=NULL;
 	int byte_stuff;
-	
+
 #ifdef STAT
 	ori_i = ori_p = ori_b = 0;
 	new_i = new_p = new_b = 0;
@@ -1827,33 +1827,33 @@ int main (int argc, char *argv[])
 	byte_stuff = 1;
 
 	while ((ch = getopt(argc, argv, "b:d:i:o:f:v?h")) != -1) {
-	
+
 	    switch (ch) {
-	    
-	    case 'i': 
-	    
+
+	    case 'i':
+
 		if(optarg[0]=='-') usage(EXIT_FAILURE);
 		ifile = optarg;
 		break;
 
-	    case 'o': 
-	    
+	    case 'o':
+
 		if(optarg[0]=='-') usage(EXIT_FAILURE);
 		ofile = optarg;
 		break;
 
-	    case 'f': 
+	    case 'f':
 
 		if(optarg[0]=='-') usage(EXIT_FAILURE);
 		fact_x = atof(optarg); break;
 
-	    case 'd': 
+	    case 'd':
 
 		if(optarg[0]=='-') usage(EXIT_FAILURE);
 		verbose = atoi(optarg);
 		break;
 
-	    case 'b': 
+	    case 'b':
 
 		if(optarg[0]=='-') usage(EXIT_FAILURE);
 		byte_stuff = atoi(optarg);
@@ -1872,7 +1872,7 @@ int main (int argc, char *argv[])
 	    }
 	} // while
 
-	
+
 	if (ifile) {
 	    if ( (ifd = open(ifile, O_RDONLY, 0)) < 0) {
 		fprintf(stderr, "[%s] Cannot open input file: %s\n", EXE, strerror(errno));
@@ -1900,14 +1900,14 @@ int main (int argc, char *argv[])
 	validPicHeader = 0;
 	validSeqHeader = 0;
 	validExtHeader = 0;
-	
+
 	if (fact_x < 1.0) fact_x = 1.0;
 	else if (fact_x > 900.0) fact_x = 900.0;
 	byte_stuff = !!byte_stuff;
-	
+
 	LOGF("[%s] MPEG2 Requantiser by Makira.\n", EXE);
 	LOGF("[%s] Using %f as factor.\n", EXE, fact_x);
-	
+
 	// recoding
 	while(1)
 	{
@@ -1925,7 +1925,7 @@ int main (int argc, char *argv[])
 		    else { COPY(1) } // continue search
 		}
 		COPY(3)
-		
+
 		// get start code
 		LOCK(1)
 		ID = cbuf[0];
@@ -1974,7 +1974,7 @@ int main (int argc, char *argv[])
 				f_code[0][1] = (cbuf[1] >> 4) - 1;
 				f_code[1][0] = (cbuf[1] & 0xF) - 1;
 				f_code[1][1] = (cbuf[2] >> 4) - 1;
-				
+
 				intra_dc_precision = (cbuf[2] >> 2) & 0x3;
 				picture_structure = cbuf[2] & 0x3;
 				frame_pred_frame_dct = (cbuf[3] >> 6) & 0x1;
@@ -1982,7 +1982,7 @@ int main (int argc, char *argv[])
 				q_scale_type = (cbuf[3] >> 4) & 0x1;
 				intra_vlc_format = (cbuf[3] >> 3) & 0x1;
 				alternate_scan = (cbuf[3] >> 2) & 0x1;
-				
+
 				if (	(f_code[0][0] > 8 && f_code[0][0] < 14)
 					||  (f_code[0][1] > 8 && f_code[0][1] < 14)
 					||  (f_code[1][0] > 8 && f_code[1][0] < 14)
@@ -2010,9 +2010,9 @@ int main (int argc, char *argv[])
 		else if ((ID >= 0x01) && (ID <= 0xAF) && validPicHeader && validSeqHeader && validExtHeader) // slice
 		{
 			uint8 *outTemp = wbuf, *inTemp = cbuf;
-			
+
 			quant_corr = (((inbytecnt - (rbuf - cbuf)) / fact_x) - (outbytecnt + (wbuf - owbuf))) / REACT_DELAY;
-			
+
 			if 	(		((picture_coding_type == B_TYPE) && (quant_corr < 2.5f)) // don't recompress if we're in advance!
 					||	((picture_coding_type == P_TYPE) && (quant_corr < -2.5f))
 					||	((picture_coding_type == I_TYPE) && (quant_corr < -5.0f))
@@ -2020,40 +2020,40 @@ int main (int argc, char *argv[])
 			{
 				uint8 *nsc = cbuf;
 				int fsc = 0, toLock;
-				
+
 				// lock all the slice
 				while (!fsc)
 				{
 					toLock = nsc - cbuf + 3;
 					LOCK(toLock)
-	
+
 					if ( (nsc[0] == 0) && (nsc[1] == 0) && (nsc[2] == 1) ) fsc = 1; // start code !
 					else nsc++; // continue search
 				}
-				
+
 				// init error
 				sliceError = 0;
-			
+
 				// init bit buffer
 				inbitbuf = 0; inbitcnt = 0;
 				outbitbuf = 0; outbitcnt = BITS_IN_BUF;
-				
+
 				// get 32 bits
 				Refill_bits();
 				Refill_bits();
 				Refill_bits();
 				Refill_bits();
-			
+
 				// begin bit level recoding
 				mpeg2_slice(ID);
 				flush_read_buffer();
 				flush_write_buffer();
 				// end bit level recoding
-				
+
 				/*LOGF("type: %s code: %02i in : %6i out : %6i diff : %6i fact: %2.2f\n",
 				(picture_coding_type == I_TYPE ? "I_TYPE" : (picture_coding_type == P_TYPE ? "P_TYPE" : "B_TYPE")),
 				ID,  cbuf - inTemp, wbuf - outTemp, (wbuf - outTemp) - (cbuf - inTemp), (float)(cbuf - inTemp) / (float)(wbuf - outTemp));*/
-				
+
 				if ((wbuf - outTemp > cbuf - inTemp) || (sliceError > MAX_ERRORS)) // yes that might happen, rarely
 				{
 #ifndef NDEBUG
@@ -2062,19 +2062,19 @@ int main (int argc, char *argv[])
 						DEBF("sliceError (%i) > MAX_ERRORS (%i)\n", sliceError, MAX_ERRORS);
 					}
 #endif
-				
+
 					/*LOGF("*** slice bigger than before !! (type: %s code: %i in : %i out : %i diff : %i)\n",
 					(picture_coding_type == I_TYPE ? "I_TYPE" : (picture_coding_type == P_TYPE ? "P_TYPE" : "B_TYPE")),
 					ID, cbuf - inTemp, wbuf - outTemp, (wbuf - outTemp) - (cbuf - inTemp));*/
-				
+
 					// in this case, we'll just use the original slice !
 					memcpy(outTemp, inTemp, cbuf - inTemp);
 					wbuf = outTemp + (cbuf - inTemp);
-					
+
 					// adjust outbytecnt
 					outbytecnt -= (wbuf - outTemp) - (cbuf - inTemp);
 				}
-				
+
 #ifdef STAT
 				switch(picture_coding_type)
 				{
@@ -2083,19 +2083,19 @@ int main (int argc, char *argv[])
 						new_i += (wbuf - outTemp > cbuf - inTemp) ? (cbuf - inTemp) : (wbuf - outTemp);
 						cnt_i ++;
 						break;
-						
+
 					case P_TYPE:
 						ori_p += cbuf - inTemp;
 						new_p += (wbuf - outTemp > cbuf - inTemp) ? (cbuf - inTemp) : (wbuf - outTemp);
 						cnt_p ++;
 						break;
-						
+
 					case B_TYPE:
 						ori_b += cbuf - inTemp;
 						new_b += (wbuf - outTemp > cbuf - inTemp) ? (cbuf - inTemp) : (wbuf - outTemp);
 						cnt_b ++;
 						break;
-						
+
 					default:
 						assert(0);
 						break;
@@ -2103,7 +2103,7 @@ int main (int argc, char *argv[])
 #endif
 			}
 		}
-		
+
 #ifndef NDEBUG
 		if ((ID >= 0x01) && (ID <= 0xAF) && (!validPicHeader || !validSeqHeader || !validExtHeader))
 		{
@@ -2112,7 +2112,7 @@ int main (int argc, char *argv[])
 			if (!validExtHeader) DEBF("missing ext header (%02X)\n", ID);
 		}
 #endif
-		
+
 		if (wbuf - owbuf > MIN_WRITE) { WRITE }
 	}
 
@@ -2123,40 +2123,40 @@ int main (int argc, char *argv[])
 int byte_stuff;
 uint8 ID, found;
 int ch;
-	
+
 int Mrequant_init (float quant_factor,int byteStuffing)
 {
-	
-	
-	
+
+
+
 	// default
 	fact_x = quant_factor;
 	byte_stuff = byteStuffing;
 
-	
+
 	rbuf = cbuf = orbuf = ADM_alloc(BUF_SIZE);
 	wbuf = owbuf = ADM_alloc(BUF_SIZE);
-	
+
 	inbytecnt = outbytecnt = 0;
 
 	validPicHeader = 0;
 	validSeqHeader = 0;
 	validExtHeader = 0;
-	
+
 	if (fact_x < 1.0) fact_x = 1.0;
 	else if (fact_x > 900.0) fact_x = 900.0;
 	byte_stuff = !!byte_stuff;
-	
+
 	LOGF("[%s] MPEG2 Requantiser by Makira.\n", EXE);
 	LOGF("[%s] Using %f as factor.\n", EXE, fact_x);
-	printf("Tc requant successfully initialized with quant %f, byte stuffing %d\n",fact_x,byteStuffing);	
+	printf("Tc requant successfully initialized with quant %f, byte stuffing %d\n",fact_x,byteStuffing);
 	return 1;
 }
 
 #define MEAN_MIN 10*1024
 
 int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
-{	
+{
     int bufAvailable;
 	// recoding
 	mean_write=out;;
@@ -2168,32 +2168,32 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 	while(mean_read_available+(rbuf-cbuf)>=4)
 	{
 		aprintf("Available :%lu\n",mean_read_available+(rbuf-cbuf));
-	
+
 			// get next start code prefix
 		found = 0;
 		while (!found)
 		{
     		bufAvailable=mean_read_available+(rbuf-cbuf);
-		    if (!byte_stuff || bufAvailable<7 ) // Don't try to cleanup padding if there is not 'nough bytes 
+		    if (!byte_stuff || bufAvailable<7 ) // Don't try to cleanup padding if there is not 'nough bytes
 		    {
 			    LOCK(3)
 		    } else {
 			LOCK(6)
-			if ( (cbuf[0] == 0) && (cbuf[1] == 0) && (cbuf[2] == 0) && (cbuf[3] == 0) && (cbuf[4] == 0) && (cbuf[5] == 0) ) 
+			if ( (cbuf[0] == 0) && (cbuf[1] == 0) && (cbuf[2] == 0) && (cbuf[3] == 0) && (cbuf[4] == 0) && (cbuf[5] == 0) )
 			{ SEEKR(1) }
 		    }
 		    if ( (cbuf[0] == 0) && (cbuf[1] == 0) && (cbuf[2] == 1) ) found = 1; // start code !
 		    else { COPY(1) } // continue search
 		}
 		COPY(3)
-		
+
 		// get start code
 		LOCK(1)
 		ID = cbuf[0];
 		COPY(1)
-        
+
 		bufAvailable=mean_read_available+(rbuf-cbuf);
-        if(bufAvailable<6 && ID==0xB3) 
+        if(bufAvailable<6 && ID==0xB3)
         {
             wbuf-=4; // Remove the fake start seq
             goto _req_exit;
@@ -2243,7 +2243,7 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 				f_code[0][1] = (cbuf[1] >> 4) - 1;
 				f_code[1][0] = (cbuf[1] & 0xF) - 1;
 				f_code[1][1] = (cbuf[2] >> 4) - 1;
-				
+
 				intra_dc_precision = (cbuf[2] >> 2) & 0x3;
 				picture_structure = cbuf[2] & 0x3;
 				frame_pred_frame_dct = (cbuf[3] >> 6) & 0x1;
@@ -2251,7 +2251,7 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 				q_scale_type = (cbuf[3] >> 4) & 0x1;
 				intra_vlc_format = (cbuf[3] >> 3) & 0x1;
 				alternate_scan = (cbuf[3] >> 2) & 0x1;
-				
+
 				if (	(f_code[0][0] > 8 && f_code[0][0] < 14)
 					||  (f_code[0][1] > 8 && f_code[0][1] < 14)
 					||  (f_code[1][0] > 8 && f_code[1][0] < 14)
@@ -2281,7 +2281,7 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 			uint8 *outTemp = wbuf, *inTemp = cbuf;
 //			printf("Processing slice %d\n",ID);
 			quant_corr = (((inbytecnt - (rbuf - cbuf)) / fact_x) - (outbytecnt + (wbuf - owbuf))) / REACT_DELAY;
-			
+
 			if 	(		((picture_coding_type == B_TYPE) && (quant_corr < 2.5f)) // don't recompress if we're in advance!
 					||	((picture_coding_type == P_TYPE) && (quant_corr < -2.5f))
 					||	((picture_coding_type == I_TYPE) && (quant_corr < -5.0f))
@@ -2289,40 +2289,40 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 			{
 				uint8 *nsc = cbuf;
 				int fsc = 0, toLock;
-				
+
 				// lock all the slice
 				while (!fsc)
 				{
 					toLock = nsc - cbuf + 3;
 					LOCK(toLock)
-	
+
 					if ( (nsc[0] == 0) && (nsc[1] == 0) && (nsc[2] == 1) ) fsc = 1; // start code !
 					else nsc++; // continue search
 				}
-				
+
 				// init error
 				sliceError = 0;
-			
+
 				// init bit buffer
 				inbitbuf = 0; inbitcnt = 0;
 				outbitbuf = 0; outbitcnt = BITS_IN_BUF;
-				
+
 				// get 32 bits
 				Refill_bits();
 				Refill_bits();
 				Refill_bits();
 				Refill_bits();
-			
+
 				// begin bit level recoding
 				mpeg2_slice(ID);
 				flush_read_buffer();
 				flush_write_buffer();
 				// end bit level recoding
-				
+
 				/*LOGF("type: %s code: %02i in : %6i out : %6i diff : %6i fact: %2.2f\n",
 				(picture_coding_type == I_TYPE ? "I_TYPE" : (picture_coding_type == P_TYPE ? "P_TYPE" : "B_TYPE")),
 				ID,  cbuf - inTemp, wbuf - outTemp, (wbuf - outTemp) - (cbuf - inTemp), (float)(cbuf - inTemp) / (float)(wbuf - outTemp));*/
-				
+
 				if ((wbuf - outTemp > cbuf - inTemp) || (sliceError > MAX_ERRORS)) // yes that might happen, rarely
 				{
 #ifndef NDEBUG
@@ -2331,19 +2331,19 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 						DEBF("sliceError (%i) > MAX_ERRORS (%i)\n", sliceError, MAX_ERRORS);
 					}
 #endif
-				
+
 					/*LOGF("*** slice bigger than before !! (type: %s code: %i in : %i out : %i diff : %i)\n",
 					(picture_coding_type == I_TYPE ? "I_TYPE" : (picture_coding_type == P_TYPE ? "P_TYPE" : "B_TYPE")),
 					ID, cbuf - inTemp, wbuf - outTemp, (wbuf - outTemp) - (cbuf - inTemp));*/
-				
+
 					// in this case, we'll just use the original slice !
 					memcpy(outTemp, inTemp, cbuf - inTemp);
 					wbuf = outTemp + (cbuf - inTemp);
-					
+
 					// adjust outbytecnt
 					outbytecnt -= (wbuf - outTemp) - (cbuf - inTemp);
 				}
-				
+
 #ifdef STAT
 				switch(picture_coding_type)
 				{
@@ -2352,19 +2352,19 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 						new_i += (wbuf - outTemp > cbuf - inTemp) ? (cbuf - inTemp) : (wbuf - outTemp);
 						cnt_i ++;
 						break;
-						
+
 					case P_TYPE:
 						ori_p += cbuf - inTemp;
 						new_p += (wbuf - outTemp > cbuf - inTemp) ? (cbuf - inTemp) : (wbuf - outTemp);
 						cnt_p ++;
 						break;
-						
+
 					case B_TYPE:
 						ori_b += cbuf - inTemp;
 						new_b += (wbuf - outTemp > cbuf - inTemp) ? (cbuf - inTemp) : (wbuf - outTemp);
 						cnt_b ++;
 						break;
-						
+
 					default:
 						assert(0);
 						break;
@@ -2372,7 +2372,7 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 #endif
 			}
 		}
-		
+
 #ifndef NDEBUG
 		if ((ID >= 0x01) && (ID <= 0xAF) && (!validPicHeader || !validSeqHeader || !validExtHeader))
 		{
@@ -2381,25 +2381,25 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 			if (!validExtHeader) DEBF("missing ext header (%02X)\n", ID);
 		}
 #endif
-		
+
 		if (wbuf - owbuf > MIN_WRITE) { WRITE }
 	}
 
 	// Flush incoming & outgoing buffers
-_req_exit:	
-	aprintf("Left1: %lu\n",rbuf-cbuf);	
+_req_exit:
+	aprintf("Left1: %lu\n",rbuf-cbuf);
 	// Some leftovers, 4 we added to force a startsync and hopefully some crap
 	if(rbuf!=cbuf)
-	{ 
-    	printf("LeftOver..:%d\n",rbuf-cbuf);
+	{
+    	printf("LeftOver..:%"LD"\n",rbuf-cbuf);
     	mixDump_c(cbuf,rbuf-cbuf);
     	rbuf=cbuf;
     }
-	
+
 	WRITE;
-	
+
 	FORCE_LOCK();
-	assert(!mean_available);	
+	assert(!mean_available);
 	*lenout=mean_wrotten;
 	return 1;
 }
@@ -2411,7 +2411,7 @@ int Mrequant_end (void)
 	free_if(orbuf);
 	free_if(owbuf);
 	return 1;
-	
+
 }
 void mean_track(void )
 {

@@ -41,7 +41,7 @@ EncoderRequant::EncoderRequant (COMPRES_PARAMS * codecconfig)
 {
   uint32_t p;
   float fp;
-  
+
   _frameStart = _total = 0;
   _lastIPFrameSent = 0xFFFFFFFF;
   _buffer=new uint8_t[REQUANT_BUFFER];
@@ -146,7 +146,7 @@ uint8_t EncoderRequant::code(uint32_t frame,uint8_t *out, uint32_t *outlen)
   if(!ret)
   {
     printf("[Requant] Cannot read frame %u\n",frame);
-    return 0; 
+    return 0;
   }
   Mrequant_frame(_buffer,  len,out, outlen);
   return 1;
@@ -158,7 +158,7 @@ EncoderRequant::encode (uint32_t frame, ADMBitstream *out)
 {
   uint8_t ret = 0;
   out->dtsFrame = frame;
-  
+
   if (frame >= _total)
     {
       printf ("[Requant]: Going out of bound %d/%d\n", frame, _total);
@@ -168,11 +168,11 @@ EncoderRequant::encode (uint32_t frame, ADMBitstream *out)
     }
     out->flags=0;
     /* First frame ? */
-    
+
   // No B frames, take as is
   if (!video_body->isReordered (frameStart + frame))
     {
-      
+
           ret =code(_frameStart + frame, out->data, &out->len);
           out->ptsFrame = frame;
           return ret;
@@ -236,12 +236,12 @@ EncoderRequant::encode (uint32_t frame, ADMBitstream *out)
                     ADMCompressedImage image;
                     image.data=buf;
                     image.dataLength=REQUANT_BUFFER;
-                    video_body->getFrame (frameStart,&image, &seq);	
-                    printf("Adding seq header (%lu)\n",seq);
+                    video_body->getFrame (frameStart,&image, &seq);
+                    printf("Adding seq header (%"LU")\n",seq);
                     memmove(_buffer+seq,_buffer,out->len);
                     memcpy(_buffer,buf,seq);
                     out->len+=seq;
-        
+
                   }
             }
         }

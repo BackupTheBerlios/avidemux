@@ -43,7 +43,7 @@ aviInfo aviinf;
   	_info.encoding=0;
 	_info.fps1000=aviinf.fps1000;
 	ADM_assert(start+nb<=aviinf.nb_frames);
-	printf("\n Raw stream initizlized with start frame = %lu\n",_start);
+	printf("\n Raw stream initialized with start frame = %"LU"\n",_start);
 }
 AVDMVideoStreamRaw::~AVDMVideoStreamRaw()
 {
@@ -66,14 +66,14 @@ uint8_t AVDMVideoStreamRaw::getFrameNumberNoAlloc(uint32_t frame,
 		*len=(_info.width*_info.height*3)>>1;
 		if(!(frame<_info.nb_frames))
 		{
-				printf("\n goiing out of bounds! :%ld / %ld \n",frame,_info.nb_frames);
+				printf("\n going out of bounds! :%"LU" / %"LU" \n",frame,_info.nb_frames);
 				return 0;
 		}
 
 			// read uncompressed frame
 		if(!_in->getUncompressedFrame(_start+frame,data,flags)     )
      			return 0;
-		
+
         return 1;
 
 

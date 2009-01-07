@@ -4,9 +4,9 @@
     begin                : Thu Oct 10 2002
     copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
-    
+
     This file reads the command line and do the corresponding command
-    
+
  ***************************************************************************/
 
 /***************************************************************************
@@ -132,7 +132,7 @@ typedef	void (*two_arg_type)(char *arg,char *otherarg);
 typedef	void (*three_arg_type)(char *arg,char *otherarg,char *yetother);
 //_________________________________________________________________________
 
-typedef struct 
+typedef struct
 {
           const char    *string;
           uint8_t       have_arg;
@@ -142,7 +142,7 @@ typedef struct
 //_________________________________________________________________________
 
 AUTOMATON reaction_table[]=
-{	
+{
         {"nogui",               0,"Run in silent mode",		(one_arg_type)GUI_Quiet}   ,
         {"listfilters",		0,"list all filters by name",		(one_arg_type)filterListAll}   ,
         {"run",			1,"load and run a script",		(one_arg_type)A_parseECMAScript},
@@ -153,12 +153,12 @@ AUTOMATON reaction_table[]=
         {"vcd-res",		0,"set VCD resolution",			(one_arg_type)setVCD}              ,
         {"svcd-res",		0,"set SVCD resolution",		(one_arg_type)setSVCD}              ,
         {"dvd-res",		0,"set DVD resolution",			(one_arg_type)setDVD}  ,
-        {"halfd1-res",		0,"set 1/2 DVD resolution",		(one_arg_type)setHalfD1} ,  
+        {"halfd1-res",		0,"set 1/2 DVD resolution",		(one_arg_type)setHalfD1} ,
         {"save-jpg",		1,"save a jpeg",			(one_arg_type)A_saveJpg}        ,
         {"begin",		1,"set start frame",			setBegin},
         {"end",			1,"set end frame",			setEnd},
         {"save-unpacked-vop",	1,"save avi, unpacking vop",(one_arg_type)A_SaveUnpackedVop},
-        {"save-packed-vop",	1,"save avi, packing vop",(one_arg_type)A_SavePackedVop},				
+        {"save-packed-vop",	1,"save avi, packing vop",(one_arg_type)A_SavePackedVop},
 //        {"save-ogm",		1,"save as ogm file ",			(one_arg_type)ogmSave},
         {"save-raw-audio",	1,"save audio as-is ",			A_saveAudio},
         {"save-raw-video",	1,"save raw video stream (mpeg/... ) ",	(one_arg_type)ADM_saveRaw},
@@ -166,15 +166,15 @@ AUTOMATON reaction_table[]=
         {"load",		1,"load video or workbench", (one_arg_type)A_openAvi},
         {"load-workbench",	1,"load workbench file", (one_arg_type)A_openAvi},
         {"append",		1,"append video",			(one_arg_type)A_appendAvi},
-        {"save",		1,"save avi",				save},		
+        {"save",		1,"save avi",				save},
         {"save-workbench",	1,"save workbench file",		(one_arg_type)A_saveWorkbench},
-        
+
         {"force-b-frame",	0,"Force detection of bframe in next loaded file", (one_arg_type)call_bframe},
         {"force-alt-h264",	0,"Force use of alternate read mode for h264", (one_arg_type)call_x264},
-        {"force-unpack",	0,"Force detection of packed vop in next loaded file"       
+        {"force-unpack",	0,"Force detection of packed vop in next loaded file"
                                                           ,(one_arg_type)call_packedvop},
-        {"force-smart",   	0,"Engage smart copy mode with CQ=3 at next save"       
-                                                          ,(one_arg_type)call_forcesmart},                                                          
+        {"force-smart",   	0,"Engage smart copy mode with CQ=3 at next save"
+                                                          ,(one_arg_type)call_forcesmart},
         {"external-mp3",	1,"load external mpeg audio as audio track",(one_arg_type)A_loadMP3},
         {"external-ac3",	1,"load external ac3 audio as audio track",(one_arg_type)A_loadAC3},
         {"external-wav",	1,"load external wav audio as audio track",(one_arg_type)A_loadWave},
@@ -184,7 +184,7 @@ AUTOMATON reaction_table[]=
         {"audio-bitrate",	1,"set audio encoding bitrate",	call_audiobitrate},
         {"fps",	                1,"set frames per second",	call_fps},
         {"audio-codec",		1,"set audio codec (MP2/MP3/AC3/NONE (WAV PCM)/TWOLAME/COPY)",call_audiocodec},
-        
+
         {"video-codec",		1,"set video codec (Divx/Xvid/FFmpeg4/VCD/SVCD/DVD/XVCD/XSVCD/COPY)",				call_videocodec},
         {"video-conf",		1	,"set video codec conf (cq=q|cbr=br|2pass=size)[,mbr=br][,matrix=(0|1|2|3)]",				call_videoconf},
         {"reuse-2pass-log",	0	,"reuse 2pass logfile if it exists",	set_reuse_2pass_log},
@@ -196,7 +196,7 @@ AUTOMATON reaction_table[]=
         {"info",		0	,"show information about loaded video and audio streams", show_info},
         {"autoindex",		0	,"try to generate required index files", set_autoindex},
         {"output-format",	1	,"set output format (AVI|OGM|ES|PS|AVI_DUAL|AVI_UNP|...)", (one_arg_type )set_output_format},
-        
+
         {"rebuild-index",       0       ,"rebuild index with correct frame type", (one_arg_type)A_rebuildKeyFrame},
 
         {"var",                 1       ,"set var (--var myvar=3)", (one_arg_type)setVar},
@@ -230,7 +230,7 @@ static two_arg_type two;
 static int index;
           argv=global_argv;
           argc=global_argc;
-          printf("\n *** Automated : %d entries*************\n",NB_AUTO);
+          printf("\n *** Automated : %"LU" entries*************\n",NB_AUTO);
           // we need to process
           argc-=1;
           cur=1;
@@ -239,7 +239,7 @@ static int index;
           {
                       if(( *argv[cur]!='-') || (*(argv[cur]+1)!='-'))
                       {
-                            if(cur==1) 
+                            if(cur==1)
                             {
 #ifdef __WIN32
 								int utf8StringLength = ansiStringToUtf8(argv[cur], -1, NULL);
@@ -251,11 +251,11 @@ static int index;
 #else
 								A_openAvi(argv[cur]);
 #endif
-	
+
                             }
                             else
                                 printf("\n Found garbage %s\n",argv[cur]);
-                            cur+=1;myargc-=1;				
+                            cur+=1;myargc-=1;
                             continue;
                       }
                       // else it begins with --
@@ -263,7 +263,7 @@ static int index;
                       if(index==-1) // not found
                       {
                                                       printf("\n Unknown command :%s\n",argv[cur] );
-                                                      cur+=1;myargc-=1;	
+                                                      cur+=1;myargc-=1;
                       }
                       else
                       {
@@ -279,7 +279,7 @@ static int index;
                                         two=(  two_arg_type) reaction_table[index].callback;
                                         two( argv[cur+1],argv[cur+2]);
                                         break;
-                              case 1:		
+                              case 1:
                                         reaction_table[index].callback(argv[cur+1]);
                                         break;
                               case 0:
@@ -288,9 +288,9 @@ static int index;
                               default:
                                         ADM_assert(0);
                                         break;
-                          } 
+                          }
                           cur+=1+reaction_table[index].have_arg;
-                          myargc-=1+reaction_table[index].have_arg;		   
+                          myargc-=1+reaction_table[index].have_arg;
                       }
           } // end while
           GUI_Verbose();
@@ -325,7 +325,7 @@ void call_normalize   (char *p)
 {
   int32_t i;
   sscanf(p,"%d",&i);
-        audioFilterNormalizeMode(i);	
+        audioFilterNormalizeMode(i);
 }
 void call_resample    (char *p)
 {
@@ -339,7 +339,7 @@ int fq;
         else
         {
                 printf("*** INVALID FREQUENCY***\n");
-        }        
+        }
 
 }
 // The form is name=value
@@ -359,9 +359,9 @@ char *equal;
                 return ;
         }
         *equal=0; // Remove =
-        
+
         if(!scriptAddVar(in,equal+1))
-                printf("Warning setvar failed\n");        
+                printf("Warning setvar failed\n");
 
 }
 
@@ -373,15 +373,15 @@ void call_buildtimemap(char *p) { UNUSED_ARG(p); aprintf("timemap\n");HandleActi
 void call_setPP(char *v,char *s)
 {
 // TODO
-	
+
 
 }
-void call_setAudio (char *p) 	
+void call_setAudio (char *p)
 {
-	
+
 		int32_t i;
-		sscanf(p,"%ld",&i);
-		audioFilterDelay(i);	
+		sscanf(p,"%"LD,&i);
+		audioFilterDelay(i);
 }
 void call_audiocodec(char *p)
 {
@@ -394,9 +394,9 @@ void call_audiocodec(char *p)
 	else if(!strcasecmp(p,"PCM"))
 		audio_selectCodecByTag( WAV_PCM );
 	else if(!strcasecmp(p,"VORBIS"))
-		audio_selectCodecByTag( WAV_OGG );		
+		audio_selectCodecByTag( WAV_OGG );
 	else if(!strcasecmp(p,"COPY"))
-		audio_setCopyCodec();		
+		audio_setCopyCodec();
 	else{
 		audio_selectCodecByTag( WAV_PCM );
 		fprintf(stderr,"audio codec \"%s\" unknown.\n",p);
@@ -404,7 +404,7 @@ void call_audiocodec(char *p)
 }
 void call_probePat(char *p)
 {
-// BAZOOKA  runProbe(p); 
+// BAZOOKA  runProbe(p);
 }
 void call_videocodec(char *p)
 {
@@ -422,8 +422,8 @@ void call_audiobitrate(char *p)
 {
 
 		int32_t i;
-		sscanf(p,"%ld",&i);
-		printf("\n Audio bitrate %ld\n",i);
+		sscanf(p,"%"LD,&i);
+		printf("\n Audio bitrate %"LD"\n",i);
 		audioFilter_SetBitrate(i);
 }
 void call_fps(char *p)
@@ -440,7 +440,7 @@ void call_fps(char *p)
 			info.fps1000 = (uint32_t) (floor (fps * 1000.+0.49));
 			video_body->updateVideoInfo (&info);
 			video_body->getVideoInfo (avifileinfo);
-		} else 
+		} else
 		{
 			printf("\n No Video loaded; ignoring --fps\n");
 		}
@@ -449,17 +449,17 @@ void call_autosplit(char *p)
 {
 
 		int32_t i;
-		sscanf(p,"%ld",&i);
+		sscanf(p,"%"LD,&i);
 //		ADM_aviSetSplitSize(i);
 }
 
-void setBegin(char *p) 
-{	
-    frameStart=atoi(p);  
+void setBegin(char *p)
+{
+    frameStart=atoi(p);
     printf("\n Start %u\n",frameStart);
 }
-void setEnd(char *p) 
-{	
+void setEnd(char *p)
+{
     frameEnd=atoi(p);
     printf("\n End %u\n",frameStart);
 
@@ -481,7 +481,7 @@ void call_help(char *p)
           }
 
       }
-    
+
                     call_quit(NULL);
 }
 
@@ -500,10 +500,10 @@ void show_info(char *p){
    UNUSED_ARG(p);
    uint32_t war,har;
    const char *s;
-   
+
    if (avifileinfo)
     {
-		
+
    printf("Video\n");
    printf("   Video Size: %u x %u\n", avifileinfo->width, avifileinfo->height);
    printf("   Frame Rate: %2.3f fps\n", (float)avifileinfo->fps1000/1000.F);
@@ -524,7 +524,7 @@ void show_info(char *p){
    printf("Audio\n");
    if( wavinfo )
     {
-      printf("   Codec: %s\n",getStrFromAudioCodec(wavinfo->encoding));     
+      printf("   Codec: %s\n",getStrFromAudioCodec(wavinfo->encoding));
       printf("   Mode: ");
       switch( wavinfo->channels ){
          case 1:  printf("MONO\n"); break;
@@ -533,7 +533,7 @@ void show_info(char *p){
       }
       printf("   BitRate: %u Bps / %u kbps\n", wavinfo->byterate, wavinfo->byterate*8/1000);
       printf("   Frequency: %u Hz\n", wavinfo->frequency);
-      { 
+      {
 double du = 0;// BAZOOKA video_body->getAudioLength();
         uint16_t hh, mm, ss, ms;
          du*=1000;
@@ -598,13 +598,13 @@ int notdigit=0;
                 return 0;
         }
         // It is a string
-        
+
         uint8_t ret=1;
 
         if(!strcasecmp(p,"off")) ret=0;
         if(!strcasecmp(p,"false")) ret=0;
 
-        
+
         return ret;
 
 }
@@ -626,12 +626,12 @@ uint32_t nbVar=0;
 */
 uint8_t scriptAddVar(char *var,char *value)
 {
-        if(!var || !strlen(var)) 
+        if(!var || !strlen(var))
         {
                 printf("Script : Var name invalid\n");
                 return 0;
         }
-        if(!value || !strlen(value)) 
+        if(!value || !strlen(value))
         {
                 printf("Script : value invalid\n");
                 return 0;
@@ -667,7 +667,7 @@ char *script_getVar(char *in, int *r)
         {
                 if(myVars[i].name)
                 {
-                        if(!strcmp(myVars[i].name,in)) // skip the  $ 
+                        if(!strcmp(myVars[i].name,in)) // skip the  $
                         {
                                 *r=myVars[i].isString;
                                 return ADM_strdup(myVars[i].string);

@@ -40,7 +40,7 @@ bool ADM_audioStreamBuffered::refill(void)
         {
             if( abs(newDts-lastDts)>ADM_MAX_SKEW)
             {
-                printf("[AudioStream] Warning skew in dts %"LD"\n",newDts-lastDts);
+                printf("[AudioStream] Warning skew in dts %"LLD"\n",(int64_t)newDts-(uint64_t)lastDts);
                 setDts(newDts);
             }
             // If we have a DTS and the buffer is empty, set the dts inconditionnaly

@@ -4,11 +4,11 @@
     begin                : Mon Dec 30 2002
     copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
-    
+
     This filter is special
     It uses internally another filter from _start to _end
-    and output copy of input else 
-    
+    and output copy of input else
+
  ***************************************************************************/
 
 /***************************************************************************
@@ -40,7 +40,7 @@ BUILD_CREATE(partial_create,ADMVideoPartial);
 char 						*ADMVideoPartial::printConf(void)
 {
 	static char string[500];
-		 			sprintf(string,"Partial from %ld to %ld : %s",
+		 			sprintf(string,"Partial from %"LD" to %"LD" : %s",
 		    						_param->_start,
 		          			_param->_end,
 		             		_son->printConf());
@@ -133,12 +133,12 @@ uint8_t ADMVideoPartial::getFrameNumberNoAlloc(uint32_t frame,
 {
 		ADM_assert(_son);
 		if(frame>= _info.nb_frames) return 0;
-		if((frame+_info.orgFrame>=_param->_start) && (frame+_info.orgFrame)<=_param->_end) // 
+		if((frame+_info.orgFrame>=_param->_start) && (frame+_info.orgFrame)<=_param->_end) //
 		{
 				return _son->getFrameNumberNoAlloc(frame,len,data,flags);
 		}
-		return _in->getFrameNumberNoAlloc(frame,len,data,flags);	                           
-}	      
+		return _in->getFrameNumberNoAlloc(frame,len,data,flags);
+}
 //
 extern uint8_t DIA_getPartial(PARTIAL_CONFIG *param,AVDMGenericVideoStream *son,AVDMGenericVideoStream *previous);
 uint8_t ADMVideoPartial::configure( AVDMGenericVideoStream *instream)
@@ -148,8 +148,8 @@ uint8_t ADMVideoPartial::configure( AVDMGenericVideoStream *instream)
     if(_param->_end<_param->_start) _param->_end=_param->_start;
 
    return r;
-}  
+}
 
- 		                                                                         
+
 
 

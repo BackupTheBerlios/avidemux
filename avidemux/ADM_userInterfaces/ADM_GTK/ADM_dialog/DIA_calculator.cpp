@@ -33,8 +33,8 @@
 #include "avi_vars.h"
 
 void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
-static GtkWidget	*create_Calculator (void);  
-static GtkWidget *dialog;  
+static GtkWidget	*create_Calculator (void);
+static GtkWidget *dialog;
 static void prepare( void );
 static void update( void );
 static int cb_mod(GtkObject * object, gpointer user_data);
@@ -53,7 +53,7 @@ extern uint8_t         videoCodecSetFinalSize(uint32_t size);;
 void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate )
 {
 	if(!avifileinfo) return ;
-	
+
 	dialog=create_Calculator();
 	gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
 										GTK_RESPONSE_CANCEL,
@@ -74,7 +74,7 @@ void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate )
 		{
 			update();
                         videoCodecSetFinalSize(videoSize);
-                        
+
 		}
 	else
 		{
@@ -85,7 +85,7 @@ void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate )
 	gtk_widget_destroy(dialog);
 	*sizeInMeg=videoSize;
 	*avgBitrate=videoBitrate;
-	
+
 }
 //******************************************
 // Compute the value that will not change
@@ -100,25 +100,25 @@ void prepare( void )
 	char string[200];
 	 uint16_t mm,hh,ss,ms;
          AVDMGenericAudioStream *stream;
-	 
+
 	 if(frameStart<frameEnd) numberOfVideoFrames=frameEnd-frameStart;
 	 else			 numberOfVideoFrames=frameStart-frameEnd;
- 
- 	
-	
+
+
+
 	duration=(float)video_body->getTime (numberOfVideoFrames);
 	duration=duration/1000.;
-	
+
 	if(duration<0) duration=-duration;
-	
+
 	video_body->getVideoInfo(&info);
-	
+
 	videoDuration=(uint32_t)ceil(duration);
 	frame2time(numberOfVideoFrames,info.fps1000, &hh, &mm, &ss, &ms);
 	// now we can set it
 	sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
 	gtk_label_set_text(GTK_LABEL(WID(labelDuration)),string);
-	
+
 	printf("Video duration :%lu\n",videoDuration);
 
 	// Now get audio info
@@ -126,7 +126,7 @@ void prepare( void )
 	if(audioProcessMode() && currentaudiostream)
 	{
 //		stream=buildAudioFilter(currentaudiostream,0);
-	
+
 		if(stream)
 		{
 			track1=(stream->getInfo()->byterate*8)/1000;
@@ -136,16 +136,16 @@ void prepare( void )
 	{
 		if(currentaudiostream) track1=(currentaudiostream->getInfo()->byterate*8)/1000;
 	}
-	
+
 	track2=0;
 	gtk_write_entry(WID(entry3), track1);
 	gtk_write_entry(WID(entry4), track2);
-	
+
 	printf("Track1 bitrate :%lu\n",track1);
 	printf("Track2 bitrate :%lu\n",track2);
 
 #endif
-	
+
 }
 /************************************/
 uint32_t getPicSize(void)
@@ -154,7 +154,7 @@ uint32_t size;
          AVDMGenericVideoStream *last;
                 last=getLastVideoFilter();
                 size=last->getInfo()->width*last->getInfo()->height;
-        
+
                 return size;
 }
 //*************************************
@@ -171,27 +171,27 @@ aviInfo info;
 	track2=gtk_read_entry(WID(entry4));
 	gtk_write_entry(WID(entry3), track1);
 	gtk_write_entry(WID(entry4), track2);
-	
+
 	// kb->Byte
 	audioSize=(track1+track2)*1000;
 	audioSize/=8;
-	
-	audioSize*=videoDuration;	
+
+	audioSize*=videoDuration;
 	audioSize>>=20;
-	sprintf(string,"%lu",audioSize);
+	sprintf(string,"%"LU,audioSize);
 	gtk_label_set_text(GTK_LABEL(WID(labelAudio)),string);
-	
+
 	// Compute total size (for Avi)
 	uint32_t s74,s80,dvd;
-	
-	// For avi/ogm 
+
+	// For avi/ogm
 	int f = getRangeInMenu(WID(optionmenu2));
 	if(f==2)
 	{ // Mpeg
 		s74=730;
 		s80=790;
 		dvd=4300;
-	
+
 	}
 	else
 	{//AVI or OGM
@@ -199,7 +199,7 @@ aviInfo info;
 		s80=700;
 		dvd=4300;
 	}
-	
+
 	int j=getRangeInMenu(WID(optionmenu1));
 	switch(j)
 	{
@@ -212,15 +212,15 @@ aviInfo info;
 		default:
 			ADM_assert(0);
 	}
-	sprintf(string,"%lu",totalSize);
+	sprintf(string,"%"LU,totalSize);
 	gtk_label_set_text(GTK_LABEL(WID(labelTotal)),string);
-	
+
 	// Compute muxing overhead size
 	uint32_t muxingOverheadSize;
 	int numberOfAudioTracks = 0;
 	int numberOfChunks;
 	switch (f)
-	{ 
+	{
 		case 0:
 			// AVI
 			/*
@@ -254,14 +254,14 @@ aviInfo info;
 	}
 	//sprintf(string,"%lu",muxingOverheadSize);
 	//gtk_label_set_text(GTK_LABEL(WID(labelMux)),string);
-	
+
 	// and compute
 	//
 	//uint32_t videoSize;
-	
+
 	if(audioSize>=totalSize) sprintf(string,"** NO ROOM LEFT**");
 	else
-		{     
+		{
                         uint32_t picSize;
 			videoSize=totalSize-audioSize - muxingOverheadSize;
 			// Compute average bps
@@ -274,19 +274,19 @@ aviInfo info;
 			// convert to kb per sec
 			avg=(avg*8)/1000;
 			videoBitrate=(uint32_t)avg;
-			sprintf(string,"%lu",(uint32_t)videoBitrate);
-			
+			sprintf(string,"%"LU,(uint32_t)videoBitrate);
+
 			gtk_label_set_text(GTK_LABEL(WID(labelBitrate)),string);
-			
+
 			//
-			sprintf(string,"%lu",videoSize);
+			sprintf(string,"%"LU,videoSize);
 	                gtk_label_set_text(GTK_LABEL(WID(labelVideo)),string);
                         // Bpp
                         bpp=videoBitrate;
                         bpp=bpp*1000000.;  // kbit->bit + compensate for fps1000
                         // Fetch info from filter
-                
-                        
+
+
                         if(videoProcessMode())
                                 picSize=getPicSize();
                         else
@@ -296,21 +296,21 @@ aviInfo info;
                         bpp/=info.fps1000;
                         sprintf(string,"%1.3f",bpp);
                         gtk_label_set_text(GTK_LABEL(WID(labelBPP)),string);
-                        		
+
 		}
-	
-	
-	
+
+
+
 }
-// 
+//
 int cb_mod(GtkObject * object, gpointer user_data)
 {
 int r;
 int sens=0;
         r=getRangeInMenu(WID(optionmenu1));
         if(r==5)
-        {                   
-                sens=1;    
+        {
+                sens=1;
         }
         gtk_widget_set_sensitive(WID(entryCustom),sens);
         update();
@@ -378,7 +378,7 @@ create_Calculator (void)
   GtkWidget *label15;
   GtkWidget *labelBitrate;
   GtkWidget *labelBPP;
-  
+
   GtkWidget *dialog_action_area1;
   GtkWidget *doit;
   GtkWidget *button1;
@@ -786,7 +786,7 @@ create_Calculator (void)
   GLADE_HOOKUP_OBJECT (Calculator, label15, "label15");
   GLADE_HOOKUP_OBJECT (Calculator, labelBitrate, "labelBitrate");
   GLADE_HOOKUP_OBJECT (Calculator, labelBPP, "labelBPP");
-  
+
   GLADE_HOOKUP_OBJECT_NO_REF (Calculator, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (Calculator, doit, "doit");
   GLADE_HOOKUP_OBJECT (Calculator, button1, "button1");

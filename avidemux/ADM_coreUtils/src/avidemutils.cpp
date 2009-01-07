@@ -301,7 +301,7 @@ void printBih(ADM_BITMAPINFOHEADER *bi)
 void printWavHeader(WAVHeader *hdr)
 {
 #undef X_DUMP
-#define X_DUMP(x) printf(#x":\t\t:%lu\n",hdr->x);
+#define X_DUMP(x) printf(#x":\t\t:%"LU"\n",hdr->x);
 
           X_DUMP(encoding);
           X_DUMP(channels);	/* 1 = mono, 2 = stereo */
@@ -312,13 +312,14 @@ void printWavHeader(WAVHeader *hdr)
 
 }
 /* Compute aspect ration from common ARWidth / AR Height value */
-typedef struct ARDescriptor
+typedef struct
 {
   int width;
   int height;
   ADM_ASPECT ar;
   const char *string;
-};
+}ARDescriptor;
+
 ARDescriptor  allArs[]=
 {
   {8,9,ADM_ASPECT_4_3,     QT_TR_NOOP("NTSC 4:3")},

@@ -198,7 +198,7 @@ int nw;
                                 DIA_builtin();
                                 return;
 #if BAZOOKA
-        case ACT_GLYPHEDIT: 
+        case ACT_GLYPHEDIT:
                                 DIA_glyphEdit();
                                 return;
 
@@ -210,7 +210,7 @@ int nw;
                                 GUI_jobs();
                                 return;
         case ACT_RECENT0:
-        case ACT_RECENT1:        
+        case ACT_RECENT1:
         case ACT_RECENT2:
         case ACT_RECENT3:
                         const char **name;
@@ -246,17 +246,17 @@ int nw;
    case ACT_AudioCodecChanged:
                 nw=UI_getCurrentACodec();
                 audioCodecSetByIndex(nw);
-    		
+
 		return;
     case ACT_PLUGIN_INFO:
             DIA_pluginsInfo();
             return;
     case ACT_RunScript:
                 GUI_FileSelRead (QT_TR_NOOP("Select ECMAScript to Run"),(SELFILE_CB *) A_parseECMAScript);
-                        
+
                         //
     		return;
-		
+
     case ACT_RecentFiles:
     	char *file;
 		if(		DIA_RecentFiles(&file))
@@ -284,17 +284,17 @@ int nw;
     	if(DIA_Preferences())
 	{
 	saveEncoderConfig ();
- 	#ifdef HAVE_AUDIO     
+ 	#ifdef HAVE_AUDIO
       		AVDM_audioSave();
- 	#endif     
-      	prefs->save ();	
-	}      
+ 	#endif
+      	prefs->save ();
+	}
 	return;
     case ACT_SavePref:
       saveEncoderConfig ();
- #ifdef HAVE_AUDIO     
+ #ifdef HAVE_AUDIO
       AVDM_audioSave();
- #endif     
+ #endif
       prefs->save ();
       return;
     case ACT_SetLogFile:
@@ -318,11 +318,11 @@ int nw;
          if( saveprefsonexit )
             prefs->save ();
       }
-      cleanUp (); 
+      cleanUp ();
       exit (0);
       break;
 /*			case ACT_SelectEncoder:
-				
+
 						A_selectEncoder();
   	  			return;
 						break;*/
@@ -334,7 +334,7 @@ int nw;
       break;
 
     }
-//------------------------------------------------                                      
+//------------------------------------------------
 
   if (playing)			// only allow some action
     {
@@ -385,7 +385,7 @@ int nw;
       return;
     }
 
-//#define TEST_UNPACK    
+//#define TEST_UNPACK
   // we have an AVI loaded
   switch (action)
     {
@@ -433,16 +433,16 @@ int nw;
     			break;
     case ACT_SaveUnpackedMpeg4:
       if(GUI_Question(QT_TR_NOOP("This is to be used to undo packed VOP on MPEG-4.\nContinue ?")))
-			{ 
+			{
                           GUI_FileSelWrite (QT_TR_NOOP("Select AVI File to Write"), (SELFILE_CB *)A_SaveUnpackedVop);
-				
+
 			}
     			break;
-			
+
     case ACT_SaveOGM:
 //                        GUI_FileSelWrite (QT_TR_NOOP("Select OGM File to Write"), (SELFILE_CB *)ogmSave);
     			break;
-				
+
     case ACT_SaveWork:
       GUI_FileSelWrite (QT_TR_NOOP("Select Workbench to Save"), A_saveWorkbench);
 	  UI_refreshCustomMenu();
@@ -460,8 +460,8 @@ int nw;
 		UI_refreshCustomMenu();
       }
       break;
-        case ACT_JumpToFrame: 
-                // read value	
+        case ACT_JumpToFrame:
+                // read value
                 nf=UI_readCurFrame();
 				if(nf< avifileinfo->nb_frames)
 					GUI_GoToFrame(nf);
@@ -509,7 +509,7 @@ int nw;
     case ACT_SaveWave:
       	{
           GUI_FileSelWrite (QT_TR_NOOP("Select File to Save Audio"),(SELFILE_CB *)A_audioSave);
-	
+
 	}
       break;
 
@@ -542,7 +542,7 @@ int nw;
       break;
 
     case ACT_SaveBunchJPG:
-      GUI_FileSelWrite (QT_TR_NOOP("Select JPEG Sequence to Save"), A_saveBunchJpg);      
+      GUI_FileSelWrite (QT_TR_NOOP("Select JPEG Sequence to Save"), A_saveBunchJpg);
     	break;
     case ACT_SaveImg:
       GUI_FileSelWrite (QT_TR_NOOP("Select BMP to Save"), A_saveImg);
@@ -552,7 +552,7 @@ int nw;
       GUI_FileSelWrite (QT_TR_NOOP("Select JPEG to Save"), (SELFILE_CB *)A_saveJpg);
       	//GUI_FileSelWrite ("Select Jpg to save ", A_saveJpg);
       	break;
-    
+
     case ACT_Scale:
       if (!ignore_change)
 	{
@@ -570,7 +570,7 @@ int nw;
     {
         ADM_PREVIEW_MODE oldpreview=getPreviewMode(),newpreview=(ADM_PREVIEW_MODE)UI_getCurrentPreview();
           printf("Old preview %d, New preview mode : %d\n",oldpreview,newpreview);
-          
+
           if(oldpreview==newpreview)
           {
             return;
@@ -601,10 +601,10 @@ int nw;
     case ACT_PrevBlackFrame:
       GUI_NextPrevBlackFrame(-1);
       break;
-    case ACT_AllBlackFrames:    
+    case ACT_AllBlackFrames:
       GUI_FileSelWrite (QT_TR_NOOP("Select File to Save"), (SELFILE_CB *)A_ListAllBlackFrames);
-        break;                        
-    
+        break;
+
     case ACT_PreviousFrame:
         GUI_PrevFrame();
       break;
@@ -667,7 +667,7 @@ int nw;
 //       A_changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
       break;
 
-  
+
     case ACT_MarkA:
     case ACT_MarkB:
       uint32_t swapit;
@@ -760,8 +760,8 @@ int nw;
 
     case ACT_Delete:
     case ACT_Cut:
-    
-#if 0     
+
+#if 0
       old=frameStart;
       if( A_delete(frameStart,frameEnd))
       {
@@ -769,11 +769,11 @@ int nw;
 	{			// we removed too much
 	  old = avifileinfo->nb_frames - 1;
 	}
-      	curframe=old;	 
-      	GUI_GoToFrame (old);      
+      	curframe=old;
+      	GUI_GoToFrame (old);
       }
-      
-#endif      
+
+#endif
       break;
 
     case ACT_AudioMap:
@@ -865,7 +865,7 @@ int nw;
    case ACT_HEX_DUMP:
       GUI_showCurrentFrameHex();
       break;
-      
+
     default:
       printf ("\n unhandled action %d\n", action);
       ADM_assert (0);
@@ -925,7 +925,7 @@ int A_openAvi2 (const char *name, uint8_t mode)
 
 
   GUI_close(); // Cleanup
-  
+
   DIA_StartBusy ();
   /*
   ** we may get a relative path by cmdline
@@ -948,11 +948,11 @@ int A_openAvi2 (const char *name, uint8_t mode)
   if (res!=ADM_OK)			// an error occured
     {
 		delete[] longname;
-    	if(ADM_IGN==res) 
+    	if(ADM_IGN==res)
 	{
 		return 0;
 	}
-	
+
 	if( fourCC::check(id,(uint8_t *)"//AD") ){
           GUI_Error_HIG(QT_TR_NOOP("Cannot open project using the video loader."),
                         QT_TR_NOOP(  "Try 'File' -> 'Load/Run Project...'"));
@@ -1031,7 +1031,7 @@ void  updateLoaded ()
       return;
     }
 
-  
+
   getFirstVideoFilter(); // reinit first filter
 
   // now get audio information if exists
@@ -1057,7 +1057,7 @@ void  updateLoaded ()
 
   // Init renderer
     admPreview::setMainDimension(avifileinfo->width, avifileinfo->height);
-  
+
 
   // Draw first frame
   GUI_setAllFrameAndTime();
@@ -1066,7 +1066,7 @@ void  updateLoaded ()
   UI_setMarkers (frameStart, frameEnd);
 
   getFirstVideoFilter(); // Rebuild filter if needed
-  
+
   /* Zoom out if needed */
   uint32_t phyW,phyH;
   UI_getPhysicalScreenSize(NULL, &phyW,&phyH);
@@ -1086,13 +1086,13 @@ void  updateLoaded ()
       currentZoom=ZOOM_1_1;
       changePreviewZoom(currentZoom);
   }
-        
-  
-  
+
+
+
       admPreview::seekToIntra (0);
       admPreview::samePicture();
       GUI_setCurrentFrameAndTime();
-   
+
    printf("\n** conf updated **\n");
 }
 
@@ -1183,18 +1183,18 @@ A_saveAudio (char *name)
     return;
 
 
-  
+
   out = fopen (name, "wb");
   if (!out) return;
-  
+
   work=new DIA_working(QT_TR_NOOP("Saving audio"));
-  
+
   uint32_t timeEnd,timeStart,sample,hold,len;
   uint64_t tgt_sample,cur_sample;
   double   duration;
 
   // compute start position and duration in samples
-    
+
    timeStart=video_body->getTime (frameStart);
    timeEnd=video_body->getTime (frameEnd+1);
 
@@ -1202,12 +1202,12 @@ A_saveAudio (char *name)
    duration=timeEnd-timeStart;
    printf("Duration:%f ms\n",duration);
    if(duration<0) duration=-duration;
-  
-   duration/=1000;   
+
+   duration/=1000;
    duration*=currentaudiostream->getInfo()->frequency;
-   
-   tgt_sample=(uint64_t)floor(duration);  
-   
+
+   tgt_sample=(uint64_t)floor(duration);
+
    cur_sample=0;
    written = 0;
    hold=0;
@@ -1221,23 +1221,23 @@ A_saveAudio (char *name)
 	if(hold>ONE_STRIKE)
 	{
 		fwrite(buffer,hold,1,out);
-		hold=0;		
+		hold=0;
 	}
 	if(cur_sample>tgt_sample)
-		break;   
+		break;
       work->update(cur_sample>>10, tgt_sample>>10);
       if(!work->isAlive()) break;
     };
   if(hold)
   {
   	fwrite(buffer,hold,1,out);
-	hold=0;  
+	hold=0;
   }
-  
+
   fclose (out);
   delete work;
   delete[] buffer;
-  printf ("\n wanted %llu samples, goto %llu samples, written %u bytes\n", tgt_sample,cur_sample, written);
+  printf ("\n wanted %"LLU" samples, goto %"LLU" samples, written %"LU" bytes\n", tgt_sample,cur_sample, written);
 
 
 }
@@ -1265,7 +1265,7 @@ int A_saveJpg (char *name)
     if(!GUI_getFrameContent(&image, curframe))
     {
       GUI_Error_HIG(QT_TR_NOOP("Get Frame"),QT_TR_NOOP("Cannot get this frame to save"));
-      return 0; 
+      return 0;
     }
     return (int) image.saveAsJpg (name);
 }
@@ -1281,7 +1281,7 @@ static int b=1;
          video_body->changeAudioStream(0,b);
         b^=1;
         return 1;
- 	
+
 }
 #endif
 
@@ -1299,7 +1299,7 @@ void A_saveBunchJpg(const char *name)
   char *baseName;
   DIA_working *working;
   uint8_t success=0;
-  
+
         if(frameStart>frameEnd)
                 {
                   GUI_Error_HIG(QT_TR_NOOP("Mark A > B"), QT_TR_NOOP("Set your markers correctly."));
@@ -1307,14 +1307,14 @@ void A_saveBunchJpg(const char *name)
                 }
         // Split name into base + extension
         ADM_PathSplit(name,&baseName,&ext);
-        
+
         src=new ADMImage(avifileinfo->width,avifileinfo->height);
         ADM_assert(src);
 
         working=new DIA_working(QT_TR_NOOP("Saving as set of jpegs"));
         for(curImg=frameStart;curImg<=frameEnd;curImg++)
-        {	
-                working->update(curImg-frameStart,frameEnd-frameStart);	
+        {
+                working->update(curImg-frameStart,frameEnd-frameStart);
                 if (!GUI_getFrameContent (src,curImg ))
                 {
                   GUI_Error_HIG(QT_TR_NOOP("Cannot decode frame"), QT_TR_NOOP("Aborting."));
@@ -1325,7 +1325,7 @@ void A_saveBunchJpg(const char *name)
                 if(!src->saveAsJpg(fullName)) goto _bunch_abort;
         }
         success=1;
-        
+
 _bunch_abort:
         if(success)
             GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Done"),QT_TR_NOOP( "Saved %d images."), curImg-frameStart);
@@ -1343,7 +1343,7 @@ _bunch_abort:
 */
 void A_saveImg (const char *name)
 {
-  
+
   ADMImage image(avifileinfo->width,avifileinfo->height);
   GUI_getFrameContent(&image, video_body->getCurrentFrame());
   if(image.saveAsBmp(name))
@@ -1361,7 +1361,7 @@ void A_saveImg (const char *name)
 int
 A_loadAC3 (char *name)
 {
- 
+
 }
 int A_loadNone( void )
 {
@@ -1376,17 +1376,17 @@ int A_loadNone( void )
 //_____________________________________________________________
 int A_loadMP3(char *name)
 {
-  }  
+  }
 //_____________________________________________________________
 //
 //              Load wave
-//              
+//
 //
 //_____________________________________________________________
 
 int A_loadWave (char *name)
 {
-  
+
 }
 AudioSource getCurrentAudioSource(char **name)
 {
@@ -1435,9 +1435,9 @@ A_saveAudioDecodedTest (char *name)
   uint32_t written = 0;
   FILE *out;
   AVDMGenericAudioStream *saveFilter;
-  
+
   uint64_t sampleTarget,sampleCurrent;
-  
+
 #undef BITT
 #define BITT 4*1152
 #define OUTCHUNK 1024*1024
@@ -1445,7 +1445,7 @@ A_saveAudioDecodedTest (char *name)
 
   if (!currentaudiostream)
     return;
- 
+
 
   if (!(out = fopen (name, "wb")))
     {
@@ -1487,7 +1487,7 @@ A_saveAudioDecodedTest (char *name)
 			ADM_dealloc(outbuffer);
 			return;
 		}
-   
+
     	DIA_working *work=new DIA_working(QT_TR_NOOP("Saving audio"));
 
 
@@ -1502,11 +1502,11 @@ A_saveAudioDecodedTest (char *name)
   duration=(tend-tstart);
   duration*=saveFilter->getInfo()->frequency;
   duration/=1000.;
-  
+
   sampleTarget=(uint64_t)floor(duration);
   sampleCurrent=0;
   gauge=0;
-  
+
   if( frameStart == frameEnd ){
      /* JSC: we will write some bytes, but nobody should expect useful data */
     GUI_Error_HIG(QT_TR_NOOP("No frames to encode"),QT_TR_NOOP("Please check markers. Is \"A>\" == \">B\"?"));
@@ -1522,23 +1522,23 @@ A_saveAudioDecodedTest (char *name)
       //      printf("Got : %lu\n",len2);
       gauge += len;
       sampleCurrent+=samples;
-      // update GUI                   
+      // update GUI
 	// JSC: if "A>" == ">B" we will get >100% here => assert in work->update()
 	if (work->update ((sampleCurrent>>10 > sampleTarget>>10 ? sampleTarget>>10 : sampleCurrent>>10), sampleTarget>>10))	// abort request ?
 	    break;;
-      if (gauge > OUTCHUNK)	// either out buffer is full	
+      if (gauge > OUTCHUNK)	// either out buffer is full
 	{
-	  fwrite (outbuffer, 1, gauge, out);	  
+	  fwrite (outbuffer, 1, gauge, out);
 	  written += gauge;
 	  gauge = 0;
-	}   	
+	}
     };
 // Clean up
 	if(gauge)
 	{
-		fwrite (outbuffer,  gauge,1, out);	  
+		fwrite (outbuffer,  gauge,1, out);
 		written += gauge;
-		gauge = 0;	
+		gauge = 0;
 	}
   saveFilter->endWrite (out, written);
   fclose (out);
@@ -1674,7 +1674,7 @@ uint8_t ADM_saveRaw (const char *name)
                 }
                 ADM_assert (video_body->getFlags (i, &flags));
         }
-      
+
       if (flags & AVI_B_FRAME)	// oops
 	{
 	  // se search for the next i /p
@@ -1699,7 +1699,7 @@ uint8_t ADM_saveRaw (const char *name)
 	    goto _abt;
           }
 	  // Write the found frame
-    
+
 	  video_body->getFrame (found, &image, &seq);
 	  fwrite (buffer, len, 1, fd);
 	  // and the B frames
@@ -1831,7 +1831,7 @@ int A_audioSave(char *name)
 	return 0;
 	if (audioProcessMode())
 	{
-		
+
 		// if we get here, either not compressed
 		// or decompressable
 		A_saveAudioDecodedTest(name);
@@ -1854,7 +1854,7 @@ uint32_t count;
       aviInfo info;
       ADM_assert (video_body->getVideoInfo (&info));
       count = end - start;
-     
+
       if( end < start ){
         GUI_Error_HIG(QT_TR_NOOP("Marker A > B"), QT_TR_NOOP("Cannot delete the selection."));
          return 0;
@@ -1877,7 +1877,7 @@ uint32_t count;
 	{
           GUI_Error_HIG (QT_TR_NOOP("Something bad happened (II)"), NULL);
 	}
-      
+
 
 
       frameEnd=avifileinfo->nb_frames-1;
@@ -1886,7 +1886,7 @@ uint32_t count;
       UI_setMarkers (frameStart, frameEnd);
       ReSync ();
      return 1;
-      
+
 
 
 }
@@ -1902,7 +1902,7 @@ uint32_t frame;
                 return 0;
         }
         return GUI_GoToFrame(frame);
-        
+
 }
 
 //
@@ -1910,7 +1910,7 @@ void	A_setPostproc( void )
 {
 uint32_t type,strength,swap;
 	if(!avifileinfo) return;
-	
+
 	video_body->getPostProc(&type,&strength,&swap);
 
  	if(DIA_getMPParams( &type, &strength,&swap))
@@ -1929,8 +1929,8 @@ void A_audioTrack( void )
 {
         uint32_t nb;
         audioInfo *infos=NULL;
-        
-        uint32_t old,nw;        
+
+        uint32_t old,nw;
         uint8_t r=0;
         uint32_t oldtrack,newtrack;
         char *newtrackname=ADM_strdup(currentAudioName);
@@ -1942,7 +1942,7 @@ void A_audioTrack( void )
         }
         newtrack=oldtrack=(uint32_t)video_body->getCurrentAudioStreamNumber(0);
         nw=old=currentAudioSource;
-        
+
         /* Build dialog factory widget */
         diaMenuEntry sourcesStream[]={
             {AudioAvi,QT_TR_NOOP("Video"),QT_TR_NOOP("Take audio from video file")},
@@ -1951,14 +1951,14 @@ void A_audioTrack( void )
             {AudioMP3,QT_TR_NOOP("External MP3"),QT_TR_NOOP("Take audio from external MP3 file")},
             {AudioWav,QT_TR_NOOP("External WAV"),QT_TR_NOOP("Take audio from external WAV file")}
         };
-        
-        
+
+
         diaElemMenu   sourceMenu(&nw,QT_TR_NOOP("_Audio source:"),5,sourcesStream,NULL);
-        
-        
-        
+
+
+
         diaElemFile  sourceName(0,&newtrackname,QT_TR_NOOP("_External file:"), NULL, QT_TR_NOOP("Select file"));
-        
+
         // Now build the list of embedded track
 #define MAX_AUDIO_TRACK 10
 #define MAX_AUDIO_TRACK_NAME 100
@@ -1971,24 +1971,24 @@ void A_audioTrack( void )
            sourceavitracks[i]=new diaMenuEntryDynamic(i,string,NULL);
         }
          if(infos) delete [] infos;
-         
+
          diaElemMenuDynamic   sourceFromVideo(&newtrack,QT_TR_NOOP("_Track from video:"),nb,sourceavitracks);
          diaElem *allWidgets[]={&sourceMenu,&sourceFromVideo,&sourceName};
-         
+
          /* Link..*/
          sourceMenu.link(&(sourcesStream[0]),1,&sourceFromVideo);
          sourceMenu.link(&(sourcesStream[2]),1,&sourceName);
          sourceMenu.link(&(sourcesStream[3]),1,&sourceName);
          sourceMenu.link(&(sourcesStream[4]),1,&sourceName);
-         
-         
+
+
          if( diaFactoryRun(QT_TR_NOOP("Main Audio Track"),3,allWidgets))
          {
            if(nw!=AudioNone && nw!=AudioAvi)
            {
               if( !ADM_fileExist(newtrackname))
               {
-                GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Cannot load"),QT_TR_NOOP("The selected audio file does not exist.")); 
+                GUI_Info_HIG(ADM_LOG_INFO,QT_TR_NOOP("Cannot load"),QT_TR_NOOP("The selected audio file does not exist."));
                 goto roger_and_out;
               }
            }
@@ -2027,7 +2027,7 @@ void A_audioTrack( void )
                             ADM_assert(0);
         }
          }
-roger_and_out:         
+roger_and_out:
          /* Clean up */
          for(int i=0;i<nb;i++)
             delete sourceavitracks[i];
@@ -2050,7 +2050,7 @@ void A_externalAudioTrack( void )
             {AudioMP3,QT_TR_NOOP("External MP3"),QT_TR_NOOP("Take audio from external MP3 file")},
             {AudioWav,QT_TR_NOOP("External WAV"),QT_TR_NOOP("Take audio from external WAV file")}
         };
-        
+
         old=nw=secondAudioSource;
 
         diaElemMenu     sourceMenu(&nw,QT_TR_NOOP("_Audio source:"),4,sourcesStream,NULL);
@@ -2058,7 +2058,7 @@ void A_externalAudioTrack( void )
         diaElem *allWidgets[]={&sourceMenu,&sourceName};
 
   /* Link..*/
-        
+
          sourceMenu.link(&(sourcesStream[2]),1,&sourceName);
          sourceMenu.link(&(sourcesStream[3]),1,&sourceName);
          sourceMenu.link(&(sourcesStream[1]),1,&sourceName);
@@ -2097,11 +2097,11 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                         {
                                 delete tmp;
                                 GUI_Error_HIG(QT_TR_NOOP("Error loading the MP3 file"), NULL);
-                                
+
                         }
                         else
                         {
-/*                                secondaudiostream = tmp;     
+/*                                secondaudiostream = tmp;
                                 secondAudioSource=AudioMP3;
                                 secondAudioName=ADM_strdup(name);
                                 printf ("\n MP3 loaded\n");
@@ -2125,7 +2125,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                         else
                         {
 /*
-                                secondaudiostream = tmp;     
+                                secondaudiostream = tmp;
                                 secondAudioSource=AudioAC3;
                                 secondAudioName=ADM_strdup(name);
                                 printf ("\n AC3 loaded\n");
@@ -2149,7 +2149,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                         else
                         {
 /*
-                                secondaudiostream = tmp;     
+                                secondaudiostream = tmp;
                                 secondAudioSource=AudioAC3;
                                 secondAudioName=ADM_strdup(name);
                                 printf ("\n AC3 loaded\n");
@@ -2164,7 +2164,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
         return 0;
 #endif
 }
-             
+
 
 //****************
 uint8_t A_TimeShift(void)
@@ -2190,7 +2190,7 @@ void A_Resync(void)
 // Just in case update file info
         if(!avifileinfo) return;
         GUI_setAllFrameAndTime();
-        
+
         if(curframe>avifileinfo->nb_frames) curframe=frameEnd;
         UI_setMarkers (frameStart, frameEnd);
         GUI_GoToFrame(curframe);
@@ -2206,7 +2206,7 @@ void A_addJob(void)
 
         base=ADM_getJobDir();
         fullname=new char[strlen(name)+strlen(base)+2+4];
-        
+
         strcpy(fullname,base);
         strcat(fullname,"/");
         strcat(fullname,name);
@@ -2266,7 +2266,7 @@ uint32_t GUI_GetScale(void)
 
     percent = UI_readScale();
     tg= (avifileinfo->nb_frames-1) * percent / 100.;
-    
+
     return (uint32_t)floor(tg);;
 
 
@@ -2283,7 +2283,7 @@ uint8_t GUI_getFrameContent(ADMImage *image, uint32_t frame)
 {
   uint32_t flags;
   if(!video_body->getUncompressedFrame(frame,image,&flags)) return 0;
-  return 1; 
+  return 1;
 }
 /**
     \fn GUI_close
@@ -2368,27 +2368,27 @@ void GUI_showCurrentFrameHex(void)
  ADMCompressedImage image;
  uint8_t seq;
  if (!avifileinfo) return;
- 
+
  buffer=new uint8_t [avifileinfo->width*avifileinfo->height*3];
  image.data=buffer;
- 
+
 
  video_body->getFrame (curframe,&image,&seq);
  fullLen=image.dataLength;
  video_body->getFlags (curframe, &flags);
- 
+
  diaElemHex binhex("*****",fullLen,buffer);
-      
+
  if(flags==AVI_KEY_FRAME) sprintf(sType,"I");
   else if(flags==AVI_B_FRAME) sprintf(sType,"B");
     else sprintf(sType,"P");
  sprintf(sSize,"%d bytes",fullLen);
- 
+
  diaElemReadOnlyText Type(sType,QT_TR_NOOP("Frame type:"));
  diaElemReadOnlyText Size(sSize,QT_TR_NOOP("Frame size:"));
  diaElem *elems[]={&Type,&Size,&binhex   };
  if(diaFactoryRun(QT_TR_NOOP("Frame Hex Dump"),3,elems))
- 
+
  delete [] buffer;
 }
 // Temporary place...
@@ -2405,7 +2405,7 @@ uint8_t  ADMImage::saveAsBmp(const char *filename)
   uint32_t sz;
   uint16_t s16;
   uint32_t s32;
-  
+
   sz = _width* _height * 3;
 
   bmfh.bfReserved1 = bmfh.bfReserved2 = 0;
@@ -2429,7 +2429,7 @@ uint8_t  ADMImage::saveAsBmp(const char *filename)
 */
 
   ADMImage image(_width,_height);
-  
+
 
   printf ("\n %u x %u=%u\n", bmph.biWidth, bmph.biHeight, sz);
 
@@ -2460,16 +2460,16 @@ uint8_t  ADMImage::saveAsBmp(const char *filename)
 	// Bitmpap file header, not using tructure due to gcc padding it
 #ifdef ADM_BIG_ENDIAN
 	s16 = 0x424D;
-#else	
-  	s16 = 0x4D42;
-#endif	
-  	s32 = 14 + sizeof (bmph) + sz;
-#ifdef ADM_BIG_ENDIAN	
-	#define SWAP32(x) x=R32(x)	
 #else
-	#define SWAP32(x) ; 
+  	s16 = 0x4D42;
 #endif
-        SWAP32(s32);	
+  	s32 = 14 + sizeof (bmph) + sz;
+#ifdef ADM_BIG_ENDIAN
+	#define SWAP32(x) x=R32(x)
+#else
+	#define SWAP32(x) ;
+#endif
+        SWAP32(s32);
         fwrite (&s16, 2, 1, fd);
         fwrite (&s32, 4, 1, fd);
         s32 = 0;
@@ -2482,7 +2482,7 @@ uint8_t  ADMImage::saveAsBmp(const char *filename)
 #endif
         fwrite (&bmph, sizeof (bmph), 1, fd);
         fwrite (out, sz, 1, fd);
-  
+
         fclose(fd);
         ADM_dealloc(out);
         return 1;
@@ -2497,7 +2497,7 @@ uint8_t  ADMImage::saveAsJpg(const char *filename)
   FILE *fd;
   uint8_t *buffer=NULL;
   uint32_t sz;
-  
+
 
         sz = _width*_height*3;
         ADMBitstream bitstream(sz);
@@ -2528,7 +2528,7 @@ uint8_t  ADMImage::saveAsJpg(const char *filename)
 /**
  *      \fn UI_getPreferredRender
  *      \brief Returns to render lib the user preferred rendering method
- * 
+ *
  */
 ADM_RENDER_TYPE UI_getPreferredRender(void)
 {
@@ -2540,7 +2540,7 @@ ADM_RENDER_TYPE UI_getPreferredRender(void)
         // First check if local
         // We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
         // in that case we do not even try to use accel
-        
+
         // Win32 and Mac/Qt4 don't have DISPLAY
         displ=getenv("DISPLAY");
         if(!displ)
@@ -2552,10 +2552,10 @@ ADM_RENDER_TYPE UI_getPreferredRender(void)
                 printf("Looks like remote display, no Xv :%s\n",displ);
                 return RENDER_GTK;
         }
-#endif  
- 
+#endif
+
         if(prefs->get(DEVICE_VIDEODEVICE,&renderI)!=RC_OK)
-        {       
+        {
                 render=RENDER_GTK;
         }else
         {
@@ -2574,7 +2574,7 @@ const char *getStrFromAudioCodec( uint32_t codec)
               case WAV_MP2: return QT_TR_NOOP("MP2");
               case WAV_MP3: return QT_TR_NOOP("MP3");
               case WAV_WMA:  return QT_TR_NOOP("WMA");
-              case WAV_LPCM: return QT_TR_NOOP("LPCM");	
+              case WAV_LPCM: return QT_TR_NOOP("LPCM");
               case WAV_AC3:  return QT_TR_NOOP("AC3");
               case WAV_OGG: return QT_TR_NOOP("Ogg Vorbis");
               case WAV_MP4: return QT_TR_NOOP("MP4");

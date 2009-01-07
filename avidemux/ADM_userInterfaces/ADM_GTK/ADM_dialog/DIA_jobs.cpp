@@ -8,7 +8,7 @@ extern bool parseECMAScript(const char *name);
 static const char *StringStatus[]={QT_TR_NOOP("Ready"),QT_TR_NOOP("Succeeded"),QT_TR_NOOP("Failed"),QT_TR_NOOP("Deleted"),QT_TR_NOOP("Running")};
 
 
-typedef enum 
+typedef enum
 {
         STATUS_READY=0,
         STATUS_SUCCEED,
@@ -18,14 +18,14 @@ typedef enum
 }JOB_STATUS;
 
 
-typedef struct ADM_Job_Descriptor
+typedef struct
 {
   JOB_STATUS  status;
   ADM_date    startDate;
   ADM_date    endDate;
-};
+}ADM_Job_Descriptor;
 
-typedef enum 
+typedef enum
 {
         COMMAND_DELETE_ALL=1,
         COMMAND_DELETE=2,
@@ -34,7 +34,7 @@ typedef enum
 };
 
 
-typedef struct JobsDescriptor
+typedef struct
 {
         GtkWidget *dialog;
         GtkListStore *store;
@@ -53,7 +53,7 @@ GtkTreeViewColumn *column,*column2,*column3;
 GtkCellRenderer *renderer;
 
         int ret=0;
-        
+
 
 
         GtkWidget *dialog;
@@ -66,10 +66,10 @@ GtkCellRenderer *renderer;
 									-1);
 
         gtk_register_dialog(dialog);
-        
-        
+
+
         store=gtk_list_store_new (3, G_TYPE_STRING, G_TYPE_STRING,G_TYPE_STRING);
-        
+
         // initialize our job structure
         jobs.dialog=dialog;
         jobs.nb=nb;
@@ -105,7 +105,7 @@ GtkCellRenderer *renderer;
             ASSOCIATE(buttonRunAll,COMMAND_RUN_ALL);
             ASSOCIATE(buttonRun,COMMAND_RUN);
         //
-         
+
         int running=1;
         gtk_widget_set_usize(WID(treeview1), 180, 300);
         while(running)
@@ -125,7 +125,7 @@ GtkCellRenderer *renderer;
                                                 for(int i=0;i<jobs.nb;i++) jobs.status[i].status=STATUS_DELETED;
                                         }
                                         break;
-                        case COMMAND_RUN: 
+                        case COMMAND_RUN:
                                         sel=getSelection(jobs.dialog);
                                         if(sel>=jobs.nb) break;
                                         jobs.status[sel].status=STATUS_RUNNING;
@@ -138,7 +138,7 @@ GtkCellRenderer *renderer;
                                         updateStatus();
                                         GUI_Verbose();
                                         break;
-                        case COMMAND_RUN_ALL: 
+                        case COMMAND_RUN_ALL:
                                         GUI_Quiet();
                                         for(int i=0;i<jobs.nb;i++)
                                         {
@@ -155,7 +155,7 @@ GtkCellRenderer *renderer;
                                         updateStatus();
                                         GUI_Verbose();
                                         break;
-                        case COMMAND_DELETE: 
+                        case COMMAND_DELETE:
                                         sel=getSelection(jobs.dialog);
                                         if(sel>=jobs.nb) break;
                                         if(GUI_Confirmation_HIG(QT_TR_NOOP("Sure!"),QT_TR_NOOP("Delete job"),QT_TR_NOOP("Are you sure you want to delete %s job ?"),ADM_GetFileName(jobs.name[sel])))
@@ -164,12 +164,12 @@ GtkCellRenderer *renderer;
                                         }
                                         break;
 
-                        
+
                         default:
-                                printf("Event:%d\n",event); 
+                                printf("Event:%d\n",event);
                                 GUI_Error_HIG("Jobs",QT_TR_NOOP("Unknown event"));break;
                 }
-                
+
         }
         gtk_unregister_dialog(dialog);
         gtk_widget_destroy(dialog);
@@ -206,7 +206,7 @@ char *str1,str2[200],str3[200];
         gtk_list_store_clear (jobs.store);
         for (uint32_t i = 0; i < jobs.nb; i++)
         {
-               str1 = g_markup_printf_escaped("<span weight=\"heavy\">%s</span>\n" 
+               str1 = g_markup_printf_escaped("<span weight=\"heavy\">%s</span>\n"
                "<span size=\"smaller\" style=\"oblique\">%s</span>"
                 , ADM_GetFileName(jobs.name[i]), StringStatus[jobs.status[i].status]);
 

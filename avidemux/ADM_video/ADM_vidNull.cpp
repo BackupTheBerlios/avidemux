@@ -2,11 +2,11 @@
                           ADM_vidNull.cpp  -  description
                              -------------------
 
-	This filter asks an image from the editor and 
+	This filter asks an image from the editor and
 	clean-up the output
 	It does compute the average quant possibly apply postprocessing
-	
-	
+
+
 
     begin                : Wed Mar 20 2002
     copyright            : (C) 2002 by mean
@@ -39,10 +39,10 @@
 AVDMVideoStreamNull::AVDMVideoStreamNull(ADM_Composer *in,uint32_t start, uint32_t nb)
 {
 aviInfo aviinf;
-  	_in=in;	
-  	
+  	_in=in;
+
   	// now build infos
-  	
+
   	ADM_assert(_in->getVideoInfo(&aviinf));
   	_info.width=aviinf.width;
   	_info.height=aviinf.height;
@@ -60,11 +60,11 @@ aviInfo aviinf;
         par_width=_in->getPARWidth();
         par_height=_in->getPARHeight();
 	aprintf("\n Null stream initialized with start frame = %lu, nbframe=%lu \n",_start,nb);
-  	
+
 }
 uint32_t   AVDMVideoStreamNull::getPARWidth(void)
 {
-  return par_width; 
+  return par_width;
 }
 uint32_t   AVDMVideoStreamNull::getPARHeight(void)
 {
@@ -73,8 +73,8 @@ uint32_t   AVDMVideoStreamNull::getPARHeight(void)
 AVDMVideoStreamNull::~AVDMVideoStreamNull()
 {
 
- //	delete _uncompressed;	
-	
+ //	delete _uncompressed;
+
 }
 //
 //	Basically ask a uncompressed frame from editor and ask
@@ -90,10 +90,10 @@ uint8_t AVDMVideoStreamNull::getFrameNumberNoAlloc(uint32_t frame,
     	UNUSED_ARG(flags);
 		if(!(frame<_info.nb_frames))
 		{
-				printf("\n going out of bounds! :%ld / %ld \n",frame,_info.nb_frames);
+				printf("\n going out of bounds! :%"LD" / %"LD"\n",frame,_info.nb_frames);
 				return 0;
 		}
-		
+
 			// read uncompressed frame
 
 	// 1 get it

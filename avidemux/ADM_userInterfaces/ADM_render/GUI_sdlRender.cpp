@@ -84,12 +84,12 @@ uint8_t sdlAccelRender::end( void)
         if(decoded)
         {
 		        delete [] decoded;
-		        decoded=NULL;	
+		        decoded=NULL;
         }
         sdl_running=0;
         sdl_overlay=NULL;
         sdl_display=NULL;
-        printf("[SDL] Video subsystem closed and destroyed\n");        
+        printf("[SDL] Video subsystem closed and destroyed\n");
 }
 uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 {
@@ -123,11 +123,11 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 	char SDL_windowhack[32];
     int winId=(int)window->window;
 
-    sprintf(SDL_windowhack,"SDL_WINDOWID=%ld",winId);
+    sprintf(SDL_windowhack,"SDL_WINDOWID=%"LD,winId);
     putenv(SDL_windowhack);
 #endif
 
-    if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) 
+    if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
     {
 		printf("[SDL] FAILED initialising video subsystem\n");
 		printf("[SDL] ERROR: %s\n", SDL_GetError());
@@ -140,7 +140,7 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 #if !defined(__WIN32) && !defined(__APPLE__)
     putenv(SDL_windowhack);
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
-    if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) 
+    if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
     {
                 printf("[SDL] FAILED initialising video subsystem\n");
                 printf("[SDL] ERROR: %s\n", SDL_GetError());
@@ -220,7 +220,7 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 #endif
 
         int cspace;
-        
+
         if(useYV12) cspace=SDL_YV12_OVERLAY;
             else    cspace=SDL_YUY2_OVERLAY;
         //_______________________________________________________
@@ -241,7 +241,7 @@ uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 
 			return 0;
         }
-        
+
         printf("[SDL] Overlay created; type: %d, planes: %d, pitch: %d\n", sdl_overlay->hw_overlay, sdl_overlay->planes, sdl_overlay->pitches[0]);
 
         if(!sdl_overlay->hw_overlay)
@@ -260,8 +260,8 @@ static void interleave(uint8_t *dst,uint8_t *src,int width, int stride, int line
     {
         memcpy(dst,src,width);
         src+=width;
-        dst+=stride;          
-    }   
+        dst+=stride;
+    }
 }
 uint8_t sdlAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h,renderZoom zoom)
 {
@@ -277,7 +277,7 @@ uint8_t sdlAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h,renderZoom 
 
 		if (currentPos.left != lastPos.left || currentPos.top != lastPos.top)
 		{
-			// By default SetWindowPos doesn't work if the new coordinates are the same as the 
+			// By default SetWindowPos doesn't work if the new coordinates are the same as the
 			// current so use SWP_FRAMECHANGED to force an update.
 			SetWindowPos(sdlWin32, NULL, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 			lastPos = currentPos;
@@ -288,7 +288,7 @@ uint8_t sdlAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h,renderZoom 
 int pitch;
 int page=w*h;
         ADM_assert(sdl_overlay);
-        SDL_LockYUVOverlay(sdl_overlay);	
+        SDL_LockYUVOverlay(sdl_overlay);
         pitch=sdl_overlay->pitches[0];
 //	printf("SDL: new pitch :%d\n",pitch);
         if(useYV12)
@@ -297,18 +297,18 @@ int page=w*h;
 	            memcpy(sdl_overlay->pixels[0],ptr,w*h);
 	        else
 	            interleave(sdl_overlay->pixels[0],ptr,w,pitch,h);
-	            
+
 	        pitch=sdl_overlay->pitches[1];
 	        if(pitch==(w>>1))
 	            memcpy(sdl_overlay->pixels[1],ptr+page,(w*h)>>2);
 	        else
 	            interleave(sdl_overlay->pixels[1],ptr+page,w>>1,pitch,h>>1);
-	      
+
 	        pitch=sdl_overlay->pitches[2];
 	        if(pitch==(w>>1))
 	            memcpy(sdl_overlay->pixels[2],ptr+(page*5)/4,(w*h)>>2);
 	        else
-	            interleave(sdl_overlay->pixels[2],ptr+(page*5)/4,w>>1,pitch,h>>1);  	
+	            interleave(sdl_overlay->pixels[2],ptr+(page*5)/4,w>>1,pitch,h>>1);
         }else
         {
 	        color->reset(w,h);
@@ -321,7 +321,7 @@ int page=w*h;
 	            color->scale(ptr,decoded);
 	            interleave(sdl_overlay->pixels[0],decoded,2*w,pitch,h);
 	        }
-        }	
+        }
         uint32_t factor=4;
                switch(zoom)
                {
@@ -331,16 +331,16 @@ int page=w*h;
                    case ZOOM_2:   factor=8;break;
                    case ZOOM_4:   factor=16;break;
                    default : ADM_assert(0);
-                 
+
                }
         disp.w=(w*factor)/4;
         disp.h=(h*factor)/4;
         disp.x=0;
         disp.y=0;
-        
+
         SDL_UnlockYUVOverlay(sdl_overlay);
         SDL_DisplayYUVOverlay(sdl_overlay,&disp);
-        
+
         return 1;
 }
 

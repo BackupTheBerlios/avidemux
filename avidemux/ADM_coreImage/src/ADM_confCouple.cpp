@@ -55,7 +55,7 @@ uint8_t CONFcouple::setCouple(const char *myname,uint32_t val)
 	ADM_assert(cur<nb);
 
 	name[cur]=ADM_strdup(myname);
-	sprintf(tmpstring,"%lu",val);
+	sprintf(tmpstring,"%"LU,val);
 	value[cur]=ADM_strdup(tmpstring);
 	cur++;
 	return 1;
@@ -85,7 +85,7 @@ uint8_t CONFcouple::setCouple(const char *myname,int32_t val)
 	ADM_assert(cur<nb);
 
 	name[cur]=ADM_strdup(myname);
-	sprintf(tmpstring,"%ld",val);
+	sprintf(tmpstring,"%"LD,val);
 	value[cur]=ADM_strdup(tmpstring);
 	cur++;
 	return 1;

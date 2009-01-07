@@ -30,13 +30,13 @@
 ADM_newXvidRcVBV::ADM_newXvidRcVBV(uint32_t fps1000, char *logname) : ADM_ratecontrol(fps1000,logname)
 {
 	rc=new ADM_newXvidRc(fps1000,logname);
-	_state=RS_IDLE; 
+	_state=RS_IDLE;
 	_minbr=0;
 	_maxbr=2*9*1000*1000; // ~ 9MB*2
 	_vbvsize=5*224*1024;	// 1MB vbv buffer size
 	_stat=NULL;
 	_lastSize=NULL;
-	
+
     _idxI=_idxP=_idxB=0;
 }
 ADM_newXvidRcVBV::~ADM_newXvidRcVBV()
@@ -57,9 +57,9 @@ uint8_t ADM_newXvidRcVBV::setVBVInfo(uint32_t maxbr,uint32_t minbr, uint32_t vbv
 	_minbr=minbr*1000;
 	_vbvsize=vbvsize*1024;
 	printf("RC: Initializing vbv buffer \n");
-	printf("RC: with min br= %lu kbps\n",(minbr)/1000);
-	printf("RC:      max br= %lu kbps\n",(maxbr)/1000);
-	printf("Rc:      VBV   = %lu kB\n",_vbvsize/1024);
+	printf("RC: with min br= %"LU" kbps\n",(minbr)/1000);
+	printf("RC:      max br= %"LU" kbps\n",(maxbr)/1000);
+	printf("Rc:      VBV   = %"LU" kB\n",_vbvsize/1024);
 
 	return 1;
 }
@@ -70,7 +70,7 @@ uint8_t ADM_newXvidRcVBV::startPass1( void )
 }
 uint8_t ADM_newXvidRcVBV::startPass2( uint32_t size,uint32_t nbFrame )
 {
-	printf("Starting Xvid VBV with %lu frames, target size :%lu MB\n",nbFrame,size);
+	printf("Starting Xvid VBV with %"LU" frames, target size :%"LU" MB\n",nbFrame,size);
 	_nbFrames=nbFrame;
 	if(! rc->startPass2(size,nbFrame)) return 0;
 	// Built pass 1 stat file in memory
@@ -78,7 +78,7 @@ uint8_t ADM_newXvidRcVBV::startPass2( uint32_t size,uint32_t nbFrame )
 	//________________________________
 	_stat=new ADM_pass_stat[nbFrame];
 	ADM_pass_stat *cur=_stat;
-	
+
 	for(uint32_t i=0;i<nbFrame;i++)
 	{
 		rc->getInfo(i,&(cur->quant),&(cur->size),&(cur->type));
@@ -98,7 +98,7 @@ uint8_t ADM_newXvidRcVBV::startPass2( uint32_t size,uint32_t nbFrame )
 		_compr[1][i]=1.0;
 		_compr[2][i]=1.0;
 	}
-	printf("Rc: Byte per image : %lu \n",_byte_per_image);
+	printf("Rc: Byte per image : %"LU" \n",_byte_per_image);
 	return 1;
 }
 uint8_t ADM_newXvidRcVBV::logPass1(uint32_t qz, ADM_rframe ftype,uint32_t size)
@@ -109,11 +109,11 @@ uint8_t ADM_newXvidRcVBV::logPass2(uint32_t qz, ADM_rframe ftype,uint32_t size)
 {
 	// update stored value
 	_lastSize[_frame%_roundup]=size;
-	
+
 	_vbv_fullness+=_byte_per_image;
 	if(_vbv_fullness<size)
 	{
-		printf("VBV buffer underflow :frame %lu, underflow : %lu\n",_frame,size-_vbv_fullness);
+		printf("VBV buffer underflow :frame %"LU", underflow : %"LU"\n",_frame,size-_vbv_fullness);
 	}
 	else
 	{
@@ -121,22 +121,22 @@ uint8_t ADM_newXvidRcVBV::logPass2(uint32_t qz, ADM_rframe ftype,uint32_t size)
 	}
 	if(_vbv_fullness>_vbvsize)
 	{
-		// not an error printf("VBV buffer overflow :frame %lu, overflow : %lu\n",_frame,_vbv_fullness-_vbvsize);
+		// not an error printf("VBV buffer overflow :frame %"LU", overflow : %"LU"\n",_frame,_vbv_fullness-_vbvsize);
 		_vbv_fullness=_vbvsize;
 	}
 	// update compr
 	uint32_t rank;
-#define BLEND(x) case RF_##x: rank=_idx##x;_idx##x=_idx##x+1;_idx##x%=AVG_LOOKUP;break;	
+#define BLEND(x) case RF_##x: rank=_idx##x;_idx##x=_idx##x+1;_idx##x%=AVG_LOOKUP;break;
 	switch(ftype)
 	{
 	    BLEND(I)
 	    BLEND(P)
 	    BLEND(B)
 	    default: ADM_assert(0);
-	}    
+	}
 		_compr[ftype-1][rank]=getComp(_stat[_frame].size,_stat[_frame].quant,size,qz);
 	//
-	aprintf("Frame %08lu size %d type:%d vbv fullness %u, kbytes :%lu qz used :%d\n",_frame,size, ftype,(100*_vbv_fullness)/_vbvsize,_vbv_fullness/1024,qz);
+	aprintf("Frame %08lu size %d type:%d vbv fullness %u, kbytes :%"LU" qz used :%d\n",_frame,size, ftype,(100*_vbv_fullness)/_vbvsize,_vbv_fullness/1024,qz);
 	// compute instantaneous br
 	uint32_t br=0;
 	for(uint32_t i=0;i<_roundup;i++)
@@ -145,7 +145,7 @@ uint8_t ADM_newXvidRcVBV::logPass2(uint32_t qz, ADM_rframe ftype,uint32_t size)
 	}
 	br*=8;
 	br/=1000;
-	aprintf("br : %lu\n",br);
+	aprintf("br : %"LU"\n",br);
 	_frame++;
 	return rc->logPass2(qz,ftype,size);
 }
@@ -157,7 +157,7 @@ uint8_t ADM_newXvidRcVBV::getQz( uint32_t *qz, ADM_rframe *type )
 	if(*qz<2) *qz=2;
 	while(*qz<31 && project(_frame,*qz,*type)) (*qz)++;
 
-	
+
 	return 1;
 }
 
@@ -181,7 +181,7 @@ uint8_t ADM_newXvidRcVBV::verifyLog(const char *file,uint32_t nbFrame)
         if(!in) return 0;
         while(fgets(oneLine,1023,in)) nb++;
         fclose(in);
-        if(nbFrame+1==nb) 
+        if(nbFrame+1==nb)
         {
             printf("[XvidRC]Logfile Seems ok\n");
             return 1;
@@ -200,37 +200,37 @@ uint8_t ADM_newXvidRcVBV::project(uint32_t framenum, uint32_t q, ADM_rframe fram
 }
 uint8_t ADM_newXvidRcVBV::checkVBV(uint32_t framenum, uint32_t q, ADM_rframe frame)
 {
-	
+
 	// Project the next frames with the same Q factor reduction as now
 	// and check
-	
+
 	// A bit simplistic...
-	
+
 	if(framenum<_nbFrames-_roundup)
 	{
 		uint32_t projected_vbv=(_vbv_fullness*9)/10; // Only use 90% of the buffer
 		uint32_t framesize;
-		
+
 		// Q increase ratio
-		
+
 		float compI=0,compP=0,compB=0,comp=0,size,qr;
 		float ratioI,ratioP,ratioB,ratio;
-	
+
 			for(uint32_t i=0;i<AVG_LOOKUP;i++)
 			{
 				compI+=_compr[0][i];
 				compP+=_compr[1][i];
 				compB+=_compr[2][i];
 			}
-			
+
 			compI=compI/AVG_LOOKUP;	// Average compression ratio
 			compP=compP/AVG_LOOKUP;	// Average compression ratio
 			compB=compB/AVG_LOOKUP;	// Average compression ratio
 			ratioI=getRatio(q,_stat[framenum].quant,compI);
 			ratioP=getRatio(q,_stat[framenum].quant,compP);
 			ratioB=getRatio(q,_stat[framenum].quant,compB);
-			
-		
+
+
 		for(uint32_t i=0;i<_roundup>>1;i++)
 		{
 			switch(_stat[framenum+i].type)
@@ -243,11 +243,11 @@ uint8_t ADM_newXvidRcVBV::checkVBV(uint32_t framenum, uint32_t q, ADM_rframe fra
 			size=ratio;
 			size*=_stat[framenum+i].size;
 			framesize=(uint32_t)floor(size);	// predicted size
-			
+
 			if(frame==RF_I) // Keep a margin and anticipate BIG I frame
 				framesize=(framesize*12)/10;
-			
-			aprintf("\t Org: %lu projected :%d VBV:%d q:%d ratio:%f alpha:%f  type :%d\n",_stat[framenum+i].size,framesize,
+
+			aprintf("\t Org: %"LU" projected :%d VBV:%d q:%d ratio:%f alpha:%f  type :%d\n",_stat[framenum+i].size,framesize,
 					projected_vbv/1024,q,ratio,comp,_stat[framenum+i].type);
 			if(projected_vbv<framesize)
 			{
@@ -265,7 +265,7 @@ uint8_t ADM_newXvidRcVBV::checkVBV(uint32_t framenum, uint32_t q, ADM_rframe fra
 	else
 	{
 		if(q<9) return 0;
-	}		
+	}
 	return 1;
 
 }
@@ -281,7 +281,7 @@ uint8_t ADM_newXvidRcVBV::checkVBV(uint32_t framenum, uint32_t q, ADM_rframe fra
 float ADM_newXvidRcVBV::getComp(int oldbits, int qporg, int newbits, int qpused)
 {
 	float comp;
-/*	
+/*
 	comp=newbits;
 	comp/=oldbits;
 	comp=log(comp);
@@ -309,7 +309,7 @@ float ADM_newXvidRcVBV::getComp(int oldbits, int qporg, int newbits, int qpused)
 /*_______________________________________________________________
 	Predict the size of the image
 	Using a exp(-comp) formula instead of linear formula
-	
+
 	Idea by Peter Cheat
 __________________________________________________________________
 */
@@ -327,8 +327,8 @@ float ADM_newXvidRcVBV::getRatio(uint32_t newq, uint32_t oldq, float alpha)
 	// Nb/Ob=Oq/Nq*alpha
 	//alpha=1;
 	float comp;
-	
-	comp=oldq;	
+
+	comp=oldq;
 	comp/=newq;
 	comp*=alpha;
 	return comp;

@@ -92,7 +92,7 @@ static COMPRES_PARAMS* getCodecParamFromTag(    SelectCodecType tag)
         if(r->codec==tag) return r;
       }
     return NULL;
-  
+
 }
 CodecFamilty videoCodecGetFamily(void)
 {
@@ -363,7 +363,7 @@ int videoCodecSelectByName(const char *name)
 	}
 
 	printf ("\n Mmmm Select codec by name failed...(%s).\n", name);
-	printf (" Available codec : %d\n", sizeof (AllVideoCodec) / sizeof (COMPRES_PARAMS));
+	printf (" Available codec : %"LU"\n", sizeof (AllVideoCodec) / sizeof (COMPRES_PARAMS));
 
 	for (uint32_t i = 0; i < nb; i++)
 		printf ("%s:%s\n", AllVideoCodec[i].tagName, AllVideoCodec[i].descriptor);
@@ -806,7 +806,7 @@ void videoCodecSetConf(uint32_t extraLen, uint8_t *extraData)
 */
 void setIpod_Xvid4Preset(void)
 {
-	memcpy(&xvid4Extra,&xvid4ExtraIPOD,sizeof(xvid4ExtraIPOD)); 
+	memcpy(&xvid4Extra,&xvid4ExtraIPOD,sizeof(xvid4ExtraIPOD));
 }
 #endif
 

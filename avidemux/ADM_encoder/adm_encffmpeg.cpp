@@ -378,14 +378,14 @@ uint8_t EncoderFFMPEG::configure (AVDMGenericVideoStream * instream, int useExis
       break;
 
     case COMPRESS_CQ:
-      printf ("ffmpeg cq mode: %ld\n", _param.qz);
+      printf ("ffmpeg cq mode: %"LU"\n", _param.qz);
       _state = enc_CQ;
       _codec = new ffmpegEncoderCQ (_w, _h, _id);
       _codec->setConfig (&_settings);
       _codec->init (_param.qz, _fps, 0);
       break;
     case COMPRESS_CBR:
-      printf ("ffmpeg cbr mode: %ld\n", _param.bitrate);
+      printf ("ffmpeg cbr mode: %"LU"\n", _param.bitrate);
       _state = enc_CBR;
       _codec = new ffmpegEncoderCBR (_w, _h, _id);
       _codec->setConfig (&_settings);
