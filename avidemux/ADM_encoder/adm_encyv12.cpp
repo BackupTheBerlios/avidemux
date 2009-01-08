@@ -58,7 +58,7 @@ EncoderYV12::configure (AVDMGenericVideoStream * instream, int useExistingLogFil
   _frametogo = info->nb_frames;
   _vbuffer = new ADMImage (_w, _h);
   ADM_assert (_vbuffer);
-  printf ("\n Yv12 Encoder ready , w: %lu h:%lu mode:%d", _w, _h, _state);
+  printf ("\n Yv12 Encoder ready , w: %"LU" h:%"LU" mode:%d", _w, _h, _state);
   return 1;
 }
 

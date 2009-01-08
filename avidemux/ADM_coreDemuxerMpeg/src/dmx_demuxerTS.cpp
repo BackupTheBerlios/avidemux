@@ -158,7 +158,7 @@ uint8_t dmx_demuxerTS::setPos( uint64_t abs,uint64_t  rel)
         {
                 if(_pesBufferLen<rel)
                 {
-                        printf("Asked setpos to go %"LU" whereas %"LU" is max\n",
+                        printf("Asked setpos to go %"LLU" whereas %"LU" is max\n",
                                 rel,_pesBufferLen);
                         ADM_assert(rel<_pesBufferLen);
                 }
@@ -183,7 +183,7 @@ uint8_t dmx_demuxerTS::setPos( uint64_t abs,uint64_t  rel)
 
         if(rel>_pesBufferLen)
         {
-                printf("Set pos failed : asked rel:%"LU" max: %"LU", absPos:%"LLU" absPosafterRefill:%"LLU"\n",
+                printf("Set pos failed : asked rel:%"LLU" max: %"LU", absPos:%"LLU" absPosafterRefill:%"LLU"\n",
                                         rel,_pesBufferLen,abs,_pesBufferStart);
                 ADM_assert(rel<_pesBufferLen);
         }
@@ -281,12 +281,12 @@ retry:
                                  }
                                  left=_oldPesLen-left;
 #if 0
-                                 printf("Next packet : %I64X Len :%lu, using previous packet %I64X len:%u as pos=%lu\n",
+                                 printf("Next packet : %I64X Len :%"LU", using previous packet %I64X len:%u as pos=%"LU"\n",
                                  		_pesBufferStart,_pesBufferLen,_oldPesStart,_oldPesLen,_pesBufferIndex);
 #endif
                                  if(left>_oldPesLen)
                                 {
-                                        printf("Need %lu bytes from previous packet, which len is %"LU"\n",left,_oldPesLen);
+                                        printf("Need %"LU" bytes from previous packet, which len is %"LU"\n",left,_oldPesLen);
                                         ADM_assert(0);
                                 }
                                 *abs=_oldPesStart;
@@ -389,7 +389,7 @@ _againBranch:
                                          _pesBufferLen=packLen;
                                 }
 #if 0
-                                printf("at %llx, packLen=%lu minus %lu\n",_pesBufferStart,packLen,_pesBufferLen);
+                                printf("at %llx, packLen=%"LU" minus %"LU"\n",_pesBufferStart,packLen,_pesBufferLen);
 #endif
                                 packLen-=_pesBufferLen;
 
@@ -408,7 +408,7 @@ _againBranch:
         // Payload present, read header
 #ifdef TS_VERBOSE
         parser->getpos(&first);
-        printf("BF: left:%lu delta :%"LLU"\n",left,first-abs);
+        printf("BF: left:%"LU" delta :%"LLU"\n",left,first-abs);
 #endif
         if(pid==myPid && isPsi)
         {
@@ -441,9 +441,9 @@ _againBranch:
                         goto _againBranch;
         }
 #ifdef TS_VERBOSE
-        printf("Stream :%x found at %"LLX" size :%lu\n",stream,abs,lenPes);
+        printf("Stream :%x found at %"LLX" size :%"LU"\n",stream,abs,lenPes);
         parser->getpos(&count);
-        printf("consumed :%lu left:%lu delta :%"LLU"\n",consumed,left,count-first);
+        printf("consumed :%"LU" left:%"LU" delta :%"LLU"\n",consumed,left,count-first);
         if(count-first!=consumed) printf("*** PES header length is wrong***\n");
 
 #endif
@@ -826,7 +826,7 @@ retry:
                                  }
                                  left=_oldPesLen-left;
 #if 0
-                                 printf("Next packet : %I64X Len :%lu, using previous packet %I64X len:%u as pos=%lu\n",
+                                 printf("Next packet : %I64X Len :%"LU", using previous packet %I64X len:%u as pos=%"LU"\n",
                                  		_pesBufferStart,_pesBufferLen,_oldPesStart,_oldPesLen,_pesBufferIndex);
 #endif
                                  if(left>_oldPesLen)

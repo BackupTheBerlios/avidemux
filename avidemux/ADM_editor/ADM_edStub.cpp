@@ -127,7 +127,7 @@ uint8_t   ADM_Composer::getFrame (uint32_t framenum, ADMCompressedImage *img, ui
   if (!convFrame2Seg (framenum, &seg, &relframe))
     return 0;
 #if 0
-  printf ("\n %lu --> %lu,%lu\n", framenum, seg, relframe);
+  printf ("\n %"LU" --> %"LU",%"LU"\n", framenum, seg, relframe);
 #endif
   if (seg)
     {
@@ -168,7 +168,7 @@ uint8_t ADM_Composer::sequentialFramesB(uint32_t frameA,uint32_t frameB)
   	}
   	if(segA!=segB)
 	{
-	// printf("%lu %lu -> seg differs: %lu,%lu\n",frameA,frameB,segA,segB);
+	// printf("%"LU" %"LU" -> seg differs: %"LU",%"LU"\n",frameA,frameB,segA,segB);
 	 return 0;
 	}
 
@@ -179,7 +179,7 @@ uint8_t ADM_Composer::sequentialFramesB(uint32_t frameA,uint32_t frameB)
 		_videos[ref]._aviheader->getFlags(i,&flags);
 		if(!(flags&AVI_B_FRAME))
 		{
-	//		printf("Start: %lu ko:%lu end:%lu\n",relframeA+1,i,relframeB);
+	//		printf("Start: %"LU" ko:%"LU" end:%"LU"\n",relframeA+1,i,relframeB);
 			return 0;		// There is not only B frame between A & B
 		}
 	}
@@ -386,7 +386,7 @@ uint32_t i=0;
 	// If the last frames are B frames it is fatal
 	if(!getFlagsAndSeg (end-1, &flags,&seg))
 	{
-				printf("Cannot get flags for frame %lu\n",end-1);
+				printf("Cannot get flags for frame %"LU"\n",end-1);
 				goto _abt;
 	}
 	if(flags & AVI_B_FRAME)

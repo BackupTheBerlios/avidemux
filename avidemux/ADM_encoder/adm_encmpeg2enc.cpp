@@ -1,5 +1,5 @@
 /***************************************************************************
-                         
+
     copyright            : (C) 2006 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
@@ -105,7 +105,7 @@ _retry:
     printf ("\n Error : Cannot read incoming frame !");
     return 0;
   }
-  
+
   if(_state==enc_Pass2)
   {
       _xrc->getQz (&nq, &f);
@@ -117,12 +117,12 @@ _retry:
         default:
           nf = 0;
       }
-  
+
       if (nq < MPEG1_MIN_Q)
         nq = MPEG1_MIN_Q;
       if (nq > MPEG1_MAX_Q)
         nq = MPEG1_MAX_Q;
-  
+
         //printf("asked :%d ",nq);
         out->in_quantizer=nq;
         out->flags=nf;
@@ -135,7 +135,7 @@ _retry:
      printf("[mpeg2enc]Codec error frame %u delay %u\n", frame,_delayed);
      return 0;
    }
-   
+
    switch (out->flags)
    {
      case AVI_KEY_FRAME:
@@ -151,7 +151,7 @@ _retry:
        ADM_assert (0);
 
    }
-   
+
    switch(_state)
    {
      case enc_Pass1:
@@ -161,7 +161,7 @@ _retry:
             printf ("Skipping delay\n");
             goto _retry;
           }
-         
+
           _xrc->logPass1 (out->out_quantizer, rf, out->len);
           _frametogo++;
         }
@@ -211,11 +211,11 @@ uint8_t     EncoderMpeg2enc::configure (AVDMGenericVideoStream * instream, int u
   _in = instream;
 
   _availableFrames=instream->getInfo()->nb_frames;
-  
+
   uint32_t interlaced=_settings.interlaced;
   uint32_t bff=_settings.bff;
   uint32_t widescreen=_settings.widescreen;
-  
+
   _codec=NULL;
   switch (_param.mode)
   {
@@ -244,7 +244,7 @@ uint8_t     EncoderMpeg2enc::configure (AVDMGenericVideoStream * instream, int u
         Mpeg2encVCD *dec;
         dec = new Mpeg2encVCD (_w, _h);
         dec->init (1, 0, _fps1000, interlaced, bff, widescreen, 0);
-        _codec = dec;	
+        _codec = dec;
       }
       break;
     case MPEG2ENC_SVCD:
@@ -272,7 +272,7 @@ uint8_t     EncoderMpeg2enc::configure (AVDMGenericVideoStream * instream, int u
   ADM_assert(_codec);
 
   _in = instream;
-  printf ("\n Mpeg2enc Encoder , w: %lu h:%lu mode:%d", _w, _h, _state);
+  printf ("\n Mpeg2enc Encoder , w: %"LU" h:%"LU" mode:%d", _w, _h, _state);
   return 1;
 }
 
@@ -333,7 +333,7 @@ uint8_t     EncoderMpeg2enc::stop (void)
 uint8_t    EncoderMpeg2enc::startPass2 (void)
 {
   uint32_t br,avg_bitrate,size;
-  
+
   ADM_assert (_state == enc_Pass1);
   printf ("[Mpeg2enc]-------* Starting pass 2*-------------\n");
 
@@ -353,7 +353,7 @@ uint8_t    EncoderMpeg2enc::startPass2 (void)
     size=(uint32_t )d;
 
     printf("[Mpeg2enc]  Final Size: %u MB 2pass avg bitrate %u kb/s\n",size,br);
-    
+
   }else ADM_assert(0);
 
   uint32_t maxbr;
@@ -369,8 +369,8 @@ uint8_t    EncoderMpeg2enc::startPass2 (void)
   }
 
 
-  printf ("[Mpeg2enc] ** Total size     : %lu MBytes \n", _param.finalsize);
-  printf ("[Mpeg2enc] ** Total frame    : %lu  \n", _totalframe);
+  printf ("[Mpeg2enc] ** Total size     : %"LU" MBytes \n", _param.finalsize);
+  printf ("[Mpeg2enc] ** Total frame    : %"LU"  \n", _totalframe);
 
   printf ("[Mpeg2enc] VBR parameters computed\n");
   _state = enc_Pass2;
@@ -386,7 +386,7 @@ uint8_t    EncoderMpeg2enc::startPass2 (void)
   uint32_t bff=_settings.bff;
   uint32_t widescreen=_settings.widescreen;
   uint32_t vbv;
-  
+
   switch(_id)
   {
     case MPEG2ENC_SVCD:
@@ -415,7 +415,7 @@ uint8_t    EncoderMpeg2enc::startPass2 (void)
   }
   _xrc->setVBVInfo (_settings.maxBitrate, 0,  vbv);
   ADM_assert (_xrc->startPass2 (size, _totalframe));
-  
+
   printf ("\n XV:ready to encode in 2pass(%s)\n", _logname);
   _frametogo = 0;
   return 1;

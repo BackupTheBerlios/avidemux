@@ -111,7 +111,7 @@ int max;
 				 char *nm,*val;
 
 					nodeConf= xmlNewChild(node,NULL,(xmlChar *)"Parameters",NULL );
-					sprintf(tmpstring,"%lu",setup->getNumber());
+					sprintf(tmpstring,"%"LU"",setup->getNumber());
 					xmlNewProp(nodeConf,(xmlChar *)"Number",(xmlChar *)tmpstring);
 
 					// and write each attribute

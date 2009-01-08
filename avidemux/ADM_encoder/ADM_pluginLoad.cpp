@@ -167,7 +167,7 @@ int loadVideoEncoderPlugins(int uiType, const char *path)
 	for (int i = 0; i < nbFile; i++)
 		loadVideoEncoderPlugin(uiType, files[i]);
 
-	printf("[ADM_vidEnc_plugin] Scanning done, found %u codec\n", ADM_videoEncoderPlugins.size());
+	printf("[ADM_vidEnc_plugin] Scanning done, found %"LU" codec\n", ADM_videoEncoderPlugins.size());
 
 	AllVideoCodecCount = ADM_videoEncoderPlugins.size() + getInternalVideoCodecCount();
 	AllVideoCodec = new COMPRES_PARAMS[AllVideoCodecCount];

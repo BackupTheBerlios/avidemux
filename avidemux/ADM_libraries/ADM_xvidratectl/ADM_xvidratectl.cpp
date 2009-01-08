@@ -1,6 +1,6 @@
  // Port of below to use with mpeg2enc/lavcodec
  // port by mean, see below for original copyright/authors
- 
+
  /******************************************************************************
  *
  *  XviD Bit Rate Controller Library
@@ -286,7 +286,7 @@ static void writeQuantStat(rc_2pass2_t * rc);
 //****************************************************************************************
 //****************************************************************************************
 //****************************************************************************************
-#define FAKE_VERSION  XVID_MAKE_VERSION(1,1,99) 
+#define FAKE_VERSION  XVID_MAKE_VERSION(1,1,99)
 static void *myHandle=NULL;
 
 ADM_newXvidRc::~ADM_newXvidRc()
@@ -296,7 +296,7 @@ xvid_plg_destroy_t data;
 	data.version=FAKE_VERSION;
 	switch(_state)
 	{
-	
+
 		case RS_IDLE:break;
 		case RS_PASS1:rc_2pass1_destroy((rc_2pass1_t *)myHandle,&data);break;
 		case RS_PASS2:writeQuantStat((rc_2pass2_t *)myHandle);
@@ -306,24 +306,24 @@ xvid_plg_destroy_t data;
 	}
 	_state=RS_IDLE;
 	myHandle=0;
-	
+
 
 }
 
 //
 ADM_newXvidRc::ADM_newXvidRc(uint32_t fps1000, char *logname) : ADM_ratecontrol(fps1000,logname)
 {
-  
+
 	_totalFrame=0;
-	
+
 }
 //
 uint8_t ADM_newXvidRc::setVBVInfo(uint32_t maxbr,uint32_t minbr, uint32_t vbvsize)
 {
 
-	
 
-	
+
+
 	return 1;
 }
 uint8_t ADM_newXvidRc::startPass1( void )
@@ -331,14 +331,14 @@ uint8_t ADM_newXvidRc::startPass1( void )
 xvid_plugin_2pass1_t 	data;
 xvid_plg_create_t	create;
 	ADM_assert(_state==RS_IDLE);
-	
-	
+
+
 	create.version=FAKE_VERSION;
-	create.param=&data;	
+	create.param=&data;
 
 	data.version=FAKE_VERSION; // Fake 1.1
 	data.filename=_logname;
-			
+
 	 if(rc_2pass1_create(&create, (rc_2pass1_t **)&myHandle))
 	 {
 	 	printf("XvidRC(new): pass1 failed\n");
@@ -352,7 +352,7 @@ uint8_t ADM_newXvidRc::logPass1(uint32_t qz, ADM_rframe ftype,uint32_t size)
 {
 
 xvid_plg_data_t  data;
-	
+
 	memset(&data,0,sizeof(data));
 	data.stats.version=FAKE_VERSION;
 	data.version=FAKE_VERSION;
@@ -361,16 +361,16 @@ xvid_plg_data_t  data;
 		case RF_I: data.stats.type=XVID_TYPE_IVOP;break;
 		case RF_P: data.stats.type=XVID_TYPE_PVOP;break;
 		case RF_B: data.stats.type=XVID_TYPE_BVOP;break;
-		default:ADM_assert(0);		
+		default:ADM_assert(0);
 	}
 	data.stats.quant=qz;
 	data.stats.length=size;
-	
-	
+
+
  	rc_2pass1_after((rc_2pass1_t *)myHandle,&data);
 	_nbFrames++;
 
-		
+
 	return 1;
 }
 uint8_t ADM_newXvidRc::getInfo(uint32_t framenum, uint32_t *qz, uint32_t *size,ADM_rframe *type )
@@ -389,7 +389,7 @@ int override=0;
               ADM_assert(framenum<rc->num_frames+2)
               override=1;
         }
-        
+
         if(framenum>=_totalFrame-2)
         {
                 override=1;
@@ -411,9 +411,9 @@ int override=0;
               case XVID_TYPE_IVOP: *type=RF_I; ;break;
               case XVID_TYPE_PVOP: *type=RF_P; ;break;
               case XVID_TYPE_BVOP: *type=RF_B; ;break;
-              default:printf("f:%lu Type : %d\n",framenum,rc->stats[framenum].type);ADM_assert(0);
+              default:printf("f:%"LU" Type : %d\n",framenum,rc->stats[framenum].type);ADM_assert(0);
         }
-        
+
 	return 1;
 
 }
@@ -433,36 +433,36 @@ xvid_plg_create_t	create;
 		rc_2pass1_destroy((rc_2pass1_t *)myHandle,&data);
 		myHandle=NULL;
 	}
-	
+
         printf("[Xvid RC] Starting pass2 , %u frames\n",nbFrame);
 	_totalFrame=_nbFrames=nbFrame;
 	memset(&data,0,sizeof(data));
 	memset(&create,0,sizeof(create));
-	
-	
-	
+
+
+
 	//avg/=1000; //bps / kbps
-	
-	printf("Xvidr: pass2 : %lu MB, avg:%d, nbframe:%lu\n",final_size,0,_nbFrames);
-	
+
+	printf("Xvidr: pass2 : %"LU" MB, avg:%d, nbframe:%"LU"\n",final_size,0,_nbFrames);
+
 	create.version=FAKE_VERSION;
-	create.param=&data;	
+	create.param=&data;
 
 	data.version=FAKE_VERSION; // Fake 1.1
 	data.filename=_logname;
-	
+
 	create.width=720;
 	create.height=576;
-	
+
 	// incr/base =1000/fps1000
 	//base*1000=incr*fps1000
 	// base=fps1000 incr=1000
 	create.fbase=_fps1000;
 	create.fincr=1000;
-	
-	
+
+
 	data.bitrate=-1024*final_size;
-	
+
 	data.keyframe_boost=10;
 	/*
 	data.curve_compression_high=10;
@@ -473,7 +473,7 @@ xvid_plg_create_t	create;
 	data.kfreduction=10;
 	data.kfthreshold=10;
 	*/
-	
+
 	 if(rc_2pass2_create(&create, (rc_2pass2_t **)&myHandle))
 	 {
 	 	printf("XvidRC(new): pass2 failed\n");
@@ -493,8 +493,8 @@ uint8_t ADM_newXvidRc::getQz( uint32_t *qz, ADM_rframe *type )
 {
 		_2pass_data.frame_num=_nbFrames;
 		_2pass_data.quant=0;
-		
-	
+
+
 	 rc_2pass2_before((rc_2pass2_t *)myHandle, &_2pass_data);
 	 *qz=_2pass_data.quant;
 	 switch(_2pass_data.type)
@@ -514,7 +514,7 @@ uint8_t ADM_newXvidRc::logPass2( uint32_t qz, ADM_rframe ftype,uint32_t size)
 		case RF_I: _2pass_data.type=XVID_TYPE_IVOP;break;
 		case RF_P: _2pass_data.type=XVID_TYPE_PVOP;break;
 		case RF_B: _2pass_data.type=XVID_TYPE_BVOP;break;
-		default:ADM_assert(0);		
+		default:ADM_assert(0);
 	}
 	_2pass_data.quant=qz;
 	_2pass_data.length=size;
@@ -523,13 +523,13 @@ uint8_t ADM_newXvidRc::logPass2( uint32_t qz, ADM_rframe ftype,uint32_t size)
 	{
 		_2pass_data.min_quant[i]=2;
 		_2pass_data.max_quant[i]=31;
-	
+
 	}
 	 //rc_2pass2_after(rc_2pass2_t * rc, xvid_plg_data_t * data);
  	rc_2pass2_after((rc_2pass2_t *)myHandle,&_2pass_data);
 	_nbFrames++;
 
-		
+
 	return 1;
 
 }
@@ -991,8 +991,8 @@ rc_2pass2_before(rc_2pass2_t * rc, xvid_plg_data_t * data)
 	 // Meanx
 	 // For raw mpeg2 encoding access we will use bquant etc directly
 	 // as for that, we do final=1squant*100/bquant_ratio+
-	 
-#ifdef BQUANT_PRESCALE 
+
+#ifdef BQUANT_PRESCALE
 	if(s->type == XVID_TYPE_BVOP) {
 
 		twopass_stat_t *b_ref = s;
@@ -1010,14 +1010,14 @@ rc_2pass2_before(rc_2pass2_t * rc, xvid_plg_data_t * data)
 #endif
 #ifdef MEANX_RESCALE
 	/* For bframes we prescale the quantizer to avoid too high quant scaling */
-	if(s->type == XVID_TYPE_BVOP) 
+	if(s->type == XVID_TYPE_BVOP)
 	{
 		int newquant;
-		
+
 			newquant=data->bquant_ratio*s->quant+data->bquant_offset;;
 			newquant/=100;
-			
-			s->quant=newquant;		
+
+			s->quant=newquant;
 	}
 #endif
 
