@@ -160,7 +160,7 @@ uint8_t mkvHeader::analyzeTracks(void *head,uint32_t headlen)
       father.readElemId(&id,&len);
       if(!ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type))
       {
-        printf("[MKV] Tag 0x%x not found (len %llu)\n",id,len);
+        printf("[MKV] Tag 0x%"LLX" not found (len %"LLU")\n",id,len);
         father.skip(len);
         continue;
       }
@@ -192,7 +192,7 @@ uint8_t mkvHeader::walk(void *seed)
       father->readElemId(&id,&len);
       if(!ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type))
       {
-        printf("[MKV] Tag 0x%x not found (len %llu)\n",id,len);
+        printf("[MKV] Tag 0x%"LLX" not found (len %"LLU")\n",id,len);
         father->skip(len);
         continue;
       }
@@ -204,10 +204,10 @@ uint8_t mkvHeader::walk(void *seed)
                   printf("%s skipped\n",ss);
                   break;
         case ADM_MKV_TYPE_UINTEGER:
-                  printf("%s:%llu\n",ss,father->readUnsignedInt(len));
+                  printf("%s:%"LLU"\n",ss,father->readUnsignedInt(len));
                   break;
         case ADM_MKV_TYPE_INTEGER:
-                  printf("%s:%lld\n",ss,father->readSignedInt(len));
+                  printf("%s:%"LLD"\n",ss,father->readSignedInt(len));
                   break;
         case ADM_MKV_TYPE_STRING:
         {
@@ -474,7 +474,7 @@ uint8_t                 mkvHeader::getNbAudioStreams(void)
     \fn getAudioInfo
 */
 
-WAVHeader              *mkvHeader::getAudioInfo(uint32_t i )  
+WAVHeader              *mkvHeader::getAudioInfo(uint32_t i )
 {
     if(!_nbAudioTrack) return NULL;
     ADM_assert(i<_nbAudioTrack)

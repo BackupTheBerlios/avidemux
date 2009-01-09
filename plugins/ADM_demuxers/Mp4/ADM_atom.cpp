@@ -87,7 +87,7 @@ uint8_t adm_atom::skipBytes( uint32_t nb )
 int64_t pos;
 	fseeko(_fd,nb,SEEK_CUR);
 	pos=ftello(_fd);
-	if(pos>_atomStart+_atomSize+1) ADM_assert(0);	
+	if(pos>_atomStart+_atomSize+1) ADM_assert(0);
 	return 1;
 }
 
@@ -138,7 +138,7 @@ uint32_t adm_atom::getFCC( void )
 int64_t adm_atom::getRemainingSize( void )
 {
         int64_t pos=ftello(_fd);
-        
+
         return _atomStart+_atomSize-pos;
 }
 
@@ -157,7 +157,7 @@ uint8_t adm_atom::readPayload( uint8_t *whereto, uint32_t rd)
 	i=fread(whereto,rd,1,_fd);
 	if(i!=1)
 	{
-		printf("\n oops asked %lu got %lu \n",rd,i);
+		printf("\n oops asked %"LU" got %"LU" \n",rd,i);
 	return 0;
 	}
 	return 1;

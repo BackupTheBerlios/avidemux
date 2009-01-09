@@ -2,10 +2,10 @@
             \file            muxerFlv
             \brief           i/f to lavformat mpeg4 muxer
                              -------------------
-    
+
     copyright            : (C) 2008 by mean
     email                : fixounet@free.fr
-        
+
  ***************************************************************************/
 
 /***************************************************************************
@@ -48,7 +48,7 @@ FLVMUXERCONFIG muxerConfig=
     \fn     muxerFlv
     \brief  Constructor
 */
-muxerFlv::muxerFlv() 
+muxerFlv::muxerFlv()
 {
 };
 /**
@@ -56,7 +56,7 @@ muxerFlv::muxerFlv()
     \brief  Destructor
 */
 
-muxerFlv::~muxerFlv() 
+muxerFlv::~muxerFlv()
 {
     printf("[FLV] Destructing\n");
     if(oc)
@@ -112,7 +112,7 @@ bool muxerFlv::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
     }
     /* All seems fine, open stuff */
     const char *f="flv";
-    
+
     fmt=guess_format(f, NULL, NULL);
     if(!fmt)
     {
@@ -140,10 +140,10 @@ bool muxerFlv::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
 	}
     AVCodecContext *c;
 	c = video_st->codec;
-    
+
   // probably a memeleak here
         char *foo=ADM_strdup(file);
-        
+
         strcpy(oc->title,ADM_GetFileName(foo));
         strcpy(oc->author,"Avidemux");
         c->sample_aspect_ratio.num=1;
@@ -161,7 +161,7 @@ bool muxerFlv::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
                         c->has_b_frames=0; // No PTS=cannot handle CTS...
                         c->max_b_frames=0;
                         c->codec_id=CODEC_ID_FLV1;
-					 	 
+
                         c->codec=new AVCodec;
                         memset(c->codec,0,sizeof(AVCodec));
                         c->codec->name=ADM_strdup("FLV1");
@@ -170,7 +170,7 @@ bool muxerFlv::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
                 {
                         ADM_assert(0);
                 }
-        
+
         uint32_t videoExtraDataSize=0;
         uint8_t  *videoExtraData;
         s->getExtraData(&videoExtraDataSize,&videoExtraData);
@@ -179,7 +179,7 @@ bool muxerFlv::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
                 c->extradata=videoExtraData;
                 c->extradata_size= videoExtraDataSize;
         }
-        
+
         c->rc_buffer_size=8*1024*224;
         c->rc_max_rate=9500*1000;
         c->rc_min_rate=0;
@@ -194,8 +194,8 @@ bool muxerFlv::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
 
         rescaleFps(s->getAvgFps1000(),&(c->time_base));
         c->gop_size=15;
-        
-        
+
+
 
 // *******************************************
 // *******************************************
@@ -206,7 +206,7 @@ bool muxerFlv::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
         {
           uint32_t audioextraSize;
           uint8_t  *audioextraData;
-          
+
           a[0]->getExtraData(&audioextraSize,&audioextraData);
 
           audio_st = av_new_stream(oc, 1);
@@ -241,7 +241,7 @@ bool muxerFlv::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
                                   break;
                   default:
                                  printf("[FLV]: Unsupported audio\n");
-                                 return false; 
+                                 return false;
                           break;
           }
           c->codec_type = CODEC_TYPE_AUDIO;
@@ -277,7 +277,7 @@ bool muxerFlv::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,A
 /**
     \fn save
 */
-bool muxerFlv::save(void) 
+bool muxerFlv::save(void)
 {
     printf("[FLV] Saving\n");
     uint32_t bufSize=vStream->getWidth()*vStream->getHeight()*3;
@@ -301,7 +301,7 @@ bool muxerFlv::save(void)
     while(true==vStream->getPacket(&len, buffer, bufSize,&pts,&dts,&flags))
     {
 	AVPacket pkt;
-            printf("[MP5] LastDts:%08lu Dts:%08lu (%04.4lu) Delta : %u\n",lastVideoDts,dts,dts/1000000,dts-lastVideoDts);
+            printf("[MP5] LastDts:%08"LLU" Dts:%08"LLU" (%04"LLU") Delta : %"LLD"\n",lastVideoDts,dts,dts/1000000,dts-lastVideoDts);
             rawDts=dts;
             if(rawDts==ADM_NO_PTS)
             {
@@ -313,7 +313,7 @@ bool muxerFlv::save(void)
 #define RESCALE(x) x=rescaleLavPts(x,scale);
 
             dts=lastVideoDts/1000;
-            
+
             aprintf("[FLV] RawDts:%lu Scaled Dts:%lu\n",rawDts,dts);
             aprintf("[FLV] Rescaled: Len : %d flags:%x Pts:%llu Dts:%llu\n",len,flags,pts,dts);
             RESCALE(pts);
@@ -353,7 +353,7 @@ bool muxerFlv::save(void)
                     nb++;
                     AVPacket pkt;
                     rescaled=audioDts/1000;
-                    
+
                     aprintf("[FLV] Video frame  %d, audio Dts :%lu size :%lu nbSample : %lu rescaled:%lu\n",written,audioDts,audioSize,nbSample,rescaledDts);
                     av_init_packet(&pkt);
                     pkt.dts=rescaled;
@@ -386,7 +386,7 @@ bool muxerFlv::save(void)
     \fn close
     \brief Cleanup is done in the dtor
 */
-bool muxerFlv::close(void) 
+bool muxerFlv::close(void)
 {
     if(oc)
     {

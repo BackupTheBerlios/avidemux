@@ -193,7 +193,7 @@ uint8_t picHeader::open(const char *inname)
 	    printf("\n It looks like Jpg...\n");
 	} else {
 	    if (fcc_tab[1] == 'P' && fcc_tab[2] == 'N'
-		&& fcc_tab[3] == 'G') 
+		&& fcc_tab[3] == 'G')
 		{
     		printf("\n It looks like PNG...\n");
 		    _type = PIC_PNG;
@@ -231,11 +231,11 @@ char realstring[250];
     nnum--;
     end++;
     _first = atoi(end);
-	printf("\n First: %lu, Digit count: %lu\n", _first, nnum);
+	printf("\n First: %"LU", Digit count: %"LU"\n", _first, nnum);
     *(end) = 0;
 	printf(" Path: %s\n", name);
 
-	sprintf(realstring, "%s%%0%lud.%s", name, nnum, extension);
+	sprintf(realstring, "%s%%0%"LU"d.%s", name, nnum, extension);
 	_fileMask = ADM_strdup(realstring);
 	printf(" File Mask: %s\n\n", _fileMask);
 
@@ -244,7 +244,7 @@ char realstring[250];
 	for (uint32_t i = 0; i < MAX_ACCEPTED_OPEN_FILE; i++)
 	{
 		sprintf(realname, realstring, i + _first);
-		printf(" %lu : %s\n", i, realname);
+		printf(" %"LU" : %s\n", i, realname);
 
 		fd = fopen(realname, "rb");
 
@@ -255,7 +255,7 @@ char realstring[250];
 		_nb_file++;
 	}
 	}
-    printf("\n found %lu images\n", _nb_file);
+    printf("\n found %"LU" images\n", _nb_file);
 
     _imgSize = new uint32_t[_nb_file];
     //_________________________________
@@ -349,7 +349,7 @@ char realstring[250];
 		fclose(fd);
 		return 0;
 	    }
-	    printf("\n %lu x %lu..\n", w, h);
+	    printf("\n %"LU" x %"LU"..\n", w, h);
 	}
 	break;
 
@@ -364,7 +364,7 @@ char realstring[250];
 
 	    fread(fcc_tab, 4, 1, fd);
 	    _offset = MK32();
-	    // size, width height follow as int32 
+	    // size, width height follow as int32
 	    fread(&bmph, sizeof(bmph), 1, fd);
 #ifdef ADM_BIG_ENDIAN
 	    Endian_BitMapInfo(&bmph);
@@ -381,7 +381,7 @@ char realstring[250];
 	}
 
 	break;
-	
+
 	case PIC_PNG:
 	    {
     	     _offset = 0;
@@ -449,7 +449,7 @@ char realstring[250];
         default:
             ADM_assert(0);
     }
-    printf("Offset : %lu\n", _offset);
+    printf("Offset : %"LU"\n", _offset);
     return 1;
 }
 //****************************************************************

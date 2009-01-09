@@ -27,7 +27,7 @@
 #include "ADM_default.h"
 // /MEANX
 
-    
+
 #include "a52.h"
 #include "a52_internal.h"
 #include "bitstream.h"
@@ -39,6 +39,7 @@
 void * memalign (size_t align, size_t size);
 #else
 /* assume malloc alignment is sufficient */
+#undef memalign //MEANX
 #define memalign(align,size) malloc (size)
 #endif
 
@@ -264,7 +265,7 @@ static int parse_exponents (a52_state_t * state, int expstr, int ngrps,
 	case EXP_D15:
 	    *(dest++) = exponent;
 	}
-    }	
+    }
 
     return 0;
 }
@@ -312,7 +313,7 @@ static inline int16_t dither_gen (a52_state_t * state)
     int16_t nstate;
 
     nstate = dither_lut[state->lfsr_state >> 8] ^ (state->lfsr_state << 8);
-	
+
     state->lfsr_state = (uint16_t) nstate;
 
     return nstate;
@@ -642,7 +643,7 @@ int a52_block (a52_state_t * state)
 	cplexpstr = bitstream_get (state, 2);
     for (i = 0; i < nfchans; i++)
 	chexpstr[i] = bitstream_get (state, 2);
-    if (state->lfeon) 
+    if (state->lfeon)
 	lfeexpstr = bitstream_get (state, 1);
 
     for (i = 0; i < nfchans; i++)
@@ -860,7 +861,7 @@ int a52_block (a52_state_t * state)
 		if (blksw[i])
 		    a52_imdct_256 (samples + 256 * i, samples + 1536 + 256 * i,
 				   bias);
-		else 
+		else
 		    a52_imdct_512 (samples + 256 * i, samples + 1536 + 256 * i,
 				   bias);
 	    } else {
@@ -889,7 +890,7 @@ int a52_block (a52_state_t * state)
 	    for (i = 0; i < nfchans; i++)
 		a52_imdct_256 (samples + 256 * i, samples + 1536 + 256 * i,
 			       state->bias);
-	else 
+	else
 	    for (i = 0; i < nfchans; i++)
 		a52_imdct_512 (samples + 256 * i, samples + 1536 + 256 * i,
 			       state->bias);

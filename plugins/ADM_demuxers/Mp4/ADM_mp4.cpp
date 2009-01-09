@@ -1,11 +1,11 @@
 /***************************************************************************
                           ADMMP4p.cpp  -  description
                              -------------------
-	
+
 		Read quicktime/mpeg4 file format found in 3gpp file.
 		They are limited to SQCIF/QCIF video size and can
 		only contains
-			video : h263 or mpeg4 
+			video : h263 or mpeg4
 			audio : AMR or AAC
 
 
@@ -88,17 +88,17 @@ MP4Track::~MP4Track()
 {
     if(extraData) delete [] extraData;
     if(index)   delete [] index;
- 
+
     index=NULL;
     extraData=NULL;
-    
+
 }
 //****************************************************
 uint8_t MP4Header::setFlag(uint32_t frame,uint32_t flags)
 {
     UNUSED_ARG(frame);
     UNUSED_ARG(flags);
-    
+
     VDEO.index[frame].intra=flags;
     return 0;
 }
@@ -107,7 +107,7 @@ uint32_t MP4Header::getFlags(uint32_t frame,uint32_t *flags)
 {
         if(frame>= (uint32_t)_videostream.dwLength) return 0;
         *flags=VDEO.index[frame].intra;
-  
+
         return 1;
 }
 /**
@@ -133,7 +133,7 @@ uint8_t  MP4Header::getFrame(uint32_t framenum,ADMCompressedImage *img)
 {
     if(framenum>=VDEO.nbIndex)
     {
-      return 0; 
+      return 0;
     }
 
 MP4Index *idx=&(VDEO.index[framenum]);
@@ -150,7 +150,7 @@ MP4Index *idx=&(VDEO.index[framenum]);
     img->demuxerPts=idx->pts;
     if(img->demuxerPts==ADM_COMPRESSED_NO_PTS)
         img->demuxerPts=img->demuxerDts;
-    
+
     return 1;
 }
 MP4Header::~MP4Header()
@@ -184,14 +184,14 @@ MP4Header::MP4Header(void)
     \fn getAudioInfo
     \brief
 */
-WAVHeader    *MP4Header::getAudioInfo(uint32_t i )  
+WAVHeader    *MP4Header::getAudioInfo(uint32_t i )
 {
-    if(nbAudioTrack) 
+    if(nbAudioTrack)
     {
         ADM_assert(i<nbAudioTrack);
         return &(_tracks[i+1]._rdWav);
-    }  
-       
+    }
+
     return NULL;
 
 }
@@ -201,11 +201,11 @@ WAVHeader    *MP4Header::getAudioInfo(uint32_t i )
 
 uint8_t      MP4Header::getAudioStream(uint32_t i,ADM_audioStream  **audio)
 {
-    if(nbAudioTrack) 
+    if(nbAudioTrack)
     {
         ADM_assert(i<nbAudioTrack);
         *audio=audioStream[i];
-    }  else 
+    }  else
         *audio=NULL;
     return 1;
 }
@@ -237,7 +237,7 @@ uint32_t old;
 // i.e. :
 //	index for audio and video track
 //	esds for mpeg4
-//	size / codec used 
+//	size / codec used
 //
 // We don't care about sync atom and all
 // other stuff which are pretty useless on
@@ -245,7 +245,7 @@ uint32_t old;
 //______________________________________
 uint8_t    MP4Header::open(const char *name)
 {
-        printf("** opening 3gpp files **");	
+        printf("** opening 3gpp files **");
         _fd=fopen(name,"rb");
         if(!_fd)
         {
@@ -260,11 +260,11 @@ uint8_t    MP4Header::open(const char *name)
         _videostream.dwScale=1000;
         _videostream.dwRate=10000;
         _mainaviheader.dwMicroSecPerFrame=100000;;     // 10 fps hard coded
-        
+
         adm_atom *atom=new adm_atom(_fd);
         // Some mp4/mov files have the data at the end but do start properly
         // detect and workaround...
-        // Check it is not mdat start(ADM_memcpy_0)     
+        // Check it is not mdat start(ADM_memcpy_0)
         uint8_t check[4];
         fseeko(_fd,4,SEEK_SET);
         fread(check,4,1,_fd);
@@ -280,13 +280,13 @@ uint8_t    MP4Header::open(const char *name)
                                           atom->read32();	// fcc
                                           of=atom->read64();
                                         }
-                                        fseeko(_fd,of,SEEK_SET);        
-                                        printf("Header starts at %x\n",of);
+                                        fseeko(_fd,of,SEEK_SET);
+                                        printf("Header starts at %"LLX"\n",of);
                                         delete atom;
                                         atom=new adm_atom(_fd);
         }
         //**************
-        
+
         if(!lookupMainAtoms((void*) atom))
         {
           printf("Cannot find needed atom\n");
@@ -294,21 +294,21 @@ uint8_t    MP4Header::open(const char *name)
 		  delete atom;
           return 0;
         }
-        
+
         delete atom;
 
 	      _isvideopresent=1;
 	      _isaudiopresent=0;
-    	     
+
               _videostream.fccType=fourCC::get((uint8_t *)"vids");
               _video_bih.biBitCount=24;
               _videostream.dwInitialFrames= 0;
               _videostream.dwStart= 0;
 
 	printf("\n");
-	
-       
-        if(!VDEO.index) 
+
+
+        if(!VDEO.index)
         {
                 printf("No index!\n");
                 return 0;
@@ -325,12 +325,12 @@ uint8_t    MP4Header::open(const char *name)
                 uint32_t w,h,ti;
                 if(extractMpeg4Info(VDEO.extraData,VDEO.extraDataSize,&w,&h,&ti))
                 {
-                    printf("MP4 Corrected size : %lu x %lu\n",w,h);
+                    printf("MP4 Corrected size : %"LU" x %"LU"\n",w,h);
                     _video_bih.biWidth=_mainaviheader.dwWidth=w ;
-                    _video_bih.biHeight=_mainaviheader.dwHeight=h;                               
+                    _video_bih.biHeight=_mainaviheader.dwHeight=h;
                 }
             }else { printf("No extradata to probe\n");}
-        
+
         }
         else
         {
@@ -352,13 +352,13 @@ uint8_t    MP4Header::open(const char *name)
                         {
                         if(extractH263Info(bfer,sz,&w,&h))
                         {
-                            printf("H263 Corrected size : %lu x %lu\n",w,h);
+                            printf("H263 Corrected size : %"LU" x %"LU"\n",w,h);
                             _video_bih.biWidth=_mainaviheader.dwWidth=w ;
-                            _video_bih.biHeight=_mainaviheader.dwHeight=h;                               
+                            _video_bih.biHeight=_mainaviheader.dwHeight=h;
                         }
                         else
                         {
-                                  printf("H263 COULD NOT EXTRACT SIZE, using : %lu x %lu\n",
+                                  printf("H263 COULD NOT EXTRACT SIZE, using : %"LU" x %"LU"\n",
                                       _video_bih.biWidth,  _video_bih.biHeight);
                         }
                         }
@@ -373,7 +373,7 @@ uint8_t    MP4Header::open(const char *name)
         for(int audio=0;audio<nbAudioTrack;audio++)
         {
             audioAccess[audio]=new ADM_mp4AudioAccess(name,&(_tracks[1+audio]));
-            audioStream[audio]=ADM_audioCreateStream(&(_tracks[1+audio]._rdWav), audioAccess[audio]);  
+            audioStream[audio]=ADM_audioCreateStream(&(_tracks[1+audio]._rdWav), audioAccess[audio]);
         }
         fseeko(_fd,0,SEEK_SET);
         printf("3gp/mov file successfully read..\n");
@@ -409,9 +409,9 @@ uint8_t MP4Header::getFrameSize (uint32_t frame, uint32_t * size){
         _currentAudioTrack=newstream;
         return 1;
 }
-uint32_t     MP4Header::getCurrentAudioStreamNumber(void) 
-{ 
+uint32_t     MP4Header::getCurrentAudioStreamNumber(void)
+{
     return _currentAudioTrack;
 }
- 
-//EOF 
+
+//EOF

@@ -1,5 +1,5 @@
 /***************************************************************************
-    
+
     \file ADM_openDMLDepack
     \brief Removed packed bitstream stuff
     copyright            : (C) 2001/2008 by mean
@@ -69,12 +69,12 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	uint32_t targetIndex=0,nbVop;
 	uint32_t nbDuped=0;
         uint32_t timcincbits=16;  /* Nb bits used to code time_inc 16 is a safe default */
-	
+
 	vopS	myVops[MAX_VOP]; // should be enough
 	// here we got the vidHeader to get the file easily
 	// we only deal with avi now, so cast it to its proper type (i.e. avi)
-		
-	
+
+
 	// now we are ready to rumble
 	// First get a unpack buffe
 	uint8_t *buffer=new uint8_t [2*getWidth()*getHeight()];
@@ -83,9 +83,9 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	// the first one become frame n, the second one becomes frame N+1
 	// Image contaning only VOP header are royally ignored
 	// We should get about the same number of in/out frame
-	
+
 	nbFrame=getMainHeader()->dwTotalFrames;
-	
+
 	odmlIndex *newIndex=new odmlIndex[nbFrame+MAX_VOP]; // Due to the packed vop, we may end up with more images
 							// Assume MAX_VOP Bframes maximum
 	ADM_assert(newIndex);
@@ -110,11 +110,11 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 		working->update(img,nbFrame);
 		if(!getFrame(img,&image))
         {
-            printf("Error could not get frame %lu\n",img);
+            printf("Error could not get frame %"LU"\n",img);
             goto _abortUnpack;
         }
 		aprintf("--Frame:%lu/%lu, len %lu, nbDuped%u\n",img,nbFrame,image.dataLength,nbDuped);
-		
+
 		if(image.dataLength<=2)
                 {
                   if(nbDuped)
@@ -122,7 +122,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
                     aprintf("Skipping null frame\n");
                     nbDuped--;
                     img++;
-                    continue;  
+                    continue;
                   }
                 }
 		if(image.dataLength<6) // Too short to contain a valid vop header, just copy
@@ -136,12 +136,12 @@ uint8_t OpenDMLHeader::unpackPacked( void )
                 /* Cannot find vop, corrupted or WTF ...*/
                 if(!searchVop(buffer,buffer+image.dataLength,&nbVop,myVops,&timcincbits))
                 {
-                    printf("img :%u failed to find vop!\n",img); 
+                    printf("img :%u failed to find vop!\n",img);
                     memcpy(&newIndex[targetIndex],&_idx[img],sizeof(_idx[0]));
                     targetIndex++;
                     img++;
                     continue;
-                  
+
                 }
                 /* We have one or more vop inside it...*/
                 if(nbVop==1 && nbDuped) // only one vop, could it be an evil duplicate ?
@@ -154,13 +154,13 @@ uint8_t OpenDMLHeader::unpackPacked( void )
                           continue;
                         }
                 }
-		
+
 		// more than one vop, do up to the n-1th
 		// the 1st image starts at 0
 		myVops[0].offset=0;
 		myVops[nbVop].offset=image.dataLength;
-				
-		
+
+
 		uint32_t place;
                 //if(nbVop>2)
                 {
@@ -172,21 +172,21 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 
                 for(uint32_t j=0;j<nbVop;j++)
                 {
-  
-                        
+
+
                           if(!j)
                                 newIndex[targetIndex].intra=myVops[j].type;
                         else
                                 newIndex[targetIndex].intra=AVI_B_FRAME;
                         newIndex[targetIndex].size=myVops[j+1].offset-myVops[j].offset;
                         newIndex[targetIndex].offset=_idx[img].offset+myVops[j].offset;
-                        
+
                         if(j)
                         {
                           if(nbDuped)
                           {
                               printf("WARNING*************** Missing one NVOP, dropping one b frame instead  at image %u\n",img);
-                              nbDuped--; 
+                              nbDuped--;
                           }else
                           {
                               nbDuped++;
@@ -194,29 +194,29 @@ uint8_t OpenDMLHeader::unpackPacked( void )
                           }
                         } else
                         {
-                         targetIndex++; 
+                         targetIndex++;
                         }
-                }				
-                
+                }
+
                 img++;
-                
-		
+
+
 	}
 	newIndex[0].intra=AVI_KEY_FRAME; // Force
 	ret=1;
 _abortUnpack:
 	delete [] buffer;
 	delete working;
-#if 0	
+#if 0
 	for(uint32_t k=0;k<nbFrame;k++)
 	{
 		printf("%d old:%lu new: %lu \n",_idx[k].size,newIndex[k].size);
-	}	
-#endif	
+	}
+#endif
 	if(ret==1)
 	{
 		printf("Sucessfully unpacked the bitstream\n");
-		
+
 		delete [] _idx;
 		_idx=newIndex;
 	}
@@ -225,9 +225,9 @@ _abortUnpack:
 		delete [] newIndex;
 		printf("Could not unpack this...\n");
 	}
-	printf("Initial # of images : %lu, now we have %lu \n",nbFrame,targetIndex);
+	printf("Initial # of images : %"LU", now we have %"LU" \n",nbFrame,targetIndex);
 	nbFrame=targetIndex;
-	
+
 	setpriority(PRIO_PROCESS, 0, originalPriority);
 
 	return ret;
@@ -237,7 +237,7 @@ _abortUnpack:
 // needed to update the index
 uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop,uint32_t *timeincbits)
 {
-	
+
 	uint32_t off=0;
 	uint32_t globalOff=0;
 	uint32_t voptype;
@@ -261,13 +261,13 @@ uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop,uint32_t
 					case 1: voptype=0;break;
 					case 2: voptype=AVI_B_FRAME;break;
 					case 3: printf("Glouglou\n");voptype=0;break;
-				
+
 				}
         	                vop[*nb].offset=globalOff+off-4;
 				vop[*nb].type=voptype;
 
-				
-                                
+
+
                                 /* Get more info */
                                 if( extractVopInfo(begin+off, end-begin-off, *timeincbits,&vopType,&modulo, &time_inc,&vopcoded))
                                 {
@@ -280,22 +280,22 @@ uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop,uint32_t
                                 begin+=off+1;
 				globalOff+=off+1;
 				continue;
-			
+
 			}
                 else if(code==0x20 && off>=4	) // Vol start
                 {
-                  
+
                    if(extractMpeg4Info(begin+off-4,end+4-off-begin,&w,&h,timeincbits))
                    {
                       aprintf("Found Vol header : w:%d h:%d timeincbits:%d\n",w,h,*timeincbits);
                    }
-                  
+
                 }
         	begin+=off;
         	globalOff+=off;
         	continue;
     	}
-    	return 1; 
-    }   
+    	return 1;
+    }
 	return 1;
 }

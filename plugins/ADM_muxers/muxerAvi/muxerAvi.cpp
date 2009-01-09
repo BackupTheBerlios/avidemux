@@ -5,7 +5,7 @@
     TODO: Fill in drops/holes in audio as for video
     copyright            : (C) 2008 by mean
     email                : fixounet@free.fr
-        
+
  ***************************************************************************/
 
 /***************************************************************************
@@ -48,7 +48,7 @@ AVIMUXERCONFIG muxerConfig=
     \fn     muxerMP4
     \brief  Constructor
 */
-muxerAvi::muxerAvi() 
+muxerAvi::muxerAvi()
 {
     audioBuffer=NULL;
     videoBuffer=NULL;
@@ -59,7 +59,7 @@ muxerAvi::muxerAvi()
     \brief  Destructor
 */
 
-muxerAvi::~muxerAvi() 
+muxerAvi::~muxerAvi()
 {
     printf("[AVI] Destructing\n");
     if(clocks)
@@ -78,7 +78,7 @@ muxerAvi::~muxerAvi()
 
 bool muxerAvi::open(const char *file, ADM_videoStream *s,uint32_t nbAudioTrack,ADM_audioStream **a)
 {
-    
+
         if(!writter.saveBegin (
              file,
 		     s,
@@ -116,9 +116,9 @@ bool muxerAvi::fillAudio(uint64_t targetDts)
 
                 while(a->getPacket(audioBuffer,&audioSize, AUDIO_BUFFER_SIZE,&nbSample,&audioDts))
                 {
-                    printf("[Audio] Packet size %lu sample:%lu dts:%lu target :%lu\n",audioSize,nbSample,audioDts,targetDts);
+                    printf("[Audio] Packet size %"LU" sample:%"LU" dts:%"LLU" target :%"LLU"\n",audioSize,nbSample,audioDts,targetDts);
                     if(audioDts!=ADM_NO_PTS)
-                        if( abs(audioDts-clk->getTimeUs())>5000) 
+                        if( abs(audioDts-clk->getTimeUs())>5000)
                         {
                             printf("[Avi] Audio skew!");
                             clk->setTimeUs(audioDts);
@@ -138,11 +138,11 @@ bool muxerAvi::fillAudio(uint64_t targetDts)
 /**
     \fn save
 */
-bool muxerAvi::save(void) 
+bool muxerAvi::save(void)
 {
     printf("[AVI] Saving\n");
     uint32_t bufSize=vStream->getWidth()*vStream->getHeight()*3;
-    
+
     uint32_t len,flags;
     uint64_t pts,dts,rawDts;
     uint64_t lastVideoDts=0;
@@ -161,7 +161,7 @@ bool muxerAvi::save(void)
     printf("[AVI]avg fps=%u\n",vStream->getAvgFps1000());
     DIA_encodingBase  *progress=createEncoding(vStream->getAvgFps1000());
     progress->setContainer("AVI");
-    
+
     uint64_t aviTime=0;
     if(false==vStream->getPacket(&len, videoBuffer, bufSize,&pts,&dts,&flags)) goto abt;
     if(dts==ADM_NO_PTS) dts=0;
@@ -185,10 +185,10 @@ bool muxerAvi::save(void)
                 }
                 lastVideoDts=dts;
             }
-             
+
             fillAudio(aviTime+videoIncrement);    // and matching audio
-            
-            
+
+
             uint32_t  percent=(100*aviTime)/videoDuration;
             if(percent>100) percent=100;
             progress->setPercent(percent);
@@ -211,9 +211,9 @@ abt:
     \fn close
     \brief Cleanup is done in the dtor
 */
-bool muxerAvi::close(void) 
+bool muxerAvi::close(void)
 {
- 
+
     printf("[AVI] Closing\n");
     return true;
 }

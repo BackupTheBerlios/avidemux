@@ -38,7 +38,7 @@ extern "C"
 
 /*
   It is slow , optimize later
-*/  
+*/
 
 uint8_t    ADM_ebml::readElemId(uint64_t *code,uint64_t *len)
 {
@@ -55,22 +55,22 @@ uint8_t    ADM_ebml::readElemId(uint64_t *code,uint64_t *len)
 uint64_t    ADM_ebml::readEBMCode(void)
 {
  uint64_t start=readu8();
-  uint64_t val;      
+  uint64_t val;
   uint32_t mask=0x80,outmask=0x7F,more=0;
-  
+
   aprintf("Start :%x at %llx\n",start,tell()-1);
-  
+
   while(!(mask&start))
   {
     mask>>=1;
     ADM_assert(mask);
-    more++; 
+    more++;
   }
   outmask=mask-1;
   start=start&outmask;
   for(int i=0;i<more;i++)
   {
-    start=(start<<8)+readu8(); 
+    start=(start<<8)+readu8();
   }
   aprintf("End at %llx\n",tell());
   return start;
@@ -83,32 +83,32 @@ uint64_t    ADM_ebml::readEBMCode(void)
 int64_t    ADM_ebml::readEBMCode_Signed(void)
 {
   uint8_t start=readu8();
-  int64_t val;      
+  int64_t val;
   uint32_t mask=0x80,outmask=0x7F,more=0;
-  
+
   while(!(mask&start))
   {
     mask>>=1;
     ADM_assert(mask);
-    more++; 
+    more++;
   }
   outmask=mask-1;
   val=start&outmask;
   for(int i=0;i<more;i++)
   {
-    val=(val<<8)+readu8(); 
+    val=(val<<8)+readu8();
   }
   // Signed !
 
   switch(more)
   {
-    case 0: val-=63;break; 
+    case 0: val-=63;break;
     case 1: val-=8191;break;
-    case 2: val-=1048575L;break;  
-    default: 
+    case 2: val-=1048575L;break;
+    default:
         ADM_assert(0);
         return 0;
-    
+
   }
 
   return val;
@@ -126,39 +126,39 @@ uint64_t    ADM_ebml::readEBMCode_Full(void)
   {
     mask>>=1;
     ADM_assert(mask);
-    more++; 
+    more++;
   }
   for(int i=0;i<more;i++)
   {
-    start=(start<<8)+readu8(); 
+    start=(start<<8)+readu8();
   }
   return start;
 }
 
-uint64_t    ADM_ebml::readUnsignedInt(uint32_t nb) 
+uint64_t    ADM_ebml::readUnsignedInt(uint32_t nb)
 {
   uint64_t val=0;
   for(int i=0;i<nb;i++)
   {
-    val=(val<<8)+readu8(); 
+    val=(val<<8)+readu8();
   }
   return val;
 }
-int64_t    ADM_ebml::readSignedInt(uint32_t nb) 
+int64_t    ADM_ebml::readSignedInt(uint32_t nb)
 {
   int64_t val=0;
   uint8_t r=0;
   r=readu8();
   if(r&0x80) // sign
       val=-1;
-  val=(val<<8)+r; 
+  val=(val<<8)+r;
   for(int i=0;i<nb-1;i++)
   {
     r=readu8();
-    val=(val<<8)+r; 
+    val=(val<<8)+r;
   }
   return val;
-  
+
 }
 uint8_t     ADM_ebml::readString(char *string, uint32_t maxLen)
 {
@@ -169,7 +169,7 @@ uint8_t     ADM_ebml::readString(char *string, uint32_t maxLen)
     if(!v) return 1;
   }
   *string=0;
-  return 1;  
+  return 1;
 }
 /******************
   Low level read
@@ -193,7 +193,7 @@ uint16_t ADM_ebml::readu16(void)
 float       ADM_ebml::readFloat(uint32_t n)
 {
   if(n!=4 && n!=8) ADM_assert(0);
-  
+
   switch(n)
   {
     case 4:
@@ -213,11 +213,11 @@ float       ADM_ebml::readFloat(uint32_t n)
 
 ADM_ebml::ADM_ebml(void)
 {
-  
+
 }
 ADM_ebml::~ADM_ebml()
 {
-  
+
 }
 
 
@@ -255,22 +255,22 @@ ADM_ebml_file::~ADM_ebml_file()
       fclose(fp);
     }else
     {
-      printf("WARNING: EBML killing father with non empty refcount : %u\n",_refCount); 
+      printf("WARNING: EBML killing father with non empty refcount : %u\n",_refCount);
     }
   }
-  else 
+  else
   {
     fseeko(fp,_begin+_size,SEEK_SET);
     ADM_assert(_root);
     _root->_refCount--;
   }
-  fp=NULL; 
+  fp=NULL;
 }
 uint8_t ADM_ebml_file::open(const char *name)
 {
-  
+
   fp=fopen(name,"rb");
-  if(!fp) 
+  if(!fp)
   {
     aprintf("[EBML FILE] Failed to open <%s>\n",name);
     return 0;
@@ -293,7 +293,7 @@ uint8_t  ADM_ebml_file::readBin(uint8_t *whereto,uint32_t len)
 uint8_t ADM_ebml_file::skip(uint32_t vv)
 {
   fseeko(fp,vv,SEEK_CUR);
-  return 1; 
+  return 1;
 }
 uint64_t ADM_ebml_file::tell(void)
 {
@@ -308,9 +308,9 @@ uint8_t ADM_ebml_file::finished(void)
 {
   if(tell()>(_fileSize-4)) return 1;
   if(tell()>(_begin+_size-4)) return 1;
-  return 0; 
+  return 0;
 }
-/** 
+/**
   \fn find
   \brief Search for the tag given and returns the corresponding atom
 */
@@ -330,7 +330,7 @@ uint8_t ADM_ebml_file::finished(void)
     if(!simplefind(prim,len,rewind))
     {
       vprintf("[MKV] Primary find failed for %llx\n",prim);
-      return 0; 
+      return 0;
     }
     // Now we have the father, go inside
     ADM_ebml_file *son=new ADM_ebml_file(this,*len);
@@ -339,7 +339,7 @@ uint8_t ADM_ebml_file::finished(void)
     {
       vprintf("[MKV] secondary find failed for secondary %llx\n",second);
       delete son;
-      return 0; 
+      return 0;
     }
     pos=son->tell();
     delete son;
@@ -347,7 +347,7 @@ uint8_t ADM_ebml_file::finished(void)
     return 1;
 }
 
-/** 
+/**
   \fn find
   \brief Search for the tag given and returns the corresponding atom
 */
@@ -356,11 +356,11 @@ uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint64_t *len,uint32_t rewin
   uint64_t id,alen;
   ADM_MKV_TYPE type;
   const char *ss;
-  
+
 
     vprintf("[MKV] Simple Searching for tag %llx\n",prim);
     if(rewind) seek(_begin);
-   
+
       while(!finished())
       {
           readElemId(&id,&alen);
@@ -372,8 +372,8 @@ uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint64_t *len,uint32_t rewin
            }
           if(!alen)
           {
-            printf("[MKV] WARNING ZERO SIZED ATOM %s %llu/%llu\n",ss,tell(),_fileSize);
-            continue; 
+            printf("[MKV] WARNING ZERO SIZED ATOM %s %"LLU"/%"LLU"\n",ss,tell(),_fileSize);
+            continue;
           }
           vprintf("Found Tag : %x (%s)\n",id,ss);
           if(id==prim)
@@ -394,6 +394,6 @@ uint64_t ADM_ebml_file::remaining(void)
 {
   uint64_t pos=tell();
   ADM_assert(pos<=(_begin+_size));
-  return (_begin+_size)-pos; 
+  return (_begin+_size)-pos;
 }
 //EOF

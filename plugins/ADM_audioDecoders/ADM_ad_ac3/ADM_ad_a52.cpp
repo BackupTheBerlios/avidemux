@@ -45,7 +45,7 @@ class ADM_AudiocodecAC3 : public     ADM_Audiocodec
 //*******************************************************
    static  uint32_t Formats[]={WAV_AC3};
    DECLARE_AUDIO_DECODER(ADM_AudiocodecAC3,						// Class
-		   	0,0,1, 												// Major, minor,patch 
+		   	0,0,1, 												// Major, minor,patch
 		   	Formats, 											// Supported formats
 		   	"LibAC3 decoder plugin for avidemux (c) Mean\n"); 	// Desc
    //********************************************************
@@ -63,18 +63,18 @@ ADM_AudiocodecAC3::ADM_AudiocodecAC3( uint32_t fourcc, WAVHeader *info,uint32_t 
     CHK(3DNOW,3DNOW);
     CHK(MMXEXT,MMXEXT);
 #endif
-    
+
     ac3_handle=(void *)a52_init(flags);
     if(!ac3_handle)
     {
         printf("Cannot init a52\n");
-        ADM_assert(0);   
+        ADM_assert(0);
     }
     ac3_sample=(sample_t *)a52_samples(AC3_HANDLE);
     if(!ac3_sample)
     {
         printf("Cannot init a52 sample\n");
-        ADM_assert(0);   
+        ADM_assert(0);
     }
         _downmix=0;
       _wavHeader = info;
@@ -176,7 +176,7 @@ uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   u
 			default:
 				ADM_assert(0);
 		}
-	
+
 
         sample_t level = 1, bias = 0;
 
@@ -195,7 +195,7 @@ uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   u
         float *cur;
         for (int i = 0; i < 6; i++) {
                 if (a52_block(AC3_HANDLE)) {
-                        printf("\n A52_block failed! on fblock :%lu", i);
+                        printf("\n A52_block failed! on fblock :%"LU"", i);
                         // in that case we silent out the chunk
                         memset(outptr, 0, 256 * chan * sizeof(float));
                 } else {
@@ -212,6 +212,6 @@ uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   u
                 outptr += chan * 256;
         }
     }
-    return 1; 
+    return 1;
 
 }

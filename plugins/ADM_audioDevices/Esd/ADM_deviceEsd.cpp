@@ -2,7 +2,7 @@
                           ADM_deviceEsd.cpp  -  description
 
   ESD support as output audio device
-                          
+
     copyright            : (C) 2005 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
@@ -39,7 +39,7 @@ uint32_t esdAudioDevice::getLatencyMs(void)
     \brief
 
 */
-bool  esdAudioDevice::localStop(void) 
+bool  esdAudioDevice::localStop(void)
 {
     if (esdDevice >= 0) {
         esd_close(esdDevice);
@@ -56,7 +56,7 @@ bool  esdAudioDevice::localStop(void)
 /**
     \fn localInit
 */
-bool esdAudioDevice::localInit(void) 
+bool esdAudioDevice::localInit(void)
 {
 esd_format_t format;
 
@@ -77,15 +77,15 @@ esd_server_info_t *esdInfo;
     if(_channels==1) format|=ESD_MONO;
         else format|=ESD_STEREO;
 
-    printf("[ESD]  : %lu Hz, %lu channels\n", _frequency, _channels);
+    printf("[ESD]  : %"LU" Hz, %"LU" channels\n", _frequency, _channels);
     esdDevice=esd_play_stream(format,_frequency,NULL,"avidemux");
-    if(esdDevice<=0) 
+    if(esdDevice<=0)
     {
         printf("[ESD] open failed\n");
         return 0;
     }
     printf("[ESD] open succeedeed\n");
-      
+
     float l=esd_get_latency(esdServer);
     printf("[ESD] Raw latency %f\n",l);
     l=l/(44.1*4);
@@ -106,7 +106,7 @@ void esdAudioDevice::sendData(void)
     uint32_t avail=wrIndex-rdIndex;
     if(avail>sizeOf10ms) avail=sizeOf10ms;
     mutex.unlock();
-	write(esdDevice, audioBuffer+rdIndex, avail);
+	int w=write(esdDevice, audioBuffer+rdIndex, avail);
     mutex.lock();
     rdIndex+=avail;
     mutex.unlock();

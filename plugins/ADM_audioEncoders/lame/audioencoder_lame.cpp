@@ -36,14 +36,14 @@ static uint8_t setOption(const char *paramName, uint32_t value);
 /********************* Declare Plugin *****************************************************/
 ADM_DECLARE_AUDIO_ENCODER_PREAMBLE(AUDMEncoder_Lame);
 
-static ADM_audioEncoder encoderDesc = { 
+static ADM_audioEncoder encoderDesc = {
   ADM_AUDIO_ENCODER_API_VERSION,
   create,			// Defined by macro automatically
   destroy,			// Defined by macro automatically
   configure,		//** put your own function here**
-  "Lame",            
-  "MP3 (lame)",      
-  "Lame MP3 encoder plugin Mean 2008",             
+  "Lame",
+  "MP3 (lame)",
+  "Lame MP3 encoder plugin Mean 2008",
   2,                    // Max channels
   1,0,0,                // Version
   WAV_MP3,
@@ -52,7 +52,7 @@ static ADM_audioEncoder encoderDesc = {
   setConfigurationData,  // Defined by macro automatically
 
   getBitrate,           // Defined by macro automatically
-  setBitrate,            // Defined by macro automatically 
+  setBitrate,            // Defined by macro automatically
 
   setOption,         //** put your own function here**
 
@@ -75,7 +75,7 @@ AUDMEncoder_Lame::AUDMEncoder_Lame (AUDMAudioFilter * instream):AUDMEncoder
 };
 
 /**
-    \fn AUDMEncoder_Lame 
+    \fn AUDMEncoder_Lame
     \brief Destructor
 */
 
@@ -127,7 +127,7 @@ AUDMEncoder_Lame::initialize (void)
 
 
   frequence = _wavheader->frequency;
-  printf ("[Lame] output frequency : %lu\n", frequence);
+  printf ("[Lame] output frequency : %"LU"\n", frequence);
   ret = lame_set_out_samplerate (MYFLAGS, frequence);
 
   ret = lame_set_quality (MYFLAGS, 2);
@@ -209,7 +209,7 @@ uint8_t AUDMEncoder_Lame::isVBR (void)
     \brief Get an encoded mp3 packet
     @param dest [in] Where to write datas
     @param len  [out] Length of encoded datas in bytes
-    @param samples [out] Number of samples 
+    @param samples [out] Number of samples
     @return 1 on success, 0 on error
 
 */
@@ -251,7 +251,7 @@ uint8_t AUDMEncoder_Lame::getPacket (uint8_t * dest, uint32_t * len,
   tmphead += _chunk;
   if (nbout < 0)
     {
-      printf ("\n Error !!! : %ld\n", nbout);
+      printf ("\n Error !!! : %"LD"\n", nbout);
       return 0;
     }
   *len = nbout;
@@ -311,7 +311,7 @@ uint8_t configure (void)
     BITRATE (224)
   };
 
-//***  
+//***
   diaElemMenu bitrate (PX(bitrate), QT_TR_NOOP ("_Bitrate:"), SZT (bitrateM),
 		       bitrateM);
   diaElemUInteger quality (PX (quality), QT_TR_NOOP ("_Quality:"), 0, 9);

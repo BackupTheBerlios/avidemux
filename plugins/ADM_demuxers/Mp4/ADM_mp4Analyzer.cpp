@@ -117,7 +117,7 @@ void MP4Header::parseMvhd(void *ztom)
 
 	_videoScale = scale;
 
-	printf("Warning: scale is not in ms %lu!\n", _videoScale);
+	printf("Warning: scale is not in ms %"LU"!\n", _videoScale);
 
 	if (_videoScale)
 	{
@@ -168,12 +168,12 @@ uint8_t MP4Header::parseTrack(void *ztom)
 				  else
 					  tom->skipBytes(8);
 
-				  adm_printf(ADM_PRINT_DEBUG,"Track Id: %lu\n", son.read32());
+				  adm_printf(ADM_PRINT_DEBUG,"Track Id: %"LU"\n", son.read32());
 				  son.skipBytes(4);
 
 				  uint64_t duration = (version == 1) ? son.read64() : son.read32();
 
-				  adm_printf(ADM_PRINT_DEBUG, "Duration: %lu (ms)\n", (duration * 1000) / _videoScale);
+				  adm_printf(ADM_PRINT_DEBUG, "Duration: %"LU" (ms)\n", (duration * 1000) / _videoScale);
 				  son.skipBytes(8);
 				  son.skipBytes(8);
 				  son.skipBytes(36);
@@ -366,10 +366,10 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
        }
        case ADM_MP4_STTS:
             {
-                printf("stts:%lu\n",son.read32()); // version & flags
+                printf("stts:%"LU"\n",son.read32()); // version & flags
                 info.nbStts=son.read32();
-                printf("Time stts atom found (%lu)\n",info.nbStts);
-                printf("Using myscale %lu\n",trackScale);
+                printf("Time stts atom found (%"LU")\n",info.nbStts);
+                printf("Using myscale %"LU"\n",trackScale);
                 info.SttsN=new uint32_t[info.nbStts];
                 info.SttsC=new uint32_t[info.nbStts];
                 //double dur;
@@ -408,10 +408,10 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
               n=son.read32();
               info.nbSz=son.read32();
               info.SzIndentical=0;
-              printf("%lu frames /%lu nbsz..\n",n,info.nbSz);
+              printf("%"LU" frames /%"LU" nbsz..\n",n,info.nbSz);
               if(n)
                       {
-                            adm_printf(ADM_PRINT_VERY_VERBOSE,"\t\t%lu frames of the same size %lu , n=%lu\n",
+                            adm_printf(ADM_PRINT_VERY_VERBOSE,"\t\t%"LU" frames of the same size %"LU" , n=%"LU"\n",
                                 info.nbSz,info.SzIndentical,n);
                             info.SzIndentical=n;
                             info.Sz=NULL;
@@ -430,7 +430,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
             {
                 uint32_t n,i,j,k,v;
 
-                  printf("ctts:%lu\n",son.read32()); // version & flags
+                  printf("ctts:%"LU"\n",son.read32()); // version & flags
                   n=son.read32();
                   if(n==1) // all the same , ignore
                   {
@@ -628,7 +628,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                             VDEO.extraData[1]='V';
                                             VDEO.extraData[2]='Q';
                                             VDEO.extraData[3]='3';
-                                            printf("SVQ3 Header size : %lu",_videoExtraLen);
+                                            printf("SVQ3 Header size : %"LU"",_videoExtraLen);
                                             commonPart(SVQ3);
                                             left=0;
                                   }
@@ -984,7 +984,7 @@ foundit: // HACK FIXME
           printf("Cur audio track :%u\n",nbAudioTrack);
           if(info.SzIndentical ==1 && (ADIO.encoding==WAV_LPCM || ADIO.encoding==WAV_PCM ))
             {
-              printf("Overriding size %lu -> %lu\n", info.SzIndentical,info.SzIndentical*2*ADIO.channels);
+              printf("Overriding size %"LU" -> %"LU"\n", info.SzIndentical,info.SzIndentical*2*ADIO.channels);
               info.SzIndentical=info.SzIndentical*2*ADIO.channels;
             }
             r=indexify(&(_tracks[1+nbAudioTrack]),trackScale,&info,1,&nbo);
@@ -1099,7 +1099,7 @@ uint8_t MP4Header::updateCtts(MPsampleinfo *info )
         f+=_tracks[0].index[i].dts;
         _tracks[0].index[i].pts=(uint64_t)f;
     }
-          
+
   return 1;
 }
 //***********************************

@@ -58,13 +58,13 @@ snd_pcm_t *pcm_handle;
     }
 /**
     \fn localInit
-    \brief 
+    \brief
 */
 bool alsaAudioDevice::localInit( void )
 {
 	int dir=0;
 
-	
+
 	_init=0;
    /* Playback stream */
     snd_pcm_stream_t stream = SND_PCM_STREAM_PLAYBACK;
@@ -134,7 +134,7 @@ bool alsaAudioDevice::localInit( void )
     dir=0;
     exact_rate = snd_pcm_hw_params_set_rate_near(pcm_handle, hwparams, &_frequency, &dir);
     if (dir != 0) {
-      fprintf(stderr, "[Alsa]The rate %lu Hz is not supported by your hardware.\n  ==> Using %d Hz instead.\n", _frequency, exact_rate);
+      fprintf(stderr, "[Alsa]The rate %"LU" Hz is not supported by your hardware.\n  ==> Using %d Hz instead.\n", _frequency, exact_rate);
     }
 
     /* Set number of channels */
@@ -224,7 +224,7 @@ If your hardware does not support a buffersize of 2^n, you can use the function 
 
 /**
     \fn sendData
-    
+
 */
 void alsaAudioDevice::sendData(void)
 {
@@ -276,11 +276,11 @@ _again:
 					snd_pcm_prepare(pcm_handle);
 					goto _again;
 				default:
-					printf("[Alsa]ALSA Error %d : Play %s (len=%lu)\n",ret, snd_strerror(ret),0);
-					
+					printf("[Alsa]ALSA Error %d : Play %s (len=%d)\n",ret, snd_strerror(ret),0);
+
 			}
 		}
-		
+
 	mutex.unlock();
 	return ;
 }
@@ -366,7 +366,7 @@ uint8_t alsaAudioDevice::setVolume(int volume){
 				if( (rc=snd_mixer_selem_set_playback_volume_all(elem,volume*max/100)) < 0 ){
 					printf("[Alsa]: snd_mixer_selem_set_playback_volume_all failed: %d\n",rc);
 				}
-				printf("[Alsa]: new %s val: %lu\n",(which_vol?"master":"pcm"),volume);
+				printf("[Alsa]: new %s val: %"LU"\n",(which_vol?"master":"pcm"),volume);
 				break;
 			}
 		}

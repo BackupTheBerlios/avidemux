@@ -34,7 +34,7 @@
 #define VB (((vorbisStruct *)_handle)->vb)
 #define VC (((vorbisStruct *)_handle)->vc)
 typedef struct vorbisStruct
-{ 
+{
 	vorbis_info 	 vi ;
 	vorbis_dsp_state vd ;
 	vorbis_block     vb ;
@@ -52,14 +52,14 @@ static uint8_t configure(void);
 /********************* Declare Plugin *****************************************************/
 ADM_DECLARE_AUDIO_ENCODER_PREAMBLE(AUDMEncoder_Vorbis);
 
-static ADM_audioEncoder encoderDesc = { 
+static ADM_audioEncoder encoderDesc = {
   ADM_AUDIO_ENCODER_API_VERSION,
   create,			// Defined by macro automatically
   destroy,			// Defined by macro automatically
   configure,		//** put your own function here**
-  "Vorbis",            
-  "Vorbis",      
-  "Vorbis encoder plugin Mean 2008",             
+  "Vorbis",
+  "Vorbis",
+  "Vorbis encoder plugin Mean 2008",
   6,                    // Max channels
   1,0,0,                // Version
   WAV_OGG,
@@ -68,7 +68,7 @@ static ADM_audioEncoder encoderDesc = {
   setConfigurationData,  // Defined by macro automatically
 
   getBitrate,           // Defined by macro automatically
-  setBitrate,            // Defined by macro automatically 
+  setBitrate,            // Defined by macro automatically
 
   NULL,         //** put your own function here**
 
@@ -87,7 +87,7 @@ AUDMEncoder_Vorbis::AUDMEncoder_Vorbis(AUDMAudioFilter * instream)  :AUDMEncoder
   _handle=NULL;
   _wavheader->encoding=WAV_OGG;
   _oldpos=0;
-  _handle=(void *)new  vorbisStruct; 
+  _handle=(void *)new  vorbisStruct;
   outputChannelMapping[0] = CH_FRONT_LEFT;
   outputChannelMapping[1] = CH_FRONT_RIGHT;
   outputChannelMapping[2] = CH_REAR_LEFT;
@@ -108,9 +108,9 @@ AUDMEncoder_Vorbis::~AUDMEncoder_Vorbis()
     vorbis_dsp_clear(&VD);
     vorbis_info_clear(&VI);
     delete (vorbisStruct *)_handle;
-  }    	
+  }
   _handle=NULL;
-  
+
   cleanup();
 };
 
@@ -122,23 +122,23 @@ uint8_t AUDMEncoder_Vorbis::initialize(void)
 {
   int ret;
   VORBIS_encoderParam *vorbisConf=&vorbisParam;
-  
+
 
   ogg_packet header1,header2,header3;
   int err;
 
-  
-  
+
+
   vorbis_info_init(&VI) ;
 
   switch(vorbisConf->mode)
   {
-    
+
     case ADM_VORBIS_VBR:
                       err=vorbis_encode_init(&VI,
                               _wavheader->channels,
                               _wavheader->frequency,
-                              -1, // Max bitrate      
+                              -1, // Max bitrate
                               vorbisConf->bitrate*1000, //long nominal_bitrate,
                               -1 //long min_bitrate))
                             );
@@ -150,11 +150,11 @@ uint8_t AUDMEncoder_Vorbis::initialize(void)
                                 vorbisConf->quality/10
                               );
                     break;
-      
+
     default:
       ADM_assert(0);
   }
-  if (err!=0) 
+  if (err!=0)
   {
 	  delete (vorbisStruct*)_handle;
 	  _handle = NULL;
@@ -190,12 +190,12 @@ uint8_t AUDMEncoder_Vorbis::initialize(void)
   d+=ex[1];
   memcpy(d,header3.packet,ex[2]);
   vorbis_comment_clear(&VC);
-			
+
   printf("\n[Vorbis]Vorbis encoder initialized\n");
   switch(vorbisConf->mode)
   {
     case ADM_VORBIS_VBR:
-      printf("[Vorbis]CBR Bitrate:%lu\n",vorbisConf->bitrate);
+      printf("[Vorbis]CBR Bitrate:%"LU"\n",vorbisConf->bitrate);
       break;
     case ADM_VORBIS_QUALITY: //FIXME FIXME FIXME
       printf("[Vorbis]VBR Quality:%.1f\n",vorbisConf->quality);
@@ -203,9 +203,9 @@ uint8_t AUDMEncoder_Vorbis::initialize(void)
     default:
       ADM_assert(0);
   }
-   
-  printf("[Vorbis]Channels  :%lu\n",_wavheader->channels);
-  printf("[Vorbis]Frequency :%lu\n",_wavheader->frequency);
+
+  printf("[Vorbis]Channels  :%"LU"\n",_wavheader->channels);
+  printf("[Vorbis]Frequency :%"LU"\n",_wavheader->frequency);
   return 1;
 }
 
@@ -229,22 +229,22 @@ uint8_t	AUDMEncoder_Vorbis::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sa
   {
     if(!refillBuffer(_chunk ))
     {
-      return 0; 
+      return 0;
     }
-        
+
     if(tmptail-tmphead<_chunk)
     {
-      return 0; 
+      return 0;
     }
-    
+
 	//printf("Round %d\n",ROUNDMAX-count);
-    if(vorbis_analysis_blockout(&VD, &VB) == 1) 
+    if(vorbis_analysis_blockout(&VD, &VB) == 1)
     {
       vorbis_analysis(&VB, NULL);
       vorbis_bitrate_addblock(&VB) ;
 	//printf("Blockout\n");
-	
-      if(vorbis_bitrate_flushpacket(&VD, &op)) 
+
+      if(vorbis_bitrate_flushpacket(&VD, &op))
       {
         memcpy(dest, op.packet,op.bytes);
         *len=op.bytes;
@@ -255,7 +255,7 @@ uint8_t	AUDMEncoder_Vorbis::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sa
       }
     }
 
-    
+
     uint32_t nbSample=(tmptail-tmphead)/_wavheader->channels;
     if(nbSample>1024) nbSample=1024;
     float_samples=vorbis_analysis_buffer(&VD, nbSample) ;
@@ -269,11 +269,11 @@ uint8_t	AUDMEncoder_Vorbis::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sa
       if (float_samples[j][i] < -1) float_samples[j][i] = -1;
       }
       // Buffer full, go go go
-      vorbis_analysis_wrote(&VD, nbSample) ;  
-      tmphead+=nbSample*_wavheader->channels;	
+      vorbis_analysis_wrote(&VD, nbSample) ;
+      tmphead+=nbSample*_wavheader->channels;
   }
   return 0;
-	
+
 }
 #define SZT(x) sizeof(x)/sizeof(diaMenuEntry )
 #define PX(x) &(lameParam->x)
@@ -287,22 +287,22 @@ uint8_t	AUDMEncoder_Vorbis::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sa
 
 uint8_t configure(void)
 {
-    
+
     uint32_t mmode,ppreset;
     ELEM_TYPE_FLOAT qqual;
-    
-    
+
+
    VORBIS_encoderParam *vParam=&vorbisParam;
-  
+
     mmode=vParam->mode;
     qqual=(ELEM_TYPE_FLOAT)vParam->quality;
-    
+
     diaMenuEntry channelMode[]={
                              {ADM_VORBIS_VBR,      QT_TR_NOOP("VBR"),NULL},
                              {ADM_VORBIS_QUALITY,   QT_TR_NOOP("Quality based"),NULL}};
-          
+
     diaElemMenu menuMode(&mmode,   QT_TR_NOOP("_Mode:"), SZT(channelMode),channelMode);
-    
+
 
     diaMenuEntry bitrateM[]={
                               BITRATE(56),
@@ -316,14 +316,14 @@ uint8_t configure(void)
                               BITRATE(224)
                           };
     diaElemMenu bitrate(&(vParam->bitrate),   QT_TR_NOOP("_Bitrate:"), SZT(bitrateM),bitrateM);
-    
+
     diaElemFloat quality(&qqual,QT_TR_NOOP("_Quality:"),-1.,10.);
-    
-    
-    
-  
+
+
+
+
       diaElem *elems[]={&menuMode,&bitrate,&quality};
-    
+
   if( diaFactoryRun(QT_TR_NOOP("Vorbis Configuration"),3,elems))
   {
     vParam->mode=(ADM_VORBIS_MODE)mmode;
@@ -331,6 +331,6 @@ uint8_t configure(void)
     return 1;
   }
   return 0;
-}  
+}
 
 // EOF

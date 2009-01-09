@@ -1,7 +1,7 @@
 /** *************************************************************************
         \file op_aviwrite.cpp
         \brief low level avi muxer
-                             
+
 		etc...
 
 
@@ -85,7 +85,7 @@ aviWrite::aviWrite( void )
 	LMain=NULL;
     _file=NULL;
 	odml_indexes=NULL;
-    
+
     doODML=muxerConfig.odmlType;	// default; TODO: user should be able to choose NO for plain avi
     memset(&(audioTracks),0,sizeof(audioTracks));
 }
@@ -94,7 +94,7 @@ aviWrite::aviWrite( void )
 */
 
 aviWrite::~aviWrite(){
-	
+
 	if (LAll)
 		delete LAll;
 
@@ -104,7 +104,7 @@ aviWrite::~aviWrite(){
 	if (LMain)
 		delete LMain;
 
-	
+
 	LAll = NULL;
 	LMovie = NULL;
 	LMain = NULL;
@@ -149,7 +149,7 @@ uint8_t aviWrite::updateHeader (MainAVIHeader * mainheader,
 #else
     _file->write ((uint8_t *)mainheader, sizeof (MainAVIHeader));
     _file->seek(0x6c);
-    _file->write ((uint8_t *)videostream, sizeof (AVIStreamHeader));        
+    _file->write ((uint8_t *)videostream, sizeof (AVIStreamHeader));
 #endif
   // update audio headers
     for(int i=0;i<nb_audio;i++)
@@ -227,7 +227,7 @@ uint32_t odml_video_super_idx_size;
 	memcpy(&b,&_bih,sizeof(_bih));
 	Endian_BitMapInfo( &b );
   	setStreamInfo (_file, (uint8_t *) &as,
-		  (uint8_t *)&b,sizeof(ADM_BITMAPINFOHEADER),		
+		  (uint8_t *)&b,sizeof(ADM_BITMAPINFOHEADER),
             odml_video_super_idx_size,0,
             extra,extraLen,
             0x1000);
@@ -286,7 +286,7 @@ uint32_t extraLen=0;
       header->dwSampleSize = 1;
       header->dwQuality = 0xffffffff;
       header->dwSuggestedBufferSize = 8000;
-      
+
 
 	switch(wav.encoding)
 	{
@@ -373,10 +373,10 @@ uint32_t extraLen=0;
 			header->dwScale = wav.blockalign;
 			header->dwLength= _videostream.dwLength;
   			header->dwSampleSize = 0;
-			mp3vbr.nblocksize=samplePerFrame;	
-			
-		   }	
-		   else 
+			mp3vbr.nblocksize=samplePerFrame;
+
+		   }
+		   else
            {
              wav.blockalign=1;
            }
@@ -446,13 +446,13 @@ uint32_t extraLen=0;
 uint8_t aviWrite::saveBegin (
              const char         *name,
 		     ADM_videoStream    *video,
-		     
+
              uint32_t           nbAudioStreams,
              ADM_audioStream 	*audiostream[])
 {
 
 
-    
+
 //  Sanity Check
         ADM_assert (_out == NULL);
         if (!(_out = qfopen (name, "wb")))
@@ -481,7 +481,7 @@ uint8_t aviWrite::saveBegin (
         memset (&_videostream, 0, sizeof (AVIStreamHeader));
         mx_streamHeaderFromVideo(&_videostream,video);
         _videostream.dwLength = 0;
-        
+
 
         mx_bihFromVideo(&_bih,video);
 
@@ -491,7 +491,7 @@ uint8_t aviWrite::saveBegin (
             aprintf("\n ODML writer error: data structures not empty for init!");
             return 0;
         }
-        
+
 
 	if(doODML!=NO){
 		// get number of streams
@@ -569,8 +569,8 @@ uint8_t aviWrite::saveBegin (
   curindex = 0;
   // the *2 is for audio and video
   // the *3 if for security sake
-  
-  
+
+
   vframe = 0;
   return 1;
 }
@@ -586,7 +586,7 @@ uint8_t aviWrite::saveVideoFrame (uint32_t len, uint32_t flags, uint8_t * data)
 	if(vframe==2 && doODML!=NO)
     {	// apparently some players require a video frame at first in the movi list, so we put the initial index dummys behind it (bye bye index before data)
 		odml_write_dummy_chunk(LMovie, &(odml_indexes[0].odml_index[0].fpos), 24+8*odml_index_size);
-        for(int i=1;i<odml_nbrof_streams;i++)		
+        for(int i=1;i<odml_nbrof_streams;i++)
 			odml_write_dummy_chunk(LMovie, &(odml_indexes[i].odml_index[0].fpos), 24+8*odml_index_size);
 	}
 	// test for new riff
@@ -637,7 +637,7 @@ uint8_t aviWrite::saveFrame (uint32_t len, uint32_t flags,    uint8_t * data, ui
     if(doODML!=NORMAL)
     {
       IdxEntry entry;
-           
+
       entry.fcc = fourCC::get (fcc);
       entry.len = len;
       entry.flags = flags;
@@ -721,7 +721,7 @@ uint8_t aviWrite::setEnd (void)
                 case 1:strcpy(tag1,"01wb");break;
                 default:tag1[1]='1'+i;break;
             }
-            
+
             tag2[3]='1'+i;
 			if(!odml_write_index(1, tag1, tag2))
             {	// audio indexes
@@ -745,7 +745,7 @@ uint8_t aviWrite::setEnd (void)
 
 
   _videostream.dwLength = vframe;
-  
+
 
 // Update Header
   updateHeader (&_mainheader, &_videostream);
@@ -754,9 +754,9 @@ uint8_t aviWrite::setEnd (void)
 	printf("\n End of movie, \n video frames : %u\n",vframe);
     for(int i=0;i<nb_audio;i++)
     {
-        printf("Track %d Size :%lu bytes, %lu blocks\n",i,audioTracks[i].sizeInBytes,audioTracks[i].nbBlocks);
+        printf("Track %d Size :%"LU" bytes, %"LU" blocks\n",i,audioTracks[i].sizeInBytes,audioTracks[i].nbBlocks);
     }
- 
+
   // need to update headers now
   // AUDIO SIZE ->TODO
   delete _file;

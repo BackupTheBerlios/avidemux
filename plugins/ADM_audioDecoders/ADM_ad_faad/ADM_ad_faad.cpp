@@ -4,7 +4,7 @@
 // Description: class ADM_faad, interface to libfaad2 .
 //
 // The init can be done 2 ways
-// 1- some info are used as extradata (esds atom ot whatever) 
+// 1- some info are used as extradata (esds atom ot whatever)
 // 2- the init is done when decoding the actual raw stream
 //
 // The big drawback if that in some case you can eat up a lot of the stream
@@ -28,7 +28,7 @@ class ADM_faad : public     ADM_Audiocodec
 		uint8_t _inited;
 		void	*_instance;
 		uint8_t _buffer[FAAD_BUFFER];
-		uint32_t _inbuffer;	
+		uint32_t _inbuffer;
 
 	public:
 		ADM_faad(uint32_t fourcc, WAVHeader *info, uint32_t l, uint8_t *d);
@@ -44,7 +44,7 @@ class ADM_faad : public     ADM_Audiocodec
 //*******************************************************
 static uint32_t Formats[]={WAV_AAC,WAV_MP4};
 DECLARE_AUDIO_DECODER(ADM_faad,						// Class
-			0,0,1, 												// Major, minor,patch 
+			0,0,1, 												// Major, minor,patch
 			Formats, 											// Supported formats
 			"Faad2 decoder plugin for avidemux (c) Mean\n"); 	// Desc
 //********************************************************
@@ -74,12 +74,12 @@ unsigned char chan;
 		{
 			_inited = 1;
 			faacDecInit2(_instance, d,l, &srate,&chan);
-			printf("[FAAD]Found :%d rate %d channels\n",srate,chan);
+			printf("[FAAD]Found :%"LU" rate %"LU" channels\n",srate,chan);
                         if(srate!=info->frequency)
                         {
-                            printf("[FAAD]Frequency mismatch!!! %d to %d (SBR ?)\n",info->frequency,srate);
+                            printf("[FAAD]Frequency mismatch!!! %d to %"LU" (SBR ?)\n",info->frequency,srate);
                             info->frequency=srate;
-                        }	
+                        }
                         if(chan!=info->channels) // Ask for stereo !
                         {
                              printf("[FAAD]channel mismatch!!! %d to %d \n",info->channels,chan);
@@ -90,7 +90,7 @@ unsigned char chan;
 		{
 			_inited=0;
 			printf("No conf header, will try to init later\n");
-			
+
 		}
 
 		channelMapping[0] = CH_FRONT_CENTER;
@@ -120,7 +120,7 @@ uint8_t ADM_faad:: beginDecompress( void )
 {
 	_inbuffer=0;
 }
-uint8_t ADM_faad::endDecompress( void ) 
+uint8_t ADM_faad::endDecompress( void )
 {
 	_inbuffer=0;
 	 faacDecPostSeekReset(_instance, 0);
@@ -150,19 +150,19 @@ uint8_t first=0;
 			res=faacDecInit(_instance,inptr,nbIn,&srate,&chan);
 			if(res>=0)
 			{
-				printf("Faad Inited : rate:%d chan:%d off:%ld\n",srate,chan,res);
+				printf("Faad Inited : rate:%"LU" chan:%"LU" off:%"LD"\n",srate,chan,res);
 				_inited=1;
 				first=1;
 				_inbuffer=0;
 				inptr+=res;
 				nbIn-=res;
-				
+
 			}
 		}
 		if(!_inited)
 		{
 			printf("No dice...\n");
-			return 1;	
+			return 1;
 		}
 		// The codec is initialized, feed him
 		do
@@ -185,7 +185,7 @@ uint8_t first=0;
 			{
 				printf("Faad: Error %d :%s\n",info.error,
 					faacDecGetErrorMessage(info.error));
-				printf("Bye consumed %u, bytes dropped %u \n",info.bytesconsumed,_inbuffer);
+				printf("Bye consumed %"LLU", bytes dropped %"LU" \n",info.bytesconsumed,_inbuffer);
 
                                 _inbuffer=0; // Purge buffer
 				return 1;
@@ -193,14 +193,14 @@ uint8_t first=0;
 			if(first)
 			{
 				printf("Channels : %d\n",info.channels);
-				printf("Frequency: %d\n",info.samplerate);
+				printf("Frequency: %"LLU"\n",info.samplerate);
 				printf("SBR      : %d\n",info.sbr);
-				
-			
+
+
 			}
 			xin=info.bytesconsumed ;
 			if(xin>_inbuffer) xin=0;
-			
+
 			memmove(_buffer,_buffer+xin,_inbuffer-xin);
 			_inbuffer-=xin;
 			if(info.samples)

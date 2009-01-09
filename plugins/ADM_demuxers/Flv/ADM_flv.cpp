@@ -1,7 +1,7 @@
 /***************************************************************************
     copyright            : (C) 2007 by mean
     email                : fixounet@free.fr
-    
+
 
 Not sure if the timestamp is PTS or DTS (...)
 
@@ -27,7 +27,7 @@ Not sure if the timestamp is PTS or DTS (...)
 
 // Borrowed from lavformt/flv.h
 #include "ADM_lavformat/flv.h"
-// Borrowed from lavformt/flv.h    
+// Borrowed from lavformt/flv.h
 uint32_t ADM_UsecFromFps1000(uint32_t fps1000);
 extern uint8_t extractH263FLVInfo(uint8_t *buffer,uint32_t len,uint32_t *w,uint32_t *h);
 
@@ -38,7 +38,7 @@ extern uint8_t extractH263FLVInfo(uint8_t *buffer,uint32_t len,uint32_t *w,uint3
 uint8_t flvHeader::Skip(uint32_t len)
 {
   fseeko(_fd,len,SEEK_CUR);
-  return 1; 
+  return 1;
 }
 /**
     \fn read
@@ -47,39 +47,39 @@ uint8_t flvHeader::Skip(uint32_t len)
 
 uint8_t flvHeader::read(uint32_t len, uint8_t *where)
 {
-  
+
     uint32_t got=fread(where,1,len,_fd);
     if(len!=got)
     {
-      printf("[FLV] Read error : asked %u, got %u\n",len,got); 
+      printf("[FLV] Read error : asked %u, got %u\n",len,got);
       return 0;
     }
-    return 1; 
+    return 1;
 }
 //__________________________________________________________
 uint8_t flvHeader::read8(void)
 {
   uint8_t r;
     fread(&r,1,1,_fd);
-    return r; 
+    return r;
 }
 uint32_t flvHeader::read16(void)
 {
   uint8_t r[2];
     fread(r,2,1,_fd);
-    return (r[0]<<8)+r[1]; 
+    return (r[0]<<8)+r[1];
 }
 uint32_t flvHeader::read24(void)
 {
   uint8_t r[3];
     fread(r,3,1,_fd);
-    return (r[0]<<16)+(r[1]<<8)+r[2]; 
+    return (r[0]<<16)+(r[1]<<8)+r[2];
 }
 uint32_t flvHeader::read32(void)
 {
   uint8_t r[4];
     fread(r,4,1,_fd);
-    return (r[0]<<24)+(r[1]<<16)+(r[2]<<8)+r[3]; 
+    return (r[0]<<24)+(r[1]<<16)+(r[2]<<8)+r[3];
 }
 /**
     \fn     readFlvString
@@ -119,7 +119,7 @@ uint8_t flvHeader::parseMetaData(uint32_t remaining)
     {
         // Check the first one is onMetaData...
         uint8_t type=read8();
-            
+
         if(type!=AMF_DATA_TYPE_STRING) // String!
             goto endit;
         char *z=readFlvString();
@@ -130,14 +130,14 @@ uint8_t flvHeader::parseMetaData(uint32_t remaining)
         Skip(1);
         while(ftello(_fd)<endPos-4)
         {
-            
+
             char *s=readFlvString();
             printf("[FlvType] :%d String : %s",type,s);
             type=read8();
             switch(type)
             {
                 case AMF_DATA_TYPE_DATE: Skip(8+2);break;
-                case AMF_DATA_TYPE_NUMBER: 
+                case AMF_DATA_TYPE_NUMBER:
                                         {
                                             float val;
                                             uint64_t hi,lo;
@@ -188,7 +188,7 @@ uint32_t flvHeader::searchMinimum(void)
 uint8_t flvHeader::open(const char *name)
 {
   uint32_t prevLen, type, size, pts,pos=0;
-  
+
   _isvideopresent=0;
   _isaudiopresent=0;
   audioTrack=NULL;
@@ -199,7 +199,7 @@ uint8_t flvHeader::open(const char *name)
   if(!_fd)
   {
     printf("[FLV] Cannot open %s\n",name);
-    return 0; 
+    return 0;
   }
   // Get size
   uint32_t fileSize=0;
@@ -209,12 +209,12 @@ uint8_t flvHeader::open(const char *name)
   printf("[FLV] file size :%u bytes\n",fileSize);
   // It must begin by F L V 01
   uint8_t four[4];
-  
+
   read(4,four);
   if(four[0]!='F' || four[1]!='L' || four[2]!='V')
   {
      printf("[FLV] Not a flv file %s\n",name);
-    return 0; 
+    return 0;
   }
   // Next one is flags
   uint32_t flags=read8();
@@ -222,29 +222,29 @@ uint8_t flvHeader::open(const char *name)
   {
     _isvideopresent=1;
     printf("[FLV] Video flag\n");
-  }else 
+  }else
     {
     GUI_Info_HIG(ADM_LOG_INFO,"Warning","This FLV file says it has no video.\nI will assume it has and try to continue");
     _isvideopresent=1;
-    }   
+    }
   if(flags & 4) // Audio
   {
     _isaudiopresent=1;
     printf("[FLV] Audio flag\n");
   }
-  
-  
+
+
   // Skip header
   uint32_t skip=read32();
   fseeko(_fd,skip,SEEK_SET);
   printf("[FLV] Skipping %u header bytes\n",skip);
-  
-  
+
+
   pos=ftello(_fd);;
-  printf("pos:%u/%u\n",pos,fileSize); 
+  printf("pos:%u/%u\n",pos,fileSize);
   // Create our video index
   videoTrack=new flvTrak(50);
-  if(_isaudiopresent) 
+  if(_isaudiopresent)
     audioTrack=new flvTrak(50);
   else
     audioTrack=NULL;
@@ -263,7 +263,7 @@ uint8_t flvHeader::open(const char *name)
     {
       case FLV_TAG_TYPE_AUDIO:
           {
-            if(!_isaudiopresent) 
+            if(!_isaudiopresent)
             {
                 audioTrack=new flvTrak(50);
                 _isaudiopresent=1; /* Damn  lying headers...*/
@@ -292,9 +292,9 @@ uint8_t flvHeader::open(const char *name)
             uint8_t flags=read8();
             remaining--;
             int frameType=flags>>4;
-            
+
             int codec=(flags)&0xf;
-            
+
             if(codec==FLV_CODECID_VP6)
             {
               read8(); // 1 byte of extraData
@@ -308,22 +308,22 @@ uint8_t flvHeader::open(const char *name)
             {
                 if(!setVideoHeader(codec,&remaining)) return 0;
             }
-            
+
           }
            break;
       default: printf("[FLV]At 0x%x, unhandled type %u\n",pos,type);
     }
     Skip(remaining);
   } // while
-  
+
   // Udpate frame count etc..
   printf("[FLV] Found %u frames\n",videoTrack->_nbIndex);
-   _videostream.dwLength= _mainaviheader.dwTotalFrames=videoTrack->_nbIndex; 
+   _videostream.dwLength= _mainaviheader.dwTotalFrames=videoTrack->_nbIndex;
    // Compute average fps
     float f=_videostream.dwLength;
     uint64_t duration=videoTrack->_index[videoTrack->_nbIndex-1].timeCodeUs;
-      
-    if(duration) 
+
+    if(duration)
           f=1000.*1000.*1000.*f/duration;
      else  f=25000;
     // If it was available from the metadata, use the one from metadata
@@ -333,7 +333,7 @@ uint8_t flvHeader::open(const char *name)
         printf("[FLV] minimum delta :%d\n",(uint32_t)d);
         d=1/d;
         d*=1000*1000*1000;
-        
+
         uint32_t avg=(uint32_t)floor(f);
         uint32_t max=(uint32_t)floor(d);
         if(max<2) max=2; // 500 fps max
@@ -342,15 +342,15 @@ uint8_t flvHeader::open(const char *name)
     }
     _videostream.dwScale=1000;
     _mainaviheader.dwMicroSecPerFrame=ADM_UsecFromFps1000(_videostream.dwRate);
-   printf("[FLV] Duration %u ms\n",videoTrack->_index[videoTrack->_nbIndex-1].timeCodeUs/1000);
-           
+   printf("[FLV] Duration %"LLU" ms\n",videoTrack->_index[videoTrack->_nbIndex-1].timeCodeUs/1000);
+
    //
     _videostream.fccType=fourCC::get((uint8_t *)"vids");
     _video_bih.biBitCount=24;
     _videostream.dwInitialFrames= 0;
     _videostream.dwStart= 0;
     videoTrack->_index[0].flags=AVI_KEY_FRAME;
-    
+
     // audio track
     if(_isaudiopresent)
     {
@@ -364,7 +364,7 @@ uint8_t flvHeader::open(const char *name)
     }
 
   printf("[FLV]FLV successfully read\n");
-  
+
   return 1;
 }
 /**
@@ -373,7 +373,7 @@ uint8_t flvHeader::open(const char *name)
 */
 uint64_t flvHeader::getVideoDuration(void)
 {
-     uint64_t dur=videoTrack->_index[videoTrack->_nbIndex-1].timeCodeUs; 
+     uint64_t dur=videoTrack->_index[videoTrack->_nbIndex-1].timeCodeUs;
     return dur;
 }
 
@@ -392,17 +392,17 @@ uint8_t flvHeader::setVideoHeader(uint8_t codec,uint32_t *remaining)
       case FLV_CODECID_VP6:             _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"VP6F");break;
     //???   case FLV_CODECID_SCREEN:          _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"VP6F");break;
       default :                         _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"XXX");break;
-      
+
     }
     if(codec==FLV_CODECID_VP6)
     {
         read8();
         read8();
         *remaining-=2;
-         
+
          _video_bih.biHeight=_mainaviheader.dwHeight=read8()*16;
          _video_bih.biWidth=_mainaviheader.dwWidth=read8()*16;
-        *remaining-=2; 
+        *remaining-=2;
     }
     if(codec==FLV_CODECID_H263)
     {
@@ -415,7 +415,7 @@ uint8_t flvHeader::setVideoHeader(uint8_t codec,uint32_t *remaining)
       {
          _video_bih.biHeight=_mainaviheader.dwHeight=height;
          _video_bih.biWidth=_mainaviheader.dwWidth=width;
-      }  
+      }
     }
    return 1;
 }
@@ -428,10 +428,10 @@ uint8_t   flvHeader::setAudioHeader(uint32_t format,uint32_t fq,uint32_t bps,uin
 {
   switch(fq)
   {
-    case 3: wavHeader.frequency=44100;break;  
+    case 3: wavHeader.frequency=44100;break;
     case 2: wavHeader.frequency=22050;break;
     case 1: wavHeader.frequency=11025;break;
-    case 0: 
+    case 0:
           if(format==5) wavHeader.frequency=8000;
           else wavHeader.frequency=5512;
           break;
@@ -441,28 +441,28 @@ uint8_t   flvHeader::setAudioHeader(uint32_t format,uint32_t fq,uint32_t bps,uin
   {
     case 6: wavHeader.encoding=WAV_NELLYMOSER;break;
     case 2: wavHeader.encoding=WAV_MP3;break;
-    case 3: wavHeader.encoding=WAV_PCM;break; 
+    case 3: wavHeader.encoding=WAV_PCM;break;
     case 0: wavHeader.encoding=WAV_LPCM;break;
     case 1: wavHeader.encoding=WAV_MSADPCM;break;
     default:
-          printf("[FLV]Unsupported audio codec:%u\n",format);    
+          printf("[FLV]Unsupported audio codec:%u\n",format);
   }
   switch(channels)
   {
-    case 1: wavHeader.channels=2;break; 
+    case 1: wavHeader.channels=2;break;
     case 0: wavHeader.channels=1;break;
         default:
-          printf("[FLV]Unsupported channel mode :%u\n",channels);    
+          printf("[FLV]Unsupported channel mode :%u\n",channels);
   }
   switch(bps)
   {
-    case 1: wavHeader.bitspersample=16;break; 
+    case 1: wavHeader.bitspersample=16;break;
     case 0: wavHeader.bitspersample=8;break;
         default:
-          printf("[FLV]Unsupported bps mode :%u\n",bps);    
+          printf("[FLV]Unsupported bps mode :%u\n",bps);
   }
   wavHeader.byterate=(64000)/8; // 64 kbits default
-  return 1; 
+  return 1;
 }
 /**
       \fn insertVideo
@@ -475,7 +475,7 @@ uint8_t flvHeader::insertVideo(uint32_t pos,uint32_t size,uint32_t frameType,uin
     x->size=size;
     x->pos=pos;
     x->timeCodeUs=pts*1000LL;
-    if(frameType==1) 
+    if(frameType==1)
     {
         x->flags=AVI_KEY_FRAME;
     }
@@ -485,7 +485,7 @@ uint8_t flvHeader::insertVideo(uint32_t pos,uint32_t size,uint32_t frameType,uin
     }
     videoTrack->_nbIndex++;
     return 1;
-}    
+}
 /**
       \fn insertVideo
       \brief add a frame to the index, grow the index if needed
@@ -500,7 +500,7 @@ uint8_t flvHeader::insertAudio(uint32_t pos,uint32_t size,uint32_t pts)
     x->flags=0;
     audioTrack->_nbIndex++;
     return 1;
-}    
+}
 
 
 
@@ -527,7 +527,7 @@ uint8_t   flvHeader::getAudioStream(uint32_t i,ADM_audioStream  **audio)
     return 1;
   }
   *audio=NULL;
-  return 0; 
+  return 0;
 }
 /**
     \fn getNbAudioStreams
@@ -537,10 +537,10 @@ uint8_t   flvHeader::getNbAudioStreams(void)
 {
  if(_isaudiopresent)
   {
-    
+
     return 1;
   }
-  return 0; 
+  return 0;
 }
 /*
     __________________________________________________________
@@ -548,7 +548,7 @@ uint8_t   flvHeader::getNbAudioStreams(void)
 
 void flvHeader::Dump(void)
 {
- 
+
 }
 /**
     \fn close
@@ -576,8 +576,8 @@ uint8_t flvHeader::close(void)
 */
 
  flvHeader::flvHeader( void ) : vidHeader()
-{ 
-    
+{
+
     _fd=NULL;
     _filename=NULL;
     videoTrack=NULL;
@@ -585,7 +585,7 @@ uint8_t flvHeader::close(void)
     _audioStream=NULL;
     access=NULL;
     memset(&wavHeader,0,sizeof(wavHeader));
-    
+
 }
 /**
     \fn flvHeader
@@ -605,7 +605,7 @@ uint8_t flvHeader::close(void)
 
   uint8_t  flvHeader::setFlag(uint32_t frame,uint32_t flags)
 {
-    if(frame>=videoTrack->_nbIndex) 
+    if(frame>=videoTrack->_nbIndex)
     {
         printf("[FLV] Setflags out of boud %u/%u\n",frame,videoTrack->_nbIndex);
         return 0;
@@ -665,7 +665,7 @@ uint8_t  flvHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
 {
                 *len=0; //_tracks[0].extraDataLen;
                 *data=NULL; //_tracks[0].extraData;
-                return 1;            
+                return 1;
 }
 
 /**

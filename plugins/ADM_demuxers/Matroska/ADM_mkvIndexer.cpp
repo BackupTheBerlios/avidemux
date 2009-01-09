@@ -56,7 +56,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
       cluster.readElemId(&id,&len);
       if(!ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type))
       {
-        printf("[MKV] Tag 0x%x not found (len %llu)\n",id,len);
+        printf("[MKV] Tag 0x%"LLX" not found (len %"LLU")\n",id,len);
         cluster.skip(len);
         continue;
       }
@@ -82,7 +82,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
                                 blockGroup.readElemId(&id,&len);
                                 if(!ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type))
                                 {
-                                  printf("[MKV] Tag 0x%x not found (len %llu)\n",id,len);
+                                  printf("[MKV] Tag 0x%"LLX" not found (len %"LLU")\n",id,len);
                                   blockGroup.skip(len);
                                   continue;
                                 }
@@ -107,7 +107,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
      }
    // printf("[MKV] ending cluster at 0x%llx\n",segment.tell());
   }
-     printf("Found %lu images in this cluster\n",VIDEO._nbIndex);
+     printf("Found %"LU" images in this cluster\n",VIDEO._nbIndex);
      delete work;
      return 1;
 }
@@ -135,9 +135,9 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t cluste
       int16_t timecode=parser->readSignedInt(2);
       //if(!track) printf("TC: %d\n",timecode);
       uint8_t flags=parser->readu8();
-      
+
       lacing=((flags>>1)&3);
-      
+
       addIndexEntry(track,blockBegin,tail-blockBegin,entryFlags,clusterTimeCodeMs+timecode);
       parser->seek(tail);
       return 1;
@@ -221,7 +221,7 @@ uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
       cues.readElemId(&id,&len);
       if(!ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type))
       {
-        printf("[MKV] Tag 0x%x not found (len %llu)\n",id,len);
+        printf("[MKV] Tag 0x%"LLX" not found (len %"LLU")\n",id,len);
         cues.skip(len);
         continue;
       }
@@ -237,7 +237,7 @@ uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
        if(id!=MKV_CUE_TIME)
        {
           ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type);
-          printf("Found %s(0x%x), expected CUE_TIME  (0x%x)\n", ss,id,MKV_CUE_TIME);
+          printf("Found %s(0x%"LLX"), expected CUE_TIME  (0x%x)\n", ss,id,MKV_CUE_TIME);
           cue.skip(cue.remaining());
           continue;
        }
@@ -248,7 +248,7 @@ uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
        if(id!=MKV_CUE_TRACK_POSITION)
        {
           ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type);
-          printf("Found %s (0x%x), expected MKV_CUE_TRACK_POSITION (0x%x)\n", ss,id,MKV_CUE_TRACK_POSITION);
+          printf("Found %s (0x%"LLX"), expected MKV_CUE_TRACK_POSITION (0x%x)\n", ss,id,MKV_CUE_TRACK_POSITION);
           cue.skip(cues.remaining());
           continue;
        }
@@ -264,12 +264,12 @@ uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
            case MKV_CUE_CLUSTER_POSITION: cluster_position=trackPos.readUnsignedInt(len);break;
            default:
                  ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type);
-                 printf("[MKV] in cluster position found tag %s (0x%x)\n",ss,id);
+                 printf("[MKV] in cluster position found tag %s (0x%"LLX")\n",ss,id);
                  trackPos.skip(len);
                  continue;
          }
        }
-       printf("Track %u Position 0x%llx time %llu final pos:%llx \n",tid,cluster_position,time,
+       printf("Track %"LLX" Position 0x%"LLX" time %"LLU" final pos:%"LLX" \n",tid,cluster_position,time,
              cluster_position+segmentPos );
      }
    }
@@ -328,7 +328,7 @@ uint8_t   mkvHeader::indexClusters(ADM_ebml_file *parser)
        if(id!=MKV_TIMECODE)
        {
           ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type);
-          printf("[MKV] Cluster : no time code Found %s(0x%x), expected MKV_TIMECODE  (0x%x)\n",
+          printf("[MKV] Cluster : no time code Found %s(0x%"LLX"), expected MKV_TIMECODE  (0x%x)\n",
                   ss,id,MKV_TIMECODE);
        }
        else

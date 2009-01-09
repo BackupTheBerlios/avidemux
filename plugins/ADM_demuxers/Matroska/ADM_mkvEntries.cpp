@@ -182,7 +182,7 @@ uint8_t entryWalk(ADM_ebml_file *head,uint32_t headlen,entryDesc *entry)
       father.readElemId(&id,&len);
       if(!ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type))
       {
-        printf("[MKV] Tag 0x%x not found (len %llu)\n",id,len);
+        printf("[MKV] Tag 0x%"LLX" not found (len %"LLU")\n",id,len);
         father.skip(len);
         continue;
       }

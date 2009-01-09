@@ -43,7 +43,7 @@
     \fn ADM_mp4AudioAccess
     \brief constructor
 */
- ADM_mp4AudioAccess::ADM_mp4AudioAccess(const char *name,MP4Track *track) 
+ ADM_mp4AudioAccess::ADM_mp4AudioAccess(const char *name,MP4Track *track)
 {
 	_nb_chunks=track->nbIndex;
 	_fd=fopen(name,"rb");
@@ -75,7 +75,7 @@
     \fn ADM_mp4AudioAccess
     \brief destructor
 */
- 
+
 ADM_mp4AudioAccess::~ADM_mp4AudioAccess()
 {
        if(_fd)
@@ -102,11 +102,11 @@ uint64_t target=timeUs;
 			if(_index[i].dts >= target)
 			{
 				_current_index=i;
-				printf("[MP4] Go to time succeeded chunk :%lu time ask:%lu time get:%lu\n",i,timeUs/1000,
+				printf("[MP4] Go to time succeeded chunk :%"LU" time ask:%"LLU" time get:%"LLU"\n",i,timeUs/1000,
 						_index[i].dts/1000);
 				return true;
 			}
-		
+
 		}
 		printf("[MP4]: gototime Failed\n");
 		return false;
@@ -119,7 +119,7 @@ bool    ADM_mp4AudioAccess::getPacket(uint8_t *buffer, uint32_t *size, uint32_t 
 {
 uint32_t r=0;
 double delta;
-	if(_current_index>=_nb_chunks)  
+	if(_current_index>=_nb_chunks)
         {
               printf("[MP4Audio] : index max :%u/%u\n",_current_index,_nb_chunks);
               return 0;
@@ -128,7 +128,7 @@ double delta;
 	  r=fread(buffer,1,_index[_current_index].size,_fd);
       if(!r)
       {
-        printf("[MP4 Audio] Cannot read \n"); 
+        printf("[MP4 Audio] Cannot read \n");
         return false;
       }
       *dts=_index[_current_index].dts;

@@ -26,14 +26,14 @@
 /********************* Declare Plugin *****************************************************/
 ADM_DECLARE_AUDIO_ENCODER_PREAMBLE(AUDMEncoder_PCM);
 
-static ADM_audioEncoder encoderDesc = { 
+static ADM_audioEncoder encoderDesc = {
   ADM_AUDIO_ENCODER_API_VERSION,
   create,			// Defined by macro automatically
   destroy,			// Defined by macro automatically
   NULL,		//** put your own function here**
-  "PCM",            
-  "PCM",      
-  "PCM encoder plugin Mean 2008",             
+  "PCM",
+  "PCM",
+  "PCM encoder plugin Mean 2008",
   6,                    // Max channels
   1,0,0,                // Version
   WAV_PCM,
@@ -42,17 +42,17 @@ static ADM_audioEncoder encoderDesc = {
   NULL,  // Defined by macro automatically
 
   NULL,           // Defined by macro automatically
-  NULL,            // Defined by macro automatically 
+  NULL,            // Defined by macro automatically
 
   NULL,         //** put your own function here**
 
   NULL
 };
 //ADM_DECLARE_AUDIO_ENCODER_CONFIG(NULL);
-extern "C" ADM_audioEncoder *getInfo (void) 
-{ 
-  return &encoderDesc; 
-}  
+extern "C" ADM_audioEncoder *getInfo (void)
+{
+  return &encoderDesc;
+}
 
 /******************* / Declare plugin*******************************************************/
 
@@ -65,7 +65,7 @@ AUDMEncoder_PCM::AUDMEncoder_PCM(AUDMAudioFilter * instream)  :AUDMEncoder    (i
 {
   printf("[PCM] Creating PCM\n");
   _wavheader->encoding=WAV_PCM;
-  
+
 };
 
 
@@ -80,15 +80,15 @@ AUDMEncoder_PCM::~AUDMEncoder_PCM()
 */
 uint8_t AUDMEncoder_PCM::initialize(void)
 {
-  
+
   _wavheader->byterate=_wavheader->channels*_wavheader->frequency*2;
   _chunk = (_wavheader->frequency/100)*_wavheader->channels*2;
-  
 
- 
-  printf("[PCM]Incoming :fq : %lu, channel : %lu \n",_wavheader->frequency,_wavheader->channels);
+
+
+  printf("[PCM]Incoming :fq : %"LU", channel : %"LU" \n",_wavheader->frequency,_wavheader->channels);
   printf("[PCM]PCM successfully initialized\n");
-  return 1;       
+  return 1;
 }
 /**
     \fn getPacket
@@ -97,18 +97,18 @@ uint8_t AUDMEncoder_PCM::initialize(void)
 uint8_t	AUDMEncoder_PCM::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
   uint32_t nbout;
-  
+
   *samples = _chunk; //FIXME
   *len = 0;
 
   if(!refillBuffer(_chunk ))
   {
-    return 0; 
+    return 0;
   }
-        
+
   if(tmptail-tmphead<_chunk)
   {
-    return 0; 
+    return 0;
   }
         // Do in place replace
   dither16(&(tmpbuffer[tmphead]),_chunk,_wavheader->channels);

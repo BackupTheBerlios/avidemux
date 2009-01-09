@@ -27,7 +27,7 @@
 */
 mkvAccess::mkvAccess(const char *name,mkvTrak *track)
 {
- 
+
    _parser=new ADM_ebml_file();
    ADM_assert(_parser->open(name));
   _track=track;
@@ -35,7 +35,7 @@ mkvAccess::mkvAccess(const char *name,mkvTrak *track)
   _currentBlock=0;
   _currentLace=_maxLace=0;
   goToBlock(0);
- 
+
   /* In case of AC3, do not trust the header...*/
   if(_track->wavHeader.encoding==WAV_AC3)
   {
@@ -123,8 +123,8 @@ uint64_t targetUs=timeUs;
 
             targetUs-=dex[clus].Dts; // now the time is relative
             goToBlock(clus);
-            
-            printf("[MKVAUDIO] Asked for %u us, go to block %u, which starts at %u ms\n",timeUs,clus,targetUs);
+
+            printf("[MKVAUDIO] Asked for %"LLU" us, go to block %d, which starts at %"LLU" ms\n",timeUs,clus,targetUs);
             // Now seek more finely
             // will be off by one frame
 #if 0
@@ -187,7 +187,7 @@ bool    mkvAccess::getPacket(uint8_t *dest, uint32_t *packlen, uint32_t maxSize,
      int16_t dummyTime=_parser->readSignedInt(2);
      //if(!track) printf("TC: %d\n",timecode);
      uint8_t flags=_parser->readu8();
-     int     lacing=((flags>>1)&3);   
+     int     lacing=((flags>>1)&3);
         vprintf("[MKV] Lacing : %u\n",lacing);
      switch(lacing)
             {
@@ -209,7 +209,7 @@ bool    mkvAccess::getPacket(uint8_t *dest, uint32_t *packlen, uint32_t maxSize,
                         {
                           int v=0;
                           int lce=0;
-                          while(  (v=_parser->readu8())==0xff) 
+                          while(  (v=_parser->readu8())==0xff)
                           {
                                 lce+=v;
                                 size-=(1+0xff);
@@ -259,7 +259,7 @@ bool    mkvAccess::getPacket(uint8_t *dest, uint32_t *packlen, uint32_t maxSize,
                         int32_t curSize=_parser->readEBMCode();
                         int32_t delta;
                         uint32_t sum;
-                        
+
 
                         vprintf("Ebml nbLaces :%u lacesize(0):%u\n",nbLaces,curSize);
 
@@ -278,10 +278,10 @@ bool    mkvAccess::getPacket(uint8_t *dest, uint32_t *packlen, uint32_t maxSize,
                         }
                         uint64_t tail=_parser->tell();
                         uint64_t consumed=head+size-tail;
-                    
+
                         _Laces[nbLaces-1]=consumed-sum;
                         _maxLace=nbLaces;
-                        
+
 
                       // Take the 1st laces, it has timestamp
                       _parser->readBin(dest,_Laces[0]);
