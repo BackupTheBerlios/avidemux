@@ -35,7 +35,8 @@
 #include "colorspace.h"
 
 #ifdef HAVE_MMX
-#include "i386/mmx.h"
+#include "x86/mmx.h"
+#include "x86/dsputil_mmx.h"
 #endif
 
 #define xglue(x, y) x ## y
@@ -266,6 +267,9 @@ static const PixFmtInfo pix_fmt_info[PIX_FMT_NB] = {
     [PIX_FMT_XVMC_MPEG2_IDCT] = {
         .name = "xvmcidct",
     },
+    [PIX_FMT_VDPAU_H264] = {
+        .name = "vdpau_h264",
+    },
     [PIX_FMT_UYYVYY411] = {
         .name = "uyyvyy411",
         .nb_channels = 1,
@@ -390,7 +394,7 @@ void avcodec_get_chroma_sub_sample(int pix_fmt, int *h_shift, int *v_shift)
 const char *avcodec_get_pix_fmt_name(int pix_fmt)
 {
     if (pix_fmt < 0 || pix_fmt >= PIX_FMT_NB)
-        return "???";
+        return NULL;
     else
         return pix_fmt_info[pix_fmt].name;
 }
@@ -401,22 +405,22 @@ enum PixelFormat avcodec_get_pix_fmt(const char* name)
 
     for (i=0; i < PIX_FMT_NB; i++)
          if (!strcmp(pix_fmt_info[i].name, name))
-             break;
-    return i;
+             return i;
+    return PIX_FMT_NONE;
 }
 
 void avcodec_pix_fmt_string (char *buf, int buf_size, int pix_fmt)
 {
-    PixFmtInfo info= pix_fmt_info[pix_fmt];
-
-    char is_alpha_char= info.is_alpha ? 'y' : 'n';
-
     /* print header */
     if (pix_fmt < 0)
         snprintf (buf, buf_size,
                   "name      " " nb_channels" " depth" " is_alpha"
             );
-    else
+    else{
+        PixFmtInfo info= pix_fmt_info[pix_fmt];
+
+        char is_alpha_char= info.is_alpha ? 'y' : 'n';
+
         snprintf (buf, buf_size,
                   "%-10s" "      %1d     " "   %2d " "     %c   ",
                   info.name,
@@ -424,6 +428,7 @@ void avcodec_pix_fmt_string (char *buf, int buf_size, int pix_fmt)
                   info.depth,
                   is_alpha_char
             );
+    }
 }
 
 int ff_fill_linesize(AVPicture *picture, int pix_fmt, int width)
@@ -771,7 +776,7 @@ static int avg_bits_per_pixel(int pix_fmt)
     return bits;
 }
 
-static int avcodec_find_best_pix_fmt1(int pix_fmt_mask,
+static int avcodec_find_best_pix_fmt1(int64_t pix_fmt_mask,
                                       int src_pix_fmt,
                                       int has_alpha,
                                       int loss_mask)
@@ -782,7 +787,7 @@ static int avcodec_find_best_pix_fmt1(int pix_fmt_mask,
     dst_pix_fmt = -1;
     min_dist = 0x7fffffff;
     for(i = 0;i < PIX_FMT_NB; i++) {
-        if (pix_fmt_mask & (1 << i)) {
+        if (pix_fmt_mask & (1ULL << i)) {
             loss = avcodec_get_pix_fmt_loss(i, src_pix_fmt, has_alpha) & loss_mask;
             if (loss == 0) {
                 dist = avg_bits_per_pixel(i);
@@ -796,7 +801,7 @@ static int avcodec_find_best_pix_fmt1(int pix_fmt_mask,
     return dst_pix_fmt;
 }
 
-int avcodec_find_best_pix_fmt(int pix_fmt_mask, int src_pix_fmt,
+int avcodec_find_best_pix_fmt(int64_t pix_fmt_mask, int src_pix_fmt,
                               int has_alpha, int *loss_ptr)
 {
     int dst_pix_fmt, loss_mask, i;
@@ -869,7 +874,7 @@ int ff_get_plane_bytewidth(enum PixelFormat pix_fmt, int width, int plane)
         break;
     case FF_PIXEL_PLANAR:
             if (plane == 1 || plane == 2)
-                width >>= pf->x_chroma_shift;
+                width= -((-width)>>pf->x_chroma_shift);
 
             return (width * pf->depth + 7) >> 3;
         break;
@@ -893,13 +898,11 @@ void av_picture_copy(AVPicture *dst, const AVPicture *src,
     case FF_PIXEL_PACKED:
     case FF_PIXEL_PLANAR:
         for(i = 0; i < pf->nb_channels; i++) {
-            int w, h;
+            int h;
             int bwidth = ff_get_plane_bytewidth(pix_fmt, width, i);
-            w = width;
             h = height;
             if (i == 1 || i == 2) {
-                w >>= pf->x_chroma_shift;
-                h >>= pf->y_chroma_shift;
+                h= -((-height)>>pf->y_chroma_shift);
             }
             ff_img_copy_plane(dst->data[i], dst->linesize[i],
                            src->data[i], src->linesize[i],
@@ -1362,7 +1365,7 @@ void ff_shrink88(uint8_t *dst, int dst_wrap,
 /* this is maybe slow, but allows for extensions */
 static inline unsigned char gif_clut_index(uint8_t r, uint8_t g, uint8_t b)
 {
-    return ((((r)/47)%6)*6*6+(((g)/47)%6)*6+(((b)/47)%6));
+    return (((r) / 47) % 6) * 6 * 6 + (((g) / 47) % 6) * 6 + (((b) / 47) % 6);
 }
 
 static void build_rgb_palette(uint8_t *palette, int has_alpha)
@@ -1415,7 +1418,7 @@ static inline unsigned int bitcopy_n(unsigned int a, int n)
 
 #define BPP 2
 
-#include "imgconvert_template.h"
+#include "imgconvert_template.c"
 
 /* rgb565 handling */
 
@@ -1436,7 +1439,7 @@ static inline unsigned int bitcopy_n(unsigned int a, int n)
 
 #define BPP 2
 
-#include "imgconvert_template.h"
+#include "imgconvert_template.c"
 
 /* bgr24 handling */
 
@@ -1458,7 +1461,7 @@ static inline unsigned int bitcopy_n(unsigned int a, int n)
 
 #define BPP 3
 
-#include "imgconvert_template.h"
+#include "imgconvert_template.c"
 
 #undef RGB_IN
 #undef RGB_OUT
@@ -1485,7 +1488,7 @@ static inline unsigned int bitcopy_n(unsigned int a, int n)
 
 #define BPP 3
 
-#include "imgconvert_template.h"
+#include "imgconvert_template.c"
 
 /* rgb32 handling */
 
@@ -1516,7 +1519,7 @@ static inline unsigned int bitcopy_n(unsigned int a, int n)
 
 #define BPP 4
 
-#include "imgconvert_template.h"
+#include "imgconvert_template.c"
 
 static void mono_to_gray(AVPicture *dst, const AVPicture *src,
                          int width, int height, int xor_mask)
@@ -2062,7 +2065,7 @@ int av_picture_pad(AVPicture *dst, const AVPicture *src, int height, int width,
             uint8_t *iptr = src->data[i];
             optr = dst->data[i] + dst->linesize[i] * (padtop >> y_shift) +
                     (padleft >> x_shift);
-            memcpy(optr, iptr, src->linesize[i]);
+            memcpy(optr, iptr, (width - padleft - padright) >> x_shift);
             iptr += src->linesize[i];
             optr = dst->data[i] + dst->linesize[i] * (padtop >> y_shift) +
                 (dst->linesize[i] - (padright >> x_shift));
@@ -2070,7 +2073,7 @@ int av_picture_pad(AVPicture *dst, const AVPicture *src, int height, int width,
             for (y = 0; y < yheight; y++) {
                 memset(optr, color[i], (padleft + padright) >> x_shift);
                 memcpy(optr + ((padleft + padright) >> x_shift), iptr,
-                    src->linesize[i]);
+                       (width - padleft - padright) >> x_shift);
                 iptr += src->linesize[i];
                 optr += dst->linesize[i];
             }
@@ -2085,27 +2088,6 @@ int av_picture_pad(AVPicture *dst, const AVPicture *src, int height, int width,
     }
     return 0;
 }
-
-#if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
-void img_copy(AVPicture *dst, const AVPicture *src,
-              int pix_fmt, int width, int height)
-{
-    av_picture_copy(dst, src, pix_fmt, width, height);
-}
-
-int img_crop(AVPicture *dst, const AVPicture *src,
-              int pix_fmt, int top_band, int left_band)
-{
-    return av_picture_crop(dst, src, pix_fmt, top_band, left_band);
-}
-
-int img_pad(AVPicture *dst, const AVPicture *src, int height, int width,
-            int pix_fmt, int padtop, int padbottom, int padleft, int padright,
-            int *color)
-{
-    return av_picture_pad(dst, src, height, width, pix_fmt, padtop, padbottom, padleft, padright, color);
-}
-#endif
 
 #ifndef CONFIG_SWSCALE
 static uint8_t y_ccir_to_jpeg[256];
@@ -2755,13 +2737,8 @@ static void deinterlace_line(uint8_t *dst,
 #else
 
     {
-        mmx_t rounder;
-        rounder.uw[0]=4;
-        rounder.uw[1]=4;
-        rounder.uw[2]=4;
-        rounder.uw[3]=4;
         pxor_r2r(mm7,mm7);
-        movq_m2r(rounder,mm6);
+        movq_m2r(ff_pw_4,mm6);
     }
     for (;size > 3; size-=4) {
         DEINT_LINE_LUM
@@ -2798,13 +2775,8 @@ static void deinterlace_line_inplace(uint8_t *lum_m4, uint8_t *lum_m3, uint8_t *
 #else
 
     {
-        mmx_t rounder;
-        rounder.uw[0]=4;
-        rounder.uw[1]=4;
-        rounder.uw[2]=4;
-        rounder.uw[3]=4;
         pxor_r2r(mm7,mm7);
-        movq_m2r(rounder,mm6);
+        movq_m2r(ff_pw_4,mm6);
     }
     for (;size > 3; size-=4) {
         DEINT_INPLACE_LINE_LUM

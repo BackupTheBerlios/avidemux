@@ -48,7 +48,7 @@ typedef struct DPCMContext {
 
 #define SE_16BIT(x)  if (x & 0x8000) x -= 0x10000;
 
-static int interplay_delta_table[] = {
+static const int interplay_delta_table[] = {
          0,      1,      2,      3,      4,      5,      6,      7,
          8,      9,     10,     11,     12,     13,     14,     15,
         16,     17,     18,     19,     20,     21,     22,     23,
@@ -110,7 +110,7 @@ static const int sol_table_16[128] = {
 
 
 
-static int dpcm_decode_init(AVCodecContext *avctx)
+static av_cold int dpcm_decode_init(AVCodecContext *avctx)
 {
     DPCMContext *s = avctx->priv_data;
     int i;
@@ -154,6 +154,7 @@ static int dpcm_decode_init(AVCodecContext *avctx)
         break;
     }
 
+    avctx->sample_fmt = SAMPLE_FMT_S16;
     return 0;
 }
 
@@ -267,7 +268,7 @@ static int dpcm_decode_frame(AVCodecContext *avctx,
                 n1 = (buf[in] >> 4) & 0xF;
                 n2 = buf[in++] & 0xF;
                 s->sample[0] += s->sol_table[n1];
-                 if (s->sample[0] < 0) s->sample[0] = 0;
+                if (s->sample[0] < 0) s->sample[0] = 0;
                 if (s->sample[0] > 255) s->sample[0] = 255;
                 output_samples[out++] = (s->sample[0] - 128) << 8;
                 s->sample[s->channels - 1] += s->sol_table[n2];
@@ -294,7 +295,7 @@ static int dpcm_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-#define DPCM_DECODER(id, name)                  \
+#define DPCM_DECODER(id, name, long_name_)      \
 AVCodec name ## _decoder = {                    \
     #name,                                      \
     CODEC_TYPE_AUDIO,                           \
@@ -304,9 +305,10 @@ AVCodec name ## _decoder = {                    \
     NULL,                                       \
     NULL,                                       \
     dpcm_decode_frame,                          \
+    .long_name = NULL_IF_CONFIG_SMALL(long_name_), \
 };
 
-DPCM_DECODER(CODEC_ID_INTERPLAY_DPCM, interplay_dpcm);
-DPCM_DECODER(CODEC_ID_ROQ_DPCM, roq_dpcm);
-DPCM_DECODER(CODEC_ID_SOL_DPCM, sol_dpcm);
-DPCM_DECODER(CODEC_ID_XAN_DPCM, xan_dpcm);
+DPCM_DECODER(CODEC_ID_INTERPLAY_DPCM, interplay_dpcm, "Interplay DPCM");
+DPCM_DECODER(CODEC_ID_ROQ_DPCM, roq_dpcm, "id RoQ DPCM");
+DPCM_DECODER(CODEC_ID_SOL_DPCM, sol_dpcm, "Sol DPCM");
+DPCM_DECODER(CODEC_ID_XAN_DPCM, xan_dpcm, "Xan DPCM");

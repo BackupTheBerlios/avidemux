@@ -18,9 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_X86CPU_H
-#define FFMPEG_X86CPU_H
+#ifndef AVUTIL_X86_CPU_H
+#define AVUTIL_X86_CPU_H
 
+#include <stdint.h>
 #include "config.h"
 
 #ifdef ARCH_X86_64
@@ -31,6 +32,7 @@
 #    define REG_D "rdi"
 #    define REG_S "rsi"
 #    define PTR_SIZE "8"
+typedef int64_t x86_reg;
 
 #    define REG_SP "rsp"
 #    define REG_BP "rbp"
@@ -38,9 +40,10 @@
 #    define REGa    rax
 #    define REGb    rbx
 #    define REGc    rcx
+#    define REGd    rdx
 #    define REGSP   rsp
 
-#else
+#elif ARCH_X86_32
 
 #    define REG_a "eax"
 #    define REG_b "ebx"
@@ -49,6 +52,7 @@
 #    define REG_D "edi"
 #    define REG_S "esi"
 #    define PTR_SIZE "4"
+typedef int32_t x86_reg;
 
 #    define REG_SP "esp"
 #    define REG_BP "ebp"
@@ -56,6 +60,7 @@
 #    define REGa    eax
 #    define REGb    ebx
 #    define REGc    ecx
+#    define REGd    edx
 #    define REGSP   esp
 #endif
 
@@ -63,8 +68,12 @@
 #    define HAVE_7REGS 1
 #endif
 
+#if defined(ARCH_X86_64) || (defined(ARCH_X86_32) && (defined(HAVE_EBX_AVAILABLE) || defined(HAVE_EBP_AVAILABLE)))
+#    define HAVE_6REGS 1
+#endif
+
 #if defined(ARCH_X86_64) && defined(PIC)
 #    define BROKEN_RELOCATIONS 1
 #endif
 
-#endif /* FFMPEG_X86CPU_H */
+#endif /* AVUTIL_X86_CPU_H */

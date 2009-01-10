@@ -67,7 +67,7 @@ int ff_rate_control_init(MpegEncContext *s)
     RateControlContext *rcc= &s->rc_context;
     int i;
     const char *error = NULL;
-    static const char *const_names[]={
+    static const char * const const_names[]={
         "PI",
         "E",
         "iTex",
@@ -94,19 +94,19 @@ int ff_rate_control_init(MpegEncContext *s)
         "avgTex",
         NULL
     };
-    static double (*func1[])(void *, double)={
+    static double (* const func1[])(void *, double)={
         (void *)bits2qp,
         (void *)qp2bits,
         NULL
     };
-    static const char *func1_names[]={
+    static const char * const func1_names[]={
         "bits2qp",
         "qp2bits",
         NULL
     };
     emms_c();
 
-    rcc->rc_eq_eval = ff_parse(s->avctx->rc_eq, const_names, func1, func1_names, NULL, NULL, &error);
+    rcc->rc_eq_eval = ff_parse(s->avctx->rc_eq ? s->avctx->rc_eq : "tex^qComp", const_names, func1, func1_names, NULL, NULL, &error);
     if (!rcc->rc_eq_eval) {
         av_log(s->avctx, AV_LOG_ERROR, "Error parsing rc_eq \"%s\": %s\n", s->avctx->rc_eq, error? error : "");
         return -1;
@@ -121,7 +121,7 @@ int ff_rate_control_init(MpegEncContext *s)
         rcc->p_cplx_sum [i]=
         rcc->mv_bits_sum[i]=
         rcc->qscale_sum [i]=
-        rcc->frame_count[i]= 1; // 1 is better cuz of 1/0 and such
+        rcc->frame_count[i]= 1; // 1 is better because of 1/0 and such
         rcc->last_qscale_for[i]=FF_QP2LAMBDA * 5;
     }
     rcc->buffer_index= s->avctx->rc_initial_buffer_occupancy;
@@ -187,7 +187,7 @@ int ff_rate_control_init(MpegEncContext *s)
 #ifdef CONFIG_LIBXVID
             return ff_xvid_rate_control_init(s);
 #else
-            av_log(s->avctx, AV_LOG_ERROR, "XviD ratecontrol requires libavcodec compiled with XviD support\n");
+            av_log(s->avctx, AV_LOG_ERROR, "Xvid ratecontrol requires libavcodec compiled with Xvid support.\n");
             return -1;
 #endif
         }
@@ -461,7 +461,7 @@ static double modify_qscale(MpegEncContext *s, RateControlEntry *rce, double q, 
             else if(d<0.0001) d=0.0001;
             q*= pow(d, 1.0/s->avctx->rc_buffer_aggressivity);
 
-            q_limit= bits2qp(rce, FFMAX((min_rate - buffer_size + rcc->buffer_index)*3, 1));
+            q_limit= bits2qp(rce, FFMAX((min_rate - buffer_size + rcc->buffer_index) * s->avctx->rc_min_vbv_overflow_use, 1));
             if(q > q_limit){
                 if(s->avctx->debug&FF_DEBUG_RC){
                     av_log(s->avctx, AV_LOG_DEBUG, "limiting QP %f -> %f\n", q, q_limit);
@@ -476,7 +476,7 @@ static double modify_qscale(MpegEncContext *s, RateControlEntry *rce, double q, 
             else if(d<0.0001) d=0.0001;
             q/= pow(d, 1.0/s->avctx->rc_buffer_aggressivity);
 
-            q_limit= bits2qp(rce, FFMAX(rcc->buffer_index/3, 1));
+            q_limit= bits2qp(rce, FFMAX(rcc->buffer_index * s->avctx->rc_max_available_vbv_use, 1));
             if(q < q_limit){
                 if(s->avctx->debug&FF_DEBUG_RC){
                     av_log(s->avctx, AV_LOG_DEBUG, "limiting QP %f -> %f\n", q, q_limit);
@@ -840,7 +840,7 @@ static int init_pass2(MpegEncContext *s)
     //int last_i_frame=-10000000;
     const int filter_size= (int)(a->qblur*4) | 1;
     double expected_bits;
-    double *qscale, *blured_qscale, qscale_sum;
+    double *qscale, *blurred_qscale, qscale_sum;
 
     /* find complexity & const_bits & decide the pict_types */
     for(i=0; i<rcc->num_entries; i++){
@@ -863,7 +863,7 @@ static int init_pass2(MpegEncContext *s)
     }
 
     qscale= av_malloc(sizeof(double)*rcc->num_entries);
-    blured_qscale= av_malloc(sizeof(double)*rcc->num_entries);
+    blurred_qscale= av_malloc(sizeof(double)*rcc->num_entries);
     toobig = 0;
 
     for(step=256*256; step>0.0000001; step*=0.5){
@@ -902,16 +902,16 @@ static int init_pass2(MpegEncContext *s)
                 q+= qscale[index] * coeff;
                 sum+= coeff;
             }
-            blured_qscale[i]= q/sum;
+            blurred_qscale[i]= q/sum;
         }
 
         /* find expected bits */
         for(i=0; i<rcc->num_entries; i++){
             RateControlEntry *rce= &rcc->entry[i];
             double bits;
-            rce->new_qscale= modify_qscale(s, rce, blured_qscale[i], i);
+            rce->new_qscale= modify_qscale(s, rce, blurred_qscale[i], i);
             bits= qp2bits(rce, rce->new_qscale) + rce->mv_bits + rce->misc_bits;
-//printf("%d %f\n", rce->new_bits, blured_qscale[i]);
+//printf("%d %f\n", rce->new_bits, blurred_qscale[i]);
             bits += 8*ff_vbv_update(s, bits);
 
             rce->expected_bits= expected_bits;
@@ -929,7 +929,7 @@ static int init_pass2(MpegEncContext *s)
         }
     }
     av_free(qscale);
-    av_free(blured_qscale);
+    av_free(blurred_qscale);
 
     /* check bitrate calculations and print info */
     qscale_sum = 0.0;

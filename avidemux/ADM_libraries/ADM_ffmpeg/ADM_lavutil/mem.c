@@ -31,6 +31,7 @@
 #undef free
 #undef realloc
 
+#include <stdlib.h>
 #ifdef HAVE_MALLOC_H
 #include <malloc.h>
 #endif
@@ -41,7 +42,7 @@
 
 void *av_malloc(unsigned int size)
 {
-    void *ptr;
+    void *ptr = NULL;
 #ifdef CONFIG_MEMALIGN_HACK
     long diff;
 #endif
@@ -57,6 +58,8 @@ void *av_malloc(unsigned int size)
     diff= ((-(long)ptr - 1)&15) + 1;
     ptr = (char*)ptr + diff;
     ((char*)ptr)[-1]= diff;
+#elif defined (HAVE_POSIX_MEMALIGN)
+    posix_memalign(&ptr,16,size);
 #elif defined (HAVE_MEMALIGN)
     ptr = memalign(16,size);
     /* Why 64?
@@ -131,9 +134,7 @@ void av_freep(void *arg)
 
 void *av_mallocz(unsigned int size)
 {
-    void *ptr;
-
-    ptr = av_malloc(size);
+    void *ptr = av_malloc(size);
     if (ptr)
         memset(ptr, 0, size);
     return ptr;
@@ -141,12 +142,13 @@ void *av_mallocz(unsigned int size)
 
 char *av_strdup(const char *s)
 {
-    char *ptr;
-    int len;
-    len = strlen(s) + 1;
-    ptr = av_malloc(len);
-    if (ptr)
-        memcpy(ptr, s, len);
+    char *ptr= NULL;
+    if(s){
+        int len = strlen(s) + 1;
+        ptr = av_malloc(len);
+        if (ptr)
+            memcpy(ptr, s, len);
+    }
     return ptr;
 }
 

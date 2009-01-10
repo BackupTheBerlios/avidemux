@@ -51,7 +51,7 @@ static int encode_ext_header(Wmv2Context *w){
     return 0;
 }
 
-static int wmv2_encode_init(AVCodecContext *avctx){
+static av_cold int wmv2_encode_init(AVCodecContext *avctx){
     Wmv2Context * const w= avctx->priv_data;
 
     if(MPV_encode_init(avctx) < 0)
@@ -67,7 +67,7 @@ static int wmv2_encode_init(AVCodecContext *avctx){
 }
 
 #if 0 /* unused, remove? */
-static int wmv2_encode_end(AVCodecContext *avctx){
+static av_cold int wmv2_encode_end(AVCodecContext *avctx){
 
     if(MPV_encode_end(avctx) < 0)
         return -1;
@@ -236,5 +236,6 @@ AVCodec wmv2_encoder = {
     wmv2_encode_init,
     MPV_encode_picture,
     MPV_encode_end,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
+    .long_name= NULL_IF_CONFIG_SMALL("Windows Media Video 8"),
 };

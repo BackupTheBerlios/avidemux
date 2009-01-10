@@ -19,8 +19,10 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+#include "libavutil/avstring.h"
 #include "avformat.h"
-#include "avstring.h"
+#include <strings.h>
 
 typedef struct {
     int img_first;
@@ -43,6 +45,7 @@ static const IdStrMap img_tags[] = {
     { CODEC_ID_PNG       , "png"},
     { CODEC_ID_PNG       , "mng"},
     { CODEC_ID_PPM       , "ppm"},
+    { CODEC_ID_PPM       , "pnm"},
     { CODEC_ID_PGM       , "pgm"},
     { CODEC_ID_PGMYUV    , "pgmyuv"},
     { CODEC_ID_PBM       , "pbm"},
@@ -56,6 +59,7 @@ static const IdStrMap img_tags[] = {
     { CODEC_ID_GIF       , "gif"},
     { CODEC_ID_TARGA     , "tga"},
     { CODEC_ID_TIFF      , "tiff"},
+    { CODEC_ID_TIFF      , "tif"},
     { CODEC_ID_SGI       , "sgi"},
     { CODEC_ID_PTX       , "ptx"},
     { CODEC_ID_PCX       , "pcx"},
@@ -66,10 +70,11 @@ static const IdStrMap img_tags[] = {
     { CODEC_ID_SUNRAST   , "im8"},
     { CODEC_ID_SUNRAST   , "im24"},
     { CODEC_ID_SUNRAST   , "sunras"},
-    {0, NULL}
+    { CODEC_ID_JPEG2000  , "jp2"},
+    { CODEC_ID_NONE      , NULL}
 };
 
-static int sizes[][2] = {
+static const int sizes[][2] = {
     { 640, 480 },
     { 720, 480 },
     { 720, 576 },
@@ -85,7 +90,7 @@ static int infer_size(int *width_ptr, int *height_ptr, int size)
 {
     int i;
 
-    for(i=0;i<sizeof(sizes)/sizeof(sizes[0]);i++) {
+    for(i=0;i<FF_ARRAY_ELEMS(sizes);i++) {
         if ((sizes[i][0] * sizes[i][1]) == size) {
             *width_ptr = sizes[i][0];
             *height_ptr = sizes[i][1];
@@ -101,11 +106,8 @@ static enum CodecID av_str2id(const IdStrMap *tags, const char *str)
     str++;
 
     while (tags->id) {
-        int i;
-        for(i=0; toupper(tags->str[i]) == toupper(str[i]); i++){
-            if(tags->str[i]==0 && str[i]==0)
-                return tags->id;
-        }
+        if (!strcasecmp(str, tags->str))
+            return tags->id;
 
         tags++;
     }
@@ -303,12 +305,7 @@ static int img_read_packet(AVFormatContext *s1, AVPacket *pkt)
     }
 }
 
-static int img_read_close(AVFormatContext *s1)
-{
-    return 0;
-}
-
-#ifdef CONFIG_MUXERS
+#if defined(CONFIG_IMAGE2_MUXER) || defined(CONFIG_IMAGE2PIPE_MUXER)
 /******************************************************/
 /* image output */
 
@@ -373,18 +370,18 @@ static int img_write_packet(AVFormatContext *s, AVPacket *pkt)
     return 0;
 }
 
-#endif /* CONFIG_MUXERS */
+#endif /* defined(CONFIG_IMAGE2_MUXER) || defined(CONFIG_IMAGE2PIPE_MUXER) */
 
 /* input */
 #ifdef CONFIG_IMAGE2_DEMUXER
 AVInputFormat image2_demuxer = {
     "image2",
-    "image2 sequence",
+    NULL_IF_CONFIG_SMALL("image2 sequence"),
     sizeof(VideoData),
     image_probe,
     img_read_header,
     img_read_packet,
-    img_read_close,
+    NULL,
     NULL,
     NULL,
     AVFMT_NOFILE,
@@ -393,13 +390,11 @@ AVInputFormat image2_demuxer = {
 #ifdef CONFIG_IMAGE2PIPE_DEMUXER
 AVInputFormat image2pipe_demuxer = {
     "image2pipe",
-    "piped image2 sequence",
+    NULL_IF_CONFIG_SMALL("piped image2 sequence"),
     sizeof(VideoData),
     NULL, /* no probe */
     img_read_header,
     img_read_packet,
-    img_read_close,
-    NULL,
 };
 #endif
 
@@ -407,22 +402,22 @@ AVInputFormat image2pipe_demuxer = {
 #ifdef CONFIG_IMAGE2_MUXER
 AVOutputFormat image2_muxer = {
     "image2",
-    "image2 sequence",
+    NULL_IF_CONFIG_SMALL("image2 sequence"),
     "",
-    "",
+    "bmp,jpeg,jpg,ljpg,pam,pbm,pgm,pgmyuv,png,ppm,sgi,tif,tiff",
     sizeof(VideoData),
     CODEC_ID_NONE,
     CODEC_ID_MJPEG,
     img_write_header,
     img_write_packet,
     NULL,
-    AVFMT_NOFILE,
+    .flags= AVFMT_NOTIMESTAMPS | AVFMT_NOFILE
 };
 #endif
 #ifdef CONFIG_IMAGE2PIPE_MUXER
 AVOutputFormat image2pipe_muxer = {
     "image2pipe",
-    "piped image2 sequence",
+    NULL_IF_CONFIG_SMALL("piped image2 sequence"),
     "",
     "",
     sizeof(VideoData),
@@ -430,5 +425,6 @@ AVOutputFormat image2pipe_muxer = {
     CODEC_ID_MJPEG,
     img_write_header,
     img_write_packet,
+    .flags= AVFMT_NOTIMESTAMPS
 };
 #endif

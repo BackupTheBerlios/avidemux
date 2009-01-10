@@ -129,7 +129,7 @@ static int decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int decode_init(AVCodecContext *avctx){
+static av_cold int decode_init(AVCodecContext *avctx){
 //    QdrawContext * const a = avctx->priv_data;
 
     if (avcodec_check_dimensions(avctx, avctx->width, avctx->height) < 0) {
@@ -151,4 +151,5 @@ AVCodec qdraw_decoder = {
     NULL,
     decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("Apple QuickDraw"),
 };

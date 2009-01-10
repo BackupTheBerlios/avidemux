@@ -23,10 +23,12 @@
  * Memory handling functions.
  */
 
-#ifndef FFMPEG_MEM_H
-#define FFMPEG_MEM_H
+#ifndef AVUTIL_MEM_H
+#define AVUTIL_MEM_H
 
-#ifdef __ICC
+#include "common.h"
+
+#if defined(__ICC) || defined(__SUNPRO_C)
     #define DECLARE_ALIGNED(n,t,v)      t v __attribute__ ((aligned (n)))
     #define DECLARE_ASM_CONST(n,t,v)    const t __attribute__ ((aligned (n))) v
 #elif defined(__GNUC__)
@@ -42,6 +44,18 @@
     #define DECLARE_ASM_CONST(n,t,v)    static const t v
 #endif
 
+#if AV_GCC_VERSION_AT_LEAST(3,1)
+    #define av_malloc_attrib __attribute__((__malloc__))
+#else
+    #define av_malloc_attrib
+#endif
+
+#if (!defined(__ICC) || __ICC > 1100) && AV_GCC_VERSION_AT_LEAST(4,3)
+    #define av_alloc_size(n) __attribute__((alloc_size(n)))
+#else
+    #define av_alloc_size(n)
+#endif
+
 /**
  * Allocate a block of \p size bytes with alignment suitable for all
  * memory accesses (including vectors if available on the CPU).
@@ -50,7 +64,7 @@
  * it.
  * @see av_mallocz()
  */
-void *av_malloc(unsigned int size);
+void *av_malloc(unsigned int size) av_malloc_attrib av_alloc_size(1);
 
 /**
  * Allocate or reallocate a block of memory.
@@ -64,7 +78,7 @@ void *av_malloc(unsigned int size);
  * reallocate or the function is used to free the memory block.
  * @see av_fast_realloc()
  */
-void *av_realloc(void *ptr, unsigned int size);
+void *av_realloc(void *ptr, unsigned int size) av_alloc_size(2);
 
 /**
  * Free a memory block which has been allocated with av_malloc(z)() or
@@ -85,7 +99,7 @@ void av_free(void *ptr);
  * it.
  * @see av_malloc()
  */
-void *av_mallocz(unsigned int size);
+void *av_mallocz(unsigned int size) av_malloc_attrib av_alloc_size(1);
 
 /**
  * Duplicate the string \p s.
@@ -93,7 +107,7 @@ void *av_mallocz(unsigned int size);
  * @return Pointer to a newly allocated string containing a
  * copy of \p s or NULL if it cannot be allocated.
  */
-char *av_strdup(const char *s);
+char *av_strdup(const char *s) av_malloc_attrib;
 
 /**
  * Free a memory block which has been allocated with av_malloc(z)() or
@@ -104,4 +118,4 @@ char *av_strdup(const char *s);
  */
 void av_freep(void *ptr);
 
-#endif /* FFMPEG_MEM_H */
+#endif /* AVUTIL_MEM_H */

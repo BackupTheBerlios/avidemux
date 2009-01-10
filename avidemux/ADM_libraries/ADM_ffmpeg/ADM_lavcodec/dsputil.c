@@ -41,11 +41,17 @@ void ff_spatial_dwt(int *buffer, int width, int height, int stride, int type, in
 /* vorbis.c */
 void vorbis_inverse_coupling(float *mag, float *ang, int blocksize);
 
+/* ac3dec.c */
+void ff_ac3_downmix_c(float (*samples)[256], float (*matrix)[2], int out_ch, int in_ch, int len);
+
 /* flacenc.c */
 void ff_flac_compute_autocorr(const int32_t *data, int len, int lag, double *autoc);
 
 /* pngdec.c */
 void ff_add_png_paeth_prediction(uint8_t *dst, uint8_t *src, uint8_t *top, int w, int bpp);
+
+/* eaidct.c */
+void ff_ea_idct_put_c(uint8_t *dest, int linesize, DCTELEM *block);
 
 uint8_t ff_cropTbl[256 + 2 * MAX_NEG_CROP] = {0, };
 uint32_t ff_squareTbl[512] = {0, };
@@ -151,6 +157,8 @@ static const uint8_t simple_mmx_permutation[64]={
         0x32, 0x3A, 0x36, 0x3B, 0x33, 0x3E, 0x37, 0x3F,
 };
 
+static const uint8_t idct_sse2_row_perm[8] = {0, 4, 1, 5, 2, 6, 3, 7};
+
 void ff_init_scantable(uint8_t *permutation, ScanTable *st, const uint8_t *src_scantable){
     int i;
     int end;
@@ -161,7 +169,7 @@ void ff_init_scantable(uint8_t *permutation, ScanTable *st, const uint8_t *src_s
         int j;
         j = src_scantable[i];
         st->permutated[i] = permutation[j];
-#ifdef ARCH_POWERPC
+#ifdef ARCH_PPC
         st->inverse[j] = i;
 #endif
     }
@@ -2735,6 +2743,27 @@ void ff_intrax8dsp_init(DSPContext* c, AVCodecContext *avctx);
 /* H264 specific */
 void ff_h264dspenc_init(DSPContext* c, AVCodecContext *avctx);
 
+#if defined(CONFIG_RV30_DECODER)
+void ff_rv30dsp_init(DSPContext* c, AVCodecContext *avctx);
+#endif /* CONFIG_RV30_DECODER */
+
+#if defined(CONFIG_RV40_DECODER)
+static void put_rv40_qpel16_mc33_c(uint8_t *dst, uint8_t *src, int stride){
+    put_pixels16_xy2_c(dst, src, stride, 16);
+}
+static void avg_rv40_qpel16_mc33_c(uint8_t *dst, uint8_t *src, int stride){
+    avg_pixels16_xy2_c(dst, src, stride, 16);
+}
+static void put_rv40_qpel8_mc33_c(uint8_t *dst, uint8_t *src, int stride){
+    put_pixels8_xy2_c(dst, src, stride, 8);
+}
+static void avg_rv40_qpel8_mc33_c(uint8_t *dst, uint8_t *src, int stride){
+    avg_pixels8_xy2_c(dst, src, stride, 8);
+}
+
+void ff_rv40dsp_init(DSPContext* c, AVCodecContext *avctx);
+#endif /* CONFIG_RV40_DECODER */
+
 static void wmv2_mspel8_v_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int w){
     uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
     int i;
@@ -2960,6 +2989,63 @@ static void h264_v_loop_filter_luma_c(uint8_t *pix, int stride, int alpha, int b
 static void h264_h_loop_filter_luma_c(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0)
 {
     h264_loop_filter_luma_c(pix, 1, stride, alpha, beta, tc0);
+}
+
+static inline void h264_loop_filter_luma_intra_c(uint8_t *pix, int xstride, int ystride, int alpha, int beta)
+{
+    int d;
+    for( d = 0; d < 16; d++ ) {
+        const int p2 = pix[-3*xstride];
+        const int p1 = pix[-2*xstride];
+        const int p0 = pix[-1*xstride];
+
+        const int q0 = pix[ 0*xstride];
+        const int q1 = pix[ 1*xstride];
+        const int q2 = pix[ 2*xstride];
+
+        if( FFABS( p0 - q0 ) < alpha &&
+            FFABS( p1 - p0 ) < beta &&
+            FFABS( q1 - q0 ) < beta ) {
+
+            if(FFABS( p0 - q0 ) < (( alpha >> 2 ) + 2 )){
+                if( FFABS( p2 - p0 ) < beta)
+                {
+                    const int p3 = pix[-4*xstride];
+                    /* p0', p1', p2' */
+                    pix[-1*xstride] = ( p2 + 2*p1 + 2*p0 + 2*q0 + q1 + 4 ) >> 3;
+                    pix[-2*xstride] = ( p2 + p1 + p0 + q0 + 2 ) >> 2;
+                    pix[-3*xstride] = ( 2*p3 + 3*p2 + p1 + p0 + q0 + 4 ) >> 3;
+                } else {
+                    /* p0' */
+                    pix[-1*xstride] = ( 2*p1 + p0 + q1 + 2 ) >> 2;
+                }
+                if( FFABS( q2 - q0 ) < beta)
+                {
+                    const int q3 = pix[3*xstride];
+                    /* q0', q1', q2' */
+                    pix[0*xstride] = ( p1 + 2*p0 + 2*q0 + 2*q1 + q2 + 4 ) >> 3;
+                    pix[1*xstride] = ( p0 + q0 + q1 + q2 + 2 ) >> 2;
+                    pix[2*xstride] = ( 2*q3 + 3*q2 + q1 + q0 + p0 + 4 ) >> 3;
+                } else {
+                    /* q0' */
+                    pix[0*xstride] = ( 2*q1 + q0 + p1 + 2 ) >> 2;
+                }
+            }else{
+                /* p0', q0' */
+                pix[-1*xstride] = ( 2*p1 + p0 + q1 + 2 ) >> 2;
+                pix[ 0*xstride] = ( 2*q1 + q0 + p1 + 2 ) >> 2;
+            }
+        }
+        pix += ystride;
+    }
+}
+static void h264_v_loop_filter_luma_intra_c(uint8_t *pix, int stride, int alpha, int beta)
+{
+    h264_loop_filter_luma_intra_c(pix, stride, 1, alpha, beta);
+}
+static void h264_h_loop_filter_luma_intra_c(uint8_t *pix, int stride, int alpha, int beta)
+{
+    h264_loop_filter_luma_intra_c(pix, 1, stride, alpha, beta);
 }
 
 static inline void h264_loop_filter_chroma_c(uint8_t *pix, int xstride, int ystride, int alpha, int beta, int8_t *tc0)
@@ -3395,6 +3481,11 @@ void ff_set_cmp(DSPContext* c, me_cmp_func *cmp, int type){
     }
 }
 
+static void clear_block_c(DCTELEM *block)
+{
+    memset(block, 0, sizeof(DCTELEM)*64);
+}
+
 /**
  * memset(blocks, 0, sizeof(DCTELEM)*6*64)
  */
@@ -3696,7 +3787,7 @@ static int rd8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int
     DECLARE_ALIGNED_8 (uint64_t, aligned_bak[stride]);
     DCTELEM * const temp= (DCTELEM*)aligned_temp;
     uint8_t * const bak= (uint8_t*)aligned_bak;
-    int i, last, run, bits, level, distoration, start_i;
+    int i, last, run, bits, level, distortion, start_i;
     const int esc_length= s->ac_esc_length;
     uint8_t * length;
     uint8_t * last_length;
@@ -3763,9 +3854,9 @@ static int rd8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int
 
     s->dsp.idct_add(bak, stride, temp);
 
-    distoration= s->dsp.sse[1](NULL, bak, src1, stride, 8);
+    distortion= s->dsp.sse[1](NULL, bak, src1, stride, 8);
 
-    return distoration + ((bits*s->qscale*s->qscale*109 + 64)>>7);
+    return distortion + ((bits*s->qscale*s->qscale*109 + 64)>>7);
 }
 
 static int bit8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
@@ -3928,18 +4019,78 @@ void ff_vector_fmul_add_add_c(float *dst, const float *src0, const float *src1, 
         dst[i*step] = src0[i] * src1[i] + src2[i] + src3;
 }
 
-void ff_float_to_int16_c(int16_t *dst, const float *src, int len){
-    int i;
-    for(i=0; i<len; i++) {
-        int_fast32_t tmp = ((const int32_t*)src)[i];
-        if(tmp & 0xf0000){
-            tmp = (0x43c0ffff - tmp)>>31;
-            // is this faster on some gcc/cpu combinations?
-//          if(tmp > 0x43c0ffff) tmp = 0xFFFF;
-//          else                 tmp = 0;
-        }
-        dst[i] = tmp - 0x8000;
+void ff_vector_fmul_window_c(float *dst, const float *src0, const float *src1, const float *win, float add_bias, int len){
+    int i,j;
+    dst += len;
+    win += len;
+    src0+= len;
+    for(i=-len, j=len-1; i<0; i++, j--) {
+        float s0 = src0[i];
+        float s1 = src1[j];
+        float wi = win[i];
+        float wj = win[j];
+        dst[i] = s0*wj - s1*wi + add_bias;
+        dst[j] = s0*wi + s1*wj + add_bias;
     }
+}
+
+static void int32_to_float_fmul_scalar_c(float *dst, const int *src, float mul, int len){
+    int i;
+    for(i=0; i<len; i++)
+        dst[i] = src[i] * mul;
+}
+
+static av_always_inline int float_to_int16_one(const float *src){
+    int_fast32_t tmp = *(const int32_t*)src;
+    if(tmp & 0xf0000){
+        tmp = (0x43c0ffff - tmp)>>31;
+        // is this faster on some gcc/cpu combinations?
+//      if(tmp > 0x43c0ffff) tmp = 0xFFFF;
+//      else                 tmp = 0;
+    }
+    return tmp - 0x8000;
+}
+
+void ff_float_to_int16_c(int16_t *dst, const float *src, long len){
+    int i;
+    for(i=0; i<len; i++)
+        dst[i] = float_to_int16_one(src+i);
+}
+
+void ff_float_to_int16_interleave_c(int16_t *dst, const float **src, long len, int channels){
+    int i,j,c;
+    if(channels==2){
+        for(i=0; i<len; i++){
+            dst[2*i]   = float_to_int16_one(src[0]+i);
+            dst[2*i+1] = float_to_int16_one(src[1]+i);
+        }
+    }else{
+        for(c=0; c<channels; c++)
+            for(i=0, j=c; i<len; i++, j+=channels)
+                dst[j] = float_to_int16_one(src[c]+i);
+    }
+}
+
+static void add_int16_c(int16_t * v1, int16_t * v2, int order)
+{
+    while (order--)
+       *v1++ += *v2++;
+}
+
+static void sub_int16_c(int16_t * v1, int16_t * v2, int order)
+{
+    while (order--)
+        *v1++ -= *v2++;
+}
+
+static int32_t scalarproduct_int16_c(int16_t * v1, int16_t * v2, int order, int shift)
+{
+    int res = 0;
+
+    while (order--)
+        res += (*v1++ * *v2++) >> shift;
+
+    return res;
 }
 
 #define W0 2048
@@ -4175,6 +4326,9 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
             c->idct_add= ff_faanidct_add;
             c->idct    = ff_faanidct;
             c->idct_permutation_type= FF_NO_IDCT_PERM;
+        }else if(ENABLE_EATGQ_DECODER && avctx->idct_algo==FF_IDCT_EA) {
+            c->idct_put= ff_ea_idct_put_c;
+            c->idct_permutation_type= FF_NO_IDCT_PERM;
         }else{ //accurate/default
             c->idct_put= ff_simple_idct_put;
             c->idct_add= ff_simple_idct_add;
@@ -4188,6 +4342,10 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
         c->h264_idct8_add= ff_h264_idct8_add_c;
         c->h264_idct_dc_add= ff_h264_idct_dc_add_c;
         c->h264_idct8_dc_add= ff_h264_idct8_dc_add_c;
+        c->h264_idct_add16     = ff_h264_idct_add16_c;
+        c->h264_idct8_add4     = ff_h264_idct8_add4_c;
+        c->h264_idct_add8      = ff_h264_idct_add8_c;
+        c->h264_idct_add16intra= ff_h264_idct_add16intra_c;
     }
 
     c->get_pixels = get_pixels_c;
@@ -4200,6 +4358,7 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->sum_abs_dctelem = sum_abs_dctelem_c;
     c->gmc1 = gmc1_c;
     c->gmc = ff_gmc_c;
+    c->clear_block = clear_block_c;
     c->clear_blocks = clear_blocks_c;
     c->pix_sum = pix_sum_c;
     c->pix_norm1 = pix_norm1_c;
@@ -4340,6 +4499,16 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 #if defined(CONFIG_H264_ENCODER)
     ff_h264dspenc_init(c,avctx);
 #endif
+#if defined(CONFIG_RV30_DECODER)
+    ff_rv30dsp_init(c,avctx);
+#endif
+#if defined(CONFIG_RV40_DECODER)
+    ff_rv40dsp_init(c,avctx);
+    c->put_rv40_qpel_pixels_tab[0][15] = put_rv40_qpel16_mc33_c;
+    c->avg_rv40_qpel_pixels_tab[0][15] = avg_rv40_qpel16_mc33_c;
+    c->put_rv40_qpel_pixels_tab[1][15] = put_rv40_qpel8_mc33_c;
+    c->avg_rv40_qpel_pixels_tab[1][15] = avg_rv40_qpel8_mc33_c;
+#endif
 
     c->put_mspel_pixels_tab[0]= put_mspel8_mc00_c;
     c->put_mspel_pixels_tab[1]= put_mspel8_mc10_c;
@@ -4395,6 +4564,8 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 
     c->h264_v_loop_filter_luma= h264_v_loop_filter_luma_c;
     c->h264_h_loop_filter_luma= h264_h_loop_filter_luma_c;
+    c->h264_v_loop_filter_luma_intra= h264_v_loop_filter_luma_intra_c;
+    c->h264_h_loop_filter_luma_intra= h264_h_loop_filter_luma_intra_c;
     c->h264_v_loop_filter_chroma= h264_v_loop_filter_chroma_c;
     c->h264_h_loop_filter_chroma= h264_h_loop_filter_chroma_c;
     c->h264_v_loop_filter_chroma_intra= h264_v_loop_filter_chroma_intra_c;
@@ -4404,6 +4575,11 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     if (ENABLE_ANY_H263) {
         c->h263_h_loop_filter= h263_h_loop_filter_c;
         c->h263_v_loop_filter= h263_v_loop_filter_c;
+    }
+
+    if (ENABLE_VP3_DECODER || ENABLE_THEORA_DECODER) {
+        c->vp3_h_loop_filter= ff_vp3_h_loop_filter_c;
+        c->vp3_v_loop_filter= ff_vp3_v_loop_filter_c;
     }
 
     c->h261_loop_filter= h261_loop_filter_c;
@@ -4420,13 +4596,22 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 #ifdef CONFIG_VORBIS_DECODER
     c->vorbis_inverse_coupling = vorbis_inverse_coupling;
 #endif
+#ifdef CONFIG_AC3_DECODER
+    c->ac3_downmix = ff_ac3_downmix_c;
+#endif
 #ifdef CONFIG_FLAC_ENCODER
     c->flac_compute_autocorr = ff_flac_compute_autocorr;
 #endif
     c->vector_fmul = vector_fmul_c;
     c->vector_fmul_reverse = vector_fmul_reverse_c;
     c->vector_fmul_add_add = ff_vector_fmul_add_add_c;
+    c->vector_fmul_window = ff_vector_fmul_window_c;
+    c->int32_to_float_fmul_scalar = int32_to_float_fmul_scalar_c;
     c->float_to_int16 = ff_float_to_int16_c;
+    c->float_to_int16_interleave = ff_float_to_int16_interleave_c;
+    c->add_int16 = add_int16_c;
+    c->sub_int16 = sub_int16_c;
+    c->scalarproduct_int16 = scalarproduct_int16_c;
 
     c->shrink[0]= ff_img_copy_plane;
     c->shrink[1]= ff_shrink22;
@@ -4439,11 +4624,11 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     memset(c->avg_2tap_qpel_pixels_tab, 0, sizeof(c->avg_2tap_qpel_pixels_tab));
 
     if (ENABLE_MMX)      dsputil_init_mmx   (c, avctx);
-    if (ENABLE_ARMV4L)   dsputil_init_armv4l(c, avctx);
+    if (ENABLE_ARM)      dsputil_init_arm   (c, avctx);
     if (ENABLE_MLIB)     dsputil_init_mlib  (c, avctx);
     if (ENABLE_VIS)      dsputil_init_vis   (c, avctx);
     if (ENABLE_ALPHA)    dsputil_init_alpha (c, avctx);
-    if (ENABLE_POWERPC)  dsputil_init_ppc   (c, avctx);
+    if (ENABLE_PPC)      dsputil_init_ppc   (c, avctx);
     if (ENABLE_MMI)      dsputil_init_mmi   (c, avctx);
     if (ENABLE_SH4)      dsputil_init_sh4   (c, avctx);
     if (ENABLE_BFIN)     dsputil_init_bfin  (c, avctx);
@@ -4475,6 +4660,10 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     case FF_PARTTRANS_IDCT_PERM:
         for(i=0; i<64; i++)
             c->idct_permutation[i]= (i&0x24) | ((i&3)<<3) | ((i>>3)&3);
+        break;
+    case FF_SSE2_IDCT_PERM:
+        for(i=0; i<64; i++)
+            c->idct_permutation[i]= (i&0x38) | idct_sse2_row_perm[i&7];
         break;
     default:
         av_log(avctx, AV_LOG_ERROR, "Internal error, IDCT permutation not set\n");

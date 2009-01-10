@@ -127,14 +127,13 @@ static int find_frame_rate_index(MpegEncContext *s){
             s->frame_rate_index= i;
         }
     }
- /* MEANX 
-
+/* MEANX
     if(dmin)
         return -1;
     else
         return 0;
-  */
-        if(dmin>4)
+ /MEANX */
+     if(dmin>4)
    {
         av_log(0,AV_LOG_ERROR,"We did a roundup ! Expect async!\n");
    }
@@ -142,7 +141,7 @@ static int find_frame_rate_index(MpegEncContext *s){
 
 }
 
-static int encode_init(AVCodecContext *avctx)
+static av_cold int encode_init(AVCodecContext *avctx)
 {
     MpegEncContext *s = avctx->priv_data;
 
@@ -193,7 +192,7 @@ static void put_header(MpegEncContext *s, int header)
 {
     align_put_bits(&s->pb);
     put_bits(&s->pb, 16, header>>16);
-    put_bits(&s->pb, 16, header&0xFFFF);
+    put_sbits(&s->pb, 16, header);
 }
 
 /* put sequence header if needed */
@@ -215,8 +214,8 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
             /* mpeg1 header repeated every gop */
             put_header(s, SEQ_START_CODE);
 
-            put_bits(&s->pb, 12, s->width);
-            put_bits(&s->pb, 12, s->height);
+            put_sbits(&s->pb, 12, s->width );
+            put_sbits(&s->pb, 12, s->height);
 #if 0 //MEANX
 
             for(i=1; i<15; i++){
@@ -233,11 +232,10 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
                     s->aspect_ratio_info= i;
                 }
             }
-#endif // MEANX
-            //MEANX put_bits(&s->pb, 4, s->aspect_ratio_info);
-            //MEANX put_bits(&s->pb, 4, s->frame_rate_index);
- // MEANX 4:3
-  if(s->avctx->sample_aspect_ratio.num==16 && s->avctx->sample_aspect_ratio.den==9)
+ #endif // /MEANX
+ // MEANX   put_bits(&s->pb, 4, s->aspect_ratio_info);
+// MEANX    put_bits(&s->pb, 4, s->frame_rate_index);
+        if(s->avctx->sample_aspect_ratio.num==16 && s->avctx->sample_aspect_ratio.den==9)
             {
                 //printf("FFmpeg : Wide\n");
                 put_bits(&s->pb,4,3); //16:9
@@ -250,9 +248,8 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
                 put_bits(&s->pb, 4, 12); // MPEG1
             }
 // /MEANX
-
-// //MEANX PULLDOWN            put_bits(&s->pb, 4, s->frame_rate_index);
-if((s->flags2 & CODEC_FLAG2_32_PULLDOWN) && (s->codec_id == CODEC_ID_MPEG2VIDEO))
+       // MEANX PULLDOWN            put_bits(&s->pb, 4, s->frame_rate_index);
+        if((s->flags2 & CODEC_FLAG2_32_PULLDOWN) && (s->codec_id == CODEC_ID_MPEG2VIDEO))
             {           
                 put_bits(&s->pb, 4,4);
             }
@@ -261,7 +258,9 @@ if((s->flags2 & CODEC_FLAG2_32_PULLDOWN) && (s->codec_id == CODEC_ID_MPEG2VIDEO)
                 put_bits(&s->pb, 4, s->frame_rate_index);
             } //MEANX pulldown
 
-            if(s->avctx->rc_max_rate_header){ //MEANX we use header
+     
+
+            if(s->avctx->rc_max_rate_header){ // MEANX we use header
                 v = (s->avctx->rc_max_rate_header + 399) / 400;
                 if (v > 0x3ffff && s->codec_id == CODEC_ID_MPEG1VIDEO)
                     v = 0x3ffff;
@@ -269,16 +268,16 @@ if((s->flags2 & CODEC_FLAG2_32_PULLDOWN) && (s->codec_id == CODEC_ID_MPEG2VIDEO)
                 v= 0x3FFFF;
             }
 
-            if(s->avctx->rc_buffer_size_header) // MEANX we use header
+            if(s->avctx->rc_buffer_size_header) // MEANX use header
                 vbv_buffer_size = s->avctx->rc_buffer_size_header;
             else
                 /* VBV calculation: Scaled so that a VCD has the proper VBV size of 40 kilobytes */
                 vbv_buffer_size = (( 20 * s->bit_rate) / (1151929 / 2)) * 8 * 1024;
             vbv_buffer_size= (vbv_buffer_size + 16383) / 16384;
 
-            put_bits(&s->pb, 18, v & 0x3FFFF);
+            put_sbits(&s->pb, 18, v);
             put_bits(&s->pb, 1, 1); /* marker */
-            put_bits(&s->pb, 10, vbv_buffer_size & 0x3FF);
+            put_sbits(&s->pb, 10, vbv_buffer_size);
 
             constraint_parameter_flag=
                 s->width <= 768 && s->height <= 576 &&
@@ -303,9 +302,9 @@ if((s->flags2 & CODEC_FLAG2_32_PULLDOWN) && (s->codec_id == CODEC_ID_MPEG2VIDEO)
 
                 put_bits(&s->pb, 3, s->avctx->profile); //profile
                 put_bits(&s->pb, 4, s->avctx->level); //level
-   // MEANX pulldown put_bits(&s->pb, 1, s->progressive_sequence);
+  // MEANX pulldown put_bits(&s->pb, 1, s->progressive_sequence);
   // MEANX Pulldown
- if(s->flags2 & CODEC_FLAG2_32_PULLDOWN) //MEANX
+                if(s->flags2 & CODEC_FLAG2_32_PULLDOWN) //MEANX
                         put_bits(&s->pb, 1, 0);
                 else
                         put_bits(&s->pb, 1, s->progressive_sequence);
@@ -315,8 +314,8 @@ if((s->flags2 & CODEC_FLAG2_32_PULLDOWN) && (s->codec_id == CODEC_ID_MPEG2VIDEO)
 
 
                 put_bits(&s->pb, 2, s->chroma_format);
-                put_bits(&s->pb, 2, 0); //horizontal size ext
-                put_bits(&s->pb, 2, 0); //vertical size ext
+                put_bits(&s->pb, 2, s->width >>12);
+                put_bits(&s->pb, 2, s->height>>12);
                 put_bits(&s->pb, 12, v>>18); //bitrate ext
                 put_bits(&s->pb, 1, 1); //marker
                 put_bits(&s->pb, 8, vbv_buffer_size >>10); //vbv buffer ext
@@ -377,7 +376,7 @@ void ff_mpeg1_encode_slice_header(MpegEncContext *s){
 
 void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
 {
-	int tff,rff; //MEANX
+int tff,rff; //MEANX
 
     mpeg1_encode_sequence_header(s);
 
@@ -457,7 +456,6 @@ void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
 //               /MEANX pulldown
 
 
-
         put_header(s, EXT_START_CODE);
         put_bits(&s->pb, 4, 8); //pic ext
         if (s->pict_type == FF_P_TYPE || s->pict_type == FF_B_TYPE) {
@@ -476,8 +474,7 @@ void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
 
         assert(s->picture_structure == PICT_FRAME);
         put_bits(&s->pb, 2, s->picture_structure);
-#if 0 //MEANX
-
+#if 0
         if (s->progressive_sequence) {
             put_bits(&s->pb, 1, 0); /* no repeat */
         } else {
@@ -495,8 +492,8 @@ void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
         put_bits(&s->pb, 1, s->q_scale_type);
         put_bits(&s->pb, 1, s->intra_vlc_format);
         put_bits(&s->pb, 1, s->alternate_scan);
- // MEANX put_bits(&s->pb, 1, s->repeat_first_field);
-	put_bits(&s->pb, 1, rff);
+        // MEANX put_bits(&s->pb, 1, s->repeat_first_field);
+        put_bits(&s->pb, 1, rff);
       // /MEANX
 
         s->progressive_frame = s->progressive_sequence;
@@ -653,7 +650,7 @@ static av_always_inline void mpeg1_encode_mb_internal(MpegEncContext *s,
                     put_bits(&s->pb, ff_mpeg12_mbPatTable[cbp][1], ff_mpeg12_mbPatTable[cbp][0]);
                 } else {
                     put_bits(&s->pb, ff_mpeg12_mbPatTable[cbp>>2][1], ff_mpeg12_mbPatTable[cbp>>2][0]);
-                    put_bits(&s->pb, 2, cbp & 3);
+                    put_sbits(&s->pb, 2, cbp);
                 }
             }
             s->f_count++;
@@ -736,7 +733,7 @@ static av_always_inline void mpeg1_encode_mb_internal(MpegEncContext *s,
                     put_bits(&s->pb, ff_mpeg12_mbPatTable[cbp][1], ff_mpeg12_mbPatTable[cbp][0]);
                 } else {
                     put_bits(&s->pb, ff_mpeg12_mbPatTable[cbp>>2][1], ff_mpeg12_mbPatTable[cbp>>2][0]);
-                    put_bits(&s->pb, 2, cbp & 3);
+                    put_sbits(&s->pb, 2, cbp);
                 }
             }
         }
@@ -1004,16 +1001,16 @@ static void mpeg1_encode_block(MpegEncContext *s,
                 put_bits(&s->pb, 6, run);
                 if(s->codec_id == CODEC_ID_MPEG1VIDEO){
                     if (alevel < 128) {
-                        put_bits(&s->pb, 8, level & 0xff);
+                        put_sbits(&s->pb, 8, level);
                     } else {
                         if (level < 0) {
                             put_bits(&s->pb, 16, 0x8001 + level + 255);
                         } else {
-                            put_bits(&s->pb, 16, level & 0xffff);
+                            put_sbits(&s->pb, 16, level);
                         }
                     }
                 }else{
-                    put_bits(&s->pb, 12, level & 0xfff);
+                    put_sbits(&s->pb, 12, level);
                 }
             }
             last_non_zero = i;
@@ -1032,8 +1029,9 @@ AVCodec mpeg1video_encoder = {
     MPV_encode_picture,
     MPV_encode_end,
     .supported_framerates= ff_frame_rate_tab+1,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
     .capabilities= CODEC_CAP_DELAY,
+    .long_name= NULL_IF_CONFIG_SMALL("MPEG-1 video"),
 };
 
 AVCodec mpeg2video_encoder = {
@@ -1045,6 +1043,7 @@ AVCodec mpeg2video_encoder = {
     MPV_encode_picture,
     MPV_encode_end,
     .supported_framerates= ff_frame_rate_tab+1,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_YUV422P, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_YUV422P, PIX_FMT_NONE},
     .capabilities= CODEC_CAP_DELAY,
+    .long_name= NULL_IF_CONFIG_SMALL("MPEG-2 video"),
 };

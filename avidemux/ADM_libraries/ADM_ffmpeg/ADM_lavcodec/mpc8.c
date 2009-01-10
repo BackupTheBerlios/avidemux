@@ -25,10 +25,10 @@
  * divided into 32 subbands.
  */
 
+#include "libavutil/random.h"
 #include "avcodec.h"
 #include "bitstream.h"
 #include "dsputil.h"
-#include "random.h"
 
 #ifdef CONFIG_MPEGAUDIO_HP
 #define USE_HIGHPRECISION
@@ -92,7 +92,7 @@ static int mpc8_get_mask(GetBitContext *gb, int size, int t)
     return mask;
 }
 
-static int mpc8_decode_init(AVCodecContext * avctx)
+static av_cold int mpc8_decode_init(AVCodecContext * avctx)
 {
     int i;
     MPCContext *c = avctx->priv_data;
@@ -177,6 +177,8 @@ static int mpc8_decode_init(AVCodecContext * avctx)
                  &mpc8_q8_codes[i], 1, 1, INIT_VLC_USE_STATIC);
     }
     vlc_initialized = 1;
+    avctx->sample_fmt = SAMPLE_FMT_S16;
+    avctx->channel_layout = (avctx->channels==2) ? CH_LAYOUT_STEREO : CH_LAYOUT_MONO;
     return 0;
 }
 
@@ -353,7 +355,7 @@ static int mpc8_decode_frame(AVCodecContext * avctx,
 }
 
 AVCodec mpc8_decoder = {
-    "mpc sv8",
+    "mpc8",
     CODEC_TYPE_AUDIO,
     CODEC_ID_MUSEPACK8,
     sizeof(MPCContext),
@@ -361,4 +363,5 @@ AVCodec mpc8_decoder = {
     NULL,
     NULL,
     mpc8_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("Musepack SV8"),
 };

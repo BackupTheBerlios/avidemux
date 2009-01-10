@@ -98,7 +98,7 @@ static void common_init(MpegEncContext * s)
     case 3:
         if(s->workaround_bugs){
             s->y_dc_scale_table= old_ff_y_dc_scale_table;
-            s->c_dc_scale_table= old_ff_c_dc_scale_table;
+            s->c_dc_scale_table= wmv1_c_dc_scale_table;
         } else{
             s->y_dc_scale_table= ff_mpeg4_y_dc_scale_table;
             s->c_dc_scale_table= ff_mpeg4_c_dc_scale_table;
@@ -238,7 +238,7 @@ static int get_size_of_code(MpegEncContext * s, RLTable *rl, int last, int run, 
     return size;
 }
 
-void ff_find_best_tables(MpegEncContext * s)
+static void find_best_tables(MpegEncContext * s)
 {
     int i;
     int best       =-1, best_size       =9999999;
@@ -308,7 +308,7 @@ void ff_find_best_tables(MpegEncContext * s)
 /* write MSMPEG4 compatible frame header */
 void msmpeg4_encode_picture_header(MpegEncContext * s, int picture_number)
 {
-    ff_find_best_tables(s);
+    find_best_tables(s);
 
     align_put_bits(&s->pb);
     put_bits(&s->pb, 2, s->pict_type - 1);
@@ -654,7 +654,7 @@ static inline int msmpeg4_pred_dc(MpegEncContext * s, int n,
        fact they decided to store the quantized DC (which would lead
        to problems if Q could vary !) */
 #if (defined(ARCH_X86)) && !defined PIC
-    asm volatile(
+    __asm__ volatile(
         "movl %3, %%eax         \n\t"
         "shrl $1, %%eax         \n\t"
         "addl %%eax, %2         \n\t"
@@ -957,7 +957,7 @@ else
                             put_bits(&s->pb, s->esc3_level_length, level);
                         }else{
                             put_bits(&s->pb, 6, run);
-                            put_bits(&s->pb, 8, slevel & 0xff);
+                            put_sbits(&s->pb, 8, slevel);
                         }
                     } else {
                         /* second escape */
@@ -1063,8 +1063,13 @@ int ff_msmpeg4_decode_init(MpegEncContext *s)
 
         for(i=0;i<NB_RL_TABLES;i++) {
             init_rl(&rl_table[i], static_rl_table_store[i]);
-            init_vlc_rl(&rl_table[i], 1);
         }
+        INIT_VLC_RL(rl_table[0], 642);
+        INIT_VLC_RL(rl_table[1], 1104);
+        INIT_VLC_RL(rl_table[2], 554);
+        INIT_VLC_RL(rl_table[3], 940);
+        INIT_VLC_RL(rl_table[4], 962);
+        INIT_VLC_RL(rl_table[5], 554);
         for(i=0;i<2;i++) {
             mv = &mv_tables[i];
             init_vlc(&mv->vlc, MV_VLC_BITS, mv->n + 1,
@@ -1817,7 +1822,7 @@ int ff_msmpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
             i-= 192;
             if(i&(~63)){
                 const int left= s->gb.size_in_bits - get_bits_count(&s->gb);
-                if(((i+192 == 64 && level/qmul==-1) || s->error_resilience<=1) && left>=0){
+                if(((i+192 == 64 && level/qmul==-1) || s->error_recognition<=1) && left>=0){
                     av_log(s->avctx, AV_LOG_ERROR, "ignoring overflow at %d %d\n", s->mb_x, s->mb_y);
                     break;
                 }else{

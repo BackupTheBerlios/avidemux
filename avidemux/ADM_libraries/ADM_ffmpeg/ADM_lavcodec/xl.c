@@ -117,7 +117,7 @@ static int decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int decode_init(AVCodecContext *avctx){
+static av_cold int decode_init(AVCodecContext *avctx){
 //    VideoXLContext * const a = avctx->priv_data;
 
     avctx->pix_fmt= PIX_FMT_YUV411P;
@@ -135,4 +135,5 @@ AVCodec xl_decoder = {
     NULL,
     decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("Miro VideoXL"),
 };

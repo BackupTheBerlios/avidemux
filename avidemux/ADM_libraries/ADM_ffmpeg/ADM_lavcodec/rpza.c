@@ -21,7 +21,7 @@
 
 /**
  * @file rpza.c
- * QT RPZA Video Decoder by Roberto Togni <rtogni@bresciaonline.it>
+ * QT RPZA Video Decoder by Roberto Togni
  * For more information about the RPZA format, visit:
  *   http://www.pcisys.net/~melanson/codecs/
  *
@@ -226,7 +226,7 @@ static void rpza_decode_stream(RpzaContext *s)
     }
 }
 
-static int rpza_decode_init(AVCodecContext *avctx)
+static av_cold int rpza_decode_init(AVCodecContext *avctx)
 {
     RpzaContext *s = avctx->priv_data;
 
@@ -263,7 +263,7 @@ static int rpza_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int rpza_decode_end(AVCodecContext *avctx)
+static av_cold int rpza_decode_end(AVCodecContext *avctx)
 {
     RpzaContext *s = avctx->priv_data;
 
@@ -283,4 +283,5 @@ AVCodec rpza_decoder = {
     rpza_decode_end,
     rpza_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("QuickTime video (RPZA)"),
 };

@@ -23,8 +23,8 @@
  * common internal api header.
  */
 
-#ifndef FFMPEG_INTERNAL_H
-#define FFMPEG_INTERNAL_H
+#ifndef AVUTIL_INTERNAL_H
+#define AVUTIL_INTERNAL_H
 
 #if !defined(DEBUG) && !defined(NDEBUG)
 #    define NDEBUG
@@ -33,9 +33,10 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <assert.h>
+#include "common.h"
 
 #ifndef attribute_align_arg
-#if defined(__GNUC__) && (__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__>1)
+#if (!defined(__ICC) || __ICC > 1100) && AV_GCC_VERSION_AT_LEAST(4,2)
 #    define attribute_align_arg __attribute__((force_align_arg_pointer))
 #else
 #    define attribute_align_arg
@@ -43,22 +44,11 @@
 #endif
 
 #ifndef attribute_used
-#if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
+#if AV_GCC_VERSION_AT_LEAST(3,1)
 #    define attribute_used __attribute__((used))
 #else
 #    define attribute_used
 #endif
-#endif
-
-/* Use Apple-specific AltiVec syntax for vector declarations when necessary. */
-#ifdef __APPLE_CC__
-#define AVV(x...) (x)
-#else
-#define AVV(x...) {x}
-#endif
-
-#ifndef M_PI
-#define M_PI    3.14159265358979323846
 #endif
 
 #ifndef INT16_MIN
@@ -113,25 +103,14 @@
 #    define offsetof(T,F) ((unsigned int)((char *)&((T *)0)->F))
 #endif
 
-#ifdef USE_FASTMEMCPY
-#    include "libvo/fastmemcpy.h"
-#    define memcpy(a,b,c) fast_memcpy(a,b,c)
+// Use rip-relative addressing if compiling PIC code on x86-64.
+#if defined(ARCH_X86_64) && defined(PIC)
+#    define LOCAL_MANGLE(a) #a "(%%rip)"
+#else
+#    define LOCAL_MANGLE(a) #a
 #endif
 
-// Use rip-relative addressing if compiling PIC code on x86-64.
-#if defined(__MINGW32__) || defined(__CYGWIN__) || defined(__DJGPP__) || \
-    defined(__OS2__) || defined(__APPLE__) || \
-    (defined (__OpenBSD__) && !defined(__ELF__))
-#    if defined(ARCH_X86_64) && defined(PIC)
-#        define MANGLE(a) "_" #a"(%%rip)"
-#    else
-#        define MANGLE(a) "_" #a
-#    endif
-#elif defined(ARCH_X86_64) && defined(PIC)
-#    define MANGLE(a) #a"(%%rip)"
-#else
-#    define MANGLE(a) #a
-#endif
+#define MANGLE(a) EXTERN_PREFIX LOCAL_MANGLE(a)
 
 /* debug stuff */
 
@@ -152,24 +131,32 @@ extern const uint32_t ff_inverse[256];
 #    define FASTDIV(a,b) \
     ({\
         int ret,dmy;\
-        asm volatile(\
+        __asm__ volatile(\
             "mull %3"\
             :"=d"(ret),"=a"(dmy)\
             :"1"(a),"g"(ff_inverse[b])\
             );\
         ret;\
     })
-#elif defined(ARCH_ARMV4L)
-#    define FASTDIV(a,b) \
-    ({\
-        int ret,dmy;\
-        asm volatile(\
-            "umull %1, %0, %2, %3"\
-            :"=&r"(ret),"=&r"(dmy)\
-            :"r"(a),"r"(ff_inverse[b])\
-            );\
-        ret;\
-    })
+#elif defined(HAVE_ARMV6)
+static inline av_const int FASTDIV(int a, int b)
+{
+    int r, t;
+    __asm__ volatile("cmp     %3, #2               \n\t"
+                     "ldr     %1, [%4, %3, lsl #2] \n\t"
+                     "lsrle   %0, %2, #1           \n\t"
+                     "smmulgt %0, %1, %2           \n\t"
+                     : "=&r"(r), "=&r"(t) : "r"(a), "r"(b), "r"(ff_inverse));
+    return r;
+}
+#elif defined(ARCH_ARM)
+static inline av_const int FASTDIV(int a, int b)
+{
+    int r, t;
+    __asm__ volatile ("umull %1, %0, %2, %3"
+                      : "=&r"(r), "=&r"(t) : "r"(a), "r"(ff_inverse[b]));
+    return r;
+}
 #elif defined(CONFIG_FASTDIV)
 #    define FASTDIV(a,b)   ((uint32_t)((((uint64_t)a)*ff_inverse[b])>>32))
 #else
@@ -180,7 +167,7 @@ extern const uint8_t ff_sqrt_tab[256];
 
 static inline int av_log2_16bit(unsigned int v);
 
-static inline unsigned int ff_sqrt(unsigned int a)
+static inline av_const unsigned int ff_sqrt(unsigned int a)
 {
     unsigned int b;
 
@@ -202,7 +189,7 @@ static inline unsigned int ff_sqrt(unsigned int a)
 
 #if defined(ARCH_X86)
 #define MASK_ABS(mask, level)\
-            asm volatile(\
+            __asm__ volatile(\
                 "cltd                   \n\t"\
                 "xorl %1, %0            \n\t"\
                 "subl %1, %0            \n\t"\
@@ -216,7 +203,7 @@ static inline unsigned int ff_sqrt(unsigned int a)
 
 #ifdef HAVE_CMOV
 #define COPY3_IF_LT(x,y,a,b,c,d)\
-asm volatile (\
+__asm__ volatile (\
     "cmpl %0, %3        \n\t"\
     "cmovl %3, %0       \n\t"\
     "cmovl %4, %1       \n\t"\
@@ -234,14 +221,15 @@ if((y)<(x)){\
 #endif
 
 /* avoid usage of various functions */
-#if 0 //MEANX
+#if 0 // MEANX
 #undef  malloc
 #define malloc please_use_av_malloc
 #undef  free
 #define free please_use_av_free
 #undef  realloc
 #define realloc please_use_av_realloc
-#endif
+#endif // /MEANX
+
 #undef  time
 #define time time_is_forbidden_due_to_security_issues
 #undef  rand
@@ -256,7 +244,7 @@ if((y)<(x)){\
 #define strcat strcat_is_forbidden_due_to_security_issues_use_av_strlcat
 #undef  exit
 #define exit exit_is_forbidden
-#if !(defined(LIBAVFORMAT_BUILD) || defined(FFMPEG_FRAMEHOOK_H))
+#ifndef LIBAVFORMAT_BUILD
 #undef  printf
 #define printf please_use_av_log
 #undef  fprintf
@@ -277,38 +265,38 @@ if((y)<(x)){\
 }
 
 #ifndef HAVE_LLRINT
-static av_always_inline long long llrint(double x)
+static av_always_inline av_const long long llrint(double x)
 {
     return rint(x);
 }
 #endif /* HAVE_LLRINT */
 
 #ifndef HAVE_LRINT
-static av_always_inline long int lrint(double x)
+static av_always_inline av_const long int lrint(double x)
 {
     return rint(x);
 }
 #endif /* HAVE_LRINT */
 
 #ifndef HAVE_LRINTF
-static av_always_inline long int lrintf(float x)
+static av_always_inline av_const long int lrintf(float x)
 {
     return (int)(rint(x));
 }
 #endif /* HAVE_LRINTF */
 
 #ifndef HAVE_ROUND
-static av_always_inline double round(double x)
+static av_always_inline av_const double round(double x)
 {
     return (x > 0) ? floor(x + 0.5) : ceil(x - 0.5);
 }
 #endif /* HAVE_ROUND */
 
 #ifndef HAVE_ROUNDF
-static av_always_inline float roundf(float x)
+static av_always_inline av_const float roundf(float x)
 {
     return (x > 0) ? floor(x + 0.5) : ceil(x - 0.5);
 }
 #endif /* HAVE_ROUNDF */
 
-#endif /* FFMPEG_INTERNAL_H */
+#endif /* AVUTIL_INTERNAL_H */
