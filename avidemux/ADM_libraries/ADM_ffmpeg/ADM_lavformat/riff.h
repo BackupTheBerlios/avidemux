@@ -28,7 +28,7 @@
 #ifndef AVFORMAT_RIFF_H
 #define AVFORMAT_RIFF_H
 
-#include "libavcodec/avcodec.h"
+#include "ADM_lavcodec/avcodec.h"
 #include "avio.h"
 
 int64_t start_tag(ByteIOContext *pb, const char *tag);

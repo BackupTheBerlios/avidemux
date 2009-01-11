@@ -571,7 +571,7 @@ static inline int get_penalty_factor(int lambda, int lambda2, int type){
 
 /* should be defined by architectures supporting
    one or more MultiMedia extension */
-// MEANX int mm_support(void);
+int mm_support(void);
 
 void dsputil_init_alpha(DSPContext* c, AVCodecContext *avctx);
 void dsputil_init_arm(DSPContext* c, AVCodecContext *avctx);

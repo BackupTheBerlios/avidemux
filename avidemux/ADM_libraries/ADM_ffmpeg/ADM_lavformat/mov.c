@@ -27,8 +27,8 @@
 #include "riff.h"
 #include "isom.h"
 #include "dv.h"
-#include "libavcodec/mpeg4audio.h"
-#include "libavcodec/mpegaudiodata.h"
+#include "ADM_lavcodec/mpeg4audio.h"
+#include "ADM_lavcodec/mpegaudiodata.h"
 
 #ifdef CONFIG_ZLIB
 #include <zlib.h>

@@ -25,7 +25,7 @@
  */
 
 #include "libavutil/x86_cpu.h"
-#include "libavcodec/dsputil.h"
+#include "ADM_lavcodec/dsputil.h"
 #include "dsputil_mmx.h"
 
 /** Add rounder from mm7 to mm3 and pack result at destination */

@@ -20,7 +20,7 @@
  */
 
 #include "libavutil/avstring.h"
-#include "libavcodec/opt.h"
+#include "ADM_lavcodec/opt.h"
 #include "os_support.h"
 #include "avformat.h"
 

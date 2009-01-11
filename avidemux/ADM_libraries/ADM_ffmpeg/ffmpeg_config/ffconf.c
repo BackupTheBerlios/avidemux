@@ -8,7 +8,7 @@ int main(void)
 {
 	printf("#include \"ADM_coreConfig.h\"\n");
 
-#define DECLARE_DECODER(a,b); printf("#define ENABLE_"#a"_DECODER 1\n"); 
+#define DECLARE_DECODER(a,b); printf("#define ENABLE_"#a"_DECODER 1\n"); printf("#define CONFIG_"#a"_DECODER 1\n");
   
     DECLARE_DECODER(NELLYMOSER,nellymoser);
     DECLARE_DECODER(ADPCM_IMA_AMV, amv);
@@ -233,7 +233,8 @@ int main(void)
     DECLARE_PARSER (PNM, pnm);
     DECLARE_PARSER (VC1, vc1);
 
-#define DECLARE_ENCODER(a,b); printf("#define ENABLE_"#a"_ENCODER 1\n"); 
+#define DECLARE_ENCODER(a,b); printf("#define ENABLE_"#a"_ENCODER 1\n"); printf("#define CONFIG_"#a"_ENCODER 1\n");
+
     DECLARE_ENCODER (MJPEG, mjpeg);
     DECLARE_ENCODER (MSMPEG4V3, msmpeg4v3);
     DECLARE_ENCODER(H263P, h263p);
@@ -455,10 +456,13 @@ printf("#endif //ADM_MINIMAL_INCLUDE\n");
 	printf("#	define WORDS_BIGENDIAN 1\n");
 	printf("#endif\n");
 
+        printf("#define ENABLE_YASM      0\n");
         printf("#define ENABLE_ARM      0\n");
         printf("#define ENABLE_PPC      0\n");
 	printf("#define ENABLE_THREADS 1\n");
 	printf("#define ENABLE_ENCODERS 1\n");
+	printf("#define CONFIG_MUXERS 1\n");
+	printf("#define CONFIG_DEMUXERS 1\n");
 	printf("#define ENABLE_VIS 0\n");
 	printf("#define ENABLE_GRAY 0\n");
 	printf("#define HAVE_LRINTF 1\n");

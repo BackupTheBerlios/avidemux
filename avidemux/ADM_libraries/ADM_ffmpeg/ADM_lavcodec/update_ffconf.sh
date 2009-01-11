@@ -1,2 +1,2 @@
-gcc ../ffconf.c -o ffconf
-./ffconf > ../config.h
+gcc ../ffmpeg_config/ffconf.c -o ffconf
+./ffconf > ../ffmpeg_config/config.h

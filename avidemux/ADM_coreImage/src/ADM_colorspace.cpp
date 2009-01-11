@@ -21,7 +21,7 @@
 
 extern "C" {
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/avcodec.h"
-#include "ADM_libraries/ADM_ffmpeg/ADM_lavutil/avutil.h"
+#include "ADM_libraries/ADM_ffmpeg/libavutil/avutil.h"
 #include "ADM_libraries/ADM_ffmpeg/ADM_libswscale/swscale.h"
 }
 

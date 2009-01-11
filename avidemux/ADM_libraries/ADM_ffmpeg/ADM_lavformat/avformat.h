@@ -42,7 +42,7 @@ unsigned avformat_version(void);
 
 #include <time.h>
 #include <stdio.h>  /* FILE */
-#include "libavcodec/avcodec.h"
+#include "ADM_lavcodec/avcodec.h"
 
 #include "avio.h"
 

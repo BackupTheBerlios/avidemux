@@ -21,9 +21,9 @@
  */
 
 #include "libavutil/crc.h"
-#include "libavcodec/ac3_parser.h"
-#include "libavcodec/bitstream.h"
-#include "libavcodec/bytestream.h"
+#include "ADM_lavcodec/ac3_parser.h"
+#include "ADM_lavcodec/bitstream.h"
+#include "ADM_lavcodec/bytestream.h"
 #include "avformat.h"
 #include "raw.h"
 

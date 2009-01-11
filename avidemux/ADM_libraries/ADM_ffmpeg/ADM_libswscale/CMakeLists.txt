@@ -1,5 +1,5 @@
 SET(ADM_LIB ADM_libswscale)
-SET(${ADM_LIB}_SRCS swscale.c yuv2rgb.c rgb2rgb.c ADM_mp.cpp)
+SET(${ADM_LIB}_SRCS swscale.c yuv2rgb.c rgb2rgb.c ADM_mp.cpp swscale_avoption.c)
 
 IF (ADM_CPU_ALTIVEC)
 	SET(${ADM_LIB}_SRCS ${${ADM_LIB}_SRCS} yuv2rgb_altivec.c)

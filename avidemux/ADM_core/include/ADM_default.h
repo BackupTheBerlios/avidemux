@@ -35,4 +35,9 @@
 
 #include "ADM_mangle.h"
 #include "ADM_files.h"
+
+#ifndef QT_TR_NOOP
+#define QT_TR_NOOP(x) x
+#endif
+
 #endif

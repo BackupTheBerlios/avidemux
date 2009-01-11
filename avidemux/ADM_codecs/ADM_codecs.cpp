@@ -45,13 +45,9 @@ extern "C"
 #include "avidemutils.h"
 #include "fourcc.h"
 
-#ifdef USE_FFMPEG
-#include "ADM_codecs/ADM_ffmp43.h"
-#endif
 
-#ifdef USE_DIVX
-#include "ADM_codecs/ADM_divx4.h"
-#endif
+#include "ADM_codecs/ADM_ffmp43.h"
+
 
 #ifdef USE_THEORA
 #include "ADM_codecs/ADM_theora_dec.h"

@@ -17,7 +17,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifdef USE_FFMPEG
+
 #include "ADM_lavcodec.h"
 class decoderFFSubs
 {
@@ -347,4 +347,4 @@ public:
   decoderFFMjpegB (uint32_t w, uint32_t h, uint32_t l, uint8_t * d);
 };
 
-#endif
+

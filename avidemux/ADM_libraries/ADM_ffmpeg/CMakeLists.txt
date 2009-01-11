@@ -14,7 +14,7 @@ IF (ADM_CPU_X86_64 OR ADM_CPU_PPC)
 ELSEIF (APPLE)
 	ADD_DEFINITIONS(-mdynamic-no-pic)
 ENDIF (ADM_CPU_X86_64 OR ADM_CPU_PPC)
-
+include_directories(ffmpeg_config)
 # Linker flags
 IF (APPLE)
 	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-single_module -Wl,-read_only_relocs,suppress")
@@ -30,6 +30,6 @@ ENDIF (WIN32)
 
 ADD_SUBDIRECTORY(ADM_lavcodec)
 ADD_SUBDIRECTORY(ADM_lavformat)
-ADD_SUBDIRECTORY(ADM_lavutil)
+ADD_SUBDIRECTORY(libavutil)
 ADD_SUBDIRECTORY(ADM_libswscale)
 ADD_SUBDIRECTORY(ADM_libpostproc)

@@ -22,7 +22,7 @@
 #ifndef AVFORMAT_MATROSKA_H
 #define AVFORMAT_MATROSKA_H
 
-#include "libavcodec/avcodec.h"
+#include "ADM_lavcodec/avcodec.h"
 
 /* EBML version supported */
 #define EBML_VERSION 1

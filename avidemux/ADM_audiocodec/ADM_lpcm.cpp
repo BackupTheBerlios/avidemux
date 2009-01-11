@@ -27,12 +27,12 @@
 
 ADM_AudiocodecWavSwapped::ADM_AudiocodecWavSwapped( uint32_t fourcc ) : ADM_Audiocodec(fourcc)
 {
-	channelMapping[0] = CH_FRONT_LEFT;
-	channelMapping[1] = CH_FRONT_RIGHT;
-	channelMapping[2] = CH_FRONT_CENTER;
-	channelMapping[3] = CH_LFE;
-	channelMapping[4] = CH_REAR_LEFT;
-	channelMapping[5] = CH_REAR_RIGHT;
+	channelMapping[0] = ADM_CH_FRONT_LEFT;
+	channelMapping[1] = ADM_CH_FRONT_RIGHT;
+	channelMapping[2] = ADM_CH_FRONT_CENTER;
+	channelMapping[3] = ADM_CH_LFE;
+	channelMapping[4] = ADM_CH_REAR_LEFT;
+	channelMapping[5] = ADM_CH_REAR_RIGHT;
 }
 
 ADM_AudiocodecWavSwapped::~ADM_AudiocodecWavSwapped()

@@ -41,7 +41,7 @@ extern FILTER  videofilters[VF_MAX_FILTER];
 
 extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, AVDMGenericVideoStream *in);
 extern void filterCleanUp( void );
-extern int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
+
 
 /*
 
@@ -53,7 +53,7 @@ extern int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
 static int32_t getIntegerAttribute(xmlNodePtr node, char *name, char *atrname);
 static xmlNodePtr nextByName(xmlNodePtr node,char *name);
 static CONFcouple *buildCouple(uint32_t nb, xmlNodePtr node);
-
+extern int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
 /**
 	Xml Read/write ConfCouple from files
 */

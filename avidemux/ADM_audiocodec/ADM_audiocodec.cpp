@@ -122,10 +122,10 @@ ADM_Audiocodec *out = NULL;
 	// For more complicated case (channel >2) , it is up to the decoder to do it...
 	switch(info->channels)
 	{
-			case 1: out->channelMapping[0] = CH_MONO;
+			case 1: out->channelMapping[0] = ADM_CH_MONO;
 					break;
-			case 2: out->channelMapping[0] = CH_FRONT_LEFT;
-					out->channelMapping[1] = CH_FRONT_RIGHT;
+			case 2: out->channelMapping[0] = ADM_CH_FRONT_LEFT;
+					out->channelMapping[1] = ADM_CH_FRONT_RIGHT;
 					break;
 			default:break;
 

@@ -804,7 +804,7 @@ static int encode_init(AVCodecContext *avctx)
         case PIX_FMT_BGR24:
             c->imgtype = IMGTYPE_RGB24;
             c->decomp_size = avctx->width * avctx->height * 3;
-            avctx->bits_per_sample= 24;
+            avctx->bits_per_coded_sample= 24;
             break;
         default:
             av_log(avctx, AV_LOG_ERROR, "Format %d not supported\n", avctx->pix_fmt);

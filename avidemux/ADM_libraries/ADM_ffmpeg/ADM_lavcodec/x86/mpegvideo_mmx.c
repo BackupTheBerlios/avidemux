@@ -23,9 +23,9 @@
  */
 
 #include "libavutil/x86_cpu.h"
-#include "libavcodec/avcodec.h"
-#include "libavcodec/dsputil.h"
-#include "libavcodec/mpegvideo.h"
+#include "ADM_lavcodec/avcodec.h"
+#include "ADM_lavcodec/dsputil.h"
+#include "ADM_lavcodec/mpegvideo.h"
 #include "dsputil_mmx.h"
 
 extern uint16_t inv_zigzag_direct16[64];

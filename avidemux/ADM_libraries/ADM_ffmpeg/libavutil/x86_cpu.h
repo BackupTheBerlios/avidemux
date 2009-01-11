@@ -22,6 +22,7 @@
 #define AVUTIL_X86_CPU_H
 
 #include <stdint.h>
+#define ADM_MINIMAL_INCLUDE
 #include "config.h"
 
 #ifdef ARCH_X86_64

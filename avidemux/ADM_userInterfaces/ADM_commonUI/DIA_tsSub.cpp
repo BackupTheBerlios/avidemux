@@ -70,11 +70,13 @@ uint32_t pts,dts;
         printf("Found %d rects to process\n",sub.num_rects);
         for(int i=0;i<sub.num_rects;i++)
         {
+/*
           AVSubtitleRect *r=&(sub.rects[i]); 
               printf("x :%d\n",r->x);
               printf("y :%d\n",r->y);
               printf("w :%d\n",r->w);
               printf("h :%d\n",r->h);
+*/
               // rgba_palette
               // Bitmap
         }

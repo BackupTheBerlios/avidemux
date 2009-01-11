@@ -7,7 +7,7 @@ SET(${ADM_LIB}_SRCS
 	msmpeg4.c  pcm.c  ratecontrol.c  raw.c  resample.c  rv10.c  simple_idct.c  svq1.c
 	utils.c  wmadec.c  indeo3.c  vp3.c  vp3dsp.c  h264.c  ffv1.c  ra144.c  ra288.c
 	golomb.c  4xm.c  cabac.c  asv1.c  vcr1.c  cljr.c  faandct.c  parser.c  roqvideo.c
-	xan.c  rpza.c  msrle.c  msvideo1.c  cinepak.c  vqavideo.c  idcinvideo.c  smc.c
+	xan.c  rpza.c  msrle.c  msrledec.c msvideo1.c  cinepak.c  vqavideo.c  idcinvideo.c  smc.c
 	flicvideo.c  interplayvideo.c  dpcm.c  8bps.c  vmdav.c  truemotion1.c  flac.c
 	g726.c  qtrle.c  lcl.c  snow.c  rangecoder.c  bitstream.c  h264idct.c  h261.c
 	amr.c  tscc.c  resample2.c    qdm2.c  bitstream_filter.c  eval.c  vc1.c
@@ -15,17 +15,23 @@ SET(${ADM_LIB}_SRCS
 	mpeg12data.c  mpegaudiodata.c  msmpeg4data.c  vc1data.c  vp56data.c  mjpegbdec.c
 	h263_parser.c  h264_parser.c  mpeg4video_parser.c  mpegvideo_enc.c  mpeg12enc.c
 	mpegaudioenc.c  ac3enc.c  ac3.c  ac3tab.c  mjpegenc.c  mjpegdec.c  wma.c  
-	dvbsub_parser.c  dvbsubdec.c  dvbsub.c  xiph.c  sp5xdec.c  nellymoserdec.c
+	dvbsub_parser.c  dvbsubdec.c  dvbsub.c  xiph.c  sp5xdec.c  
+        nellymoserdec.c nellymoser.c
 	ADM_lavcodec.cpp  pthread.c  huffman.c  wmv2dec.c  wmv2.c  h264pred.c  intrax8.c
 	intrax8dsp.c  dnxhddata.c  faanidct.c  ac3_parser.c  aac_ac3_parser.c
+        celp_math.c options.c aandcttab.c audioconvert.c mpeg4audio.c svq1dec.c celp_filters.c
 	aac_parser.c  mpegaudiodecheader.c)
 
 IF(ADM_CPU_X86)
 	SET(${ADM_LIB}_SRCS  ${${ADM_LIB}_SRCS}
-		i386/cputest.c  i386/mpegvideo_mmx.c  i386/vp3dsp_mmx.c  i386/dsputil_mmx.c
-		i386/fdct_mmx.c  i386/motion_est_mmx.c  i386/simple_idct_mmx.c  i386/fft_sse.c
-		i386/vp3dsp_sse2.c  i386/idct_mmx_xvid.c  i386/fft_3dn2.c  i386/snowdsp_mmx.c
-		i386/fft_3dn.c  i386/dsputilenc_mmx.c  i386/vc1dsp_mmx.c  i386/idct_mmx.c)
+		x86/cpuid.c  x86/mpegvideo_mmx.c  x86/vp3dsp_mmx.c  x86/dsputil_mmx.c
+		x86/fdct_mmx.c  x86/motion_est_mmx.c  x86/simple_idct_mmx.c  
+		x86/vp3dsp_sse2.c  x86/idct_mmx_xvid.c    x86/snowdsp_mmx.c
+                x86/idct_sse2_xvid.c 
+                #x86/fft_sse.c
+                #x86/fft_3dn2.c
+		#x86/fft_3dn.c  
+                x86/dsputilenc_mmx.c  x86/vc1dsp_mmx.c  x86/idct_mmx.c)
 ENDIF(ADM_CPU_X86)
 
 IF (ADM_CPU_ALTIVEC)
@@ -42,8 +48,8 @@ IF (ADM_DEBUG AND ADM_CPU_X86_32)
 	ADD_SOURCE_CFLAGS(cabac.c -O2)
 	ADD_SOURCE_CFLAGS(h264.c -O2)
 	ADD_SOURCE_CFLAGS(h264_parser.c -O2)
-	ADD_SOURCE_CFLAGS(i386/dsputil_mmx.c -O2)
-	ADD_SOURCE_CFLAGS(i386/snowdsp_mmx.c -O2)
+	ADD_SOURCE_CFLAGS(x86/dsputil_mmx.c -O2)
+	ADD_SOURCE_CFLAGS(x86/snowdsp_mmx.c -O2)
 ENDIF (ADM_DEBUG AND ADM_CPU_X86_32)
 
 TARGET_LINK_LIBRARIES(${ADM_LIB} ADM_core ADM_libavutil ${ZLIB_LIBRARY})

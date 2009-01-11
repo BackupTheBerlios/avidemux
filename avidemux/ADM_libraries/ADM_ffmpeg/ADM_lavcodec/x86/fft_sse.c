@@ -20,7 +20,7 @@
  */
 
 #include "libavutil/x86_cpu.h"
-#include "libavcodec/dsputil.h"
+#include "ADM_lavcodec/dsputil.h"
 
 static const int m1m1m1m1[4] __attribute__((aligned(16))) =
     { 1 << 31, 1 << 31, 1 << 31, 1 << 31 };

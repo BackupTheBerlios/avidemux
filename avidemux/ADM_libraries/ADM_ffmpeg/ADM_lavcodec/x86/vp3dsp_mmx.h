@@ -23,7 +23,7 @@
 #define AVCODEC_X86_VP3DSP_MMX_H
 
 #include <stdint.h>
-#include "libavcodec/dsputil.h"
+#include "ADM_lavcodec/dsputil.h"
 
 void ff_vp3_idct_mmx(int16_t *data);
 void ff_vp3_idct_put_mmx(uint8_t *dest, int line_size, DCTELEM *block);

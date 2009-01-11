@@ -29,7 +29,7 @@
 #ifndef AVCODEC_X86_H264_I386_H
 #define AVCODEC_X86_H264_I386_H
 
-#include "libavcodec/cabac.h"
+#include "ADM_lavcodec/cabac.h"
 
 //FIXME use some macros to avoid duplicating get_cabac (cannot be done yet
 //as that would make optimization work hard)

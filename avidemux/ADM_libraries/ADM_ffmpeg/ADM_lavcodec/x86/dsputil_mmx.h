@@ -23,7 +23,7 @@
 #define AVCODEC_X86_DSPUTIL_MMX_H
 
 #include <stdint.h>
-#include "libavcodec/dsputil.h"
+#include "ADM_lavcodec/dsputil.h"
 
 typedef struct { uint64_t a, b; } xmm_reg;
 

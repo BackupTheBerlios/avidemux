@@ -21,7 +21,7 @@
  */
 
 #include "libavutil/common.h"
-#include "libavcodec/dsputil.h"
+#include "ADM_lavcodec/dsputil.h"
 
 #include "mmx.h"
 

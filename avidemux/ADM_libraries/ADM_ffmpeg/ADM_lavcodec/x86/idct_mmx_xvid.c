@@ -40,7 +40,7 @@
  */
 
 #include <inttypes.h>
-#include "libavcodec/avcodec.h"
+#include "ADM_lavcodec/avcodec.h"
 
 //=============================================================================
 // Macros and other preprocessor constants

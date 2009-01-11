@@ -737,7 +737,12 @@ ffmpegEncoder::mplayer_init (void)
       //SETX(_HQ);
       SETX (_4MV);
       SETX (_QPEL);
-      SETX (_TRELLIS_QUANT);
+      //SETX (_TRELLIS_QUANT);
+#warning FIXME TRELLIS
+      if(_settings._TRELLIS_QUANT)
+        { 
+            _context->trellis=1;printf("[LAVCODEC] trellisis set\n");
+        }
       SETX (_NORMALIZE_AQP);
 
       if (_settings.widescreen)

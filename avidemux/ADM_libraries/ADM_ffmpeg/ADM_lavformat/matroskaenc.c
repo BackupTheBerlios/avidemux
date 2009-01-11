@@ -25,8 +25,8 @@
 #include "matroska.h"
 #include "avc.h"
 #include "libavutil/md5.h"
-#include "libavcodec/xiph.h"
-#include "libavcodec/mpeg4audio.h"
+#include "ADM_lavcodec/xiph.h"
+#include "ADM_lavcodec/mpeg4audio.h"
 
 typedef struct ebml_master {
     int64_t         pos;                ///< absolute offset in the file where the master's elements start

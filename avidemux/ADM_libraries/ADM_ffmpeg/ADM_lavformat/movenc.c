@@ -24,7 +24,7 @@
 #include "avio.h"
 #include "isom.h"
 #include "avc.h"
-#include "libavcodec/bitstream.h"
+#include "ADM_lavcodec/bitstream.h"
 
 #undef NDEBUG
 #include <assert.h>

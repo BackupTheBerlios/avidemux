@@ -23,10 +23,10 @@
  */
 
 #include "libavutil/x86_cpu.h"
-#include "libavcodec/dsputil.h"
-#include "libavcodec/h263.h"
-#include "libavcodec/mpegvideo.h"
-#include "libavcodec/simple_idct.h"
+#include "ADM_lavcodec/dsputil.h"
+#include "ADM_lavcodec/h263.h"
+#include "ADM_lavcodec/mpegvideo.h"
+#include "ADM_lavcodec/simple_idct.h"
 #include "dsputil_mmx.h"
 #include "mmx.h"
 #include "vp3dsp_mmx.h"
@@ -35,7 +35,7 @@
 
 //#undef NDEBUG
 //#include <assert.h>
-
+#undef mm_flags
 int mm_flags; /* multimedia extension flags */
 
 /* pixel operations */

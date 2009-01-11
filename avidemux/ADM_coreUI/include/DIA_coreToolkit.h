@@ -50,4 +50,7 @@ void            GUI_Verbose(void);
 void            GUI_Quiet(void);
 // Is the UI in quiet mode ?
 uint8_t			GUI_isQuiet(void);
+//
+//
+
 #endif

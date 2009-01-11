@@ -22,8 +22,8 @@
 
 #include <stdlib.h>
 #include "libavutil/x86_cpu.h"
-#include "libavcodec/dsputil.h"
-
+#include "ADM_lavcodec/dsputil.h"
+#undef mm_support
 #undef printf
 
 /* ebx saving is necessary for PIC. gcc seems unable to see it alone */

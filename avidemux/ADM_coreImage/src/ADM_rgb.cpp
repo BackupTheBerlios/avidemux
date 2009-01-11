@@ -25,7 +25,7 @@
 
 extern "C" {
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/avcodec.h"
-#include "ADM_libraries/ADM_ffmpeg/ADM_lavutil/avutil.h"
+#include "ADM_libraries/ADM_ffmpeg/libavutil/avutil.h"
 #include "ADM_libraries/ADM_ffmpeg/ADM_libswscale/swscale.h"
 }
 
@@ -83,6 +83,7 @@ extern "C" {
 	
     CLEANUP();
     FLAGS();
+    flags|=SWS_BILINEAR;
     PixelFormat fmt=TARGET_COLORSPACE;
     if(_inverted) fmt=ALTERNATE_COLORSPACE;
     if(!ww || !hh) return 0;
@@ -273,6 +274,7 @@ uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
  int flags=0;
 	CLEANUP();
     FLAGS();
+    flags|=SWS_BILINEAR;
    if(!ww || !hh) return 0;
 
 	if (_context)
