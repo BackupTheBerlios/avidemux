@@ -667,7 +667,7 @@ loadVideoCodecConf (const char *name)
 		videoCodecSelectByName (str);
 
 		fgets (str, 200, fd);		// here we got the conf
-		fscanf (fd, "Video extraConf size : %lu\n", &extraSize);
+		fscanf (fd, "Video extraConf size : %"LU"\n", &extraSize);
 
 		if (extraSize)
 		{
