@@ -57,6 +57,9 @@ int main(void)
     DECLARE_DECODER (AMV, amv);
 #undef DECLARE_DECODER
 #define DECLARE_DECODER(a,b); printf("#define ENABLE_"#a"_DECODER 0\n"); 
+
+    DECLARE_DECODER(H264_VDPAU, h264_vdpau);
+    DECLARE_DECODER(EATGQ, eatgq);
     DECLARE_DECODER(PCX, aasc);
     DECLARE_DECODER(SUNRAST, aasc);
     DECLARE_DECODER(VB, aasc);
@@ -414,6 +417,7 @@ int main(void)
 	printf("#	define HAVE_DCBZL 1\n");
 	printf("#endif	// ADM_CPU_DCBZL\n");
 	printf("#endif	// ADM_CPU_X86_32\n");
+printf("#ifndef ADM_MINIMAL_INCLUDE\n");
 
 	printf("#if defined(ADM_CPU_X86_32) && defined(ADM_CPU_MMX2)\n");
 	printf("#	define HAVE_MMX2 1\n");
@@ -422,6 +426,7 @@ int main(void)
 	printf("#ifdef ADM_CPU_SSSE3\n");
 	printf("#	define HAVE_SSSE3 1\n");
 	printf("#endif\n");
+printf("#endif //ADM_MINIMAL_INCLUDE\n");
 
 	printf("#ifdef ARCH_POWERPC\n");
 	printf("#	define ENABLE_POWERPC 1\n");
@@ -431,8 +436,10 @@ int main(void)
 
 	printf("#ifdef ARCH_X86\n");
 	printf("#	define ENABLE_BSWAP 1\n");
+printf("#ifndef ADM_MINIMAL_INCLUDE\n");
 	printf("#	define HAVE_MMX 1\n");
 	printf("#	define ENABLE_MMX 1\n");
+printf("#endif //ADM_MINIMAL_INCLUDE\n");
 	printf("#	define HAVE_FAST_UNALIGNED 1\n");
 	printf("#	define HAVE_EBP_AVAILABLE 1\n");
 	printf("#	define HAVE_EBX_AVAILABLE 1\n");
@@ -448,6 +455,8 @@ int main(void)
 	printf("#	define WORDS_BIGENDIAN 1\n");
 	printf("#endif\n");
 
+        printf("#define ENABLE_ARM      0\n");
+        printf("#define ENABLE_PPC      0\n");
 	printf("#define ENABLE_THREADS 1\n");
 	printf("#define ENABLE_ENCODERS 1\n");
 	printf("#define ENABLE_VIS 0\n");
@@ -459,5 +468,6 @@ int main(void)
 	printf("#define HAVE_ROUNDF 1\n");
 	printf("#define HAVE_THREADS 1\n");
 	printf("#define RUNTIME_CPUDETECT 1\n");
+	printf("#define EXTERN_PREFIX\n");
 	printf("#define restrict __restrict__\n");
 }

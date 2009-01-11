@@ -20,7 +20,7 @@
  */
 
 #include "libavutil/x86_cpu.h"
-#include "libavcodec/dsputil.h"
+#include "ADM_lavcodec/dsputil.h"
 
 DECLARE_ALIGNED_8(static const int, m1m1[2]) = { 1<<31, 1<<31 };
 
