@@ -188,7 +188,7 @@ ENDFOREACH(_current ${ADM_SUBDIR})
 ###########################################
 # Construct ADM_outputs
 ###########################################
-ADD_SUBDIRECTORY(ADM_outputs)
+#ADD_SUBDIRECTORY(ADM_outputs)
 
 SET(ADM_OUTPUTS	
 	#oplug_avi

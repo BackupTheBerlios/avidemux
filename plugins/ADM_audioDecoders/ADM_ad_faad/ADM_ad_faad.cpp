@@ -93,12 +93,12 @@ unsigned char chan;
 
 		}
 
-		channelMapping[0] = CH_FRONT_CENTER;
-		channelMapping[1] = CH_FRONT_LEFT;
-		channelMapping[2] = CH_FRONT_RIGHT;
-		channelMapping[3] = CH_REAR_LEFT;
-		channelMapping[4] = CH_REAR_RIGHT;
-		channelMapping[5] = CH_LFE;
+		channelMapping[0] = ADM_CH_FRONT_CENTER;
+		channelMapping[1] = ADM_CH_FRONT_LEFT;
+		channelMapping[2] = ADM_CH_FRONT_RIGHT;
+		channelMapping[3] = ADM_CH_REAR_LEFT;
+		channelMapping[4] = ADM_CH_REAR_RIGHT;
+		channelMapping[5] = ADM_CH_LFE;
 
 		printf("[FAAD]Faad decoder created\n");
 }

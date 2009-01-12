@@ -68,18 +68,18 @@ AUDMEncoder_Faac::AUDMEncoder_Faac(AUDMAudioFilter * instream)  :AUDMEncoder    
   channels=instream->getInfo()->channels;
   switch(channels)
   {
-    case 1:outputChannelMapping[1] = CH_FRONT_LEFT;break;
+    case 1:outputChannelMapping[1] = ADM_CH_FRONT_LEFT;break;
     case 2:
-    	outputChannelMapping[0] = CH_FRONT_LEFT;
-    	outputChannelMapping[1] = CH_FRONT_RIGHT;
+    	outputChannelMapping[0] = ADM_CH_FRONT_LEFT;
+    	outputChannelMapping[1] = ADM_CH_FRONT_RIGHT;
       break;
     default :
-    	outputChannelMapping[0] = CH_FRONT_CENTER;
-    	outputChannelMapping[1] = CH_FRONT_LEFT;
-    	outputChannelMapping[2] = CH_FRONT_RIGHT;
-    	outputChannelMapping[3] = CH_REAR_LEFT;
-    	outputChannelMapping[4] = CH_REAR_RIGHT;
-    	outputChannelMapping[5] = CH_LFE;
+    	outputChannelMapping[0] = ADM_CH_FRONT_CENTER;
+    	outputChannelMapping[1] = ADM_CH_FRONT_LEFT;
+    	outputChannelMapping[2] = ADM_CH_FRONT_RIGHT;
+    	outputChannelMapping[3] = ADM_CH_REAR_LEFT;
+    	outputChannelMapping[4] = ADM_CH_REAR_RIGHT;
+    	outputChannelMapping[5] = ADM_CH_LFE;
   }
 };
 
@@ -112,7 +112,7 @@ int ret=0;
                                 &max_bytes_output);
     if(!_handle)
     {
-          printf("Cannot open faac with fq=%lu chan=%lu br=%lu\n",
+          printf("Cannot open faac with fq=%"LU" chan=%"LU" br=%"LU"\n",
           _wavheader->frequency,_wavheader->channels,faacParm.bitrate);
           return 0;
     }
@@ -131,7 +131,7 @@ int ret=0;
     cfg->useLfe=0;	
     if (!(ret=faacEncSetConfiguration(_handle, cfg))) 
     {
-        printf("[FAAC] Cannot set conf for faac with fq=%lu chan=%lu br=%lu (err:%d)\n",
+        printf("[FAAC] Cannot set conf for faac with fq=%"LU" chan=%"LU" br=%"LU" (err:%d)\n",
 				_wavheader->frequency,_wavheader->channels,faacParm.bitrate,ret);
 	return 0;
     }
@@ -159,10 +159,10 @@ int ret=0;
     printf("[Faac] Initialized :\n");
     
     printf("[Faac]Version        : %s\n",cfg->name);
-    printf("[Faac]Bitrate        : %lu\n",cfg->bitRate);
+    printf("[Faac]Bitrate        : %"LU"\n",cfg->bitRate);
     printf("[Faac]Mpeg2 (1)/4(0) : %u\n",cfg->mpegVersion);
     printf("[Faac]Use lfe      ) : %u\n",cfg->useLfe);
-    printf("[Faac]Sample output  : %lu\n",_chunk / _wavheader->channels);
+    printf("[Faac]Sample output  : %"LU"\n",_chunk / _wavheader->channels);
     printf("[Faac]Bitrate        : %lu\n",cfg->bitRate*_wavheader->channels);
 
     

@@ -88,12 +88,12 @@ AUDMEncoder_Vorbis::AUDMEncoder_Vorbis(AUDMAudioFilter * instream)  :AUDMEncoder
   _wavheader->encoding=WAV_OGG;
   _oldpos=0;
   _handle=(void *)new  vorbisStruct;
-  outputChannelMapping[0] = CH_FRONT_LEFT;
-  outputChannelMapping[1] = CH_FRONT_RIGHT;
-  outputChannelMapping[2] = CH_REAR_LEFT;
-  outputChannelMapping[3] = CH_REAR_RIGHT;
-  outputChannelMapping[4] = CH_FRONT_CENTER;
-  outputChannelMapping[5] = CH_LFE;
+  outputChannelMapping[0] = ADM_CH_FRONT_LEFT;
+  outputChannelMapping[1] = ADM_CH_FRONT_RIGHT;
+  outputChannelMapping[2] = ADM_CH_REAR_LEFT;
+  outputChannelMapping[3] = ADM_CH_REAR_RIGHT;
+  outputChannelMapping[4] = ADM_CH_FRONT_CENTER;
+  outputChannelMapping[5] = ADM_CH_LFE;
 };
 
 /**
