@@ -23,6 +23,7 @@
 
 #include "avidemutils.h"
 #include "ADM_quota.h"
+#include "ADM_psAudioProbe.h"
 
 static const char Type[5]={'X','I','P','B','P'};
 
@@ -108,6 +109,9 @@ psPacketInfo info;
     }
     writeSystem(index,file,true);
     psPacketLinear *pkt=new psPacketLinear(0xE0);
+
+    listOfPsAudioTracks *audioTracks=psProbeAudio(file);
+
     pkt->open(file,false);
     data.pkt=pkt;
       while(1)
@@ -199,6 +203,8 @@ psPacketInfo info;
         Mark(index,&data,&info,markStart);
         qfprintf(index,"\n[End]\n");
         qfclose(index);
+        if(audioTracks) delete audioTracks;
+        audioTracks=NULL;
         delete pkt;
         return 1; 
 }

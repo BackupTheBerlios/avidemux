@@ -5,6 +5,9 @@ SET(ADM_ps_SRCS
 	ADM_psIndex.cpp
 	ADM_psReadIndex.cpp
 	ADM_psAudio.cpp
+	ADM_psAudioProbe.cpp
+	ADM_psAudioProbe.h
+
     dmxPSPacket.cpp
     dmx_io.cpp
     ADM_indexFile.cpp
