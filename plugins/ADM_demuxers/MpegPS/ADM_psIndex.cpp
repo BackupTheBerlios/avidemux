@@ -111,7 +111,20 @@ psPacketInfo info;
     psPacketLinear *pkt=new psPacketLinear(0xE0);
 
     listOfPsAudioTracks *audioTracks=psProbeAudio(file);
+    if(audioTracks)
+    {
+        for(int i=0;i<audioTracks->size();i++)
+        {
+                printf("[PsProbe] Found audio Track %d, pid=%x\n",i,(*audioTracks)[i]->esID);
+                WAVHeader *hdr=&((*audioTracks)[i]->header);
+                printf("[PsProbe] codec    : 0x%x \n",hdr->encoding);
+                printf("[PsProbe] frequency: %"LU" Hz\n",hdr->frequency);
+                printf("[PsProbe] channel  : %"LU" \n",hdr->channels);
+                printf("[PsProbe] byterate : %"LU" Byte/s\n",hdr->byterate);
 
+        }
+
+    }
     pkt->open(file,false);
     data.pkt=pkt;
       while(1)
@@ -203,7 +216,7 @@ psPacketInfo info;
         Mark(index,&data,&info,markStart);
         qfprintf(index,"\n[End]\n");
         qfclose(index);
-        if(audioTracks) delete audioTracks;
+        if(audioTracks) DestroyListOfPsAudioTracks( audioTracks);
         audioTracks=NULL;
         delete pkt;
         return 1; 

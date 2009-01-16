@@ -21,13 +21,14 @@ using std::vector;
 typedef struct
 {
     WAVHeader header;
-    uint32_t  esID;
+    uint8_t   esID;
 }psAudioTrackInfo;
 
 typedef vector <psAudioTrackInfo*> listOfPsAudioTracks;
 
 /// Returns a list of audio tracks found in the file.
 listOfPsAudioTracks *psProbeAudio(const char *fileName);
+bool DestroyListOfPsAudioTracks(listOfPsAudioTracks *list);
 
 
 #endif

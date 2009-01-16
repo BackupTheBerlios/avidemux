@@ -40,6 +40,7 @@ public:
     virtual bool        getPacketOfType(uint8_t pid,uint32_t maxSize, uint32_t *packetSize,uint64_t *pts,uint64_t *dts,uint8_t *buffer,uint64_t *startAt);
     uint64_t    getPos(void);
     bool        setPos(uint64_t pos);
+    uint64_t    getSize(void) { return _file->getSize();}
 };
 /**
     \class psPacketLinear
@@ -77,6 +78,7 @@ public:
         bool    stillOk(void) {return !eof;};
         bool    getInfo(psPacketInfo *info);
         bool    seek(uint64_t packetStart, uint32_t offset);
+        bool    changePid(uint32_t pid) {myPid==(pid&0xff);return true;}
 };
 /**
     \class psPacketLinearTracker
