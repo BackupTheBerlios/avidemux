@@ -180,6 +180,12 @@ er:
 */
 bool DestroyListOfPsAudioTracks(listOfPsAudioTracks *list)
 {
+    while( list->size())
+    {
+        delete (*list)[0];
+        list->erase(list->begin());
+    }
+    delete list;
     return true;
 }
 //EOF
