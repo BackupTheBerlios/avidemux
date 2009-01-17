@@ -40,8 +40,8 @@ char buffer[2000];
             // Now split the line
             if(strncmp(buffer,"Video ",6))
             {
-                    printf("[psDemuxer] Invalid line :%s\n",buffer);
-                    return false;
+                    //printf("[psDemuxer] Invalid line :%s\n",buffer);
+                    continue;
             }
             char *head=buffer+6;
             uint64_t pts,dts,startAt;
