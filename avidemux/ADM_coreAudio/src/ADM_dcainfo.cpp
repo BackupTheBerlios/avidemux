@@ -1,26 +1,21 @@
-//
-// C++ Implementation: ADM_a52info
-//
-// Description: 
-//
-//
-// Author: mean <fixounet@free.fr>, (C) 2004
-//
-// Copyright: See COPYING file that comes with this distribution
-//
-//
+/**
 
+        \file ADM_dcainfo
+        \brief extract info from DTS/DCA streams
+        Author: mean <fixounet@free.fr>, (C) 2004
+        Code very derived from libdca
+
+*/
 #include "ADM_default.h"
 #include "ADM_dcainfo.h"
-#if 0
+#define ADM_NO_CONFIG_H
 extern "C"
 {
-#include "ADM_libraries/ADM_ffmpeg/ADM_lavutil/common.h"
-#include "ADM_libraries/ADM_ffmpeg/ADM_lavutil/bswap.h"
+#include "ADM_libraries/ADM_ffmpeg/libavutil/common.h"
+#include "ADM_libraries/ADM_ffmpeg/libavutil/bswap.h"
 #include "ADM_libraries/ADM_ffmpeg/ADM_lavcodec/bitstream.h"
 
 }
-#include "ADM_assert.h"
 
 /*
         Borrowed from libdca
@@ -111,4 +106,4 @@ uint32_t size,len1,len2,flags,sr,framesize=0,index,nbBlocks;
             printf("[DTS] Cannot find sync\n");
 	      return 0;
 }
-#endif
+

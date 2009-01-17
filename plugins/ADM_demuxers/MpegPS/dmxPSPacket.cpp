@@ -25,6 +25,7 @@
 */
 psPacket::psPacket(void)
 {
+    doNoComplainAnyMore=0;
     _file=NULL;
 }
 /**
@@ -315,7 +316,9 @@ uint8_t align=0;
                                                 break;
                              
                                 default:
-                                                printf("[DmxPS]Unkown substream %x\n",*substream);
+                                                doNoComplainAnyMore++;
+                                                if(doNoComplainAnyMore<10)
+                                                    printf("[DmxPS]Unkown substream %x\n",*substream);
                                                 *substream=0xff;
                                 }
                                 // skip audio header (if not sub)

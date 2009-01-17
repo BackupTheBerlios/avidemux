@@ -24,6 +24,7 @@
 #include "ADM_default.h"
 #include "dmx_io.h"
 
+#define aprintf(...) {}
 
 fileParser::fileParser( void )
 {
@@ -102,7 +103,7 @@ uint8_t fileParser::open( const char *filename,FP_TYPE *multi )
         // no number sequence
         if( decimals == 0 )
         {
-                printf( "\nSimple loading: \n" );
+                aprintf( "\nSimple loading: \n" );
                 delete [] followup;
                 _nbFd = 1;
                 _curFd = 0;
@@ -120,9 +121,9 @@ uint8_t fileParser::open( const char *filename,FP_TYPE *multi )
                 fseeko( _fd[0], 0, SEEK_SET );
                 _sizeFdCumul[0]=0;
                 _size=_sizeFd[0];
-                printf( " file: %s, size: %"LLU"\n", filename, _sizeFd[0] );
-                printf( " found 1 files \n" );
-                printf( "Done \n" );
+                aprintf( " file: %s, size: %"LLU"\n", filename, _sizeFd[0] );
+                aprintf( " found 1 files \n" );
+                aprintf( "Done \n" );
                 return 1;
         }
 
@@ -154,7 +155,7 @@ uint8_t fileParser::open( const char *filename,FP_TYPE *multi )
                 buffer_fd = new FILE * [tabSize];
                 buffer_sizeFd = new uint64_t [tabSize];
 
-                printf( "\nAuto adding: \n" );
+                aprintf( "\nAuto adding: \n" );
                 while( last_followup == 0 )
                 {
                         strcpy( followup, left );
@@ -177,7 +178,7 @@ uint8_t fileParser::open( const char *filename,FP_TYPE *multi )
                         buffer_sizeFd[count] = ftello( buffer_fd[count] );
                         fseeko( buffer_fd[count], 0, SEEK_SET );
 
-                        printf( " file %d: %s, size: %"LLU"\n", (count + 1), followup, buffer_sizeFd[count] );
+                        aprintf( " file %d: %s, size: %"LLU"\n", (count + 1), followup, buffer_sizeFd[count] );
 
                         // increase number
                         number[decimals - 1] = number[decimals - 1] + 1;
@@ -226,8 +227,8 @@ uint8_t fileParser::open( const char *filename,FP_TYPE *multi )
                                 *multi=FP_DONT_APPEND;
                 }
 
-                printf( " found %d files \n", count );
-                printf( "Done \n" );
+                aprintf( " found %d files \n", count );
+                aprintf( "Done \n" );
         } // if( decimals == 0 )
                 return 1;
 } // fileParser::open()

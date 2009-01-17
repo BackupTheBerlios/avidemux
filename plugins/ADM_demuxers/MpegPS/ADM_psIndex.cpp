@@ -78,22 +78,67 @@ typedef enum
     markNow
 }markType;
 
-static void writeVideo(FILE *file,PSVideo *video);
-static void writeSystem(FILE *file,const char *filename,bool append);
-static void Mark(FILE *file, indexerData *data,psPacketInfo *info,markType update);
+/**
+    \class PsIndexer
+*/
+class PsIndexer
+{
+protected:
+        FILE *index;
+        psPacketLinearTracker *pkt;
+        listOfPsAudioTracks *audioTracks;
+public:
+                PsIndexer(void);
+                ~PsIndexer();
+        bool    run(const char *file);
+        bool    writeVideo(PSVideo *video);
+        bool    writeAudio(void);
+        bool    writeSystem(const char *filename,bool append);
+        bool    Mark(indexerData *data,psPacketInfo *s,markType update);
 
-
+};
 /**
       \fn psIndexer 
       \brief main indexing loop for mpeg2 payload
 */
 uint8_t   psIndexer(const char *file)
 {
+bool r;
+    PsIndexer *dx=new PsIndexer;
+    r=dx->run(file);
+    delete dx;
+    return r;
+}
+
+/**
+    \fn PsIndexer
+*/
+PsIndexer::PsIndexer(void)
+{
+    index=NULL;
+    pkt=NULL;
+    audioTracks=NULL;
+}
+
+/**
+    \fn ~PsIndexer
+*/
+PsIndexer::~PsIndexer()
+{
+    if(index) qfclose(index);
+    if(pkt) delete pkt;
+    if( audioTracks) DestroyListOfPsAudioTracks(audioTracks);
+}
+/**
+    \fn run
+*/  
+bool PsIndexer::run(const char *file)
+{
 uint32_t temporal_ref,val;
 
 uint8_t buffer[50*1024];
 bool seq_found=false;
-FILE *index;
+
 PSVideo video;
 indexerData  data;    
 psPacketInfo info;
@@ -107,10 +152,10 @@ psPacketInfo info;
         printf("[PsIndex] Cannot create %s\n",indexName);
         return false;
     }
-    writeSystem(index,file,true);
-    psPacketLinear *pkt=new psPacketLinear(0xE0);
+    writeSystem(file,true);
+    pkt=new psPacketLinearTracker(0xE0);
 
-    listOfPsAudioTracks *audioTracks=psProbeAudio(file);
+    audioTracks=psProbeAudio(file);
     if(audioTracks)
     {
         for(int i=0;i<audioTracks->size();i++)
@@ -143,7 +188,7 @@ psPacketInfo info;
           switch(startCode)
                   {
                   case 0xB3: // sequence start
-                          Mark(index,&data,&info,markStart);
+                          Mark(&data,&info,markStart);
                           data.state=idx_startAtGopOrSeq;
                           if(seq_found)
                           {
@@ -162,7 +207,8 @@ psPacketInfo info;
                           
                           video.fps= FPS[val & 0xf];
                           pkt->forward(4);
-                          writeVideo(index,&video);
+                          writeVideo(&video);
+                          writeAudio();
                           qfprintf(index,"[Data]");
                           break;
                   case 0xb8: // GOP
@@ -173,7 +219,7 @@ psPacketInfo info;
                                   continue;;
                           }
                           
-                          Mark(index,&data,&info,markStart);
+                          Mark(&data,&info,markStart);
                           data.state=idx_startAtGopOrSeq;
                           break;
                   case 0x00 : // picture
@@ -202,7 +248,7 @@ psPacketInfo info;
                                 update=markEnd;
                           }
                           data.frameType=type;
-                          Mark(index,&data,&info,update);
+                          Mark(&data,&info,update);
                           data.state=idx_startAtImage;
                           data.nbPics++;
                         }
@@ -213,16 +259,18 @@ psPacketInfo info;
       }
     
         printf("\n");
-        Mark(index,&data,&info,markStart);
+        Mark(&data,&info,markStart);
         qfprintf(index,"\n[End]\n");
         qfclose(index);
+        index=NULL;
         if(audioTracks) DestroyListOfPsAudioTracks( audioTracks);
         audioTracks=NULL;
         delete pkt;
+        pkt=NULL;
         return 1; 
 }
 /**
-    \fn index
+    \fn   Mark
     \brief update the file
 
     The offset part is due to the fact that we read 2 bytes from the pic header to know the pic type.
@@ -230,7 +278,7 @@ psPacketInfo info;
     If the beginning is not a pic, but a gop start for example, we had to add/remove those.
 
 */
-void Mark(FILE *file, indexerData *data,psPacketInfo *info,markType update)
+bool  PsIndexer::Mark(indexerData *data,psPacketInfo *info,markType update)
 {
     int offset=data->nextOffset;
     data->nextOffset=0;
@@ -244,7 +292,7 @@ void Mark(FILE *file, indexerData *data,psPacketInfo *info,markType update)
         if(data->nbPics)
         {
             // Write previous image data (size) : TODO
-            qfprintf(file,":%06"LX" ",data->pkt->getConsumed()+offset); // Size
+            qfprintf(index,":%06"LX" ",data->pkt->getConsumed()+offset); // Size
         }
         else data->pkt->getConsumed();
     }
@@ -252,12 +300,25 @@ void Mark(FILE *file, indexerData *data,psPacketInfo *info,markType update)
     {
         if(data->frameType==1)
         {
+            // If audio, also dump audio
+            if(audioTracks)
+            {
+                qfprintf(index,"\nAudio bf:%08"LLX" ",data->startAt);
+                for(int i=0;i<audioTracks->size();i++)
+                {
+                    uint8_t e=(*audioTracks)[i]->esID;
+                    packetStats *s=pkt->getStat(e);
+                    
+                    qfprintf(index,"Pes:%x:%08"LLD":%"LLD" ",e,s->lastDts,s->size);
+                }
+                
+            }
             // start a new line
-            qfprintf(file,"\nVideo at:%08"LLX":%04"LX" Pts:%08"LLD":%08"LLD" ",data->startAt,data->offset,info->pts,info->dts);
+            qfprintf(index,"\nVideo at:%08"LLX":%04"LX" Pts:%08"LLD":%08"LLD" ",data->startAt,data->offset,info->pts,info->dts);
             data->nextOffset=-2;
         }
     
-        qfprintf(file,"%c",Type[data->frameType]);
+        qfprintf(index,"%c",Type[data->frameType]);
     }
     if(update==markEnd || update==markNow)
     {
@@ -275,30 +336,51 @@ void Mark(FILE *file, indexerData *data,psPacketInfo *info,markType update)
     \fn writeVideo
     \brief Write Video section of index file
 */
-void writeVideo(FILE *file,PSVideo *video)
+bool PsIndexer::writeVideo(PSVideo *video)
 {
-    qfprintf(file,"[Video]\n");
-    qfprintf(file,"Width=%d\n",video->w);
-    qfprintf(file,"Height=%d\n",video->h);
-    qfprintf(file,"Fps=%d\n",video->fps);
-    qfprintf(file,"Interlaced=%d\n",video->interlaced);
-    qfprintf(file,"AR=%d\n",video->ar);
-
+    qfprintf(index,"[Video]\n");
+    qfprintf(index,"Width=%d\n",video->w);
+    qfprintf(index,"Height=%d\n",video->h);
+    qfprintf(index,"Fps=%d\n",video->fps);
+    qfprintf(index,"Interlaced=%d\n",video->interlaced);
+    qfprintf(index,"AR=%d\n",video->ar);
+    return true;
 }
 /**
     \fn writeSystem
     \brief Write system part of index file
 */
-void writeSystem(FILE *file,const char *filename,bool append)
+bool PsIndexer::writeSystem(const char *filename,bool append)
 {
-    qfprintf(file,"PSD1\n");
-    qfprintf(file,"[System]\n");
-    qfprintf(file,"Type=P\n");
-    qfprintf(file,"File=%s\n",filename);
-    qfprintf(file,"Append=%d\n",append);
-
+    qfprintf(index,"PSD1\n");
+    qfprintf(index,"[System]\n");
+    qfprintf(index,"Type=P\n");
+    qfprintf(index,"File=%s\n",filename);
+    qfprintf(index,"Append=%d\n",append);
+    return true;
 }
-
+/**
+    \fn     writeAudio
+    \brief  Write audio headers
+*/
+bool PsIndexer::writeAudio(void)
+{
+    if(!audioTracks) return false;
+    qfprintf(index,"[Audio]\n");
+    qfprintf(index,"Tracks=%d\n",audioTracks->size());
+    for(int i=0;i<audioTracks->size();i++)
+    {
+        char head[30];
+        psAudioTrackInfo *t=(*audioTracks)[i];
+        sprintf(head,"Track%1d",i);
+        qfprintf(index,"%s.pid=%x\n",head,t->esID);
+        qfprintf(index,"%s.codec=%d\n",head,t->header.encoding);
+        qfprintf(index,"%s.fq=%d\n",head,t->header.frequency);
+        qfprintf(index,"%s.chan=%d\n",head,t->header.channels);
+        qfprintf(index,"%s.br=%d\n",head,t->header.byterate);
+    }
+    return true;
+}
 /********************************************************************************************/
 /********************************************************************************************/
 /********************************************************************************************/

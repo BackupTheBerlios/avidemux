@@ -28,6 +28,7 @@ typedef struct
 class psPacket
 {
 protected:
+    int         doNoComplainAnyMore;
     fileParser  *_file;
     uint64_t    _size;
     uint8_t     getPacketInfo(uint8_t stream,uint8_t *substream,uint32_t *olen,uint64_t *opts,uint64_t *odts);

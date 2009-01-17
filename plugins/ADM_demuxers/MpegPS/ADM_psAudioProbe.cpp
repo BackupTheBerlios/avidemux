@@ -62,18 +62,24 @@ listOfPsAudioTracks *psProbeAudio(const char *fileName)
                 break;
     }
     // Now synthetize
-    for(int i=0x0;i<0xFF;i++)   // MP2 Audio
+    for(int i=0x0;i<0xFF;i++)   
     {
          packetStats *stat=packet->getStat(i);
+        if(stat->count)
+        {
+            printf("[PsProbeAudo] Pid:%x count:%d size:%d\n",i,stat->count,stat->size);
+        }
+
          if(stat->count>=PROBE_MIN_PACKET && stat->size>PROBE_MIN_SIZE)
          {
-                packet->setPos(fileSize/2);     
+                packet->setPos(fileSize/2); 
                 addAudioTrack(i,tracks,packet);
          }
 
     }
 
 end:
+    printf("[PsDemux] Audio probe done, found %lu tracks\n",tracks->size());
     delete packet;
     
     if(tracks->size()==0) 
