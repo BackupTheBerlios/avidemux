@@ -22,7 +22,7 @@
 
 #include <math.h>
 /**
-        \fn readVideo
+        \fn readIndex
         \brief Read the [video] section of the index file
 
 */
@@ -175,6 +175,39 @@ bool    psHeader::readVideo(indexFile *index)
     _videostream.dwRate=fps;
 
     _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"MPEG");
+
+    return true;
+}
+/**
+        \fn readAudio
+        \brief Read the [Audio] section of the index file
+
+*/
+bool    psHeader::readAudio(indexFile *index)
+{
+    printf("[psDemuxer] Reading Audio\n");
+    if(!index->readSection("Audio")) return false;
+    uint32_t nbTracks;
+    
+    nbTracks=index->getAsUint32("Tracks");
+    if(!nbTracks)
+    {
+        printf("[PsDemux] No audio\n");
+        return true;
+    }
+    for(int i=0;i<nbTracks;i++)
+    {
+        char header[40];
+        char body[40];
+        uint32_t fq,chan,br,codec,pid;
+        sprintf(header,"Track%d.",i);
+#define readInt(x,y) {sprintf(body,"%s"#y,header);x=index->getAsUint32(body);printf("%02d:"#y"=%"LU"\n",i,x);}
+#define readHex(x,y) {sprintf(body,"%s"#y,header);x=index->getAsHex(body);printf("%02x:"#y"=%"LU"\n",i,x);}
+        readInt(fq,fq);
+        readInt(br,br);
+        readInt(codec,codec);
+        readHex(pid,pid);
+    }
 
     return true;
 }

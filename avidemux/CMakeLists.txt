@@ -228,8 +228,8 @@ ADD_ADMLIB_ALL_TARGETS(${ADM_INPUTS})
 #########################################
 # Mpeg Indexer (Mpeg TS/PS/...)
 #########################################
-ADD_SUBDIRECTORY(ADM_mpegIndexer)
-ADD_ADMLIB_ALL_TARGETS(ADM_mpegIndexer)
+#ADD_SUBDIRECTORY(ADM_mpegIndexer)
+#ADD_ADMLIB_ALL_TARGETS(ADM_mpegIndexer)
 
 #########################################
 # Tails
@@ -342,8 +342,8 @@ ADD_SUBDIRECTORY(ADM_coreAudio)
 ADD_LIB_ALL_TARGETS(ADM_coreAudio)
 ADD_SUBDIRECTORY(ADM_coreDemuxer)
 ADD_LIB_ALL_TARGETS(ADM_coreDemuxer)
-ADD_SUBDIRECTORY(ADM_coreDemuxerMpeg)
-ADD_LIB_ALL_TARGETS(ADM_coreDemuxerMpeg)
+#ADD_SUBDIRECTORY(ADM_coreDemuxerMpeg)
+#ADD_LIB_ALL_TARGETS(ADM_coreDemuxerMpeg)
 ADD_SUBDIRECTORY(ADM_coreAudioDevice)
 ADD_LIB_ALL_TARGETS(ADM_coreAudioDevice)
 ADD_SUBDIRECTORY(ADM_coreUtils)

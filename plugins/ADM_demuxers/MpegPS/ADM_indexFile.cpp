@@ -193,6 +193,23 @@ uint32_t indexFile::getAsUint32(const char *name)
     return 0;
 }
 
+/** 
+    \fn getAsHex
+    \read entry as hex
+
+*/
+
+uint32_t indexFile::getAsHex(const char *name)
+{
+    uint32_t v;
+    dmxToken *token=searchToken(name);
+    char *s;
+    if(!token) return 0;
+    s=token->getValue();
+    sscanf(s,"%x",&v);
+    return v;
+}
+
 /**
 
 */

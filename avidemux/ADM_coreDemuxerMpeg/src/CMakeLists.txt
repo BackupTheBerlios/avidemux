@@ -4,12 +4,12 @@
 #
 
 SET(ADMcoreDemuxerMpeg_SRCS
-dmx_demuxer.cpp
-dmx_demuxerES.cpp
-dmx_demuxerMSDVR.cpp
-dmx_demuxerPS.cpp
-dmx_demuxerTS.cpp
-dmx_io.cpp
+#dmx_demuxer.cpp
+#dmx_demuxerES.cpp
+#dmx_demuxerMSDVR.cpp
+#dmx_demuxerPS.cpp
+#dmx_demuxerTS.cpp
+#dmx_io.cpp
 )	
 #*************************************************
 ADD_LIBRARY(ADM_coreDemuxerMpeg SHARED ${ADMcoreDemuxerMpeg_SRCS})

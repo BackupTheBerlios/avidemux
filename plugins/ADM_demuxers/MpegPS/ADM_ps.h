@@ -26,7 +26,7 @@
 #include "ADM_indexFile.h"
 #include "dmxPSPacket.h"
 #include <vector>
-//std::vector <dmxToken *> ListOfTokens;
+using std::vector;
 
 typedef struct 
 {
@@ -37,6 +37,15 @@ typedef struct
     uint64_t  dts;
     uint32_t  len;
 }dmxFrame;
+/**
+
+*/
+typedef struct
+{            
+      uint64_t position;
+      uint64_t dts;
+
+}ADM_psAudioSeekPoint;
 
 /**
     \fn ADM_psAccess
@@ -44,12 +53,13 @@ typedef struct
 class ADM_psAccess : public ADM_audioAccess
 {
 protected:
-                
-             
+                vector          <ADM_psAudioSeekPoint >seekPoints;
+                psPacket        demuxer;
+                uint8_t         pid;
                 
 public:
-                                  ADM_psAccess(const char *name) {}; 
-                virtual           ~ADM_psAccess() {};
+                                  ADM_psAccess(const char *name,uint8_t pid,bool append); 
+                virtual           ~ADM_psAccess();
                                     /// Hint, the stream is pure CBR (AC3,MP2,MP3)
                 virtual bool      isCBR(void) { return true;}
                                     /// Return true if the demuxer can seek in time
@@ -61,8 +71,12 @@ public:
                                     /// Returns audio duration in us
                 virtual uint64_t  getDurationInUs(void) ;
                                     /// Go to a given time
-                virtual bool      goToTime(uint64_t timeUs) {return false;}
-                virtual bool      getPacket(uint8_t *buffer, uint32_t *size, uint32_t maxSize,uint64_t *dts) {return false;}
+                virtual bool      goToTime(uint64_t timeUs) ;
+                                    /// Get a packet
+                virtual bool      getPacket(uint8_t *buffer, uint32_t *size, uint32_t maxSize,uint64_t *dts);
+
+                        bool      push(uint64_t at, uint64_t dts);
+
 };
 
 
@@ -77,6 +91,7 @@ class psHeader         :public vidHeader
     
     bool    interlaced;
     bool    readVideo(indexFile *index);
+    bool    readAudio(indexFile *index);
     bool    readIndex(indexFile *index);
     std::vector <dmxFrame *> ListOfFrames;      
     fileParser      parser;

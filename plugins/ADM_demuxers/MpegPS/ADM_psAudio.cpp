@@ -4,7 +4,7 @@
     copyright            : (C) 2006/2009 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
-#if 0
+
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,111 +20,63 @@
 #include <string.h>
 #include <math.h>
 
-#include "ADM_flv.h"
-
-
-
+#include "ADM_ps.h"
+/**
+    \fn ADM_psAccess
+*/
+ADM_psAccess::ADM_psAccess(const char *name,uint8_t pid,bool append)
+{
+FP_TYPE fp=FP_DONT_APPEND;
+        if(append) fp=FP_APPEND;
+        this->pid=pid;
+        if(!demuxer.open(name,&fp)) ADM_assert(0);
+}
 
 /**
-    \fn ADM_audioAccess
-    \brief Constructor
-
+    \fn ~ADM_psAccess
 */
-ADM_flvAccess::ADM_flvAccess(const char *name,flvTrak *track) : ADM_audioAccess()
+ADM_psAccess::~ADM_psAccess()
 {
-        _fd=fopen(name,"rb");
-        ADM_assert(_fd);
-        _track=track;
-        goToBlock(0);
-        currentBlock=0;
+    demuxer.close();
 }
 /**
-    \fn ADM_audioAccess
-    \brief Destructor
-
+    \fn push
+    \brief add a seek point.
 */
-ADM_flvAccess::~ADM_flvAccess()
+bool      ADM_psAccess::push(uint64_t at, uint64_t dts)
 {
-        if(_fd) fclose(_fd);
-        _fd=NULL;
+ADM_psAudioSeekPoint s;
+            s.position=at;
+            s.dts=dts;
+            seekPoints.push_back(s);
+            return true;
 }
+
 /**
     \fn getDurationInUs
-
-*/ 
-uint64_t  ADM_flvAccess::getDurationInUs(void)
+*/
+uint64_t  ADM_psAccess::getDurationInUs(void)
 {
-    if(!_track->_nbIndex) return 0;
-    // ms -> us
-    uint64_t dur=_track->_index[_track->_nbIndex-1].timeCodeUs;
-    
-    return dur;
+    return 1000000LL; // FIXLE
 }
 /**
     \fn goToTime
-    \brief
-*/
-bool      ADM_flvAccess::goToTime(uint64_t timeUs)
+*/                              
+bool      ADM_psAccess::goToTime(uint64_t timeUs)
 {
-
-uint32_t target=(timeUs);;
-uint32_t mstime=target;
-uint32_t _nbClusters=_track->_nbIndex;
-
-      // First identify the cluster...
-      // Special case when first chunk does not start at 0
-      if(_nbClusters && mstime<_track->_index[0].timeCodeUs)
-      {
-            goToBlock(0);
-            return true;
-      }
-      int clus=-1;
-            for(int i=0;i<_nbClusters-1;i++)
-            {
-              if(target>=_track->_index[i].timeCodeUs && target<_track->_index[i+1].timeCodeUs)
-              {
-                clus=i;
-                i=_nbClusters; 
-              }
-            }
-            if(clus==-1) clus=_nbClusters-1; // Hopefully in the last one
-            goToBlock(clus);
-            return true;
+    return false;
 }
 /**
     \fn getPacket
 */
-bool      ADM_flvAccess::getPacket(uint8_t *buffer, uint32_t *osize, uint32_t maxSize,uint64_t *dts)
+bool      ADM_psAccess::getPacket(uint8_t *buffer, uint32_t *size, uint32_t maxSize,uint64_t *dts)
 {
-    flvIndex *x;
-    if(false==goToBlock(currentBlock))
-    {
-      printf("[ADM_flvAccess] Get packet out of bound\n");
-      return false;
-    }
-    x=&(_track->_index[currentBlock]);
-    fread(buffer,x->size,1,_fd);
-    *osize=x->size;
-    *dts=((uint64_t)x->timeCodeUs);
-    
-    currentBlock++;
-    //
-    return 1;
-}
-/**
-    \fn goToBlock
-*/
-bool      ADM_flvAccess::goToBlock(uint32_t block)
-{
-  if(block>=_track->_nbIndex)
-  {
-    printf("[FLVAUDIO]Exceeding max cluster : asked: %u max :%u\n",block,_track->_nbIndex); 
-    return false;  // FIXME
-  }
-  currentBlock=block;
-  fseeko(_fd,_track->_index[currentBlock].pos,SEEK_SET);
-  return 1;
+uint64_t p,d,start;
+    if(false==demuxer.getPacketOfType(pid,maxSize,size,&p,&d,buffer,&start)) return false;
+    if(d==ADM_NO_PTS) *dts=p;
+            else *dts=d;
+    return false;
 }
 
+
 //EOF
-#endif

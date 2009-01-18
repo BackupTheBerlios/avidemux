@@ -65,6 +65,7 @@ public:
     bool goToSection(const char *section);
     bool readSection(const char *section);
     uint32_t getAsUint32(const char *token);
+    uint32_t getAsHex(const char *token);
     char *getAsString(const char *token);
     bool  readString(uint32_t maxLen,uint8_t *buffer);
 

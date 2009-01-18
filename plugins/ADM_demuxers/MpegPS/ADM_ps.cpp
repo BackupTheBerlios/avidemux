@@ -68,6 +68,11 @@ uint8_t psHeader::open(const char *name)
         printf("[psDemux] Cannot read Video section of %s\n",idxName);
         goto abt;
     }
+    if(!readAudio(&index)) 
+    {
+        printf("[psDemux] Cannot read Audio section of %s\n",idxName);
+        goto abt;
+    }
     if(!readIndex(&index))
     {
         printf("[psDemux] Cannot read index for file %s\n",idxName);
