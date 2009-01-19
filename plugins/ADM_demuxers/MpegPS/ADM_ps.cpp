@@ -68,7 +68,7 @@ uint8_t psHeader::open(const char *name)
         printf("[psDemux] Cannot read Video section of %s\n",idxName);
         goto abt;
     }
-    if(!readAudio(&index)) 
+    if(!readAudio(&index,name)) 
     {
         printf("[psDemux] Cannot read Audio section of %s\n",idxName);
         goto abt;
@@ -117,8 +117,10 @@ uint64_t psHeader::getVideoDuration(void)
 */
 WAVHeader *psHeader::getAudioInfo(uint32_t i )
 {
- 
-      return NULL;
+        if(!listOfAudioTracks.size()) return NULL;
+      ADM_assert(i<listOfAudioTracks.size());
+      return listOfAudioTracks[i]->stream->getInfo();
+      
 }
 /**
    \fn getAudioStream
@@ -126,9 +128,14 @@ WAVHeader *psHeader::getAudioInfo(uint32_t i )
 
 uint8_t   psHeader::getAudioStream(uint32_t i,ADM_audioStream  **audio)
 {
-  
-  *audio=NULL;
-  return 0; 
+    if(!listOfAudioTracks.size())
+    {
+            *audio=NULL;
+            return true;
+    }
+  ADM_assert(i<listOfAudioTracks.size());
+  *audio=listOfAudioTracks[i]->stream;
+  return true; 
 }
 /**
     \fn getNbAudioStreams
@@ -137,7 +144,7 @@ uint8_t   psHeader::getAudioStream(uint32_t i,ADM_audioStream  **audio)
 uint8_t   psHeader::getNbAudioStreams(void)
 {
  
-  return 0; 
+  return listOfAudioTracks.size(); 
 }
 /*
     __________________________________________________________

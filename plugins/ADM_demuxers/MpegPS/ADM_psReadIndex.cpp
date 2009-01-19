@@ -183,7 +183,7 @@ bool    psHeader::readVideo(indexFile *index)
         \brief Read the [Audio] section of the index file
 
 */
-bool    psHeader::readAudio(indexFile *index)
+bool    psHeader::readAudio(indexFile *index,const char *name)
 {
     printf("[psDemuxer] Reading Audio\n");
     if(!index->readSection("Audio")) return false;
@@ -205,10 +205,28 @@ bool    psHeader::readAudio(indexFile *index)
 #define readHex(x,y) {sprintf(body,"%s"#y,header);x=index->getAsHex(body);printf("%02x:"#y"=%"LU"\n",i,x);}
         readInt(fq,fq);
         readInt(br,br);
+        readInt(chan,chan);
         readInt(codec,codec);
         readHex(pid,pid);
-    }
+        WAVHeader hdr;
+            hdr.frequency=fq;
+            hdr.byterate=br;
+            hdr.channels=chan;
+            hdr.encoding=codec;
+        ADM_psAccess *access=new ADM_psAccess(name,pid,true);
+        ADM_audioStream *audioStream=ADM_audioCreateStream(&hdr,access);
+        if(!audioStream)
+        {
+            delete access;
+        }else       
+        {
+            ADM_psTrackDescriptor *desc=new ADM_psTrackDescriptor;
+            desc->stream=audioStream;
+            desc->access=access;
+            listOfAudioTracks.push_back(desc);
+        }
 
+    }
     return true;
 }
 //EOF

@@ -27,7 +27,9 @@
 #include "dmxPSPacket.h"
 #include <vector>
 using std::vector;
-
+/**
+    \struct dmxFrame
+*/
 typedef struct 
 {
     uint64_t  startAt;
@@ -38,7 +40,7 @@ typedef struct
     uint32_t  len;
 }dmxFrame;
 /**
-
+    \struct ADM_psAudioSeekPoint
 */
 typedef struct
 {            
@@ -78,7 +80,29 @@ public:
                         bool      push(uint64_t at, uint64_t dts);
 
 };
+/**
+    \class ADM_psTrackDescriptor
+*/
+class ADM_psTrackDescriptor
+{
+public:
+        ADM_audioStream *stream;
+        ADM_psAccess    *access;
+        ADM_psTrackDescriptor()
+            {
+                stream=NULL;
+                access=NULL;
+            }
+        ~ADM_psTrackDescriptor()
+            {
+                if(stream) delete stream;
+                stream=NULL;
+                if(access) delete access;
+                access=NULL;
+            }
 
+
+};
 
 /**
     \Class psHeader
@@ -91,7 +115,7 @@ class psHeader         :public vidHeader
     
     bool    interlaced;
     bool    readVideo(indexFile *index);
-    bool    readAudio(indexFile *index);
+    bool    readAudio(indexFile *index,const char *name);
     bool    readIndex(indexFile *index);
     std::vector <dmxFrame *> ListOfFrames;      
     fileParser      parser;
@@ -99,6 +123,8 @@ class psHeader         :public vidHeader
     psPacketLinear *psPacket;
     uint64_t        timeConvert(uint64_t x);
     bool            updatePtsDts(void);
+protected:
+    vector <ADM_psTrackDescriptor *>listOfAudioTracks;
   public:
 
 
