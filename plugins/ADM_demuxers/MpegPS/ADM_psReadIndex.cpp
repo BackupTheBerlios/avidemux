@@ -38,12 +38,34 @@ char buffer[2000];
             if(buffer[0]=='[') return true;
             if(buffer[0]==0xa || buffer[0]==0xd) continue; // blank line
             // Now split the line
-            if(strncmp(buffer,"Video ",6))
+            if(!strncmp(buffer,"Video ",6))
             {
-                    //printf("[psDemuxer] Invalid line :%s\n",buffer);
-                    continue;
+                processVideoIndex(buffer+6);
             }
-            char *head=buffer+6;
+            if(!strncmp(buffer,"Audio ",6))
+            {
+                processAudioIndex(buffer+6);
+            }
+        }
+    return true;
+}
+/**
+    \fn processAudioIndex
+    \brief process audio seek points from a line from the index file
+*/
+bool psHeader::processAudioIndex(char *buffer)
+{
+    return true;
+
+}
+
+/**
+    \fn processVideoIndex
+    \brief process an mpeg index entry from a line from the index file
+*/
+bool psHeader::processVideoIndex(char *buffer)
+{
+            char *head=buffer;
             uint64_t pts,dts,startAt;
             uint32_t offset;
             if(4!=sscanf(head,"at:%"LLX":%"LX" Pts:%"LLD":%"LLD,&startAt,&offset,&pts,&dts))
@@ -53,7 +75,7 @@ char buffer[2000];
             }
             
             char *start=strstr(buffer," I:");
-            if(!start) continue;
+            if(!start) return true;
             start+=1;
             int count=0;
             while(1)
@@ -107,10 +129,7 @@ char buffer[2000];
                 start=next+1;
             }
 
-         
-        }
-
-    return false;
+        return true;
 }
 /**
         \fn updatePtsDts

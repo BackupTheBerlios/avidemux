@@ -75,7 +75,7 @@ uint64_t p,d,start;
     if(false==demuxer.getPacketOfType(pid,maxSize,size,&p,&d,buffer,&start)) return false;
     if(d==ADM_NO_PTS) *dts=p;
             else *dts=d;
-    return false;
+    return true;
 }
 
 

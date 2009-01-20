@@ -31,6 +31,8 @@
 #define PROBE_MIN_PACKET 5
 #define PROBE_MIN_SIZE   5000
 
+#define MP2_AUDIO_VALUE 0xC0
+
 static bool addAudioTrack(int pid, listOfPsAudioTracks *list, psPacketLinearTracker *p);
 
 /**
@@ -103,7 +105,7 @@ uint8_t audioBuffer[PROBE_ANALYZE_SIZE];
 
         //
         int masked=pid&0xF0;
-        if(masked!=0xD0 &&  // MP2
+        if(masked!=MP2_AUDIO_VALUE &&  // MP2
             masked!=0xA0 && // PCM
             masked!=0x80  // AC3 & DTS
             ) return false;
@@ -113,7 +115,9 @@ uint8_t audioBuffer[PROBE_ANALYZE_SIZE];
         p->getPacketOfType(pid,PROBE_ANALYZE_SIZE, &packetSize,&pts,&dts,audioBuffer,&startAt);
         //Realign
         p->seek(startAt,0);
-        int rd=p->read(PROBE_ANALYZE_SIZE,audioBuffer);
+        int rd=PROBE_ANALYZE_SIZE;
+        if(!p->read(PROBE_ANALYZE_SIZE,audioBuffer))
+            return false;
         psAudioTrackInfo *info=new psAudioTrackInfo;
         info->esID=pid;
         uint32_t fq,br,chan,off;
@@ -125,7 +129,7 @@ uint8_t audioBuffer[PROBE_ANALYZE_SIZE];
                             info->header.byterate=48000*4;
                             info->header.encoding=WAV_LPCM;
                             break;
-            case 0xD0: // MP2
+            case MP2_AUDIO_VALUE: // MP2
                             {
                                 info->header.encoding=WAV_MP2;
                                 MpegAudioInfo mpeg;

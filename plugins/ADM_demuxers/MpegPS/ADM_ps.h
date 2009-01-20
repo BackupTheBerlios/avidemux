@@ -117,6 +117,10 @@ class psHeader         :public vidHeader
     bool    readVideo(indexFile *index);
     bool    readAudio(indexFile *index,const char *name);
     bool    readIndex(indexFile *index);
+
+    bool    processVideoIndex(char *buffer);
+    bool    processAudioIndex(char *buffer);
+
     std::vector <dmxFrame *> ListOfFrames;      
     fileParser      parser;
     uint32_t       lastFrame;
