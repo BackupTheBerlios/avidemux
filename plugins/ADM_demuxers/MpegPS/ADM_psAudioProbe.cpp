@@ -32,9 +32,11 @@
 #define PROBE_MIN_SIZE   5000
 
 #define MP2_AUDIO_VALUE 0xC0
+#define LPCM_AUDIO_VALUE 0xA0
+#define DTS_AC3_AUDIO_VALUE 0x00
 
 static bool addAudioTrack(int pid, listOfPsAudioTracks *list, psPacketLinearTracker *p);
-
+static bool psCheckMp2Audio(WAVHeader *hdr, uint8_t *data, uint32_t dataSize);
 /**
     \fn listOfPsAudioTracks
     \brief returns a list of audio track found, null if none found
@@ -98,7 +100,7 @@ end:
 */
 bool addAudioTrack(int pid, listOfPsAudioTracks *list, psPacketLinearTracker *p)
 {
-#define PROBE_ANALYZE_SIZE 5000 // Should be enough in all cases
+#define PROBE_ANALYZE_SIZE 6000 // Should be enough in all cases (need ~ 2 blocks)
 uint8_t audioBuffer[PROBE_ANALYZE_SIZE];
         uint64_t pts,dts,startAt;
         uint32_t packetSize;
@@ -106,8 +108,8 @@ uint8_t audioBuffer[PROBE_ANALYZE_SIZE];
         //
         int masked=pid&0xF0;
         if(masked!=MP2_AUDIO_VALUE &&  // MP2
-            masked!=0xA0 && // PCM
-            masked!=0x80  // AC3 & DTS
+            masked!=LPCM_AUDIO_VALUE && // PCM
+            masked!=DTS_AC3_AUDIO_VALUE  // AC3 & DTS
             ) return false;
 
         // Go back where we were
@@ -123,7 +125,7 @@ uint8_t audioBuffer[PROBE_ANALYZE_SIZE];
         uint32_t fq,br,chan,off;
         switch(pid & 0xF0)
         {
-            case 0xA0: // LPCM
+            case LPCM_AUDIO_VALUE: // LPCM
                             info->header.frequency=48000;
                             info->header.channels=2;
                             info->header.byterate=48000*4;
@@ -131,34 +133,26 @@ uint8_t audioBuffer[PROBE_ANALYZE_SIZE];
                             break;
             case MP2_AUDIO_VALUE: // MP2
                             {
-                                info->header.encoding=WAV_MP2;
-                                MpegAudioInfo mpeg;
-                                if(!getMpegFrameInfo(audioBuffer, rd, &mpeg,NULL,&off))
+                                if(! psCheckMp2Audio(&(info->header),audioBuffer,rd))
                                 {
-                                        printf("[PsProbeAudio] Failed to get info on track :%x\n",pid);
-                                        goto er;
+                                    printf("[PsProbeAudio] Failed to get info on track :%x (MP2)\n",pid);
+                                    goto er;
                                 }
-                                info->header.frequency=mpeg.samplerate;
-                                if(mpeg.mode==3)
-                                    info->header.channels=1;
-                                else
-                                    info->header.channels=2;
-                                info->header.byterate=mpeg.bitrate>>3;
                             }
                             break;
-            case 0x80: // AC3 or DTS
-                            if(pid>=0x88) // DTS
+            case DTS_AC3_AUDIO_VALUE: // AC3 or DTS
+                            if(pid>=0x8) // DTS
                             {
                                 info->header.encoding=WAV_DTS;
                                 uint32_t flags,nbSample;
-                           //     if(!ADM_DCAGetInfo(audioBuffer, rd, &fq, &br, &chan,&off,&flags,&nbSample))
+                                if(!ADM_DCAGetInfo(audioBuffer, rd, &fq, &br, &chan,&off,&flags,&nbSample))
                                 {
                                         printf("[PsProbeAudio] Failed to get info on track :%x\n",pid);
                                         goto er;
                                 }
                                 info->header.frequency=fq;
                                 info->header.channels=chan;
-                                info->header.byterate=(br>>3);
+                                info->header.byterate=(br);
                                 break;
                             }else // AC3
                             {
@@ -170,7 +164,7 @@ uint8_t audioBuffer[PROBE_ANALYZE_SIZE];
                                 }
                                 info->header.frequency=fq;
                                 info->header.channels=chan;
-                                info->header.byterate=(br>>3);
+                                info->header.byterate=(br);
                                 break;
                             }
                             
@@ -196,6 +190,45 @@ bool DestroyListOfPsAudioTracks(listOfPsAudioTracks *list)
         list->erase(list->begin());
     }
     delete list;
+    return true;
+}
+/**
+    \fn psCheckMp2Audio
+    \brief Wait to have 2 audio packets to make sure it is not a false detection (that happens with mp2/mp3 audio)
+*/
+bool psCheckMp2Audio(WAVHeader *hdr, uint8_t *data, uint32_t dataSize)
+{
+    MpegAudioInfo mpeg,first;
+    uint32_t off2,off;
+
+    hdr->encoding=WAV_MP2;
+again:
+    if(!getMpegFrameInfo(data, dataSize, &first,NULL,&off))
+    {
+            return false;
+    }
+    if(dataSize<(off+first.size))
+    {
+        return false;
+    }
+    if(!getMpegFrameInfo(data+off+first.size, dataSize-off-first.size, &mpeg,NULL,&off2))
+    {
+            return false;
+    }
+    if(off2) // false detectio ?
+    {
+        printf("[psAudioProbe] Mp2 : False MP2 header at %"LU"\n",off);
+        if(dataSize<4) return false;
+        data+=3;
+        dataSize-=3;
+        goto again;
+    }
+    hdr->frequency=mpeg.samplerate;
+    if(mpeg.mode==3)
+        hdr->channels=1;
+    else
+        hdr->channels=2;
+    hdr->byterate=(mpeg.bitrate*1000)>>3;
     return true;
 }
 //EOF

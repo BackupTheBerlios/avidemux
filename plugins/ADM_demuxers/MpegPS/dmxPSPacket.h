@@ -79,7 +79,7 @@ public:
         bool    stillOk(void) {return !eof;};
         bool    getInfo(psPacketInfo *info);
         bool    seek(uint64_t packetStart, uint32_t offset);
-        bool    changePid(uint32_t pid) {myPid==(pid&0xff);return true;}
+        bool    changePid(uint32_t pid) ;
 };
 /**
     \class psPacketLinearTracker

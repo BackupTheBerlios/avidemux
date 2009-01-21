@@ -150,7 +150,7 @@ _again2:
                 goto _again2;
         }
         
-
+        //printf("Main Stream :%x substream :%x\n",stream,substream);
         if(stream==PRIVATE_STREAM_1) globstream=0xFF00+substream;
                 else                 globstream=stream;
 
@@ -573,6 +573,16 @@ uint32_t psPacketLinear::getConsumed(void)
     consumed=0;
     return c;
 }
+/**
+    \fn changePid
+    \brief change the pid of the stream we read (used when probing all tracks)
+*/
+bool    psPacketLinear::changePid(uint32_t pid) 
+{
+    myPid=(pid&0xff);
+    bufferLen=bufferIndex=0;
+    return true;
+}
 /* ********************************************************* */
 /**
     \fn psPacketLinearTracker
@@ -583,7 +593,7 @@ uint32_t psPacketLinear::getConsumed(void)
     for(int i=0;i<256;i++)
     {
         packetStats *p=stats+i;
-        p->lastDts=ADM_NO_PTS;
+        p->firstDts=ADM_NO_PTS;
         p->lastDts=ADM_NO_PTS;
     }
 }
